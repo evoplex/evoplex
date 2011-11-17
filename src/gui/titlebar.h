@@ -38,6 +38,8 @@ protected:
 private:
     Ui_TitleBar* m_ui;
     Experiment* m_exp;
+
+    bool isFreeToUse();
 };
 }
 

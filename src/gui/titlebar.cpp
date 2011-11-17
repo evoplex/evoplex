@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Copyright (C) 2017 - Marcos Cardinot
  * @author Marcos Cardinot <mcardinot@gmail.com>
  */
@@ -34,13 +34,7 @@ TitleBar::TitleBar(Experiment* exp, QDockWidget* parent)
     connect(m_ui->cbTrial, SIGNAL(currentIndexChanged(int)), SLOT(slotTrialChanged(int)));
 
     connect(m_ui->bSettings, &QPushButton::clicked,
-    [this]() {
-        if (m_exp->expStatus() == Experiment::READY) {
-            emit (openSettingsDlg());
-        } else {
-            QMessageBox::warning(this, "Experiment", "You should pause the experiment first.");
-        }
-    });
+            [this]() { if (isFreeToUse()) emit (openSettingsDlg()); });
 }
 
 TitleBar::~TitleBar()
@@ -57,12 +51,28 @@ void TitleBar::paintEvent(QPaintEvent* pe)
     QWidget::paintEvent(pe);
 }
 
-void TitleBar::slotTrialChanged(int trialId)
+bool TitleBar::isFreeToUse()
 {
     if (m_exp->expStatus() == Experiment::READY) {
-        emit (trialSelected(trialId));
+        return true;
+    }
+
+    QString msg;
+    if (m_exp->expStatus() == Experiment::FINISHED) {
+        msg = "This experiment has finished. Changes cannot be made at this stage.";
+    } else if (m_exp->expStatus() == Experiment::INVALID) {
+        msg = "This experiment is not valid.";
     } else {
-        QMessageBox::warning(this, "Experiment", "You should pause the experiment first.");
+        msg = "You should pause the experiment first.";
+    }
+    QMessageBox::warning(this, "Experiment", msg);
+    return false;
+}
+
+void TitleBar::slotTrialChanged(int trialId)
+{
+    if (isFreeToUse()) {
+        emit (trialSelected(trialId));
     }
 }
 
