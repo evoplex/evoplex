@@ -6,14 +6,15 @@
 #ifndef MAINAPP_H
 #define MAINAPP_H
 
-class MainApp : public QObject, public Singleton<MainApp>
+#include <QObject>
+
+class MainApp : public QObject
 {
     Q_OBJECT
 
-protected:
+public:
     MainApp();
-    virtual ~MainApp();
-    friend class Singleton<MainApp>;
+    ~MainApp();
 
 };
 

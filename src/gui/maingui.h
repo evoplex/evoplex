@@ -3,13 +3,20 @@
 
 #include <QMainWindow>
 
+namespace Ui {
+    class MainGUI;
+}
+
 class MainGUI: public QMainWindow
 {
     Q_OBJECT
 
 public:
-    explicit MainGUI(QWidget *parent = 0);
+    explicit MainGUI(QWidget* parent = 0);
     ~MainGUI();
+
+private:
+    Ui::MainGUI* ui;
 
 };
 
