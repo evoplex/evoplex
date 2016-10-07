@@ -8,7 +8,7 @@
 
 #include <QObject>
 
-class MainApp : public QObject
+class MainApp: public QObject
 {
     Q_OBJECT
 

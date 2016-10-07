@@ -1,4 +1,4 @@
-#include "mainapp.h"
+#include "core/mainapp.h"
 
 MainApp::MainApp()
 {

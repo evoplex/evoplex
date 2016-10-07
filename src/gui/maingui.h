@@ -3,6 +3,8 @@
 
 #include <QMainWindow>
 
+#include "core/mainapp.h"
+
 namespace Ui {
     class MainGUI;
 }
@@ -12,11 +14,12 @@ class MainGUI: public QMainWindow
     Q_OBJECT
 
 public:
-    explicit MainGUI(QWidget* parent = 0);
+    explicit MainGUI(MainApp& mainApp, QWidget* parent=0);
     ~MainGUI();
 
 private:
-    Ui::MainGUI* ui;
+    Ui::MainGUI* m_ui;
+    MainApp& m_mainApp;
 
 };
 

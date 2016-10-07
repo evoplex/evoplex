@@ -3,19 +3,20 @@
  * @author Marcos Cardinot <mcardinot@gmail.com>
  */
 
-#include "core/mainapp.h"
-#include "gui/maingui.h"
-
-#include <QApplication>
-#include <QCoreApplication>
-#include <QScopedPointer>
-#include <QDebug>
-
 // std stuff, used in PRNG
 #include <functional>
 #include <iostream>
 #include <random>
 #include <time.h>
+
+#include <QApplication>
+#include <QCoreApplication>
+#include <QDebug>
+#include <QScopedPointer>
+
+#include "core/mainapp.h"
+#include "gui/maingui.h"
+
 static std::mt19937 _mt_eng_; //  Mersenne Twister engine
 
 QCoreApplication* createApp(int& argc, char* argv[])
@@ -47,16 +48,17 @@ int main(int argc, char* argv[])
     qsrand(time(NULL)); // just in case... =D
 
     // init application
-    MainApp a;
+    MainApp mainApp;
 
     int result = -1;
     if (qobject_cast<QApplication*>(app.data())) {
-       // start GUI version
-       MainGUI gui;
+       // start GUI application
+       MainGUI gui(mainApp);
        gui.show();
        result = app->exec();
     } else {
-       // start non-GUI version
+       // start console application
+       // TODO: handle args
     }
 
     return result;
