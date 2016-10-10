@@ -22,15 +22,15 @@ public:
 
     // Returns the processId or 0 if something went wrong
     quint16 add(Simulation* sim);
-    QSet<quint16> add(QSet<Simulation*> sims);
+    QList<quint16> add(QList<Simulation*> sims);
 
     // Add process and tries to play
     quint16 addAndPlay(Simulation* sim);
-    QSet<quint16> addAndPlay(QSet<Simulation*> sims);
+    QList<quint16> addAndPlay(QList<Simulation*> sims);
 
     // Run simulation
     void play(quint16 id);
-    void play(QSet<quint16> ids);
+    void play(QList<quint16> ids);
 
     // Pauses simulation asap
     void pause(quint16 id);

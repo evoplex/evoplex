@@ -5,6 +5,9 @@
 
 #include "core/processes.h"
 
+#include <QFutureWatcher>
+#include <QList>
+#include <QtConcurrent/QtConcurrentRun>
 #include <QtDebug>
 
 Processes::Processes(quint8 threads)
@@ -19,7 +22,7 @@ Processes::~Processes()
 
 quint16 Processes::add(Simulation* sim)
 {
-    quint16 key = m_processes.value(sim, 0);
+    quint16 key = m_processes.key(sim, 0);
     if (key == 0) {
         key = m_processes.lastKey() + 1;
         m_processes.insert(key, sim);
@@ -27,16 +30,16 @@ quint16 Processes::add(Simulation* sim)
     return key;
 }
 
-QSet<quint16> Processes::add(QSet<Simulation*> sims)
+QList<quint16> Processes::add(QList<Simulation*> sims)
 {
-    QSet<quint16> keys;
-    quint16 key = m_processes.lastKey();
+    QList<quint16> ids;
+    quint16 id = m_processes.lastKey();
     foreach (Simulation* sim, sims) {
-        keys.append(key);
-        m_processes.insert(key, sim);
-        ++key;
+        ids.append(id);
+        m_processes.insert(id, sim);
+        ++id;
     }
-    return keys;
+    return ids;
 }
 
 quint16 Processes::addAndPlay(Simulation* sim)
@@ -46,9 +49,9 @@ quint16 Processes::addAndPlay(Simulation* sim)
     return key;
 }
 
-QSet<quint16> Processes::addAndPlay(QSet<Simulation*> sims)
+QList<quint16> Processes::addAndPlay(QList<Simulation*> sims)
 {
-   QSet<quint16> keys = add(sims);
+   QList<quint16> keys = add(sims);
    play(keys);
    return keys;
 }
@@ -67,16 +70,16 @@ void Processes::play(quint16 id)
         m_runningProcesses.append(id);
 
         QFutureWatcher<quint16> watcher;
-        connect(&m_watcher, SIGNAL(finished()), this, SLOT(threadFinished()));
-        m_watcher.setFuture(QtConcurrent::run(this, &Processes::runThread(), id));
+        connect(&watcher, SIGNAL(finished()), this, SLOT(threadFinished()));
+        watcher.setFuture(QtConcurrent::run(this, &Processes::runThread, id));
 
-        m_queuedProcesses.remove(id);
+        m_queuedProcesses.removeAt(id);
     } else {
         m_queuedProcesses.append(id);
     }
 }
 
-void Processes::play(QSet<quint16> ids)
+void Processes::play(QList<quint16> ids)
 {
     foreach (quint16 id, ids) {
         play(id);
@@ -125,9 +128,9 @@ quint16 Processes::runThread(quint16 id)
 // watcher
 void Processes::threadFinished()
 {
-    QFutureWatcher<quint16> w = reinterpret_cast<QFutureWatcher<quint16> >(sender());
+    QFutureWatcher<quint16>* w = reinterpret_cast<QFutureWatcher<quint16>*>(sender());
     quint16 id = w->result();
-    m_runningProcesses.remove(id);
+    m_runningProcesses.removeAt(id);
 
     // marked to kill?
     if (m_processesToKill.contains(id)) {
@@ -167,11 +170,11 @@ void Processes::kill(quint16 id)
     if (m_runningProcesses.contains(id)) {
         m_processesToKill.append(id);
     } else {
-        m_processesToKill.remove(id);
+        m_processesToKill.removeAt(id);
         delete m_processes.take(id);
         emit (killed(id));
     }
-    m_queuedProcesses.remove(id); // just in case...
+    m_queuedProcesses.removeAt(id); // just in case...
 }
 
 void Processes::killAll()
