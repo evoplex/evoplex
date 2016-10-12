@@ -1,7 +1,12 @@
+/**
+ * Copyright (C) 2016 - Marcos Cardinot
+ * @author Marcos Cardinot <mcardinot@gmail.com>
+ */
+
 #include "core/simulation.h"
 
-Simulation::Simulation(const quint16& processId, const QVariantMap& params)
-    : m_processId(processId)
+Simulation::Simulation(IModel *model)
+    : m_model(model)
     , m_status(INVALID)
     , m_currentStep(0)
     , m_pauseAt(0)
@@ -11,6 +16,8 @@ Simulation::Simulation(const quint16& processId, const QVariantMap& params)
 
 Simulation::~Simulation()
 {
+    delete m_model;
+    m_model = NULL;
 }
 
 
@@ -23,7 +30,7 @@ void Simulation::processSteps()
     m_status = RUNNING;
 
     while (m_currentStep <= m_pauseAt) {
-        algorithmStep();
+        m_model->algorithmStep();
         ++m_currentStep;
     }
 

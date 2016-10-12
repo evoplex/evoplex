@@ -9,12 +9,14 @@
 #include <QObject>
 #include <QVariantMap>
 
+#include "core/interfaces.h"
+
 class Simulation: public QObject
 {
     Q_OBJECT
 
 public:
-    Simulation(const quint16& processId, const QVariantMap& params);
+    Simulation(IModel* model);
     virtual ~Simulation();
 
     // This method will run in a worker thread until it reaches the max
@@ -29,9 +31,6 @@ public:
 
     quint64 getCurrentStep() { return m_currentStep; }
 
-protected:
-    const quint32 m_processId;
-
 private:
     enum SimulationStatus {
         INVALID,    // model was not loaded correctly
@@ -41,6 +40,7 @@ private:
         FINISHED    // completely finished
     };
 
+    IModel* m_model;
     SimulationStatus m_status;
     quint64 m_currentStep;
     quint64 m_pauseAt;      // use 0 to infinite
@@ -49,11 +49,6 @@ private:
     // Finishes this simulation.
     // Any IO operation will be called from here.
     void finish();
-
-    // This method must be implemented by the metaheuristic and
-    // have to contain all the logic to perform a single step.
-    virtual void algorithmStep() = 0;
-
 };
 
 #endif // SIMULATION_H
