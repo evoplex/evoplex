@@ -3,15 +3,15 @@
  * @author Marcos Cardinot <mcardinot@gmail.com>
  */
 
-#include "core/processes.h"
-
 #include <QFutureWatcher>
 #include <QList>
 #include <QtConcurrent/QtConcurrentRun>
 #include <QtDebug>
 
-Processes::Processes(quint8 threads)
-    : m_threads(threads)
+#include "core/processes.h"
+
+Processes::Processes()
+    : m_threads(QThread::idealThreadCount())
 {
 }
 

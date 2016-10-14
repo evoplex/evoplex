@@ -17,7 +17,7 @@ class Processes: public QObject
     Q_OBJECT
 
 public:
-    explicit Processes(quint8 threads);
+    explicit Processes();
     ~Processes();
 
     // Returns the processId or 0 if something went wrong
@@ -60,7 +60,7 @@ signals:
     void killed(quint16 id);
 
 private:
-    quint8 m_threads;
+    int m_threads;
     QList<quint16> m_runningProcesses;
     QList<quint16> m_queuedProcesses;
     QList<quint16> m_processesToKill;
