@@ -19,9 +19,9 @@ Project::~Project()
 {
 }
 
-Simulation* Project::newSimulation(Graph* graph, QList<QMetaProperty> params)
+void Project::newExperiment(Graph* graph, QVariantMap params)
 {
     IModel* mi = m_model->factory->create();
     mi->init(graph, params);
-    return new Simulation(mi);
+    m_experiments.append(new Simulation(mi));
 }
