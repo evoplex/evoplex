@@ -71,6 +71,15 @@ WidgetProject::WidgetProject(Project* project, QWidget *parent)
 
 WidgetProject::~WidgetProject()
 {
+    delete m_treeGraphType;
+    m_treeGraphType = NULL;
+    delete m_treeInitialPop;
+    m_treeInitialPop = NULL;
+    delete m_treeSeed;
+    m_treeSeed = NULL;
+    delete m_treeStopAt;
+    m_treeStopAt = NULL;
+    qDeleteAll(m_treeModelParams);
     delete m_ui;
     m_ui = NULL;
 }
