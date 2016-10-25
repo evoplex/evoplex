@@ -18,3 +18,6 @@ FIND_PACKAGE(Qt5Widgets REQUIRED)
 
 # Compile source
 ADD_SUBDIRECTORY(src)
+
+# default models
+ADD_SUBDIRECTORY(models)
