@@ -1,7 +1,7 @@
 #### UTILS ####
-SET(evoplex_util
-    util/singleton.h
-    util/util.h
+SET(evoplex_utils
+    utils/singleton.h
+    utils/utils.h
 )
 
 #### GUI ####
@@ -40,7 +40,7 @@ SET(evoplex_core_src
 #INSTALL(FILES core/interfaces.h DESTINATION core/interfaces)
 
 #### link src, gui and qt ####
-ADD_LIBRARY(evoplex_lib SHARED ${evoplex_core_src} ${evoplex_gui} ${evoplex_util})
+ADD_LIBRARY(evoplex_lib SHARED ${evoplex_core_src} ${evoplex_gui} ${evoplex_utils})
 TARGET_LINK_LIBRARIES(evoplex_lib Qt5::Core Qt5::Widgets)
 
 #### EXECUTABLE ####
