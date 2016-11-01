@@ -6,11 +6,30 @@
 #ifndef INTERFACES_H
 #define INTERFACES_H
 
-#include <QList>
-#include <QMetaProperty>
+#include <QObject>
+#include <QVariantHash>
 #include <QtPlugin>
 
-#include "graph.h"
+class Graph;
+
+class IAgent
+{
+public:
+    inline const QVariantHash getProperties() {
+        return m_properties;
+    }
+
+    inline const QVariant getProperty(const QString& name) {
+        return m_properties.value(name);
+    }
+
+    inline void setProperty(const QString& name, const QVariant& value) {
+        m_properties.insert(name, value);
+    }
+
+private:
+    QVariantHash m_properties;
+};
 
 class IModel: public QObject
 {
@@ -20,11 +39,33 @@ public:
 
     // this method is called before the actuall simulation and
     // is mainly used to set the environment (initial population)
-    virtual void init(Graph* graph, QVariantMap params) = 0;
+    virtual void init(Graph* graph, const QVariantHash& params) = 0;
 
     // Implements the metaheuristic.
     // That is, it has to contain all the logic to perform ONE step.
     virtual void algorithmStep() = 0;
+
+    // return a QVariantHash with all parameters used to define an agent.
+    // use {} to define a set of possible things. eg, {0,1} zero and one
+    // use [] to define a continuous interval. eg., [0,1] zero to one (including)
+    virtual QVariantHash agentParamsDomain() = 0;
+
+    // return a new IAgent with default parameters
+    virtual IAgent* newDefaultAgent() = 0;
+
+    // return a QVariantHash with all parameters used to define the model.
+    virtual QVariantHash defaultModelParams() = 0;
+
+    // return a QVariantHash with all things which can be inspected over time.
+    virtual QVariantHash defaultInspectorParams() = 0;
+
+    // return the current status of all parameters
+    // it might be a bit slow -- be careful!
+    virtual QVariantHash getModelParams() = 0;
+
+    // return the current status of all things that can be inspected over time.
+    // it might be a bit slow -- be careful!
+    virtual QVariantHash getInspectorParams() = 0;
 };
 
 class IModelFactory
