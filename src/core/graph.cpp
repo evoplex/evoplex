@@ -6,8 +6,8 @@
 #include <QtDebug>
 #include <QtMath>
 
-#include "graph.h"
-#include "util/util.h"
+#include "core/graph.h"
+#include "utils/utils.h"
 
 Graph::Graph(QVector<IAgent*> agents, GraphType type)
     : m_valid(false)
@@ -37,11 +37,6 @@ Graph::Graph(QVector<IAgent*> agents, GraphType type)
     }
 
     m_valid = true;
-}
-
-Graph::Graph(QString path, GraphType type)
-{
-    // TODO: build from csv
 }
 
 Graph::Graph(Graph* g)
@@ -87,7 +82,7 @@ void Graph::buildMooreGrid()
 Graph::Neighbours Graph::calcMooreNeighborhood(const int id) const
 {
     int row, col;
-    Util::ind2sub(id, m_width, row, col);
+    Utils::ind2sub(id, m_width, row, col);
     int nbs[8][2];
     // nw
     nbs[0][0] = row - 1;
@@ -129,7 +124,7 @@ Graph::Neighbours Graph::calcMooreNeighborhood(const int id) const
             nbs[i][1] = 0;
         }
 
-        Neighbour neighbour = m_agents.at(Util::getLinearIdx(nbs[i][0], nbs[i][1], m_width));
+        Neighbour neighbour = m_agents.at(Utils::getLinearIdx(nbs[i][0], nbs[i][1], m_width));
         Q_ASSERT(neighbour != NULL); // must exist
         neighbours.append(neighbour);
     }
@@ -140,7 +135,7 @@ Graph::Neighbours Graph::calcMooreNeighborhood(const int id) const
 Graph::Neighbours Graph::calcSquareNeighborhood(const int id) const
 {
     int row, col;
-    Util::ind2sub(id, m_width, row, col);
+    Utils::ind2sub(id, m_width, row, col);
     int nbs[4][2];
     //n
     nbs[0][0] = row - 1;
@@ -170,7 +165,7 @@ Graph::Neighbours Graph::calcSquareNeighborhood(const int id) const
             nbs[i][1] = 0;
         }
 
-        Neighbour neighbour = m_agents.at(Util::getLinearIdx(nbs[i][0], nbs[i][1], m_width));
+        Neighbour neighbour = m_agents.at(Utils::getLinearIdx(nbs[i][0], nbs[i][1], m_width));
         Q_ASSERT(neighbour != NULL); // must exist
         neighbours.append(neighbour);
     }

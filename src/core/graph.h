@@ -10,29 +10,7 @@
 #include <QObject>
 #include <QVector>
 
-class IAgent
-{
-};
-
-class AgentGT: public IAgent
-{
-public:
-    AgentGT(int strategy): IAgent(), m_strategy(strategy) {}
-    inline int getStrategy() { return m_strategy; }
-    inline void setStrategy(int s) { m_strategy = s; }
-private:
-    int m_strategy;
-};
-
-class AgentHOPD: public AgentGT
-{
-public:
-    AgentHOPD(int strategy, double probToA): AgentGT(strategy), m_probToA(probToA) {}
-    inline double getProbToA() { return m_probToA; }
-    inline void setProbToA(double p) { m_probToA = p; }
-private:
-    double m_probToA;
-};
+class IAgent;
 
 class Graph: public QObject
 {
@@ -47,7 +25,6 @@ public:
         MOORE_GRID
     };
 
-    Graph(QString path, GraphType type);
     Graph(QVector<IAgent*> agents, GraphType type);
     Graph(Graph *g);
     virtual ~Graph();
