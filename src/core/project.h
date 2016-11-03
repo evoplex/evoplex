@@ -7,7 +7,9 @@
 #define PROJECT_H
 
 #include <QObject>
+#include <QVariantHash>
 
+#include "core/interfaces.h"
 #include "core/graph.h"
 #include "core/mainapp.h"
 #include "core/simulation.h"
@@ -22,7 +24,9 @@ public:
 
     virtual ~Project();
 
-    void newExperiment(Graph* graph, QVariantMap params);
+    QVector<IAgent*> getAgentsFromFile(QString path);
+
+    void newExperiment(Graph* graph, const QVariantHash &params);
     inline const QList<Simulation*> getExperiments() { return m_experiments; }
 
     inline const QString& getName() { return m_name; }
