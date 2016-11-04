@@ -53,12 +53,6 @@ public:
     // return a new IAgent with default parameters
     virtual IAgent* newDefaultAgent() = 0;
 
-    // return a QVariantHash with all parameters used to define the model.
-    virtual QVariantHash defaultModelParams() = 0;
-
-    // return a QVariantHash with all things which can be inspected over time.
-    virtual QVariantHash defaultInspectorParams() = 0;
-
     // return the current status of all parameters
     // it might be a bit slow -- be careful!
     virtual QVariantHash getModelParams() = 0;

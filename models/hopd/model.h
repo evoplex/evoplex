@@ -6,9 +6,8 @@
 #ifndef HOPD_H
 #define HOPD_H
 
-#include <QList>
-#include <QMetaProperty>
 #include <QObject>
+#include <QVariantHash>
 
 #include "../src/core/graph.h"
 #include "../src/core/interfaces.h"
@@ -18,18 +17,19 @@ class Model: public IModel
     Q_OBJECT
     Q_INTERFACES(IModel)
 
-    // we have to define all parameters used by the model
-    // anything that you define here will be displayed.
-    Q_PROPERTY(double b MEMBER m_b)
-    Q_PROPERTY(double l MEMBER m_l)
-
 public:
     Model();
     ~Model();
 
-    void init(Graph* graph, QVariantMap params);
+    void init(Graph* graph, const QVariantHash& modelParams);
 
     void algorithmStep();
+
+    QVariantHash agentParamsDomain();
+    IAgent* newDefaultAgent();
+
+    QVariantHash getModelParams();
+    QVariantHash getInspectorParams();
 
 private:
     Graph* m_graph;
