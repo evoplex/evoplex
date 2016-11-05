@@ -3,8 +3,8 @@
  * @author Marcos Cardinot <mcardinot@gmail.com>
  */
 
-#ifndef PROCESSES_H
-#define PROCESSES_H
+#ifndef PROCESSESMGR_H
+#define PROCESSESMGR_H
 
 #include <QList>
 #include <QMap>
@@ -12,13 +12,13 @@
 
 #include "core/simulation.h"
 
-class Processes: public QObject
+class ProcessesMgr: public QObject
 {
     Q_OBJECT
 
 public:
-    explicit Processes();
-    ~Processes();
+    explicit ProcessesMgr();
+    ~ProcessesMgr();
 
     // Returns the processId or 0 if something went wrong
     quint16 add(Simulation* sim);
@@ -74,4 +74,4 @@ private:
     void threadFinished();
 };
 
-#endif // PROCESSES_H
+#endif // PROCESSESMGR_H
