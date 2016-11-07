@@ -29,8 +29,8 @@ SET(evoplex_core_src
 
     core/graph.cpp
     core/graph.h
-    core/processes.cpp
-    core/processes.h
+    core/processesmgr.cpp
+    core/processesmgr.h
     core/project.cpp
     core/project.h
     core/simulation.cpp

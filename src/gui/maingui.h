@@ -15,7 +15,7 @@ class MainGUI: public QMainWindow
     Q_OBJECT
 
 public:
-    explicit MainGUI(MainApp& mainApp, QWidget* parent=0);
+    explicit MainGUI(MainApp* mainApp, QWidget* parent=0);
     ~MainGUI();
 
 public slots:
@@ -23,7 +23,7 @@ public slots:
 
 private:
     Ui::MainGUI* m_ui;
-    MainApp& m_mainApp;
+    MainApp* m_mainApp;
     WizardNewProject* m_wizardNewProject;
 
 };

@@ -4,7 +4,7 @@
 #include "gui/wizardnewproject.h"
 #include "ui_maingui.h"
 
-MainGUI::MainGUI(MainApp& mainApp, QWidget* parent)
+MainGUI::MainGUI(MainApp* mainApp, QWidget* parent)
     : QMainWindow(parent)
     , m_ui(new Ui::MainGUI)
     , m_mainApp(mainApp)

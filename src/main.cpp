@@ -53,7 +53,7 @@ int main(int argc, char* argv[])
     int result = -1;
     if (qobject_cast<QApplication*>(app.data())) {
        // start GUI application
-       MainGUI gui(mainApp);
+       MainGUI gui(&mainApp);
        gui.show();
        result = app->exec();
     } else {

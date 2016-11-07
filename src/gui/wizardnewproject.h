@@ -14,7 +14,7 @@ class WizardNewProject : public QWizard
     Q_OBJECT
 
 public:
-    explicit WizardNewProject(MainApp& mainApp, QWidget* parent = 0);
+    explicit WizardNewProject(MainApp* mainApp, QWidget* parent = 0);
     ~WizardNewProject();
 
     virtual bool validateCurrentPage();
@@ -30,7 +30,7 @@ private slots:
 
 private:
     Ui::WizardNewProject* m_ui;
-    MainApp& m_mainApp;
+    MainApp* m_mainApp;
 
     void updateModels();
 };

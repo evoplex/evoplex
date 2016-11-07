@@ -7,7 +7,7 @@
 #include "gui/wizardnewproject.h"
 #include "ui_wizardnewproject.h"
 
-WizardNewProject::WizardNewProject(MainApp& mainApp, QWidget* parent)
+WizardNewProject::WizardNewProject(MainApp* mainApp, QWidget* parent)
     : QWizard(parent)
     , m_ui(new Ui::WizardNewProject)
     , m_mainApp(mainApp)
@@ -35,7 +35,7 @@ void WizardNewProject::slotBrowseModel()
                 this, tr("Load Model"), QDir::homePath(),
                 tr("Evoplex Model (*.so)"));
 
-    if (!path.isEmpty() && m_mainApp.loadModel(path).isEmpty()) {
+    if (!path.isEmpty() && m_mainApp->loadModel(path).isEmpty()) {
         QMessageBox::critical(this, tr("Load Model"), tr("Unable to load the selected model!"));
         return;
     }
@@ -53,12 +53,12 @@ void WizardNewProject::slotBrowseProjectDir()
 void WizardNewProject::slotModelSelected()
 {
     QString name = m_ui->modelList->currentIndex().data().toString();
-    m_ui->modelDescr->setText(m_mainApp.getModel(name)->description);
+    m_ui->modelDescr->setText(m_mainApp->getModel(name)->description);
 }
 
 void WizardNewProject::updateModels()
 {
-    QList<MainApp::Model*> models = m_mainApp.getModels();
+    QList<MainApp::Model*> models = m_mainApp->getModels();
     foreach (MainApp::Model* m, models) {
         m_ui->modelList->addItem(m->name);
     }
@@ -92,6 +92,6 @@ void WizardNewProject::done(int result)
     QString pname = m_ui->projectName->text();
     QString pdescr = m_ui->projectDescr->toPlainText();
     QString pdir = m_ui->projectPath->text();
-    Project* project = m_mainApp.newProject(mname, pname, pdescr, pdir);
+    Project* project = m_mainApp->newProject(mname, pname, pdescr, pdir);
     emit (newProject(project));
 }
