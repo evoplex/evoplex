@@ -15,8 +15,9 @@ Model::~Model()
     m_graph = NULL;
 }
 
-void Model::init(Graph* graph, const QVariantHash& modelParams)
+bool Model::init(Graph* graph, const QVariantHash& modelParams)
 {
+    return true;
 }
 
 void Model::algorithmStep()

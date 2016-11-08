@@ -21,7 +21,7 @@ public:
     Model();
     ~Model();
 
-    void init(Graph* graph, const QVariantHash& modelParams);
+    bool init(Graph* graph, const QVariantHash& modelParams);
 
     void algorithmStep();
 

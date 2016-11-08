@@ -39,7 +39,7 @@ public:
 
     // this method is called before the actuall simulation and
     // is mainly used to set the environment (initial population)
-    virtual void init(Graph* graph, const QVariantHash& params) = 0;
+    virtual bool init(Graph* graph, const QVariantHash& params) = 0;
 
     // Implements the metaheuristic.
     // That is, it has to contain all the logic to perform ONE step.
