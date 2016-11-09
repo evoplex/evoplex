@@ -20,20 +20,20 @@ ProcessesMgr::~ProcessesMgr()
     killAll();
 }
 
-quint16 ProcessesMgr::add(Simulation* sim)
+int ProcessesMgr::add(Simulation* sim)
 {
-    quint16 key = m_processes.key(sim, 0);
-    if (key == 0) {
-        key = m_processes.lastKey() + 1;
+    int key = m_processes.key(sim, -1);
+    if (key == -1) {
+        key = m_processes.isEmpty() ? 0 : m_processes.lastKey() + 1;
         m_processes.insert(key, sim);
     }
     return key;
 }
 
-QList<quint16> ProcessesMgr::add(QList<Simulation*> sims)
+QList<int> ProcessesMgr::add(QList<Simulation*> sims)
 {
-    QList<quint16> ids;
-    quint16 id = m_processes.lastKey();
+    QList<int> ids;
+    int id = m_processes.lastKey();
     foreach (Simulation* sim, sims) {
         ids.append(id);
         m_processes.insert(id, sim);
@@ -42,21 +42,21 @@ QList<quint16> ProcessesMgr::add(QList<Simulation*> sims)
     return ids;
 }
 
-quint16 ProcessesMgr::addAndPlay(Simulation* sim)
+int ProcessesMgr::addAndPlay(Simulation* sim)
 {
-    quint16 key = add(sim);
+    int key = add(sim);
     play(key);
     return key;
 }
 
-QList<quint16> ProcessesMgr::addAndPlay(QList<Simulation*> sims)
+QList<int> ProcessesMgr::addAndPlay(QList<Simulation*> sims)
 {
-   QList<quint16> keys = add(sims);
+   QList<int> keys = add(sims);
    play(keys);
    return keys;
 }
 
-void ProcessesMgr::play(quint16 id)
+void ProcessesMgr::play(int id)
 {
     if (m_runningProcesses.contains(id)
             && m_queuedProcesses.contains(id)) {
@@ -69,9 +69,9 @@ void ProcessesMgr::play(quint16 id)
     if (m_runningProcesses.size() < m_threads) {
         m_runningProcesses.append(id);
 
-        QFutureWatcher<quint16> watcher;
-        connect(&watcher, SIGNAL(finished()), this, SLOT(threadFinished()));
-        watcher.setFuture(QtConcurrent::run(this, &ProcessesMgr::runThread, id));
+        QFutureWatcher<int>* watcher = new QFutureWatcher<int>(this);
+        connect(watcher, SIGNAL(finished()), this, SLOT(threadFinished()));
+        watcher->setFuture(QtConcurrent::run(this, &ProcessesMgr::runThread, id));
 
         m_queuedProcesses.removeAt(id);
     } else {
@@ -79,14 +79,14 @@ void ProcessesMgr::play(quint16 id)
     }
 }
 
-void ProcessesMgr::play(QList<quint16> ids)
+void ProcessesMgr::play(QList<int> ids)
 {
-    foreach (quint16 id, ids) {
+    foreach (int id, ids) {
         play(id);
     }
 }
 
-void ProcessesMgr::pause(quint16 id)
+void ProcessesMgr::pause(int id)
 {
     if (!m_runningProcesses.contains(id) || !m_processes.contains(id)) {
         return;
@@ -94,7 +94,7 @@ void ProcessesMgr::pause(quint16 id)
     m_processes.value(id)->pause();
 }
 
-void ProcessesMgr::pauseAt(quint16 id, quint64 step)
+void ProcessesMgr::pauseAt(int id, quint64 step)
 {
     if (!m_runningProcesses.contains(id) || !m_processes.contains(id)) {
         return;
@@ -102,7 +102,7 @@ void ProcessesMgr::pauseAt(quint16 id, quint64 step)
     m_processes.value(id)->pauseAt(step);
 }
 
-void ProcessesMgr::stop(quint16 id)
+void ProcessesMgr::stop(int id)
 {
     if (!m_runningProcesses.contains(id) || !m_processes.contains(id)) {
         return;
@@ -110,7 +110,7 @@ void ProcessesMgr::stop(quint16 id)
     m_processes.value(id)->stop();
 }
 
-void ProcessesMgr::stopAt(quint16 id, quint64 step)
+void ProcessesMgr::stopAt(int id, quint64 step)
 {
     if (!m_runningProcesses.contains(id) || !m_processes.contains(id)) {
         return;
@@ -118,7 +118,7 @@ void ProcessesMgr::stopAt(quint16 id, quint64 step)
     m_processes.value(id)->stopAt(step);
 }
 
-quint16 ProcessesMgr::runThread(quint16 id)
+int ProcessesMgr::runThread(int id)
 {
     Simulation* sim = m_processes.value(id);
     sim->processSteps();
@@ -128,8 +128,8 @@ quint16 ProcessesMgr::runThread(quint16 id)
 // watcher
 void ProcessesMgr::threadFinished()
 {
-    QFutureWatcher<quint16>* w = reinterpret_cast<QFutureWatcher<quint16>*>(sender());
-    quint16 id = w->result();
+    QFutureWatcher<int>* w = reinterpret_cast<QFutureWatcher<int>*>(sender());
+    int id = w->result();
     m_runningProcesses.removeAt(id);
 
     // marked to kill?
@@ -138,34 +138,36 @@ void ProcessesMgr::threadFinished()
     }
 
     // call next process in the queue
-    play(m_queuedProcesses.first());
+    if (!m_queuedProcesses.isEmpty()) {
+        play(m_queuedProcesses.first());
+    }
 }
 
-void ProcessesMgr::setNumThreads(quint8 threads)
+void ProcessesMgr::setNumThreads(int threads)
 {
     if (m_threads == threads) {
         return;
     }
 
     const int p = qAbs(threads - m_threads);
-    quint8 old = m_threads;
+    int old = m_threads;
     m_threads = threads;
 
     if (threads > old) {
         for (int i = 0; i < p && !m_queuedProcesses.isEmpty(); ++i) {
-            quint16 id = m_queuedProcesses.takeFirst();
+            int id = m_queuedProcesses.takeFirst();
             play(id);
         }
     } else if (threads < old) {
         for (int i = 0; i < p && !m_runningProcesses.isEmpty(); ++i) {
-            quint16 id = m_runningProcesses.takeFirst();
+            int id = m_runningProcesses.takeFirst();
             pause(id);
             m_queuedProcesses.push_front(id);
         }
     }
 }
 
-void ProcessesMgr::kill(quint16 id)
+void ProcessesMgr::kill(int id)
 {
     if (m_runningProcesses.contains(id)) {
         m_processesToKill.append(id);
@@ -179,8 +181,8 @@ void ProcessesMgr::kill(quint16 id)
 
 void ProcessesMgr::killAll()
 {
-    QList<quint16> ids = m_processes.keys();
-    foreach (quint16 id, ids) {
+    QList<int> ids = m_processes.keys();
+    foreach (int id, ids) {
         kill(id);
     }
 }

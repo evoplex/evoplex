@@ -21,57 +21,58 @@ public:
     ~ProcessesMgr();
 
     // Returns the processId or 0 if something went wrong
-    quint16 add(Simulation* sim);
-    QList<quint16> add(QList<Simulation*> sims);
+    int add(Simulation* sim);
+    QList<int> add(QList<Simulation*> sims);
 
     // Add process and tries to play
-    quint16 addAndPlay(Simulation* sim);
-    QList<quint16> addAndPlay(QList<Simulation*> sims);
+    int addAndPlay(Simulation* sim);
+    QList<int> addAndPlay(QList<Simulation*> sims);
 
     // Run simulation
-    void play(quint16 id);
-    void play(QList<quint16> ids);
+    void play(int id);
+    void play(QList<int> ids);
 
     // Pauses simulation asap
-    void pause(quint16 id);
+    void pause(int id);
 
     // Pauses simulation at specific step.
     // If current step is already greater than stepToPause, it'll pause asap.
-    void pauseAt(quint16 id, quint64 stepToPause);
+    void pauseAt(int id, quint64 stepToPause);
 
     // Stops simulation asap
-    void stop(quint16 id);
+    void stop(int id);
 
     // Stops simulation at specific step.
     // If current step is already greater than stepToPause, it'll pause asap.
-    void stopAt(quint16 id, quint64 stepToStop);
+    void stopAt(int id, quint64 stepToStop);
 
     // Kill process
-    void kill(quint16 id);
+    void kill(int id);
 
     // Kill all processes
     void killAll();
 
     // as we are changing the number of threads available,
     // we have to walk through all the processes
-    void setNumThreads(quint8 threads);
+    void setNumThreads(int threads);
 
 signals:
-    void killed(quint16 id);
+    void killed(int id);
 
-private:
-    int m_threads;
-    QList<quint16> m_runningProcesses;
-    QList<quint16> m_queuedProcesses;
-    QList<quint16> m_processesToKill;
-    QMap<quint16, Simulation*> m_processes;
-
-    // method called by a QtConcurrent::run()
-    quint16 runThread(quint16 id);
-
+public slots:
     // watcher
     // trigged when a process ends
     void threadFinished();
+
+private:
+    int m_threads;
+    QList<int> m_runningProcesses;
+    QList<int> m_queuedProcesses;
+    QList<int> m_processesToKill;
+    QMap<int, Simulation*> m_processes;
+
+    // method called by a QtConcurrent::run()
+    int runThread(int id);
 };
 
 #endif // PROCESSESMGR_H
