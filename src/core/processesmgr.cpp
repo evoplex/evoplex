@@ -131,6 +131,7 @@ void ProcessesMgr::threadFinished()
     QFutureWatcher<int>* w = reinterpret_cast<QFutureWatcher<int>*>(sender());
     int id = w->result();
     m_runningProcesses.removeAt(id);
+    delete w;
 
     // marked to kill?
     if (m_processesToKill.contains(id)) {

@@ -14,8 +14,9 @@ Graph::Graph(QVector<IAgent*> agents, GraphType type)
     , m_type(type)
 {
     const double width = qSqrt(agents.size());
-    if (width == std::floor(width)) {
-        qWarning() << "[Graph] sqrt of population should be integer!";
+    if (width != std::floor(width)) {
+        qWarning() << "[Graph] sqrt of population ("
+                   << width << ") should be integer!";
         return;
     }
 
