@@ -23,7 +23,7 @@ public:
 
     bool init(Graph* graph, const QVariantHash& modelParams);
 
-    void algorithmStep();
+    bool algorithmStep();
 
     QVariantHash agentParamsDomain();
     IAgent* newDefaultAgent();

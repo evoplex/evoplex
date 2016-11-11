@@ -43,7 +43,8 @@ public:
 
     // Implements the metaheuristic.
     // That is, it has to contain all the logic to perform ONE step.
-    virtual void algorithmStep() = 0;
+    // If return is false, simulation will stop asap.
+    virtual bool algorithmStep() = 0;
 
     // return a QVariantHash with all parameters used to define an agent.
     // use {} to define a set of possible things. eg, {0,1} zero and one

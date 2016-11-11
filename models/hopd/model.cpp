@@ -20,9 +20,10 @@ bool Model::init(Graph* graph, const QVariantHash& modelParams)
     return true;
 }
 
-void Model::algorithmStep()
+bool Model::algorithmStep()
 {
     qDebug() << "HOPD";
+    return true;
 }
 
 IAgent* Model::newDefaultAgent()
