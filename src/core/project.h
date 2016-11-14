@@ -19,14 +19,19 @@ class Project: public QObject
     Q_OBJECT
 
 public:
-    Project(const MainApp& mainapp, MainApp::Model* model,
+    Project(MainApp *mainapp, MainApp::Model* model,
             const QString& name, const QString& descr="", const QString& dir="");
 
     virtual ~Project();
 
     QVector<IAgent*> getAgentsFromFile(QString path);
 
-    void newExperiment(Graph* graph, const QVariantHash &params);
+    // return processId
+    int runExperiment(const int id);
+
+    // return experimentId
+    int newExperiment(Graph* graph, const QVariantHash &params);
+
     inline const QList<Simulation*> getExperiments() { return m_experiments; }
 
     inline const QString& getName() { return m_name; }
@@ -34,7 +39,7 @@ public:
     inline MainApp::Model* getModel() { return m_model; }
 
 private:
-    const MainApp& m_mainApp;
+    MainApp* m_mainApp;
     MainApp::Model* m_model;
     QString m_name;
     QString m_description;

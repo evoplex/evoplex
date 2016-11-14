@@ -5,12 +5,13 @@
 
 #include <QFile>
 #include <QTextStream>
+#include <QVector>
 #include <QtDebug>
 
 #include "core/project.h"
 #include "utils/utils.h"
 
-Project::Project(const MainApp& mainapp, MainApp::Model *model,
+Project::Project(MainApp* mainapp, MainApp::Model *model,
         const QString& name, const QString& descr, const QString& dir)
     : m_mainApp(mainapp)
     , m_model(model)
@@ -24,11 +25,25 @@ Project::~Project()
 {
 }
 
-void Project::newExperiment(Graph* graph, const QVariantHash& params)
+int Project::runExperiment(const int id)
+{
+    if (id < 0 || id >= m_experiments.size()) {
+        return -1;
+    }
+    return m_mainApp->getProcessesMgr()->addAndPlay(m_experiments.at(id));
+}
+
+int Project::newExperiment(Graph* graph, const QVariantHash& params)
 {
     IModel* mi = m_model->factory->create();
-    mi->init(graph, params);
-    m_experiments.append(new Simulation(mi));
+    Simulation* sim = new Simulation(mi, params.value("stopAt", -1).toInt());
+    if (!mi->init(graph, params) || !sim->isValid()) {
+        delete mi;
+        delete sim;
+        return -1;
+    }
+    m_experiments.append(sim);
+    return m_experiments.size() - 1;
 }
 
 QVector<IAgent*> Project::getAgentsFromFile(QString filePath)
