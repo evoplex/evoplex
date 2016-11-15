@@ -37,9 +37,9 @@ public:
     // provide the destructor to keep compilers happy.
     virtual ~IModel() {}
 
-    // this method is called before the actuall simulation and
-    // is mainly used to set the environment (initial population)
-    virtual bool init(Graph* graph, const QVariantHash& params) = 0;
+    // this method is called before the actual simulation and
+    // is mainly used to set the environment and parameters
+    virtual bool init(Graph* graph, const QVariantHash& modelParams) = 0;
 
     // Implements the metaheuristic.
     // That is, it has to contain all the logic to perform ONE step.
