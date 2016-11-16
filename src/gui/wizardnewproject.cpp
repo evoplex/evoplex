@@ -1,3 +1,8 @@
+/**
+ * Copyright (C) 2016 - Marcos Cardinot
+ * @author Marcos Cardinot <mcardinot@gmail.com>
+ */
+
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QtDebug>

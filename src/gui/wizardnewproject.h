@@ -1,3 +1,8 @@
+/**
+ * Copyright (C) 2016 - Marcos Cardinot
+ * @author Marcos Cardinot <mcardinot@gmail.com>
+ */
+
 #ifndef WIZARDNEWPROJECT_H
 #define WIZARDNEWPROJECT_H
 
