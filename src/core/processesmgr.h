@@ -28,26 +28,26 @@ public:
     int addAndPlay(Simulation* sim);
     QList<int> addAndPlay(QList<Simulation*> sims);
 
-    // Run simulation
-    void play(int id);
-    void play(QList<int> ids);
+    // Run process
+    void play(int processId);
+    void play(QList<int> processIds);
 
-    // Pauses simulation asap
-    void pause(int id);
+    // Pauses process asap
+    void pause(int processId);
 
-    // Pauses simulation at specific step.
+    // Pauses process at specific step.
     // If current step is already greater than stepToPause, it'll pause asap.
-    void pauseAt(int id, quint64 stepToPause);
+    void pauseAt(int processId, quint64 stepToPause);
 
-    // Stops simulation asap
-    void stop(int id);
+    // Stops process asap
+    void stop(int processId);
 
-    // Stops simulation at specific step.
+    // Stops process at specific step.
     // If current step is already greater than stepToPause, it'll pause asap.
-    void stopAt(int id, quint64 stepToStop);
+    void stopAt(int processId, quint64 stepToStop);
 
     // Kill process
-    void kill(int id);
+    void kill(int processId);
 
     // Kill all processes
     void killAll();
@@ -56,7 +56,10 @@ public:
     // we have to walk through all the processes
     void setNumThreads(int threads);
 
+    inline Simulation* getProcess(int id) { return m_processes.value(id); }
+
 signals:
+    void newProcess(int id);
     void killed(int id);
 
 public slots:

@@ -22,100 +22,104 @@ ProcessesMgr::~ProcessesMgr()
 
 int ProcessesMgr::add(Simulation* sim)
 {
-    int key = m_processes.key(sim, -1);
-    if (key == -1) {
-        key = m_processes.isEmpty() ? 0 : m_processes.lastKey() + 1;
-        m_processes.insert(key, sim);
+    int processId = m_processes.key(sim, -1);
+    if (processId == -1) {
+        processId = m_processes.isEmpty() ? 0 : m_processes.lastKey() + 1;
+        m_processes.insert(processId, sim);
+        sim->setProcessId(processId);
     }
-    return key;
+    emit (newProcess(processId));
+    return processId;
 }
 
 QList<int> ProcessesMgr::add(QList<Simulation*> sims)
 {
-    QList<int> ids;
+    QList<int> processIds;
     int id = m_processes.lastKey();
     foreach (Simulation* sim, sims) {
-        ids.append(id);
+        processIds.append(id);
         m_processes.insert(id, sim);
+        sim->setProcessId(id);
+        emit (newProcess(id));
         ++id;
     }
-    return ids;
+    return processIds;
 }
 
 int ProcessesMgr::addAndPlay(Simulation* sim)
 {
-    int key = add(sim);
-    play(key);
-    return key;
+    int id = add(sim);
+    play(id);
+    return id;
 }
 
 QList<int> ProcessesMgr::addAndPlay(QList<Simulation*> sims)
 {
-   QList<int> keys = add(sims);
-   play(keys);
-   return keys;
+   QList<int> processIds = add(sims);
+   play(processIds);
+   return processIds;
 }
 
-void ProcessesMgr::play(int id)
+void ProcessesMgr::play(int processId)
 {
-    if (m_runningProcesses.contains(id)
-            && m_queuedProcesses.contains(id)) {
+    if (m_runningProcesses.contains(processId)
+            && m_queuedProcesses.contains(processId)) {
         return;
-    } else if (!m_processes.contains(id)) {
-        qWarning() << "[Processes] tried to play an nonexistent process:" << id;
+    } else if (!m_processes.contains(processId)) {
+        qWarning() << "[Processes] tried to play an nonexistent process:" << processId;
         return;
     }
 
     if (m_runningProcesses.size() < m_threads) {
-        m_runningProcesses.append(id);
+        m_runningProcesses.append(processId);
 
         QFutureWatcher<int>* watcher = new QFutureWatcher<int>(this);
         connect(watcher, SIGNAL(finished()), this, SLOT(threadFinished()));
-        watcher->setFuture(QtConcurrent::run(this, &ProcessesMgr::runThread, id));
+        watcher->setFuture(QtConcurrent::run(this, &ProcessesMgr::runThread, processId));
 
-        m_queuedProcesses.removeAt(id);
+        m_queuedProcesses.removeAt(processId);
     } else {
-        m_queuedProcesses.append(id);
+        m_queuedProcesses.append(processId);
     }
 }
 
-void ProcessesMgr::play(QList<int> ids)
+void ProcessesMgr::play(QList<int> processIds)
 {
-    foreach (int id, ids) {
+    foreach (int id, processIds) {
         play(id);
     }
 }
 
-void ProcessesMgr::pause(int id)
+void ProcessesMgr::pause(int processId)
 {
-    if (!m_runningProcesses.contains(id) || !m_processes.contains(id)) {
+    if (!m_runningProcesses.contains(processId) || !m_processes.contains(processId)) {
         return;
     }
-    m_processes.value(id)->pause();
+    m_processes.value(processId)->pause();
 }
 
-void ProcessesMgr::pauseAt(int id, quint64 step)
+void ProcessesMgr::pauseAt(int processId, quint64 step)
 {
-    if (!m_runningProcesses.contains(id) || !m_processes.contains(id)) {
+    if (!m_runningProcesses.contains(processId) || !m_processes.contains(processId)) {
         return;
     }
-    m_processes.value(id)->pauseAt(step);
+    m_processes.value(processId)->pauseAt(step);
 }
 
-void ProcessesMgr::stop(int id)
+void ProcessesMgr::stop(int processId)
 {
-    if (!m_runningProcesses.contains(id) || !m_processes.contains(id)) {
+    if (!m_runningProcesses.contains(processId) || !m_processes.contains(processId)) {
         return;
     }
-    m_processes.value(id)->stop();
+    m_processes.value(processId)->stop();
 }
 
-void ProcessesMgr::stopAt(int id, quint64 step)
+void ProcessesMgr::stopAt(int processId, quint64 step)
 {
-    if (!m_runningProcesses.contains(id) || !m_processes.contains(id)) {
+    if (!m_runningProcesses.contains(processId) || !m_processes.contains(processId)) {
         return;
     }
-    m_processes.value(id)->stopAt(step);
+    m_processes.value(processId)->stopAt(step);
 }
 
 int ProcessesMgr::runThread(int id)
