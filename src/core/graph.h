@@ -22,14 +22,16 @@ public:
 
     enum GraphType {
         SQUARE_GRID,
-        MOORE_GRID
+        MOORE_GRID,
+        ERROR
     };
 
-    Graph(QVector<IAgent*> agents, GraphType type);
+    Graph(QVector<IAgent*> agents, GraphType type);  
+    Graph(QVector<IAgent*> agents, QString type): Graph(agents, graphTypeFromString(type)) {}
     Graph(Graph *g);
     virtual ~Graph();
 
-    inline const bool getIsValid() { return m_valid; }
+    inline const bool isValid() { return m_valid; }
     inline const GraphType getGraphType() { return m_type; }
     inline const int getWidth() { return m_width; }
     inline const int getHeight() { return m_height; }
@@ -46,6 +48,8 @@ private:
     int m_height;
     QVector<IAgent*> m_agents;
     QVector<Neighbours> m_neighbours; // each agentId maps to a set of neighbours
+
+    GraphType graphTypeFromString(QString type) const;
 
     void buildSquareGrid();
     void buildMooreGrid();

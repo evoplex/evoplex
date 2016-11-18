@@ -51,6 +51,14 @@ Graph::~Graph()
     m_agents.clear();
 }
 
+Graph::GraphType Graph::graphTypeFromString(QString type) const
+{
+    if (type == "mooreGrid") return MOORE_GRID;
+    if (type == "squareGrid") return SQUARE_GRID;
+
+    return ERROR;
+}
+
 void Graph::buildSquareGrid()
 {
     const int popSize = m_agents.size();
