@@ -19,33 +19,38 @@ class Project: public QObject
     Q_OBJECT
 
 public:
-    Project(MainApp *mainapp, MainApp::Model* model,
-            const QString& name, const QString& descr="", const QString& dir="");
+    Project(MainApp *mainApp, int projId, int modelId, const QString& name,
+            const QString& descr="", const QString& dir="");
 
     virtual ~Project();
 
-    QVector<IAgent*> getAgentsFromFile(QString path);
+    QVector<IAgent*> getAgentsFromFile(const QString& path);
 
     // return processId
-    int runExperiment(const int id);
+    int runExperiment(const int expId);
 
-    // return experimentId
-    int newExperiment(Graph* graph, const QVariantHash &params);
+    Simulation* newExperiment(const QVariantHash& generalParams, const QVariantHash& modelParams);
 
-    inline const QList<Simulation*> getExperiments() { return m_experiments; }
+    QList<Simulation*> importExperiments(const QString& filePath, QVariantHash &generalParams, QVariantHash &modelParams);
 
+    QVariantHash getGeneralParams(int eId);
+    QVariantHash getModelParams(int eId);
+
+    inline const Simulation* getExperiment(int eId) { return m_experiments.value(eId); }
     inline const QString& getName() { return m_name; }
     inline const QString& getDir() { return m_dir; }
     inline MainApp::Model* getModel() { return m_model; }
 
 private:
     MainApp* m_mainApp;
+    const int m_projId;
+    const int m_modelId;
     MainApp::Model* m_model;
     QString m_name;
     QString m_description;
     QString m_dir;
 
-    QList<Simulation*> m_experiments;
+    QHash<int, Simulation*> m_experiments;
 };
 
 #endif // PROJECT_H
