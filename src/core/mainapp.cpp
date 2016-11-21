@@ -13,27 +13,27 @@
 MainApp::MainApp()
     : m_processesMgr(new ProcessesMgr())
 {
+    m_generalProperties << GENERAL_PROPERTY_NAME_AGENTS
+                        << GENERAL_PROPERTY_NAME_GRAPHTYPE
+                        << GENERAL_PROPERTY_NAME_SEED
+                        << GENERAL_PROPERTY_NAME_STOPAT;
 }
 
 MainApp::~MainApp()
 {
-    foreach (Project* p, m_openedProjects) {
-        delete p;
-        p = NULL;
-    }
-    m_openedProjects.clear();
-
+    qDeleteAll(m_models);
+    qDeleteAll(m_projects);
     delete m_processesMgr;
     m_processesMgr = NULL;
 }
 
-QString MainApp::loadModel(QString path)
+int MainApp::loadModel(QString path)
 {
     QPluginLoader loader(path);
     QObject* obj = loader.instance();
     if (!obj) {
         qWarning() << "[MainApp] unable to load the model" << path;
-        return QString();
+        return -1;
     }
 
     Model* model = new Model();
@@ -43,7 +43,7 @@ QString MainApp::loadModel(QString path)
     model->author = model->factory->author();
     if (model->name.isEmpty()) {
         qWarning() << "[MainApp] unable to load the model. Name cannot be empty" << path;
-        return QString();
+        return -1;
     }
 
     IModel* mi = model->factory->create();
@@ -52,14 +52,15 @@ QString MainApp::loadModel(QString path)
     model->agentParamsDomain = mi->agentParamsDomain();
     delete mi;
 
-    m_models.insert(model->name, model);
-    return model->name;
+    int modelId = m_models.size();
+    m_models.insert(modelId, model);
+    return modelId;
 }
 
-Project* MainApp::newProject(const QString& modelName, const QString& name,
-        const QString& descr, const QString& dir)
+int MainApp::newProject(int modelId, const QString& name,
+                        const QString& descr, const QString& dir)
 {
-    Project* p = new Project(this, m_models.value(modelName), name, descr, dir);
-    m_openedProjects.append(p);
-    return p;
+    int projId = m_projects.size();
+    m_projects.insert(projId, new Project(this, projId, modelId, name, descr, dir));
+    return projId;
 }
