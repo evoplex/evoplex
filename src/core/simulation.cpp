@@ -5,21 +5,25 @@
 
 #include <QtDebug>
 
-#include "core/mainapp.h"
 #include "core/simulation.h"
+#include "core/mainapp.h"
+#include "core/project.h"
 
-Simulation::Simulation(int eId, IModel *model, const QVariantHash& generalParams)
-    : m_model(model)
+Simulation::Simulation(int expId, int projId, int modelId, IModel* modelObj, const QVariantHash& generalParams)
+    : m_experimentId(expId)
+    , m_projectId(projId)
+    , m_modelId(modelId)
+    , m_processId(-1)
+    , m_modelObj(modelObj)
     , m_status(INVALID)
     , m_currentStep(0)
-    , m_experimentId(eId)
-    , m_processId(-1)
 {
-    m_stopAt = generalParams.value(GENERAL_PROPERTY_NAME_STOPAT).toInt();
+    bool ok;
+    m_stopAt = generalParams.value(GENERAL_PROPERTY_NAME_STOPAT).toInt(&ok);
     m_pauseAt = m_stopAt;
 
-    if (m_stopAt < 0 || m_stopAt > MAX_STEP) {
-        QString msg = QString("[Simulation] unable to load the simulation."
+    if (!ok || m_stopAt < 0 || m_stopAt > MAX_STEP) {
+        QString msg = QString("[Simulation]: unable to load the simulation."
                               "stopAt=%1 is invalid!").arg(m_stopAt);
         qWarning() << msg;
         return;
@@ -30,10 +34,9 @@ Simulation::Simulation(int eId, IModel *model, const QVariantHash& generalParams
 
 Simulation::~Simulation()
 {
-    delete m_model;
-    m_model = NULL;
+    delete m_modelObj;
+    m_modelObj = NULL;
 }
-
 
 void Simulation::processSteps()
 {
@@ -44,7 +47,7 @@ void Simulation::processSteps()
     m_status = RUNNING;
     emit (statusChanged(m_experimentId, m_processId, m_status));
 
-    while (m_currentStep <= m_pauseAt && m_model->algorithmStep()) {
+    while (m_currentStep <= m_pauseAt && m_modelObj->algorithmStep()) {
         ++m_currentStep;
     }
 
