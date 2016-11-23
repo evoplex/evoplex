@@ -1,3 +1,8 @@
+/**
+ * Copyright (C) 2016 - Marcos Cardinot
+ * @author Marcos Cardinot <mcardinot@gmail.com>
+ */
+
 #ifndef MAINGUI_H
 #define MAINGUI_H
 
@@ -5,6 +10,12 @@
 
 #include "core/mainapp.h"
 #include "gui/wizardnewproject.h"
+
+#define STRING_EXPERIMENT_ID "expId"
+#define STRING_PROCESS_ID "procId"
+#define STRING_PROCESS_STATUS "status"
+#define STRING_MODEL_NAME "model"
+#define STRING_PROJECT_NAME "project"
 
 namespace Ui {
     class MainGUI;
@@ -18,14 +29,18 @@ public:
     explicit MainGUI(MainApp* mainApp, QWidget* parent=0);
     ~MainGUI();
 
+    void addProject(int projId);
+
 public slots:
-    void addProject(Project* project);
+    void slotAddProcess(int processId);
+    void slotStatusChanged(int experimentId, int processId, int newStatus);
 
 private:
     Ui::MainGUI* m_ui;
     MainApp* m_mainApp;
     WizardNewProject* m_wizardNewProject;
 
+    QHash<QString, int> m_tableHeader; // map column name to column index
 };
 
 #endif // MAINGUI_H
