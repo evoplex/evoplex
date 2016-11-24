@@ -8,15 +8,14 @@
 #include <QMessageBox>
 #include <QtDebug>
 
-#include "widgetproject.h"
+#include "gui/maingui.h"
+#include "gui/widgetproject.h"
 #include "ui_widgetproject.h"
 
 WidgetProject::WidgetProject(Project* project, QWidget *parent)
     : QWidget(parent)
     , m_ui(new Ui::WidgetProject)
     , m_project(project)
-    , STRING_EXPERIMENT_ID("eid")
-    , STRING_EXPERIMENT_STATUS("status")
 {
     m_ui->setupUi(this);
 
@@ -25,6 +24,8 @@ WidgetProject::WidgetProject(Project* project, QWidget *parent)
     connect(m_ui->bImport, SIGNAL(clicked(bool)), this, SLOT(slotImport()));
     connect(m_ui->bRunAll, SIGNAL(clicked(bool)), this, SLOT(slotRunAll()));
     connect(m_ui->bRunSelected, SIGNAL(clicked(bool)), this, SLOT(slotRunSelected()));
+
+    const QString treeFieldStyle = "*{background-color: rgba(0,0,0,0);}";
 
     //
     // simulation settings
@@ -37,6 +38,9 @@ WidgetProject::WidgetProject(Project* project, QWidget *parent)
     item->setText(0, GENERAL_PROPERTY_NAME_SEED);
     m_treeSeed = new QSpinBox();
     m_treeSeed->setMaximum(100000000);
+    m_treeSeed->setFrame(false);
+    m_treeSeed->setStyleSheet(treeFieldStyle);
+    m_treeSeed->setButtonSymbols(QAbstractSpinBox::NoButtons);
     m_ui->treeSettings->setItemWidget(item, 1, m_treeSeed);
 
     item =new QTreeWidgetItem(general);
@@ -44,6 +48,9 @@ WidgetProject::WidgetProject(Project* project, QWidget *parent)
     m_treeStopAt = new QSpinBox();
     m_treeStopAt->setMaximum(100000000);
     m_treeStopAt->setValue(10000);
+    m_treeStopAt->setFrame(false);
+    m_treeStopAt->setStyleSheet(treeFieldStyle);
+    m_treeStopAt->setButtonSymbols(QAbstractSpinBox::NoButtons);
     m_ui->treeSettings->setItemWidget(item, 1, m_treeStopAt);
 
     //
@@ -55,6 +62,8 @@ WidgetProject::WidgetProject(Project* project, QWidget *parent)
     item =new QTreeWidgetItem(env);
     item->setText(0, GENERAL_PROPERTY_NAME_AGENTS);
     m_treeAgents = new QLineEdit(m_project->getDir());
+    m_treeAgents->setFrame(false);
+    m_treeAgents->setStyleSheet(treeFieldStyle);
     m_ui->treeSettings->setItemWidget(item, 1, m_treeAgents);
 
     item =new QTreeWidgetItem(env);
@@ -62,6 +71,7 @@ WidgetProject::WidgetProject(Project* project, QWidget *parent)
     m_treeGraphType = new QComboBox();
     m_treeGraphType->insertItem(0, "Square Grid (k=4)", "squareGrid");
     m_treeGraphType->insertItem(1, "Moore Grid (k=8)", "mooreGrid");
+    m_treeGraphType->setFrame(false);
     m_ui->treeSettings->setItemWidget(item, 1, m_treeGraphType);
 
     //
@@ -80,20 +90,28 @@ WidgetProject::WidgetProject(Project* project, QWidget *parent)
         QDoubleSpinBox* box = new QDoubleSpinBox();
         box->setDecimals(4);
         box->setValue(propertyValue.toDouble());
+        box->setFrame(false);
+        box->setButtonSymbols(QAbstractSpinBox::NoButtons);
+        box->setStyleSheet(treeFieldStyle);
         m_treeModelParams.insert(propertyName, box);
         m_ui->treeSettings->setItemWidget(item, 1, box);
     }
 
     //
+    // setup tree widget
+    //
+    m_ui->treeSettings->expandAll();
+
+    //
     // setup table of experiments
     //
     QStringList tableHeader;
-    tableHeader << STRING_EXPERIMENT_STATUS
-                << STRING_EXPERIMENT_ID
+    tableHeader << STRING_EXPERIMENT_ID
                 << GENERAL_PROPERTY_NAME_SEED
                 << GENERAL_PROPERTY_NAME_STOPAT
                 << GENERAL_PROPERTY_NAME_AGENTS
-                << m_project->getModel()->defaultModelParams.keys();
+                << m_project->getModel()->defaultModelParams.keys()
+                << STRING_PROCESS_STATUS;
 
     m_ui->tableExperiments->setColumnCount(tableHeader.size());
     m_ui->tableExperiments->setHorizontalHeaderLabels(tableHeader);
@@ -120,7 +138,7 @@ WidgetProject::~WidgetProject()
 void WidgetProject::insertRow(Simulation* sim, QVariantHash generalParams, QVariantHash modelParams)
 {
     generalParams.insert(STRING_EXPERIMENT_ID, sim->getExperimentId());
-    generalParams.insert(STRING_EXPERIMENT_STATUS, sim->getStatus());
+    generalParams.insert(STRING_PROCESS_STATUS, sim->getStatus());
 
     int row = m_ui->tableExperiments->rowCount();
     m_ui->tableExperiments->insertRow(row);
@@ -147,7 +165,7 @@ void WidgetProject::slotStatusChanged(int experimentId, int processId, int newSt
     }
 
     // set the status
-    int colStatus = m_tableHeader.value(STRING_EXPERIMENT_STATUS);
+    int colStatus = m_tableHeader.value(STRING_PROCESS_STATUS);
     m_ui->tableExperiments->item(r.first().row(), colStatus)->setText(QString::number(newStatus));
 }
 

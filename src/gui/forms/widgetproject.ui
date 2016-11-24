@@ -29,7 +29,7 @@
         <bool>true</bool>
        </property>
        <property name="selectionMode">
-        <enum>QAbstractItemView::MultiSelection</enum>
+        <enum>QAbstractItemView::ExtendedSelection</enum>
        </property>
        <property name="selectionBehavior">
         <enum>QAbstractItemView::SelectRows</enum>
@@ -128,6 +128,9 @@
        </property>
        <property name="indentation">
         <number>8</number>
+       </property>
+       <property name="animated">
+        <bool>true</bool>
        </property>
        <property name="columnCount">
         <number>2</number>

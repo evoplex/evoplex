@@ -40,8 +40,6 @@ private:
     Ui::WidgetProject* m_ui;
     Project* m_project;
 
-    const QString STRING_EXPERIMENT_ID;
-    const QString STRING_EXPERIMENT_STATUS;
     QHash<QString, int> m_tableHeader; // map column name to column index
 
     // general properties
