@@ -40,7 +40,7 @@ void WizardNewProject::slotBrowseModel()
                 this, tr("Load Model"), QDir::homePath(),
                 tr("Evoplex Model (*.so)"));
 
-    if (!path.isEmpty() && m_mainApp->loadModel(path).isEmpty()) {
+    if (!path.isEmpty() && m_mainApp->loadModel(path) == -1) {
         QMessageBox::critical(this, tr("Load Model"), tr("Unable to load the selected model!"));
         return;
     }
@@ -57,15 +57,18 @@ void WizardNewProject::slotBrowseProjectDir()
 
 void WizardNewProject::slotModelSelected()
 {
-    QString name = m_ui->modelList->currentIndex().data().toString();
-    m_ui->modelDescr->setText(m_mainApp->getModel(name)->description);
+    int modelId = m_ui->modelList->currentIndex().data(Qt::UserRole).toInt();
+    m_ui->modelDescr->setText(m_mainApp->getModel(modelId)->description);
 }
 
 void WizardNewProject::updateModels()
 {
-    QList<MainApp::Model*> models = m_mainApp->getModels();
-    foreach (MainApp::Model* m, models) {
-        m_ui->modelList->addItem(m->name);
+    QHashIterator<int, MainApp::Model*> i(m_mainApp->getModels());
+    while (i.hasNext()) {
+        i.next();
+        QListWidgetItem* item = new QListWidgetItem(i.value()->name);
+        item->setData(Qt::UserRole, i.key());
+        m_ui->modelList->addItem(item);
     }
     m_ui->modelList->setCurrentRow(0);
 }
@@ -93,10 +96,11 @@ void WizardNewProject::done(int result)
         return;
     }
 
-    QString mname = m_ui->modelList->currentIndex().data().toString();
+    int modelId = m_ui->modelList->currentIndex().data(Qt::UserRole).toInt();
     QString pname = m_ui->projectName->text();
     QString pdescr = m_ui->projectDescr->toPlainText();
     QString pdir = m_ui->projectPath->text();
-    Project* project = m_mainApp->newProject(mname, pname, pdescr, pdir);
-    emit (newProject(project));
+
+    int projId = m_mainApp->newProject(modelId, pname, pdescr, pdir);
+    qobject_cast<MainGUI*>(parentWidget())->addProject(projId);
 }

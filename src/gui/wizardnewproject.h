@@ -25,9 +25,6 @@ public:
     virtual bool validateCurrentPage();
     virtual void done(int result);
 
-signals:
-    void newProject(Project*);
-
 private slots:
     void slotBrowseModel();
     void slotBrowseProjectDir();
