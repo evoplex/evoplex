@@ -13,6 +13,7 @@
 #include <QCoreApplication>
 #include <QDebug>
 #include <QScopedPointer>
+#include <QStyleFactory>
 
 #include "core/mainapp.h"
 #include "gui/maingui.h"
@@ -31,7 +32,7 @@ QCoreApplication* createApp(int& argc, char* argv[])
 
 int main(int argc, char* argv[])
 {
-    QScopedPointer<QCoreApplication> app(createApp(argc, argv));
+    QScopedPointer<QCoreApplication> coreApp(createApp(argc, argv));
 
     qDebug() <<" *************************************************\n"
              << "* Copyright (C) 2016 - Marcos Cardinot          *\n"
@@ -51,14 +52,16 @@ int main(int argc, char* argv[])
     MainApp mainApp;
 
     int result = -1;
-    if (qobject_cast<QApplication*>(app.data())) {
-       // start GUI application
-       MainGUI gui(&mainApp);
-       gui.show();
-       result = app->exec();
+    QApplication* app = qobject_cast<QApplication*>(coreApp.data());
+    if (app) {
+        // start GUI application
+        app->setStyle(QStyleFactory::create("Fusion"));
+        MainGUI gui(&mainApp);
+        gui.show();
+        result = app->exec();
     } else {
-       // start console application
-       // TODO: handle args
+        // start console application
+        // TODO: handle args
     }
 
     return result;
