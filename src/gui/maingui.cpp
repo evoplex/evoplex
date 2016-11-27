@@ -29,13 +29,11 @@ MainGUI::MainGUI(MainApp* mainApp, QWidget* parent)
                 << STRING_PROJECT_NAME
                 << STRING_EXPERIMENT_ID
                 << STRING_PROCESS_STATUS;
-
     m_ui->tableProcesses->setColumnCount(tableHeader.size());
     m_ui->tableProcesses->setHorizontalHeaderLabels(tableHeader);
     for (int col = 0; col < tableHeader.size(); ++col) {
         m_tableHeader.insert(tableHeader.at(col), col);
     }
-
 }
 
 MainGUI::~MainGUI()
@@ -73,8 +71,11 @@ void MainGUI::slotAddProcess(int processId)
                                   new QTableWidgetItem(p->getName()));
     m_ui->tableProcesses->setItem(row, m_tableHeader.value(STRING_EXPERIMENT_ID),
                                   new QTableWidgetItem(QString::number(s->getExperimentId())));
-    m_ui->tableProcesses->setItem(row, m_tableHeader.value(STRING_PROCESS_STATUS),
-                                  new QTableWidgetItem(QString::number(s->getStatus())));
+
+    QTableWidgetItem* status = new QTableWidgetItem();
+    status->setData(Qt::DisplayRole, statusToString(s->getStatus()));
+    status->setData(Qt::UserRole, s->getStatus());
+    m_ui->tableProcesses->setItem(row, m_tableHeader.value(STRING_PROCESS_STATUS), status);
 }
 
 void MainGUI::slotStatusChanged(int experimentId, int processId, int newStatus)
@@ -92,5 +93,17 @@ void MainGUI::slotStatusChanged(int experimentId, int processId, int newStatus)
 
     // set the status
     int colStatus = m_tableHeader.value(STRING_PROCESS_STATUS);
-    m_ui->tableProcesses->item(r.first().row(), colStatus)->setText(QString::number(newStatus));
+    QTableWidgetItem* s = m_ui->tableProcesses->item(r.first().row(), colStatus);
+    s->setText(statusToString((Simulation::Status) newStatus));
+    s->setData(Qt::UserRole, newStatus);
+}
+
+const QString MainGUI::statusToString(Simulation::Status status) const
+{
+    if (status == Simulation::INVALID) return "Invalid";
+    if (status == Simulation::READY) return "Idle";
+    if (status == Simulation::RUNNING) return "Running";
+    if (status == Simulation::FINISHING) return "Finishing";
+    if (status == Simulation::FINISHED) return "Finished";
+    return "Error!";
 }

@@ -51,12 +51,18 @@ Graph::~Graph()
     m_agents.clear();
 }
 
-Graph::GraphType Graph::graphTypeFromString(QString type) const
+Graph::GraphType Graph::graphTypeFromString(QString type)
 {
     if (type == "mooreGrid") return MOORE_GRID;
     if (type == "squareGrid") return SQUARE_GRID;
-
     return ERROR;
+}
+
+QString Graph::graphTypeToString(GraphType type)
+{
+    if (type == MOORE_GRID) return "mooreGrid";
+    if (type == SQUARE_GRID) return "squareGrid";
+    return "";
 }
 
 void Graph::buildSquareGrid()

@@ -31,6 +31,8 @@ public:
 
     void addProject(int projId);
 
+    const QString statusToString(Simulation::Status status) const;
+
 public slots:
     void slotAddProcess(int processId);
     void slotStatusChanged(int experimentId, int processId, int newStatus);

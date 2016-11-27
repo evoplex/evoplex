@@ -69,8 +69,10 @@ WidgetProject::WidgetProject(Project* project, QWidget *parent)
     item =new QTreeWidgetItem(env);
     item->setText(0, GENERAL_PROPERTY_NAME_GRAPHTYPE);
     m_treeGraphType = new QComboBox();
-    m_treeGraphType->insertItem(0, "Square Grid (k=4)", "squareGrid");
-    m_treeGraphType->insertItem(1, "Moore Grid (k=8)", "mooreGrid");
+    m_treeGraphType->insertItem(0, "Square Grid (k=4)",
+            Graph::graphTypeToString(Graph::SQUARE_GRID));
+    m_treeGraphType->insertItem(1, "Moore Grid (k=8)",
+            Graph::graphTypeToString(Graph::MOORE_GRID));
     m_treeGraphType->setFrame(false);
     m_ui->treeSettings->setItemWidget(item, 1, m_treeGraphType);
 
@@ -166,7 +168,9 @@ void WidgetProject::slotStatusChanged(int experimentId, int processId, int newSt
 
     // set the status
     int colStatus = m_tableHeader.value(STRING_PROCESS_STATUS);
-    m_ui->tableExperiments->item(r.first().row(), colStatus)->setText(QString::number(newStatus));
+    QTableWidgetItem* s = m_ui->tableExperiments->item(r.first().row(), colStatus);
+    s->setText(qobject_cast<MainGUI*>(parentWidget())->statusToString((Simulation::Status) newStatus));
+    s->setData(Qt::UserRole, newStatus);
 }
 
 int WidgetProject::slotAdd()

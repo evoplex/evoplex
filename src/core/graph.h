@@ -25,6 +25,8 @@ public:
         MOORE_GRID,
         ERROR
     };
+    static GraphType graphTypeFromString(QString type);
+    static QString graphTypeToString(GraphType type);
 
     Graph(QVector<IAgent*> agents, GraphType type);  
     Graph(QVector<IAgent*> agents, QString type): Graph(agents, graphTypeFromString(type)) {}
@@ -48,8 +50,6 @@ private:
     int m_height;
     QVector<IAgent*> m_agents;
     QVector<Neighbours> m_neighbours; // each agentId maps to a set of neighbours
-
-    GraphType graphTypeFromString(QString type) const;
 
     void buildSquareGrid();
     void buildMooreGrid();
