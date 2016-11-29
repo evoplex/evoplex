@@ -8,6 +8,8 @@ SET(evoplex_utils
 SET(evoplex_gui_src
     gui/maingui.cpp
     gui/maingui.h
+    gui/contextmenutable.cpp
+    gui/contextmenutable.h
     gui/widgetproject.cpp
     gui/widgetproject.h
     gui/wizardnewproject.cpp
