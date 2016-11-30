@@ -63,7 +63,7 @@ QList<int> ProcessesMgr::addAndPlay(QList<Simulation*> sims)
 void ProcessesMgr::play(int processId)
 {
     if (m_runningProcesses.contains(processId)
-            && m_queuedProcesses.contains(processId)) {
+            || m_queuedProcesses.contains(processId)) {
         return;
     } else if (!m_processes.contains(processId)) {
         qWarning() << "[Processes] tried to play an nonexistent process:" << processId;
@@ -100,7 +100,7 @@ void ProcessesMgr::pause(int processId)
 
 void ProcessesMgr::pauseAt(int processId, quint64 step)
 {
-    if (!m_runningProcesses.contains(processId) || !m_processes.contains(processId)) {
+    if (!m_processes.contains(processId)) {
         return;
     }
     m_processes.value(processId)->pauseAt(step);
@@ -108,15 +108,18 @@ void ProcessesMgr::pauseAt(int processId, quint64 step)
 
 void ProcessesMgr::stop(int processId)
 {
-    if (!m_runningProcesses.contains(processId) || !m_processes.contains(processId)) {
+    if (!m_processes.contains(processId)) {
         return;
     }
     m_processes.value(processId)->stop();
+    // make sure it is/will play
+    // so, we know that this STOP order will be processed
+    play(processId);
 }
 
 void ProcessesMgr::stopAt(int processId, quint64 step)
 {
-    if (!m_runningProcesses.contains(processId) || !m_processes.contains(processId)) {
+    if (!m_processes.contains(processId)) {
         return;
     }
     m_processes.value(processId)->stopAt(step);
@@ -133,13 +136,13 @@ int ProcessesMgr::runThread(int id)
 void ProcessesMgr::threadFinished()
 {
     QFutureWatcher<int>* w = reinterpret_cast<QFutureWatcher<int>*>(sender());
-    int id = w->result();
-    m_runningProcesses.removeAt(id);
+    int processId = w->result();
+    m_runningProcesses.removeOne(processId);
     delete w;
 
     // marked to kill?
-    if (m_processesToKill.contains(id)) {
-        kill(id);
+    if (m_processesToKill.contains(processId)) {
+        kill(processId);
     }
 
     // call next process in the queue

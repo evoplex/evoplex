@@ -56,7 +56,7 @@ public:
     // we have to walk through all the processes
     void setNumThreads(int threads);
 
-    inline Simulation* getProcess(int id) { return m_processes.value(id); }
+    inline Simulation* getProcess(int id) { return m_processes.value(id, NULL); }
 
 signals:
     void newProcess(int id);
