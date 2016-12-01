@@ -37,7 +37,7 @@ WidgetProject::WidgetProject(Project* project, QWidget *parent)
     item = new QTreeWidgetItem(general);
     item->setText(0, GENERAL_PROPERTY_NAME_SEED);
     m_treeSeed = new QSpinBox();
-    m_treeSeed->setMaximum(100000000);
+    m_treeSeed->setMaximum(MAX_STEP);
     m_treeSeed->setFrame(false);
     m_treeSeed->setStyleSheet(treeFieldStyle);
     m_treeSeed->setButtonSymbols(QAbstractSpinBox::NoButtons);
@@ -46,7 +46,7 @@ WidgetProject::WidgetProject(Project* project, QWidget *parent)
     item =new QTreeWidgetItem(general);
     item->setText(0, GENERAL_PROPERTY_NAME_STOPAT);
     m_treeStopAt = new QSpinBox();
-    m_treeStopAt->setMaximum(100000000);
+    m_treeStopAt->setMaximum(MAX_STEP);
     m_treeStopAt->setValue(10000);
     m_treeStopAt->setFrame(false);
     m_treeStopAt->setStyleSheet(treeFieldStyle);
