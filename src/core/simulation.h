@@ -42,6 +42,8 @@ public:
     inline bool isValid() { return m_status != INVALID; }
     inline quint64 getCurrentStep() { return m_currentStep; }
     inline Status getStatus() { return m_status; }
+    inline int getPauseAt() { return m_pauseAt; }
+    inline int getStopAt() { return m_stopAt; }
 
     inline int getExperimentId() { return m_experimentId; }
     inline int getProjectId() { return m_projectId; }

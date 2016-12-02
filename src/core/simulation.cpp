@@ -47,15 +47,18 @@ void Simulation::processSteps()
     m_status = RUNNING;
     emit (statusChanged(m_experimentId, m_processId, m_status));
 
-    while (m_currentStep <= m_pauseAt && m_modelObj->algorithmStep()) {
+    bool algorithmConverged = false;
+    while (m_currentStep <= m_pauseAt && !algorithmConverged) {
+        algorithmConverged = m_modelObj->algorithmStep();
         ++m_currentStep;
     }
 
-    if (m_currentStep >= m_stopAt) {
+    if (m_currentStep >= m_stopAt || algorithmConverged) {
         m_status = FINISHING;
         finish();
         m_status = FINISHED;
     } else {
+        m_pauseAt = m_stopAt; // reset the pauseAt flag to maximum
         m_status = READY;
     }
     emit (statusChanged(m_experimentId, m_processId, m_status));
