@@ -25,8 +25,6 @@ Project::Project(MainApp* mainApp, int projId, int modelId, const QString& name,
 
 Project::~Project()
 {
-    delete m_model;
-    m_model = NULL;
 }
 
 int Project::runExperiment(const int expId)
