@@ -22,6 +22,11 @@ MainGUI::MainGUI(MainApp* mainApp, QWidget* parent)
     connect(m_ui->actionNewProject, SIGNAL(triggered(bool)), m_wizardNewProject, SLOT(show()));
     connect(m_mainApp->getProcessesMgr(), SIGNAL(newProcess(int)), this, SLOT(slotAddProcess(int)));
 
+    // setup the context menu
+    m_contextMenu = new ContextMenuTable(m_mainApp, m_ui->tableProcesses);
+    m_ui->tableProcesses->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(m_ui->tableProcesses, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(slotContextMenu(QPoint)));
+
     // setup table of processes
     QStringList tableHeader;
     tableHeader << STRING_PROCESS_ID
@@ -38,8 +43,29 @@ MainGUI::MainGUI(MainApp* mainApp, QWidget* parent)
 
 MainGUI::~MainGUI()
 {
+    delete m_contextMenu;
+    m_contextMenu = NULL;
     delete m_ui;
     m_ui = NULL;
+}
+
+void MainGUI::slotContextMenu(QPoint point)
+{
+    const int row = m_ui->tableProcesses->rowAt(point.y());
+    if (row == -1) {
+        return;
+    }
+
+    QTableWidgetItem* ip = m_ui->tableProcesses->item(row, m_tableHeader.value(STRING_PROCESS_ID));
+    QTableWidgetItem* is = m_ui->tableProcesses->item(row, m_tableHeader.value(STRING_PROCESS_STATUS));
+    if (!ip || !is) {
+        return;
+    }
+
+    point = m_ui->tableProcesses->mapToGlobal(point);
+    int processId = ip->data(Qt::DisplayRole).toInt();
+    Simulation::Status status = (Simulation::Status) is->data(Qt::UserRole).toInt();
+    m_contextMenu->openMenu(point, processId, status);
 }
 
 void MainGUI::addProject(int projId)

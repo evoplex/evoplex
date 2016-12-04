@@ -9,6 +9,7 @@
 #include <QMainWindow>
 
 #include "core/mainapp.h"
+#include "gui/contextmenutable.h"
 #include "gui/wizardnewproject.h"
 
 #define STRING_EXPERIMENT_ID "expId"
@@ -36,6 +37,7 @@ public:
 public slots:
     void slotAddProcess(int processId);
     void slotStatusChanged(int experimentId, int processId, int newStatus);
+    void slotContextMenu(QPoint point);
 
 private:
     Ui::MainGUI* m_ui;
@@ -43,6 +45,7 @@ private:
     WizardNewProject* m_wizardNewProject;
 
     QHash<QString, int> m_tableHeader; // map column name to column index
+    ContextMenuTable* m_contextMenu;
 };
 
 #endif // MAINGUI_H
