@@ -34,13 +34,13 @@ public:
     void processSteps();
 
     inline void pause() { m_pauseAt = m_currentStep; }
-    inline void pauseAt(quint64 step) { m_pauseAt = step > MAX_STEP ? MAX_STEP : step; }
+    inline void pauseAt(int step) { m_pauseAt = step > MAX_STEP ? MAX_STEP : step; }
 
     inline void stop() { m_pauseAt = m_currentStep; m_stopAt = m_currentStep; }
-    inline void stopAt(quint64 step) { m_stopAt = step > MAX_STEP ? MAX_STEP : step; }
+    inline void stopAt(int step) { m_stopAt = step > MAX_STEP ? MAX_STEP : step; }
 
     inline bool isValid() { return m_status != INVALID; }
-    inline quint64 getCurrentStep() { return m_currentStep; }
+    inline int getCurrentStep() { return m_currentStep; }
     inline Status getStatus() { return m_status; }
     inline int getPauseAt() { return m_pauseAt; }
     inline int getStopAt() { return m_stopAt; }
@@ -63,9 +63,9 @@ private:
 
     IModel* m_modelObj;
     Status m_status;
-    quint64 m_currentStep;
-    quint64 m_pauseAt;
-    quint64 m_stopAt;
+    int m_currentStep;
+    int m_pauseAt;
+    int m_stopAt;
 
     // Finishes this simulation.
     // Any IO operation will be called from here.
