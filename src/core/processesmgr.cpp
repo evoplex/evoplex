@@ -22,8 +22,8 @@ ProcessesMgr::~ProcessesMgr()
 
 int ProcessesMgr::add(Simulation* sim)
 {
-    int processId = m_processes.key(sim, -1);
-    if (processId == -1) {
+    int processId = sim->getProcessId();
+    if (processId < 0 || !m_processes.contains(processId)) {
         processId = m_processes.isEmpty() ? 0 : m_processes.lastKey() + 1;
         m_processes.insert(processId, sim);
         sim->setProcessId(processId);

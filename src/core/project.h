@@ -36,7 +36,7 @@ public:
     QVariantHash getGeneralParams(int eId);
     QVariantHash getModelParams(int eId);
 
-    inline const Simulation* getExperiment(int eId) { return m_experiments.value(eId); }
+    inline Simulation* getExperiment(int eId) { return m_experiments.value(eId); }
     inline const QString& getName() { return m_name; }
     inline const QString& getDir() { return m_dir; }
     inline MainApp::Model* getModel() { return m_model; }
