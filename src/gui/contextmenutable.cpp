@@ -39,7 +39,6 @@ MenuSpinBox::MenuSpinBox(const QString& title, QWidget* parent)
 MenuSpinBox::~MenuSpinBox()
 {
     delete m_action;
-    delete m_spinBox;
 }
 
 void MenuSpinBox::mouseReleaseEvent(QMouseEvent* e)
@@ -78,9 +77,7 @@ ContextMenuTable::ContextMenuTable(MainApp* mainApp, QWidget* parent)
     m_actionPlay = new QAction("Play", this);
     m_actionPause = new QAction("Pause", this);
     m_actionStop = new QAction("Stop", this);
-    m_actionDisplayAgents = new QAction("Agents Graph", this);
-    m_actionDisplayBarChart = new QAction("Bar Chart", this);
-    m_actionDisplayLineChart = new QAction("Line Chart", this);
+    m_actionView = new QAction("View", this);
     m_menuPauseAt = new MenuSpinBox(m_stringPauseAt);
     m_menuStopAt = new MenuSpinBox("Stop at");
 
@@ -94,9 +91,7 @@ ContextMenuTable::ContextMenuTable(MainApp* mainApp, QWidget* parent)
     addAction(m_actionStop);
     addMenu(m_menuStopAt);
     addSection("Displays");
-    addAction(m_actionDisplayAgents);
-    addAction(m_actionDisplayBarChart);
-    addAction(m_actionDisplayLineChart);
+    addAction(m_actionView);
 
     //
     // connect signals
@@ -104,9 +99,9 @@ ContextMenuTable::ContextMenuTable(MainApp* mainApp, QWidget* parent)
     connect(m_actionPlay, SIGNAL(triggered(bool)), this, SLOT(slotPlay()));
     connect(m_actionPause, SIGNAL(triggered(bool)), this, SLOT(slotPause()));
     connect(m_actionStop, SIGNAL(triggered(bool)), this, SLOT(slotStop()));
-
     connect(m_menuPauseAt, SIGNAL(okButton()), this, SLOT(slotPauseAt()));
     connect(m_menuStopAt, SIGNAL(okButton()), this, SLOT(slotStopAt()));
+    connect(m_actionView, SIGNAL(triggered(bool)), this, SLOT(slotOpenView()));
 }
 
 ContextMenuTable::~ContextMenuTable()
@@ -116,9 +111,7 @@ ContextMenuTable::~ContextMenuTable()
     delete m_menuPauseAt;
     delete m_actionStop;
     delete m_menuStopAt;
-    delete m_actionDisplayAgents;
-    delete m_actionDisplayBarChart;
-    delete m_actionDisplayLineChart;
+    delete m_actionView;
 }
 
 void ContextMenuTable::openMenu(QPoint globalPoint, int processId, Simulation::Status status)
@@ -194,4 +187,9 @@ void ContextMenuTable::slotStopAt()
     int step = m_menuPauseAt->value();
     m_mainApp->getProcessesMgr()->stopAt(m_curProcessId, step);
     close();
+}
+
+void ContextMenuTable::slotOpenView()
+{
+    emit (openView(m_curProcessId));
 }

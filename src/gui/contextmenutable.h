@@ -47,12 +47,16 @@ public:
 
     void openMenu(QPoint globalPoint, int processId, Simulation::Status status);
 
+signals:
+    void openView(int experimentId);
+
 public slots:
     void slotPlay();
     void slotPause();
     void slotPauseAt();
     void slotStop();
     void slotStopAt();
+    void slotOpenView();
 
 private:
     MainApp* m_mainApp;
@@ -65,11 +69,8 @@ private:
     MenuSpinBox* m_menuPauseAt;
     QAction* m_actionStop;
     MenuSpinBox* m_menuStopAt;
-
     // displays
-    QAction* m_actionDisplayAgents;
-    QAction* m_actionDisplayBarChart;
-    QAction* m_actionDisplayLineChart;
+    QAction* m_actionView;
 
     // playAt and pauseAt are essentially the same thing
     // so, we just set the string based on the current status

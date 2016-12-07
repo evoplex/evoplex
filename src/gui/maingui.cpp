@@ -71,7 +71,8 @@ void MainGUI::slotContextMenu(QPoint point)
 void MainGUI::addProject(int projId)
 {
     Project* p = m_mainApp->getProject(projId);
-    WidgetProject* wp = new WidgetProject(p, m_ui->tableProcesses);
+    WidgetProject* wp = new WidgetProject(m_mainApp, p, m_ui->tableProcesses);
+    connect(m_contextMenu, SIGNAL(openView(int)), wp, SLOT(slotOpenView(int)));
     m_ui->tabWidget->addTab(wp, p->getName());
     m_ui->tabWidget->setCurrentWidget(wp);
 }
