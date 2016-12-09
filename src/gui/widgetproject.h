@@ -15,6 +15,8 @@
 #include <QWidget>
 
 #include "core/project.h"
+#include "gui/contextmenutable.h"
+#include "gui/experimentview.h"
 
 namespace Ui {
 class WidgetProject;
@@ -25,7 +27,7 @@ class WidgetProject : public QWidget
     Q_OBJECT
 
 public:
-    explicit WidgetProject(Project* project, QWidget *parent = 0);
+    explicit WidgetProject(MainApp* mainApp, Project* project, QWidget *parent = 0);
     ~WidgetProject();
 
 private slots:
@@ -35,11 +37,16 @@ private slots:
     void slotRunAll();
     void slotRunSelected();
     void slotStatusChanged(int experimentId, int processId, int newStatus);
+    void slotOpenView(int experimentId);
+    void slotContextMenu(QPoint point);
 
 private:
     Ui::WidgetProject* m_ui;
+    MainApp* m_mainApp;
     Project* m_project;
+    ContextMenuTable* m_contextMenu;
 
+    QHash<int, ExperimentView*> m_views;
     QHash<QString, int> m_tableHeader; // map column name to column index
 
     // general properties

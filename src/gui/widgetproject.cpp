@@ -12,9 +12,10 @@
 #include "gui/widgetproject.h"
 #include "ui_widgetproject.h"
 
-WidgetProject::WidgetProject(Project* project, QWidget *parent)
+WidgetProject::WidgetProject(MainApp* mainApp, Project* project, QWidget *parent)
     : QWidget(parent)
     , m_ui(new Ui::WidgetProject)
+    , m_mainApp(mainApp)
     , m_project(project)
 {
     m_ui->setupUi(this);
@@ -26,6 +27,13 @@ WidgetProject::WidgetProject(Project* project, QWidget *parent)
     connect(m_ui->bRunSelected, SIGNAL(clicked(bool)), this, SLOT(slotRunSelected()));
 
     const QString treeFieldStyle = "*{background-color: rgba(0,0,0,0);}";
+
+    // setup the context menu
+    m_contextMenu = new ContextMenuTable(m_mainApp, m_ui->tableExperiments);
+    m_ui->tableExperiments->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(m_ui->tableExperiments, SIGNAL(customContextMenuRequested(QPoint)),
+            this, SLOT(slotContextMenu(QPoint)));
+    connect(m_contextMenu, SIGNAL(openView(int)), this, SLOT(slotOpenView(int)));
 
     //
     // simulation settings
@@ -124,6 +132,7 @@ WidgetProject::WidgetProject(Project* project, QWidget *parent)
 
 WidgetProject::~WidgetProject()
 {
+    qDeleteAll(m_views);
     delete m_treeGraphType;
     m_treeGraphType = NULL;
     delete m_treeAgents;
@@ -137,10 +146,44 @@ WidgetProject::~WidgetProject()
     m_ui = NULL;
 }
 
+void WidgetProject::slotContextMenu(QPoint point)
+{
+    const int row = m_ui->tableExperiments->rowAt(point.y());
+    if (row == -1) {
+        return;
+    }
+
+    QTableWidgetItem* ie = m_ui->tableExperiments->item(row, m_tableHeader.value(STRING_EXPERIMENT_ID));
+    if (!ie) {
+        return;
+    }
+
+    int experimentId = ie->data(Qt::DisplayRole).toInt();
+    Simulation* sim = m_project->getExperiment(experimentId);
+    if (!sim) {
+        return;
+    }
+    int processId = m_mainApp->getProcessesMgr()->add(sim);
+    point = m_ui->tableExperiments->mapToGlobal(point);
+    m_contextMenu->openMenu(point, processId, sim->getStatus());
+}
+
+void WidgetProject::slotOpenView(int experimentId)
+{
+    if (m_views.contains(experimentId)) {
+        m_views.value(experimentId)->show();
+    } else {
+        ExperimentView* v = new ExperimentView(this);
+        m_views.insert(experimentId, v);
+        v->show();
+    }
+}
+
 void WidgetProject::insertRow(Simulation* sim, QVariantHash generalParams, QVariantHash modelParams)
 {
     generalParams.insert(STRING_EXPERIMENT_ID, sim->getExperimentId());
-    generalParams.insert(STRING_PROCESS_STATUS, sim->getStatus());
+    generalParams.insert(STRING_PROCESS_STATUS,
+            qobject_cast<MainGUI*>(parentWidget())->statusToString(sim->getStatus()));
 
     int row = m_ui->tableExperiments->rowCount();
     m_ui->tableExperiments->insertRow(row);
