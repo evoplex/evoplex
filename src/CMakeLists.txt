@@ -10,6 +10,10 @@ SET(evoplex_gui_src
     gui/maingui.h
     gui/contextmenutable.cpp
     gui/contextmenutable.h
+    gui/experimentview.cpp
+    gui/experimentview.h
+    gui/widgetgraph.cpp
+    gui/widgetgraph.h
     gui/widgetproject.cpp
     gui/widgetproject.h
     gui/wizardnewproject.cpp
@@ -17,6 +21,7 @@ SET(evoplex_gui_src
 )
 SET(evoplex_ui
     gui/forms/maingui.ui
+    gui/forms/experimentview.ui
     gui/forms/widgetproject.ui
     gui/forms/wizardnewproject.ui
 )
