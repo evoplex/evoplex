@@ -26,7 +26,7 @@ WidgetProject::WidgetProject(MainApp* mainApp, Project* project, QWidget *parent
     connect(m_ui->bRunAll, SIGNAL(clicked(bool)), this, SLOT(slotRunAll()));
     connect(m_ui->bRunSelected, SIGNAL(clicked(bool)), this, SLOT(slotRunSelected()));
 
-    const QString treeFieldStyle = "*{background-color: rgba(0,0,0,0);}";
+    const QString treeFieldStyle = "QLineEdit, QSpinBox, QDoubleSpinBox { background-color: rgba(0,0,0,0); }";
 
     // setup the context menu
     m_contextMenu = new ContextMenuTable(m_mainApp, m_ui->tableExperiments);
