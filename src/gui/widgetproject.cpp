@@ -72,7 +72,15 @@ WidgetProject::WidgetProject(MainApp* mainApp, Project* project, QWidget *parent
     m_treeAgents = new QLineEdit(m_project->getDir());
     m_treeAgents->setFrame(false);
     m_treeAgents->setStyleSheet(treeFieldStyle);
-    m_ui->treeSettings->setItemWidget(item, 1, m_treeAgents);
+    QPushButton* button = new QPushButton("...");
+    button->setMaximumWidth(20);
+    connect(button, SIGNAL(clicked(bool)), this, SLOT(slotAgentFile()));
+    QHBoxLayout* l = new QHBoxLayout();
+    l->insertWidget(0, m_treeAgents);
+    l->insertWidget(1, button);
+    QWidget* w = new QWidget();
+    w->setLayout(l);
+    m_ui->treeSettings->setItemWidget(item, 1, w);
 
     item =new QTreeWidgetItem(env);
     item->setText(0, GENERAL_PROPERTY_NAME_GRAPHTYPE);
@@ -176,6 +184,15 @@ void WidgetProject::slotOpenView(int experimentId)
         ExperimentView* v = new ExperimentView(this);
         m_views.insert(experimentId, v);
         v->show();
+    }
+}
+
+void WidgetProject::slotAgentFile()
+{
+    QString path = QFileDialog::getOpenFileName(this,
+            "Agents", m_treeAgents->text(), "Agents (*.csv)");
+    if (!path.isEmpty()) {
+        m_treeAgents->setText(path);
     }
 }
 

@@ -39,6 +39,7 @@ private slots:
     void slotStatusChanged(int experimentId, int processId, int newStatus);
     void slotOpenView(int experimentId);
     void slotContextMenu(QPoint point);
+    void slotAgentFile();
 
 private:
     Ui::WidgetProject* m_ui;
