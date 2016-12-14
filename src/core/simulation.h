@@ -29,16 +29,6 @@ public:
     Simulation(int expId, int projId, int modelId, IModel* modelObj, const QVariantHash& generalParams);
     virtual ~Simulation();
 
-    // This method will run in a worker thread until it reaches the max
-    // number of steps or the pause criteria defined by the user.
-    void processSteps();
-
-    inline void pause() { m_pauseAt = m_currentStep; }
-    inline void pauseAt(int step) { m_pauseAt = step > MAX_STEP ? MAX_STEP : step; }
-
-    inline void stop() { m_pauseAt = m_currentStep; m_stopAt = m_currentStep; }
-    inline void stopAt(int step) { m_stopAt = step > MAX_STEP ? MAX_STEP : step; }
-
     inline bool isValid() { return m_status != INVALID; }
     inline int getCurrentStep() { return m_currentStep; }
     inline Status getStatus() { return m_status; }
@@ -54,6 +44,19 @@ public:
 
 signals:
     void statusChanged(int experimentId, int processId, int newStatus);
+
+protected:
+    // All these methods to control the simulation should only be accessed by the
+    // ProcessesMgr class. Otherwise, we might have issues with our concurrent system.
+    friend class ProcessesMgr;
+
+    inline void pause() { m_pauseAt = m_currentStep; }
+    inline void pauseAt(int step) { m_pauseAt = step > MAX_STEP ? MAX_STEP : step; }
+    inline void stop() { m_pauseAt = m_currentStep; m_stopAt = m_currentStep; }
+    inline void stopAt(int step) { m_stopAt = step > MAX_STEP ? MAX_STEP : step; }
+    // This method will run in a worker thread until it reaches the max
+    // number of steps or the pause criteria defined by the user.
+    void processSteps();
 
 private:
     const int m_experimentId;
