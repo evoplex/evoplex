@@ -8,6 +8,9 @@
 
 #include <QMainWindow>
 
+#include "core/mainapp.h"
+#include "core/simulation.h"
+
 namespace Ui {
 class ExperimentView;
 }
@@ -17,11 +20,13 @@ class ExperimentView : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit ExperimentView(QWidget *parent = 0);
+    explicit ExperimentView(ProcessesMgr* pMgr, Simulation* sim, QWidget* parent = 0);
     ~ExperimentView();
 
 private:
     Ui::ExperimentView *ui;
+    ProcessesMgr* m_processesMgr;
+    Simulation* m_simulation;
 };
 
 #endif // EXPERIMENTVIEW_H

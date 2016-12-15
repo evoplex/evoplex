@@ -7,13 +7,15 @@
 #include "gui/widgetgraph.h"
 #include "ui_experimentview.h"
 
-ExperimentView::ExperimentView(QWidget *parent) :
-    QMainWindow(parent),
-    ui(new Ui::ExperimentView)
+ExperimentView::ExperimentView(ProcessesMgr* pMgr, Simulation* sim, QWidget* parent)
+    : QMainWindow(parent)
+    , ui(new Ui::ExperimentView)
+    , m_processesMgr(pMgr)
+    , m_simulation(sim)
 {
     ui->setupUi(this);
 
-    QDockWidget* dw = new WidgetGraph(parent);
+    QDockWidget* dw = new WidgetGraph(this);
     addDockWidget(Qt::RightDockWidgetArea, dw);
 }
 

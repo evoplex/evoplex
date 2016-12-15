@@ -181,7 +181,8 @@ void WidgetProject::slotOpenView(int experimentId)
     if (m_views.contains(experimentId)) {
         m_views.value(experimentId)->show();
     } else {
-        ExperimentView* v = new ExperimentView(this);
+        Simulation* s = m_project->getExperiment(experimentId);
+        ExperimentView* v = new ExperimentView(m_mainApp->getProcessesMgr(), s, this);
         m_views.insert(experimentId, v);
         v->show();
     }
