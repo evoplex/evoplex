@@ -25,11 +25,10 @@ public:
 
     bool algorithmStep();
 
-    QVariantHash agentParamsDomain();
-    IAgent* newDefaultAgent();
-
-    QVariantHash getModelParams();
-    QVariantHash getInspectorParams();
+    QVariantHash paramsSpace() const;
+    IAgent* newDefaultAgent() const;
+    QVariantHash getModelParams() const;
+    QVariantHash getInspectorParams() const;
 
 private:
     Graph* m_graph;

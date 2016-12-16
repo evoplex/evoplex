@@ -26,7 +26,7 @@ bool Model::algorithmStep()
     return false;
 }
 
-IAgent* Model::newDefaultAgent()
+IAgent* Model::newDefaultAgent() const
 {
     IAgent* a = new IAgent();
     a->setProperty("strategy", 0);
@@ -34,28 +34,38 @@ IAgent* Model::newDefaultAgent()
     return a;
 }
 
-QVariantHash Model::agentParamsDomain()
+QVariantHash Model::paramsSpace() const
 {
-    QVariantHash map;
+    QVariantHash h;
+    //
+    // agent definition
+    //
+    // probability to turn to abstainer
+    h.insert("probToA", "[0,1]");
     // possible strategies for this model
     // 0 (cooperator), 1 (defector) or 2 (abstainer)
-    map.insert("strategy", "{0,1,2}");
-    // probability to turn to abstainer
-    map.insert("probToA", "[0,1]");
-    return map;
+    h.insert("strategy", "{0,1,2}");
+
+    //
+    // model stuff
+    //
+    h.insert("graphType", "{mooreGrid}");
+    h.insert("b", "[1,2]");
+    h.insert("l", "[0,1]");
+    return h;
 }
 
-QVariantHash Model::getModelParams()
+QVariantHash Model::getModelParams() const
 {
-    QVariantHash map;
-    map.insert("b", m_b);   // temptation to defect
-    map.insert("l", m_l);   // loner's payoff
-    return map;
+    QVariantHash h;
+    h.insert("b", m_b);   // temptation to defect
+    h.insert("l", m_l);   // loner's payoff
+    return h;
 }
 
-QVariantHash Model::getInspectorParams()
+QVariantHash Model::getInspectorParams() const
 {
-    QVariantHash map;
+    QVariantHash h;
     // TODO
-    return map;
+    return h;
 }

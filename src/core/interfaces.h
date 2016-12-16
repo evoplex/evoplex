@@ -49,18 +49,18 @@ public:
     // return a QVariantHash with all parameters used to define an agent.
     // use {} to define a set of possible things. eg, {0,1} zero and one
     // use [] to define a continuous interval. eg., [0,1] zero to one (including)
-    virtual QVariantHash agentParamsDomain() = 0;
+    virtual QVariantHash paramsSpace() const = 0;
 
     // return a new IAgent with default parameters
-    virtual IAgent* newDefaultAgent() = 0;
+    virtual IAgent* newDefaultAgent() const = 0;
 
     // return the current status of all parameters
     // it might be a bit slow -- be careful!
-    virtual QVariantHash getModelParams() = 0;
+    virtual QVariantHash getModelParams() const = 0;
 
     // return the current status of all things that can be inspected over time.
     // it might be a bit slow -- be careful!
-    virtual QVariantHash getInspectorParams() = 0;
+    virtual QVariantHash getInspectorParams() const = 0;
 };
 
 class IModelFactory
