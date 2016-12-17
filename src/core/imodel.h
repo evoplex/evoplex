@@ -3,33 +3,15 @@
  * @author Marcos Cardinot <mcardinot@gmail.com>
  */
 
-#ifndef INTERFACES_H
-#define INTERFACES_H
+#ifndef IMODEL_H
+#define IMODEL_H
 
 #include <QObject>
 #include <QVariantHash>
 #include <QtPlugin>
 
-class Graph;
-
-class IAgent
-{
-public:
-    inline const QVariantHash getProperties() {
-        return m_properties;
-    }
-
-    inline const QVariant getProperty(const QString& name) {
-        return m_properties.value(name);
-    }
-
-    inline void setProperty(const QString& name, const QVariant& value) {
-        m_properties.insert(name, value);
-    }
-
-private:
-    QVariantHash m_properties;
-};
+#include "core/abstractagent.h"
+#include "core/abstractgraph.h"
 
 class IModel: public QObject
 {
@@ -39,7 +21,7 @@ public:
 
     // this method is called before the actual simulation and
     // is mainly used to set the environment and parameters
-    virtual bool init(Graph* graph, const QVariantHash& modelParams) = 0;
+    virtual bool init(AbstractGraph* graph, const QVariantHash& modelParams) = 0;
 
     // Implements the metaheuristic.
     // That is, it has to contain all the logic to perform ONE step.
@@ -52,7 +34,7 @@ public:
     virtual QVariantHash paramsSpace() const = 0;
 
     // return a new IAgent with default parameters
-    virtual IAgent* newDefaultAgent() const = 0;
+    virtual AbstractAgent* newDefaultAgent() const = 0;
 
     // return the current status of all parameters
     // it might be a bit slow -- be careful!
@@ -63,11 +45,11 @@ public:
     virtual QVariantHash getInspectorParams() const = 0;
 };
 
-class IModelFactory
+class IPluginModel
 {
 public:
     // provide the destructor to keep compilers happy.
-    virtual ~IModelFactory() {}
+    virtual ~IPluginModel() {}
 
     // create the real model object.
     virtual IModel* create() = 0;
@@ -83,6 +65,6 @@ public:
 };
 
 Q_DECLARE_INTERFACE(IModel, "org.evoplex.IModel")
-Q_DECLARE_INTERFACE(IModelFactory, "org.evoplex.IModelFactory")
+Q_DECLARE_INTERFACE(IPluginModel, "org.evoplex.IPluginModel")
 
-#endif // INTERFACES_H
+#endif // IMODEL_H
