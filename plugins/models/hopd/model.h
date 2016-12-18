@@ -9,8 +9,8 @@
 #include <QObject>
 #include <QVariantHash>
 
-#include "../src/core/graph.h"
-#include "../src/core/interfaces.h"
+#include "../src/core/abstractgraph.h"
+#include "../src/core/imodel.h"
 
 class Model: public IModel
 {
@@ -21,34 +21,34 @@ public:
     Model();
     ~Model();
 
-    bool init(Graph* graph, const QVariantHash& modelParams);
+    bool init(AbstractGraph* graph, const QVariantHash& modelParams);
 
     bool algorithmStep();
 
     QVariantHash paramsSpace() const;
-    IAgent* newDefaultAgent() const;
+    AbstractAgent *newDefaultAgent() const;
     QVariantHash getModelParams() const;
     QVariantHash getInspectorParams() const;
 
 private:
-    Graph* m_graph;
+    AbstractGraph* m_graph;
 
     double m_b;
     double m_l;
 };
 
 // This class will be loaded as a plugin.
-class ModelFactory: public QObject, public IModelFactory
+class PMModel: public QObject, public IPluginModel
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "org.evoplex.IModelFactory")
-    Q_INTERFACES(IModelFactory)
+    Q_PLUGIN_METADATA(IID "org.evoplex.IPluginModel")
+    Q_INTERFACES(IPluginModel)
 
 public:
     IModel* create() { return qobject_cast<IModel*>(new Model());  }
-    QString name() { return "hopd"; }
-    QString description() { return "optional prisoner's dilemma"; }
-    QString author() { return "author"; }
+    const QString& name() { return "hopd"; }
+    const QString& description() { return "optional prisoner's dilemma"; }
+    const QString& author() { return "author"; }
 };
 
 #endif // HOPD_H

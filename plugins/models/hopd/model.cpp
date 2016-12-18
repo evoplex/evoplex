@@ -15,7 +15,7 @@ Model::~Model()
     m_graph = NULL;
 }
 
-bool Model::init(Graph* graph, const QVariantHash& modelParams)
+bool Model::init(AbstractGraph* graph, const QVariantHash& modelParams)
 {
     return true;
 }
@@ -26,9 +26,9 @@ bool Model::algorithmStep()
     return false;
 }
 
-IAgent* Model::newDefaultAgent() const
+AbstractAgent* Model::newDefaultAgent() const
 {
-    IAgent* a = new IAgent();
+    AbstractAgent* a = new AbstractAgent();
     a->setProperty("strategy", 0);
     a->setProperty("probToA", 0.0);
     return a;
