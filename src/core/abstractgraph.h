@@ -31,6 +31,11 @@ public:
     // Reset the neighbourhood for the current set of agents.
     virtual void resetLinks() = 0;
 
+    // This method is used to introduce spatial coordinates for each agent.
+    // It is mainly used by the GUI when it wants to draw the graph.
+    // If returns false, GUI will not draw it.
+    virtual bool buildCoordinates() = 0;
+
     // return the current value of all graph parameters (if any)
     // eg., height, width ...
     virtual QVariantHash getGraphParams() const = 0;
@@ -38,7 +43,7 @@ public:
     // getters
     inline const QString& getGraphName() { return m_graphName; }
     inline const QVector<AbstractAgent*>& getAgents() { return m_agents; }
-    inline const AbstractAgent* getAgent(int id) { return m_agents.value(id, NULL); }
+    inline AbstractAgent* getAgent(int id) { return m_agents.value(id, NULL); }
     inline const QHash<int, QVector<AbstractAgent*>>& getLinks() { return m_links; }
     inline const QVector<AbstractAgent*> getLinks(int id) { return m_links.value(id); }
 
