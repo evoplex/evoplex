@@ -9,7 +9,7 @@
 #include "core/graph.h"
 #include "utils/utils.h"
 
-Graph::Graph(QVector<IAgent*> agents, GraphType type)
+Graph::Graph(QVector<AbstractAgent*> agents, GraphType type)
     : m_valid(false)
     , m_type(type)
 {
@@ -92,7 +92,6 @@ void Graph::buildMooreGrid()
         m_neighbours.append(nbs);
     }
 }
-
 
 Graph::Neighbours Graph::calcMooreNeighborhood(const int id) const
 {

@@ -10,14 +10,14 @@
 #include <QObject>
 #include <QVector>
 
-class IAgent;
+class AbstractAgent;
 
 class Graph: public QObject
 {
     Q_OBJECT
 
 public:
-    typedef const IAgent* Neighbour;
+    typedef const AbstractAgent* Neighbour;
     typedef QVector<Neighbour> Neighbours;
 
     enum GraphType {
@@ -28,8 +28,8 @@ public:
     static GraphType graphTypeFromString(QString type);
     static QString graphTypeToString(GraphType type);
 
-    Graph(QVector<IAgent*> agents, GraphType type);  
-    Graph(QVector<IAgent*> agents, QString type): Graph(agents, graphTypeFromString(type)) {}
+    Graph(QVector<AbstractAgent*> agents, GraphType type);
+    Graph(QVector<AbstractAgent*> agents, QString type): Graph(agents, graphTypeFromString(type)) {}
     Graph(Graph *g);
     virtual ~Graph();
 
@@ -37,10 +37,10 @@ public:
     inline const GraphType getGraphType() { return m_type; }
     inline const int getWidth() { return m_width; }
     inline const int getHeight() { return m_height; }
-    inline const QVector<IAgent*> getAgents() { return m_agents; }
+    inline const QVector<AbstractAgent*> getAgents() { return m_agents; }
     inline const QVector<Neighbours> getNeighbours() { return m_neighbours; }
 
-    inline const IAgent* getAgent(int id) { return m_agents.at(id); }
+    inline const AbstractAgent* getAgent(int id) { return m_agents.at(id); }
     inline const Neighbours getNeighbours(int id) { return m_neighbours.at(id); }
 
 private:
@@ -48,7 +48,7 @@ private:
     GraphType m_type;
     int m_width;
     int m_height;
-    QVector<IAgent*> m_agents;
+    QVector<AbstractAgent*> m_agents;
     QVector<Neighbours> m_neighbours; // each agentId maps to a set of neighbours
 
     void buildSquareGrid();
