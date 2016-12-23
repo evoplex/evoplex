@@ -6,7 +6,7 @@
 #ifndef PROCESSESMGR_H
 #define PROCESSESMGR_H
 
-#include <QList>
+#include <QVector>
 #include <QMap>
 #include <QObject>
 
@@ -22,15 +22,15 @@ public:
 
     // Returns the processId or 0 if something went wrong
     int add(Simulation* sim);
-    QList<int> add(QList<Simulation*> sims);
+    QVector<int> add(QVector<Simulation*> sims);
 
     // Add process and tries to play
     int addAndPlay(Simulation* sim);
-    QList<int> addAndPlay(QList<Simulation*> sims);
+    QVector<int> addAndPlay(QVector<Simulation*> sims);
 
     // Run process
     void play(int processId);
-    void play(QList<int> processIds);
+    void play(QVector<int> processIds);
 
     // Pauses process asap
     void pause(int processId);
@@ -69,10 +69,10 @@ public slots:
 
 private:
     int m_threads;
-    QList<int> m_runningProcesses;
-    QList<int> m_queuedProcesses;
-    QList<int> m_processesToKill;
-    QMap<int, Simulation*> m_processes;
+    QVector<int> m_runningProcesses;
+    QVector<int> m_queuedProcesses;
+    QVector<int> m_processesToKill;
+    QMap<int, Simulation*> m_processes; // using qmap because to keep the ids in order
 
     // method called by a QtConcurrent::run()
     int runThread(int id);

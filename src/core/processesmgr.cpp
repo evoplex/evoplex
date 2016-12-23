@@ -4,7 +4,6 @@
  */
 
 #include <QFutureWatcher>
-#include <QList>
 #include <QtConcurrent/QtConcurrentRun>
 #include <QtDebug>
 
@@ -32,9 +31,9 @@ int ProcessesMgr::add(Simulation* sim)
     return processId;
 }
 
-QList<int> ProcessesMgr::add(QList<Simulation*> sims)
+QVector<int> ProcessesMgr::add(QVector<Simulation*> sims)
 {
-    QList<int> processIds;
+    QVector<int> processIds;
     int id = m_processes.lastKey();
     foreach (Simulation* sim, sims) {
         processIds.append(id);
@@ -53,9 +52,9 @@ int ProcessesMgr::addAndPlay(Simulation* sim)
     return id;
 }
 
-QList<int> ProcessesMgr::addAndPlay(QList<Simulation*> sims)
+QVector<int> ProcessesMgr::addAndPlay(QVector<Simulation*> sims)
 {
-   QList<int> processIds = add(sims);
+   QVector<int> processIds = add(sims);
    play(processIds);
    return processIds;
 }
@@ -83,7 +82,7 @@ void ProcessesMgr::play(int processId)
     }
 }
 
-void ProcessesMgr::play(QList<int> processIds)
+void ProcessesMgr::play(QVector<int> processIds)
 {
     foreach (int id, processIds) {
         play(id);
