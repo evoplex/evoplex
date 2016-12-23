@@ -34,6 +34,7 @@ int ProcessesMgr::add(Simulation* sim)
 QVector<int> ProcessesMgr::add(QVector<Simulation*> sims)
 {
     QVector<int> processIds;
+    processIds.reserve(sims.size());
     int id = m_processes.lastKey();
     foreach (Simulation* sim, sims) {
         processIds.append(id);
