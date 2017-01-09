@@ -9,6 +9,9 @@
 #include <QVariant>
 #include <QVariantHash>
 #include <QVector>
+#include <QtDebug>
+
+#include "utils/prg.h"
 
 class Utils
 {
@@ -29,45 +32,58 @@ public:
         return row * cols + col;
     }
 
-    // check if the value belongs to the domain
-    static bool validateParameter(const QString& space, const QVariant& value) {
-        if (space.contains('{') && space.contains('}')) {
-            QVariantList values = paramSet(space);
-            if (!values.contains(value)) {
-                qWarning() << "[Utils]: value (" << value
+    // Check if the value belongs to the parameter space.
+    // If true, return a valid QVariant with the correct type
+    //
+    // Parameter space can be:
+    //   - "string"             // a string
+    //   - "int[min,max]"       // integers from min to max (including min and max)
+    //   - "int{1,2,3}"         // set of integers
+    //   - "double[min,max]     // doubles from min to max (including min and max)
+    //   - "double{1.1,1.2}     // set of doubles
+    static QVariant validateParameter(const QString& space, const QString& valueStr) {
+        if (space == "string") {
+            // nothing to do
+            return valueStr;
+        } else if (space.contains('{') && space.endsWith('}')) {
+            QVector<QVariant> values = paramSet(space);
+            int idx = values.indexOf(valueStr);
+            if (idx < 0) {
+                qWarning() << "[Utils]: value (" << valueStr
                            << ") is not in the set" << space;
-                return false;
+                return QVariant();
             }
-        } else if (space.contains('[') && space.contains(']')) {
+            return values.at(idx);
+        } else if (space.contains('[') && space.endsWith(']')) {
             QVariant min, max;
             paramInterval(space, min, max);
             if (!min.isValid() || !max.isValid()) {
                 qWarning() << "[Utils]: unable to validate the value"
-                           << value << "in the space" << space;
-                return false;
+                           << valueStr << "in the space" << space;
+                return QVariant();
             }
 
-            double v = value.toDouble();
+            QVariant v = min.type() == QVariant::Int ? valueStr.toInt() : valueStr.toDouble();
             if (min > v || max < v) {
-                qWarning() << "[Utils]: value(" << value
+                qWarning() << "[Utils]: value(" << valueStr
                            << ") is out of bounds!" << space;
-                return false;
+                return QVariant();
             }
-        } else {
-            qWarning() << "[Utils]: unable to validate value!\n"
-                       << "Value:" << value << "Space:" << space;
-            return false;
+            return v;
         }
-        // all is fine =D
-        return true;
+
+        qWarning() << "[Utils]: unable to validate value!\n"
+                   << "Value:" << valueStr << "Space:" << space;
+        return QVariant();
     }
 
     // assume that space is equal to 'int{ }' or 'double{ }'
-    static QVariantList paramSet(QString space) {
+    // return a vector with all elements with the proper type
+    static QVector<QVariant> paramSet(const QString& space) {
         bool ok;
-        QVariantList ret;
-        space = space.remove("{").remove("}");
-        QStringList values = space.split(",");
+        QVector<QVariant> ret;
+        QString spc = space;
+        QStringList values = spc.remove("{").remove("}").split(",");
 
         if (space.startsWith("int")) {
             values[0] = values[0].remove("int");
@@ -88,9 +104,9 @@ public:
     }
 
     // assume that space is equal to 'int[min,max]' or 'double[min,max]'
-    static void paramInterval(QString space, QVariant& min, QVariant& max) {
-        space = space.remove("{").remove("}");
-        QStringList values = space.split(",");
+    static void paramInterval(const QString& space, QVariant& min, QVariant& max) {
+        QString spc = space;
+        QStringList values = spc.remove("{").remove("}").split(",");
         if (values.size() != 2) {
             qWarning() << "[Utils:paramInterval()]: unable to parse" << space;
             return;
@@ -98,11 +114,11 @@ public:
 
         bool ok1, ok2;
         if (space.startsWith("int")) {
-            min = QVariant::fromValue(values.at(0).toInt(&ok1));
-            max = QVariant::fromValue(values.at(1).toInt(&ok2));
+            min = QVariant(values.at(0).toInt(&ok1));
+            max = QVariant(values.at(1).toInt(&ok2));
         } else if (space.startsWith("double")) {
-            min = QVariant::fromValue(values.at(0).toDouble(&ok1));
-            max = QVariant::fromValue(values.at(1).toDouble(&ok2));
+            min = QVariant(values.at(0).toDouble(&ok1));
+            max = QVariant(values.at(1).toDouble(&ok2));
         }
 
         if (!ok1 || !ok2) {
@@ -113,33 +129,68 @@ public:
     }
 
     // return the minimum value for each parameter
-    static QVariantHash minParams(const QVariantHash& paramsSpace) {
+    static QVariantHash minParams(const QHash<QString,QString>& paramsSpace) {
         if (paramsSpace.isEmpty()) {
             return QVariantHash();
         }
 
         QVariantHash ret;
-        QHashIterator<QString, QVariant> i(paramsSpace);
+        QHashIterator<QString, QString> i(paramsSpace);
         while (i.hasNext()) {
             i.next();
 
-            QString space = i.value().toString();
+            const QString& space = i.value();
             if (space.isEmpty()) {
                 ret.insert(i.key(), 0);
                 qWarning() << "[Utils]: unable to parse the parameter space of"
                            << i.key() << i.value();
                 continue;
-            } else if (space.contains("{") && space.contains("}")) {
+            } else if (space.contains("{") && space.endsWith("}")) {
                 ret.insert(i.key(), paramSet(space).first());
-            } else if (space.contains("(") && space.contains(")")) {
+            } else if (space.contains("(") && space.endsWith(")")) {
                 QVariant max, min;
                 paramInterval(space, min, max);
                 ret.insert(i.key(), min);
             } else {
                 qWarning() << "[Utils]: unable to parse the parameter space of"
-                           << i.key() << i.value();
+                           << i.key() << space;
             }
         }
+
+        return ret;
+    }
+
+    // return a valid random value for each parameter
+    static QVariantHash randomParams(const QHash<QString,QString>& paramsSpace, PRG* prg) {
+        if (paramsSpace.isEmpty()) {
+            return QVariantHash();
+        }
+
+        QVariantHash ret;
+        QHashIterator<QString, QString> i(paramsSpace);
+        while (i.hasNext()) {
+            i.next();
+
+            const QString& space = i.value();
+            if (space.isEmpty()) {
+                ret.insert(i.key(), 0);
+                qWarning() << "[Utils]: unable to parse the parameter space of"
+                           << i.key() << i.value();
+                continue;
+            } else if (space.contains("{") && space.endsWith("}")) {
+                QVector<QVariant> vals = paramSet(space);
+                ret.insert(i.key(), vals.at(prg->randI(vals.size())));
+            } else if (space.contains("(") && space.endsWith(")")) {
+                QVariant max, min;
+                paramInterval(space, min, max);
+                ret.insert(i.key(), prg->randD(min, max));
+            } else {
+                qWarning() << "[Utils]: unable to parse the parameter space of"
+                           << i.key() << space;
+            }
+        }
+
+        return ret;
     }
 };
 
