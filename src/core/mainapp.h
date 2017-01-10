@@ -6,21 +6,16 @@
 #ifndef MAINAPP_H
 #define MAINAPP_H
 
-#include <QList>
+#include <QHash>
 #include <QVariantHash>
+#include <QVector>
 
 #include "core/abstractgraph.h"
 #include "core/abstractmodel.h"
-#include "core/processesmgr.h"
+#include "core/trialsmgr.h"
 
-// these constants hold the name of the properties used in any simulation
-#define GENERAL_PARAMETER_AGENTS "agents"
-#define GENERAL_PARAMETER_GRAPHID "graphId"
-#define GENERAL_PARAMETER_SEED "seed"
-#define GENERAL_PARAMETER_STOPAT "stopAt"
-
+class FileMgr;
 class Project;
-class Simulation;
 
 class MainApp
 {
@@ -30,7 +25,7 @@ public:
         QString author;
         QString name;
         QString description;
-        QVariantHash graphParamsSpace;
+        QHash<QString, QString> graphParamsSpace;
         IPluginGraph* factory;
     };
 
@@ -39,8 +34,9 @@ public:
         QString author;
         QString name;
         QString description;
-        QVariantHash agentParamsSpace;
-        QVariantHash modelParamsSpace;
+        QVector<QString> allowedGraphs;
+        QHash<QString, QString> agentParamsSpace;
+        QHash<QString, QString> modelParamsSpace;
         QVariantHash defaultAgentParams;
         QVariantHash defaultModelParams;
         IPluginModel* factory;
@@ -51,33 +47,42 @@ public:
 
     // load graph from a .so file
     // return the graph uid
-    const QString &loadGraphPlugin(QString path);
+    const QString& loadGraphPlugin(const QString& path);
 
     // load model from a .so file
     // return the model uid
-    const QString &loadModelPlugin(QString path);
+    const QString& loadModelPlugin(const QString& path);
 
-    int newProject(const QString &modelId, const QString& name,
-            const QString& descr, const QString& dir);
+    // Create a new project; return its id
+    int newProject(const QString& name="", const QString& dir="");
 
-    inline ProcessesMgr* getProcessesMgr() { return m_processesMgr; }
+    inline FileMgr* getFileMgr() { return m_fileMgr; }
+    inline TrialsMgr* getTrialsMgr() { return m_trialsMgr; }
     inline const QHash<QString, GraphPlugin*>& getGraphs() { return m_graphs; }
     inline const QHash<QString, ModelPlugin*>& getModels() { return m_models; }
     inline const QHash<int, Project*>& getProjects() { return m_projects; }
-    inline GraphPlugin* getGraph(const QString& graphId) { return m_graphs.value(graphId); }
-    inline ModelPlugin* getModel(const QString& modelId) { return m_models.value(modelId); }
+
+    inline const GraphPlugin* getGraph(const QString& graphId) { return m_graphs.value(graphId, nullptr); }
+    inline const ModelPlugin* getModel(const QString& modelId) { return m_models.value(modelId, nullptr); }
     inline Project* getProject(int projId) { return m_projects.value(projId); }
-    inline const QStringList& getGeneralProperties() { return m_generalProperties; }
+    inline const QHash<QString, QString>& getGeneralParamsSpace() { return m_generalParamsSpace; }
 
 private:
-    ProcessesMgr* m_processesMgr;
+    FileMgr* m_fileMgr;
+    TrialsMgr* m_trialsMgr;
 
-    QHash<QString, GraphPlugin*> m_graphs;
-    QHash<QString, ModelPlugin*> m_models;
-    QHash<int, Project*> m_projects;
+    int m_lastProjectId;
+    QHash<int, Project*> m_projects; // opened projects.
 
-    // lets build a list with the name of the essential properties
-    QStringList m_generalProperties;
+    QHash<QString, GraphPlugin*> m_graphs;  // loaded graphs
+    QHash<QString, ModelPlugin*> m_models;  // loaded models
+
+    // lets build a hash with the name and space of the essential parameters
+    // it is important to validate the contents of csv files
+    QHash<QString, QString> m_generalParamsSpace;
+
+    // load plugin from a .so file; return true if successful
+    bool loadPlugin(const QString& path, QObject* instance, QJsonObject& metaData);
 };
 
 #endif // MAINAPP_H
