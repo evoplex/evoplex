@@ -12,6 +12,14 @@
 class AbstractAgent
 {
 public:
+    // constructors
+    AbstractAgent();
+    AbstractAgent(QVariantHash p): m_properties(p) {}
+
+    inline AbstractAgent* clone() {
+        return new AbstractAgent(m_properties);
+    }
+
     inline const QVariantHash getProperties() {
         return m_properties;
     }
