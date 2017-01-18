@@ -6,51 +6,45 @@
 #ifndef PROJECT_H
 #define PROJECT_H
 
-#include <QObject>
 #include <QVariantHash>
+#include <QVector>
 
-#include "core/interfaces.h"
-#include "core/graph.h"
+#include "core/abstractmodel.h"
 #include "core/mainapp.h"
-#include "core/simulation.h"
+#include "core/experiment.h"
 
-class Project: public QObject
+class Project
 {
-    Q_OBJECT
-
 public:
-    Project(MainApp *mainApp, int projId, int modelId, const QString& name,
-            const QString& descr="", const QString& dir="");
-
+    Project(MainApp* mainApp, int id, const QString& name="", const QString& dir="");
     virtual ~Project();
-
-    QVector<IAgent*> getAgentsFromFile(const QString& path);
 
     // return processId
     int runExperiment(const int expId);
 
-    Simulation* newExperiment(const QVariantHash& generalParams, const QVariantHash& modelParams);
+    // add a new experiment to this project
+    // return true if successful
+    bool newExperiment(const QVariantHash& generalParams,
+            const QVariantHash& modelParams, const QVariantHash& graphParams);
 
-    QList<Simulation*> importExperiments(const QString& filePath, QVariantHash &generalParams, QVariantHash &modelParams);
+    // add a new experiment to this project
+    // return true if successful
+    bool newExperiment(const QStringList& header, const QStringList& values);
 
-    QVariantHash getGeneralParams(int eId);
-    QVariantHash getModelParams(int eId);
-
-    inline Simulation* getExperiment(int eId) { return m_experiments.value(eId); }
+    // getters
+    inline int getId() { return m_id; }
     inline const QString& getName() { return m_name; }
     inline const QString& getDir() { return m_dir; }
-    inline MainApp::Model* getModel() { return m_model; }
+    inline Experiment* getExperiment(int expId) { return m_experiments.value(expId); }
 
 private:
     MainApp* m_mainApp;
-    const int m_projId;
-    const int m_modelId;
-    MainApp::Model* m_model;
+    const int m_id;
     QString m_name;
-    QString m_description;
     QString m_dir;
 
-    QHash<int, Simulation*> m_experiments;
+    int m_lastExpId;
+    QHash<int, Experiment*> m_experiments;
 };
 
 #endif // PROJECT_H
