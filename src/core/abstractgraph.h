@@ -13,12 +13,18 @@
 
 #include "core/abstractagent.h"
 
-class AbstractGraph: public QObject
+// one agent can be linked to N neighbours which are also agents in the graph
+typedef AbstractAgent Neighbour; // alias
+typedef QVector<Neighbour*> Neighbours;  // neighbourhood of one agent
+// A hash to allow us to find out the links of each agent.
+// We call it 'network' just to avoid any confusion with the whole 'graph' object.
+typedef QHash<int, Neighbours> Network;
+
+class AbstractGraph
 {
 public:
     // constructor
-    explicit AbstractGraph(const QString& name)
-        : m_graphName(name) { setObjectName(name); }
+    explicit AbstractGraph(const QString& name): m_graphName(name) {}
 
     // Provide the destructor to keep compilers happy.
     virtual ~AbstractGraph() {}
@@ -26,10 +32,10 @@ public:
     // Initializes the graph object.
     // This method is called once when a new graph object is being created.
     // Tt is usually used to validate the graphParams and the set of agents.
-    virtual bool init(QVector<AbstractAgent*> agents, QVariantHash graphParams) = 0;
+    virtual bool init(QVector<AbstractAgent*> agents, const QVariantHash& graphParams) = 0;
 
-    // Reset the neighbourhood for the current set of agents.
-    virtual void resetLinks() = 0;
+    // Reset the neighbourhood of all agents to the original structure.
+    virtual void resetNetwork() = 0;
 
     // This method is used to introduce spatial coordinates for each agent.
     // It is mainly used by the GUI when it wants to draw the graph.
@@ -42,15 +48,15 @@ public:
 
     // getters
     inline const QString& getGraphName() { return m_graphName; }
-    inline const QVector<AbstractAgent*>& getAgents() { return m_agents; }
+    inline QVector<AbstractAgent*> getAgents() { return m_agents; }
     inline AbstractAgent* getAgent(int id) { return m_agents.value(id, NULL); }
-    inline const QHash<int, QVector<AbstractAgent*>>& getLinks() { return m_links; }
-    inline const QVector<AbstractAgent*> getLinks(int id) { return m_links.value(id); }
+    inline const Network& getNetwork() { return m_network; }
+    inline const Neighbours getNeighbours(int id) { return m_network.value(id); }
 
 protected:
     const QString m_graphName;
     QVector<AbstractAgent*> m_agents;
-    QHash<int, QVector<AbstractAgent*>> m_links;
+    Network m_network;
 };
 
 class IPluginGraph
@@ -59,20 +65,23 @@ public:
     // provide the destructor to keep compilers happy.
     virtual ~IPluginGraph() {}
 
-    // create the real model object.
+    // create the real graph object.
     virtual AbstractGraph* create() = 0;
-
-    // author's name
-    virtual QString author() = 0;
-
-    // graph's name
-    virtual QString name() = 0;
-
-    // graph's description
-    virtual QString description() = 0;
 };
-
-Q_DECLARE_INTERFACE(AbstractGraph, "org.evoplex.AbstractGraph")
 Q_DECLARE_INTERFACE(IPluginGraph, "org.evoplex.IPluginGraph")
+
+
+#define REGISTER_GRAPH(CLASSNAME)                                           \
+    class PG_CLASSNAME: public QObject, public IPluginGraph                 \
+    {                                                                       \
+    Q_OBJECT                                                                \
+    Q_PLUGIN_METADATA(IID "org.evoplex.IPluginGraph"                        \
+                      FILE "graphMetaData.json")                            \
+    Q_INTERFACES(IPluginGraph)                                              \
+    public:                                                                 \
+        QSharedPointer<AbstractGraph> create() {                            \
+            return QSharedPointer<AbstractGraph>(new CLASSNAME(CLASSNAME)); \
+        }                                                                   \
+    };
 
 #endif // ABSTRACT_GRAPH_H
