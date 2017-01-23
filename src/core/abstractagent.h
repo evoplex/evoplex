@@ -13,27 +13,27 @@ class AbstractAgent
 {
 public:
     // constructors
-    AbstractAgent();
-    AbstractAgent(QVariantHash p): m_properties(p) {}
+    explicit AbstractAgent() {}
+    explicit AbstractAgent(QVariantHash attr): m_attributes(attr) {}
 
     inline AbstractAgent* clone() {
-        return new AbstractAgent(m_properties);
+        return new AbstractAgent(m_attributes);
     }
 
-    inline const QVariantHash getProperties() {
-        return m_properties;
+    inline const QVariantHash getAttributes() {
+        return m_attributes;
     }
 
-    inline const QVariant getProperty(const QString& name) {
-        return m_properties.value(name);
+    inline const QVariant getAttribute(const QString& name) {
+        return m_attributes.value(name);
     }
 
-    inline void setProperty(const QString& name, const QVariant& value) {
-        m_properties.insert(name, value);
+    inline void setAttribute(const QString& name, const QVariant& value) {
+        m_attributes.insert(name, value);
     }
 
 private:
-    QVariantHash m_properties;
+    QVariantHash m_attributes;
 };
 
 #endif // ABSTRACT_AGENT_H
