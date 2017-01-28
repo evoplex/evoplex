@@ -14,11 +14,23 @@
 #include "core/abstractagent.h"
 
 // one agent can be linked to N neighbours which are also agents in the graph
-typedef AbstractAgent Neighbour; // alias
-typedef QVector<Neighbour*> Neighbours;  // neighbourhood of one agent
-// A hash to allow us to find out the links of each agent.
-// We call it 'network' just to avoid any confusion with the whole 'graph' object.
-typedef QHash<int, Neighbours> Network;
+typedef const AbstractAgent* Neighbour; // alias
+
+class Edge
+{
+public:
+    Edge(Neighbour neighbour): m_neighbour(neighbour) {}
+    Edge(Neighbour neighbour, QVariantHash& attributes): m_neighbour(neighbour), m_attributes(attributes) {}
+    inline Neighbour getNeighbour() { return m_neighbour; }
+    inline const QVariant getAttribute(const QString& name) { return m_attributes.value(name); }
+private:
+    Neighbour m_neighbour;
+    QVariantHash m_attributes;
+};
+
+typedef QVector<Edge> Neighbours;  // neighbourhood of one agent
+typedef QHash<int, Neighbours> AdjacencyList;
+typedef QHash<int, AbstractAgent*> Population;
 
 class AbstractGraph
 {
@@ -31,7 +43,7 @@ public:
 
     // Initializes the graph object.
     // This method is called once when a new graph object is being created.
-    // Tt is usually used to validate the graphParams and the set of agents.
+    // It is usually used to validate the graphParams and the set of agents.
     virtual bool init(QVector<AbstractAgent*> agents, const QVariantHash& graphParams) = 0;
 
     // Reset the neighbourhood of all agents to the original structure.
@@ -48,16 +60,16 @@ public:
 
     // getters
     inline const QString& getGraphName() { return m_graphName; }
-    inline QVector<AbstractAgent*> getAgents() { return m_agents; }
-    inline AbstractAgent* getAgent(int id) { return m_agents.value(id, NULL); }
-    inline const Network& getNetwork() { return m_network; }
-    inline const Neighbours getNeighbours(int id) { return m_network.value(id); }
+    inline AbstractAgent* getAgent(int id) { return m_population.value(id, NULL); }
+    inline Neighbours getNeighbours(int id) { return m_adjacencyList.value(id); }
+    inline Population getPopulation() { return m_population; }
 
 protected:
     const QString m_graphName;
-    QVector<AbstractAgent*> m_agents;
-    Network m_network;
+    AdjacencyList m_adjacencyList;
+    Population m_population;
 };
+
 
 class IPluginGraph
 {
