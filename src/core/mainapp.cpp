@@ -3,6 +3,9 @@
  * @author Marcos Cardinot <mcardinot@gmail.com>
  */
 
+#include <QApplication>
+#include <QDir>
+#include <QFile>
 #include <QJsonObject>
 #include <QPluginLoader>
 #include <QtDebug>
@@ -25,7 +28,29 @@ MainApp::MainApp()
     m_generalParamsSpace.insert(GENERAL_PARAMETER_STOPAT, QString("int[1,%1]").arg(EVOPLEX_MAX_STEPS));
     m_generalParamsSpace.insert(GENERAL_PARAMETER_TRIALS, QString("int[1,%1]").arg(EVOPLEX_MAX_TRIALS));
 
-    //loadModelPlugin("/home/cardinot/dev/evoplex/evoplex/build2/models/libevoplex_models.so");
+    // load plugins
+    QDir pluginsDir = QDir(qApp->applicationDirPath());
+    pluginsDir.cdUp();
+    pluginsDir.cd("plugins");
+    if (pluginsDir.cd("graphs")) {
+        foreach (QString dir, pluginsDir.entryList(QDir::Dirs)) {
+            pluginsDir.cd(dir);
+            foreach (QString fileName, pluginsDir.entryList(QStringList("*.so"), QDir::Files)) {
+                loadGraphPlugin(pluginsDir.absoluteFilePath(fileName));
+            }
+            pluginsDir.cdUp();
+        }
+        pluginsDir.cdUp();
+    }
+    if (pluginsDir.cd("models")) {
+        foreach (QString dir, pluginsDir.entryList(QDir::Dirs | QDir::NoDotAndDotDot)) {
+            pluginsDir.cd(dir);
+            foreach (QString fileName, pluginsDir.entryList(QStringList("*.so"), QDir::Files)) {
+                loadModelPlugin(pluginsDir.absoluteFilePath(fileName));
+            }
+            pluginsDir.cdUp();
+        }
+    }
 }
 
 MainApp::~MainApp()
@@ -39,9 +64,13 @@ MainApp::~MainApp()
 
 bool MainApp::loadPlugin(const QString& path, QObject* instance, QJsonObject& metaData)
 {
-    QPluginLoader loader(path);
+    if (!QFile(path).exists()) {
+        qWarning() << "[MainApp] unable to find the .so file." << path;
+        return false;
+    }
 
-    metaData = loader.metaData();
+    QPluginLoader loader(path);
+    metaData = loader.metaData().value("MetaData").toObject();
     if (metaData.isEmpty()) {
         qWarning() << "[MainApp] unable to load the plugin."
                    << "Couldn't find the meta data json file." << path;
@@ -66,15 +95,15 @@ bool MainApp::loadPlugin(const QString& path, QObject* instance, QJsonObject& me
         return false;
     }
 
+    qDebug() << "[MainApp] a plugin has been loaded." << path;
     return true;
 }
 
 const QString& MainApp::loadGraphPlugin(const QString& path)
 {
-    QObject* instance;
+    QObject instance;
     QJsonObject metaData;
-    if (!loadPlugin(path, instance, metaData)) {
-        delete instance;
+    if (!loadPlugin(path, &instance, metaData)) {
         return NULL;
     }
 
@@ -83,7 +112,7 @@ const QString& MainApp::loadGraphPlugin(const QString& path)
     graph->author = metaData["author"].toString();
     graph->name = metaData["name"].toString();
     graph->description = metaData["description"].toString();
-    graph->factory = qobject_cast<IPluginGraph*>(instance);
+    graph->factory = qobject_cast<IPluginGraph*>(&instance);
 
     if (metaData.contains("graphParamsSpace")) {
         QJsonObject json = metaData["graphParamsSpace"].toObject();
@@ -98,10 +127,9 @@ const QString& MainApp::loadGraphPlugin(const QString& path)
 
 const QString& MainApp::loadModelPlugin(const QString& path)
 {
-    QObject* instance;
+    QObject instance;
     QJsonObject metaData;
-    if (!loadPlugin(path, instance, metaData)) {
-        delete instance;
+    if (!loadPlugin(path, &instance, metaData)) {
         return NULL;
     }
 
@@ -113,7 +141,7 @@ const QString& MainApp::loadModelPlugin(const QString& path)
     model->allowedGraphs = metaData["allowedGraphs"].toString().split(",").toVector();
     model->defaultAgentParams = Utils::minParams(model->agentParamsSpace);
     model->defaultModelParams = Utils::minParams(model->modelParamsSpace);
-    model->factory = qobject_cast<IPluginModel*>(instance);
+    model->factory = qobject_cast<IPluginModel*>(&instance);
 
     if (metaData.contains("agentParamsSpace")) {
         QJsonObject json = metaData["agentParamsSpace"].toObject();
