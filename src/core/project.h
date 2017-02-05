@@ -19,9 +19,6 @@ public:
     Project(MainApp* mainApp, int id, const QString& name="", const QString& dir="");
     virtual ~Project();
 
-    // return processId
-    int runExperiment(const int expId);
-
     // add a new experiment to this project
     // return true if successful
     bool newExperiment(const QVariantHash& generalParams,

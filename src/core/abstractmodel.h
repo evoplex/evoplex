@@ -23,7 +23,7 @@ public:
         m_graph = nullptr;
         delete m_prg;
         m_prg = nullptr;
-        qDeleteAll(m_graph->getAgents());
+        qDeleteAll(m_graph->getPopulation());
     }
 
 protected:
@@ -76,19 +76,21 @@ public:
     // create the real model object.
     virtual AbstractModel* create() = 0;
 };
+
 Q_DECLARE_INTERFACE(IPluginModel, "org.evoplex.IPluginModel")
 
 
 #define REGISTER_MODEL(CLASSNAME)                                           \
-    class PM_CLASSNAME: public QObject, public IPluginModel                 \
+    class PM_##CLASSNAME: public QObject, public IPluginModel               \
     {                                                                       \
     Q_OBJECT                                                                \
     Q_PLUGIN_METADATA(IID "org.evoplex.IPluginModel"                        \
                       FILE "modelMetaData.json")                            \
+                                                                            \
     Q_INTERFACES(IPluginModel)                                              \
     public:                                                                 \
         AbstractModel* create() {                                           \
-            return qobject_cast<AbstractModel*>(new CLASSNAME());           \
+            return dynamic_cast<AbstractModel*>(new CLASSNAME());           \
         }                                                                   \
     };
 
