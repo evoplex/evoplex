@@ -84,15 +84,15 @@ Q_DECLARE_INTERFACE(IPluginGraph, "org.evoplex.IPluginGraph")
 
 
 #define REGISTER_GRAPH(CLASSNAME)                                           \
-    class PG_CLASSNAME: public QObject, public IPluginGraph                 \
+    class PG_##CLASSNAME: public QObject, public IPluginGraph               \
     {                                                                       \
     Q_OBJECT                                                                \
     Q_PLUGIN_METADATA(IID "org.evoplex.IPluginGraph"                        \
                       FILE "graphMetaData.json")                            \
     Q_INTERFACES(IPluginGraph)                                              \
     public:                                                                 \
-        QSharedPointer<AbstractGraph> create() {                            \
-            return QSharedPointer<AbstractGraph>(new CLASSNAME(CLASSNAME)); \
+        AbstractGraph* create() {                                           \
+            return dynamic_cast<AbstractGraph*>(new CLASSNAME(CLASSNAME));  \
         }                                                                   \
     };
 

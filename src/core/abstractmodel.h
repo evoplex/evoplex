@@ -76,7 +76,6 @@ public:
     // create the real model object.
     virtual AbstractModel* create() = 0;
 };
-
 Q_DECLARE_INTERFACE(IPluginModel, "org.evoplex.IPluginModel")
 
 
