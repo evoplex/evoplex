@@ -106,7 +106,7 @@ public:
     // assume that space is equal to 'int[min,max]' or 'double[min,max]'
     static void paramInterval(const QString& space, QVariant& min, QVariant& max) {
         QString spc = space;
-        QStringList values = spc.remove("{").remove("}").split(",");
+        QStringList values = spc.remove("[").remove("]").split(",");
         if (values.size() != 2) {
             qWarning() << "[Utils:paramInterval()]: unable to parse" << space;
             return;
@@ -147,7 +147,7 @@ public:
                 continue;
             } else if (space.contains("{") && space.endsWith("}")) {
                 ret.insert(i.key(), paramSet(space).first());
-            } else if (space.contains("(") && space.endsWith(")")) {
+            } else if (space.contains("[") && space.endsWith("]")) {
                 QVariant max, min;
                 paramInterval(space, min, max);
                 ret.insert(i.key(), min);
@@ -180,10 +180,14 @@ public:
             } else if (space.contains("{") && space.endsWith("}")) {
                 QVector<QVariant> vals = paramSet(space);
                 ret.insert(i.key(), vals.at(prg->randI(vals.size())));
-            } else if (space.contains("(") && space.endsWith(")")) {
+            } else if (space.contains("[") && space.endsWith("]")) {
                 QVariant max, min;
                 paramInterval(space, min, max);
-                ret.insert(i.key(), prg->randD(min, max));
+                if (min.type() == QVariant::Int) {
+                    ret.insert(i.key(), prg->randI(min.toInt(), max.toInt()));
+                } else {
+                    ret.insert(i.key(), prg->randD(min.toDouble(), max.toDouble()));
+                }
             } else {
                 qWarning() << "[Utils]: unable to parse the parameter space of"
                            << i.key() << space;
