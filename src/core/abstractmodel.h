@@ -58,10 +58,6 @@ public:
     // If return is true, algorithm converged and simulation will stop asap.
     virtual bool algorithmStep() = 0;
 
-    // return the current status of all parameters
-    // it might be a bit slow -- be careful!
-    virtual QVariantHash getModelParams() const = 0;
-
     // This method allows you to create custom outputs which, for example,
     // might be used by the GUI to generate custom plots or to be stored in a file.
     virtual QVariantList requestCustomOutputs(QStringList requestedHeader) const {}
