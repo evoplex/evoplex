@@ -1,2 +1,2 @@
+INCLUDE_DIRECTORIES(../../src/)
 ADD_SUBDIRECTORY(hopd)
-

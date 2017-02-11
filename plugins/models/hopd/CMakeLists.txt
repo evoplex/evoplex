@@ -1,6 +1,6 @@
-ADD_LIBRARY(evoplex_model_hopd SHARED
-    model.cpp
-    model.h
-)
-TARGET_LINK_LIBRARIES(evoplex_model_hopd evoplex_lib Qt5::Core)
+SET(MODEL_NAME hopd)
 
+qt5_generate_moc(model.h moc_model.cpp)
+FILE(COPY modelMetaData.json DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+ADD_LIBRARY(evoplex_model_${MODEL_NAME} SHARED model.cpp model.h moc_model.cpp)
+TARGET_LINK_LIBRARIES(evoplex_model_${MODEL_NAME} evoplex_core_lib Qt5::Core)
