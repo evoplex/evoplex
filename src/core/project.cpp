@@ -47,8 +47,8 @@ bool Project::newExperiment(const QStringList& header, const QStringList& values
     }
 
     // find the model and graph for this experiment
-    const int headerGraphId = header.indexOf(GENERAL_PARAMETER_GRAPHID);
-    const int headerModelId = header.indexOf(GENERAL_PARAMETER_MODELID);
+    const int headerGraphId = header.indexOf(GENERAL_ATTRIBUTE_GRAPHID);
+    const int headerModelId = header.indexOf(GENERAL_ATTRIBUTE_MODELID);
     if (headerGraphId < 0 && headerModelId < 0) {
         qWarning() << "[Project]: unable to add a new experiment."
                    << "The experiment should have both graphId and modelId.";

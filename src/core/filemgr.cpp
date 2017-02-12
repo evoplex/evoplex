@@ -115,7 +115,7 @@ int FileMgr::importExperiments(const QString& filePath, int projId)
         // just make sure that this file really exists. We do not validate the
         // file here because it would affect performace unnecessarily.
         bool validAgents = true;
-        const QString& agents = values.at(header.indexOf(GENERAL_PARAMETER_AGENTS));
+        const QString& agents = values.at(header.indexOf(GENERAL_ATTRIBUTE_AGENTS));
         if (agents.endsWith(".csv") && !QFile(agents).exists()) {
             qWarning() << "[FileMgr]: unable to import an experiment."
                        << "Unable to find the csv file with the agents.";

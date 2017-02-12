@@ -21,12 +21,12 @@ MainApp::MainApp()
     , m_trialsMgr(new TrialsMgr())
     , m_lastProjectId(-1)
 {
-    m_generalParamsSpace.insert(GENERAL_PARAMETER_AGENTS, "string");
-    m_generalParamsSpace.insert(GENERAL_PARAMETER_GRAPHID, "string");
-    m_generalParamsSpace.insert(GENERAL_PARAMETER_MODELID, "string");
-    m_generalParamsSpace.insert(GENERAL_PARAMETER_SEED, "string");
-    m_generalParamsSpace.insert(GENERAL_PARAMETER_STOPAT, QString("int[1,%1]").arg(EVOPLEX_MAX_STEPS));
-    m_generalParamsSpace.insert(GENERAL_PARAMETER_TRIALS, QString("int[1,%1]").arg(EVOPLEX_MAX_TRIALS));
+    m_generalParamsSpace.insert(GENERAL_ATTRIBUTE_AGENTS, "string");
+    m_generalParamsSpace.insert(GENERAL_ATTRIBUTE_GRAPHID, "string");
+    m_generalParamsSpace.insert(GENERAL_ATTRIBUTE_MODELID, "string");
+    m_generalParamsSpace.insert(GENERAL_ATTRIBUTE_SEED, "string");
+    m_generalParamsSpace.insert(GENERAL_ATTRIBUTE_STOPAT, QString("int[1,%1]").arg(EVOPLEX_MAX_STEPS));
+    m_generalParamsSpace.insert(GENERAL_ATTRIBUTE_TRIALS, QString("int[1,%1]").arg(EVOPLEX_MAX_TRIALS));
 
     // load plugins
     QDir pluginsDir = QDir(qApp->applicationDirPath());

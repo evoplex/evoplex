@@ -29,18 +29,18 @@ bool Experiment::createTrials()
         return false;
     }
 
-    int seed = m_generalParams.value(GENERAL_PARAMETER_SEED).toInt();
+    int seed = m_generalParams.value(GENERAL_ATTRIBUTE_SEED).toInt();
     PRG* prg = new PRG(seed);
 
     // find out the model and graph
-    const QString& modelId = m_generalParams.value(GENERAL_PARAMETER_MODELID).toString();
+    const QString& modelId = m_generalParams.value(GENERAL_ATTRIBUTE_MODELID).toString();
     const MainApp::ModelPlugin* modelPlugin = m_mainApp->getModel(modelId);
-    const QString& graphId = m_generalParams.value(GENERAL_PARAMETER_GRAPHID).toString();
+    const QString& graphId = m_generalParams.value(GENERAL_ATTRIBUTE_GRAPHID).toString();
     const MainApp::GraphPlugin* graphPlugin = m_mainApp->getGraph(graphId);
 
     // create the set of agents
     QVector<AbstractAgent*> agents;
-    const QString& agentsStr = m_generalParams.value(GENERAL_PARAMETER_AGENTS).toString();
+    const QString& agentsStr = m_generalParams.value(GENERAL_ATTRIBUTE_AGENTS).toString();
     if (agentsStr.endsWith(".csv")) {
         // I/O operations are expensive. So, if this is the case, lets do it
         // only once and feed the trials with copies of the population.
@@ -62,7 +62,7 @@ bool Experiment::createTrials()
         return false;
     }
 
-    const int trials = m_generalParams.value(GENERAL_PARAMETER_TRIALS).toInt();
+    const int trials = m_generalParams.value(GENERAL_ATTRIBUTE_TRIALS).toInt();
     m_trialsIds.reserve(trials);
 
     // create the graph structure
@@ -92,7 +92,7 @@ bool Experiment::createTrials()
     }
 
     // finally, create the first trial
-    const int stopAt = m_generalParams.value(GENERAL_PARAMETER_STOPAT).toInt();
+    const int stopAt = m_generalParams.value(GENERAL_ATTRIBUTE_STOPAT).toInt();
     m_trialsIds.append(m_mainApp->getTrialsMgr()->newTrial(m_id, m_projId, modelObj, stopAt));
 
     // more trials to be created? (ie, trials>1)
