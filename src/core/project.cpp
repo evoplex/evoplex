@@ -17,7 +17,7 @@ Project::Project(MainApp* mainApp, int id, const QString& name, const QString& d
     , m_lastExpId(-1)
 {
     if (m_name.isEmpty()) {
-        m_name = QString("project%1").arg(id);
+        m_name = QString("Project%1").arg(id);
     }
 }
 
