@@ -114,9 +114,11 @@ public:
 
         bool ok1, ok2;
         if (space.startsWith("int")) {
+            values[0] = values[0].remove("int");
             min = QVariant(values.at(0).toInt(&ok1));
             max = QVariant(values.at(1).toInt(&ok2));
         } else if (space.startsWith("double")) {
+            values[0] = values[0].remove("double");
             min = QVariant(values.at(0).toDouble(&ok1));
             max = QVariant(values.at(1).toDouble(&ok2));
         }
@@ -128,46 +130,46 @@ public:
         }
     }
 
-    // return the minimum value for each parameter
-    static QVariantHash minParams(const QHash<QString,QString>& paramsSpace) {
-        if (paramsSpace.isEmpty()) {
-            return QVariantHash();
+    // return the boundary value for each parameter (min and max)
+    static void boundaryValues(const QHash<QString, QString>& attributesSpace,
+                               QVariantHash& minValues, QVariantHash& maxValues) {
+        if (attributesSpace.isEmpty()) {
+            return;
         }
 
-        QVariantHash ret;
-        QHashIterator<QString, QString> i(paramsSpace);
+        QHashIterator<QString, QString> i(attributesSpace);
         while (i.hasNext()) {
             i.next();
-
             const QString& space = i.value();
             if (space.isEmpty()) {
-                ret.insert(i.key(), 0);
+                minValues.insert(i.key(), 0);
+                maxValues.insert(i.key(), 0);
                 qWarning() << "[Utils]: unable to parse the parameter space of"
                            << i.key() << i.value();
                 continue;
             } else if (space.contains("{") && space.endsWith("}")) {
-                ret.insert(i.key(), paramSet(space).first());
+                minValues.insert(i.key(), paramSet(space).first());
+                maxValues.insert(i.key(), paramSet(space).last());
             } else if (space.contains("[") && space.endsWith("]")) {
                 QVariant max, min;
                 paramInterval(space, min, max);
-                ret.insert(i.key(), min);
+                minValues.insert(i.key(), min);
+                maxValues.insert(i.key(), max);
             } else {
                 qWarning() << "[Utils]: unable to parse the parameter space of"
                            << i.key() << space;
             }
         }
-
-        return ret;
     }
 
     // return a valid random value for each parameter
-    static QVariantHash randomParams(const QHash<QString,QString>& paramsSpace, PRG* prg) {
-        if (paramsSpace.isEmpty()) {
+    static QVariantHash randomParams(const QHash<QString,QString>& attributesSpace, PRG* prg) {
+        if (attributesSpace.isEmpty()) {
             return QVariantHash();
         }
 
         QVariantHash ret;
-        QHashIterator<QString, QString> i(paramsSpace);
+        QHashIterator<QString, QString> i(attributesSpace);
         while (i.hasNext()) {
             i.next();
 
