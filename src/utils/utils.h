@@ -10,6 +10,7 @@
 #include <QVariantHash>
 #include <QVector>
 #include <QtDebug>
+#include <float.h>
 
 #include "utils/prg.h"
 
@@ -41,6 +42,7 @@ public:
     //   - "int{1,2,3}"         // set of integers
     //   - "double[min,max]     // doubles from min to max (including min and max)
     //   - "double{1.1,1.2}     // set of doubles
+    //   * you can use 'max' to take the maximum value for the type
     static QVariant validateParameter(const QString& space, const QString& valueStr) {
         if (space == "string") {
             // nothing to do
@@ -116,11 +118,21 @@ public:
         if (space.startsWith("int")) {
             values[0] = values[0].remove("int");
             min = QVariant(values.at(0).toInt(&ok1));
-            max = QVariant(values.at(1).toInt(&ok2));
+            if (values.at(1) == "max") {
+                max = INT32_MAX;
+                ok2 = true;
+            } else {
+                max = QVariant(values.at(1).toInt(&ok2));
+            }
         } else if (space.startsWith("double")) {
             values[0] = values[0].remove("double");
             min = QVariant(values.at(0).toDouble(&ok1));
-            max = QVariant(values.at(1).toDouble(&ok2));
+            if (values.at(1) == "max") {
+                max = DBL_MAX;
+                ok2 = true;
+            } else {
+                max = QVariant(values.at(1).toDouble(&ok2));
+            }
         }
 
         if (!ok1 || !ok2) {
