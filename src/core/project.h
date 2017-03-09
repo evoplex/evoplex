@@ -20,19 +20,17 @@ public:
     virtual ~Project();
 
     // add a new experiment to this project
-    // return true if successful
-    bool newExperiment(const QVariantHash& generalParams,
-            const QVariantHash& modelParams, const QVariantHash& graphParams);
-
-    // add a new experiment to this project
-    // return true if successful
-    bool newExperiment(const QStringList& header, const QStringList& values);
+    // return the experimentId or -1 if unsuccessful
+    int newExperiment(const QStringList& header, const QStringList& values, QString& errorMsg);
 
     // getters
     inline int getId() { return m_id; }
     inline const QString& getName() { return m_name; }
     inline const QString& getDir() { return m_dir; }
     inline Experiment* getExperiment(int expId) { return m_experiments.value(expId); }
+
+    inline const QHash<QString, MainApp::GraphPlugin*>& getGraphs() { return m_mainApp->getGraphs(); }
+    inline const QHash<QString, MainApp::ModelPlugin*>& getModels() { return m_mainApp->getModels(); }
 
 private:
     MainApp* m_mainApp;
