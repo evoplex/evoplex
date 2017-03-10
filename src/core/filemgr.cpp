@@ -31,9 +31,9 @@ QVector<AbstractAgent*> FileMgr::importAgents(const QString& filePath, const QSt
     QStringList header;
     if (!in.atEnd() && !modelPlugin) {
         header = in.readLine().split(",");
-        if (header.size() == modelPlugin->agentParamsSpace.size()) {
+        if (header.size() == modelPlugin->agentAttrSpace.size()) {
             foreach (QString paramName, header) {
-                if (!modelPlugin->agentParamsSpace.contains(paramName)) {
+                if (!modelPlugin->agentAttrSpace.contains(paramName)) {
                     header.clear();
                     break;
                 }
@@ -45,7 +45,7 @@ QVector<AbstractAgent*> FileMgr::importAgents(const QString& filePath, const QSt
 
     if (header.isEmpty()) {
         qWarning() << "[FileMgr]: unable to read the set of agents from" << filePath
-                   << "Expected properties:" << modelPlugin->agentParamsSpace.keys();
+                   << "Expected properties:" << modelPlugin->agentAttrSpace.keys();
         return QVector<AbstractAgent*>();
     }
 
@@ -61,7 +61,7 @@ QVector<AbstractAgent*> FileMgr::importAgents(const QString& filePath, const QSt
 
         QVariantHash parameters;
         for (int i = 0; i < values.size(); ++i) {
-            const QString& space = modelPlugin->agentParamsSpace.value(header.at(i));
+            const QString& space = modelPlugin->agentAttrSpace.value(header.at(i));
             QVariant value = Utils::validateParameter(space, values.at(i));
             if (!value.isValid()) {
                 qDeleteAll(agents);
@@ -91,7 +91,7 @@ int FileMgr::importExperiments(const QString& filePath, int projId)
     QStringList header;
     if (!in.atEnd()) {
         header = in.readLine().split(",");
-        foreach (const QString& paramName, m_mainApp->getGeneralParamsSpace()) {
+        foreach (const QString& paramName, m_mainApp->getGeneralAttrSpace()) {
             if (!header.contains(paramName)) {
                 header.clear();
                 break;
@@ -101,7 +101,7 @@ int FileMgr::importExperiments(const QString& filePath, int projId)
 
     if (header.isEmpty()) {
         qWarning() << "[FileMgr]: unable to read the experiments from" << filePath
-                   << "The header must have:" << m_mainApp->getGeneralParamsSpace();
+                   << "The header must have:" << m_mainApp->getGeneralAttrSpace();
         return -1;
     }
 
@@ -126,8 +126,9 @@ int FileMgr::importExperiments(const QString& filePath, int projId)
         }
 
         // finally, try to add the experiment
-        if (!validAgents || !m_mainApp->getProject(projId)->newExperiment(header, values)) {
-            qWarning() << "Failed at" << row << filePath;
+        QString errorMsg;
+        if (!validAgents || !m_mainApp->getProject(projId)->newExperiment(header, values, errorMsg)) {
+            qWarning() << "Error: \"" << errorMsg << "\n\"Failed at" << row << filePath;
             ++failures;
         }
         ++row;

@@ -25,7 +25,9 @@ public:
         QString author;
         QString name;
         QString description;
-        QHash<QString, QString> graphParamsSpace;
+        QHash<QString, QString> graphAttrSpace;
+        QVariantHash graphAttrMin;
+        QVariantHash graphAttrMax;
         IPluginGraph* factory;
     };
 
@@ -34,11 +36,13 @@ public:
         QString author;
         QString name;
         QString description;
-        QVector<QString> allowedGraphs;
-        QHash<QString, QString> agentParamsSpace;
-        QHash<QString, QString> modelParamsSpace;
-        QVariantHash defaultAgentParams;
-        QVariantHash defaultModelParams;
+        QVector<QString> supportedGraphs;
+        QHash<QString, QString> agentAttrSpace;
+        QHash<QString, QString> modelAttrSpace;
+        QVariantHash agentAttrMin;
+        QVariantHash agentAttrMax;
+        QVariantHash modelAttrMin;
+        QVariantHash modelAttrMax;
         IPluginModel* factory;
     };
 
@@ -65,7 +69,8 @@ public:
     inline const GraphPlugin* getGraph(const QString& graphId) { return m_graphs.value(graphId, nullptr); }
     inline const ModelPlugin* getModel(const QString& modelId) { return m_models.value(modelId, nullptr); }
     inline Project* getProject(int projId) { return m_projects.value(projId); }
-    inline const QHash<QString, QString>& getGeneralParamsSpace() { return m_generalParamsSpace; }
+
+    inline const QHash<QString, QString>& getGeneralAttrSpace() { return m_generalAttrSpace; }
 
 private:
     FileMgr* m_fileMgr;
@@ -79,7 +84,7 @@ private:
 
     // lets build a hash with the name and space of the essential parameters
     // it is important to validate the contents of csv files
-    QHash<QString, QString> m_generalParamsSpace;
+    QHash<QString, QString> m_generalAttrSpace;
 
     // load plugin from a .so file; return true if successful
     bool loadPlugin(const QString& path, QObject* instance, QJsonObject& metaData);

@@ -49,7 +49,7 @@ bool Experiment::createTrials()
         const int agentsSize = agentsStr.toInt();
         agents.reserve(agentsSize);
         for (int i = 0; i < agentsSize; ++i) {
-            agents.append(new AbstractAgent(Utils::randomParams(modelPlugin->agentParamsSpace, prg)));
+            agents.append(new AbstractAgent(Utils::randomParams(modelPlugin->agentAttrSpace, prg)));
         }
     }
 

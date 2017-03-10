@@ -21,19 +21,19 @@ MainApp::MainApp()
     , m_trialsMgr(new TrialsMgr())
     , m_lastProjectId(-1)
 {
-    m_generalParamsSpace.insert(GENERAL_ATTRIBUTE_AGENTS, "string");
-    m_generalParamsSpace.insert(GENERAL_ATTRIBUTE_GRAPHID, "string");
-    m_generalParamsSpace.insert(GENERAL_ATTRIBUTE_MODELID, "string");
-    m_generalParamsSpace.insert(GENERAL_ATTRIBUTE_SEED, "string");
-    m_generalParamsSpace.insert(GENERAL_ATTRIBUTE_STOPAT, QString("int[1,%1]").arg(EVOPLEX_MAX_STEPS));
-    m_generalParamsSpace.insert(GENERAL_ATTRIBUTE_TRIALS, QString("int[1,%1]").arg(EVOPLEX_MAX_TRIALS));
+    m_generalAttrSpace.insert(GENERAL_ATTRIBUTE_AGENTS, "string");
+    m_generalAttrSpace.insert(GENERAL_ATTRIBUTE_GRAPHID, "string");
+    m_generalAttrSpace.insert(GENERAL_ATTRIBUTE_MODELID, "string");
+    m_generalAttrSpace.insert(GENERAL_ATTRIBUTE_SEED, "string");
+    m_generalAttrSpace.insert(GENERAL_ATTRIBUTE_STOPAT, QString("int[1,%1]").arg(EVOPLEX_MAX_STEPS));
+    m_generalAttrSpace.insert(GENERAL_ATTRIBUTE_TRIALS, QString("int[1,%1]").arg(EVOPLEX_MAX_TRIALS));
 
     // load plugins
     QDir pluginsDir = QDir(qApp->applicationDirPath());
     pluginsDir.cdUp();
     pluginsDir.cd("plugins");
     if (pluginsDir.cd("graphs")) {
-        foreach (QString dir, pluginsDir.entryList(QDir::Dirs)) {
+        foreach (QString dir, pluginsDir.entryList(QDir::Dirs | QDir::NoDotAndDotDot)) {
             pluginsDir.cd(dir);
             foreach (QString fileName, pluginsDir.entryList(QStringList("*.so"), QDir::Files)) {
                 loadGraphPlugin(pluginsDir.absoluteFilePath(fileName));
@@ -75,16 +75,16 @@ bool MainApp::loadPlugin(const QString& path, QObject* instance, QJsonObject& me
         qWarning() << "[MainApp] unable to load the plugin."
                    << "Couldn't find the meta data json file." << path;
         return false;
-    } else if (!metaData.contains("uid")) {
+    } else if (!metaData.contains(PLUGIN_ATTRIBUTE_UID)) {
         qWarning() << "[MainApp] unable to load the plugin."
-                   << "'uid' cannot be empty" << path;
+                   << PLUGIN_ATTRIBUTE_UID << " cannot be empty" << path;
             return false;
     }
 
-    QString uid = metaData["uid"].toString();
+    QString uid = metaData[PLUGIN_ATTRIBUTE_UID].toString();
     if (m_models.contains(uid) || m_graphs.contains(uid)) {
         qWarning() << "[MainApp] unable to load the plugin."
-                   << "'uid' must be unique!" << path;
+                   << PLUGIN_ATTRIBUTE_UID << " must be unique!" << path;
         return false;
     }
 
@@ -108,19 +108,22 @@ const QString& MainApp::loadGraphPlugin(const QString& path)
     }
 
     GraphPlugin* graph = new GraphPlugin();
-    graph->uid = metaData["uid"].toString();
-    graph->author = metaData["author"].toString();
-    graph->name = metaData["name"].toString();
-    graph->description = metaData["description"].toString();
+    graph->uid = metaData[PLUGIN_ATTRIBUTE_UID].toString();
+    graph->author = metaData[PLUGIN_ATTRIBUTE_AUTHOR].toString();
+    graph->name = metaData[PLUGIN_ATTRIBUTE_NAME].toString();
+    graph->description = metaData[PLUGIN_ATTRIBUTE_DESCRIPTION].toString();
     graph->factory = qobject_cast<IPluginGraph*>(&instance);
 
-    if (metaData.contains("graphParamsSpace")) {
-        QJsonObject json = metaData["graphParamsSpace"].toObject();
+    if (metaData.contains(PLUGIN_ATTRIBUTE_GRAPHSPACE)) {
+        QJsonObject json = metaData[PLUGIN_ATTRIBUTE_GRAPHSPACE].toObject();
         for (QJsonObject::iterator it = json.begin(); it != json.end(); ++it) {
-            graph->graphParamsSpace.insert(it.key(), it.value().toString());
+            // let's add the uid to the key just to avoid clashes
+            QString key = QString("%1_%2").arg(graph->uid).arg(it.key());
+            graph->graphAttrSpace.insert(key, it.value().toString());
         }
     }
 
+    Utils::boundaryValues(graph->graphAttrSpace, graph->graphAttrMin, graph->graphAttrMax);
     m_graphs.insert(graph->uid, graph);
     return graph->uid;
 }
@@ -134,29 +137,31 @@ const QString& MainApp::loadModelPlugin(const QString& path)
     }
 
     ModelPlugin* model = new ModelPlugin();
-    model->uid = metaData["uid"].toString();
-    model->author = metaData["author"].toString();
-    model->name = metaData["name"].toString();
-    model->description = metaData["description"].toString();
-    model->allowedGraphs = metaData["allowedGraphs"].toString().split(",").toVector();
-    model->defaultAgentParams = Utils::minParams(model->agentParamsSpace);
-    model->defaultModelParams = Utils::minParams(model->modelParamsSpace);
+    model->uid = metaData[PLUGIN_ATTRIBUTE_UID].toString();
+    model->author = metaData[PLUGIN_ATTRIBUTE_AUTHOR].toString();
+    model->name = metaData[PLUGIN_ATTRIBUTE_NAME].toString();
+    model->description = metaData[PLUGIN_ATTRIBUTE_DESCRIPTION].toString();
+    model->supportedGraphs = metaData[PLUGIN_ATTRIBUTE_SUPPORTEDGRAPHS].toString().split(",").toVector();
     model->factory = qobject_cast<IPluginModel*>(&instance);
 
-    if (metaData.contains("agentParamsSpace")) {
-        QJsonObject json = metaData["agentParamsSpace"].toObject();
+    if (metaData.contains(PLUGIN_ATTRIBUTE_AGENTSPACE)) {
+        QJsonObject json = metaData[PLUGIN_ATTRIBUTE_AGENTSPACE].toObject();
         for (QJsonObject::iterator it = json.begin(); it != json.end(); ++it) {
-            model->agentParamsSpace.insert(it.key(), it.value().toString());
+            model->agentAttrSpace.insert(it.key(), it.value().toString());
         }
     }
 
-    if (metaData.contains("modelParamsSpace")) {
-        QJsonObject json = metaData["modelParamsSpace"].toObject();
+    if (metaData.contains(PLUGIN_ATTRIBUTE_MODELSPACE)) {
+        QJsonObject json = metaData[PLUGIN_ATTRIBUTE_MODELSPACE].toObject();
         for (QJsonObject::iterator it = json.begin(); it != json.end(); ++it) {
-            model->modelParamsSpace.insert(it.key(), it.value().toString());
+            // let's add the uid to the key just to avoid clashes
+            QString key = QString("%1_%2").arg(model->uid).arg(it.key());
+            model->modelAttrSpace.insert(key, it.value().toString());
         }
     }
 
+    Utils::boundaryValues(model->agentAttrSpace, model->agentAttrMin, model->agentAttrMax);
+    Utils::boundaryValues(model->modelAttrSpace, model->modelAttrMin, model->modelAttrMax);
     m_models.insert(model->uid, model);
     return model->uid;
 }
