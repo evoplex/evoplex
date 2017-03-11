@@ -28,7 +28,7 @@ private:
     QVariantHash m_attributes;
 };
 
-typedef QVector<Edge> Neighbours;  // neighbourhood of one agent
+typedef QVector<Edge*> Neighbours;  // neighbourhood of one agent
 typedef QHash<int, Neighbours> AdjacencyList;
 typedef QHash<int, AbstractAgent*> Population;
 
@@ -92,7 +92,7 @@ Q_DECLARE_INTERFACE(IPluginGraph, "org.evoplex.IPluginGraph")
     Q_INTERFACES(IPluginGraph)                                              \
     public:                                                                 \
         AbstractGraph* create() {                                           \
-            return dynamic_cast<AbstractGraph*>(new CLASSNAME(CLASSNAME));  \
+            return dynamic_cast<AbstractGraph*>(new CLASSNAME(#CLASSNAME)); \
         }                                                                   \
     };
 
