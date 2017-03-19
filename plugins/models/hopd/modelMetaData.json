@@ -3,12 +3,12 @@
   "name": "hopd game",
   "author": "Marcos Cardinot",
   "description": "optional prisoner's dilemma game",
-  "allowedGraphs": "mooreGrid,squareGrid",
-  "agentParamsSpace": {
+  "supportedGraphs": "mooreGrid,squareGrid",
+  "agentAttributesSpace": {
     "strategy": "int{0,1}",
     "probToA": "double[0,1]"
   },
-  "modelParamsSpace": {
+  "modelAttributesSpace": {
     "b": "double[1,2]",
     "l": "double[0,1]"
   }
