@@ -6,8 +6,8 @@
 #include <QtDebug>
 #include <QtMath>
 
-#include "../src/utils/utils.h"
-#include "mooregrid.h"
+#include "graph.h"
+#include "utils/utils.h"
 
 MooreGrid::MooreGrid(const QString& name)
     : AbstractGraph(name)
@@ -16,34 +16,39 @@ MooreGrid::MooreGrid(const QString& name)
 {
 }
 
-bool MooreGrid::init(QVector<AbstractAgent*> agents, QVariantHash graphParams)
+bool MooreGrid::init(QVector<AbstractAgent*> agents, const QVariantHash& graphParams)
 {
     if (!graphParams.contains("height") || !graphParams.contains("width")) {
         qWarning() << "[MooreGrid]: unable to find the parameters 'height'(int) and 'width'(int).";
         return false;
     }
 
-    m_height = graphParams.value("height");
-    m_width = graphParams.value("width");
+    m_height = graphParams.value("height").toInt();
+    m_width = graphParams.value("width").toInt();
     if (agents.size() != m_height * m_width) {
         qWarning() << "[MooreGrid]: the agent set is not compatible with the required shape."
                    << "The number of agents should be equal to 'height'*'width'.";
         return false;
     }
 
-    m_agents = agents;
+    m_population.clear();
+    m_population.reserve(agents.size());
+    for (int i = 0; i < agents.size(); ++i) {
+        m_population.insert(i, agents.at(i));
+    }
+
     return true;
 }
 
-void MooreGrid::resetLinks()
+void MooreGrid::resetNetwork()
 {
-    m_links.clear();
-    m_links.reserve(m_agents.size());
+    m_adjacencyList.clear();
+    m_adjacencyList.reserve(m_population.size());
     // connect agents
-    for (int id = 0; id < m_agents.size(); ++id) {
-        QVector<AbstractAgent*> nbs = calcMooreNeighborhood(id);
-        Q_ASSERT(nbs.size() == 8); // regular graph
-        m_links.insert(id, nbs);
+    for (int id = 0; id < m_population.size(); ++id) {
+        Neighbours neighbours;
+        calcMooreNeighborhood(id, neighbours);
+        m_adjacencyList.insert(id, neighbours);
     }
 }
 
@@ -52,10 +57,10 @@ bool MooreGrid::buildCoordinates()
     int id = 0;
     for (int y = 0; y < m_height; ++y) {
         for (int x = 0; x < m_width; ++x) {
-            AbstractAgent* a = m_agents.at(id);
-            a->setProperty("id", id);
-            a->setProperty("x", x);
-            a->setProperty("y", y);
+            AbstractAgent* a = m_population.value(id);
+            a->setAttribute("id", id);
+            a->setAttribute("x", x);
+            a->setAttribute("y", y);
             ++id;
         }
     }
@@ -70,7 +75,7 @@ QVariantHash MooreGrid::getGraphParams() const
     return h;
 }
 
-QVector<AbstractAgent*> MooreGrid::calcMooreNeighborhood(const int id) const
+void MooreGrid::calcMooreNeighborhood(const int id, Neighbours& neighbours) const
 {
     int row, col;
     Utils::ind2sub(id, m_width, row, col);
@@ -100,7 +105,6 @@ QVector<AbstractAgent*> MooreGrid::calcMooreNeighborhood(const int id) const
     nbs[7][0] = row + 1;
     nbs[7][1] = col + 1;
 
-    QVector<AbstractAgent*> neighbours;
     neighbours.reserve(8);
     for (int i = 0; i < 8; ++i) {
         if (nbs[i][0] < 0) {
@@ -115,10 +119,8 @@ QVector<AbstractAgent*> MooreGrid::calcMooreNeighborhood(const int id) const
             nbs[i][1] = 0;
         }
 
-        QVector<AbstractAgent*> neighbour = m_agents.at(Utils::getLinearIdx(nbs[i][0], nbs[i][1], m_width));
-        Q_ASSERT(neighbour != NULL); // must exist
-        neighbours.append(neighbour);
+        Neighbour nb = m_population.value(Utils::getLinearIdx(nbs[i][0], nbs[i][1], m_width));
+        Q_ASSERT(nb != NULL); // must exist
+        neighbours.push_back(new Edge(nb));
     }
-
-    return neighbours;
 }
