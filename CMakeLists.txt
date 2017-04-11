@@ -1,13 +1,25 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 3.1.0 FATAL_ERROR)
+#=============================================================================
+#  Evoplex
+#  Copyright (C) 2016-2017 by Marcos Cardinot
+#=============================================================================
+
 PROJECT(evoplex)
+
+CMAKE_MINIMUM_REQUIRED(VERSION 3.1.0 FATAL_ERROR)
 
 # Find includes in corresponding build directories
 SET(CMAKE_INCLUDE_CURRENT_DIR ON)
+
 # Instruct CMake to run moc automatically when needed.
 SET(CMAKE_AUTOMOC ON)
 
+# Move the libs to /lib and executable to /bin
+SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+#SET(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+#SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+
 # Generate the commands
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+SET(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # c++11
 SET (CMAKE_CXX_STANDARD 11)
@@ -22,5 +34,5 @@ FIND_PACKAGE(Qt5Widgets REQUIRED)
 # Compile source
 ADD_SUBDIRECTORY(src)
 
-# default models
-ADD_SUBDIRECTORY(models)
+# default plugins (models and graphs)
+ADD_SUBDIRECTORY(plugins)
