@@ -1,3 +1,4 @@
-ADD_SUBDIRECTORY(mooregrid)
-ADD_SUBDIRECTORY(squaregrid)
+INCLUDE_DIRECTORIES(../../src/)
 
+ADD_SUBDIRECTORY(mooregrid)
+#ADD_SUBDIRECTORY(squaregrid)
