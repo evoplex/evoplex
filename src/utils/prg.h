@@ -26,7 +26,7 @@ public:
 
     // Generate a random int [min, max)
     int randI(int min, int max) {
-        std::uniform_int_distribution<int> dis(min, max);
+        std::uniform_int_distribution<int> dis(min, max-1);
         return dis(m_mteng);
     }
     // Generate a random int [0, max)
