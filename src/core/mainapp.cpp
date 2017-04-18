@@ -62,7 +62,7 @@ MainApp::~MainApp()
     qDeleteAll(m_graphs);
 }
 
-bool MainApp::loadPlugin(const QString& path, QObject* instance, QJsonObject& metaData)
+bool MainApp::loadPlugin(const QString& path, QObject** instance, QJsonObject& metaData)
 {
     if (!QFile(path).exists()) {
         qWarning() << "[MainApp] unable to find the .so file." << path;
@@ -88,7 +88,7 @@ bool MainApp::loadPlugin(const QString& path, QObject* instance, QJsonObject& me
         return false;
     }
 
-    instance = loader.instance();
+    *instance = loader.instance();
     if (!instance) {
         qWarning() << "[MainApp] unable to load the plugin."
                    << "Is it a valid .so file?" << path;
@@ -99,12 +99,12 @@ bool MainApp::loadPlugin(const QString& path, QObject* instance, QJsonObject& me
     return true;
 }
 
-const QString& MainApp::loadGraphPlugin(const QString& path)
+QString MainApp::loadGraphPlugin(const QString& path)
 {
-    QObject instance;
+    QObject* instance = nullptr;
     QJsonObject metaData;
     if (!loadPlugin(path, &instance, metaData)) {
-        return NULL;
+        return "";
     }
 
     GraphPlugin* graph = new GraphPlugin();
@@ -112,7 +112,7 @@ const QString& MainApp::loadGraphPlugin(const QString& path)
     graph->author = metaData[PLUGIN_ATTRIBUTE_AUTHOR].toString();
     graph->name = metaData[PLUGIN_ATTRIBUTE_NAME].toString();
     graph->description = metaData[PLUGIN_ATTRIBUTE_DESCRIPTION].toString();
-    graph->factory = qobject_cast<IPluginGraph*>(&instance);
+    graph->factory = qobject_cast<IPluginGraph*>(instance);
 
     if (metaData.contains(PLUGIN_ATTRIBUTE_GRAPHSPACE)) {
         QJsonObject json = metaData[PLUGIN_ATTRIBUTE_GRAPHSPACE].toObject();
@@ -128,12 +128,12 @@ const QString& MainApp::loadGraphPlugin(const QString& path)
     return graph->uid;
 }
 
-const QString& MainApp::loadModelPlugin(const QString& path)
+QString MainApp::loadModelPlugin(const QString& path)
 {
-    QObject instance;
+    QObject* instance = nullptr;
     QJsonObject metaData;
     if (!loadPlugin(path, &instance, metaData)) {
-        return NULL;
+        return "";
     }
 
     ModelPlugin* model = new ModelPlugin();
@@ -142,7 +142,7 @@ const QString& MainApp::loadModelPlugin(const QString& path)
     model->name = metaData[PLUGIN_ATTRIBUTE_NAME].toString();
     model->description = metaData[PLUGIN_ATTRIBUTE_DESCRIPTION].toString();
     model->supportedGraphs = metaData[PLUGIN_ATTRIBUTE_SUPPORTEDGRAPHS].toString().split(",").toVector();
-    model->factory = qobject_cast<IPluginModel*>(&instance);
+    model->factory = qobject_cast<IPluginModel*>(instance);
 
     if (metaData.contains(PLUGIN_ATTRIBUTE_AGENTSPACE)) {
         QJsonObject json = metaData[PLUGIN_ATTRIBUTE_AGENTSPACE].toObject();

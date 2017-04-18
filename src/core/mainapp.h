@@ -51,11 +51,11 @@ public:
 
     // load graph from a .so file
     // return the graph uid
-    const QString& loadGraphPlugin(const QString& path);
+    QString loadGraphPlugin(const QString& path);
 
     // load model from a .so file
     // return the model uid
-    const QString& loadModelPlugin(const QString& path);
+    QString loadModelPlugin(const QString& path);
 
     // Create a new project; return its id
     int newProject(const QString& name="", const QString& dir="");
@@ -87,7 +87,7 @@ private:
     QHash<QString, QString> m_generalAttrSpace;
 
     // load plugin from a .so file; return true if successful
-    bool loadPlugin(const QString& path, QObject* instance, QJsonObject& metaData);
+    bool loadPlugin(const QString& path, QObject **instance, QJsonObject& metaData);
 };
 
 #endif // MAINAPP_H
