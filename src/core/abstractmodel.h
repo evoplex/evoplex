@@ -36,8 +36,8 @@ private:
     AbstractGraph* m_graph;
     PRG* m_prg;
 
-    inline bool setup(PRG* prg, AbstractGraph* graphObj) {
-        m_prg = prg;
+    inline bool setup(int seed, AbstractGraph* graphObj) {
+        m_prg = new PRG(seed);
         m_graph = graphObj;
     }
 };
