@@ -127,7 +127,7 @@ int FileMgr::importExperiments(const QString& filePath, int projId)
 
         // finally, try to add the experiment
         QString errorMsg;
-        if (!validAgents || !m_mainApp->getProject(projId)->newExperiment(header, values, errorMsg)) {
+        if (!validAgents || m_mainApp->getProject(projId)->newExperiment(header, values, errorMsg) == -1) {
             qWarning() << "Error: \"" << errorMsg << "\n\"Failed at" << row << filePath;
             ++failures;
         }
