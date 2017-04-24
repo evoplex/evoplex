@@ -26,6 +26,7 @@ SET (CMAKE_CXX_STANDARD 11)
 
 # Find qt5 packages
 FIND_PACKAGE(Qt5Core REQUIRED)
+FIND_PACKAGE(Qt5Concurrent REQUIRED)
 FIND_PACKAGE(Qt5Widgets REQUIRED)
 
 # Handle data stuff
