@@ -3,13 +3,13 @@
  * @author Marcos Cardinot <mcardinot@gmail.com>
  */
 
+#include <QtDebug>
+
 #include "core/experiment.h"
 #include "core/abstractagent.h"
 #include "core/filemgr.h"
 #include "utils/constants.h"
 #include "utils/utils.h"
-
-#include <QtDebug>
 
 Experiment::Experiment(MainApp* mainApp, int id, int projId, const QVariantHash& generalParams,
                        const QVariantHash& modelParams, const QVariantHash& graphParams)
@@ -19,103 +19,166 @@ Experiment::Experiment(MainApp* mainApp, int id, int projId, const QVariantHash&
     , m_generalParams(generalParams)
     , m_modelParams(modelParams)
     , m_graphParams(graphParams)
+    , m_graphPlugin(m_mainApp->getGraph(generalParams.value(GENERAL_ATTRIBUTE_GRAPHID).toString()))
+    , m_modelPlugin(m_mainApp->getModel(generalParams.value(GENERAL_ATTRIBUTE_MODELID).toString()))
+    , m_numTrials(generalParams.value(GENERAL_ATTRIBUTE_TRIALS).toInt())
 {
+    m_trials.reserve(m_numTrials);
+    m_curSeed = m_generalParams.value(GENERAL_ATTRIBUTE_SEED).toInt();
+    m_stopAt = m_generalParams.value(GENERAL_ATTRIBUTE_STOPAT).toInt();
+    m_pauseAt = m_stopAt;
+    m_globalStatus = READY;
 }
 
-bool Experiment::createTrials()
+void Experiment::run()
 {
-    if (!m_trialsIds.isEmpty()) {
-        qWarning() << "[Experiment]: it seems that the trials for this experiment have already been created.";
-        return false;
+    if (m_globalStatus != READY) {
+        return;
+    }
+    m_mutex.lock();
+    m_globalStatus = RUNNING;
+    m_mainApp->getExperimentsMgr()->run(this);
+    m_mutex.unlock();
+}
+
+void Experiment::finished()
+{
+    m_pauseAt = m_stopAt; // reset the pauseAt flag to maximum
+    m_globalStatus = Experiment::FINISHED;
+    foreach (Trial trial, m_trials) {
+        if (trial.status != FINISHED) {
+            m_globalStatus = READY;
+            break;
+        }
+    }
+    m_mainApp->getExperimentsMgr()->finished(this);
+}
+
+void Experiment::processTrial(int& trialId)
+{
+    if (m_globalStatus == INVALID) {
+        return;
+    } else if (!m_trials.contains(trialId)) {
+        trialId = createTrial();
+        if (trialId == -1) {
+            m_globalStatus = INVALID;
+            pause();
+            return;
+        }
     }
 
-    int seed = m_generalParams.value(GENERAL_ATTRIBUTE_SEED).toInt();
-    PRG* prg = new PRG(seed);
+    Trial trial = m_trials.value(trialId);
+    if (trial.status != READY) {
+        return;
+    }
 
-    // find out the model and graph
-    const QString& modelId = m_generalParams.value(GENERAL_ATTRIBUTE_MODELID).toString();
-    const MainApp::ModelPlugin* modelPlugin = m_mainApp->getModel(modelId);
-    const QString& graphId = m_generalParams.value(GENERAL_ATTRIBUTE_GRAPHID).toString();
-    const MainApp::GraphPlugin* graphPlugin = m_mainApp->getGraph(graphId);
+    trial.status = RUNNING;
 
-    // create the set of agents
+    bool algorithmConverged = false;
+    while (trial.currentStep <= m_pauseAt && !algorithmConverged) {
+        algorithmConverged = trial.modelObj->algorithmStep();
+        ++trial.currentStep;
+    }
+
+    if (trial.currentStep >= m_stopAt || algorithmConverged) {
+        // TODO: IO stuff
+        trial.status = FINISHED;
+    } else {
+        trial.status = READY;
+    }
+}
+
+int Experiment::createTrial()
+{
+    if (m_trials.size() == m_numTrials) {
+        qWarning() << "[Experiment]: all the trials for this experiment have already been created."
+                   << "Project:" << m_projId << "Experiment:" << m_id;
+        return -1;
+    }
+
+    m_mutex.lock();
+    QVector<AbstractAgent*> agents = createAgents();
+    m_mutex.unlock();
+    if (agents.isEmpty()) {
+        return -1;
+    }
+
+    AbstractGraph* graphObj = m_graphPlugin->factory->create();
+    if (!graphObj || !graphObj->init(agents, m_graphParams)) {
+        qWarning() << "[Experiment]: unable to create the trials."
+                   << "The graph could not be initialized."
+                   << "Project:" << m_projId << "Experiment:" << m_id;
+        delete graphObj;
+        qDeleteAll(agents);
+        return -1;
+    }
+
+    AbstractModel* modelObj = m_modelPlugin->factory->create();
+    modelObj->setup(m_curSeed, graphObj); // make the PRG and the graph available in the model
+    if (!modelObj || !modelObj->init(m_modelParams)) {
+        qWarning() << "[Experiment]: unable to create the trials."
+                   << "The model could not be initialized."
+                   << "Project:" << m_projId << "Experiment:" << m_id;
+        delete graphObj;
+        delete modelObj;
+        qDeleteAll(agents);
+        return -1;
+    }
+
+    Trial trial;
+    trial.modelObj = modelObj;
+    trial.status = READY;
+
+    m_mutex.lock();
+    int trialId = m_trials.size() - 1;
+    m_trials.insert(trialId, trial);
+    ++m_curSeed;
+    m_mutex.unlock();
+
+    return trialId;
+}
+
+QVector<AbstractAgent*> Experiment::createAgents()
+{
+    if (!m_clonableAgents.isEmpty()) {
+        return cloneAgents(m_clonableAgents);
+    }
+
+    Q_ASSERT(m_trials.size() == 0);
+
     QVector<AbstractAgent*> agents;
-    const QString& agentsStr = m_generalParams.value(GENERAL_ATTRIBUTE_AGENTS).toString();
-    if (agentsStr.endsWith(".csv")) {
-        // I/O operations are expensive. So, if this is the case, lets do it
-        // only once and feed the trials with copies of the population.
-        agents = m_mainApp->getFileMgr()->importAgents(agentsStr, modelId);
-    } else { // random parameters
-        const int agentsSize = agentsStr.toInt();
-        agents.reserve(agentsSize);
-        for (int i = 0; i < agentsSize; ++i) {
-            agents.append(new AbstractAgent(Utils::randomParams(modelPlugin->agentAttrSpace, prg)));
+    bool isInt;
+    int numAgents = m_generalParams.value(GENERAL_ATTRIBUTE_AGENTS).toInt(&isInt);
+    if (isInt) { // create a population of agents with random properties?
+        agents.reserve(numAgents);
+        PRG* prg = new PRG(m_curSeed);
+        for (int i = 0; i < numAgents; ++i) {
+            agents.append(new AbstractAgent(Utils::randomParams(m_modelPlugin->agentAttrSpace, prg)));
         }
+    } else { // read population from a text file?
+        agents = m_mainApp->getFileMgr()->importAgents(
+                    m_generalParams.value(GENERAL_ATTRIBUTE_AGENTS).toString(),
+                    m_modelPlugin->uid);
     }
 
     if (agents.isEmpty()) {
         qWarning() << "[Experiment]: unable to create the trials."
                    << "The set of agents could not be created."
                    << "Project:" << m_projId << "Experiment:" << m_id;
-        delete prg;
-        qDeleteAll(agents);
-        return false;
-    }
-
-    const int trials = m_generalParams.value(GENERAL_ATTRIBUTE_TRIALS).toInt();
-    m_trialsIds.reserve(trials);
-
-    // create the graph structure
-    AbstractGraph* graphObj = graphPlugin->factory->create();
-    if (!graphObj || !graphObj->init(agents, m_graphParams)) {
-        qWarning() << "[Experiment]: unable to create the trials."
-                   << "The graph could not be initialized."
-                   << "Project:" << m_projId << "Experiment:" << m_id;
-        delete prg;
-        delete graphObj;
-        qDeleteAll(agents);
-        return false;
-    }
-
-    // create the model object
-    AbstractModel* modelObj = modelPlugin->factory->create();
-    modelObj->setup(prg, graphObj); // make the PRG and the graph available in the model
-    if (!modelObj || !modelObj->init(m_modelParams)) {
-        qWarning() << "[Experiment]: unable to create the trials."
-                   << "The model could not be initialized."
-                   << "Project:" << m_projId << "Experiment:" << m_id;
-        delete prg;
-        delete graphObj;
-        delete modelObj;
-        qDeleteAll(agents);
-        return false;
-    }
-
-    // finally, create the first trial
-    const int stopAt = m_generalParams.value(GENERAL_ATTRIBUTE_STOPAT).toInt();
-    m_trialsIds.append(m_mainApp->getTrialsMgr()->newTrial(m_id, m_projId, modelObj, stopAt));
-
-    // more trials to be created? (ie, trials>1)
-    // if all went well for the first trial, we don't need to check everything again
-    for (int t = 1; t < trials; ++t) {
-        // copy agents
-        QVector<AbstractAgent*> agentsCopy;
-        agentsCopy.reserve(agents.size());
-        for (int a = 1; a < agents.size(); ++a) {
-            agentsCopy.append(agents.at(a)->clone());
+    } else {
+        if (m_numTrials > 1) {
+            m_clonableAgents = cloneAgents(agents);
         }
-        // new graph
-        graphObj = graphPlugin->factory->create();
-        graphObj->init(agentsCopy, m_graphParams);
-        // new seed
-        ++seed;
-        // new model
-        modelObj = modelPlugin->factory->create();
-        modelObj->setup(new PRG(seed), graphObj);
-        modelObj->init(m_modelParams);
-        // add trial
-        m_trialsIds.append(m_mainApp->getTrialsMgr()->newTrial(m_id, m_projId, modelObj, stopAt));
     }
+    return agents;
+}
 
-    return true;
+QVector<AbstractAgent*> Experiment::cloneAgents(const QVector<AbstractAgent*>& agents) const
+{
+    QVector<AbstractAgent*> cloned;
+    cloned.reserve(agents.size());
+    foreach (AbstractAgent* a, agents) {
+        cloned.push_back(a->clone());
+    }
+    return cloned;
 }
