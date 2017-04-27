@@ -12,8 +12,8 @@
 
 #include "core/abstractgraph.h"
 #include "core/abstractmodel.h"
-#include "core/trialsmgr.h"
 
+class ExperimentsMgr;
 class FileMgr;
 class Project;
 
@@ -61,7 +61,7 @@ public:
     int newProject(const QString& name="", const QString& dir="");
 
     inline FileMgr* getFileMgr() { return m_fileMgr; }
-    inline TrialsMgr* getTrialsMgr() { return m_trialsMgr; }
+    inline ExperimentsMgr* getExperimentsMgr() { return m_experimentsMgr; }
     inline const QHash<QString, GraphPlugin*>& getGraphs() { return m_graphs; }
     inline const QHash<QString, ModelPlugin*>& getModels() { return m_models; }
     inline const QHash<int, Project*>& getProjects() { return m_projects; }
@@ -74,7 +74,7 @@ public:
 
 private:
     FileMgr* m_fileMgr;
-    TrialsMgr* m_trialsMgr;
+    ExperimentsMgr* m_experimentsMgr;
 
     int m_lastProjectId;
     QHash<int, Project*> m_projects; // opened projects.

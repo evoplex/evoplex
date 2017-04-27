@@ -11,6 +11,7 @@
 #include <QtDebug>
 
 #include "core/mainapp.h"
+#include "core/experimentsmgr.h"
 #include "core/filemgr.h"
 #include "core/project.h"
 #include "utils/constants.h"
@@ -18,7 +19,7 @@
 
 MainApp::MainApp()
     : m_fileMgr(new FileMgr(this))
-    , m_trialsMgr(new TrialsMgr())
+    , m_experimentsMgr(new ExperimentsMgr())
     , m_lastProjectId(-1)
 {
     m_generalAttrSpace.insert(GENERAL_ATTRIBUTE_AGENTS, "string");
@@ -55,8 +56,8 @@ MainApp::MainApp()
 
 MainApp::~MainApp()
 {
-    delete m_trialsMgr;
-    m_trialsMgr = nullptr;
+    delete m_experimentsMgr;
+    m_experimentsMgr = nullptr;
     qDeleteAll(m_projects);
     qDeleteAll(m_models);
     qDeleteAll(m_graphs);
