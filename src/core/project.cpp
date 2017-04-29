@@ -101,6 +101,6 @@ int Project::newExperiment(const QStringList& header, const QStringList& values,
     m_experiments.insert(m_lastExpId,
         new Experiment(m_mainApp, m_lastExpId, m_id,
                        generalParams, modelParams, graphParams));
-    qDebug() << "[Project]: New experiment has been loaded.";    
+    qDebug() << "[Project]: New experiment has been loaded.";
     return m_lastExpId;
 }

@@ -5,8 +5,9 @@
 
 #include <QtDebug>
 
-#include "core/experiment.h"
 #include "core/abstractagent.h"
+#include "core/experiment.h"
+#include "core/experimentsmgr.h"
 #include "core/filemgr.h"
 #include "utils/constants.h"
 #include "utils/utils.h"
