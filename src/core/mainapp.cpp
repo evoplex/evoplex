@@ -118,9 +118,7 @@ QString MainApp::loadGraphPlugin(const QString& path)
     if (metaData.contains(PLUGIN_ATTRIBUTE_GRAPHSPACE)) {
         QJsonObject json = metaData[PLUGIN_ATTRIBUTE_GRAPHSPACE].toObject();
         for (QJsonObject::iterator it = json.begin(); it != json.end(); ++it) {
-            // let's add the uid to the key just to avoid clashes
-            QString key = QString("%1_%2").arg(graph->uid).arg(it.key());
-            graph->graphAttrSpace.insert(key, it.value().toString());
+            graph->graphAttrSpace.insert(it.key(), it.value().toString());
         }
     }
 
@@ -155,9 +153,7 @@ QString MainApp::loadModelPlugin(const QString& path)
     if (metaData.contains(PLUGIN_ATTRIBUTE_MODELSPACE)) {
         QJsonObject json = metaData[PLUGIN_ATTRIBUTE_MODELSPACE].toObject();
         for (QJsonObject::iterator it = json.begin(); it != json.end(); ++it) {
-            // let's add the uid to the key just to avoid clashes
-            QString key = QString("%1_%2").arg(model->uid).arg(it.key());
-            model->modelAttrSpace.insert(key, it.value().toString());
+            model->modelAttrSpace.insert(it.key(), it.value().toString());
         }
     }
 

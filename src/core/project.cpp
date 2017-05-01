@@ -64,24 +64,39 @@ int Project::newExperiment(const QStringList& header, const QStringList& values,
         return -1;
     }
 
+    // we assume that all graph/model attributes start with 'uid_'
+    const QString& graphId_ = gPlugin->uid + "_";
+    const QString& modelId_ = mPlugin->uid + "_";
+
     // get the value of each parameter and make sure they are valid
     QVariantHash generalParams;
     QVariantHash modelParams;
     QVariantHash graphParams;
     const QHash<QString,QString>& gpSpace = m_mainApp->getGeneralAttrSpace();
     for (int i = 0; i < values.size(); ++i) {
-        const QString& name = header.at(i);
         const QString& vStr = values.at(i);
+        QString name = header.at(i);
 
         if (gpSpace.contains(name)) {
             QVariant value = Utils::validateParameter(gpSpace.value(name), vStr);
-            if (value.isValid()) generalParams.insert(name, value);
-        } else if (mPlugin->modelAttrSpace.contains(name)) {
-            QVariant value = Utils::validateParameter(mPlugin->modelAttrSpace.value(name), vStr);
-            if (value.isValid()) modelParams.insert(name, value);
-        } else if (gPlugin->graphAttrSpace.contains(name)) {
-            QVariant value = Utils::validateParameter(gPlugin->graphAttrSpace.value(name), vStr);
-            if (value.isValid()) graphParams.insert(name, value);
+            if (value.isValid())
+                generalParams.insert(name, value);
+        } else if (name.startsWith(modelId_)) {
+            name = name.remove(modelId_);
+            const QString attrSpace = mPlugin->modelAttrSpace.value(name);
+            if (!attrSpace.isEmpty()) {
+                QVariant value = Utils::validateParameter(attrSpace, vStr);
+                if (value.isValid())
+                    modelParams.insert(name, value);
+            }
+        } else if (name.startsWith(graphId_)) {
+            name = name.remove(graphId_);
+            const QString attrSpace = gPlugin->graphAttrSpace.value(name);
+            if (!attrSpace.isEmpty()) {
+                QVariant value = Utils::validateParameter(attrSpace, vStr);
+                if (value.isValid())
+                    graphParams.insert(name, value);
+            }
         } else {
             qWarning() << "[Project]: loading experiment. Attribute not found." << name;
         }

@@ -19,8 +19,10 @@ public:
     Project(MainApp* mainApp, int id, const QString& name="", const QString& dir="");
     virtual ~Project();
 
-    // add a new experiment to this project
-    // return the experimentId or -1 if unsuccessful
+    // Add a new experiment to this project. We assume that all graph/model
+    // attributes start with 'uid_'. It is very important to avoid clashes
+    // between different attributes which use the same name.
+    // @return the experimentId or -1 if unsuccessful
     int newExperiment(const QStringList& header, const QStringList& values, QString& errorMsg);
 
     // getters
