@@ -115,7 +115,7 @@ AttributesWidget::~AttributesWidget()
 void AttributesWidget::slotAgentFile()
 {
     QLineEdit* lineedit = m_widgetFields.value(GENERAL_ATTRIBUTE_AGENTS).value<QLineEdit*>();
-    QString path = QFileDialog::getOpenFileName(this, "Agents", lineedit->text(), "Agents (*.csv)");
+    QString path = QFileDialog::getOpenFileName(this, "Initial Population", lineedit->text(), "Text Files (*.csv *.txt)");
     if (!path.isEmpty()) {
         lineedit->setText(path);
     }
@@ -154,7 +154,7 @@ void AttributesWidget::slotCreateExperiment()
     QString errorMsg;
     int expId = m_project->newExperiment(header, values, errorMsg);
     if (expId >= 0) {
-        emit (newExperiment(m_project->getId(), expId));
+        emit (experimentCreated(expId));
     } else {
         QMessageBox::warning(this, "Experiment",
                 "Unable to create the experiment.\n Error: \"" + errorMsg + "\"");
@@ -256,9 +256,7 @@ void AttributesWidget::insertPluginAttributes(QTreeWidgetItem* itemRoot, const Q
     QVariantHash::const_iterator it = min.begin();
     while (it != min.end()) {
         QTreeWidgetItem* item = new QTreeWidgetItem(itemRoot);
-        QString name = it.key();
-        name.remove(uid_); // remove the uid prefix
-        item->setText(0, name);
+        item->setText(0, it.key());
 
         QVariant qvariant;
         if (it.value().type() == QVariant::Double) {
@@ -282,7 +280,8 @@ void AttributesWidget::insertPluginAttributes(QTreeWidgetItem* itemRoot, const Q
             qvariant = QVariant::fromValue(le);
             m_ui->treeWidget->setItemWidget(item, 1, le);
         }
-        m_widgetFields.insert(it.key(), qvariant);
+        // add the uid as prefix to avoid clashes.
+        m_widgetFields.insert(uid_+it.key(), qvariant);
         ++it;
     }
 }

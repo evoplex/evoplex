@@ -20,7 +20,7 @@ public:
     ~AttributesWidget();
 
 signals:
-    void newExperiment(int projId, int expId);
+    void experimentCreated(const int& expId);
 
 private slots:
     void slotAgentFile();
