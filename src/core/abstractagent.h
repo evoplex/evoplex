@@ -12,15 +12,15 @@
 class AbstractAgent
 {
 public:
-    // constructors
     explicit AbstractAgent() {}
-    explicit AbstractAgent(QVariantHash attr): m_attributes(attr) {}
+    explicit AbstractAgent(QVariantHash attr): m_attributes(attr) { m_attributes.squeeze(); }
+    ~AbstractAgent() {}
 
-    inline AbstractAgent* clone() {
-        return new AbstractAgent(m_attributes);
+    inline AbstractAgent clone() {
+        return AbstractAgent(m_attributes);
     }
 
-    inline const QVariantHash getAttributes() {
+    inline const QVariantHash& getAttributes() {
         return m_attributes;
     }
 
