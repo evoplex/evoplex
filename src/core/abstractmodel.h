@@ -19,7 +19,6 @@ class AbstractBaseModel
 public:
     // destructor
     virtual ~AbstractBaseModel() {
-        qDeleteAll(m_graph->getPopulation());
         delete m_graph;
         m_graph = nullptr;
         delete m_prg;
