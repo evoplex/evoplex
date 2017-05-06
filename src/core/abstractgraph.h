@@ -13,24 +13,24 @@
 
 #include "core/abstractagent.h"
 
-// one agent can be linked to N neighbours which are also agents in the graph
-typedef const AbstractAgent* Neighbour; // alias
-
 class Edge
 {
 public:
-    Edge(Neighbour neighbour): m_neighbour(neighbour) {}
-    Edge(Neighbour neighbour, QVariantHash& attributes): m_neighbour(neighbour), m_attributes(attributes) {}
-    inline Neighbour getNeighbour() { return m_neighbour; }
+    explicit Edge() {}
+    explicit Edge(const AbstractAgent& neighbour): m_neighbour(neighbour) {}
+    explicit Edge(const AbstractAgent& neighbour, QVariantHash attributes): m_neighbour(neighbour), m_attributes(attributes) {}
+
     inline const QVariant getAttribute(const QString& name) { return m_attributes.value(name); }
+    inline AbstractAgent getNeighbour() { return m_neighbour; }
+    inline void setNeighbour(AbstractAgent neighbour) { m_neighbour = neighbour; }
 private:
-    Neighbour m_neighbour;
+    AbstractAgent m_neighbour;
     QVariantHash m_attributes;
 };
 
-typedef QVector<Edge*> Neighbours;  // neighbourhood of one agent
+typedef QVector<Edge> Neighbours;  // neighbourhood of one agent
 typedef QHash<int, Neighbours> AdjacencyList;
-typedef QHash<int, AbstractAgent*> Population;
+typedef QHash<int, AbstractAgent> Population;
 
 class AbstractGraph
 {
@@ -44,7 +44,7 @@ public:
     // Initializes the graph object.
     // This method is called once when a new graph object is being created.
     // It is usually used to validate the graphParams and the set of agents.
-    virtual bool init(QVector<AbstractAgent*> agents, const QVariantHash& graphParams) = 0;
+    virtual bool init(const QVector<AbstractAgent>& agents, const QVariantHash& graphParams) = 0;
 
     // Reset the neighbourhood of all agents to the original structure.
     virtual void resetNetwork() = 0;
@@ -60,7 +60,7 @@ public:
 
     // getters
     inline const QString& getGraphName() { return m_graphName; }
-    inline AbstractAgent* getAgent(int id) { return m_population.value(id, NULL); }
+    inline AbstractAgent getAgent(int id) { return m_population.value(id); }
     inline Neighbours getNeighbours(int id) { return m_adjacencyList.value(id); }
     inline Population getPopulation() { return m_population; }
 
