@@ -91,11 +91,11 @@ private:
     int m_curSeed;
     int m_stopAt;
     int m_pauseAt;
-    Status m_globalStatus;
+    Status m_expStatus;
 
     QHash<int, Trial> m_trials;
 
-    QVector<AbstractAgent*> m_clonableAgents; // holds the initial population for further use
+    QVector<AbstractAgent> m_clonableAgents; // holds the initial population for further use
 
     // We can safely consider that all parameters are valid at this point.
     // However, some things might fail (eg, missing agents, broken graph etc),
@@ -108,10 +108,13 @@ private:
     // initial population in the 'm_clonableAgents' vector. Except when
     // the experiment has only one trial.
     // This method is thread-safe.
-    QVector<AbstractAgent*> createAgents();
+    QVector<AbstractAgent> createAgents();
 
     // clone a population of agents
-    QVector<AbstractAgent*> cloneAgents(const QVector<AbstractAgent*>& agents) const;
+    QVector<AbstractAgent> cloneAgents(const QVector<AbstractAgent>& agents) const;
+
+    // set experiment status
+    inline void setStatus(Status s) { m_mutex.lock(); m_expStatus = s; m_mutex.unlock(); }
 };
 
 #endif // EXPERIMENT_H
