@@ -34,9 +34,10 @@ void ExperimentsMgr::run(Experiment* exp)
         for (int id = 0; id < exp->getNumTrials(); ++id)
             trialIds.push_back(id);
 
-        QFutureWatcher<void> futureWatcher;
-        QObject::connect(&futureWatcher, &QFutureWatcher<void>::finished, [this, exp]() { exp->finished(); });
-        futureWatcher.setFuture(QtConcurrent::map(trialIds, [this, exp](int& trialId) { exp->processTrial(trialId); }));
+        QFutureWatcher<void>* fw = new QFutureWatcher<void>(this);
+        connect(fw, &QFutureWatcher<void>::finished, [this, exp]() { exp->finished(); });
+        fw->setFuture(QtConcurrent::map(trialIds, [this, exp](int trialId) { exp->processTrial(trialId); }));
+
         m_queued.removeOne(exp);
     } else {
         m_queued.push_back(exp);
@@ -46,6 +47,9 @@ void ExperimentsMgr::run(Experiment* exp)
 void ExperimentsMgr::finished(Experiment* exp)
 {
     m_running.removeOne(exp);
+    QFutureWatcher<void>* fw = reinterpret_cast<QFutureWatcher<void>*>(sender());
+    delete fw;
+    fw = nullptr;
 
     if (m_toKill.contains(exp)) {
         //kill(processId);
