@@ -132,7 +132,7 @@ int Experiment::createTrial()
     trial.status = READY;
 
     m_mutex.lock();
-    int trialId = m_trials.size() - 1;
+    int trialId = m_trials.size();
     m_trials.insert(trialId, trial);
     ++m_curSeed;
     m_mutex.unlock();

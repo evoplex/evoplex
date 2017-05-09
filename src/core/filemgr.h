@@ -18,7 +18,7 @@ public:
     // Import a set of agents from a csv file
     // Agents belong to some model. That's why we need the modelId,
     // which is also important to validate the inputs in the file.
-    QVector<AbstractAgent*> importAgents(const QString& filePath, const QString& modelId);
+    QVector<AbstractAgent> importAgents(const QString& filePath, const QString& modelId);
 
     // Import a set of experiments from a csv file
     // return the number of failures or -1 if everything went wrong.

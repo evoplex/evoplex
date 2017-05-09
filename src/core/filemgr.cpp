@@ -16,12 +16,12 @@ FileMgr::FileMgr(MainApp* mainApp): m_mainApp(mainApp)
 {
 }
 
-QVector<AbstractAgent*> FileMgr::importAgents(const QString& filePath, const QString& modelId)
+QVector<AbstractAgent> FileMgr::importAgents(const QString& filePath, const QString& modelId)
 {
     QFile file(filePath);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         qWarning() << "[FileMgr]: unable to read csv file with the set of agents." << filePath;
-        return QVector<AbstractAgent*>();
+        return QVector<AbstractAgent>();
     }
 
     QTextStream in(&file);
@@ -46,16 +46,17 @@ QVector<AbstractAgent*> FileMgr::importAgents(const QString& filePath, const QSt
     if (header.isEmpty()) {
         qWarning() << "[FileMgr]: unable to read the set of agents from" << filePath
                    << "Expected properties:" << modelPlugin->agentAttrSpace.keys();
-        return QVector<AbstractAgent*>();
+        return QVector<AbstractAgent>();
     }
 
     // create agents
-    QVector<AbstractAgent*> agents;
+    QVector<AbstractAgent> agents;
     while (!in.atEnd()) {
         QStringList values = in.readLine().split(",");
         if (values.size() != header.size()) {
             qWarning() << "[FileMgr]: rows must have the same number of columns!";
-            qDeleteAll(agents);
+            agents.clear();
+            agents.squeeze();
             return agents;
         }
 
@@ -64,13 +65,14 @@ QVector<AbstractAgent*> FileMgr::importAgents(const QString& filePath, const QSt
             const QString& space = modelPlugin->agentAttrSpace.value(header.at(i));
             QVariant value = Utils::validateParameter(space, values.at(i));
             if (!value.isValid()) {
-                qDeleteAll(agents);
+                agents.clear();
+                agents.squeeze();
                 return agents;
             }
             parameters.insert(header.at(i), value);
         }
 
-        agents.append(new AbstractAgent(parameters));
+        agents.push_back(AbstractAgent(parameters));
     }
     file.close();
 

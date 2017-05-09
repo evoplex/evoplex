@@ -56,6 +56,8 @@ MainApp::MainApp()
 
 MainApp::~MainApp()
 {
+    delete m_fileMgr;
+    m_fileMgr = nullptr;
     delete m_experimentsMgr;
     m_experimentsMgr = nullptr;
     qDeleteAll(m_projects);
