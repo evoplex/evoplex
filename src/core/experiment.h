@@ -49,7 +49,7 @@ public:
     // Here is where the actual simulation is performed.
     // This method will run in a worker thread until it reaches the max
     // number of steps or the pause criteria defined by the user.
-    void processTrial(int& trialId);
+    void processTrial(const int& trialId);
 
     // run all trials
     void run();
@@ -88,7 +88,7 @@ private:
     const MainApp::GraphPlugin* m_graphPlugin;
     const MainApp::ModelPlugin* m_modelPlugin;
     const int m_numTrials;
-    int m_curSeed;
+    const int m_seed;
     int m_stopAt;
     int m_pauseAt;
     Status m_expStatus;
@@ -100,7 +100,7 @@ private:
     // We can safely consider that all parameters are valid at this point.
     // However, some things might fail (eg, missing agents, broken graph etc),
     // and, in that case, we return -1 to indicate that something went wrong.
-    int createTrial();
+    Trial createTrial(const int& trialSeed);
 
     // The trials are meant to have the same initial population.
     // So, considering that it might be a very expensive operation (eg, I/O),

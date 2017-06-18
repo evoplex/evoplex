@@ -23,9 +23,9 @@ Experiment::Experiment(MainApp* mainApp, int id, int projId, const QVariantHash&
     , m_graphPlugin(m_mainApp->getGraph(generalParams.value(GENERAL_ATTRIBUTE_GRAPHID).toString()))
     , m_modelPlugin(m_mainApp->getModel(generalParams.value(GENERAL_ATTRIBUTE_MODELID).toString()))
     , m_numTrials(generalParams.value(GENERAL_ATTRIBUTE_TRIALS).toInt())
+    , m_seed(generalParams.value(GENERAL_ATTRIBUTE_SEED).toInt())
 {
     m_trials.reserve(m_numTrials);
-    m_curSeed = m_generalParams.value(GENERAL_ATTRIBUTE_SEED).toInt();
     m_stopAt = m_generalParams.value(GENERAL_ATTRIBUTE_STOPAT).toInt();
     m_pauseAt = m_stopAt;
     setStatus(READY);
@@ -53,20 +53,21 @@ void Experiment::finished()
     m_mainApp->getExperimentsMgr()->finished(this);
 }
 
-void Experiment::processTrial(int& trialId)
+void Experiment::processTrial(const int& trialId)
 {
     if (m_expStatus == INVALID) {
         return;
     } else if (!m_trials.contains(trialId)) {
-        trialId = createTrial();
-        if (trialId == -1) {
+        Trial trial = createTrial(m_seed + trialId);
+        if (trial.status == INVALID) {
             setStatus(INVALID);
             pause();
             return;
         }
+        m_trials.insert(trialId, trial);
     }
 
-    Trial trial = m_trials.value(trialId);
+    Trial& trial = m_trials[trialId];
     if (trial.status != READY) {
         return;
     }
@@ -74,7 +75,7 @@ void Experiment::processTrial(int& trialId)
     trial.status = RUNNING;
 
     bool algorithmConverged = false;
-    while (trial.currentStep <= m_pauseAt && !algorithmConverged) {
+    while (trial.currentStep < m_pauseAt && !algorithmConverged) {
         algorithmConverged = trial.modelObj->algorithmStep();
         ++trial.currentStep;
     }
@@ -87,12 +88,12 @@ void Experiment::processTrial(int& trialId)
     }
 }
 
-int Experiment::createTrial()
+Experiment::Trial Experiment::createTrial(const int& trialSeed)
 {
     if (m_trials.size() == m_numTrials) {
         qWarning() << "[Experiment]: all the trials for this experiment have already been created."
                    << "Project:" << m_projId << "Experiment:" << m_id;
-        return -1;
+        return Trial();
     }
 
     m_mutex.lock();
@@ -100,7 +101,7 @@ int Experiment::createTrial()
     m_mutex.unlock();
     if (agents.isEmpty()) {
         agents.squeeze();
-        return -1;
+        return Trial();
     }
 
     AbstractGraph* graphObj = m_graphPlugin->factory->create();
@@ -111,11 +112,11 @@ int Experiment::createTrial()
         delete graphObj;
         agents.clear();
         agents.squeeze();
-        return -1;
+        return Trial();
     }
 
     AbstractModel* modelObj = m_modelPlugin->factory->create();
-    modelObj->setup(m_curSeed, graphObj); // make the PRG and the graph available in the model
+    modelObj->setup(trialSeed, graphObj); // make the PRG and the graph available in the model
     if (!modelObj || !modelObj->init(m_modelParams)) {
         qWarning() << "[Experiment]: unable to create the trials."
                    << "The model could not be initialized."
@@ -124,20 +125,13 @@ int Experiment::createTrial()
         delete modelObj;
         agents.clear();
         agents.squeeze();
-        return -1;
+        return Trial();
     }
 
     Trial trial;
     trial.modelObj = modelObj;
     trial.status = READY;
-
-    m_mutex.lock();
-    int trialId = m_trials.size();
-    m_trials.insert(trialId, trial);
-    ++m_curSeed;
-    m_mutex.unlock();
-
-    return trialId;
+    return trial;
 }
 
 QVector<AbstractAgent> Experiment::createAgents()
@@ -153,7 +147,7 @@ QVector<AbstractAgent> Experiment::createAgents()
     int numAgents = m_generalParams.value(GENERAL_ATTRIBUTE_AGENTS).toInt(&isInt);
     if (isInt) { // create a population of agents with random properties?
         agents.reserve(numAgents);
-        PRG* prg = new PRG(m_curSeed);
+        PRG* prg = new PRG(m_seed);
         for (int i = 0; i < numAgents; ++i) {
             agents.push_back(AbstractAgent(Utils::randomParams(m_modelPlugin->agentAttrSpace, prg)));
         }
