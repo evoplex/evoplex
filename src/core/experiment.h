@@ -114,7 +114,7 @@ private:
     QVector<AbstractAgent> cloneAgents(const QVector<AbstractAgent>& agents) const;
 
     // set experiment status
-    inline void setStatus(Status s) { m_mutex.lock(); m_expStatus = s; m_mutex.unlock(); }
+    inline void setExpStatus(Status s) { m_mutex.lock(); m_expStatus = s; m_mutex.unlock(); }
 };
 
 #endif // EXPERIMENT_H

@@ -28,7 +28,7 @@ Experiment::Experiment(MainApp* mainApp, int id, int projId, const QVariantHash&
     m_trials.reserve(m_numTrials);
     m_stopAt = m_generalParams.value(GENERAL_ATTRIBUTE_STOPAT).toInt();
     m_pauseAt = m_stopAt;
-    setStatus(READY);
+    setExpStatus(READY);
 }
 
 void Experiment::run()
@@ -36,17 +36,17 @@ void Experiment::run()
     if (m_expStatus != READY) {
         return;
     }
-    setStatus(RUNNING);
+    setExpStatus(RUNNING);
     m_mainApp->getExperimentsMgr()->run(this);
 }
 
 void Experiment::finished()
 {
     m_pauseAt = m_stopAt; // reset the pauseAt flag to maximum
-    setStatus(FINISHED);
+    setExpStatus(FINISHED);
     foreach (Trial trial, m_trials) {
         if (trial.status != FINISHED) {
-            setStatus(READY);
+            setExpStatus(READY);
             break;
         }
     }
@@ -60,7 +60,7 @@ void Experiment::processTrial(const int& trialId)
     } else if (!m_trials.contains(trialId)) {
         Trial trial = createTrial(m_seed + trialId);
         if (trial.status == INVALID) {
-            setStatus(INVALID);
+            setExpStatus(INVALID);
             pause();
             return;
         }
