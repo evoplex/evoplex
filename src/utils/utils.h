@@ -22,14 +22,14 @@ public:
     // http://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle
     static QVector<int> shuffle(QVector<int> list);
 
-    // convert a linear index to row column
+    // convert a linear index to row and column
     static void ind2sub(const int ind, const int cols, int &row, int &col) {
         row = ind / cols;
         col = ind % cols;
     }
 
-    // return a linear index
-    static int getLinearIdx(const int row, const int col, const int cols) {
+    // return the linear index of an element in a matrix.
+    static int linearIdx(const int row, const int col, const int cols) {
         return row * cols + col;
     }
 
