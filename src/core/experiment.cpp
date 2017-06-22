@@ -146,12 +146,14 @@ QVector<AbstractAgent> Experiment::createAgents()
     bool isInt;
     int numAgents = m_generalParams.value(GENERAL_ATTRIBUTE_AGENTS).toInt(&isInt);
     if (isInt) { // create a population of agents with random properties?
-        agents.reserve(numAgents);
         PRG* prg = new PRG(m_seed);
-        for (int i = 0; i < numAgents; ++i) {
-            agents.push_back(AbstractAgent(Utils::randomParams(m_modelPlugin->agentAttrSpace, prg)));
-        }
+        QVector<QVariantHash> atbs = Utils::randomParams(m_modelPlugin->agentAttrSpace, prg, numAgents);
         delete prg;
+        Q_ASSERT(atbs.size() == numAgents);
+        agents.reserve(numAgents);
+        for (int i = 0; i < numAgents; ++i) {
+            agents.push_back(AbstractAgent(atbs.at(i)));
+        }
     } else { // read population from a text file?
         agents = m_mainApp->getFileMgr()->importAgents(
                     m_generalParams.value(GENERAL_ATTRIBUTE_AGENTS).toString(),

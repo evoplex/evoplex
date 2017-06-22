@@ -174,41 +174,66 @@ public:
         }
     }
 
-    // return a valid random value for each parameter
-    static QVariantHash randomParams(const QHash<QString,QString>& attributesSpace, PRG* prg) {
-        if (attributesSpace.isEmpty()) {
-            return QVariantHash();
+    // return a vector of valid random values for each parameter
+    static QVector<QVariantHash> randomParams(const QHash<QString,QString>& attributesSpace, PRG* prg, const int size=1)
+    {
+        if (attributesSpace.isEmpty() || size < 1) {
+            return QVector<QVariantHash>();
         }
 
-        QVariantHash ret;
-        QHashIterator<QString, QString> i(attributesSpace);
-        while (i.hasNext()) {
-            i.next();
+        QVector<QVariantHash> ret;
+        ret.reserve(size);
+        for (int j = 0; j < size; ++j) {
+            ret.push_back(QVariantHash());
+        }
 
-            const QString& space = i.value();
-            if (space.isEmpty()) {
-                ret.insert(i.key(), 0);
-                qWarning() << "[Utils]: unable to parse the parameter space of"
-                           << i.key() << i.value();
-                continue;
-            } else if (space.contains("{") && space.endsWith("}")) {
+        QVector<QVariant> retVals;
+        retVals.reserve(size);
+
+        QHash<QString, QString>::const_iterator it = attributesSpace.begin();
+        while (it != attributesSpace.end()) {
+            const QString& space = it.value();
+
+            if (space.contains("{") && space.endsWith("}")) {
                 QVector<QVariant> vals = paramSet(space);
-                ret.insert(i.key(), vals.at(prg->randI(vals.size())));
+                for (int j = 0; j < size; ++j)
+                    retVals.push_back(vals.at(prg->randI(vals.size())));
             } else if (space.contains("[") && space.endsWith("]")) {
                 QVariant max, min;
                 paramInterval(space, min, max);
                 if (min.type() == QVariant::Int) {
-                    ret.insert(i.key(), prg->randI(min.toInt(), max.toInt()));
+                    for (int j = 0; j < size; ++j)
+                        retVals.push_back(prg->randI(min.toInt(), max.toInt()));
                 } else {
-                    ret.insert(i.key(), prg->randD(min.toDouble(), max.toDouble()));
+                    for (int j = 0; j < size; ++j)
+                        retVals.push_back(prg->randD(min.toDouble(), max.toDouble()));
                 }
             } else {
+                for (int j = 0; j < size; ++j)
+                    retVals.push_back(0);
                 qWarning() << "[Utils]: unable to parse the parameter space of"
-                           << i.key() << space;
+                           << it.key() << space;
             }
-        }
 
+            for (int j = 0; j < size; ++j) {
+                ret[j].insert(it.key(), retVals.at(j));
+            }
+
+            retVals.clear();
+            retVals.squeeze();
+            ++it;
+        }
         return ret;
+    }
+
+    // return a valid random value for each parameter
+    static QVariantHash randomParams(const QHash<QString,QString>& attributesSpace, PRG* prg)
+    {
+        QVector<QVariantHash> r = randomParams(attributesSpace, prg, 1);
+        if (r.isEmpty())
+            return QVariantHash();
+        else
+            return r.first();
     }
 };
 
