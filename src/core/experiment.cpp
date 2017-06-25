@@ -7,9 +7,7 @@
 
 #include "core/abstractagent.h"
 #include "core/experiment.h"
-#include "core/experimentsmgr.h"
 #include "core/filemgr.h"
-#include "utils/constants.h"
 #include "utils/utils.h"
 
 Experiment::Experiment(MainApp* mainApp, int id, int projId, const QVariantHash& generalParams,
@@ -28,16 +26,38 @@ Experiment::Experiment(MainApp* mainApp, int id, int projId, const QVariantHash&
     m_trials.reserve(m_numTrials);
     m_stopAt = m_generalParams.value(GENERAL_ATTRIBUTE_STOPAT).toInt();
     m_pauseAt = m_stopAt;
-    setExpStatus(READY);
+    m_expStatus = new Experiment::Status(READY);
 }
 
-void Experiment::run()
+Experiment::~Experiment()
 {
-    if (m_expStatus != READY) {
-        return;
-    }
-    setExpStatus(RUNNING);
-    m_mainApp->getExperimentsMgr()->run(this);
+    delete m_expStatus;
+    m_expStatus = nullptr;
+}
+
+int Experiment::calcProgress()
+{
+    Status status = *m_expStatus;
+    if (status == FINISHED)
+        return 100;
+    else if (status != RUNNING)
+        return 0;
+
+    float p = 0.f;
+    QHash<int, Trial>::iterator it = m_trials.begin();
+    while (it != m_trials.end())
+        p += (it.value().currentStep / (float)m_pauseAt);
+
+    return p / m_numTrials;
+}
+
+void Experiment::toggle()
+{
+    Status status = *m_expStatus;
+    if (status == RUNNING)
+        pause();
+    else if (status == READY)
+        run();
 }
 
 void Experiment::finished()
@@ -55,7 +75,7 @@ void Experiment::finished()
 
 void Experiment::processTrial(const int& trialId)
 {
-    if (m_expStatus == INVALID) {
+    if (*m_expStatus == INVALID) {
         return;
     } else if (!m_trials.contains(trialId)) {
         Trial trial = createTrial(m_seed + trialId);

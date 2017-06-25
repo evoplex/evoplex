@@ -11,6 +11,7 @@
 #include <QVariantHash>
 #include <QVector>
 
+#include "core/experimentsmgr.h"
 #include "core/mainapp.h"
 #include "utils/constants.h"
 
@@ -24,7 +25,8 @@ public:
     enum Status {
         INVALID,  // something went wrong
         READY,    // ready for another step
-        RUNNING,  // trial is running in a work thread
+        QUEUED,   // queued to run
+        RUNNING,  // running in a work thread
         FINISHED, // all is done
     };
 
@@ -44,32 +46,42 @@ public:
         const QVariantHash& modelParams, const QVariantHash& graphParams);
 
     // destructor
-    virtual ~Experiment() {}
+    virtual ~Experiment();
+
+    // return an integer from 0% to 100%
+    int calcProgress();
 
     // Here is where the actual simulation is performed.
     // This method will run in a worker thread until it reaches the max
     // number of steps or the pause criteria defined by the user.
     void processTrial(const int& trialId);
 
+    void toggle();
+
     // run all trials
-    void run();
+    inline void run() { m_mainApp->getExperimentsMgr()->run(this); }
 
     void finished();
 
     // pause all trials at a specific step
     inline void pauseAt(int step) { m_pauseAt = step > m_stopAt ? m_stopAt : step; }
+    inline int getPauseAt() { return m_pauseAt; }
+
     // stop all trials at a specific step
     inline void stopAt(int step) { m_stopAt = step > EVOPLEX_MAX_STEPS ? EVOPLEX_MAX_STEPS : step; }
+    inline int getStopAt() { return m_stopAt; }
+
     // pause all trials asap
     inline void pause() { m_pauseAt = 0; }
+
     // stop all trials asap
     inline void stop() { pause(); m_stopAt = 0; run(); }
 
-    // getters
+    inline const Status* getExpStatusP() { return m_expStatus; }
+    inline void setExpStatus(Status s) { m_mutex.lock(); *m_expStatus = s; m_mutex.unlock(); }
+
     inline int getId() { return m_id; }
-    inline int getProjId() { return m_projId; }
-    inline int getPauseAt() { return m_pauseAt; }
-    inline int getStopAt() { return m_stopAt; }
+    inline int getProjId() { return m_projId; }        
     inline int getNumTrials() { return m_numTrials; }
     inline const QVariantHash& getGeneralParams() { return m_generalParams; }
     inline const QVariantHash& getModelParams() { return m_modelParams; }
@@ -91,7 +103,7 @@ private:
     const int m_seed;
     int m_stopAt;
     int m_pauseAt;
-    Status m_expStatus;
+    Status* m_expStatus;
 
     QHash<int, Trial> m_trials;
 
@@ -112,9 +124,6 @@ private:
 
     // clone a population of agents
     QVector<AbstractAgent> cloneAgents(const QVector<AbstractAgent>& agents) const;
-
-    // set experiment status
-    inline void setExpStatus(Status s) { m_mutex.lock(); m_expStatus = s; m_mutex.unlock(); }
 };
 
 #endif // EXPERIMENT_H
