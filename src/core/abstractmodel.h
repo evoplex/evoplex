@@ -26,8 +26,8 @@ public:
     }
 
 protected:
-    inline AbstractGraph* graph() { return m_graph; }
-    inline PRG* prg() { return m_prg; }
+    inline AbstractGraph* graph() const { return m_graph; }
+    inline PRG* prg() const { return m_prg; }
 
 private:
     friend class Experiment;

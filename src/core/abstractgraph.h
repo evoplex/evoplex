@@ -59,10 +59,10 @@ public:
     virtual QVariantHash getGraphParams() const = 0;
 
     // getters
-    inline const QString& getGraphName() { return m_graphName; }
-    inline AbstractAgent getAgent(int id) { return m_population.value(id); }
-    inline Neighbours getNeighbours(int id) { return m_adjacencyList.value(id); }
-    inline Population getPopulation() { return m_population; }
+    inline const QString& getGraphName() const { return m_graphName; }
+    inline const AbstractAgent getAgent(int id) const { return m_population.value(id); }
+    inline const Neighbours getNeighbours(int id) const { return m_adjacencyList.value(id); }
+    inline const Population& getPopulation() const { return m_population; }
 
 protected:
     const QString m_graphName;

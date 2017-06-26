@@ -20,11 +20,11 @@ public:
         return AbstractAgent(m_attributes);
     }
 
-    inline const QVariantHash& getAttributes() {
+    inline const QVariantHash& getAttributes() const {
         return m_attributes;
     }
 
-    inline const QVariant getAttribute(const QString& name) {
+    inline const QVariant getAttribute(const QString& name) const {
         return m_attributes.value(name);
     }
 
