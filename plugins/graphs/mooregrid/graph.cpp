@@ -49,18 +49,16 @@ void MooreGrid::resetNetwork()
     }
 }
 
-bool MooreGrid::buildCoordinates()
+void MooreGrid::resetCoordinates()
 {
-    QHash<int, AbstractAgent>::iterator i = m_population.begin();
-    while (i != m_population.end()) {
+    QHash<int, AbstractAgent>::iterator it = m_population.begin();
+    while (it != m_population.end()) {
         int x, y;
-        Utils::ind2sub(i.key(), m_width, y, x);
-        i.value().setAttribute("id", i.key());
-        i.value().setAttribute("x", x);
-        i.value().setAttribute("y", y);
-        ++i;
+        Utils::ind2sub(it.key(), m_width, y, x);
+        it.value().setCoords(x, y);
+        it.value().setId(it.key());
+        ++it;
     }
-    return true;
 }
 
 QVariantHash MooreGrid::getGraphParams() const

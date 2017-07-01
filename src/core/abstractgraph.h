@@ -51,8 +51,7 @@ public:
 
     // This method is used to introduce spatial coordinates for each agent.
     // It is mainly used by the GUI when it wants to draw the graph.
-    // If returns false, GUI will not draw it.
-    virtual bool buildCoordinates() = 0;
+    virtual void resetCoordinates() = 0;
 
     // return the current value of all graph parameters (if any)
     // eg., height, width ...

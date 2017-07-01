@@ -20,7 +20,7 @@ public:
 
     bool init(const QVector<AbstractAgent> &agents, const QVariantHash& graphParams);
     void resetNetwork();
-    bool buildCoordinates();
+    void resetCoordinates();
     QVariantHash getGraphParams() const;
 
 private:
