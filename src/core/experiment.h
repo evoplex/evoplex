@@ -80,6 +80,7 @@ public:
     inline const Status* getExpStatusP() { return m_expStatus; }
     inline void setExpStatus(Status s) { m_mutex.lock(); *m_expStatus = s; m_mutex.unlock(); }
 
+    AbstractGraph* getGraph(int trialId) const;
     inline int getId() { return m_id; }
     inline int getProjId() { return m_projId; }        
     inline int getNumTrials() { return m_numTrials; }

@@ -202,3 +202,10 @@ QVector<AbstractAgent> Experiment::cloneAgents(const QVector<AbstractAgent>& age
     }
     return cloned;
 }
+
+AbstractGraph* Experiment::getGraph(int trialId) const
+{
+    if (!m_trials.contains(trialId))
+        return nullptr;
+    return m_trials.value(trialId).modelObj->graph();
+}
