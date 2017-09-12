@@ -21,9 +21,6 @@ public:
 
     void run(Experiment* exp);
 
-    // trigged when an experiment ends
-    void finished(Experiment* exp);
-
     // Kill trial
     void kill(Experiment* exp);
 
@@ -43,6 +40,9 @@ private:
     QVector<Experiment*> m_running;
     QVector<Experiment*> m_queued;
     QVector<Experiment*> m_toKill;
+
+    // trigged when an experiment ends (futurewatcher)
+    void finished(Experiment* exp);
 };
 
 #endif // EXPERIMENTMGR_H

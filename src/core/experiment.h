@@ -61,8 +61,6 @@ public:
     // run all trials
     inline void run() { m_mainApp->getExperimentsMgr()->run(this); }
 
-    void finished();
-
     // pause all trials at a specific step
     inline void pauseAt(int step) { m_pauseAt = step > m_stopAt ? m_stopAt : step; }
     inline int getPauseAt() { return m_pauseAt; }
@@ -77,16 +75,17 @@ public:
     // stop all trials asap
     inline void stop() { pause(); m_stopAt = 0; run(); }
 
-    inline const Status* getExpStatusP() { return m_expStatus; }
+    inline const Status* getExpStatusP() const { return m_expStatus; }
     inline void setExpStatus(Status s) { m_mutex.lock(); *m_expStatus = s; m_mutex.unlock(); }
 
     AbstractGraph* getGraph(int trialId) const;
-    inline int getId() { return m_id; }
-    inline int getProjId() { return m_projId; }        
-    inline int getNumTrials() { return m_numTrials; }
-    inline const QVariantHash& getGeneralParams() { return m_generalParams; }
-    inline const QVariantHash& getModelParams() { return m_modelParams; }
-    inline const QVariantHash& getGraphParams() { return m_graphParams; }
+    inline int getId() const { return m_id; }
+    inline int getProjId() const { return m_projId; }
+    inline int getNumTrials() const { return m_numTrials; }
+    inline const QHash<int,Trial>& getTrials() const { return m_trials; }
+    inline const QVariantHash& getGeneralParams() const { return m_generalParams; }
+    inline const QVariantHash& getModelParams() const { return m_modelParams; }
+    inline const QVariantHash& getGraphParams() const { return m_graphParams; }
 
 private:
     QMutex m_mutex;

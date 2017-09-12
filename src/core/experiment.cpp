@@ -60,19 +60,6 @@ void Experiment::toggle()
         run();
 }
 
-void Experiment::finished()
-{
-    m_pauseAt = m_stopAt; // reset the pauseAt flag to maximum
-    setExpStatus(FINISHED);
-    foreach (Trial trial, m_trials) {
-        if (trial.status != FINISHED) {
-            setExpStatus(READY);
-            break;
-        }
-    }
-    m_mainApp->getExperimentsMgr()->finished(this);
-}
-
 void Experiment::processTrial(const int& trialId)
 {
     if (*m_expStatus == INVALID) {
