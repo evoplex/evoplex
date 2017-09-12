@@ -1,8 +1,8 @@
 
-#include <QCheckBox>
 #include <QComboBox>
 #include <QDebug>
 #include <QFileDialog>
+#include <QHBoxLayout>
 #include <QLineEdit>
 #include <QMessageBox>
 #include <QSpinBox>
@@ -28,6 +28,7 @@ AttributesWidget::AttributesWidget(Project* project, QWidget *parent)
     m_ui->setupUi(this);
 
     connect(m_ui->btnSubmit, SIGNAL(clicked(bool)), this, SLOT(slotCreateExperiment()));
+    m_ui->treeWidget->setFocusPolicy(Qt::NoFocus);
 
     // create and set the widgets for the general attributes
     //
@@ -74,23 +75,15 @@ AttributesWidget::AttributesWidget(Project* project, QWidget *parent)
     QPushButton* btBrowseFile = new QPushButton("...");
     btBrowseFile->setMaximumWidth(20);
     connect(btBrowseFile, SIGNAL(clicked(bool)), this, SLOT(slotAgentFile()));
-    QCheckBox* checkBox = new QCheckBox();
-    checkBox->setChecked(true);
-    connect(checkBox, SIGNAL(toggled(bool)), agentsPath, SLOT(clear()));
-    connect(checkBox, SIGNAL(toggled(bool)), agentsPath, SLOT(setEnabled(bool)));
-    connect(checkBox, SIGNAL(toggled(bool)), btBrowseFile, SLOT(setEnabled(bool)));
-    checkBox->setChecked(false);
-    QWidget* agentsWidget = new QWidget(m_ui->treeWidget);
-    QHBoxLayout* agentsLayout = new QHBoxLayout(agentsWidget);
+    QHBoxLayout* agentsLayout = new QHBoxLayout(new QWidget(m_ui->treeWidget));
     agentsLayout->setMargin(0);
-    agentsLayout->insertWidget(0, checkBox);
-    agentsLayout->insertWidget(1, agentsPath);
-    agentsLayout->insertWidget(2, btBrowseFile);
-    agentsWidget->setLayout(agentsLayout);
+    agentsLayout->insertWidget(0, agentsPath);
+    agentsLayout->insertWidget(1, btBrowseFile);
+    //agentsWidget->setLayout(agentsLayout);
     m_widgetFields.insert(GENERAL_ATTRIBUTE_AGENTS, QVariant::fromValue(agentsPath));
     QTreeWidgetItem* item = new QTreeWidgetItem(m_treeItemGeneral);
     item->setText(0, GENERAL_ATTRIBUTE_AGENTS);
-    m_ui->treeWidget->setItemWidget(item, 1, agentsWidget);
+    m_ui->treeWidget->setItemWidget(item, 1, agentsLayout->parentWidget());
 
     // add the graphId combo box
     cb = new QComboBox(m_ui->treeWidget);
@@ -99,8 +92,9 @@ AttributesWidget::AttributesWidget(Project* project, QWidget *parent)
     connect(cb, SIGNAL(currentIndexChanged(QString)), this, SLOT(slotGraphSelected(QString)));
     m_widgetFields.insert(GENERAL_ATTRIBUTE_GRAPHID, QVariant::fromValue(cb));
 
-    // sort items
+    // sort general tree and leave it open
     m_treeItemGeneral->sortChildren(0, Qt::AscendingOrder);
+    m_treeItemGeneral->setExpanded(true);
 
     // create the trees with the plugin stuff
     slotUpdateModelPlugins();
