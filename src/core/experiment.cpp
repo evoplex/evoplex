@@ -22,47 +22,46 @@ Experiment::Experiment(MainApp* mainApp, int id, int projId, const QVariantHash&
     , m_modelPlugin(m_mainApp->getModel(generalParams.value(GENERAL_ATTRIBUTE_MODELID).toString()))
     , m_numTrials(generalParams.value(GENERAL_ATTRIBUTE_TRIALS).toInt())
     , m_seed(generalParams.value(GENERAL_ATTRIBUTE_SEED).toInt())
+    , m_progress(0)
+    , m_autoDelete(true)
 {
     m_trials.reserve(m_numTrials);
     m_stopAt = m_generalParams.value(GENERAL_ATTRIBUTE_STOPAT).toInt();
     m_pauseAt = m_stopAt;
-    m_expStatus = new Experiment::Status(READY);
+    m_expStatus = READY;
 }
 
 Experiment::~Experiment()
 {
-    delete m_expStatus;
-    m_expStatus = nullptr;
 }
 
-int Experiment::calcProgress()
+void Experiment::updateProgressValue()
 {
-    Status status = *m_expStatus;
-    if (status == FINISHED)
-        return 100;
-    else if (status != RUNNING)
-        return 0;
+    if (m_expStatus == FINISHED) {
+        m_progress = 100;
+    } else if (m_expStatus != RUNNING) {
+        m_progress = 0;
+    } else {
+        float p = 0.f;
+        QHash<int, Trial>::iterator it = m_trials.begin();
+        while (it != m_trials.end())
+            p += (it.value().currentStep / (float)m_pauseAt);
 
-    float p = 0.f;
-    QHash<int, Trial>::iterator it = m_trials.begin();
-    while (it != m_trials.end())
-        p += (it.value().currentStep / (float)m_pauseAt);
-
-    return p / m_numTrials;
+        m_progress = p / m_numTrials;
+    }
 }
 
 void Experiment::toggle()
 {
-    Status status = *m_expStatus;
-    if (status == RUNNING)
+    if (m_expStatus == RUNNING)
         pause();
-    else if (status == READY)
+    else if (m_expStatus == READY)
         run();
 }
 
 void Experiment::processTrial(const int& trialId)
 {
-    if (*m_expStatus == INVALID) {
+    if (m_expStatus == INVALID) {
         return;
     } else if (!m_trials.contains(trialId)) {
         Trial trial = createTrial(m_seed + trialId);
@@ -144,6 +143,9 @@ Experiment::Trial Experiment::createTrial(const int& trialSeed)
 QVector<AbstractAgent> Experiment::createAgents()
 {
     if (!m_clonableAgents.isEmpty()) {
+        if (m_trials.size() == m_numTrials - 1) {
+            return m_clonableAgents;
+        }
         return cloneAgents(m_clonableAgents);
     }
 

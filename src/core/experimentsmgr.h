@@ -32,13 +32,14 @@ public:
     void setNumThreads(int threads);
 
 signals:
-    void added(int trialId);
+    void statusChanged(Experiment* exp);
     void killed(int id);
 
 private:
     int m_threads;
     QVector<Experiment*> m_running;
     QVector<Experiment*> m_queued;
+    QVector<Experiment*> m_idle;
     QVector<Experiment*> m_toKill;
 
     // trigged when an experiment ends (futurewatcher)

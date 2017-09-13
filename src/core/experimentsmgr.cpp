@@ -22,7 +22,7 @@ ExperimentsMgr::~ExperimentsMgr()
 
 void ExperimentsMgr::run(Experiment* exp)
 {
-    if (*exp->getExpStatusP() == Experiment::INVALID
+    if (exp->getExpStatus() == Experiment::INVALID
             || m_running.contains(exp) || m_queued.contains(exp)) {
         return;
     }
@@ -55,6 +55,8 @@ void ExperimentsMgr::run(Experiment* exp)
         exp->setExpStatus(Experiment::QUEUED);
         m_queued.push_back(exp);
     }
+
+    emit (statusChanged(exp));
 }
 
 void ExperimentsMgr::finished(Experiment* exp)
@@ -81,6 +83,8 @@ void ExperimentsMgr::finished(Experiment* exp)
         }
         ++it;
     }
+
+    emit (statusChanged(exp));
 }
 
 void ExperimentsMgr::setNumThreads(int threads)

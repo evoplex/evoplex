@@ -48,8 +48,9 @@ public:
     // destructor
     virtual ~Experiment();
 
-    // return an integer from 0% to 100%
-    int calcProgress();
+    // Updates the progress value.
+    // This method might be expensive!
+    void updateProgressValue();
 
     // Here is where the actual simulation is performed.
     // This method will run in a worker thread until it reaches the max
@@ -75,8 +76,8 @@ public:
     // stop all trials asap
     inline void stop() { pause(); m_stopAt = 0; run(); }
 
-    inline const Status* getExpStatusP() const { return m_expStatus; }
-    inline void setExpStatus(Status s) { m_mutex.lock(); *m_expStatus = s; m_mutex.unlock(); }
+    inline const Status getExpStatus() const { return m_expStatus; }
+    inline void setExpStatus(Status s) { m_mutex.lock(); m_expStatus = s; m_mutex.unlock(); }
 
     AbstractGraph* getGraph(int trialId) const;
     inline int getId() const { return m_id; }
@@ -103,7 +104,9 @@ private:
     const int m_seed;
     int m_stopAt;
     int m_pauseAt;
-    Status* m_expStatus;
+    Status m_expStatus;
+    quint8 m_progress; // current progress value [0, 100]%
+    bool m_autoDelete;
 
     QHash<int, Trial> m_trials;
 
@@ -111,7 +114,7 @@ private:
 
     // We can safely consider that all parameters are valid at this point.
     // However, some things might fail (eg, missing agents, broken graph etc),
-    // and, in that case, we return -1 to indicate that something went wrong.
+    // and, in that case, an invalid Trial() is returned.
     Trial createTrial(const int& trialSeed);
 
     // The trials are meant to have the same initial population.
@@ -119,7 +122,7 @@ private:
     // this method will try to do the heavy stuff only once, storing the
     // initial population in the 'm_clonableAgents' vector. Except when
     // the experiment has only one trial.
-    // This method is thread-safe.
+    // This method is NOT thread-safe.
     QVector<AbstractAgent> createAgents();
 
     // clone a population of agents
