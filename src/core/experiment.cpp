@@ -38,16 +38,17 @@ Experiment::~Experiment()
 void Experiment::updateProgressValue()
 {
     if (m_expStatus == FINISHED) {
-        m_progress = 100;
-    } else if (m_expStatus != RUNNING) {
+        m_progress = 360;
+    } else if (m_expStatus == INVALID) {
         m_progress = 0;
-    } else {
+    } else if (m_expStatus == RUNNING) {
         float p = 0.f;
         QHash<int, Trial>::iterator it = m_trials.begin();
-        while (it != m_trials.end())
-            p += (it.value().currentStep / (float)m_pauseAt);
-
-        m_progress = p / m_numTrials;
+        while (it != m_trials.end()) {
+            p += ((float) it.value().currentStep / m_pauseAt);
+            ++it;
+        }
+        m_progress = ceil(p * 360.f / m_numTrials);
     }
 }
 
@@ -96,7 +97,9 @@ void Experiment::processTrial(const int& trialId)
 
 Experiment::Trial Experiment::createTrial(const int& trialSeed)
 {
-    if (m_trials.size() == m_numTrials) {
+    if (m_expStatus == INVALID) {
+        return Trial();
+    } if (m_trials.size() == m_numTrials) {
         qWarning() << "[Experiment]: all the trials for this experiment have already been created."
                    << "Project:" << m_projId << "Experiment:" << m_id;
         return Trial();
@@ -142,7 +145,9 @@ Experiment::Trial Experiment::createTrial(const int& trialSeed)
 
 QVector<AbstractAgent> Experiment::createAgents()
 {
-    if (!m_clonableAgents.isEmpty()) {
+    if (m_expStatus == INVALID) {
+        return QVector<AbstractAgent>();
+    } else if (!m_clonableAgents.isEmpty()) {
         if (m_trials.size() == m_numTrials - 1) {
             return m_clonableAgents;
         }

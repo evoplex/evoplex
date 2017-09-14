@@ -51,6 +51,7 @@ public:
     // Updates the progress value.
     // This method might be expensive!
     void updateProgressValue();
+    inline quint16 getProgress() const { return m_progress; }
 
     // Here is where the actual simulation is performed.
     // This method will run in a worker thread until it reaches the max
@@ -105,7 +106,7 @@ private:
     int m_stopAt;
     int m_pauseAt;
     Status m_expStatus;
-    quint8 m_progress; // current progress value [0, 100]%
+    quint16 m_progress; // current progress value [0, 360]
     bool m_autoDelete;
 
     QHash<int, Trial> m_trials;
