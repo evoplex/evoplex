@@ -1,0 +1,13 @@
+<RCC>
+    <qresource prefix="/icons">
+        <file>evoplex.svg</file>
+        <file>queue.svg</file>
+        <file>projects.svg</file>
+        <file>x.svg</file>
+        <file>check.svg</file>
+        <file>play.svg</file>
+        <file>play-on.svg</file>
+        <file>pause-on.svg</file>
+        <file>restart.svg</file>
+    </qresource>
+</RCC>
