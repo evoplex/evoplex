@@ -1,19 +1,27 @@
+#include <QHeaderView>
 #include <QPainter>
 #include <QPaintEvent>
+#include <QPixmap>
 
 #include "gui/tablewidget.h"
 
 TableWidget::TableWidget(QWidget *parent)
-    : QWidget(parent)
-    , m_ui(new Ui_TableWidget)
+    : QTableWidget(parent)
+    , kIcon_check(QPixmap(":/icons/check.svg").scaledToWidth(14, Qt::SmoothTransformation))
+    , kIcon_play(QPixmap(":/icons/play.svg").scaledToWidth(28, Qt::SmoothTransformation))
+    , kIcon_playon(QPixmap(":/icons/play-on.svg").scaledToWidth(28, Qt::SmoothTransformation))
+    , kIcon_pause(QPixmap(":/icons/pause.svg").scaledToWidth(28, Qt::SmoothTransformation))
+    , kIcon_pauseon(QPixmap(":/icons/pause-on.svg").scaledToWidth(28, Qt::SmoothTransformation))
+    , kIcon_restart(QPixmap(":/icons/restart.svg").scaledToWidth(18, Qt::SmoothTransformation))
+    , kIcon_x(QPixmap(":/icons/x.svg").scaledToWidth(14, Qt::SmoothTransformation))
 {
-    m_ui->setupUi(this);
+    this->setMouseTracking(true);
 
-    m_ui->table->setStyleSheet("QTableView { background-color:transparent; selection-background-color: rgb(51,51,51); }"
-                               "QTableView::item { border-bottom: 1px solid rgb(40,40,40); color: white; }"
-                               "QTableView::item:hover { background-color: rgb(40,40,40); }");
+    this->setStyleSheet("QTableView { background-color:transparent; selection-background-color: rgb(51,51,51); }"
+                        "QTableView::item { border-bottom: 1px solid rgb(40,40,40); color: white; }"
+                        "QTableView::item:hover { background-color: rgb(40,40,40); }");
 
-    m_ui->table->horizontalHeader()->setStyleSheet(
+    this->horizontalHeader()->setStyleSheet(
                 "QHeaderView { background-color: rgb(24,24,24); }"
                 "QHeaderView::section {\
                     background-color: rgb(24,24,24); \
@@ -24,6 +32,7 @@ TableWidget::TableWidget(QWidget *parent)
                 );
 
     m_headerLabel.insert(H_BUTTON, "");
+    m_headerLabel.insert(H_PROJID, "Project");
     m_headerLabel.insert(H_EXPID, "#");
     m_headerLabel.insert(H_SEED, "Seed");
     m_headerLabel.insert(H_STOPAT, "Stop at");
@@ -32,54 +41,66 @@ TableWidget::TableWidget(QWidget *parent)
     m_headerLabel.insert(H_GRAPH, "Graph");
     m_headerLabel.insert(H_TRIALS, "Trials");
 
-    m_ui->table->horizontalHeader()->setHighlightSections(false);
-    m_ui->table->horizontalHeader()->setDefaultSectionSize(70);
-    m_ui->table->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    this->horizontalHeader()->setHighlightSections(false);
+    this->horizontalHeader()->setDefaultSectionSize(70);
+    this->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 
-    m_ui->table->verticalHeader()->setVisible(false);
-    m_ui->table->verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);
-    m_ui->table->verticalHeader()->setDefaultSectionSize(40);
+    this->verticalHeader()->setVisible(false);
+    this->verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);
+    this->verticalHeader()->setDefaultSectionSize(40);
 
-    m_ui->table->setShowGrid(false);
-    m_ui->table->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    m_ui->table->setSelectionBehavior(QAbstractItemView::SelectRows);
-    m_ui->table->setSelectionMode(QAbstractItemView::SingleSelection);
-    m_ui->table->setItemDelegate(new RowsDelegate(m_ui->table));
+    this->setShowGrid(false);
+    this->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    this->setSelectionBehavior(QAbstractItemView::SelectRows);
+    this->setSelectionMode(QAbstractItemView::SingleSelection);
+    this->setItemDelegate(new RowsDelegate(this));
 
-    connect(m_ui->table, SIGNAL(itemClicked(QTableWidgetItem*)),
-            this, SIGNAL(itemClicked(QTableWidgetItem*)));
-    connect(m_ui->table, SIGNAL(itemDoubleClicked(QTableWidgetItem*)),
-            this, SIGNAL(itemDoubleClicked(QTableWidgetItem*)));
+    // setup the context menu
+//    m_contextMenu = new ContextMenuTable(m_project, m_tableExps);
+//    m_table->setContextMenuPolicy(Qt::CustomContextMenu);
+//    connect(m_tableExps, SIGNAL(customContextMenuRequested(QPoint)),
+//            this, SLOT(slotContextMenu(QPoint)));
+//    connect(m_contextMenu, SIGNAL(openView(int)), this, SLOT(slotOpenView(int)));
 }
 
-TableWidget::~TableWidget()
-{
-    delete m_ui;
-    m_ui = nullptr;
-}
-
-void TableWidget::insertColumns(const QList<int> headers)
+void TableWidget::insertColumns(const QList<Header> headers)
 {
     QStringList labels;
-    foreach (int h, headers) {
-        labels << m_headerLabel.value((Header) h);
+    foreach (Header h, headers) {
+        labels << m_headerLabel.value(h);
     }
-    m_ui->table->setColumnCount(labels.size());
-    m_ui->table->setHorizontalHeaderLabels(labels);
+    this->setColumnCount(labels.size());
+    this->setHorizontalHeaderLabels(labels);
+}
+
+void TableWidget::insertPlayButton(int row, int col, Experiment* exp)
+{
+    this->setCellWidget(row, col, new PlayButton(row, exp, this));
+    this->horizontalHeader()->setSectionResizeMode(col, QHeaderView::Fixed);
+    this->horizontalHeader()->setDefaultSectionSize(60);
 }
 
 /*********************************************************/
 /*********************************************************/
 
-PlayButton::PlayButton(int row, Experiment* exp, QTableWidget* parent)
+PlayButton::PlayButton(int row, Experiment* exp, TableWidget* parent)
     : QWidget(parent)
+    , m_table(parent)
     , m_exp(exp)
     , m_row(row)
     , m_btnHovered(false)
     , m_rowHovered(false)
+    , m_penBlue(QPen(QBrush(QColor(66,133,244)), 3))
 {
+    connect(parent, &QTableWidget::viewportEntered, [this](){ m_rowHovered=false; });
     connect(this, SIGNAL(cellEntered(int,int)), parent, SIGNAL(cellEntered(int,int)));
     connect(parent, SIGNAL(cellEntered(int,int)), this, SLOT(onItemEntered(int,int)));
+}
+
+void PlayButton::mousePressEvent(QMouseEvent* e)
+{
+    if(e->button() == Qt::LeftButton)
+        m_exp->toggle();
 }
 
 void PlayButton::onItemEntered(int row, int col)
@@ -94,38 +115,55 @@ void PlayButton::paintEvent(QPaintEvent* e)
     painter.begin(this);
     painter.setRenderHint(QPainter::Antialiasing);
 
-    //painter.setBrush(QBrush);
-    //painter.setPen(QColor("blue"));
-
-    int xCenter = e->rect().center().x();
-
-    Experiment::Status status = *m_exp->getExpStatusP();
+    Experiment::Status status = m_exp->getExpStatus();
     if (status == Experiment::READY) {
-        if (m_btnHovered || m_rowHovered) { //play (only when hovered)
-            float x = xCenter + 16.5;
-            float r = 5.0;
-            QPointF play[3] = {
-                QPointF(x-r, 12.), // top
-                QPointF(x-r, 27.5), // bottom
-                QPointF(x+r, 20.5)  // right
-            };
-            painter.drawPolygon(play, 3);
-            painter.drawArc(xCenter, 5, 29, 29, 0, 360*16);
+        if (m_btnHovered) { //play (only when hovered)
+            painter.drawPixmap(e->rect().center().x()-14,
+                               e->rect().center().y()-14,
+                               m_table->kIcon_playon);
+        } else if (m_rowHovered) {
+            painter.drawPixmap(e->rect().center().x()-14,
+                               e->rect().center().y()-14,
+                               m_table->kIcon_play);
+        }
+        // show progress
+        if (m_exp->getProgress() > 0) {
+            painter.setPen(m_penBlue);
+            painter.drawArc(e->rect().center().x() - 14,
+                            e->rect().center().y() - 14,
+                            28, 28, 90*16, -m_exp->getProgress()*16);
         }
     } else if (status == Experiment::RUNNING) {
-        //pause (always)
-        //show progressbar (ao redor com percent na tooltip ou pequeno no topo)
+        if (m_btnHovered || m_rowHovered) { // pause (always show)
+            painter.drawPixmap(e->rect().center().x()-14,
+                               e->rect().center().y()-14,
+                               m_table->kIcon_pauseon);
+        } else {
+            painter.drawPixmap(e->rect().center().x()-14,
+                               e->rect().center().y()-14,
+                               m_table->kIcon_pause);
+        }
+        // show progress
+        if (m_exp->getProgress() > 0) {
+            painter.setPen(m_penBlue);
+            painter.drawArc(e->rect().center().x() - 14,
+                            e->rect().center().y() - 14,
+                            28, 28, 90*16, -m_exp->getProgress()*16);
+        }
     } else if (status == Experiment::FINISHED) {
-        //check (always)
-        //restart (when hovered)
+        if (m_btnHovered || m_rowHovered) { // restart (when hovered)
+            painter.drawPixmap(e->rect().center().x()-9,
+                               e->rect().center().y()-9,
+                               m_table->kIcon_restart);
+        } else { // check (always)
+            painter.drawPixmap(e->rect().center().x()-7,
+                               e->rect().center().y()-7,
+                               m_table->kIcon_check);
+        }
     } else {
-        //red cross (always)
-    }
-
-    if (m_btnHovered) { // button hovered
-        // bright
-    } else if (m_rowHovered) { // row hovered
-        // normal
+        painter.drawPixmap(e->rect().center().x()-7,
+                           e->rect().center().y()-7,
+                           m_table->kIcon_x);
     }
 
     painter.end();
@@ -139,7 +177,6 @@ RowsDelegate::RowsDelegate(QTableWidget* tableWidget)
     , m_tableWdt(tableWidget)
     , m_hoveredRow(-1)
 {
-    m_tableWdt->setMouseTracking(true);
     connect(m_tableWdt, &QTableWidget::viewportEntered, [this](){ m_hoveredRow=-1; });
     connect(m_tableWdt, SIGNAL(cellEntered(int,int)), this, SLOT(onItemEntered(int,int)));
 }
