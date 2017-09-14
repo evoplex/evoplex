@@ -30,7 +30,10 @@ QueueWidget::QueueWidget(ExperimentsMgr* expMgr, QWidget* parent)
     m_ui->queue->hide();
     m_ui->idle->hide();
 
-    connect(m_expMgr, SIGNAL(statusChanged(Experiment*)), this, SLOT(slotStatusChanged(Experiment*)));
+    connect(m_expMgr, SIGNAL(statusChanged(Experiment*)),
+            this, SLOT(slotStatusChanged(Experiment*)));
+    connect(m_expMgr, SIGNAL(progressUpdated(Experiment*)),
+            m_ui->tableRunning->viewport(), SLOT(update()));
 }
 
 void QueueWidget::slotStatusChanged(Experiment* exp)
@@ -39,7 +42,7 @@ void QueueWidget::slotStatusChanged(Experiment* exp)
     Row prev = m_rows.value(key, Row());
     Row next = prev;
 
-    Experiment::Status status = *exp->getExpStatusP();
+    Experiment::Status status = exp->getExpStatus();
     switch (status) {
         case Experiment::RUNNING:
             if (prev.table != T_RUNNING) {
