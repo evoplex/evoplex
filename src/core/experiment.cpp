@@ -31,10 +31,6 @@ Experiment::Experiment(MainApp* mainApp, int id, int projId, const QVariantHash&
     m_expStatus = READY;
 }
 
-Experiment::~Experiment()
-{
-}
-
 void Experiment::updateProgressValue()
 {
     if (m_expStatus == FINISHED) {

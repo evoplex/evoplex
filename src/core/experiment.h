@@ -41,12 +41,8 @@ public:
         Status status = INVALID;
     };
 
-    // constructor
     explicit Experiment(MainApp* mainApp, int id, int projId, const QVariantHash& generalParams,
         const QVariantHash& modelParams, const QVariantHash& graphParams);
-
-    // destructor
-    virtual ~Experiment();
 
     // Updates the progress value.
     // This method might be expensive!
