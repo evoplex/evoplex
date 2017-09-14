@@ -9,18 +9,9 @@
 #include <QMainWindow>
 
 #include "core/mainapp.h"
-#include "gui/contextmenutable.h"
-#include "gui/wizardnewproject.h"
-
-#define STRING_EXPERIMENT_ID "expId"
-#define STRING_PROCESS_ID "procId"
-#define STRING_PROCESS_STATUS "status"
-#define STRING_MODEL_NAME "model"
-#define STRING_PROJECT_NAME "project"
-
-namespace Ui {
-    class MainGUI;
-}
+#include "gui/projectswindow.h"
+#include "gui/queuewidget.h"
+#include "gui/welcomewidget.h"
 
 class MainGUI: public QMainWindow
 {
@@ -28,24 +19,28 @@ class MainGUI: public QMainWindow
 
 public:
     explicit MainGUI(MainApp* mainApp, QWidget* parent=0);
-    ~MainGUI();
-
-    void addProject(int projId);
-
-    const QString statusToString(Simulation::Status status) const;
 
 public slots:
-    void slotAddProcess(int processId);
-    void slotStatusChanged(int experimentId, int processId, int newStatus);
-    void slotContextMenu(QPoint point);
+    void slotPage(QAction* action);
+
+protected:
+    bool eventFilter(QObject *watched, QEvent *event);
 
 private:
-    Ui::MainGUI* m_ui;
-    MainApp* m_mainApp;
-    WizardNewProject* m_wizardNewProject;
+    enum Page {
+        PAGE_NULL,
+        PAGE_WELCOME,
+        PAGE_QUEUE,
+        PAGE_PROJECTS
+    };
 
-    QHash<QString, int> m_tableHeader; // map column name to column index
-    ContextMenuTable* m_contextMenu;
+    MainApp* m_mainApp;
+    WelcomeWidget* m_welcome;
+    QueueWidget* m_queue;
+    ProjectsWindow* m_projects;
+    Page m_curPage;
+
+    void setPageVisible(Page page, bool visible);
 };
 
 #endif // MAINGUI_H
