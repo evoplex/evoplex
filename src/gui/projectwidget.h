@@ -10,17 +10,17 @@
 #include <QMap>
 #include <QMainWindow>
 
+#include "ui_projectwidget.h"
 #include "core/project.h"
 #include "gui/attributeswidget.h"
 #include "gui/tablewidget.h"
-//#include "gui/contextmenutable.h"
 
 class ProjectWidget : public QDockWidget
 {
     Q_OBJECT
 
 public:
-    explicit ProjectWidget(Project* project, QWidget *parent = 0);
+    explicit ProjectWidget(Project* project, ExperimentsMgr *expMgr, QWidget *parent = 0);
     ~ProjectWidget();
 
 signals:
@@ -31,8 +31,8 @@ private slots:
     void insertRow(const int& expId);
 
 private:
+    Ui_ProjectWidget* m_ui;
     QMainWindow* m_innerWindow;
-    TableWidget* m_table;
     AttributesWidget* m_attrWidget;
     Project* m_project;
 

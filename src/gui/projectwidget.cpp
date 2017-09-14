@@ -4,30 +4,28 @@
  */
 
 #include <QDebug>
-#include <QLabel>
 #include <QHBoxLayout>
-#include <QHeaderView>
 #include <QMainWindow>
-#include <QPushButton>
-#include <QRect>
 #include <QVariantHash>
 #include <QTableWidgetItem>
 
 #include "gui/projectwidget.h"
 
-ProjectWidget::ProjectWidget(Project* project, QWidget* parent)
+ProjectWidget::ProjectWidget(Project* project, ExperimentsMgr* expMgr, QWidget* parent)
     : QDockWidget(parent)
+    , m_ui(new Ui_ProjectWidget)
     , m_innerWindow(new QMainWindow(this, Qt::FramelessWindowHint))
-    , m_table(new TableWidget(m_innerWindow))
     , m_attrWidget(new AttributesWidget(project, m_innerWindow))
     , m_project(project)
 {
     this->setWindowTitle(m_project->getName());  
-
     QHBoxLayout* lh = new QHBoxLayout(new QWidget(this));
     lh->addWidget(m_innerWindow);
     this->setWidget(lh->parentWidget());
-    m_innerWindow->setCentralWidget(m_table);
+
+    QWidget* projectWidget = new QWidget(m_innerWindow);
+    m_ui->setupUi(projectWidget);
+    m_innerWindow->setCentralWidget(projectWidget);
     m_innerWindow->setStyleSheet("QMainWindow { background-color: rgb(24,24,24); }");
 
     m_innerWindow->addDockWidget(Qt::RightDockWidgetArea, m_attrWidget);
@@ -44,10 +42,15 @@ ProjectWidget::ProjectWidget(Project* project, QWidget* parent)
     m_headerIdx.insert(TableWidget::H_MODEL, col++);
     m_headerIdx.insert(TableWidget::H_GRAPH, col++);
     m_headerIdx.insert(TableWidget::H_TRIALS, col++);
-    m_table->insertColumns(m_headerIdx.values());
+    m_ui->table->insertColumns(m_headerIdx.keys());
 
-    connect(m_table, SIGNAL(itemDoubleClicked(QTableWidgetItem*)),
+    connect(m_ui->table, SIGNAL(itemDoubleClicked(QTableWidgetItem*)),
             this, SLOT(onItemDoubleClicked(QTableWidgetItem*)));
+
+    connect(expMgr, SIGNAL(statusChanged(Experiment*)),
+            m_ui->table->viewport(), SLOT(update()));
+    connect(expMgr, SIGNAL(progressUpdated(Experiment*)),
+            m_ui->table->viewport(), SLOT(update()));
 }
 
 ProjectWidget::~ProjectWidget()
@@ -57,11 +60,10 @@ ProjectWidget::~ProjectWidget()
 void ProjectWidget::insertRow(const int& expId)
 {
     Experiment* exp = m_project->getExperiment(expId);
-    const int row = m_table->rowCount();
-    m_table->insertRow(row);
+    const int row = m_ui->table->insertRow();
 
     // play/pause button
-    m_table->insertPlayButton(row, m_headerIdx.value(TableWidget::H_BUTTON), exp);
+    m_ui->table->insertPlayButton(row, m_headerIdx.value(TableWidget::H_BUTTON), exp);
 
     // general stuff
     const QVariantHash& gep = exp->getGeneralParams();
@@ -91,9 +93,7 @@ void ProjectWidget::insertRow(const int& expId)
         QFont font = item->font();
         font.setItalic(true);
         item->setFont(font);
-        int col = m_headerIdx.value(header);
-        m_table->setItem(row, col, item);
-        m_table->stretchColumn(col);
+        m_ui->table->setItem(row, m_headerIdx.value(header), item);
     };
 
     // model stuff
@@ -108,11 +108,11 @@ void ProjectWidget::insertItem(int row, TableWidget::Header header, QString labe
     QTableWidgetItem* item = new QTableWidgetItem(label);
     item->setTextAlignment(Qt::AlignCenter);
     item->setToolTip(tooltip);
-    m_table->setItem(row, m_headerIdx.value(header), item);
+    m_ui->table->setItem(row, m_headerIdx.value(header), item);
 }
 
 void ProjectWidget::onItemDoubleClicked(QTableWidgetItem* item)
 {
-    int expId = m_table->data(item->row(), m_headerIdx.value(TableWidget::H_EXPID)).toInt();
+    int expId = m_ui->table->data(item->row(), m_headerIdx.value(TableWidget::H_EXPID)).toInt();
     emit (openExperiment(m_project->getId(), expId));
 }
