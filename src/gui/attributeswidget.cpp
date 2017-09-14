@@ -138,7 +138,9 @@ void AttributesWidget::slotCreateExperiment()
     while (it != m_widgetFields.end()) {
         header << it.key();
         QWidget* widget = it.value().value<QWidget*>();
-        if (widget->objectName() == COMBO_BOX) {
+        if (widget->objectName() == CHECK_BOX) {
+            values << QString::number(qobject_cast<QCheckBox*>(widget)->isChecked());
+        } else if (widget->objectName() == COMBO_BOX) {
             values << qobject_cast<QComboBox*>(widget)->currentText();
         } else if (widget->objectName() == DOUBLE_SPIN_BOX) {
             values << QString::number(qobject_cast<QDoubleSpinBox*>(widget)->value());
@@ -158,7 +160,7 @@ void AttributesWidget::slotCreateExperiment()
         emit (experimentCreated(expId));
     } else {
         QMessageBox::warning(this, "Experiment",
-                "Unable to create the experiment.\n Error: \"" + errorMsg + "\"");
+                "Unable to create the experiment.\nError: \"" + errorMsg + "\"");
     }
 }
 

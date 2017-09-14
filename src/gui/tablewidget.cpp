@@ -1,3 +1,8 @@
+/**
+ * Copyright (C) 2017 - Marcos Cardinot
+ * @author Marcos Cardinot <mcardinot@gmail.com>
+ */
+
 #include <QHeaderView>
 #include <QPainter>
 #include <QPaintEvent>
@@ -111,6 +116,9 @@ void PlayButton::onItemEntered(int row, int col)
 
 void PlayButton::paintEvent(QPaintEvent* e)
 {
+    if (!exp)
+        return;
+
     QPainter painter;
     painter.begin(this);
     painter.setRenderHint(QPainter::Antialiasing);
