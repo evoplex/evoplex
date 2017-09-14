@@ -37,6 +37,7 @@ public:
     // If true, return a valid QVariant with the correct type
     //
     // Parameter space can be:
+    //   - "bool"             // a boolean
     //   - "string"             // a string
     //   - "int[min,max]"       // integers from min to max (including min and max)
     //   - "int{1,2,3}"         // set of integers
@@ -45,8 +46,9 @@ public:
     //   * you can use 'max' to take the maximum value for the type
     static QVariant validateParameter(const QString& space, const QString& valueStr) {
         if (space == "string") {
-            // nothing to do
-            return valueStr;
+            return valueStr; // nothing to do
+        } else if (space == "bool") {
+            return QVariant(valueStr).toBool();
         } else if (space.contains('{') && space.endsWith('}')) {
             QVector<QVariant> values = paramSet(space);
             int idx = values.indexOf(valueStr);

@@ -1,4 +1,5 @@
 
+#include <QCheckBox>
 #include <QComboBox>
 #include <QDebug>
 #include <QFileDialog>
@@ -13,10 +14,11 @@
 
 #define STRING_NULL_PLUGINID "--"
 // let's make it easier to find the type of the field
-#define COMBO_BOX "0"
-#define DOUBLE_SPIN_BOX "1"
-#define SPIN_BOX "2"
-#define LINE_EDIT "3"
+#define CHECK_BOX "0"
+#define COMBO_BOX "1"
+#define DOUBLE_SPIN_BOX "2"
+#define SPIN_BOX "3"
+#define LINE_EDIT "4"
 
 AttributesWidget::AttributesWidget(Project* project, QWidget *parent)
     : QDockWidget(parent)
@@ -32,6 +34,11 @@ AttributesWidget::AttributesWidget(Project* project, QWidget *parent)
 
     // create and set the widgets for the general attributes
     //
+    // auto delete
+    QCheckBox* chb = new QCheckBox(m_ui->treeWidget);
+    chb->setObjectName(CHECK_BOX);
+    chb->setChecked(true);
+    m_widgetFields.insert(GENERAL_ATTRIBUTE_AUTODELETE, QVariant::fromValue(chb));
     // seed
     QSpinBox* sp = new QSpinBox(m_ui->treeWidget);
     sp->setObjectName(SPIN_BOX);

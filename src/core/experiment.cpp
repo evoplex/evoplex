@@ -22,8 +22,8 @@ Experiment::Experiment(MainApp* mainApp, int id, int projId, const QVariantHash&
     , m_modelPlugin(m_mainApp->getModel(generalParams.value(GENERAL_ATTRIBUTE_MODELID).toString()))
     , m_numTrials(generalParams.value(GENERAL_ATTRIBUTE_TRIALS).toInt())
     , m_seed(generalParams.value(GENERAL_ATTRIBUTE_SEED).toInt())
+    , m_autoDelete(generalParams.value(GENERAL_ATTRIBUTE_AUTODELETE).toBool())
     , m_progress(0)
-    , m_autoDelete(true)
 {
     m_trials.reserve(m_numTrials);
     m_stopAt = m_generalParams.value(GENERAL_ATTRIBUTE_STOPAT).toInt();

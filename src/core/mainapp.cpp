@@ -8,6 +8,7 @@
 #include <QFile>
 #include <QJsonObject>
 #include <QPluginLoader>
+#include <QThread>
 #include <QtDebug>
 
 #include "core/mainapp.h"
@@ -19,7 +20,7 @@
 
 MainApp::MainApp()
     : m_fileMgr(new FileMgr(this))
-    , m_experimentsMgr(new ExperimentsMgr())
+    , m_experimentsMgr(new ExperimentsMgr(QThread::idealThreadCount()))
     , m_lastProjectId(-1)
 {
     m_generalAttrSpace.insert(GENERAL_ATTRIBUTE_AGENTS, "string");
@@ -28,6 +29,7 @@ MainApp::MainApp()
     m_generalAttrSpace.insert(GENERAL_ATTRIBUTE_SEED, "string");
     m_generalAttrSpace.insert(GENERAL_ATTRIBUTE_STOPAT, QString("int[1,%1]").arg(EVOPLEX_MAX_STEPS));
     m_generalAttrSpace.insert(GENERAL_ATTRIBUTE_TRIALS, QString("int[1,%1]").arg(EVOPLEX_MAX_TRIALS));
+    m_generalAttrSpace.insert(GENERAL_ATTRIBUTE_AUTODELETE, "bool");
 
     // load plugins
     QDir pluginsDir = QDir(qApp->applicationDirPath());

@@ -18,6 +18,7 @@
 #define GENERAL_ATTRIBUTE_SEED "seed"                   // seed of the PRG
 #define GENERAL_ATTRIBUTE_STOPAT "stopAt"               // hard stop condition, ie., last simulation step
 #define GENERAL_ATTRIBUTE_TRIALS "trials"               // number of times the experiment has to be repeated
+#define GENERAL_ATTRIBUTE_AUTODELETE "autoDelete"       // automatically deletes the experiment from memory
 
 // Plugin stuff
 #define PLUGIN_ATTRIBUTE_UID "uid"                      // the plugin's unique id

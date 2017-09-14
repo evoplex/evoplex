@@ -76,6 +76,9 @@ public:
     inline const Status getExpStatus() const { return m_expStatus; }
     inline void setExpStatus(Status s) { m_mutex.lock(); m_expStatus = s; m_mutex.unlock(); }
 
+    inline bool getAutoDelete() const { return m_autoDelete; }
+    inline void setAutoDelete(bool b) { m_autoDelete = b; }
+
     AbstractGraph* getGraph(int trialId) const;
     inline int getId() const { return m_id; }
     inline int getProjId() const { return m_projId; }
@@ -99,11 +102,11 @@ private:
     const MainApp::ModelPlugin* m_modelPlugin;
     const int m_numTrials;
     const int m_seed;
+    bool m_autoDelete;
     int m_stopAt;
     int m_pauseAt;
     Status m_expStatus;
     quint16 m_progress; // current progress value [0, 360]
-    bool m_autoDelete;
 
     QHash<int, Trial> m_trials;
 

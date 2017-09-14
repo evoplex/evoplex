@@ -10,8 +10,8 @@
 #include "core/experimentsmgr.h"
 #include "core/experiment.h"
 
-ExperimentsMgr::ExperimentsMgr()
-    : m_threads(QThread::idealThreadCount())
+ExperimentsMgr::ExperimentsMgr(int threads)
+    : m_threads(threads)
     , m_timer(new QTimer(this))
 {
     connect(m_timer, SIGNAL(timeout()), this, SLOT(updateProgressValues()));
