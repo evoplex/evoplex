@@ -7,6 +7,7 @@
 #define EXPERIMENTMGR_H
 
 #include <QObject>
+#include <QTimer>
 #include <QVector>
 
 class Experiment;
@@ -33,10 +34,15 @@ public:
 
 signals:
     void statusChanged(Experiment* exp);
+    void progressUpdated(Experiment* exp);
     void killed(int id);
+
+private slots:
+    void updateProgressValues();
 
 private:
     int m_threads;
+    QTimer* m_timer; // timer to update the progress value of all running experiments
     QVector<Experiment*> m_running;
     QVector<Experiment*> m_queued;
     QVector<Experiment*> m_idle;

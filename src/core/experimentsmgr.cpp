@@ -12,12 +12,24 @@
 
 ExperimentsMgr::ExperimentsMgr()
     : m_threads(QThread::idealThreadCount())
+    , m_timer(new QTimer(this))
 {
+    connect(m_timer, SIGNAL(timeout()), this, SLOT(updateProgressValues()));
 }
 
 ExperimentsMgr::~ExperimentsMgr()
 {
     killAll();
+}
+
+void ExperimentsMgr::updateProgressValues()
+{
+    for (int i = 0; i < m_running.size(); ++i) {
+        quint16 p = m_running.at(i)->getProgress();
+        m_running.at(i)->updateProgressValue();
+        if (p != m_running.at(i)->getProgress())
+            emit (progressUpdated(m_running.at(i)));
+    }
 }
 
 void ExperimentsMgr::run(Experiment* exp)
@@ -30,6 +42,7 @@ void ExperimentsMgr::run(Experiment* exp)
     if (m_running.size() < m_threads) {
         exp->setExpStatus(Experiment::RUNNING);
         m_running.push_back(exp);
+        m_timer->start(500); // every half a second
 
         // both the QVector and the QFutureWatcher must live longer
         // so, they must be pointers.
@@ -62,6 +75,9 @@ void ExperimentsMgr::run(Experiment* exp)
 void ExperimentsMgr::finished(Experiment* exp)
 {
     m_running.removeOne(exp);
+    if (m_running.isEmpty()) {
+        m_timer->stop();
+    }
 
     if (m_toKill.contains(exp)) {
         //kill(processId);
@@ -73,15 +89,18 @@ void ExperimentsMgr::finished(Experiment* exp)
     }
 
     exp->pauseAt(EVOPLEX_MAX_STEPS); // reset the pauseAt flag to maximum
-    exp->setExpStatus(Experiment::FINISHED);
-    const QHash<int, Experiment::Trial>& trials = exp->getTrials();
-    QHash<int, Experiment::Trial>::const_iterator it = trials.begin();
-    while (it != trials.end()) {
-        if (it.value().status != Experiment::FINISHED) {
-            exp->setExpStatus(Experiment::READY);
-            break;
+
+    if(exp->getExpStatus() != Experiment::INVALID) {
+        exp->setExpStatus(Experiment::FINISHED);
+        const QHash<int, Experiment::Trial>& trials = exp->getTrials();
+        QHash<int, Experiment::Trial>::const_iterator it = trials.begin();
+        while (it != trials.end()) {
+            if (it.value().status != Experiment::FINISHED) {
+                exp->setExpStatus(Experiment::READY);
+                break;
+            }
+            ++it;
         }
-        ++it;
     }
 
     emit (statusChanged(exp));
