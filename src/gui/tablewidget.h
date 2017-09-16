@@ -40,7 +40,6 @@ public:
 
     inline int insertRow() { int r = rowCount(); QTableWidget::insertRow(r); return r; }
     void insertColumns(const QList<Header> headers);
-    inline QVariant data(int row, int col) { item(row, col)->data(Qt::DisplayRole); }
     void insertPlayButton(int row, int col, Experiment* exp);
 
 private:

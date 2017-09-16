@@ -17,8 +17,8 @@
 #define CHECK_BOX "0"
 #define COMBO_BOX "1"
 #define DOUBLE_SPIN_BOX "2"
-#define SPIN_BOX "3"
-#define LINE_EDIT "4"
+#define LINE_EDIT "3"
+#define SPIN_BOX "4"
 
 AttributesWidget::AttributesWidget(Project* project, QWidget *parent)
     : QDockWidget(parent)

@@ -85,10 +85,13 @@ MainGUI::MainGUI(MainApp* mainApp, QWidget* parent)
     QAction* actOpenProject = new QAction("Open Project", this);
     connect(actOpenProject, SIGNAL(triggered(bool)), this, SLOT(slotOpenProject()));
     QAction* actSave = new QAction("Save Project", this);
+    actSave->setEnabled(false);
     connect(actSave, SIGNAL(triggered(bool)), this, SLOT(slotSave()));
     QAction* actSaveAs = new QAction("Save Project As ...", this);
+    actSaveAs->setEnabled(false);
     connect(actSaveAs, SIGNAL(triggered(bool)), this, SLOT(slotSaveAs()));
     QAction* actSaveAll = new QAction("Save All", this);
+    actSaveAll->setEnabled(false);
     connect(actSaveAll, SIGNAL(triggered(bool)), this, SLOT(slotSaveAll()));
     QAction* actQuit = new QAction("Quit", this);
     connect(actQuit, SIGNAL(triggered(bool)), this, SLOT(close()));

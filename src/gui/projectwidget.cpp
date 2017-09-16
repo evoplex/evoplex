@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2016 - Marcos Cardinot
+ * Copyright (C) 2017 - Marcos Cardinot
  * @author Marcos Cardinot <mcardinot@gmail.com>
  */
 
@@ -113,6 +113,6 @@ void ProjectWidget::insertItem(int row, TableWidget::Header header, QString labe
 
 void ProjectWidget::onItemDoubleClicked(QTableWidgetItem* item)
 {
-    int expId = m_ui->table->data(item->row(), m_headerIdx.value(TableWidget::H_EXPID)).toInt();
+    int expId = m_ui->table->item(item->row(), m_headerIdx.value(TableWidget::H_EXPID))->text().toInt();
     emit (openExperiment(m_project->getId(), expId));
 }

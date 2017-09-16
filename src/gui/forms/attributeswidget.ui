@@ -14,6 +14,16 @@
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
      <widget class="QTreeWidget" name="treeWidget">
+      <property name="styleSheet">
+       <string notr="true">QTreeWidget::item {
+	height: 26px;
+	margin-top: 4px;
+}
+QTreeWidget::item:has-children {
+	margin-top: 8px;
+	margin-bottom: -3px;
+}</string>
+      </property>
       <property name="frameShape">
        <enum>QFrame::NoFrame</enum>
       </property>
@@ -58,6 +68,28 @@
       </item>
       <item>
        <widget class="QPushButton" name="btnSubmit">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>80</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QPushButton  {
+	border: 1px solid white;
+    border-radius: 8px;
+    background-color: transparent;
+}
+QPushButton::hover {
+	background-color: #4285f4;
+}</string>
+        </property>
         <property name="text">
          <string>Create</string>
         </property>
