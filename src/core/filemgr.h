@@ -17,7 +17,7 @@ public:
     // Import a set of agents from a csv file
     // Agents belong to some model. That's why we need the modelId,
     // which is also important to validate the inputs in the file.
-    Agents* importAgents(const QString& filePath, const QString& modelId) const;
+    Agents importAgents(const QString& filePath, const QString& modelId) const;
 
 private:
     MainApp* m_mainApp;

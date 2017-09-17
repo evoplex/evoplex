@@ -110,7 +110,10 @@ private:
 
     QHash<int, Trial> m_trials;
 
-    QVector<AbstractAgent> m_clonableAgents; // holds the initial population for further use
+    // It holds the initial population for further use (internal only).
+    // If this experiment has only one trial, then it won't be used anyway.
+    // If the experiment has 2 or more trials, it'll be used in the last trial.
+    Agents m_clonableAgents;
 
     // We can safely consider that all parameters are valid at this point.
     // However, some things might fail (eg, missing agents, broken graph etc),
@@ -123,10 +126,10 @@ private:
     // initial population in the 'm_clonableAgents' vector. Except when
     // the experiment has only one trial.
     // This method is NOT thread-safe.
-    QVector<AbstractAgent> createAgents();
+    Agents createAgents();
 
     // clone a population of agents
-    QVector<AbstractAgent> cloneAgents(const QVector<AbstractAgent>& agents) const;
+    Agents cloneAgents(const Agents& agents) const;
 };
 
 #endif // EXPERIMENT_H

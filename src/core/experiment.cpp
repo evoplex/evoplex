@@ -3,7 +3,7 @@
  * @author Marcos Cardinot <mcardinot@gmail.com>
  */
 
-#include <QtDebug>
+#include <QDebug>
 
 #include "core/abstractagent.h"
 #include "core/experiment.h"
@@ -101,22 +101,21 @@ Experiment::Trial Experiment::createTrial(const int& trialSeed)
         return Trial();
     }
 
-    m_mutex.lock();
-    QVector<AbstractAgent> agents = createAgents();
+    m_mutex.lock(); // make it thread-safe
+    Agents agents = createAgents();
     m_mutex.unlock();
     if (agents.isEmpty()) {
-        agents.squeeze();
         return Trial();
     }
 
     AbstractGraph* graphObj = m_graphPlugin->factory->create();
-    if (!graphObj || !graphObj->init(agents, m_graphParams)) {
+    graphObj->setup(trialSeed, agents);
+    if (!graphObj || !graphObj->init(m_graphParams)) {
         qWarning() << "[Experiment]: unable to create the trials."
                    << "The graph could not be initialized."
                    << "Project:" << m_projId << "Experiment:" << m_id;
         delete graphObj;
-        agents.clear();
-        agents.squeeze();
+        graphObj = nullptr;
         return Trial();
     }
 
@@ -126,10 +125,8 @@ Experiment::Trial Experiment::createTrial(const int& trialSeed)
         qWarning() << "[Experiment]: unable to create the trials."
                    << "The model could not be initialized."
                    << "Project:" << m_projId << "Experiment:" << m_id;
-        delete graphObj;
         delete modelObj;
-        agents.clear();
-        agents.squeeze();
+        modelObj = nullptr;
         return Trial();
     }
 
@@ -139,56 +136,58 @@ Experiment::Trial Experiment::createTrial(const int& trialSeed)
     return trial;
 }
 
-QVector<AbstractAgent> Experiment::createAgents()
+Agents Experiment::createAgents()
 {
     if (m_expStatus == INVALID) {
-        return QVector<AbstractAgent>();
+        return Agents();
     } else if (!m_clonableAgents.isEmpty()) {
         if (m_trials.size() == m_numTrials - 1) {
-            return m_clonableAgents;
+            Agents agents = m_clonableAgents;
+            m_clonableAgents = Agents();
+            return agents;
         }
         return cloneAgents(m_clonableAgents);
     }
 
     Q_ASSERT(m_trials.size() == 0);
 
-    QVector<AbstractAgent> agents;
+    Agents agents;
     bool isInt;
     int numAgents = m_generalParams.value(GENERAL_ATTRIBUTE_AGENTS).toInt(&isInt);
     if (isInt) { // create a population of agents with random properties?
-        PRG* prg = new PRG(m_seed);
-        QVector<QVariantHash> atbs = Utils::randomParams(m_modelPlugin->agentAttrSpace, prg, numAgents);
-        delete prg;
-        Q_ASSERT(atbs.size() == numAgents);
-        agents.reserve(numAgents);
-        for (int i = 0; i < numAgents; ++i) {
-            agents.push_back(AbstractAgent(atbs.at(i)));
+        if (numAgents > 0) {
+            PRG* prg = new PRG(m_seed);
+            QVector<QVariantHash> atbs = Utils::randomParams(m_modelPlugin->agentAttrSpace, prg, numAgents);
+            delete prg;
+            Q_ASSERT(atbs.size() == numAgents);
+            agents.reserve(numAgents);
+            for (int id = 0; id < numAgents; ++id) {
+                agents.push_back(new AbstractAgent(atbs.at(id)));
+            }
         }
-    } else { // read population from a text file?
+    } else { // read population from a text file
         agents = m_mainApp->getFileMgr()->importAgents(
                     m_generalParams.value(GENERAL_ATTRIBUTE_AGENTS).toString(),
                     m_modelPlugin->uid);
     }
-    agents.squeeze();
 
     if (agents.isEmpty()) {
         qWarning() << "[Experiment]: unable to create the trials."
                    << "The set of agents could not be created."
                    << "Project:" << m_projId << "Experiment:" << m_id;
-    } else {
-        if (m_numTrials > 1) {
-            m_clonableAgents = cloneAgents(agents);
-        }
+    } else if (m_numTrials > 1) {
+        m_clonableAgents = cloneAgents(agents);
     }
+
     return agents;
 }
 
-QVector<AbstractAgent> Experiment::cloneAgents(const QVector<AbstractAgent>& agents) const
+Agents Experiment::cloneAgents(const Agents& agents) const
 {
-    QVector<AbstractAgent> cloned;
+    Agents cloned;
     cloned.reserve(agents.size());
-    foreach (AbstractAgent a, agents) {
-        cloned.push_back(a.clone());
+    for (int id = 0; id < agents.size(); ++id) {
+        cloned.push_back(agents.at(id)->clone());
     }
     return cloned;
 }

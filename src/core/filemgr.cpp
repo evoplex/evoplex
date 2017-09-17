@@ -16,12 +16,12 @@ FileMgr::FileMgr(MainApp* mainApp): m_mainApp(mainApp)
 {
 }
 
-Agents* FileMgr::importAgents(const QString& filePath, const QString& modelId) const
+Agents FileMgr::importAgents(const QString& filePath, const QString& modelId) const
 {
     QFile file(filePath);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         qWarning() << "[FileMgr]: unable to read csv file with the set of agents." << filePath;
-        return nullptr;
+        return Agents();
     }
 
     QTextStream in(&file);
@@ -46,12 +46,12 @@ Agents* FileMgr::importAgents(const QString& filePath, const QString& modelId) c
     if (header.isEmpty()) {
         qWarning() << "[FileMgr]: unable to read the set of agents from" << filePath
                    << "Expected properties:" << modelPlugin->agentAttrSpace.keys();
-        return nullptr;
+        return Agents();
     }
 
     // create agents
+    Agents agents;
     bool isValid = true;
-    Agents* agents = new Agents();
     while (!in.atEnd()) {
         QStringList values = in.readLine().split(",");
         if (values.size() != header.size()) {
@@ -70,15 +70,15 @@ Agents* FileMgr::importAgents(const QString& filePath, const QString& modelId) c
             }
             attributes.insert(header.at(i), value);
         }
-        agents->push_back(new AbstractAgent(attributes));
+        agents.push_back(new AbstractAgent(attributes));
     }
     file.close();
 
-    if (isValid) {
-        agents->squeeze();
-    } else {
-        Utils::deleteQVectorP(agents);
+    if (!isValid) {
+        qDeleteAll(agents);
+        agents.clear();
     }
+    agents.squeeze();
 
     return agents;
 }
