@@ -25,15 +25,14 @@ public:
     inline const QString& getGraphName() const { return m_graphName; }
     inline const Agents& getAgents() const { return m_agents; }
     inline const AdjacencyList& getAdjacencyList() const { return m_adjacencyList; }
-    inline const int agentsSize() const { return m_agentsSize; }
 
     inline AbstractAgent* getAgent(int id) const { return m_agents.at(id); }
     inline AbstractAgent* getRandomAgent() const {
-        return m_agents.at(m_prg->randI(m_agentsSize));
+        return m_agents.at(m_prg->randI(m_agents.size()));
     }
 
 protected:
-    explicit AbstractBaseGraph(const QString& name): m_graphName(name) {}
+    explicit AbstractBaseGraph(const QString& name): m_graphName(name), m_prg(nullptr) {}
 
     virtual ~AbstractBaseGraph() {
         setAdjacencyList(AdjacencyList());
@@ -46,9 +45,9 @@ protected:
         // delete all edges
         AdjacencyList::iterator it = m_adjacencyList.begin();
         while (it != m_adjacencyList.end()) {
-            qDeleteAll(it.value()->begin(), it.value()->end());
             it.value()->clear();
             it.value()->squeeze();
+            delete it.value();
             ++it;
         }
         // clear the QHash but do not touch the agents
@@ -63,14 +62,12 @@ private:
     Agents m_agents;
     PRG* m_prg;
     AdjacencyList m_adjacencyList;
-    int m_agentsSize;
 
     // takes the ownership of the agents
     inline void setup(PRG* prg, Agents agents) {
-        Q_ASSERT(m_prg && agents.isEmpty()); // make sure it'll be called only once
+        Q_ASSERT(!m_prg && m_agents.isEmpty()); // make sure it'll be called only once
         m_prg = prg;
         m_agents = agents;
-        m_agentsSize = agents.size();
     }
 };
 

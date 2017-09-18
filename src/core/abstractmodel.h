@@ -19,6 +19,8 @@ class AbstractBaseModel
     friend class Experiment;
 
 protected:
+    explicit AbstractBaseModel() : m_graph(nullptr), m_prg(nullptr) {}
+
     virtual ~AbstractBaseModel() {
         delete m_graph;
         m_graph = nullptr;
@@ -35,7 +37,7 @@ private:
 
     // takes the ownership of the graph and the PRG
     inline void setup(PRG* prg, AbstractGraph* graphObj) {
-        Q_ASSERT(m_prg && m_graph); // make sure it'll be called only once
+        Q_ASSERT(!m_prg && !m_graph); // make sure it'll be called only once
         m_prg = prg;
         m_graph = graphObj;
     }

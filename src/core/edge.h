@@ -12,11 +12,12 @@
 class AbstractAgent;
 class Edge;
 
-typedef QVector<Edge*> Edges;  // holds the neighbourhood of one agent
+typedef QVector<Edge> Edges;  // alias: used to hold the neighbourhood of one agent
 
 class Edge
 {
 public:
+    explicit Edge(): m_neighbour(nullptr) {}
     explicit Edge(AbstractAgent* neighbour): m_neighbour(neighbour) {}
     explicit Edge(AbstractAgent* neighbour, const QVariantHash& attributes)
         : m_neighbour(neighbour), m_attributes(attributes) {}

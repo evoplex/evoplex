@@ -25,7 +25,7 @@ bool MooreGrid::init(const QVariantHash& graphParams)
 
     m_height = graphParams.value("height").toInt();
     m_width = graphParams.value("width").toInt();
-    if (agentsSize() != m_height * m_width) {
+    if (getAgents().size() != m_height * m_width) {
         qWarning() << "[MooreGrid]: the agent set is not compatible with the required shape."
                    << "The number of agents should be equal to 'height'*'width'.";
         return false;
@@ -39,9 +39,9 @@ bool MooreGrid::init(const QVariantHash& graphParams)
 void MooreGrid::reset()
 {
     AdjacencyList adjacencyList;
-    adjacencyList.reserve(agentsSize());
+    adjacencyList.reserve(getAgents().size());
 
-    for (int id = 0; id < agentsSize(); ++id) {
+    for (int id = 0; id < getAgents().size(); ++id) {
         AbstractAgent* agent = getAgent(id);
 
         int x, y;
@@ -109,8 +109,8 @@ Edges* MooreGrid::createEdges(const int id) const
         }
 
         int idx = Utils::linearIdx(nbs[i][0], nbs[i][1], m_width);
-        if (idx < agentsSize()) {
-            edges->push_back(new Edge(getAgent(idx)));
+        if (idx < getAgents().size()) {
+            edges->push_back(Edge(getAgent(idx)));
         } else {
             qWarning() << "[MooreNeighborhood]: the agent"
                        << idx << "does not exist!";
