@@ -16,8 +16,9 @@
 
 class AbstractBaseModel
 {
-public:
-    // destructor
+    friend class Experiment;
+
+protected:
     virtual ~AbstractBaseModel() {
         delete m_graph;
         m_graph = nullptr;
@@ -25,18 +26,17 @@ public:
         m_prg = nullptr;
     }
 
-protected:
     inline AbstractGraph* graph() const { return m_graph; }
     inline PRG* prg() const { return m_prg; }
 
 private:
-    friend class Experiment;
-
     AbstractGraph* m_graph;
     PRG* m_prg;
 
-    inline bool setup(int seed, AbstractGraph* graphObj) {
-        m_prg = new PRG(seed);
+    // takes the ownership of the graph and the PRG
+    inline void setup(PRG* prg, AbstractGraph* graphObj) {
+        Q_ASSERT(m_prg && m_graph); // make sure it'll be called only once
+        m_prg = prg;
         m_graph = graphObj;
     }
 };
