@@ -108,19 +108,22 @@ Experiment::Trial Experiment::createTrial(const int& trialSeed)
         return Trial();
     }
 
+    PRG* prg = new PRG(trialSeed);
     AbstractGraph* graphObj = m_graphPlugin->factory->create();
-    graphObj->setup(trialSeed, agents);
+    graphObj->setup(prg, agents);
     if (!graphObj || !graphObj->init(m_graphParams)) {
         qWarning() << "[Experiment]: unable to create the trials."
                    << "The graph could not be initialized."
                    << "Project:" << m_projId << "Experiment:" << m_id;
         delete graphObj;
         graphObj = nullptr;
+        delete prg;
+        prg = nullptr;
         return Trial();
     }
 
     AbstractModel* modelObj = m_modelPlugin->factory->create();
-    modelObj->setup(trialSeed, graphObj); // make the PRG and the graph available in the model
+    modelObj->setup(prg, graphObj);
     if (!modelObj || !modelObj->init(m_modelParams)) {
         qWarning() << "[Experiment]: unable to create the trials."
                    << "The model could not be initialized."
