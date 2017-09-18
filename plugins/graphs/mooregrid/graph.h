@@ -18,9 +18,8 @@ class MooreGrid: public AbstractGraph
 public:
     MooreGrid(const QString &name);
 
-    bool init(const QVector<AbstractAgent> &agents, const QVariantHash& graphParams);
-    void resetNetwork();
-    void resetCoordinates();
+    bool init(const QVariantHash& graphParams);
+    void reset();
     QVariantHash getGraphParams() const;
 
 private:
@@ -28,7 +27,7 @@ private:
     int m_width;
     int m_height;
 
-    Neighbours calcMooreNeighborhood(const int id) const;
+    Edges* createEdges(const int id) const;
 };
 
 REGISTER_GRAPH(MooreGrid)
