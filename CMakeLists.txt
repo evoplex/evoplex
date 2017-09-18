@@ -12,6 +12,7 @@ SET(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 # Instruct CMake to run moc automatically when needed.
 SET(CMAKE_AUTOMOC ON)
+SET(CMAKE_AUTORCC ON)
 
 # Move the libs to /lib and executable to /bin
 SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
@@ -23,6 +24,10 @@ SET(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # c++11
 SET (CMAKE_CXX_STANDARD 11)
+
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE Release)
+endif()
 
 # Find qt5 packages
 FIND_PACKAGE(Qt5Core REQUIRED)

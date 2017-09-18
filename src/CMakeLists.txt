@@ -10,6 +10,7 @@ SET(evoplex_core_src
     core/abstractagent.h
     core/abstractgraph.h
     core/abstractmodel.h
+    core/edge.h
 
     core/mainapp.cpp
     core/mainapp.h
@@ -18,43 +19,49 @@ SET(evoplex_core_src
     core/filemgr.h
     core/experiment.cpp
     core/experiment.h
+    core/experimentsmgr.cpp
+    core/experimentsmgr.h
     core/project.cpp
     core/project.h
-    core/trial.cpp
-    core/trial.h
-    core/trialsmgr.cpp
-    core/trialsmgr.h
 )
 ADD_LIBRARY(evoplex_core_lib SHARED ${evoplex_core_src} ${evoplex_utils})
-TARGET_LINK_LIBRARIES(evoplex_core_lib Qt5::Core Qt5::Widgets)
+TARGET_LINK_LIBRARIES(evoplex_core_lib Qt5::Core Qt5::Concurrent Qt5::Widgets)
 
 
 #### GUI ####
 SET(evoplex_gui_src
     gui/maingui.cpp
     gui/maingui.h
-    gui/contextmenutable.cpp
-    gui/contextmenutable.h
-    gui/experimentview.cpp
-    gui/experimentview.h
-    gui/widgetgraph.cpp
-    gui/widgetgraph.h
-    gui/widgetproject.cpp
-    gui/widgetproject.h
-    gui/wizardnewproject.cpp
-    gui/wizardnewproject.h
+    gui/attributeswidget.cpp
+    gui/attributeswidget.h
+    gui/experimentwidget.cpp
+    gui/experimentwidget.h
+    gui/graphwidget.cpp
+    gui/graphwidget.h
+    gui/projectwidget.cpp
+    gui/projectwidget.h
+    gui/projectswindow.cpp
+    gui/projectswindow.h
+    gui/queuewidget.cpp
+    gui/queuewidget.h
+    gui/tablewidget.cpp
+    gui/tablewidget.h
+    gui/welcomewidget.cpp
+    gui/welcomewidget.h
+
+    #gui/contextmenutable.cpp
+    #gui/contextmenutable.h
 )
 SET(evoplex_ui
-    gui/forms/maingui.ui
-    gui/forms/experimentview.ui
-    gui/forms/widgetproject.ui
-    gui/forms/wizardnewproject.ui
+    gui/forms/attributeswidget.ui
+    gui/forms/queuewidget.ui
+    gui/forms/projectwidget.ui
+    gui/forms/welcomewidget.ui
 )
 QT5_WRAP_UI(evoplex_ui_h ${evoplex_ui})
 ADD_LIBRARY(evoplex_gui_lib SHARED ${evoplex_gui_src} ${evoplex_ui_h})
 TARGET_LINK_LIBRARIES(evoplex_gui_lib evoplex_core_lib Qt5::Core Qt5::Widgets)
 
-
 #### EXECUTABLE ####
-ADD_EXECUTABLE(evoplex main.cpp)
+ADD_EXECUTABLE(evoplex main.cpp gui/icons/icons.qrc)
 TARGET_LINK_LIBRARIES(evoplex evoplex_core_lib evoplex_gui_lib)
