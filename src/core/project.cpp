@@ -85,7 +85,7 @@ const int Project::newExperiment(const QStringList& header, const QStringList& v
             }
         } else {
             QPair<int, QString> attrSpace;
-            Attributes* attributes;
+            Attributes* attributes = nullptr;
             if (attrName.startsWith(modelId_)) {
                 attrName = attrName.remove(modelId_);
                 attrSpace = mPlugin->modelAttrSpace.value(attrName);
@@ -96,7 +96,7 @@ const int Project::newExperiment(const QStringList& header, const QStringList& v
                 attributes = graphAttrs;
             }
 
-            if (!attrSpace.second.isEmpty()) {
+            if (attributes && !attrSpace.second.isEmpty()) {
                 Value value = Utils::validateParameter(attrSpace.second, vStr);
                 if (value.isValid()) {
                     attributes->replace(attrSpace.first, attrName, value);
@@ -112,6 +112,9 @@ const int Project::newExperiment(const QStringList& header, const QStringList& v
 
     if (!failedAttributes.isEmpty()) {
         errorMsg = QString("The following attributes are missing or invalid: %1").arg(failedAttributes.join(","));
+        delete generalAttrs;
+        delete graphAttrs;
+        delete modelAttrs;
         return -1;
     }
 
