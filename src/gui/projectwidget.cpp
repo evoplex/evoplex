@@ -66,27 +66,27 @@ void ProjectWidget::insertRow(const int& expId)
     m_ui->table->insertPlayButton(row, m_headerIdx.value(TableWidget::H_BUTTON), exp);
 
     // general stuff
-    const QVariantHash& gep = exp->getGeneralParams();
+    const Attributes* gep = exp->getGeneralAttrs();
     insertItem(row, TableWidget::H_EXPID, QString::number(exp->getId()));
-    insertItem(row, TableWidget::H_SEED, gep.value(GENERAL_ATTRIBUTE_SEED).toString());
-    insertItem(row, TableWidget::H_STOPAT, gep.value(GENERAL_ATTRIBUTE_STOPAT).toString());
-    insertItem(row, TableWidget::H_TRIALS, gep.value(GENERAL_ATTRIBUTE_TRIALS).toString());
+    insertItem(row, TableWidget::H_SEED, gep->value(GENERAL_ATTRIBUTE_SEED).toQString());
+    insertItem(row, TableWidget::H_STOPAT, gep->value(GENERAL_ATTRIBUTE_STOPAT).toQString());
+    insertItem(row, TableWidget::H_TRIALS, gep->value(GENERAL_ATTRIBUTE_TRIALS).toQString());
     bool isRandom;
-    gep.value(GENERAL_ATTRIBUTE_AGENTS).toInt(&isRandom);
+    gep->value(GENERAL_ATTRIBUTE_AGENTS).toQString().toInt(&isRandom);
     if (isRandom)
         insertItem(row, TableWidget::H_AGENTS, "R", "Agents with random attributes.");
     else
         insertItem(row, TableWidget::H_AGENTS, "F", "Agents from file.");
 
     // lambda function to add the attributes of a plugin (ie, model or graph)
-    auto pluginAtbs = [this, row](TableWidget::Header header, QString pluginId, const QVariantHash& params)
+    auto pluginAtbs = [this, row](TableWidget::Header header, QString pluginId, const Attributes* attrs)
     {
         QString pluginAttrs = "id:" + pluginId;
         pluginId += "_";
-        QVariantHash::const_iterator it = params.begin();
-        while (it != params.end()) {
-            pluginAttrs += QString(" | %1:%2").arg(QString(it.key()).remove(pluginId)).arg(it.value().toString());
-            ++it;
+        for (int i = 0; i < attrs->size(); ++i) {
+            pluginAttrs += QString(" | %1:%2")
+                    .arg(QString(attrs->name(i)).remove(pluginId))
+                    .arg(attrs->value(i).toQString());
         }
         QTableWidgetItem* item = new QTableWidgetItem(pluginAttrs);
         item->setTextAlignment(Qt::AlignCenter);
@@ -97,10 +97,10 @@ void ProjectWidget::insertRow(const int& expId)
     };
 
     // model stuff
-    pluginAtbs(TableWidget::H_MODEL, gep.value(GENERAL_ATTRIBUTE_MODELID).toString(), exp->getModelParams());
+    pluginAtbs(TableWidget::H_MODEL, exp->getModelId(), exp->getModelAttrs());
 
     // graph stuff
-    pluginAtbs(TableWidget::H_GRAPH, gep.value(GENERAL_ATTRIBUTE_GRAPHID).toString(), exp->getGraphParams());
+    pluginAtbs(TableWidget::H_GRAPH, exp->getGraphId(), exp->getGraphAttrs());
 }
 
 void ProjectWidget::insertItem(int row, TableWidget::Header header, QString label, QString tooltip)

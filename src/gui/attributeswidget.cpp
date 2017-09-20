@@ -143,7 +143,7 @@ void AttributesWidget::slotCreateExperiment()
         } else if (widget->objectName() == COMBO_BOX) {
             values << qobject_cast<QComboBox*>(widget)->currentText();
         } else if (widget->objectName() == DOUBLE_SPIN_BOX) {
-            values << QString::number(qobject_cast<QDoubleSpinBox*>(widget)->value());
+            values << QString::number(qobject_cast<QDoubleSpinBox*>(widget)->value(), 'f', 2);
         } else if (widget->objectName() == SPIN_BOX) {
             values << QString::number(qobject_cast<QSpinBox*>(widget)->value());
         } else if (widget->objectName() == LINE_EDIT) {
@@ -253,38 +253,36 @@ void AttributesWidget::slotUpdateModelPlugins()
 }
 
 void AttributesWidget::insertPluginAttributes(QTreeWidgetItem* itemRoot, const QString& uid,
-                                              const QVariantHash& min, const QVariantHash& max)
+                                              const Attributes& min, const Attributes& max)
 {
     const QString& uid_ = uid + "_";
-    QVariantHash::const_iterator it = min.begin();
-    while (it != min.end()) {
+    for (int i = 0; i < min.size(); ++i) {
         QTreeWidgetItem* item = new QTreeWidgetItem(itemRoot);
-        item->setText(0, it.key());
+        item->setText(0, min.name(i));
 
-        QVariant qvariant;
-        if (it.value().type() == QVariant::Double) {
+        QVariant widget;
+        if (min.value(i).type == Value::DOUBLE) {
             QDoubleSpinBox* sp = new QDoubleSpinBox();
             sp->setObjectName(DOUBLE_SPIN_BOX);
-            sp->setMinimum(it.value().toDouble());
-            sp->setMaximum(max.value(it.key()).toDouble());
-            qvariant = QVariant::fromValue(sp);
+            sp->setMinimum(min.value(i).toDouble);
+            sp->setMaximum(max.value(i).toDouble);
+            widget = QVariant::fromValue(sp);
             m_ui->treeWidget->setItemWidget(item, 1, sp);
-        } else if (it.value().type() == QVariant::Int) {
+        } else if (min.value(i).type == Value::INT) {
             QSpinBox* sp = new QSpinBox();
             sp->setObjectName(SPIN_BOX);
-            sp->setMinimum(it.value().toInt());
-            sp->setMaximum(max.value(it.key()).toInt());
-            qvariant = QVariant::fromValue(sp);
+            sp->setMinimum(min.value(i).toInt);
+            sp->setMaximum(max.value(i).toInt);
+            widget = QVariant::fromValue(sp);
             m_ui->treeWidget->setItemWidget(item, 1, sp);
         } else {
             QLineEdit* le = new QLineEdit();
             le->setObjectName(LINE_EDIT);
-            le->setText(it.value().toString());
-            qvariant = QVariant::fromValue(le);
+            le->setText(min.value(i).toQString());
+            widget = QVariant::fromValue(le);
             m_ui->treeWidget->setItemWidget(item, 1, le);
         }
         // add the uid as prefix to avoid clashes.
-        m_widgetFields.insert(uid_+it.key(), qvariant);
-        ++it;
+        m_widgetFields.insert(uid_ + min.name(i), widget);
     }
 }

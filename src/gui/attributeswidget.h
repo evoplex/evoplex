@@ -42,7 +42,7 @@ private:
     QVariantHash m_widgetFields;
 
     void insertPluginAttributes(QTreeWidgetItem* itemRoot, const QString &uid,
-                                const QVariantHash& min, const QVariantHash& max);
+                                const Attributes &min, const Attributes &max);
 };
 
 #endif // ATTRIBUTESWIDGET_H
