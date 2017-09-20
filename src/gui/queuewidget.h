@@ -34,7 +34,7 @@ private:
     };
 
     struct Row {
-        int row = -1;
+        QTableWidgetItem* item = nullptr;
         Table table = T_INVALID;
     };
 
@@ -44,7 +44,7 @@ private:
     QHash<QString, Row> m_rows; // map 'projId.expId' to the row
     QMap<TableWidget::Header, int> m_headerIdx; // map Header to column index
 
-    int insertRow(TableWidget *table, Experiment* exp);
+    QTableWidgetItem* insertRow(TableWidget *table, Experiment* exp);
 };
 
 #endif // QUEUEWIDGET_H

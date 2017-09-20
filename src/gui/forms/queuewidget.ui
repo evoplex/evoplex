@@ -16,6 +16,9 @@
   <property name="frameShape">
    <enum>QFrame::NoFrame</enum>
   </property>
+  <property name="sizeAdjustPolicy">
+   <enum>QAbstractScrollArea::AdjustToContents</enum>
+  </property>
   <property name="widgetResizable">
    <bool>true</bool>
   </property>
@@ -23,9 +26,9 @@
    <property name="geometry">
     <rect>
      <x>0</x>
-     <y>0</y>
-     <width>488</width>
-     <height>299</height>
+     <y>-90</y>
+     <width>474</width>
+     <height>389</height>
     </rect>
    </property>
    <property name="styleSheet">
@@ -67,17 +70,17 @@
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
-         <property name="minimumSize">
-          <size>
-           <width>0</width>
-           <height>1</height>
-          </size>
-         </property>
          <property name="verticalScrollBarPolicy">
+          <enum>Qt::ScrollBarAlwaysOff</enum>
+         </property>
+         <property name="horizontalScrollBarPolicy">
           <enum>Qt::ScrollBarAlwaysOff</enum>
          </property>
          <property name="sizeAdjustPolicy">
           <enum>QAbstractScrollArea::AdjustToContents</enum>
+         </property>
+         <property name="autoScroll">
+          <bool>false</bool>
          </property>
         </widget>
        </item>
@@ -148,17 +151,17 @@ QPushButton::hover {
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
-         <property name="minimumSize">
-          <size>
-           <width>0</width>
-           <height>1</height>
-          </size>
-         </property>
          <property name="verticalScrollBarPolicy">
+          <enum>Qt::ScrollBarAlwaysOff</enum>
+         </property>
+         <property name="horizontalScrollBarPolicy">
           <enum>Qt::ScrollBarAlwaysOff</enum>
          </property>
          <property name="sizeAdjustPolicy">
           <enum>QAbstractScrollArea::AdjustToContents</enum>
+         </property>
+         <property name="autoScroll">
+          <bool>false</bool>
          </property>
         </widget>
        </item>
@@ -229,17 +232,17 @@ QPushButton::hover {
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
-         <property name="minimumSize">
-          <size>
-           <width>0</width>
-           <height>1</height>
-          </size>
-         </property>
          <property name="verticalScrollBarPolicy">
+          <enum>Qt::ScrollBarAlwaysOff</enum>
+         </property>
+         <property name="horizontalScrollBarPolicy">
           <enum>Qt::ScrollBarAlwaysOff</enum>
          </property>
          <property name="sizeAdjustPolicy">
           <enum>QAbstractScrollArea::AdjustToContents</enum>
+         </property>
+         <property name="autoScroll">
+          <bool>false</bool>
          </property>
         </widget>
        </item>

@@ -42,25 +42,24 @@ void QueueWidget::slotStatusChanged(Experiment* exp)
     Row prev = m_rows.value(key, Row());
     Row next = prev;
 
-    Experiment::Status status = exp->getExpStatus();
-    switch (status) {
+    switch (exp->getExpStatus()) {
         case Experiment::RUNNING:
             if (prev.table != T_RUNNING) {
-                next.row = insertRow(m_ui->tableRunning, exp);
+                next.item = insertRow(m_ui->tableRunning, exp);
                 next.table = T_RUNNING;
                 m_ui->running->show();
             }
             break;
         case Experiment::QUEUED:
             if (prev.table != T_QUEUED) {
-                next.row = insertRow(m_ui->tableQueue, exp);
+                next.item = insertRow(m_ui->tableQueue, exp);
                 next.table = T_QUEUED;
                 m_ui->queue->show();
             }
             break;
         default:
             if (prev.table != T_IDLE) {
-                next.row = insertRow(m_ui->tableIdle, exp);
+                next.item = insertRow(m_ui->tableIdle, exp);
                 next.table = T_IDLE;
                 m_ui->idle->show();
             }
@@ -68,13 +67,13 @@ void QueueWidget::slotStatusChanged(Experiment* exp)
 
     if (prev.table != next.table) {
         if (prev.table == T_RUNNING) {
-            m_ui->tableRunning->removeRow(prev.row);
+            m_ui->tableRunning->removeRow(prev.item->row());
             m_ui->running->setVisible(m_ui->tableRunning->rowCount() > 0);
         } else if (prev.table == T_QUEUED) {
-            m_ui->tableQueue->removeRow(prev.row);
+            m_ui->tableQueue->removeRow(prev.item->row());
             m_ui->queue->setVisible(m_ui->tableQueue->rowCount() > 0);
         } else if (prev.table == T_IDLE) {
-            m_ui->tableIdle->removeRow(prev.row);
+            m_ui->tableIdle->removeRow(prev.item->row());
             m_ui->idle->setVisible(m_ui->tableIdle->rowCount() > 0);
         }
 
@@ -83,7 +82,7 @@ void QueueWidget::slotStatusChanged(Experiment* exp)
     }
 }
 
-int QueueWidget::insertRow(TableWidget* table, Experiment* exp)
+QTableWidgetItem* QueueWidget::insertRow(TableWidget* table, Experiment* exp)
 {
     const int row = table->insertRow();
 
@@ -91,12 +90,12 @@ int QueueWidget::insertRow(TableWidget* table, Experiment* exp)
         QTableWidgetItem* item = new QTableWidgetItem(QString::number(label));
         item->setTextAlignment(Qt::AlignCenter);
         table->setItem(row, m_headerIdx.value(header), item);
+        return item;
     };
 
     table->insertPlayButton(row, m_headerIdx.value(TableWidget::H_BUTTON), exp);
-    add(TableWidget::H_PROJID, exp->getProjId());
-    add(TableWidget::H_EXPID, exp->getId());
     add(TableWidget::H_STOPAT, exp->getStopAt());
     add(TableWidget::H_TRIALS, exp->getNumTrials());
-    return row;
+    add(TableWidget::H_PROJID, exp->getProjId());
+    return add(TableWidget::H_EXPID, exp->getId());
 }
