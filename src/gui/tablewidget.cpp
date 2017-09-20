@@ -27,9 +27,9 @@ TableWidget::TableWidget(QWidget *parent)
                         "QTableView::item:hover { background-color: rgb(40,40,40); }");
 
     this->horizontalHeader()->setStyleSheet(
-                "QHeaderView { background-color: rgb(24,24,24); }"
+                "QHeaderView { background-color: transparent; }"
                 "QHeaderView::section {\
-                    background-color: rgb(24,24,24); \
+                    background-color: transparent; \
                     color: rgb(145,145,145);\
                     padding-left: 4px;\
                     border: 0px;\
@@ -123,55 +123,38 @@ void PlayButton::paintEvent(QPaintEvent* e)
     painter.begin(this);
     painter.setRenderHint(QPainter::Antialiasing);
 
+    QPoint center = rect().center();
     Experiment::Status status = m_exp->getExpStatus();
     if (status == Experiment::READY) {
         if (m_btnHovered) { //play (only when hovered)
-            painter.drawPixmap(e->rect().center().x()-14,
-                               e->rect().center().y()-14,
-                               m_table->kIcon_playon);
+            painter.drawPixmap(center.x()-14, center.y()-14, m_table->kIcon_playon);
         } else if (m_rowHovered) {
-            painter.drawPixmap(e->rect().center().x()-14,
-                               e->rect().center().y()-14,
-                               m_table->kIcon_play);
+            painter.drawPixmap(center.x()-14, center.y()-14, m_table->kIcon_play);
         }
         // show progress
         if (m_exp->getProgress() > 0) {
             painter.setPen(m_penBlue);
-            painter.drawArc(e->rect().center().x() - 14,
-                            e->rect().center().y() - 14,
-                            28, 28, 90*16, -m_exp->getProgress()*16);
+            painter.drawArc(center.x()-14, center.y()-14, 28, 28, 90*16, -m_exp->getProgress()*16);
         }
     } else if (status == Experiment::RUNNING) {
         if (m_btnHovered || m_rowHovered) { // pause (always show)
-            painter.drawPixmap(e->rect().center().x()-14,
-                               e->rect().center().y()-14,
-                               m_table->kIcon_pauseon);
+            painter.drawPixmap(center.x()-14, center.y()-14, m_table->kIcon_pauseon);
         } else {
-            painter.drawPixmap(e->rect().center().x()-14,
-                               e->rect().center().y()-14,
-                               m_table->kIcon_pause);
+            painter.drawPixmap(center.x()-14, center.y()-14, m_table->kIcon_pause);
         }
         // show progress
         if (m_exp->getProgress() > 0) {
             painter.setPen(m_penBlue);
-            painter.drawArc(e->rect().center().x() - 14,
-                            e->rect().center().y() - 14,
-                            28, 28, 90*16, -m_exp->getProgress()*16);
+            painter.drawArc(center.x()-14, center.y()-14, 28, 28, 90*16, -m_exp->getProgress()*16);
         }
     } else if (status == Experiment::FINISHED) {
         if (m_btnHovered || m_rowHovered) { // restart (when hovered)
-            painter.drawPixmap(e->rect().center().x()-9,
-                               e->rect().center().y()-9,
-                               m_table->kIcon_restart);
+            painter.drawPixmap(center.x()-9, center.y()-9, m_table->kIcon_restart);
         } else { // check (always)
-            painter.drawPixmap(e->rect().center().x()-7,
-                               e->rect().center().y()-7,
-                               m_table->kIcon_check);
+            painter.drawPixmap(center.x()-7, center.y()-7, m_table->kIcon_check);
         }
     } else {
-        painter.drawPixmap(e->rect().center().x()-7,
-                           e->rect().center().y()-7,
-                           m_table->kIcon_x);
+        painter.drawPixmap(center.x()-7, center.y()-7, m_table->kIcon_x);
     }
 
     painter.end();
