@@ -41,8 +41,8 @@ public:
         Status status = INVALID;
     };
 
-    explicit Experiment(MainApp* mainApp, int id, int projId, const QVariantHash& generalParams,
-        const QVariantHash& modelParams, const QVariantHash& graphParams);
+    explicit Experiment(MainApp* mainApp, int id, int projId, const Attributes& generalAttrs,
+        const Attributes& modelAttrs, const Attributes& graphAttrs);
 
     // Updates the progress value.
     // This method might be expensive!
@@ -84,9 +84,11 @@ public:
     inline int getProjId() const { return m_projId; }
     inline int getNumTrials() const { return m_numTrials; }
     inline const QHash<int,Trial>& getTrials() const { return m_trials; }
-    inline const QVariantHash& getGeneralParams() const { return m_generalParams; }
-    inline const QVariantHash& getModelParams() const { return m_modelParams; }
-    inline const QVariantHash& getGraphParams() const { return m_graphParams; }
+    inline const Attributes& getGeneralAttrs() const { return m_generalAttrs; }
+    inline const Attributes& getModelAttrs() const { return m_modelAttrs; }
+    inline const Attributes& getGraphAttrs() const { return m_graphAttrs; }
+    inline const QString& getModelId() const { return m_modelPlugin->uid; }
+    inline const QString& getGraphId() const { return m_graphPlugin->uid; }
 
 private:
     QMutex m_mutex;
@@ -94,9 +96,9 @@ private:
     const int m_id;
     const int m_projId;
 
-    const QVariantHash m_generalParams;
-    const QVariantHash m_modelParams;
-    const QVariantHash m_graphParams;
+    const Attributes m_generalAttrs;
+    const Attributes m_modelAttrs;
+    const Attributes m_graphAttrs;
 
     const MainApp::GraphPlugin* m_graphPlugin;
     const MainApp::ModelPlugin* m_modelPlugin;

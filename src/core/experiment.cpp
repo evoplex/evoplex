@@ -4,29 +4,30 @@
  */
 
 #include <QDebug>
+#include <QElapsedTimer>
 
 #include "core/abstractagent.h"
 #include "core/experiment.h"
 #include "core/filemgr.h"
 #include "utils/utils.h"
 
-Experiment::Experiment(MainApp* mainApp, int id, int projId, const QVariantHash& generalParams,
-                       const QVariantHash& modelParams, const QVariantHash& graphParams)
+Experiment::Experiment(MainApp* mainApp, int id, int projId, const Attributes& generalAttrs,
+                       const Attributes& modelAttrs, const Attributes& graphAttrs)
     : m_mainApp(mainApp)
     , m_id(id)
     , m_projId(projId)
-    , m_generalParams(generalParams)
-    , m_modelParams(modelParams)
-    , m_graphParams(graphParams)
-    , m_graphPlugin(m_mainApp->getGraph(generalParams.value(GENERAL_ATTRIBUTE_GRAPHID).toString()))
-    , m_modelPlugin(m_mainApp->getModel(generalParams.value(GENERAL_ATTRIBUTE_MODELID).toString()))
-    , m_numTrials(generalParams.value(GENERAL_ATTRIBUTE_TRIALS).toInt())
-    , m_seed(generalParams.value(GENERAL_ATTRIBUTE_SEED).toInt())
-    , m_autoDelete(generalParams.value(GENERAL_ATTRIBUTE_AUTODELETE).toBool())
+    , m_generalAttrs(generalAttrs)
+    , m_modelAttrs(modelAttrs)
+    , m_graphAttrs(graphAttrs)
+    , m_graphPlugin(m_mainApp->getGraph(generalAttrs.value(GENERAL_ATTRIBUTE_GRAPHID).toQString()))
+    , m_modelPlugin(m_mainApp->getModel(generalAttrs.value(GENERAL_ATTRIBUTE_MODELID).toQString()))
+    , m_numTrials(generalAttrs.value(GENERAL_ATTRIBUTE_TRIALS).toInt)
+    , m_seed(generalAttrs.value(GENERAL_ATTRIBUTE_SEED).toInt)
+    , m_autoDelete(generalAttrs.value(GENERAL_ATTRIBUTE_AUTODELETE).toBool)
     , m_progress(0)
 {
     m_trials.reserve(m_numTrials);
-    m_stopAt = m_generalParams.value(GENERAL_ATTRIBUTE_STOPAT).toInt();
+    m_stopAt = m_generalAttrs.value(GENERAL_ATTRIBUTE_STOPAT).toInt;
     m_pauseAt = m_stopAt;
     m_expStatus = READY;
 }
@@ -77,11 +78,14 @@ void Experiment::processTrial(const int& trialId)
 
     trial.status = RUNNING;
 
+QElapsedTimer timer;
+timer.start();
     bool algorithmConverged = false;
     while (trial.currentStep < m_pauseAt && !algorithmConverged) {
         algorithmConverged = trial.modelObj->algorithmStep();
         ++trial.currentStep;
     }
+qDebug() << timer.elapsed() / 1000.0 << "s (trial)";
 
     if (trial.currentStep >= m_stopAt || algorithmConverged) {
         // TODO: IO stuff
@@ -111,7 +115,7 @@ Experiment::Trial Experiment::createTrial(const int& trialSeed)
     PRG* prg = new PRG(trialSeed);
     AbstractGraph* graphObj = m_graphPlugin->factory->create();
     graphObj->setup(prg, agents);
-    if (!graphObj || !graphObj->init(m_graphParams)) {
+    if (!graphObj || !graphObj->init(m_graphAttrs)) {
         qWarning() << "[Experiment]: unable to create the trials."
                    << "The graph could not be initialized."
                    << "Project:" << m_projId << "Experiment:" << m_id;
@@ -124,7 +128,7 @@ Experiment::Trial Experiment::createTrial(const int& trialSeed)
 
     AbstractModel* modelObj = m_modelPlugin->factory->create();
     modelObj->setup(prg, graphObj);
-    if (!modelObj || !modelObj->init(m_modelParams)) {
+    if (!modelObj || !modelObj->init(m_modelAttrs)) {
         qWarning() << "[Experiment]: unable to create the trials."
                    << "The model could not be initialized."
                    << "Project:" << m_projId << "Experiment:" << m_id;
@@ -156,21 +160,21 @@ Agents Experiment::createAgents()
 
     Agents agents;
     bool isInt;
-    int numAgents = m_generalParams.value(GENERAL_ATTRIBUTE_AGENTS).toInt(&isInt);
+    int numAgents = m_generalAttrs.value(GENERAL_ATTRIBUTE_AGENTS).toQString().toInt(&isInt);
     if (isInt) { // create a population of agents with random properties?
         if (numAgents > 0) {
             PRG* prg = new PRG(m_seed);
-            QVector<QVariantHash> atbs = Utils::randomParams(m_modelPlugin->agentAttrSpace, prg, numAgents);
+            QVector<Attributes> attrs = Utils::randomAttrs(m_modelPlugin->agentAttrSpace, prg, numAgents);
             delete prg;
-            Q_ASSERT(atbs.size() == numAgents);
+            Q_ASSERT(attrs.size() == numAgents);
             agents.reserve(numAgents);
             for (int id = 0; id < numAgents; ++id) {
-                agents.push_back(new AbstractAgent(atbs.at(id)));
+                agents.push_back(new AbstractAgent(attrs.at(id)));
             }
         }
     } else { // read population from a text file
         agents = m_mainApp->getFileMgr()->importAgents(
-                    m_generalParams.value(GENERAL_ATTRIBUTE_AGENTS).toString(),
+                    m_generalAttrs.value(GENERAL_ATTRIBUTE_AGENTS).toQString(),
                     m_modelPlugin->uid);
     }
 

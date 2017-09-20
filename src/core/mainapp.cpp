@@ -6,6 +6,7 @@
 #include <QApplication>
 #include <QDir>
 #include <QFile>
+#include <QJsonArray>
 #include <QJsonObject>
 #include <QPluginLoader>
 #include <QThread>
@@ -23,13 +24,14 @@ MainApp::MainApp()
     , m_experimentsMgr(new ExperimentsMgr(QThread::idealThreadCount()))
     , m_lastProjectId(-1)
 {
-    m_generalAttrSpace.insert(GENERAL_ATTRIBUTE_AGENTS, "string");
-    m_generalAttrSpace.insert(GENERAL_ATTRIBUTE_GRAPHID, "string");
-    m_generalAttrSpace.insert(GENERAL_ATTRIBUTE_MODELID, "string");
-    m_generalAttrSpace.insert(GENERAL_ATTRIBUTE_SEED, "string");
-    m_generalAttrSpace.insert(GENERAL_ATTRIBUTE_STOPAT, QString("int[1,%1]").arg(EVOPLEX_MAX_STEPS));
-    m_generalAttrSpace.insert(GENERAL_ATTRIBUTE_TRIALS, QString("int[1,%1]").arg(EVOPLEX_MAX_TRIALS));
-    m_generalAttrSpace.insert(GENERAL_ATTRIBUTE_AUTODELETE, "bool");
+    int id = 0;
+    m_generalAttrSpace.insert(GENERAL_ATTRIBUTE_AGENTS, qMakePair(id++, QString("string")));
+    m_generalAttrSpace.insert(GENERAL_ATTRIBUTE_GRAPHID, qMakePair(id++, QString("string")));
+    m_generalAttrSpace.insert(GENERAL_ATTRIBUTE_MODELID, qMakePair(id++, QString("string")));
+    m_generalAttrSpace.insert(GENERAL_ATTRIBUTE_SEED, qMakePair(id++, QString("int[0,%1]").arg(INT32_MAX)));
+    m_generalAttrSpace.insert(GENERAL_ATTRIBUTE_STOPAT, qMakePair(id++, QString("int[1,%1]").arg(EVOPLEX_MAX_STEPS)));
+    m_generalAttrSpace.insert(GENERAL_ATTRIBUTE_TRIALS, qMakePair(id++, QString("int[1,%1]").arg(EVOPLEX_MAX_TRIALS)));
+    m_generalAttrSpace.insert(GENERAL_ATTRIBUTE_AUTODELETE, qMakePair(id++, QString("bool")));
 
     // load plugins
     QDir pluginsDir = QDir(qApp->applicationDirPath());
@@ -109,6 +111,7 @@ QString MainApp::loadGraphPlugin(const QString& path)
     QObject* instance = nullptr;
     QJsonObject metaData;
     if (!loadPlugin(path, &instance, metaData)) {
+        instance->deleteLater();
         return "";
     }
 
@@ -118,15 +121,13 @@ QString MainApp::loadGraphPlugin(const QString& path)
     graph->name = metaData[PLUGIN_ATTRIBUTE_NAME].toString();
     graph->description = metaData[PLUGIN_ATTRIBUTE_DESCRIPTION].toString();
     graph->factory = qobject_cast<IPluginGraph*>(instance);
+    graph->graphAttrSpace = attributesSpace(metaData, PLUGIN_ATTRIBUTE_GRAPHSPACE);
 
-    if (metaData.contains(PLUGIN_ATTRIBUTE_GRAPHSPACE)) {
-        QJsonObject json = metaData[PLUGIN_ATTRIBUTE_GRAPHSPACE].toObject();
-        for (QJsonObject::iterator it = json.begin(); it != json.end(); ++it) {
-            graph->graphAttrSpace.insert(it.key(), it.value().toString());
-        }
+    if (!Utils::boundaryValues(graph->graphAttrSpace, graph->graphAttrMin, graph->graphAttrMax)) {
+        instance->deleteLater();
+        return "";
     }
 
-    Utils::boundaryValues(graph->graphAttrSpace, graph->graphAttrMin, graph->graphAttrMax);
     m_graphs.insert(graph->uid, graph);
     return graph->uid;
 }
@@ -136,6 +137,7 @@ QString MainApp::loadModelPlugin(const QString& path)
     QObject* instance = nullptr;
     QJsonObject metaData;
     if (!loadPlugin(path, &instance, metaData)) {
+        instance->deleteLater();
         return "";
     }
 
@@ -146,23 +148,15 @@ QString MainApp::loadModelPlugin(const QString& path)
     model->description = metaData[PLUGIN_ATTRIBUTE_DESCRIPTION].toString();
     model->supportedGraphs = metaData[PLUGIN_ATTRIBUTE_SUPPORTEDGRAPHS].toString().split(",").toVector();
     model->factory = qobject_cast<IPluginModel*>(instance);
+    model->agentAttrSpace = attributesSpace(metaData, PLUGIN_ATTRIBUTE_AGENTSPACE);
+    model->modelAttrSpace = attributesSpace(metaData, PLUGIN_ATTRIBUTE_MODELSPACE);
 
-    if (metaData.contains(PLUGIN_ATTRIBUTE_AGENTSPACE)) {
-        QJsonObject json = metaData[PLUGIN_ATTRIBUTE_AGENTSPACE].toObject();
-        for (QJsonObject::iterator it = json.begin(); it != json.end(); ++it) {
-            model->agentAttrSpace.insert(it.key(), it.value().toString());
-        }
+    if (!Utils::boundaryValues(model->agentAttrSpace, model->agentAttrMin, model->agentAttrMax)
+            || !Utils::boundaryValues(model->modelAttrSpace, model->modelAttrMin, model->modelAttrMax)) {
+        instance->deleteLater();
+        return "";
     }
 
-    if (metaData.contains(PLUGIN_ATTRIBUTE_MODELSPACE)) {
-        QJsonObject json = metaData[PLUGIN_ATTRIBUTE_MODELSPACE].toObject();
-        for (QJsonObject::iterator it = json.begin(); it != json.end(); ++it) {
-            model->modelAttrSpace.insert(it.key(), it.value().toString());
-        }
-    }
-
-    Utils::boundaryValues(model->agentAttrSpace, model->agentAttrMin, model->agentAttrMax);
-    Utils::boundaryValues(model->modelAttrSpace, model->modelAttrMin, model->modelAttrMax);
     m_models.insert(model->uid, model);
     return model->uid;
 }
@@ -172,4 +166,17 @@ int MainApp::newProject(const QString& name, const QString& dir)
     ++m_lastProjectId;
     m_projects.insert(m_lastProjectId, new Project(this, m_lastProjectId, name, dir));
     return m_lastProjectId;
+}
+
+AttributesSpace MainApp::attributesSpace(const QJsonObject& metaData, const QString& name) const
+{
+    AttributesSpace ret;
+    if (metaData.contains(name)) {
+        QJsonArray json = metaData[name].toArray();
+        for (int i = 0; i < json.size(); ++i) {
+            QVariantMap attrs = json.at(i).toObject().toVariantMap();
+            ret.insert(attrs.firstKey(), qMakePair(i, attrs.first().toString()));
+        }
+    }
+    return ret;
 }

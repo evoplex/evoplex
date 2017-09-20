@@ -52,7 +52,7 @@ public:
     // This method is called before the actual simulation and
     // is mainly used to set the environment and parameters.
     // Return false if anything goes wrong with the initialization.
-    virtual bool init(const QVariantHash& modelParams) = 0;
+    virtual bool init(const Attributes& modelParams) = 0;
 
     // Implements the metaheuristic.
     // That is, it has to contain all the logic to perform ONE step.

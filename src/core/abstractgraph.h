@@ -84,7 +84,7 @@ public:
     // Initializes the graph object.
     // This method is called once when a new graph object is being created.
     // It is usually used to validate the graphParams and the set of agents.
-    virtual bool init(const QVariantHash& graphParams) = 0;
+    virtual bool init(const Attributes& graphParams) = 0;
 
     // Resets the graph object to the original state.
     virtual void reset() = 0;

@@ -60,15 +60,15 @@ Agents FileMgr::importAgents(const QString& filePath, const QString& modelId) co
             break;
         }
 
-        QVariantHash attributes;
+        Attributes attributes;
         for (int i = 0; i < values.size(); ++i) {
-            const QString& space = modelPlugin->agentAttrSpace.value(header.at(i));
-            QVariant value = Utils::validateParameter(space, values.at(i));
+            QPair<int, QString> space = modelPlugin->agentAttrSpace.value(header.at(i));
+            Value value = Utils::validateParameter(space.second, values.at(i));
             if (!value.isValid()) {
                 isValid = false;
                 break;
             }
-            attributes.insert(header.at(i), value);
+            attributes.replace(space.first, header.at(i), value);
         }
         agents.push_back(new AbstractAgent(attributes));
     }

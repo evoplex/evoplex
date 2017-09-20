@@ -10,6 +10,7 @@ SET(evoplex_core_src
     core/abstractagent.h
     core/abstractgraph.h
     core/abstractmodel.h
+    core/attributes.h
     core/edge.h
 
     core/mainapp.cpp

@@ -6,35 +6,29 @@
 #ifndef ABSTRACT_AGENT_H
 #define ABSTRACT_AGENT_H
 
-#include <QVariantHash>
-#include <QString>
+#include "core/attributes.h"
+#include "core/edge.h"
+#include "utils/prg.h"
+
+typedef QVector<AbstractAgent*> Agents;
 
 class AbstractAgent
 {
 public:
-    explicit AbstractAgent() {}
-    explicit AbstractAgent(QVariantHash attr)
-        : m_attributes(attr), m_x(0), m_y(0) { m_attributes.squeeze(); }
+    explicit AbstractAgent() : AbstractAgent(Attributes()) {}
+    explicit AbstractAgent(Attributes attr)
+        : m_attributes(attr), m_edges(nullptr), m_x(0), m_y(0) {}
 
-    ~AbstractAgent() {}
-
-    inline AbstractAgent clone() {
-        return AbstractAgent(m_attributes);
+    ~AbstractAgent() {
+        delete m_edges;
+        m_edges = nullptr;
     }
 
-    inline const QVariantHash& getAttributes() const {
-        return m_attributes;
-    }
+    inline AbstractAgent* clone() { return new AbstractAgent(m_attributes); }
 
-    inline const QVariant getAttribute(const QString& name) const {
-        return m_attributes.value(name);
-    }
-    inline void setAttribute(const QString& name, const QVariant& value) {
-        m_attributes.insert(name, value);
-    }
-
-    inline const int getId() const { return m_id; }
-    inline void setId(int id) { m_id = id; }
+    inline const Value& attribute(const char* name) const { return m_attributes.value(name); }
+    inline const Value& attribute(const int id) const { return m_attributes.value(id); }
+    inline void setAttribute(const int id, const Value& value) { m_attributes.setValue(id, value); }
 
     inline const int getX() const { return m_x; }
     inline void setX(int x) { m_x = x; }
@@ -42,11 +36,18 @@ public:
     inline void setY(int y) { m_y = y; }
     inline void setCoords(int x, int y) { setX(x); setY(y); }
 
+    inline const Edges* getEdges() const { return m_edges; }
+    inline void setEdges(Edges* edges) { m_edges = edges; }
+    inline AbstractAgent* getNeighbour(int localId) const { return m_edges->at(localId).getNeighbour(); }
+    inline AbstractAgent* getRandomNeighbour(PRG* prg) const {
+        return m_edges->at(prg->randI(m_edges->size())).getNeighbour();
+    }
+
 private:
-    int m_id;
     int m_x;
     int m_y;
-    QVariantHash m_attributes;
+    Attributes m_attributes;
+    Edges* m_edges;
 };
 
 #endif // ABSTRACT_AGENT_H
