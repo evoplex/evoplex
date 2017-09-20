@@ -10,16 +10,19 @@
 
 #include "ui_welcomewidget.h"
 
+class MainGUI;
+
 class WelcomeWidget : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit WelcomeWidget(QWidget *parent = 0);
+    explicit WelcomeWidget(MainGUI* maingui);
     ~WelcomeWidget();
 
 private:
     Ui_WelcomeWidget* m_ui;
+    MainGUI* m_maingui;
 };
 
 #endif // WELCOME_H

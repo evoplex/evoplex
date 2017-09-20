@@ -113,6 +113,39 @@
     </widget>
    </item>
    <item>
+    <layout class="QGridLayout" name="gridLayout_2">
+     <property name="topMargin">
+      <number>20</number>
+     </property>
+     <item row="0" column="0">
+      <widget class="QPushButton" name="bNewProject">
+       <property name="maximumSize">
+        <size>
+         <width>120</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>New Project</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QPushButton" name="bOpenProject">
+       <property name="maximumSize">
+        <size>
+         <width>120</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>Open Project</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
     <spacer name="verticalSpacer">
      <property name="orientation">
       <enum>Qt::Vertical</enum>

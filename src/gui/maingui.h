@@ -22,6 +22,7 @@ public:
 
 public slots:
     void slotPage(QAction* action);
+    void newProject() { m_actNewProject->trigger(); }
 
 protected:
     bool eventFilter(QObject *watched, QEvent *event);
@@ -39,6 +40,8 @@ private:
     QueueWidget* m_queue;
     ProjectsWindow* m_projects;
     Page m_curPage;
+
+    QAction* m_actNewProject;
 
     void setPageVisible(Page page, bool visible);
 };
