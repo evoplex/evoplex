@@ -17,13 +17,12 @@ class MooreGrid: public AbstractGraph
 {
 public:
     MooreGrid(const QString &name);
-
-    bool init(const QVariantHash& graphParams);
+    bool init();
     void reset();
-    QVariantHash getGraphParams() const;
 
 private:
     // graph parameters
+    enum GraphAttr { Height, Width };
     int m_width;
     int m_height;
 

@@ -16,23 +16,15 @@ MooreGrid::MooreGrid(const QString& name)
 {
 }
 
-bool MooreGrid::init(const QVariantHash& graphParams)
+bool MooreGrid::init()
 {
-    if (!graphParams.contains("height") || !graphParams.contains("width")) {
-        qWarning() << "[MooreGrid]: unable to find the parameters 'height'(int) and 'width'(int).";
-        return false;
-    }
-
-    m_height = graphParams.value("height").toInt();
-    m_width = graphParams.value("width").toInt();
+    m_height = getAttributes()->value(Height).toInt;
+    m_width = getAttributes()->value(Width).toInt;
     if (getAgents().size() != m_height * m_width) {
         qWarning() << "[MooreGrid]: the agent set is not compatible with the required shape."
                    << "The number of agents should be equal to 'height'*'width'.";
         return false;
     }
-
-    reset();
-
     return true;
 }
 
@@ -53,14 +45,6 @@ void MooreGrid::reset()
         adjacencyList.insert(agent, edges);
     }
     setAdjacencyList(adjacencyList);
-}
-
-QVariantHash MooreGrid::getGraphParams() const
-{
-    QVariantHash h;
-    h.insert("height", m_height);
-    h.insert("width", m_width);
-    return h;
 }
 
 Edges* MooreGrid::createEdges(const int id) const

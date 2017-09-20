@@ -15,12 +15,14 @@ class ModelHOPD: public AbstractModel
 {
 public:
     ModelHOPD();
-    bool init(const QVariantHash& modelParams);
+    bool init();
     bool algorithmStep();
 
+    double playGame(int sA, int sB) const;
+
 private:
-    double m_b;
-    double m_l;
+    enum ModelAttr { B, L };
+    enum AgentAttr { STRATEGY, PROBTOA };
 };
 
 REGISTER_MODEL(ModelHOPD)

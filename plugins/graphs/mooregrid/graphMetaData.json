@@ -3,8 +3,8 @@
   "name": "Moore Grid",
   "author": "Marcos Cardinot",
   "description": "Regular lattice grid with moore neighbourhood. That is, each agent has eight neighbours.",
-  "graphAttributesSpace": {
-    "height": "int[1,max]",
-    "width": "int[1,max]"
-  }
+  "graphAttributesSpace": [
+    {"height": "int[1,max]"},
+    {"width": "int[1,max]"}
+  ]
 }
