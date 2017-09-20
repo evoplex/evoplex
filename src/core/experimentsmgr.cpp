@@ -34,13 +34,16 @@ void ExperimentsMgr::updateProgressValues()
 
 void ExperimentsMgr::run(Experiment* exp)
 {
-    if (exp->getExpStatus() == Experiment::INVALID
-            || m_running.contains(exp) || m_queued.contains(exp)) {
+    if (exp->getExpStatus() != Experiment::READY
+            && exp->getExpStatus() != Experiment::QUEUED) {
         return;
     }
 
     if (m_running.size() < m_threads) {
         exp->setExpStatus(Experiment::RUNNING);
+        emit (statusChanged(exp));
+        m_queued.removeOne(exp);
+
         m_running.push_back(exp);
         m_timer->start(500); // every half a second
 
@@ -64,12 +67,11 @@ void ExperimentsMgr::run(Experiment* exp)
 
         fw->setFuture(QtConcurrent::map(trialIds->begin(), trialIds->end(),
                 [this, exp](int& trialId) { exp->processTrial(trialId); }));
-    } else {
+    } else if (exp->getExpStatus() != Experiment::QUEUED) {
         exp->setExpStatus(Experiment::QUEUED);
+        emit (statusChanged(exp));
         m_queued.push_back(exp);
     }
-
-    emit (statusChanged(exp));
 }
 
 void ExperimentsMgr::finished(Experiment* exp)

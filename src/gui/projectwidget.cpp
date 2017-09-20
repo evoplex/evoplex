@@ -44,6 +44,8 @@ ProjectWidget::ProjectWidget(Project* project, ExperimentsMgr* expMgr, QWidget* 
     m_headerIdx.insert(TableWidget::H_TRIALS, col++);
     m_ui->table->insertColumns(m_headerIdx.keys());
 
+    connect(m_ui->runAll, &QPushButton::pressed, [this]() { m_project->runAll(); });
+
     connect(m_ui->table, SIGNAL(itemDoubleClicked(QTableWidgetItem*)),
             this, SLOT(onItemDoubleClicked(QTableWidgetItem*)));
 
@@ -51,10 +53,6 @@ ProjectWidget::ProjectWidget(Project* project, ExperimentsMgr* expMgr, QWidget* 
             m_ui->table->viewport(), SLOT(update()));
     connect(expMgr, SIGNAL(progressUpdated(Experiment*)),
             m_ui->table->viewport(), SLOT(update()));
-}
-
-ProjectWidget::~ProjectWidget()
-{
 }
 
 void ProjectWidget::insertRow(const int& expId)

@@ -29,6 +29,13 @@ Project::~Project()
     qDeleteAll(m_experiments);
 }
 
+void Project::runAll()
+{
+    QHash<int, Experiment*>::iterator it;
+    for (it = m_experiments.begin(); it != m_experiments.end(); ++it)
+        it.value()->run();
+}
+
 const int Project::newExperiment(const QStringList& header, const QStringList& values, QString& errorMsg)
 {
     if (header.isEmpty() || values.isEmpty() || header.size() != values.size()) {

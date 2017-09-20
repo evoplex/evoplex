@@ -21,7 +21,7 @@ class ProjectWidget : public QDockWidget
 
 public:
     explicit ProjectWidget(Project* project, ExperimentsMgr *expMgr, QWidget *parent = 0);
-    ~ProjectWidget();
+    ~ProjectWidget() {}
 
 signals:
     void openExperiment(int projId, int expId);

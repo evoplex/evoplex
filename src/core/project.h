@@ -30,7 +30,9 @@ public:
     // Experiments belong to a project, that is why we need a valid projectId.
     const int importExperiments(const QString& filePath);
 
-    // getters
+    // execute all experiments of this project.
+    void runAll();
+
     inline int getId() { return m_id; }
     inline const QString& getName() { return m_name; }
     inline const QString& getDir() { return m_dir; }
