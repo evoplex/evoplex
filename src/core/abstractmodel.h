@@ -30,16 +30,19 @@ protected:
 
     inline AbstractGraph* graph() const { return m_graph; }
     inline PRG* prg() const { return m_prg; }
+    inline const Attributes* getAttributes() const { m_attributes; }
 
 private:
     AbstractGraph* m_graph;
     PRG* m_prg;
+    Attributes* m_attributes;
 
     // takes the ownership of the graph and the PRG
-    inline void setup(PRG* prg, AbstractGraph* graphObj) {
+    inline void setup(PRG* prg, AbstractGraph* graphObj, Attributes* attrs) {
         Q_ASSERT(!m_prg && !m_graph); // make sure it'll be called only once
         m_prg = prg;
         m_graph = graphObj;
+        m_attributes = attrs;
     }
 };
 
@@ -52,7 +55,7 @@ public:
     // This method is called before the actual simulation and
     // is mainly used to set the environment and parameters.
     // Return false if anything goes wrong with the initialization.
-    virtual bool init(const Attributes& modelParams) = 0;
+    virtual bool init() = 0;
 
     // Implements the metaheuristic.
     // That is, it has to contain all the logic to perform ONE step.

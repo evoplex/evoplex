@@ -22,6 +22,7 @@ class AbstractBaseGraph
     friend class Experiment;
 
 public:
+    inline const Attributes* getAttributes() const { return m_attributes; }
     inline const QString& getGraphName() const { return m_graphName; }
     inline const Agents& getAgents() const { return m_agents; }
     inline const AdjacencyList& getAdjacencyList() const { return m_adjacencyList; }
@@ -32,7 +33,8 @@ public:
     }
 
 protected:
-    explicit AbstractBaseGraph(const QString& name): m_graphName(name), m_prg(nullptr) {}
+    explicit AbstractBaseGraph(const QString& name)
+        : m_graphName(name), m_prg(nullptr), m_attributes(nullptr) {}
 
     virtual ~AbstractBaseGraph() {
         setAdjacencyList(AdjacencyList());
@@ -62,12 +64,15 @@ private:
     Agents m_agents;
     PRG* m_prg;
     AdjacencyList m_adjacencyList;
+    Attributes* m_attributes;
 
     // takes the ownership of the agents
-    inline void setup(PRG* prg, Agents agents) {
-        Q_ASSERT(!m_prg && m_agents.isEmpty()); // make sure it'll be called only once
+    inline void setup(PRG* prg, Agents& agents, Attributes* attrs) {
+        // make sure it'll be called only once
+        Q_ASSERT(!m_prg && m_agents.isEmpty());
         m_prg = prg;
         m_agents = agents;
+        m_attributes = attrs;
     }
 };
 
@@ -83,15 +88,11 @@ public:
 
     // Initializes the graph object.
     // This method is called once when a new graph object is being created.
-    // It is usually used to validate the graphParams and the set of agents.
-    virtual bool init(const Attributes& graphParams) = 0;
+    // It is usually used to validate the graph attributes and the set of agents.
+    virtual bool init() = 0;
 
     // Resets the graph object to the original state.
     virtual void reset() = 0;
-
-    // return the current value of all graph parameters (if any)
-    // eg., height, width ...
-    virtual QVariantHash getGraphParams() const = 0;
 };
 
 

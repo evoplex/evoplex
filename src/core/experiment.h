@@ -41,8 +41,10 @@ public:
         Status status = INVALID;
     };
 
-    explicit Experiment(MainApp* mainApp, int id, int projId, const Attributes& generalAttrs,
-        const Attributes& modelAttrs, const Attributes& graphAttrs);
+    explicit Experiment(MainApp* mainApp, int id, int projId, Attributes *generalAttrs,
+        Attributes *modelAttrs, Attributes *graphAttrs);
+
+    ~Experiment();
 
     // Updates the progress value.
     // This method might be expensive!
@@ -84,9 +86,9 @@ public:
     inline int getProjId() const { return m_projId; }
     inline int getNumTrials() const { return m_numTrials; }
     inline const QHash<int,Trial>& getTrials() const { return m_trials; }
-    inline const Attributes& getGeneralAttrs() const { return m_generalAttrs; }
-    inline const Attributes& getModelAttrs() const { return m_modelAttrs; }
-    inline const Attributes& getGraphAttrs() const { return m_graphAttrs; }
+    inline const Attributes* getGeneralAttrs() const { return m_generalAttrs; }
+    inline const Attributes* getModelAttrs() const { return m_modelAttrs; }
+    inline const Attributes* getGraphAttrs() const { return m_graphAttrs; }
     inline const QString& getModelId() const { return m_modelPlugin->uid; }
     inline const QString& getGraphId() const { return m_graphPlugin->uid; }
 
@@ -96,9 +98,9 @@ private:
     const int m_id;
     const int m_projId;
 
-    const Attributes m_generalAttrs;
-    const Attributes m_modelAttrs;
-    const Attributes m_graphAttrs;
+    Attributes* m_generalAttrs;
+    Attributes* m_modelAttrs;
+    Attributes* m_graphAttrs;
 
     const MainApp::GraphPlugin* m_graphPlugin;
     const MainApp::ModelPlugin* m_modelPlugin;

@@ -68,9 +68,9 @@ const int Project::newExperiment(const QStringList& header, const QStringList& v
 
     // get the value of each attribute and make sure they are valid
     QStringList failedAttributes;
-    Attributes generalAttrs(m_mainApp->getGeneralAttrSpace().size());
-    Attributes modelAttrs(mPlugin->modelAttrSpace.size());
-    Attributes graphAttrs(gPlugin->graphAttrSpace.size());
+    Attributes* generalAttrs = new Attributes(m_mainApp->getGeneralAttrSpace().size());
+    Attributes* modelAttrs = new Attributes(mPlugin->modelAttrSpace.size());
+    Attributes* graphAttrs = new Attributes(gPlugin->graphAttrSpace.size());
     for (int i = 0; i < values.size(); ++i) {
         const QString& vStr = values.at(i);
         QString attrName = header.at(i);
@@ -80,7 +80,7 @@ const int Project::newExperiment(const QStringList& header, const QStringList& v
         if (gps != m_mainApp->getGeneralAttrSpace().end()) {
             Value value = Utils::validateParameter(gps.value().second, vStr);
             if (value.isValid()) {
-                generalAttrs.replace(gps.value().first, attrName, value);
+                generalAttrs->replace(gps.value().first, attrName, value);
                 ok = true;
             }
         } else {
@@ -89,11 +89,11 @@ const int Project::newExperiment(const QStringList& header, const QStringList& v
             if (attrName.startsWith(modelId_)) {
                 attrName = attrName.remove(modelId_);
                 attrSpace = mPlugin->modelAttrSpace.value(attrName);
-                attributes = &modelAttrs;
+                attributes = modelAttrs;
             } else if (attrName.startsWith(graphId_)) {
                 attrName = attrName.remove(graphId_);
                 attrSpace = gPlugin->graphAttrSpace.value(attrName);
-                attributes = &graphAttrs;
+                attributes = graphAttrs;
             }
 
             if (!attrSpace.second.isEmpty()) {
