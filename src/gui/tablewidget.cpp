@@ -80,7 +80,12 @@ void TableWidget::insertColumns(const QList<Header> headers)
 
 void TableWidget::insertPlayButton(int row, int col, Experiment* exp)
 {
-    this->setCellWidget(row, col, new PlayButton(row, exp, this));
+    // the row number might change (move), so lets insert an empty
+    // item just to make easier for the button to know where it is
+    QTableWidgetItem* item = new QTableWidgetItem("");
+    this->setItem(row, col, item);
+
+    this->setCellWidget(row, col, new PlayButton(item, exp, this));
     this->horizontalHeader()->setSectionResizeMode(col, QHeaderView::Fixed);
     this->horizontalHeader()->setDefaultSectionSize(60);
 }
@@ -88,17 +93,16 @@ void TableWidget::insertPlayButton(int row, int col, Experiment* exp)
 /*********************************************************/
 /*********************************************************/
 
-PlayButton::PlayButton(int row, Experiment* exp, TableWidget* parent)
+PlayButton::PlayButton(QTableWidgetItem* item, Experiment* exp, TableWidget* parent)
     : QWidget(parent)
     , m_table(parent)
     , m_exp(exp)
-    , m_row(row)
+    , m_item(item)
     , m_btnHovered(false)
     , m_rowHovered(false)
     , m_penBlue(QPen(QBrush(QColor(66,133,244)), 3))
 {
-    connect(parent, &QTableWidget::viewportEntered, [this](){ m_rowHovered=false; });
-    connect(this, SIGNAL(cellEntered(int,int)), parent, SIGNAL(cellEntered(int,int)));
+    //connect(parent, &QTableWidget::viewportEntered, [this](){ m_rowHovered=false; });
     connect(parent, SIGNAL(cellEntered(int,int)), this, SLOT(onItemEntered(int,int)));
 }
 
@@ -108,10 +112,25 @@ void PlayButton::mousePressEvent(QMouseEvent* e)
         m_exp->toggle();
 }
 
+void PlayButton::enterEvent(QEvent*)
+{
+    m_btnHovered = true;
+    if (m_item) emit (m_table->cellEntered(m_item->row(), 0));
+}
+
+void PlayButton::leaveEvent(QEvent*)
+{
+    m_btnHovered = false;
+}
+
 void PlayButton::onItemEntered(int row, int col)
 {
     Q_UNUSED(col);
-    m_rowHovered = m_row == row;
+    try {
+        m_rowHovered = m_item->row() == row;
+    } catch (...) {
+        m_rowHovered = false;
+    }
 }
 
 void PlayButton::paintEvent(QPaintEvent* e)

@@ -62,7 +62,8 @@ class PlayButton : public QWidget
     Q_OBJECT
 
 public:
-    explicit PlayButton(int row, Experiment* exp, TableWidget *parent);
+    explicit PlayButton(QTableWidgetItem* item, Experiment* exp, TableWidget *parent);
+    ~PlayButton() {}
 
 signals:
     void cellEntered(int row, int col);
@@ -72,14 +73,14 @@ private slots:
 
 protected:
     virtual void paintEvent(QPaintEvent* e);
-    inline void enterEvent(QEvent*) { m_btnHovered = true; emit (cellEntered(m_row, 0)); }
-    inline void leaveEvent(QEvent*) { m_btnHovered = false; }
-    void mousePressEvent(QMouseEvent* e);
+    virtual void enterEvent(QEvent*);
+    virtual void leaveEvent(QEvent*);
+    virtual void mousePressEvent(QMouseEvent* e);
 
 private:
     TableWidget* m_table;
     Experiment* m_exp;
-    int m_row;
+    QTableWidgetItem* m_item;
     bool m_btnHovered;
     bool m_rowHovered;
 
