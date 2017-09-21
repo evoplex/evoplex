@@ -24,14 +24,7 @@ struct Value
     Value(const double value) : type(DOUBLE), toDouble(value) {}
     Value(const int value) : type(INT), toInt(value) {}
     Value(const char* value) : type(STRING), toString(value) {}
-/*
-    Value(const Value& v) : type(v.type), toString(v.toString) {
-        if (type == BOOL) toBool = v.toBool;
-        else if (type == CHAR) toChar = v.toChar;
-        else if (type == DOUBLE) toDouble = v.toDouble;
-        else if (type == INT) toInt = v.toInt;
-    }
-*/
+
     inline bool isValid() const { return type != INVALID; }
     inline QString toQString() const {
         switch (type) {

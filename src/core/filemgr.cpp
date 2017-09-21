@@ -8,6 +8,7 @@
 #include <QTextStream>
 #include <QtDebug>
 
+#include "core/abstractagent.h"
 #include "core/filemgr.h"
 #include "core/project.h"
 #include "utils/utils.h"
@@ -29,11 +30,11 @@ Agents FileMgr::importAgents(const QString& filePath, const QString& modelId) co
 
     // read and validate header
     QStringList header;
-    if (!in.atEnd() && !modelPlugin) {
+    if (!in.atEnd() && modelPlugin) {
         header = in.readLine().split(",");
         if (header.size() == modelPlugin->agentAttrSpace.size()) {
-            foreach (QString paramName, header) {
-                if (!modelPlugin->agentAttrSpace.contains(paramName)) {
+            foreach (QString attrName, header) {
+                if (!modelPlugin->agentAttrSpace.contains(attrName)) {
                     header.clear();
                     break;
                 }
@@ -60,7 +61,7 @@ Agents FileMgr::importAgents(const QString& filePath, const QString& modelId) co
             break;
         }
 
-        Attributes attributes;
+        Attributes attributes(values.size());
         for (int i = 0; i < values.size(); ++i) {
             QPair<int, QString> space = modelPlugin->agentAttrSpace.value(header.at(i));
             Value value = Utils::validateParameter(space.second, values.at(i));

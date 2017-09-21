@@ -34,15 +34,17 @@ public:
         return row * cols + col;
     }
 
-    static Value valueFromString(const QString& valueStr) {
+    static Value valueFromString(Value::Type type, const QString& str) {
         Value value;
-        QVariant var(valueStr);
-        bool ok = false;
-        value = Value(var.toInt(&ok));
-        if (ok) return value;
-        value = Value(var.toDouble(&ok));
-        if (ok) return value;
-        return Value();
+        bool ok;
+        if (type == Value::DOUBLE)
+            value = str.toDouble(&ok);
+        else if (type == Value::INT)
+            value = str.toInt(&ok);
+
+        if (!ok || !value.isValid())
+            return Value();
+        return value;
     }
 
     // Check if the value belongs to the parameter space.
@@ -64,7 +66,7 @@ public:
         } else if (space.contains('{') && space.endsWith('}')) {
             QVector<Value> values;
             if (paramSet(space, values)) {
-                Value valSrc = valueFromString(valueStr);
+                Value valSrc = valueFromString(values.first().type, valueStr);
                 foreach (Value val, values) {
                     if (val == valSrc) return val;
                 }
@@ -72,8 +74,8 @@ public:
         } else if (space.contains('[') && space.endsWith(']')) {
             Value min, max;
             if (paramInterval(space, min, max)) {
-                Value valSrc = valueFromString(valueStr);
-                if (valSrc >= min && valSrc <= max) {
+                Value valSrc = valueFromString(min.type, valueStr);
+                if (valSrc.isValid() && valSrc >= min && valSrc <= max) {
                     return valSrc;
                 }
             }
@@ -120,7 +122,8 @@ public:
             return false;
         }
 
-        bool ok1, ok2;
+        bool ok1 = false;
+        bool ok2 = false;
         if (space.startsWith("int")) {
             values[0] = values[0].remove("int");
             min = Value(values.at(0).toInt(&ok1));
