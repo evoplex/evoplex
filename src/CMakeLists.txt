@@ -47,6 +47,8 @@ SET(evoplex_gui_src
     gui/queuewidget.h
     gui/tablewidget.cpp
     gui/tablewidget.h
+    gui/settingswidget.cpp
+    gui/settingswidget.h
     gui/welcomewidget.cpp
     gui/welcomewidget.h
 
@@ -57,6 +59,7 @@ SET(evoplex_ui
     gui/forms/attributeswidget.ui
     gui/forms/queuewidget.ui
     gui/forms/projectwidget.ui
+    gui/forms/settingswidget.ui
     gui/forms/welcomewidget.ui
 )
 QT5_WRAP_UI(evoplex_ui_h ${evoplex_ui})

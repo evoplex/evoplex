@@ -22,15 +22,12 @@ public:
 
     void run(Experiment* exp);
 
-    // Kill trial
     void kill(Experiment* exp);
 
-    // Kill all trials
     void killAll();
 
-    // as we are changing the number of threads available,
-    // we have to walk through all the processes
-    void setNumThreads(int threads);
+    inline const int maxThreadsCount() const { return m_threads; }
+    void setMaxThreadCount(const int newValue);
 
 signals:
     void statusChanged(Experiment* exp);

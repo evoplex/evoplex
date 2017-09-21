@@ -81,15 +81,6 @@ void ExperimentsMgr::finished(Experiment* exp)
         m_timer->stop();
     }
 
-    if (m_toKill.contains(exp)) {
-        //kill(processId);
-    }
-
-    // call next process in the queue
-    if (!m_queued.isEmpty()) {
-        run(m_queued.first());
-    }
-
     exp->pauseAt(EVOPLEX_MAX_STEPS); // reset the pauseAt flag to maximum
 
     if(exp->getExpStatus() != Experiment::INVALID) {
@@ -104,31 +95,43 @@ void ExperimentsMgr::finished(Experiment* exp)
             ++it;
         }
     }
-
     emit (statusChanged(exp));
+
+    if (m_toKill.contains(exp)) {
+        //kill(processId);
+    }
+
+    // call next process in the queue
+    if (!m_queued.isEmpty()) {
+        run(m_queued.first());
+    }
 }
 
-void ExperimentsMgr::setNumThreads(int threads)
+void ExperimentsMgr::setMaxThreadCount(const int newValue)
 {
-    if (m_threads == threads) {
+    if (m_threads == newValue || newValue < 1) {
         return;
     }
 
-    const int p = qAbs(threads - m_threads);
-    int old = m_threads;
-    m_threads = threads;
+    const int diff = qAbs(newValue - m_threads);
+    const int previous = m_threads;
+    m_threads = newValue;
 
-    if (threads > old) {
-        for (int i = 0; i < p && !m_queued.isEmpty(); ++i) {
+    if (newValue > previous) {
+        for (int n = 0; n < diff && !m_queued.isEmpty(); ++n) {
             run(m_queued.takeFirst());
         }
-    } else if (threads < old) {
-        for (int i = 0; i < p && !m_running.isEmpty(); ++i) {
-            Experiment* exp = m_running.takeFirst();
-            run(exp);
+    } else if (newValue < previous) {
+        for (int n = 0; n < diff && !m_running.isEmpty(); ++n) {
+            Experiment* exp = m_running.takeLast();
             m_queued.push_front(exp);
+            exp->pause();
         }
     }
+
+    QThreadPool::globalInstance()->setMaxThreadCount(m_threads);
+    qDebug() << "[ExperimentsMgr] setting the max number of thread from"
+             << previous << "to" << newValue;
 }
 
 void ExperimentsMgr::kill(Experiment* exp)

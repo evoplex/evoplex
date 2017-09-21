@@ -16,6 +16,7 @@ MainGUI::MainGUI(MainApp* mainApp, QWidget* parent)
     , m_welcome(new WelcomeWidget(this))
     , m_queue(new QueueWidget(mainApp->getExperimentsMgr(), this))
     , m_projects(new ProjectsWindow(mainApp, this))
+    , m_settings(new SettingsWidget(mainApp, this))
     , m_curPage(PAGE_NULL)
 {
     // main window
@@ -33,10 +34,12 @@ MainGUI::MainGUI(MainApp* mainApp, QWidget* parent)
     centralLayout->addWidget(m_welcome);
     centralLayout->addWidget(m_queue);
     centralLayout->addWidget(m_projects);
+    centralLayout->addWidget(m_settings);
     this->setCentralWidget(centralLayout->parentWidget());
     m_welcome->hide();
     m_queue->hide();
     m_projects->hide();
+    m_settings->hide();
 
     //
     // toolbar
@@ -57,8 +60,15 @@ MainGUI::MainGUI(MainApp* mainApp, QWidget* parent)
     wspacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     toolbar->addWidget(wspacer);
     toolbar->addSeparator();
-    toolbar->addAction("Plugins");
-    toolbar->addAction("Settings");
+    QAction* acPlugins = new QAction(QIcon(":/icons/plugins.svg"), "Plugins", actionGroup);
+    acPlugins->setCheckable(true);
+    acPlugins->setData(PAGE_PLUGINS);
+    toolbar->addAction(acPlugins);
+    QAction* acSettings = new QAction(QIcon(":/icons/settings.svg"), "Settings", actionGroup);
+    acSettings->setCheckable(true);
+    acSettings->setData(PAGE_SETTINGS);
+    toolbar->addAction(acSettings);
+
     toolbar->setStyleSheet("font: 8pt;");
     toolbar->setIconSize(QSize(32, 32));
     toolbar->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
@@ -143,6 +153,9 @@ void MainGUI::setPageVisible(Page page, bool visible)
             break;
         case PAGE_PROJECTS:
             m_projects->setVisible(visible);
+            break;
+        case PAGE_SETTINGS:
+            m_settings->setVisible(visible);
             break;
         default:
             m_welcome->setVisible(visible);
