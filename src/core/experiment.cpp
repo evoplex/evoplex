@@ -88,14 +88,11 @@ void Experiment::processTrial(const int& trialId)
 
     trial.status = RUNNING;
 
-QElapsedTimer timer;
-timer.start();
     bool algorithmConverged = false;
     while (trial.currentStep < m_pauseAt && !algorithmConverged) {
         algorithmConverged = trial.modelObj->algorithmStep();
         ++trial.currentStep;
     }
-qDebug() << timer.elapsed() / 1000.0 << "s (trial)";
 
     if (trial.currentStep >= m_stopAt || algorithmConverged) {
         // TODO: IO stuff
