@@ -6,6 +6,8 @@ ModelHOPD::ModelHOPD() {}
 
 bool ModelHOPD::init()
 {
+    m_mutRate = attributes()->value(MutRate);
+
     return true;
 }
 
@@ -16,33 +18,34 @@ bool ModelHOPD::algorithmStep()
     for (int innerStep = 0; innerStep < popSize; ++innerStep) {
         // 1. Pick an agent at random (x)
         AbstractAgent* agentX = graph()->getRandomAgent();
-        const int strategyX = agentX->attribute(STRATEGY).toInt;
         const Edges* edgesX = agentX->getEdges();
+
+        // 2. mutation of the attribute 'ProbToA'
+        if (m_mutRate > 0.0 && m_mutRate > prg()->randD()) {
+            agentX->setAttribute(PROBTOA, prg()->randD());
+        }
 
         // 2. play the game with each neighbour and calculate utility of x
         double uX = 0.0; // total utility of x
         for (int nId = 0; nId < edgesX->size(); ++nId) {
-            const AbstractAgent* neighbour = edgesX->at(nId).getNeighbour();
-            uX += playGame(strategyX, neighbour->attribute(STRATEGY).toInt);
+            uX += playGame(agentX, edgesX->at(nId).getNeighbour());
         }
 
         // 3. select a neighbour of x at random (y)
         const int idY = prg()->randI(edgesX->size());
-        const AbstractAgent* agentY = edgesX->at(idY).getNeighbour();
-        const int strategyY = agentY->attribute(STRATEGY).toInt;
+        AbstractAgent* agentY = edgesX->at(idY).getNeighbour();
         const Edges* edgesY = agentY->getEdges();
 
         // 4. calculate utility of y
         double uY = 0.0; // total utility of y
         for (int nId = 0; nId < edgesY->size(); ++nId) {
-            const AbstractAgent* neighbour = edgesY->at(nId).getNeighbour();
-            uY += playGame(strategyY, neighbour->attribute(STRATEGY).toInt);
+            uY += playGame(agentY, edgesY->at(nId).getNeighbour());
         }
 
         // 5. update strategy
         double prob = 1. / (1. + exp((-(uY - uX) / 8.0) / 0.1));
         if (prob  >  prg()->randD()) {
-            agentX->setAttribute(STRATEGY, strategyY);
+            agentX->setAttribute(STRATEGY, agentY->attribute(STRATEGY));
             agentX->setAttribute(PROBTOA, agentY->attribute(PROBTOA));
         }
     }
@@ -50,28 +53,30 @@ bool ModelHOPD::algorithmStep()
     return false;
 }
 
-double ModelHOPD::playGame(int sA, int sB) const
+double ModelHOPD::playGame(AbstractAgent* agentX, AbstractAgent* agentY) const
 {
-    if (sA == 2 || sB == 2) {
-        return 2.;
-        //return m_l;
-    }
+    // check if one of the agents do not want to play
+    const double p = prg()->randD();
+    if (agentX->attribute(PROBTOA).toDouble > p
+            || agentY->attribute(PROBTOA).toDouble > p)
+        return 2.0;
 
-    switch (sA*2 + sB) {
-        case 0:
-            return 3.0; // CC : Reward for mutual cooperation
-            return 1.0; // CC : Reward for mutual cooperation
-        case 1:
-            return 0.0; // CD : Sucker's payoff
-            return 0.0; // CD : Sucker's payoff
-        case 2:
-            return 5.0; // DC : Temptation to defect
-            //return m_b; // DC : Temptation to defect
-        case 3:
-            return 1.0; // DD : Punishment for mutual defection
-            return 0.0; // DD : Punishment for mutual defection
+    const int sX = agentX->attribute(STRATEGY).toInt;
+    const int sY = agentY->attribute(STRATEGY).toInt;
+    switch (sX*2 + sY) {
+        case 0: // CC : Reward for mutual cooperation
+            return 3.0;
+            return 1.0;
+        case 1: // CD : Sucker's payoff
+            return 0.0;
+        case 2: // DC : Temptation to defect
+            return 5.0;
+            //return m_b;
+        case 3: // DD : Punishment for mutual defection
+            return 1.0;
+            return 0.0;
         default: // it should never happen
-            qDebug() << sA << sB;
+            qDebug() << sX << sY;
             qFatal("[HOPD::playGame()] Error!");
     }
 }

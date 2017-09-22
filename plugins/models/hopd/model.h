@@ -18,11 +18,13 @@ public:
     bool init();
     bool algorithmStep();
 
-    double playGame(int sA, int sB) const;
+    double playGame(AbstractAgent* agentX, AbstractAgent* agentY) const;
 
 private:
-    enum ModelAttr { B, L };
+    enum ModelAttr { B, L, MutRate };
     enum AgentAttr { STRATEGY, PROBTOA };
+
+    double m_mutRate;
 };
 
 REGISTER_MODEL(ModelHOPD)

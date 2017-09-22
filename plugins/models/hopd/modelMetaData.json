@@ -10,6 +10,7 @@
   ],
   "modelAttributesSpace": [
     {"b": "double[1,2]"},
-    {"l": "double[0,1]"}
+    {"l": "double[0,1]"},
+    {"mutRate": "double[0,1]"}
   ]
 }
