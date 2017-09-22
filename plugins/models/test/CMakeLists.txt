@@ -1,4 +1,4 @@
-SET(MODEL_NAME hopd)
+SET(MODEL_NAME test)
 
 qt5_generate_moc(model.h moc_model.cpp)
 FILE(COPY modelMetaData.json DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
