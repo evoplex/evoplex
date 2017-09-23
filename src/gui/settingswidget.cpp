@@ -8,6 +8,8 @@
 #include "core/experimentsmgr.h"
 #include "gui/settingswidget.h"
 
+namespace evoplex {
+
 SettingsWidget::SettingsWidget(MainApp* mainApp, QWidget* parent)
     : QWidget(parent)
     , m_ui(new Ui_SettingsWidget)
@@ -30,4 +32,5 @@ SettingsWidget::~SettingsWidget()
 void SettingsWidget::slotNumThreads(int newValue)
 {
     m_mainApp->getExperimentsMgr()->setMaxThreadCount(newValue);
+}
 }

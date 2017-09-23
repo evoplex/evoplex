@@ -12,6 +12,8 @@
 #include "core/project.h"
 #include "gui/attributeswidget.h"
 
+namespace evoplex {
+
 class ExperimentWidget : public QDockWidget
 {
     Q_OBJECT
@@ -27,5 +29,6 @@ private:
     QMainWindow* m_innerWindow;
     AttributesWidget* m_attrWidget;
 };
+}
 
 #endif // EXPERIMENTWIDGET_H

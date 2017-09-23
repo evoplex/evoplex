@@ -10,6 +10,8 @@
 #include <QTimer>
 #include <QVector>
 
+namespace evoplex {
+
 class Experiment;
 
 class ExperimentsMgr: public QObject
@@ -48,5 +50,6 @@ private:
     // trigged when an experiment ends (futurewatcher)
     void finished(Experiment* exp);
 };
+}
 
 #endif // EXPERIMENTMGR_H

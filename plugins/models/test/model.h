@@ -8,16 +8,19 @@
 
 #include "core/abstractmodel.h"
 
+namespace evoplex {
+
 class ModelTest: public AbstractModel
 {
 public:
-    bool init() { return true; };
+    bool init() { return true; }
     bool algorithmStep();
 
 private:
     enum ModelAttr { Temptation, Loners };
     enum AgentAttr { Strategy };
 };
+}
 
 REGISTER_MODEL(ModelTest)
 

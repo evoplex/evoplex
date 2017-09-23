@@ -15,6 +15,7 @@
 #include "core/edge.h"
 #include "utils/prg.h"
 
+namespace evoplex {
 typedef QHash<AbstractAgent*, Edges*> AdjacencyList;
 
 class AbstractBaseGraph
@@ -105,10 +106,12 @@ public:
     // create the real graph object.
     virtual AbstractGraph* create() = 0;
 };
-Q_DECLARE_INTERFACE(IPluginGraph, "org.evoplex.IPluginGraph")
+}
+Q_DECLARE_INTERFACE(evoplex::IPluginGraph, "org.evoplex.IPluginGraph")
 
 
 #define REGISTER_GRAPH(CLASSNAME)                                           \
+    namespace evoplex {                                                     \
     class PG_##CLASSNAME: public QObject, public IPluginGraph               \
     {                                                                       \
     Q_OBJECT                                                                \
@@ -119,6 +122,6 @@ Q_DECLARE_INTERFACE(IPluginGraph, "org.evoplex.IPluginGraph")
         AbstractGraph* create() {                                           \
             return dynamic_cast<AbstractGraph*>(new CLASSNAME(#CLASSNAME)); \
         }                                                                   \
-    };
+    };}
 
 #endif // ABSTRACT_GRAPH_H

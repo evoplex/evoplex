@@ -12,6 +12,8 @@
 #include "core/experimentsmgr.h"
 #include "gui/tablewidget.h"
 
+namespace evoplex {
+
 class QueueWidget : public QScrollArea
 {
     Q_OBJECT
@@ -46,5 +48,5 @@ private:
 
     QTableWidgetItem* insertRow(TableWidget *table, Experiment* exp);
 };
-
+}
 #endif // QUEUEWIDGET_H

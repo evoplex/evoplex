@@ -10,6 +10,8 @@
 
 #include "gui/maingui.h"
 
+namespace evoplex {
+
 MainGUI::MainGUI(MainApp* mainApp, QWidget* parent)
     : QMainWindow(parent)
     , m_mainApp(mainApp)
@@ -161,4 +163,5 @@ void MainGUI::setPageVisible(Page page, bool visible)
             m_welcome->setVisible(visible);
             break;
     }
+}
 }

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>128</height>
+    <height>135</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -98,13 +98,13 @@ QPushButton::hover {
     </layout>
    </item>
    <item>
-    <widget class="TableWidget" name="table"/>
+    <widget class="evoplex::TableWidget" name="table"/>
    </item>
   </layout>
  </widget>
  <customwidgets>
   <customwidget>
-   <class>TableWidget</class>
+   <class>evoplex::TableWidget</class>
    <extends>QTableWidget</extends>
    <header>gui/tablewidget.h</header>
   </customwidget>

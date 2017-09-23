@@ -13,6 +13,8 @@
 #include "core/mainapp.h"
 #include "core/experiment.h"
 
+namespace evoplex {
+
 class Project
 {
 public:
@@ -50,5 +52,6 @@ private:
     int m_lastExpId;
     QHash<int, Experiment*> m_experiments;
 };
+}
 
 #endif // PROJECT_H

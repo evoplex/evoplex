@@ -77,7 +77,7 @@
         </font>
        </property>
        <property name="text">
-        <string>Welcome Evoplex!</string>
+        <string>Welcome to Evoplex!</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>

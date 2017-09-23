@@ -19,6 +19,8 @@
 #include "utils/constants.h"
 #include "utils/utils.h"
 
+namespace evoplex {
+
 MainApp::MainApp()
     : m_fileMgr(new FileMgr(this))
     , m_experimentsMgr(new ExperimentsMgr(QThread::idealThreadCount()))
@@ -179,4 +181,5 @@ AttributesSpace MainApp::attributesSpace(const QJsonObject& metaData, const QStr
         }
     }
     return ret;
+}
 }

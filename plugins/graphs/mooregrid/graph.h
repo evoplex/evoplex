@@ -13,6 +13,8 @@
 #include "core/abstractagent.h"
 #include "core/abstractgraph.h"
 
+namespace evoplex {
+
 class MooreGrid: public AbstractGraph
 {
 public:
@@ -28,6 +30,7 @@ private:
 
     Edges* createEdges(const int id) const;
 };
+}
 
 REGISTER_GRAPH(MooreGrid)
 

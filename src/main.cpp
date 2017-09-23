@@ -32,7 +32,7 @@ int main(int argc, char* argv[])
              << "*************************************************\n";
 
     // init application
-    MainApp mainApp;
+    evoplex::MainApp mainApp;
 
     int result = -1;
     QApplication* app = qobject_cast<QApplication*>(coreApp.data());
@@ -56,7 +56,7 @@ int main(int argc, char* argv[])
         darkPalette.setColor(QPalette::HighlightedText, Qt::black);
         app->setPalette(darkPalette);
 
-        MainGUI gui(&mainApp);
+        evoplex::MainGUI gui(&mainApp);
         gui.show();
         result = app->exec();
     } else {

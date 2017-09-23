@@ -10,6 +10,8 @@
 #include "core/edge.h"
 #include "utils/prg.h"
 
+namespace evoplex {
+
 typedef QVector<AbstractAgent*> Agents;
 
 class AbstractAgent
@@ -49,5 +51,6 @@ private:
     Attributes m_attributes;
     Edges* m_edges;
 };
+}
 
 #endif // ABSTRACT_AGENT_H

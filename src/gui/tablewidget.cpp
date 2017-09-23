@@ -10,6 +10,8 @@
 
 #include "gui/tablewidget.h"
 
+namespace evoplex {
+
 TableWidget::TableWidget(QWidget *parent)
     : QTableWidget(parent)
     , kIcon_check(QPixmap(":/icons/check.svg").scaledToWidth(14, Qt::SmoothTransformation))
@@ -216,4 +218,5 @@ void RowsDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option,
         opt.state |= QStyle::State_MouseOver;
 
     QStyledItemDelegate::paint(painter, opt, index);
+}
 }

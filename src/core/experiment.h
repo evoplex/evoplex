@@ -15,6 +15,8 @@
 #include "core/mainapp.h"
 #include "utils/constants.h"
 
+namespace evoplex {
+
 // Evoplex assumes that any experiment belong to a project.
 // Cosidering that a project might have a massive amount of experiments, this class
 // should be as light as possible and should not do any parameter validation. So,
@@ -135,5 +137,6 @@ private:
     // clone a population of agents
     Agents cloneAgents(const Agents& agents) const;
 };
+}
 
 #endif // EXPERIMENT_H

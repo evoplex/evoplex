@@ -10,6 +10,8 @@
 #include <QString>
 #include <QVector>
 
+namespace evoplex {
+
 // QHash<attributeName, <id, space>>
 typedef QHash<QString, QPair<int, QString>> AttributesSpace;
 
@@ -112,5 +114,5 @@ private:
     QVector<QString> m_names;
     QVector<Value> m_values;
 };
-
+}
 #endif // ATTRIBUTES_H

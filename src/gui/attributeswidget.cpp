@@ -10,7 +10,6 @@
 #include <QVariant>
 
 #include "attributeswidget.h"
-#include "ui_attributeswidget.h"
 
 #define STRING_NULL_PLUGINID "--"
 // let's make it easier to find the type of the field
@@ -20,12 +19,14 @@
 #define LINE_EDIT "3"
 #define SPIN_BOX "4"
 
+namespace evoplex {
+
 AttributesWidget::AttributesWidget(Project* project, QWidget *parent)
     : QDockWidget(parent)
     , m_project(project)
     , m_selectedGraphId(STRING_NULL_PLUGINID)
     , m_selectedModelId(STRING_NULL_PLUGINID)
-    , m_ui(new Ui::AttributesWidget)
+    , m_ui(new Ui_AttributesWidget)
 {
     m_ui->setupUi(this);
 
@@ -285,4 +286,5 @@ void AttributesWidget::insertPluginAttributes(QTreeWidgetItem* itemRoot, const Q
         // add the uid as prefix to avoid clashes.
         m_widgetFields.insert(uid_ + min.name(i), widget);
     }
+}
 }

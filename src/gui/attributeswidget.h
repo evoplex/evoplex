@@ -5,11 +5,10 @@
 #include <QTreeWidgetItem>
 #include <QVariantHash>
 
+#include "ui_attributeswidget.h"
 #include "core/project.h"
 
-namespace Ui {
-class AttributesWidget;
-}
+namespace evoplex {
 
 class AttributesWidget : public QDockWidget
 {
@@ -35,7 +34,7 @@ private:
     QString m_selectedGraphId;
     QString m_selectedModelId;
 
-    Ui::AttributesWidget* m_ui;
+    Ui_AttributesWidget* m_ui;
     QTreeWidgetItem* m_treeItemGeneral;
     QHash<QString, QTreeWidgetItem*> m_treeItemGraphs;
     QHash<QString, QTreeWidgetItem*> m_treeItemModels;
@@ -44,5 +43,6 @@ private:
     void insertPluginAttributes(QTreeWidgetItem* itemRoot, const QString &uid,
                                 const Attributes &min, const Attributes &max);
 };
+}
 
 #endif // ATTRIBUTESWIDGET_H

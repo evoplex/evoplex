@@ -26,7 +26,7 @@
    <property name="geometry">
     <rect>
      <x>0</x>
-     <y>-90</y>
+     <y>-60</y>
      <width>474</width>
      <height>389</height>
     </rect>
@@ -63,7 +63,7 @@
         </layout>
        </item>
        <item>
-        <widget class="TableWidget" name="tableRunning">
+        <widget class="evoplex::TableWidget" name="tableRunning">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -144,7 +144,7 @@ QPushButton::hover {
         </layout>
        </item>
        <item>
-        <widget class="TableWidget" name="tableQueue">
+        <widget class="evoplex::TableWidget" name="tableQueue">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -225,7 +225,7 @@ QPushButton::hover {
         </layout>
        </item>
        <item>
-        <widget class="TableWidget" name="tableIdle">
+        <widget class="evoplex::TableWidget" name="tableIdle">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -267,7 +267,7 @@ QPushButton::hover {
  </widget>
  <customwidgets>
   <customwidget>
-   <class>TableWidget</class>
+   <class>evoplex::TableWidget</class>
    <extends>QTableWidget</extends>
    <header>gui/tablewidget.h</header>
   </customwidget>

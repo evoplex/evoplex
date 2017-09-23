@@ -10,6 +10,8 @@
 
 #include "core/experiment.h"
 
+namespace evoplex {
+
 class GraphWidget : public QDockWidget
 {
     Q_OBJECT
@@ -32,5 +34,6 @@ private:
 
     void paintEvent(QPaintEvent*) override;
 };
+}
 
 #endif // GRAPHWIDGET_H

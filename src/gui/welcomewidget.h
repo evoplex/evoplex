@@ -10,6 +10,8 @@
 
 #include "ui_welcomewidget.h"
 
+namespace evoplex {
+
 class MainGUI;
 
 class WelcomeWidget : public QWidget
@@ -24,5 +26,6 @@ private:
     Ui_WelcomeWidget* m_ui;
     MainGUI* m_maingui;
 };
+}
 
 #endif // WELCOME_H

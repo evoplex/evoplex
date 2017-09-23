@@ -9,6 +9,8 @@
 #include "core/abstractagent.h"
 #include "core/mainapp.h"
 
+namespace evoplex {
+
 class FileMgr
 {
 public:
@@ -22,5 +24,5 @@ public:
 private:
     MainApp* m_mainApp;
 };
-
+}
 #endif // FILEMGR_H

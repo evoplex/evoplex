@@ -6,6 +6,8 @@
 #include "gui/experimentwidget.h"
 #include "gui/projectswindow.h"
 
+namespace evoplex {
+
 ProjectsWindow::ProjectsWindow(MainApp* mainApp, QWidget *parent)
     : QMainWindow(parent)
     , m_mainApp(mainApp)
@@ -39,4 +41,5 @@ void ProjectsWindow::slotOpenExperiment(int projId, int expId)
     }
     ew->show();
     ew->raise();
+}
 }

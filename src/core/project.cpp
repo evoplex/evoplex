@@ -12,6 +12,8 @@
 #include "core/project.h"
 #include "utils/utils.h"
 
+namespace evoplex {
+
 Project::Project(MainApp* mainApp, int id, const QString& name, const QString& dir)
     : m_mainApp(mainApp)
     , m_id(id)
@@ -166,4 +168,5 @@ const int Project::importExperiments(const QString& filePath)
     }
     file.close();
     return failures;
+}
 }

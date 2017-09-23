@@ -12,6 +12,8 @@
 #include "gui/experimentwidget.h"
 #include "gui/graphwidget.h"
 
+namespace evoplex {
+
 ExperimentWidget::ExperimentWidget(Project* project, int expId, QWidget *parent)
     : QDockWidget(parent)
     , m_project(project)
@@ -59,4 +61,5 @@ void ExperimentWidget::closeEvent(QCloseEvent* event)
 {
     QDockWidget::closeEvent(event);
     this->deleteLater();
+}
 }

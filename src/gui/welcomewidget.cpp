@@ -6,6 +6,8 @@
 #include "gui/maingui.h"
 #include "gui/welcomewidget.h"
 
+namespace evoplex {
+
 WelcomeWidget::WelcomeWidget(MainGUI* maingui)
     : QWidget(maingui)
     , m_ui(new Ui_WelcomeWidget)
@@ -20,4 +22,5 @@ WelcomeWidget::~WelcomeWidget()
 {
     delete m_ui;
     m_ui = nullptr;
+}
 }

@@ -14,6 +14,8 @@
 #include "core/abstractgraph.h"
 #include "utils/prg.h"
 
+namespace evoplex {
+
 class AbstractBaseModel
 {
     friend class Experiment;
@@ -79,10 +81,12 @@ public:
     // create the real model object.
     virtual AbstractModel* create() = 0;
 };
-Q_DECLARE_INTERFACE(IPluginModel, "org.evoplex.IPluginModel")
+}
+Q_DECLARE_INTERFACE(evoplex::IPluginModel, "org.evoplex.IPluginModel")
 
 
 #define REGISTER_MODEL(CLASSNAME)                                           \
+    namespace evoplex {                                                     \
     class PM_##CLASSNAME: public QObject, public IPluginModel               \
     {                                                                       \
     Q_OBJECT                                                                \
@@ -94,6 +98,6 @@ Q_DECLARE_INTERFACE(IPluginModel, "org.evoplex.IPluginModel")
         AbstractModel* create() {                                           \
             return dynamic_cast<AbstractModel*>(new CLASSNAME());           \
         }                                                                   \
-    };
+    };}
 
 #endif // ABSTRACT_MODEL_H

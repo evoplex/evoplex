@@ -14,6 +14,8 @@
 #include "gui/settingswidget.h"
 #include "gui/welcomewidget.h"
 
+namespace evoplex {
+
 class MainGUI: public QMainWindow
 {
     Q_OBJECT
@@ -49,5 +51,5 @@ private:
 
     void setPageVisible(Page page, bool visible);
 };
-
+}
 #endif // MAINGUI_H

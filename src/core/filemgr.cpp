@@ -13,6 +13,8 @@
 #include "core/project.h"
 #include "utils/utils.h"
 
+namespace evoplex {
+
 FileMgr::FileMgr(MainApp* mainApp): m_mainApp(mainApp)
 {
 }
@@ -82,4 +84,5 @@ Agents FileMgr::importAgents(const QString& filePath, const QString& modelId) co
     agents.squeeze();
 
     return agents;
+}
 }

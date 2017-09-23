@@ -12,6 +12,9 @@
 
 #include "gui/graphwidget.h"
 #include <QTimer>
+
+namespace evoplex {
+
 GraphWidget::GraphWidget(Experiment* experiment, QWidget* parent)
     : QDockWidget(parent)
     //, m_graph(graph)
@@ -82,4 +85,5 @@ void GraphWidget::mousePressEvent(QMouseEvent* e)
 
 void GraphWidget::mouseMoveEvent(QMouseEvent* e)
 {
+}
 }

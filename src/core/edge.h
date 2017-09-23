@@ -9,6 +9,8 @@
 #include <QVariantHash>
 #include <QVector>
 
+namespace evoplex {
+
 class AbstractAgent;
 class Edge;
 
@@ -36,5 +38,5 @@ private:
     AbstractAgent* m_neighbour;
     QVariantHash m_attributes;
 };
-
+}
 #endif // EDGE_H

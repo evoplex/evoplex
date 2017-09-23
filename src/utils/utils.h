@@ -15,14 +15,11 @@
 #include "core/attributes.h"
 #include "utils/prg.h"
 
+namespace evoplex {
+
 class Utils
 {
 public:
-    // Fisher–Yates shuffle algorithm
-    // https://bost.ocks.org/mike/shuffle
-    // http://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle
-    static QVector<int> shuffle(QVector<int> list);
-
     // convert a linear index to row and column
     static void ind2sub(const int ind, const int cols, int &row, int &col) {
         row = ind / cols;
@@ -251,5 +248,5 @@ public:
             return r.first();
     }
 };
-
+}
 #endif // UTILS_H

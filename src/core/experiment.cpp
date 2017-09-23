@@ -11,6 +11,8 @@
 #include "core/filemgr.h"
 #include "utils/utils.h"
 
+namespace evoplex {
+
 Experiment::Experiment(MainApp* mainApp, int id, int projId, Attributes* generalAttrs,
                        Attributes* modelAttrs, Attributes* graphAttrs)
     : m_mainApp(mainApp)
@@ -212,4 +214,5 @@ AbstractGraph* Experiment::getGraph(int trialId) const
     if (!m_trials.contains(trialId))
         return nullptr;
     return m_trials.value(trialId).modelObj->graph();
+}
 }

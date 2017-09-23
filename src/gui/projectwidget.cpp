@@ -11,6 +11,8 @@
 
 #include "gui/projectwidget.h"
 
+namespace evoplex {
+
 ProjectWidget::ProjectWidget(Project* project, ExperimentsMgr* expMgr, QWidget* parent)
     : QDockWidget(parent)
     , m_ui(new Ui_ProjectWidget)
@@ -113,4 +115,5 @@ void ProjectWidget::onItemDoubleClicked(QTableWidgetItem* item)
 {
     int expId = m_ui->table->item(item->row(), m_headerIdx.value(TableWidget::H_EXPID))->text().toInt();
     emit (openExperiment(m_project->getId(), expId));
+}
 }

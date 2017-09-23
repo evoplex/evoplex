@@ -8,6 +8,8 @@
 
 #include "queuewidget.h"
 
+namespace evoplex {
+
 QueueWidget::QueueWidget(ExperimentsMgr* expMgr, QWidget* parent)
     : QScrollArea(parent)
     , m_ui(new Ui_QueueWidget)
@@ -98,4 +100,5 @@ QTableWidgetItem* QueueWidget::insertRow(TableWidget* table, Experiment* exp)
     add(TableWidget::H_TRIALS, exp->getNumTrials());
     add(TableWidget::H_PROJID, exp->getProjId());
     return add(TableWidget::H_EXPID, exp->getId());
+}
 }

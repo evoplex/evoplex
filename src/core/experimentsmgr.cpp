@@ -10,6 +10,8 @@
 #include "core/experimentsmgr.h"
 #include "core/experiment.h"
 
+namespace evoplex {
+
 ExperimentsMgr::ExperimentsMgr(int threads)
     : m_threads(threads)
     , m_timer(new QTimer(this))
@@ -153,4 +155,5 @@ void ExperimentsMgr::killAll()
     foreach (Experiment* exp, m_toKill) {
         kill(exp);
     }
+}
 }

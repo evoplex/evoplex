@@ -15,6 +15,8 @@
 #include "gui/attributeswidget.h"
 #include "gui/tablewidget.h"
 
+namespace evoplex {
+
 class ProjectWidget : public QDockWidget
 {
     Q_OBJECT
@@ -40,5 +42,5 @@ private:
 
     void insertItem(int row, TableWidget::Header header, QString label, QString tooltip="");
 };
-
+}
 #endif // PROJECTWIDGET_H

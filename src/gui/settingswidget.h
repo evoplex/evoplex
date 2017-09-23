@@ -11,6 +11,8 @@
 #include "ui_settingswidget.h"
 #include "core/mainapp.h"
 
+namespace evoplex {
+
 class SettingsWidget : public QWidget
 {
     Q_OBJECT
@@ -26,5 +28,5 @@ private:
     Ui_SettingsWidget* m_ui;
     MainApp* m_mainApp;
 };
-
+}
 #endif // SETTINGSWIDGET_H

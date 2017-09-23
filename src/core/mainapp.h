@@ -14,6 +14,8 @@
 #include "core/abstractmodel.h"
 #include "core/attributes.h"
 
+namespace evoplex {
+
 class ExperimentsMgr;
 class FileMgr;
 class Project;
@@ -92,5 +94,6 @@ private:
 
     AttributesSpace attributesSpace(const QJsonObject &metaData, const QString& name) const;
 };
+}
 
 #endif // MAINAPP_H

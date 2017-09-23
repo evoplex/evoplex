@@ -14,6 +14,8 @@
 
 #include "core/experiment.h"
 
+namespace evoplex {
+
 class PlayButton;
 class RowsDelegate;
 
@@ -106,5 +108,5 @@ private:
     QTableWidget *m_tableWdt;
     int m_hoveredRow;
 };
-
+}
 #endif // TABLEWIDGET_H

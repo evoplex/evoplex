@@ -10,6 +10,8 @@
 
 #include "gui/projectwidget.h"
 
+namespace evoplex {
+
 class ProjectsWindow : public QMainWindow
 {
     Q_OBJECT
@@ -28,5 +30,6 @@ private:
 
     QVector<ProjectWidget*> m_projects; // opened projects
 };
+}
 
 #endif // PROJECTSWINDOW_H
