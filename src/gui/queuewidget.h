@@ -8,9 +8,10 @@
 
 #include <QScrollArea>
 
-#include "ui_queuewidget.h"
+#include "tablewidget.h"
 #include "core/experimentsmgr.h"
-#include "gui/tablewidget.h"
+
+class Ui_QueueWidget;
 
 namespace evoplex {
 

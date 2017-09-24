@@ -8,9 +8,11 @@
 
 #include <QMainWindow>
 
-#include "gui/projectwidget.h"
+#include "core/mainapp.h"
 
 namespace evoplex {
+
+class ProjectWidget;
 
 class ProjectsWindow : public QMainWindow
 {

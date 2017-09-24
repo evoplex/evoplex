@@ -5,8 +5,9 @@
 #include <QTreeWidgetItem>
 #include <QVariantHash>
 
-#include "ui_attributeswidget.h"
 #include "core/project.h"
+
+class Ui_AttributesWidget;
 
 namespace evoplex {
 

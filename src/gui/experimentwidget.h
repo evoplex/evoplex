@@ -9,8 +9,8 @@
 #include <QDockWidget>
 #include <QMainWindow>
 
+#include "attributeswidget.h"
 #include "core/project.h"
-#include "gui/attributeswidget.h"
 
 namespace evoplex {
 

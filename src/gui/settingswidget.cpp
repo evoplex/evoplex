@@ -5,8 +5,9 @@
 
 #include <QThread>
 
+#include "settingswidget.h"
+#include "ui_settingswidget.h"
 #include "core/experimentsmgr.h"
-#include "gui/settingswidget.h"
 
 namespace evoplex {
 

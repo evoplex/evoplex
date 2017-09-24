@@ -10,6 +10,7 @@
 #include <QVariant>
 
 #include "attributeswidget.h"
+#include "ui_attributeswidget.h"
 
 #define STRING_NULL_PLUGINID "--"
 // let's make it easier to find the type of the field

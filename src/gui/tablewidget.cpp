@@ -8,7 +8,7 @@
 #include <QPaintEvent>
 #include <QPixmap>
 
-#include "gui/tablewidget.h"
+#include "tablewidget.h"
 
 namespace evoplex {
 

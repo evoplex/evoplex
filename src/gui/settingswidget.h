@@ -8,8 +8,9 @@
 
 #include <QWidget>
 
-#include "ui_settingswidget.h"
 #include "core/mainapp.h"
+
+class Ui_SettingsWidget;
 
 namespace evoplex {
 

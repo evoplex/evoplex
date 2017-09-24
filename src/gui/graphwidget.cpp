@@ -10,7 +10,7 @@
 #include <QtMath>
 #include <QVector>
 
-#include "gui/graphwidget.h"
+#include "graphwidget.h"
 #include <QTimer>
 
 namespace evoplex {

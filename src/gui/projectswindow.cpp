@@ -3,8 +3,9 @@
  * @author Marcos Cardinot <mcardinot@gmail.com>
  */
 
-#include "gui/experimentwidget.h"
-#include "gui/projectswindow.h"
+#include "experimentwidget.h"
+#include "projectwidget.h"
+#include "projectswindow.h"
 
 namespace evoplex {
 

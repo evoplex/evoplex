@@ -8,7 +8,7 @@
 
 #include <QWidget>
 
-#include "ui_welcomewidget.h"
+class Ui_WelcomeWidget;
 
 namespace evoplex {
 

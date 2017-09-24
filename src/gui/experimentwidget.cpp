@@ -9,8 +9,8 @@
 #include <QDebug>
 #include <QLabel>
 
-#include "gui/experimentwidget.h"
-#include "gui/graphwidget.h"
+#include "experimentwidget.h"
+#include "graphwidget.h"
 
 namespace evoplex {
 

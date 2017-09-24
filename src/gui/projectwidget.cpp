@@ -9,7 +9,8 @@
 #include <QVariantHash>
 #include <QTableWidgetItem>
 
-#include "gui/projectwidget.h"
+#include "projectwidget.h"
+#include "ui_projectwidget.h"
 
 namespace evoplex {
 

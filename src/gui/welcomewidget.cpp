@@ -3,8 +3,9 @@
  * @author Marcos Cardinot <mcardinot@gmail.com>
  */
 
-#include "gui/maingui.h"
-#include "gui/welcomewidget.h"
+#include "maingui.h"
+#include "welcomewidget.h"
+#include "ui_welcomewidget.h"
 
 namespace evoplex {
 

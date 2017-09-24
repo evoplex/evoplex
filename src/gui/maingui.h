@@ -6,13 +6,14 @@
 #ifndef MAINGUI_H
 #define MAINGUI_H
 
+#include <QAction>
 #include <QMainWindow>
 
+#include "projectswindow.h"
+#include "queuewidget.h"
+#include "settingswidget.h"
+#include "welcomewidget.h"
 #include "core/mainapp.h"
-#include "gui/projectswindow.h"
-#include "gui/queuewidget.h"
-#include "gui/settingswidget.h"
-#include "gui/welcomewidget.h"
 
 namespace evoplex {
 

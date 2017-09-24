@@ -7,6 +7,7 @@
 #include <QSpacerItem>
 
 #include "queuewidget.h"
+#include "ui_queuewidget.h"
 
 namespace evoplex {
 

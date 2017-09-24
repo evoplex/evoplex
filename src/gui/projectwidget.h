@@ -10,10 +10,11 @@
 #include <QMap>
 #include <QMainWindow>
 
-#include "ui_projectwidget.h"
+#include "attributeswidget.h"
+#include "tablewidget.h"
 #include "core/project.h"
-#include "gui/attributeswidget.h"
-#include "gui/tablewidget.h"
+
+class Ui_ProjectWidget;
 
 namespace evoplex {
 

@@ -8,7 +8,7 @@
 #include <QToolButton>
 #include <QVBoxLayout>
 
-#include "gui/maingui.h"
+#include "maingui.h"
 
 namespace evoplex {
 
