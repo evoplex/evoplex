@@ -92,8 +92,7 @@ Q_DECLARE_INTERFACE(evoplex::IPluginModel, "org.evoplex.IPluginModel")
     Q_OBJECT                                                                \
     Q_PLUGIN_METADATA(IID "org.evoplex.IPluginModel"                        \
                       FILE "modelMetaData.json")                            \
-                                                                            \
-    Q_INTERFACES(IPluginModel)                                              \
+    Q_INTERFACES(evoplex::IPluginModel)                                     \
     public:                                                                 \
         AbstractModel* create() {                                           \
             return dynamic_cast<AbstractModel*>(new CLASSNAME());           \

@@ -117,7 +117,7 @@ Q_DECLARE_INTERFACE(evoplex::IPluginGraph, "org.evoplex.IPluginGraph")
     Q_OBJECT                                                                \
     Q_PLUGIN_METADATA(IID "org.evoplex.IPluginGraph"                        \
                       FILE "graphMetaData.json")                            \
-    Q_INTERFACES(IPluginGraph)                                              \
+    Q_INTERFACES(evoplex::IPluginGraph)                                     \
     public:                                                                 \
         AbstractGraph* create() {                                           \
             return dynamic_cast<AbstractGraph*>(new CLASSNAME(#CLASSNAME)); \
