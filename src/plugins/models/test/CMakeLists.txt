@@ -1,6 +1,9 @@
-set(MODEL_NAME test)
+#=============================================================================
+#  Evoplex
+#  Copyright (C) 2016-2017 by Marcos Cardinot <mcardinot@gmail.com>
+#=============================================================================
 
-
+get_filename_component(MODEL_NAME ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 set(MODEL_NAME EvoplexModel_${MODEL_NAME})
 qt5_generate_moc(model.h moc_model.cpp)
 file(COPY modelMetaData.json DESTINATION ${CMAKE_CURRENT_BINARY_DIR})

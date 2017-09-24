@@ -1,5 +1,8 @@
 add_subdirectory(core)
 
+# built-in plugins (models and graph generators)
+add_subdirectory(plugins)
+
 #### GUI ####
 set(EVOPLEX_GUI_SRC
   gui/maingui.cpp

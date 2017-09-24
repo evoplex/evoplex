@@ -1,6 +1,9 @@
-set(GRAPH_NAME mooregrid)
+#=============================================================================
+#  Evoplex
+#  Copyright (C) 2016-2017 by Marcos Cardinot <mcardinot@gmail.com>
+#=============================================================================
 
-
+get_filename_component(GRAPH_NAME ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 set(GRAPH_NAME EvoplexGraph_${GRAPH_NAME})
 qt5_generate_moc(graph.h moc_graph.cpp)
 file(COPY graphMetaData.json DESTINATION ${CMAKE_CURRENT_BINARY_DIR})

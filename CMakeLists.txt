@@ -1,6 +1,6 @@
 #=============================================================================
 #  Evoplex
-#  Copyright (C) 2016-2017 by Marcos Cardinot
+#  Copyright (C) 2016-2017 by Marcos Cardinot <mcardinot@gmail.com>
 #=============================================================================
 
 CMAKE_MINIMUM_REQUIRED(VERSION 3.1.0 FATAL_ERROR)
@@ -38,6 +38,3 @@ FIND_PACKAGE(Qt5Widgets 5.6.0 REQUIRED)
 
 # Compile source
 ADD_SUBDIRECTORY(src)
-
-# default plugins (models and graph generators)
-ADD_SUBDIRECTORY(plugins)
