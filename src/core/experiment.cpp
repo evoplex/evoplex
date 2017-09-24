@@ -6,10 +6,10 @@
 #include <QDebug>
 #include <QElapsedTimer>
 
-#include "core/abstractagent.h"
-#include "core/experiment.h"
-#include "core/filemgr.h"
-#include "utils/utils.h"
+#include "abstractagent.h"
+#include "experiment.h"
+#include "filemgr.h"
+#include "utils.h"
 
 namespace evoplex {
 

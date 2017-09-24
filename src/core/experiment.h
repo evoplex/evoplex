@@ -11,9 +11,9 @@
 #include <QVariantHash>
 #include <QVector>
 
-#include "core/experimentsmgr.h"
-#include "core/mainapp.h"
-#include "utils/constants.h"
+#include "experimentsmgr.h"
+#include "mainapp.h"
+#include "constants.h"
 
 namespace evoplex {
 

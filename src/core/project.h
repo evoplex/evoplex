@@ -9,9 +9,9 @@
 #include <QVariantHash>
 #include <QVector>
 
-#include "core/abstractmodel.h"
-#include "core/mainapp.h"
-#include "core/experiment.h"
+#include "abstractmodel.h"
+#include "mainapp.h"
+#include "experiment.h"
 
 namespace evoplex {
 

@@ -11,9 +11,9 @@
 #include <QVector>
 #include <QtPlugin>
 
-#include "core/abstractagent.h"
-#include "core/edge.h"
-#include "utils/prg.h"
+#include "abstractagent.h"
+#include "edge.h"
+#include "prg.h"
 
 namespace evoplex {
 typedef QHash<AbstractAgent*, Edges*> AdjacencyList;

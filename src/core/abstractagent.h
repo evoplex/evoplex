@@ -6,9 +6,9 @@
 #ifndef ABSTRACT_AGENT_H
 #define ABSTRACT_AGENT_H
 
-#include "core/attributes.h"
-#include "core/edge.h"
-#include "utils/prg.h"
+#include "attributes.h"
+#include "edge.h"
+#include "prg.h"
 
 namespace evoplex {
 

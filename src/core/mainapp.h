@@ -10,9 +10,9 @@
 #include <QVariantHash>
 #include <QVector>
 
-#include "core/abstractgraph.h"
-#include "core/abstractmodel.h"
-#include "core/attributes.h"
+#include "abstractgraph.h"
+#include "abstractmodel.h"
+#include "attributes.h"
 
 namespace evoplex {
 

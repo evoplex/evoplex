@@ -7,8 +7,8 @@
 #include <QtConcurrent>
 #include <QtDebug>
 
-#include "core/experimentsmgr.h"
-#include "core/experiment.h"
+#include "experimentsmgr.h"
+#include "experiment.h"
 
 namespace evoplex {
 

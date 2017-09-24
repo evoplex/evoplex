@@ -9,8 +9,8 @@
 #include <QStringList>
 #include <QTextStream>
 
-#include "core/project.h"
-#include "utils/utils.h"
+#include "project.h"
+#include "utils.h"
 
 namespace evoplex {
 

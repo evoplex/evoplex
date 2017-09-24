@@ -12,12 +12,12 @@
 #include <QThread>
 #include <QtDebug>
 
-#include "core/mainapp.h"
-#include "core/experimentsmgr.h"
-#include "core/filemgr.h"
-#include "core/project.h"
-#include "utils/constants.h"
-#include "utils/utils.h"
+#include "mainapp.h"
+#include "experimentsmgr.h"
+#include "filemgr.h"
+#include "project.h"
+#include "constants.h"
+#include "utils.h"
 
 namespace evoplex {
 

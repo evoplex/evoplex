@@ -12,8 +12,8 @@
 #include <QtDebug>
 #include <float.h>
 
-#include "core/attributes.h"
-#include "utils/prg.h"
+#include "attributes.h"
+#include "prg.h"
 
 namespace evoplex {
 
