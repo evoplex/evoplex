@@ -1,6 +1,10 @@
-SET(GRAPH_NAME mooregrid)
+set(GRAPH_NAME mooregrid)
 
+
+set(GRAPH_NAME EvoplexGraph_${GRAPH_NAME})
 qt5_generate_moc(graph.h moc_graph.cpp)
-FILE(COPY graphMetaData.json DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-ADD_LIBRARY(evoplex_graph_${GRAPH_NAME} SHARED graph.cpp graph.h moc_graph.cpp)
-TARGET_LINK_LIBRARIES(evoplex_graph_${GRAPH_NAME} evoplex_core_lib Qt5::Core)
+file(COPY graphMetaData.json DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+add_library(${GRAPH_NAME} SHARED graph.cpp graph.h moc_graph.cpp)
+target_link_libraries(${GRAPH_NAME} EvoplexCore Qt5::Core)
+set_target_properties(${GRAPH_NAME} PROPERTIES
+  LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib/evoplex/plugins)

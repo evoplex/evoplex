@@ -24,15 +24,16 @@ set(EVOPLEX_CORE_CXX
 )
 
 add_library(EvoplexCore SHARED ${EVOPLEX_CORE_CXX} ${EVOPLEX_CORE_H})
-target_link_libraries(EvoplexCore Qt5::Core Qt5::Concurrent Qt5::Widgets)
+target_link_libraries(EvoplexCore Qt5::Core Qt5::Concurrent)
+set_target_properties(EvoplexCore PROPERTIES
+  LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib/evoplex/core)
 
 install(FILES ${EVOPLEX_CORE_H} DESTINATION include/evoplex/core)
-
 install(TARGETS EvoplexCore EXPORT EvoplexCoreTargets
   RUNTIME DESTINATION bin
   LIBRARY DESTINATION lib/evoplex/core
   ARCHIVE DESTINATION lib/evoplex/core
-  INCLUDES DESTINATION include/evoplex
+  INCLUDES DESTINATION include/evoplex/core
 )
 
 include(GenerateExportHeader)
@@ -55,7 +56,7 @@ configure_file(cmake/EvoplexCoreConfig.cmake
   COPYONLY
 )
 
-set(ConfigPackageLocation lib/cmake/EvoplexCore)
+set(ConfigPackageLocation lib/cmake/evoplex/core)
 install(EXPORT EvoplexCoreTargets
   FILE EvoplexCoreTargets.cmake
   NAMESPACE Evoplex::

@@ -3,9 +3,10 @@
 #  Copyright (C) 2016-2017 by Marcos Cardinot
 #=============================================================================
 
-PROJECT(evoplex)
-
 CMAKE_MINIMUM_REQUIRED(VERSION 3.1.0 FATAL_ERROR)
+
+PROJECT(evoplex)
+SET (EVOPLEX_VERSION 0.0.0)
 
 # Find includes in corresponding build directories
 SET(CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -16,8 +17,6 @@ SET(CMAKE_AUTORCC ON)
 
 # Move the libs to /lib and executable to /bin
 SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-#SET(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-#SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
 # Generate the commands
 SET(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -29,16 +28,16 @@ if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Release)
 endif()
 
-# Find qt5 packages
-FIND_PACKAGE(Qt5Core REQUIRED)
-FIND_PACKAGE(Qt5Concurrent REQUIRED)
-FIND_PACKAGE(Qt5Widgets REQUIRED)
+# pass some of the CMake settings to the source code
+CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/src/config.h.in" "${CMAKE_BINARY_DIR}/src/config.h")
 
-# Handle data stuff
-#ADD_SUBDIRECTORY(data)
+# Find qt5 packages
+FIND_PACKAGE(Qt5Core 5.6.0 REQUIRED)
+FIND_PACKAGE(Qt5Concurrent 5.6.0 REQUIRED)
+FIND_PACKAGE(Qt5Widgets 5.6.0 REQUIRED)
 
 # Compile source
 ADD_SUBDIRECTORY(src)
 
-# default plugins (models and graphs)
+# default plugins (models and graph generators)
 ADD_SUBDIRECTORY(plugins)

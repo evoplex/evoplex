@@ -3,7 +3,7 @@
  * @author Marcos Cardinot <mcardinot@gmail.com>
  */
 
-#include <QApplication>
+#include <QCoreApplication>
 #include <QDir>
 #include <QFile>
 #include <QJsonArray>

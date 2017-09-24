@@ -7,7 +7,9 @@
 #include <QtMath>
 
 #include "graph.h"
-#include "utils/utils.h"
+#include "core/utils.h"
+
+namespace evoplex {
 
 MooreGrid::MooreGrid(const QString& name)
     : AbstractGraph(name)
@@ -101,4 +103,5 @@ Edges* MooreGrid::createEdges(const int id) const
         }
     }
     return edges;
+}
 }
