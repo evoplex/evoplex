@@ -21,10 +21,7 @@ public:
     explicit Agent(Attributes attr)
         : m_attributes(attr), m_edges(nullptr), m_x(0), m_y(0) {}
 
-    ~Agent() {
-        delete m_edges;
-        m_edges = nullptr;
-    }
+    ~Agent() {}
 
     inline Agent* clone() { return new Agent(m_attributes); }
 
@@ -49,7 +46,7 @@ private:
     int m_x;
     int m_y;
     Attributes m_attributes;
-    Edges* m_edges;
+    Edges* m_edges; // pointer owned by the graph
 };
 }
 
