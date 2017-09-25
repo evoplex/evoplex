@@ -23,6 +23,8 @@ namespace evoplex {
 // we assume that everything is valid at this point.
 class Experiment
 {
+    friend class ExperimentsMgr;
+
 public:
     enum Status {
         INVALID,  // something went wrong
@@ -136,6 +138,8 @@ private:
 
     // clone a population of agents
     Agents cloneAgents(const Agents& agents) const;
+
+    void deleteTrials();
 };
 }
 

@@ -36,12 +36,29 @@ Experiment::Experiment(MainApp* mainApp, int id, int projId, Attributes* general
 
 Experiment::~Experiment()
 {
+    deleteTrials();
     delete m_generalAttrs;
     m_generalAttrs = nullptr;
     delete m_modelAttrs;
     m_modelAttrs = nullptr;
     delete m_graphAttrs;
     m_graphAttrs = nullptr;
+}
+
+void Experiment::deleteTrials()
+{
+    QHash<int, Trial>::iterator it;
+    for (it = m_trials.begin(); it != m_trials.end(); ++it) {
+        delete it.value().modelObj;
+    }
+    m_trials.clear();
+    m_trials.squeeze();
+
+    // if the experiment has finished or became invalid,
+    // it's more interesing to do NOT change the status
+    if (m_expStatus != FINISHED && m_expStatus != INVALID) {
+        m_expStatus = READY;
+    }
 }
 
 void Experiment::updateProgressValue()
@@ -211,8 +228,10 @@ Agents Experiment::cloneAgents(const Agents& agents) const
 
 AbstractGraph* Experiment::getGraph(int trialId) const
 {
-    if (!m_trials.contains(trialId))
+    QHash<int, Trial>::const_iterator it = m_trials.find(trialId);
+    if (it == m_trials.end() || !it.value().modelObj)
         return nullptr;
-    return m_trials.value(trialId).modelObj->graph();
+    return it.value().modelObj->graph();
 }
+
 }

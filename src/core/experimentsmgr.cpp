@@ -99,8 +99,8 @@ void ExperimentsMgr::finished(Experiment* exp)
     }
     emit (statusChanged(exp));
 
-    if (m_toKill.contains(exp)) {
-        //kill(processId);
+    if (exp->getAutoDelete()) {
+        exp->deleteTrials();
     }
 
     // call next process in the queue
