@@ -36,8 +36,8 @@ ExperimentWidget::ExperimentWidget(Project* project, int expId, QWidget *parent)
     m_attrWidget->setFeatures(QDockWidget::NoDockWidgetFeatures);
     */
 
-    QToolBar* tb = new QToolBar("aaa");
-    tb->addAction("play");
+    QToolBar* tb = new QToolBar("Controls");
+    tb->addAction(QIcon(":/icons/play.svg"), "");
     tb->addAction("stop");
     tb->addSeparator();
     tb->addAction("graph");

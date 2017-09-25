@@ -43,7 +43,7 @@ GraphWidget::~GraphWidget()
 
 void GraphWidget::paintEvent(QPaintEvent* e)
 {
-    if (!m_isValid)
+    if (!m_isValid || !m_graph)
         return;
 
     QPainter painter;

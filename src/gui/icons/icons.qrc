@@ -12,5 +12,9 @@
         <file>pause.svg</file>
         <file>plugins.svg</file>
         <file>settings.svg</file>
+        <file>play-circle-on.svg</file>
+        <file>pause-circle-on.svg</file>
+        <file>play-circle.svg</file>
+        <file>pause-circle.svg</file>
     </qresource>
 </RCC>

@@ -15,10 +15,10 @@ namespace evoplex {
 TableWidget::TableWidget(QWidget *parent)
     : QTableWidget(parent)
     , kIcon_check(QPixmap(":/icons/check.svg").scaledToWidth(14, Qt::SmoothTransformation))
-    , kIcon_play(QPixmap(":/icons/play.svg").scaledToWidth(28, Qt::SmoothTransformation))
-    , kIcon_playon(QPixmap(":/icons/play-on.svg").scaledToWidth(28, Qt::SmoothTransformation))
-    , kIcon_pause(QPixmap(":/icons/pause.svg").scaledToWidth(28, Qt::SmoothTransformation))
-    , kIcon_pauseon(QPixmap(":/icons/pause-on.svg").scaledToWidth(28, Qt::SmoothTransformation))
+    , kIcon_play(QPixmap(":/icons/play-circle.svg").scaledToWidth(28, Qt::SmoothTransformation))
+    , kIcon_playon(QPixmap(":/icons/play-circle-on.svg").scaledToWidth(28, Qt::SmoothTransformation))
+    , kIcon_pause(QPixmap(":/icons/pause-circle.svg").scaledToWidth(28, Qt::SmoothTransformation))
+    , kIcon_pauseon(QPixmap(":/icons/pause-circle-on.svg").scaledToWidth(28, Qt::SmoothTransformation))
     , kIcon_restart(QPixmap(":/icons/restart.svg").scaledToWidth(18, Qt::SmoothTransformation))
     , kIcon_x(QPixmap(":/icons/x.svg").scaledToWidth(14, Qt::SmoothTransformation))
 {
@@ -104,7 +104,7 @@ PlayButton::PlayButton(QTableWidgetItem* item, Experiment* exp, TableWidget* par
     , m_rowHovered(false)
     , m_penBlue(QPen(QBrush(QColor(66,133,244)), 3))
 {
-    //connect(parent, &QTableWidget::viewportEntered, [this](){ m_rowHovered=false; });
+    connect(parent, &QTableWidget::viewportEntered, [this](){ m_rowHovered=false; });
     connect(parent, SIGNAL(cellEntered(int,int)), this, SLOT(onItemEntered(int,int)));
 }
 
