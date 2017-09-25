@@ -38,25 +38,9 @@ MainApp::MainApp()
     // load plugins
     QDir pluginsDir = QDir(qApp->applicationDirPath());
     pluginsDir.cdUp();
-    pluginsDir.cd("plugins");
-    if (pluginsDir.cd("graphs")) {
-        foreach (QString dir, pluginsDir.entryList(QDir::Dirs | QDir::NoDotAndDotDot)) {
-            pluginsDir.cd(dir);
-            foreach (QString fileName, pluginsDir.entryList(QStringList("*.so"), QDir::Files)) {
-                loadGraphPlugin(pluginsDir.absoluteFilePath(fileName));
-            }
-            pluginsDir.cdUp();
-        }
-        pluginsDir.cdUp();
-    }
-    if (pluginsDir.cd("models")) {
-        foreach (QString dir, pluginsDir.entryList(QDir::Dirs | QDir::NoDotAndDotDot)) {
-            pluginsDir.cd(dir);
-            foreach (QString fileName, pluginsDir.entryList(QStringList("*.so"), QDir::Files)) {
-                loadModelPlugin(pluginsDir.absoluteFilePath(fileName));
-            }
-            pluginsDir.cdUp();
-        }
+    if (pluginsDir.cd("lib/evoplex/plugins")) {
+        foreach (QString fileName, pluginsDir.entryList(QStringList("*.so"), QDir::Files))
+            loadPlugin(pluginsDir.absoluteFilePath(fileName));
     }
 }
 
@@ -71,52 +55,65 @@ MainApp::~MainApp()
     qDeleteAll(m_graphs);
 }
 
-bool MainApp::loadPlugin(const QString& path, QObject** instance, QJsonObject& metaData)
+const QString MainApp::loadPlugin(const QString& path)
 {
     if (!QFile(path).exists()) {
         qWarning() << "[MainApp] unable to find the .so file." << path;
-        return false;
+        return "";
     }
 
     QPluginLoader loader(path);
-    metaData = loader.metaData().value("MetaData").toObject();
+    QJsonObject metaData = loader.metaData().value("MetaData").toObject();
     if (metaData.isEmpty()) {
         qWarning() << "[MainApp] unable to load the plugin."
                    << "Couldn't find the meta data json file." << path;
-        return false;
+        return "";
     } else if (!metaData.contains(PLUGIN_ATTRIBUTE_UID)) {
         qWarning() << "[MainApp] unable to load the plugin."
                    << PLUGIN_ATTRIBUTE_UID << " cannot be empty" << path;
-            return false;
+        return "";
+    } else if (!metaData.contains(PLUGIN_ATTRIBUTE_TYPE)) {
+        qWarning() << "[MainApp] unable to load the plugin."
+                   << PLUGIN_ATTRIBUTE_TYPE << " cannot be empty" << path;
+        return "";
+    }
+
+    QString type = metaData[PLUGIN_ATTRIBUTE_TYPE].toString();
+    if (type != "graph" && type != "model") {
+        qWarning() << "[MainApp] unable to load the plugin."
+                   << PLUGIN_ATTRIBUTE_TYPE << " must be equal to 'graph' or 'model'" << path;
+        return "";
     }
 
     QString uid = metaData[PLUGIN_ATTRIBUTE_UID].toString();
     if (m_models.contains(uid) || m_graphs.contains(uid)) {
         qWarning() << "[MainApp] unable to load the plugin."
                    << PLUGIN_ATTRIBUTE_UID << " must be unique!" << path;
-        return false;
-    }
-
-    *instance = loader.instance();
-    if (!instance) {
-        qWarning() << "[MainApp] unable to load the plugin."
-                   << "Is it a valid .so file?" << path;
-        return false;
-    }
-
-    qDebug() << "[MainApp] a plugin has been loaded." << path;
-    return true;
-}
-
-QString MainApp::loadGraphPlugin(const QString& path)
-{
-    QObject* instance = nullptr;
-    QJsonObject metaData;
-    if (!loadPlugin(path, &instance, metaData)) {
-        instance->deleteLater();
         return "";
     }
 
+    QObject* instance = loader.instance(); // it'll load the plugin
+    if (!instance) {
+        qWarning() << "[MainApp] unable to load the plugin."
+                   << "Is it a valid .so file?" << path;
+        loader.unload();
+        return "";
+    }
+
+    if ((type == "graph" && !loadGraphPlugin(instance, metaData))
+            || (type == "model" && !loadModelPlugin(instance, metaData))) {
+        qWarning() << "[MainApp] unable to load the plugin."
+                   << "Please, check the metaData.json file.";
+        loader.unload();
+        return "";
+    }
+
+    qDebug() << "[MainApp] a plugin has been loaded." << path;
+    return uid;
+}
+
+bool MainApp::loadGraphPlugin(QObject* instance, QJsonObject& metaData)
+{
     GraphPlugin* graph = new GraphPlugin();
     graph->uid = metaData[PLUGIN_ATTRIBUTE_UID].toString();
     graph->author = metaData[PLUGIN_ATTRIBUTE_AUTHOR].toString();
@@ -126,23 +123,15 @@ QString MainApp::loadGraphPlugin(const QString& path)
     graph->graphAttrSpace = attributesSpace(metaData, PLUGIN_ATTRIBUTE_GRAPHSPACE);
 
     if (!Utils::boundaryValues(graph->graphAttrSpace, graph->graphAttrMin, graph->graphAttrMax)) {
-        instance->deleteLater();
-        return "";
+        return false;
     }
 
     m_graphs.insert(graph->uid, graph);
-    return graph->uid;
+    return true;
 }
 
-QString MainApp::loadModelPlugin(const QString& path)
+bool MainApp::loadModelPlugin(QObject* instance, QJsonObject& metaData)
 {
-    QObject* instance = nullptr;
-    QJsonObject metaData;
-    if (!loadPlugin(path, &instance, metaData)) {
-        instance->deleteLater();
-        return "";
-    }
-
     ModelPlugin* model = new ModelPlugin();
     model->uid = metaData[PLUGIN_ATTRIBUTE_UID].toString();
     model->author = metaData[PLUGIN_ATTRIBUTE_AUTHOR].toString();
@@ -155,12 +144,11 @@ QString MainApp::loadModelPlugin(const QString& path)
 
     if (!Utils::boundaryValues(model->agentAttrSpace, model->agentAttrMin, model->agentAttrMax)
             || !Utils::boundaryValues(model->modelAttrSpace, model->modelAttrMin, model->modelAttrMax)) {
-        instance->deleteLater();
-        return "";
+        return false;
     }
 
     m_models.insert(model->uid, model);
-    return model->uid;
+    return true;
 }
 
 int MainApp::newProject(const QString& name, const QString& dir)

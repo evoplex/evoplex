@@ -21,7 +21,8 @@
 #define GENERAL_ATTRIBUTE_AUTODELETE "autoDelete"       // automatically deletes the experiment from memory
 
 // Plugin stuff
-#define PLUGIN_ATTRIBUTE_UID "uid"                      // the plugin's unique id
+#define PLUGIN_ATTRIBUTE_TYPE "type"                    // plugin's type
+#define PLUGIN_ATTRIBUTE_UID "uid"                      // plugin's unique id
 #define PLUGIN_ATTRIBUTE_AUTHOR "author"                // authors' name
 #define PLUGIN_ATTRIBUTE_NAME "name"                    // plugin's name
 #define PLUGIN_ATTRIBUTE_DESCRIPTION "description"      // plugin's description

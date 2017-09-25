@@ -1,4 +1,5 @@
 {
+  "type": "graph",
   "uid": "mooreGrid",
   "name": "Moore Grid",
   "author": "Marcos Cardinot",

@@ -52,13 +52,7 @@ public:
     MainApp();
     ~MainApp();
 
-    // load graph from a .so file
-    // return the graph uid
-    QString loadGraphPlugin(const QString& path);
 
-    // load model from a .so file
-    // return the model uid
-    QString loadModelPlugin(const QString& path);
 
     // Create a new project; return its id
     int newProject(const QString& name="", const QString& dir="");
@@ -90,7 +84,15 @@ private:
     AttributesSpace m_generalAttrSpace;
 
     // load plugin from a .so file; return true if successful
-    bool loadPlugin(const QString& path, QObject **instance, QJsonObject& metaData);
+    const QString loadPlugin(const QString& path);
+
+    // load graph from a .so file
+    // return the graph uid
+    bool loadGraphPlugin(QObject* instance, QJsonObject& metaData);
+
+    // load model from a .so file
+    // return the model uid
+    bool loadModelPlugin(QObject* instance, QJsonObject& metaData);
 
     AttributesSpace attributesSpace(const QJsonObject &metaData, const QString& name) const;
 };
