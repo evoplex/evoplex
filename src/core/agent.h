@@ -12,21 +12,21 @@
 
 namespace evoplex {
 
-typedef QVector<AbstractAgent*> Agents;
+typedef QVector<Agent*> Agents;
 
-class AbstractAgent
+class Agent
 {
 public:
-    explicit AbstractAgent() : AbstractAgent(Attributes()) {}
-    explicit AbstractAgent(Attributes attr)
+    explicit Agent() : Agent(Attributes()) {}
+    explicit Agent(Attributes attr)
         : m_attributes(attr), m_edges(nullptr), m_x(0), m_y(0) {}
 
-    ~AbstractAgent() {
+    ~Agent() {
         delete m_edges;
         m_edges = nullptr;
     }
 
-    inline AbstractAgent* clone() { return new AbstractAgent(m_attributes); }
+    inline Agent* clone() { return new Agent(m_attributes); }
 
     inline const Value& attribute(const char* name) const { return m_attributes.value(name); }
     inline const Value& attribute(const int id) const { return m_attributes.value(id); }
@@ -40,8 +40,8 @@ public:
 
     inline const Edges* getEdges() const { return m_edges; }
     inline void setEdges(Edges* edges) { m_edges = edges; }
-    inline AbstractAgent* getNeighbour(int localId) const { return m_edges->at(localId).getNeighbour(); }
-    inline AbstractAgent* getRandomNeighbour(PRG* prg) const {
+    inline Agent* getNeighbour(int localId) const { return m_edges->at(localId).getNeighbour(); }
+    inline Agent* getRandomNeighbour(PRG* prg) const {
         return m_edges->at(prg->randI(m_edges->size())).getNeighbour();
     }
 

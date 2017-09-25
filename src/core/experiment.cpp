@@ -6,7 +6,7 @@
 #include <QDebug>
 #include <QElapsedTimer>
 
-#include "abstractagent.h"
+#include "agent.h"
 #include "experiment.h"
 #include "filemgr.h"
 #include "utils.h"
@@ -179,7 +179,7 @@ Agents Experiment::createAgents()
             Q_ASSERT(attrs.size() == numAgents);
             agents.reserve(numAgents);
             for (int id = 0; id < numAgents; ++id) {
-                agents.push_back(new AbstractAgent(attrs.at(id)));
+                agents.push_back(new Agent(attrs.at(id)));
             }
         }
     } else { // read population from a text file

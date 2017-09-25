@@ -6,7 +6,7 @@
 #ifndef FILEMGR_H
 #define FILEMGR_H
 
-#include "abstractagent.h"
+#include "agent.h"
 #include "mainapp.h"
 
 namespace evoplex {

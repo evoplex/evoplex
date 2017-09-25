@@ -8,7 +8,7 @@
 #include <QTextStream>
 #include <QtDebug>
 
-#include "abstractagent.h"
+#include "agent.h"
 #include "filemgr.h"
 #include "project.h"
 #include "utils.h"
@@ -73,7 +73,7 @@ Agents FileMgr::importAgents(const QString& filePath, const QString& modelId) co
             }
             attributes.replace(space.first, header.at(i), value);
         }
-        agents.push_back(new AbstractAgent(attributes));
+        agents.push_back(new Agent(attributes));
     }
     file.close();
 

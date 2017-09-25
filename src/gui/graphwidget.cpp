@@ -53,7 +53,7 @@ void GraphWidget::paintEvent(QPaintEvent* e)
     const int agentsSize = m_graph->getAgents().size();
     const Agents& agents = m_graph->getAgents();
     for (int id = 0; id < agentsSize; ++id) {
-        const AbstractAgent* agent = agents.at(id);
+        const Agent* agent = agents.at(id);
         QPointF pos;
         pos.setX(m_scale + (m_scale * agent->getX()));
         pos.setY(m_scale + (m_scale * agent->getY()));

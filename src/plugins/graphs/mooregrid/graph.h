@@ -10,7 +10,7 @@
 #include <QVariantHash>
 #include <QVector>
 
-#include "core/abstractagent.h"
+#include "core/agent.h"
 #include "core/abstractgraph.h"
 
 namespace evoplex {

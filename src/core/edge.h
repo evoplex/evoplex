@@ -11,7 +11,7 @@
 
 namespace evoplex {
 
-class AbstractAgent;
+class Agent;
 class Edge;
 
 typedef QVector<Edge> Edges;  // alias: used to hold the neighbourhood of one agent
@@ -20,8 +20,8 @@ class Edge
 {
 public:
     explicit Edge(): m_neighbour(nullptr) {}
-    explicit Edge(AbstractAgent* neighbour): m_neighbour(neighbour) {}
-    explicit Edge(AbstractAgent* neighbour, const QVariantHash& attributes)
+    explicit Edge(Agent* neighbour): m_neighbour(neighbour) {}
+    explicit Edge(Agent* neighbour, const QVariantHash& attributes)
         : m_neighbour(neighbour), m_attributes(attributes) {}
 
     inline const QVariant getAttribute(const QString& name) const {
@@ -31,11 +31,11 @@ public:
         m_attributes.insert(name, value);
     }
 
-    inline AbstractAgent* getNeighbour() const { return m_neighbour; }
-    inline void setNeighbour(AbstractAgent* neighbour) { m_neighbour = neighbour; }
+    inline Agent* getNeighbour() const { return m_neighbour; }
+    inline void setNeighbour(Agent* neighbour) { m_neighbour = neighbour; }
 
 private:
-    AbstractAgent* m_neighbour;
+    Agent* m_neighbour;
     QVariantHash m_attributes;
 };
 }

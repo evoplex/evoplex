@@ -3,10 +3,10 @@ set(EVOPLEX_CORE_H
   prg.h
   utils.h
 
-  abstractagent.h
   abstractgraph.h
   abstractmodel.h
   attributes.h
+  agent.h
   edge.h
 
   filemgr.h

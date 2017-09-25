@@ -10,8 +10,8 @@
 #include <QVariantHash>
 #include <QtPlugin>
 
-#include "abstractagent.h"
 #include "abstractgraph.h"
+#include "agent.h"
 #include "prg.h"
 
 namespace evoplex {

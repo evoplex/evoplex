@@ -36,7 +36,7 @@ void MooreGrid::reset()
     adjacencyList.reserve(getAgents().size());
 
     for (int id = 0; id < getAgents().size(); ++id) {
-        AbstractAgent* agent = getAgent(id);
+        Agent* agent = getAgent(id);
 
         int x, y;
         Utils::ind2sub(id, m_width, y, x);

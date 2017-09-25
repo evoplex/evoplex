@@ -11,12 +11,12 @@
 #include <QVector>
 #include <QtPlugin>
 
-#include "abstractagent.h"
+#include "agent.h"
 #include "edge.h"
 #include "prg.h"
 
 namespace evoplex {
-typedef QHash<AbstractAgent*, Edges*> AdjacencyList;
+typedef QHash<Agent*, Edges*> AdjacencyList;
 
 class AbstractBaseGraph
 {
@@ -28,8 +28,8 @@ public:
     inline const Agents& getAgents() const { return m_agents; }
     inline const AdjacencyList& getAdjacencyList() const { return m_adjacencyList; }
 
-    inline AbstractAgent* getAgent(int id) const { return m_agents.at(id); }
-    inline AbstractAgent* getRandomAgent() const {
+    inline Agent* getAgent(int id) const { return m_agents.at(id); }
+    inline Agent* getRandomAgent() const {
         return m_agents.at(m_prg->randI(m_agents.size()));
     }
 
