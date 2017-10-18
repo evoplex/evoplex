@@ -56,7 +56,10 @@ public:
     //   - "double{1.1,1.2}     // set of doubles
     //   * you can use 'max' to take the maximum value for the type
     static Value validateParameter(const QString& space, const QString& valueStr) {
-        if (space == "string") {
+        if (valueStr.isEmpty()) {
+            qWarning() << "[Utils]: unable to validate parameter! It should not be empty.";
+            return Value();
+        } else if (space == "string") {
             return Value(strdup(valueStr.toUtf8().constData()));
         } else if (space == "bool") {
             return QVariant(valueStr).toBool();
@@ -78,7 +81,7 @@ public:
             }
         }
 
-        qWarning() << "[Utils]: unable to validate value!\n"
+        qWarning() << "[Utils]: unable to validate parameter!\n"
                    << "Value:" << valueStr << "Space:" << space;
         return Value();
     }

@@ -1,3 +1,8 @@
+/**
+ * Copyright (C) 2017 - Marcos Cardinot
+ * @author Marcos Cardinot <mcardinot@gmail.com>
+ */
+
 #ifndef ATTRIBUTESWIDGET_H
 #define ATTRIBUTESWIDGET_H
 

@@ -1,3 +1,7 @@
+/**
+ * Copyright (C) 2017 - Marcos Cardinot
+ * @author Marcos Cardinot <mcardinot@gmail.com>
+ */
 
 #include <QCheckBox>
 #include <QComboBox>
@@ -34,49 +38,19 @@ AttributesWidget::AttributesWidget(Project* project, QWidget *parent)
     connect(m_ui->btnSubmit, SIGNAL(clicked(bool)), this, SLOT(slotCreateExperiment()));
     m_ui->treeWidget->setFocusPolicy(Qt::NoFocus);
 
-    // create and set the widgets for the general attributes
     //
-    // auto delete
-    QCheckBox* chb = new QCheckBox(m_ui->treeWidget);
-    chb->setObjectName(CHECK_BOX);
-    chb->setChecked(true);
-    m_widgetFields.insert(GENERAL_ATTRIBUTE_AUTODELETE, QVariant::fromValue(chb));
-    // seed
-    QSpinBox* sp = new QSpinBox(m_ui->treeWidget);
-    sp->setObjectName(SPIN_BOX);
-    sp->setMaximum(INT32_MAX);
-    sp->setMinimum(0);
-    m_widgetFields.insert(GENERAL_ATTRIBUTE_SEED, QVariant::fromValue(sp));
-    // stop at
-    sp = new QSpinBox(m_ui->treeWidget);
-    sp->setObjectName(SPIN_BOX);
-    sp->setMaximum(EVOPLEX_MAX_STEPS);
-    sp->setMinimum(1);
-    m_widgetFields.insert(GENERAL_ATTRIBUTE_STOPAT, QVariant::fromValue(sp));
-    // trials
-    sp = new QSpinBox(m_ui->treeWidget);
-    sp->setObjectName(SPIN_BOX);
-    sp->setMaximum(EVOPLEX_MAX_TRIALS);
-    sp->setMinimum(1);
-    m_widgetFields.insert(GENERAL_ATTRIBUTE_TRIALS, QVariant::fromValue(sp));
-    // models available
-    QComboBox* cb = new QComboBox(m_ui->treeWidget);
-    cb->setObjectName(COMBO_BOX);
-    connect(cb, SIGNAL(currentIndexChanged(QString)), this, SLOT(slotModelSelected(QString)));
-    m_widgetFields.insert(GENERAL_ATTRIBUTE_MODELID, QVariant::fromValue(cb));
-
-    // setup the tree widget
+    // setup the tree widget: general attributes
+    //
     m_treeItemGeneral = new QTreeWidgetItem(m_ui->treeWidget);
     m_treeItemGeneral->setText(0, "General");
+    m_treeItemGeneral->setExpanded(true);
 
-    // add the general attributes to the tree
-    QVariantHash::iterator it = m_widgetFields.begin();
-    while (it != m_widgetFields.end()) {
+    auto addGeneralAttr = [this](const QString& label, const QVariant& field) {
         QTreeWidgetItem* item = new QTreeWidgetItem(m_treeItemGeneral);
-        item->setText(0, it.key());
-        m_ui->treeWidget->setItemWidget(item, 1, it.value().value<QWidget*>());
-        ++it;
-    }
+        m_widgetFields.insert(label, field);
+        item->setText(0, label);
+        m_ui->treeWidget->setItemWidget(item, 1, field.value<QWidget*>());
+    };
 
     // add custom widget -- agents from file
     QLineEdit* agentsPath = new QLineEdit(m_project->getDir());
@@ -88,22 +62,44 @@ AttributesWidget::AttributesWidget(Project* project, QWidget *parent)
     agentsLayout->setMargin(0);
     agentsLayout->insertWidget(0, agentsPath);
     agentsLayout->insertWidget(1, btBrowseFile);
-    //agentsWidget->setLayout(agentsLayout);
     m_widgetFields.insert(GENERAL_ATTRIBUTE_AGENTS, QVariant::fromValue(agentsPath));
     QTreeWidgetItem* item = new QTreeWidgetItem(m_treeItemGeneral);
     item->setText(0, GENERAL_ATTRIBUTE_AGENTS);
     m_ui->treeWidget->setItemWidget(item, 1, agentsLayout->parentWidget());
-
+    // seed
+    QSpinBox* sp = new QSpinBox(m_ui->treeWidget);
+    sp->setObjectName(SPIN_BOX);
+    sp->setMaximum(INT32_MAX);
+    sp->setMinimum(0);
+    addGeneralAttr(GENERAL_ATTRIBUTE_SEED, QVariant::fromValue(sp));
+    // stop at
+    sp = new QSpinBox(m_ui->treeWidget);
+    sp->setObjectName(SPIN_BOX);
+    sp->setMaximum(EVOPLEX_MAX_STEPS);
+    sp->setMinimum(1);
+    addGeneralAttr(GENERAL_ATTRIBUTE_STOPAT, QVariant::fromValue(sp));
+    // trials
+    sp = new QSpinBox(m_ui->treeWidget);
+    sp->setObjectName(SPIN_BOX);
+    sp->setMaximum(EVOPLEX_MAX_TRIALS);
+    sp->setMinimum(1);
+    addGeneralAttr(GENERAL_ATTRIBUTE_TRIALS, QVariant::fromValue(sp));
+    // models available
+    QComboBox* cb = new QComboBox(m_ui->treeWidget);
+    cb->setObjectName(COMBO_BOX);
+    connect(cb, SIGNAL(currentIndexChanged(QString)), this, SLOT(slotModelSelected(QString)));
+    addGeneralAttr(GENERAL_ATTRIBUTE_MODELID, QVariant::fromValue(cb));
     // add the graphId combo box
     cb = new QComboBox(m_ui->treeWidget);
     cb->setObjectName(COMBO_BOX);
     cb->setHidden(true);
     connect(cb, SIGNAL(currentIndexChanged(QString)), this, SLOT(slotGraphSelected(QString)));
-    m_widgetFields.insert(GENERAL_ATTRIBUTE_GRAPHID, QVariant::fromValue(cb));
-
-    // sort general tree and leave it open
-    m_treeItemGeneral->sortChildren(0, Qt::AscendingOrder);
-    m_treeItemGeneral->setExpanded(true);
+    addGeneralAttr(GENERAL_ATTRIBUTE_GRAPHID, QVariant::fromValue(cb));
+    // auto delete
+    QCheckBox* chb = new QCheckBox(m_ui->treeWidget);
+    chb->setObjectName(CHECK_BOX);
+    chb->setChecked(true);
+    addGeneralAttr(GENERAL_ATTRIBUTE_AUTODELETE, QVariant::fromValue(chb));
 
     // create the trees with the plugin stuff
     slotUpdateModelPlugins();
@@ -127,10 +123,10 @@ void AttributesWidget::slotAgentFile()
 void AttributesWidget::slotCreateExperiment()
 {
     if (m_selectedModelId == STRING_NULL_PLUGINID) {
-        QMessageBox::warning(this, "Experiment", "Please, select a valid 'modelId' (General).");
+        QMessageBox::warning(this, "Experiment", "Please, select a valid 'modelId'.");
         return;
     } else if (m_selectedGraphId == STRING_NULL_PLUGINID) {
-        QMessageBox::warning(this, "Experiment", "Please, select a valid 'graphId' (Model).");
+        QMessageBox::warning(this, "Experiment", "Please, select a valid 'graphId'.");
         return;
     }
 
@@ -242,12 +238,6 @@ void AttributesWidget::slotUpdateModelPlugins()
         itemRoot->setText(0, "Model");
         itemRoot->setHidden(true);
         m_treeItemModels.insert(model->uid, itemRoot);
-
-        // the graphId combo box
-        QTreeWidgetItem* item = new QTreeWidgetItem(itemRoot);
-        item->setText(0, GENERAL_ATTRIBUTE_GRAPHID);
-        m_ui->treeWidget->setItemWidget(item, 1,
-                m_widgetFields.value(GENERAL_ATTRIBUTE_GRAPHID).value<QWidget*>());
 
         // the model stuff
         insertPluginAttributes(itemRoot, model->uid, model->modelAttrMin, model->modelAttrMax);

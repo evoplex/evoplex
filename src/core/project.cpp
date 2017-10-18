@@ -83,14 +83,14 @@ const int Project::newExperiment(const QStringList& header, const QStringList& v
     for (int i = 0; i < values.size(); ++i) {
         const QString& vStr = values.at(i);
         QString attrName = header.at(i);
-        bool ok = false;
 
         AttributesSpace::const_iterator gps = m_mainApp->getGeneralAttrSpace().find(attrName);
         if (gps != m_mainApp->getGeneralAttrSpace().end()) {
             Value value = Utils::validateParameter(gps.value().second, vStr);
             if (value.isValid()) {
                 generalAttrs->replace(gps.value().first, attrName, value);
-                ok = true;
+            } else {
+                failedAttributes.append(attrName);
             }
         } else {
             QPair<int, QString> attrSpace;
@@ -109,18 +109,15 @@ const int Project::newExperiment(const QStringList& header, const QStringList& v
                 Value value = Utils::validateParameter(attrSpace.second, vStr);
                 if (value.isValid()) {
                     attributes->replace(attrSpace.first, attrName, value);
-                    ok = true;
+                } else {
+                    failedAttributes.append(attrName);
                 }
             }
-        }
-
-        if (!ok) {
-            failedAttributes.append(attrName);
         }
     }
 
     if (!failedAttributes.isEmpty()) {
-        errorMsg = QString("The following attributes are missing or invalid: %1").arg(failedAttributes.join(","));
+        errorMsg = QString("The following attributes are missing/invalid: %1").arg(failedAttributes.join(","));
         delete generalAttrs;
         delete graphAttrs;
         delete modelAttrs;
