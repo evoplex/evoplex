@@ -9,6 +9,7 @@
 #include <QDockWidget>
 #include <QTreeWidgetItem>
 #include <QVariantHash>
+#include <QSpinBox>
 
 #include "core/project.h"
 
@@ -48,6 +49,10 @@ private:
 
     void insertPluginAttributes(QTreeWidgetItem* itemRoot, const QString &uid,
                                 const Attributes &min, const Attributes &max);
+
+    QSpinBox* newSpinBox(const int min, const int max);
+    QDoubleSpinBox* newDoubleSpinBox(const int min, const int max);
+    void addTreeWidget(QTreeWidgetItem* itemRoot, const QString& label, const QVariant& widget);
 };
 }
 

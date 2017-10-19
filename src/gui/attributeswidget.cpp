@@ -10,19 +10,12 @@
 #include <QHBoxLayout>
 #include <QLineEdit>
 #include <QMessageBox>
-#include <QSpinBox>
 #include <QVariant>
 
 #include "attributeswidget.h"
 #include "ui_attributeswidget.h"
 
 #define STRING_NULL_PLUGINID "--"
-// let's make it easier to find the type of the field
-#define CHECK_BOX "0"
-#define COMBO_BOX "1"
-#define DOUBLE_SPIN_BOX "2"
-#define LINE_EDIT "3"
-#define SPIN_BOX "4"
 
 namespace evoplex {
 
@@ -45,16 +38,8 @@ AttributesWidget::AttributesWidget(Project* project, QWidget *parent)
     m_treeItemGeneral->setText(0, "General");
     m_treeItemGeneral->setExpanded(true);
 
-    auto addGeneralAttr = [this](const QString& label, const QVariant& field) {
-        QTreeWidgetItem* item = new QTreeWidgetItem(m_treeItemGeneral);
-        m_widgetFields.insert(label, field);
-        item->setText(0, label);
-        m_ui->treeWidget->setItemWidget(item, 1, field.value<QWidget*>());
-    };
-
     // add custom widget -- agents from file
     QLineEdit* agentsPath = new QLineEdit(m_project->getDir());
-    agentsPath->setObjectName(LINE_EDIT);
     QPushButton* btBrowseFile = new QPushButton("...");
     btBrowseFile->setMaximumWidth(20);
     connect(btBrowseFile, SIGNAL(clicked(bool)), this, SLOT(slotAgentFile()));
@@ -67,39 +52,24 @@ AttributesWidget::AttributesWidget(Project* project, QWidget *parent)
     item->setText(0, GENERAL_ATTRIBUTE_AGENTS);
     m_ui->treeWidget->setItemWidget(item, 1, agentsLayout->parentWidget());
     // seed
-    QSpinBox* sp = new QSpinBox(m_ui->treeWidget);
-    sp->setObjectName(SPIN_BOX);
-    sp->setMaximum(INT32_MAX);
-    sp->setMinimum(0);
-    addGeneralAttr(GENERAL_ATTRIBUTE_SEED, QVariant::fromValue(sp));
+    addTreeWidget(m_treeItemGeneral, GENERAL_ATTRIBUTE_SEED, QVariant::fromValue(newSpinBox(0, INT32_MAX)));
     // stop at
-    sp = new QSpinBox(m_ui->treeWidget);
-    sp->setObjectName(SPIN_BOX);
-    sp->setMaximum(EVOPLEX_MAX_STEPS);
-    sp->setMinimum(1);
-    addGeneralAttr(GENERAL_ATTRIBUTE_STOPAT, QVariant::fromValue(sp));
+    addTreeWidget(m_treeItemGeneral, GENERAL_ATTRIBUTE_STOPAT, QVariant::fromValue(newSpinBox(1, EVOPLEX_MAX_STEPS)));
     // trials
-    sp = new QSpinBox(m_ui->treeWidget);
-    sp->setObjectName(SPIN_BOX);
-    sp->setMaximum(EVOPLEX_MAX_TRIALS);
-    sp->setMinimum(1);
-    addGeneralAttr(GENERAL_ATTRIBUTE_TRIALS, QVariant::fromValue(sp));
+    addTreeWidget(m_treeItemGeneral, GENERAL_ATTRIBUTE_TRIALS, QVariant::fromValue(newSpinBox(1, EVOPLEX_MAX_STEPS)));
     // models available
     QComboBox* cb = new QComboBox(m_ui->treeWidget);
-    cb->setObjectName(COMBO_BOX);
     connect(cb, SIGNAL(currentIndexChanged(QString)), this, SLOT(slotModelSelected(QString)));
-    addGeneralAttr(GENERAL_ATTRIBUTE_MODELID, QVariant::fromValue(cb));
-    // add the graphId combo box
+    addTreeWidget(m_treeItemGeneral, GENERAL_ATTRIBUTE_MODELID, QVariant::fromValue(cb));
+    // graphs available
     cb = new QComboBox(m_ui->treeWidget);
-    cb->setObjectName(COMBO_BOX);
-    cb->setHidden(true);
+    cb->setEnabled(false);
     connect(cb, SIGNAL(currentIndexChanged(QString)), this, SLOT(slotGraphSelected(QString)));
-    addGeneralAttr(GENERAL_ATTRIBUTE_GRAPHID, QVariant::fromValue(cb));
+    addTreeWidget(m_treeItemGeneral, GENERAL_ATTRIBUTE_GRAPHID, QVariant::fromValue(cb));
     // auto delete
     QCheckBox* chb = new QCheckBox(m_ui->treeWidget);
-    chb->setObjectName(CHECK_BOX);
     chb->setChecked(true);
-    addGeneralAttr(GENERAL_ATTRIBUTE_AUTODELETE, QVariant::fromValue(chb));
+    addTreeWidget(m_treeItemGeneral, GENERAL_ATTRIBUTE_AUTODELETE, QVariant::fromValue(chb));
 
     // create the trees with the plugin stuff
     slotUpdateModelPlugins();
@@ -132,24 +102,38 @@ void AttributesWidget::slotCreateExperiment()
 
     QStringList header;
     QStringList values;
-    QVariantHash::iterator it = m_widgetFields.begin();
-    while (it != m_widgetFields.end()) {
+    QVariantHash::iterator it;
+    for (it = m_widgetFields.begin(); it != m_widgetFields.end(); ++it) {
         header << it.key();
         QWidget* widget = it.value().value<QWidget*>();
-        if (widget->objectName() == CHECK_BOX) {
-            values << QString::number(qobject_cast<QCheckBox*>(widget)->isChecked());
-        } else if (widget->objectName() == COMBO_BOX) {
-            values << qobject_cast<QComboBox*>(widget)->currentText();
-        } else if (widget->objectName() == DOUBLE_SPIN_BOX) {
-            values << QString::number(qobject_cast<QDoubleSpinBox*>(widget)->value(), 'f', 2);
-        } else if (widget->objectName() == SPIN_BOX) {
-            values << QString::number(qobject_cast<QSpinBox*>(widget)->value());
-        } else if (widget->objectName() == LINE_EDIT) {
-            values << qobject_cast<QLineEdit*>(widget)->text();
-        } else {
-            qFatal("[AttributesWidget]: unable to know the widget type.");
+
+        QCheckBox* chb = qobject_cast<QCheckBox*>(widget);
+        if (chb) {
+            values << QString::number(chb->isChecked());
+            continue;
         }
-        ++it;
+        QComboBox* cb = qobject_cast<QComboBox*>(widget);
+        if (cb) {
+            values << cb->currentText();
+            continue;
+        }
+        QDoubleSpinBox* dsp = qobject_cast<QDoubleSpinBox*>(widget);
+        if (dsp) {
+            values << QString::number(dsp->value(), 'f', 2);
+            continue;
+        }
+        QSpinBox* sp = qobject_cast<QSpinBox*>(widget);
+        if (sp) {
+            values << QString::number(sp->value());
+            continue;
+        }
+        QLineEdit* le = qobject_cast<QLineEdit*>(widget);
+        if (le) {
+            values << le->text();
+            continue;
+        }
+
+        qFatal("[AttributesWidget]: unable to know the widget type.");
     }
 
     QString errorMsg;
@@ -180,10 +164,12 @@ void AttributesWidget::slotModelSelected(const QString& modelId)
     QTreeWidgetItem* itemModel = m_treeItemModels.value(m_selectedModelId);
     if (itemModel) itemModel->setHidden(true);
 
+    QComboBox* cb = m_widgetFields.value(GENERAL_ATTRIBUTE_GRAPHID).value<QComboBox*>();
+    cb->setCurrentIndex(0); // reset graphId
+    cb->setEnabled(modelId != STRING_NULL_PLUGINID);
+
     itemModel = m_treeItemModels.value(modelId);
     if (itemModel) {
-        QComboBox* cb = m_widgetFields.value(GENERAL_ATTRIBUTE_GRAPHID).value<QComboBox*>();
-        cb->setCurrentIndex(0); // reset graphId
         itemModel->setHidden(false);
         itemModel->setExpanded(true);
     }
@@ -252,30 +238,46 @@ void AttributesWidget::insertPluginAttributes(QTreeWidgetItem* itemRoot, const Q
         QTreeWidgetItem* item = new QTreeWidgetItem(itemRoot);
         item->setText(0, min.name(i));
 
-        QVariant widget;
+        QWidget* widget = nullptr;
         if (min.value(i).type == Value::DOUBLE) {
-            QDoubleSpinBox* sp = new QDoubleSpinBox();
-            sp->setObjectName(DOUBLE_SPIN_BOX);
-            sp->setMinimum(min.value(i).toDouble);
-            sp->setMaximum(max.value(i).toDouble);
-            widget = QVariant::fromValue(sp);
-            m_ui->treeWidget->setItemWidget(item, 1, sp);
+            widget = newDoubleSpinBox(min.value(i).toDouble, max.value(i).toDouble);
         } else if (min.value(i).type == Value::INT) {
-            QSpinBox* sp = new QSpinBox();
-            sp->setObjectName(SPIN_BOX);
-            sp->setMinimum(min.value(i).toInt);
-            sp->setMaximum(max.value(i).toInt);
-            widget = QVariant::fromValue(sp);
-            m_ui->treeWidget->setItemWidget(item, 1, sp);
+            widget = newSpinBox(min.value(i).toInt, max.value(i).toInt);
         } else {
             QLineEdit* le = new QLineEdit();
-            le->setObjectName(LINE_EDIT);
             le->setText(min.value(i).toQString());
-            widget = QVariant::fromValue(le);
-            m_ui->treeWidget->setItemWidget(item, 1, le);
+            widget = le;
         }
+        m_ui->treeWidget->setItemWidget(item, 1, widget);
         // add the uid as prefix to avoid clashes.
-        m_widgetFields.insert(uid_ + min.name(i), widget);
+        m_widgetFields.insert(uid_ + min.name(i), QVariant::fromValue(widget));
     }
 }
+
+QSpinBox* AttributesWidget::newSpinBox(const int min, const int max)
+{
+    QSpinBox* sp = new QSpinBox(m_ui->treeWidget);
+    sp->setMaximum(max);
+    sp->setMinimum(min);
+    sp->setButtonSymbols(QSpinBox::NoButtons);
+    return sp;
+}
+
+QDoubleSpinBox* AttributesWidget::newDoubleSpinBox(const int min, const int max)
+{
+    QDoubleSpinBox* sp = new QDoubleSpinBox(m_ui->treeWidget);
+    sp->setMaximum(max);
+    sp->setMinimum(min);
+    sp->setButtonSymbols(QDoubleSpinBox::NoButtons);
+    return sp;
+}
+
+void AttributesWidget::addTreeWidget(QTreeWidgetItem* itemRoot, const QString& label, const QVariant& widget)
+{
+    QTreeWidgetItem* item = new QTreeWidgetItem(itemRoot);
+    m_widgetFields.insert(label, widget);
+    item->setText(0, label);
+    m_ui->treeWidget->setItemWidget(item, 1, widget.value<QWidget*>());
+}
+
 }
