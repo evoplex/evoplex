@@ -28,6 +28,7 @@ private slots:
     void slotPage(QAction* action);
     void newProject() { m_actNewProject->trigger(); }
     void updateSaveButtons(ProjectWidget* pw);
+    void slotSave();
 
 protected:
     bool eventFilter(QObject *watched, QEvent *event);
@@ -50,8 +51,8 @@ private:
     Page m_curPage;
 
     QAction* m_actNewProject;
-    QAction* m_actSaveProject;
-    QAction* m_actSaveProjectAs;
+    QAction* m_actSave;
+    QAction* m_actSaveAs;
 
     void setPageVisible(Page page, bool visible);
 };

@@ -186,9 +186,18 @@ void MainGUI::updateSaveButtons(ProjectWidget* pw)
 
 void MainGUI::slotSave()
 {
-    // TODO:
-
-    m_projects->currentProject()->getProject()->saveProject(dest, projectName);
+    // TODO: create a dialog and let the user type the project name & destination
+    Project* project = m_projects->currentProject()->getProject();
+    QString dest = project->getDir();
+    if (dest.isEmpty()) {
+        /*
+        dest = QFileDialog::getExistingDirectory(this, tr("Saving Project"),
+                                                        "/home",
+                                                        QFileDialog::ShowDirsOnly
+                                                        | QFileDialog::DontResolveSymlinks);
+                                                        */
+    }
+    project->saveProject(dest, projectName);
 }
 
 }

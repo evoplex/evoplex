@@ -239,6 +239,10 @@ bool Project::saveProject(const QString& dest, const QString& projectName)
         out << values.join(",");
     }
     experimentsFile.close();
+
+    m_name = projectName;
+    m_dir = dest;
+
     return true;
 }
 
