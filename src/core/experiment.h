@@ -89,7 +89,7 @@ public:
     inline int getId() const { return m_id; }
     inline int getProjId() const { return m_projId; }
     inline int getNumTrials() const { return m_numTrials; }
-    inline const QHash<int,Trial>& getTrials() const { return m_trials; }
+    inline const QHash<int, Trial>& getTrials() const { return m_trials; }
     inline const Attributes* getGeneralAttrs() const { return m_generalAttrs; }
     inline const Attributes* getModelAttrs() const { return m_modelAttrs; }
     inline const Attributes* getGraphAttrs() const { return m_graphAttrs; }

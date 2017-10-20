@@ -4,12 +4,14 @@
  */
 
 #include <QDebug>
+#include <QDir>
 #include <QFile>
 #include <QVector>
 #include <QStringList>
 #include <QTextStream>
 
 #include "project.h"
+#include "experiment.h"
 #include "utils.h"
 
 namespace evoplex {
@@ -166,4 +168,78 @@ const int Project::importExperiments(const QString& filePath)
     file.close();
     return failures;
 }
+
+bool Project::saveProject(const QString& dest, const QString& projectName)
+{
+    QDir dir(dest);
+    if (!dir.mkpath(projectName)) {
+        qDebug() << "[Project] unable to save project" <<projectName
+                 << "The destination is invalid!" << dest;
+        return false;
+    }
+    dir.cd(projectName);
+
+    QFile experimentsFile(dir.absoluteFilePath(projectName + ".csv"));
+    if (experimentsFile.exists() || !experimentsFile.open(QFile::WriteOnly | QFile::Truncate)) {
+        qDebug() << "[Project] unable to save project" <<projectName
+                 << "Make sure the destination directory is empty and writtable.";
+        return false;
+    }
+
+    QStringList header;
+    QHash<int, Experiment*>::const_iterator it;
+    for (it = m_experiments.begin(); it != m_experiments.end(); ++it) {
+        header.append(it.value()->getGeneralAttrs()->names().toList());
+
+        // prefix all model attributes with the modelId
+        const QString& modelId = it.value()->getModelAttrs()->value(GENERAL_ATTRIBUTE_MODELID).toQString();
+        const QVector<QString>& modelAttrNames = it.value()->getModelAttrs()->names();
+        foreach (const QString& attrName, modelAttrNames) {
+            header.append(modelId + "_" + attrName);
+        }
+
+        // prefix all graph attributes with the graphId
+        const QString& graphId = it.value()->getGraphAttrs()->value(GENERAL_ATTRIBUTE_GRAPHID).toQString();
+        const QVector<QString>& graphAttrNames = it.value()->getGraphAttrs()->names();
+        foreach (const QString& attrName, graphAttrNames) {
+            header.append(graphId + "_" + attrName);
+        }
+    }
+    // remove duplicates
+    header = header.toSet().toList();
+
+    QTextStream out(&experimentsFile);
+    out << header.join(",");
+
+    for (it = m_experiments.begin(); it != m_experiments.end(); ++it) {
+        const Attributes* generalAttrs = it.value()->getGeneralAttrs();
+        const Attributes* modelAttrs = it.value()->getModelAttrs();
+        const Attributes* graphAttrs = it.value()->getGraphAttrs();
+
+        QStringList values;
+        foreach (const QString& attrName, header) {
+            int idx = generalAttrs->indexOf(attrName);
+            if (idx != -1) {
+                values.append(generalAttrs->value(idx).toQString());
+                continue;
+            }
+            idx = modelAttrs->indexOf(attrName);
+            if (idx != -1) {
+                values.append(modelAttrs->value(idx).toQString());
+                continue;
+            }
+            idx = graphAttrs->indexOf(attrName);
+            if (idx != -1) {
+                values.append(graphAttrs->value(idx).toQString());
+                continue;
+            }
+            values.append(""); // not found; leave empty
+        }
+        Q_ASSERT(header.size() == values.size());
+        out << values.join(",");
+    }
+    experimentsFile.close();
+    return true;
+}
+
 }

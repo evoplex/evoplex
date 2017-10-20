@@ -6,8 +6,7 @@
 #ifndef PROJECT_H
 #define PROJECT_H
 
-#include <QVariantHash>
-#include <QVector>
+#include <QHash>
 
 #include "abstractmodel.h"
 #include "mainapp.h"
@@ -31,6 +30,10 @@ public:
     // return the number of failures or -1 if everything went wrong.
     // Experiments belong to a project, that is why we need a valid projectId.
     const int importExperiments(const QString& filePath);
+
+    // Save project into the dest directory.
+    // A project is composed by plain csv files
+    bool saveProject(const QString& dest, const QString& projectName);
 
     // execute all experiments of this project.
     void runAll();

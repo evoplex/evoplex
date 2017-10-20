@@ -103,12 +103,14 @@ public:
     }
 
     inline const QString& name(int id) const { return m_names.at(id); }
+    inline const QVector<QString>& names() const { return m_names; }
 
     inline const Value& value(int id) const { return m_values.at(id); }
     inline void setValue(int id, const Value& value) { m_values.replace(id, value); }
 
     inline const Value& value(const char* name) const { return value(indexOf(name)); }
     inline const Value& value(const QString& name) const { return value(indexOf(name)); }
+    inline const QVector<Value>& values() const { return m_values; }
 
 private:
     QVector<QString> m_names;
