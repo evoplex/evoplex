@@ -16,11 +16,11 @@
 
 namespace evoplex {
 
-Project::Project(MainApp* mainApp, int id, const QString& name, const QString& dir)
+Project::Project(MainApp* mainApp, int id, const QString& name, const QString& dest)
     : m_mainApp(mainApp)
     , m_id(id)
     , m_name(name)
-    , m_dir(dir)
+    , m_dest(dest)
     , m_lastExpId(-1)
 {
     if (m_name.isEmpty()) {
@@ -171,78 +171,84 @@ const int Project::importExperiments(const QString& filePath)
 
 bool Project::saveProject(const QString& dest, const QString& projectName)
 {
-    QDir dir(dest);
-    if (!dir.mkpath(projectName)) {
-        qDebug() << "[Project] unable to save project" <<projectName
-                 << "The destination is invalid!" << dest;
+    emit (progressSave(0));
+    m_dest = dest.isEmpty() ? m_dest : dest;
+    m_name = projectName.isEmpty() ? m_name : projectName;
+
+    QDir dir(m_dest);
+    if (m_dest.isEmpty() || m_name.isEmpty() || !dir.mkpath(m_name)) {
+        qWarning() << "[Project] unable to save project" << m_name
+                 << "The destination is invalid!" << m_dest;
         return false;
     }
-    dir.cd(projectName);
+    dir.cd(m_name);
 
-    QFile experimentsFile(dir.absoluteFilePath(projectName + ".csv"));
-    if (experimentsFile.exists() || !experimentsFile.open(QFile::WriteOnly | QFile::Truncate)) {
-        qDebug() << "[Project] unable to save project" <<projectName
-                 << "Make sure the destination directory is empty and writtable.";
+    emit (progressSave(5));
+    QFile experimentsFile(dir.absoluteFilePath(m_name + ".csv"));
+    if (!experimentsFile.open(QFile::WriteOnly | QFile::Truncate)) {
+        qWarning() << "[Project] unable to save project" << m_name
+                   << "Make sure the destination directory is writtable."
+                   << dir.absolutePath();
         return false;
     }
 
+    emit (progressSave(10));
     QStringList header;
     QHash<int, Experiment*>::const_iterator it;
     for (it = m_experiments.begin(); it != m_experiments.end(); ++it) {
         header.append(it.value()->getGeneralAttrs()->names().toList());
 
         // prefix all model attributes with the modelId
-        const QString& modelId = it.value()->getModelAttrs()->value(GENERAL_ATTRIBUTE_MODELID).toQString();
+        const QString& modelId = it.value()->getGeneralAttrs()->value(GENERAL_ATTRIBUTE_MODELID).toQString();
         const QVector<QString>& modelAttrNames = it.value()->getModelAttrs()->names();
         foreach (const QString& attrName, modelAttrNames) {
             header.append(modelId + "_" + attrName);
         }
 
         // prefix all graph attributes with the graphId
-        const QString& graphId = it.value()->getGraphAttrs()->value(GENERAL_ATTRIBUTE_GRAPHID).toQString();
+        const QString& graphId = it.value()->getGeneralAttrs()->value(GENERAL_ATTRIBUTE_GRAPHID).toQString();
         const QVector<QString>& graphAttrNames = it.value()->getGraphAttrs()->names();
         foreach (const QString& attrName, graphAttrNames) {
             header.append(graphId + "_" + attrName);
-        }
+        } 
     }
     // remove duplicates
+    emit (progressSave(25));
     header = header.toSet().toList();
 
+    emit (progressSave(30));
     QTextStream out(&experimentsFile);
-    out << header.join(",");
+    out << header.join(",") + "\n";
 
+    emit (progressSave(35));
     for (it = m_experiments.begin(); it != m_experiments.end(); ++it) {
         const Attributes* generalAttrs = it.value()->getGeneralAttrs();
         const Attributes* modelAttrs = it.value()->getModelAttrs();
         const Attributes* graphAttrs = it.value()->getGraphAttrs();
 
+        const QString& modelId = it.value()->getGeneralAttrs()->value(GENERAL_ATTRIBUTE_MODELID).toQString();
+        const QString& graphId = it.value()->getGeneralAttrs()->value(GENERAL_ATTRIBUTE_GRAPHID).toQString();
+
         QStringList values;
-        foreach (const QString& attrName, header) {
+        foreach (QString attrName, header) {
             int idx = generalAttrs->indexOf(attrName);
             if (idx != -1) {
                 values.append(generalAttrs->value(idx).toQString());
-                continue;
+            } else if (attrName.startsWith(modelId)) {
+                idx = modelAttrs->indexOf(attrName.remove(modelId + "_"));
+                if (idx != -1) values.append(modelAttrs->value(idx).toQString());
+            } else if (attrName.startsWith(graphId)) {
+                idx = graphAttrs->indexOf(attrName.remove(graphId + "_"));
+                if (idx != -1) values.append(graphAttrs->value(idx).toQString());
+            } else {
+                values.append(""); // not found; leave empty
             }
-            idx = modelAttrs->indexOf(attrName);
-            if (idx != -1) {
-                values.append(modelAttrs->value(idx).toQString());
-                continue;
-            }
-            idx = graphAttrs->indexOf(attrName);
-            if (idx != -1) {
-                values.append(graphAttrs->value(idx).toQString());
-                continue;
-            }
-            values.append(""); // not found; leave empty
         }
         Q_ASSERT(header.size() == values.size());
-        out << values.join(",");
+        out << values.join(",") + "\n";
     }
     experimentsFile.close();
-
-    m_name = projectName;
-    m_dir = dest;
-
+    emit (progressSave(100));
     return true;
 }
 

@@ -9,8 +9,9 @@ set(EVOPLEX_GUI_H
   projectwidget.h
   projectswindow.h
   queuewidget.h
-  tablewidget.h
+  savedialog.h
   settingswidget.h
+  tablewidget.h
   welcomewidget.h
 )
 
@@ -23,8 +24,9 @@ set(EVOPLEX_GUI_CXX
   projectwidget.cpp
   projectswindow.cpp
   queuewidget.cpp
-  tablewidget.cpp
+  savedialog.cpp
   settingswidget.cpp
+  tablewidget.cpp
   welcomewidget.cpp
 )
 
@@ -32,6 +34,7 @@ qt5_wrap_ui(EVOPLEX_GUI_UI
   forms/attributeswidget.ui
   forms/queuewidget.ui
   forms/projectwidget.ui
+  forms/savedialog.ui
   forms/settingswidget.ui
   forms/welcomewidget.ui
 )

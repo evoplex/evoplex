@@ -30,7 +30,7 @@ struct Value
     inline bool isValid() const { return type != INVALID; }
     inline QString toQString() const {
         switch (type) {
-            case BOOL: return QString(toBool);
+            case BOOL: return QString::number(toBool);
             case CHAR: return QString(toChar);
             case DOUBLE: return QString::number(toDouble);
             case INT: return QString::number(toInt);

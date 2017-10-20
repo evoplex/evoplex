@@ -39,7 +39,7 @@ AttributesWidget::AttributesWidget(Project* project, QWidget *parent)
     m_treeItemGeneral->setExpanded(true);
 
     // add custom widget -- agents from file
-    QLineEdit* agentsPath = new QLineEdit(m_project->getDir());
+    QLineEdit* agentsPath = new QLineEdit(m_project->getDest());
     QPushButton* btBrowseFile = new QPushButton("...");
     btBrowseFile->setMaximumWidth(20);
     connect(btBrowseFile, SIGNAL(clicked(bool)), this, SLOT(slotAgentFile()));

@@ -7,6 +7,7 @@
 #define PROJECT_H
 
 #include <QHash>
+#include <QObject>
 
 #include "abstractmodel.h"
 #include "mainapp.h"
@@ -14,10 +15,12 @@
 
 namespace evoplex {
 
-class Project
+class Project : public QObject
 {
+    Q_OBJECT
+
 public:
-    Project(MainApp* mainApp, int id, const QString& name="", const QString& dir="");
+    Project(MainApp* mainApp, int id, const QString& name="", const QString& dest="");
     virtual ~Project();
 
     // Add a new experiment to this project. We assume that all graph/model
@@ -33,24 +36,31 @@ public:
 
     // Save project into the dest directory.
     // A project is composed by plain csv files
-    bool saveProject(const QString& dest, const QString& projectName);
+    bool saveProject(const QString &dest="", const QString &projectName="");
 
     // execute all experiments of this project.
     void runAll();
 
-    inline int getId() { return m_id; }
-    inline const QString& getName() { return m_name; }
-    inline const QString& getDir() { return m_dir; }
-    inline Experiment* getExperiment(int expId) { return m_experiments.value(expId); }
+    inline const QString& getName() const { return m_name; }
+    inline void setName(const QString& name) { m_name = name; }
 
-    inline const QHash<QString, MainApp::GraphPlugin*>& getGraphs() { return m_mainApp->getGraphs(); }
-    inline const QHash<QString, MainApp::ModelPlugin*>& getModels() { return m_mainApp->getModels(); }
+    inline const QString& getDest() const { return m_dest; }
+    inline void setDest(const QString& dest) { m_dest = dest; }
+
+    inline int getId() const { return m_id; }
+    inline Experiment* getExperiment(int expId) { return m_experiments.value(expId); }
+    inline const QHash<QString, MainApp::GraphPlugin*>& getGraphs() const { return m_mainApp->getGraphs(); }
+    inline const QHash<QString, MainApp::ModelPlugin*>& getModels() const { return m_mainApp->getModels(); }
+
+signals:
+    // emit an integer [0,100] while saving this project
+    void progressSave(int);
 
 private:
     MainApp* m_mainApp;
     const int m_id;
     QString m_name;
-    QString m_dir;
+    QString m_dest;
 
     int m_lastExpId;
     QHash<int, Experiment*> m_experiments;

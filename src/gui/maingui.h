@@ -11,6 +11,7 @@
 
 #include "projectswindow.h"
 #include "queuewidget.h"
+#include "savedialog.h"
 #include "settingswidget.h"
 #include "welcomewidget.h"
 #include "core/mainapp.h"
@@ -29,6 +30,7 @@ private slots:
     void newProject() { m_actNewProject->trigger(); }
     void updateSaveButtons(ProjectWidget* pw);
     void slotSave();
+    void slotSaveAs();
 
 protected:
     bool eventFilter(QObject *watched, QEvent *event);
@@ -44,6 +46,7 @@ private:
     };
 
     MainApp* m_mainApp;
+    SaveDialog* m_saveDialog;
     WelcomeWidget* m_welcome;
     QueueWidget* m_queue;
     ProjectsWindow* m_projects;

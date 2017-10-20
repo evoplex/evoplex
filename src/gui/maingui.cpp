@@ -16,6 +16,7 @@ namespace evoplex {
 MainGUI::MainGUI(MainApp* mainApp, QWidget* parent)
     : QMainWindow(parent)
     , m_mainApp(mainApp)
+    , m_saveDialog(new SaveDialog())
     , m_welcome(new WelcomeWidget(this))
     , m_queue(new QueueWidget(mainApp->getExperimentsMgr(), this))
     , m_projects(new ProjectsWindow(mainApp, this))
@@ -184,20 +185,19 @@ void MainGUI::updateSaveButtons(ProjectWidget* pw)
     }
 }
 
+void MainGUI::slotSaveAs()
+{
+    m_saveDialog->saveAs(m_projects->currentProject()->getProject());
+}
+
 void MainGUI::slotSave()
 {
-    // TODO: create a dialog and let the user type the project name & destination
     Project* project = m_projects->currentProject()->getProject();
-    QString dest = project->getDir();
-    if (dest.isEmpty()) {
-        /*
-        dest = QFileDialog::getExistingDirectory(this, tr("Saving Project"),
-                                                        "/home",
-                                                        QFileDialog::ShowDirsOnly
-                                                        | QFileDialog::DontResolveSymlinks);
-                                                        */
+    if (project->getDest().isEmpty()) {
+        slotSaveAs();
+    } else {
+        m_saveDialog->save(m_projects->currentProject()->getProject());
     }
-    project->saveProject(dest, projectName);
 }
 
 }
