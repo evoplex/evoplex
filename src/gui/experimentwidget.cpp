@@ -20,7 +20,8 @@ ExperimentWidget::ExperimentWidget(Project* project, int expId, QWidget *parent)
     , m_innerWindow(new QMainWindow(this))
     //, m_attrWidget(new AttributesWidget(project, this))
 {
-    this->setWindowTitle(QString("P%1.E%2").arg(m_project->getId()).arg(expId));
+    setObjectName(QString("P%1.E%2").arg(m_project->getId()).arg(expId));
+    setWindowTitle(objectName());
 
     // setup the inner qmainwindow
     m_innerWindow->setDockOptions(QMainWindow::AllowTabbedDocks | QMainWindow::GroupedDragging);
@@ -43,6 +44,7 @@ ExperimentWidget::ExperimentWidget(Project* project, int expId, QWidget *parent)
     tb->addAction("graph");
     tb->setMovable(false);
     tb->setFloatable(false);
+    tb->setIconSize(QSize(16,16));
     tb->setStyleSheet("background: rgb(53,53,53);");
 
     QVBoxLayout* layout = new QVBoxLayout(new QWidget(this));

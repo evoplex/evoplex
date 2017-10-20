@@ -21,7 +21,9 @@ ProjectWidget::ProjectWidget(Project* project, ExperimentsMgr* expMgr, QWidget* 
     , m_attrWidget(new AttributesWidget(project, m_innerWindow))
     , m_project(project)
 {
-    this->setWindowTitle(m_project->getName());  
+    setObjectName(m_project->getName());
+    setWindowTitle(objectName());
+
     QHBoxLayout* lh = new QHBoxLayout(new QWidget(this));
     lh->addWidget(m_innerWindow);
     this->setWidget(lh->parentWidget());

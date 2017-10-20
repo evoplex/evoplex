@@ -26,6 +26,8 @@ public:
     explicit ProjectWidget(Project* project, ExperimentsMgr *expMgr, QWidget *parent = 0);
     ~ProjectWidget() {}
 
+    inline const Project* getProject() const { return m_project; }
+
 signals:
     void openExperiment(int projId, int expId);
 
