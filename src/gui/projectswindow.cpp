@@ -3,6 +3,9 @@
  * @author Marcos Cardinot <mcardinot@gmail.com>
  */
 
+#include <QApplication>
+#include <QDebug>
+
 #include "experimentwidget.h"
 #include "projectwidget.h"
 #include "projectswindow.h"
@@ -12,7 +15,18 @@ namespace evoplex {
 ProjectsWindow::ProjectsWindow(MainApp* mainApp, QWidget *parent)
     : QMainWindow(parent)
     , m_mainApp(mainApp)
+    , m_currentProject(nullptr)
 {
+    setTabPosition(Qt::AllDockWidgetAreas, QTabWidget::South);
+    connect(this, SIGNAL(tabifiedDockWidgetActivated(QDockWidget*)),
+            SLOT(slotFocusChanged(QDockWidget*)));
+}
+
+void ProjectsWindow::slotFocusChanged(QDockWidget* currTab)
+{
+    ProjectWidget* pw = qobject_cast<ProjectWidget*>(currTab);
+    m_currentProject = pw ? pw : nullptr;
+    emit (selectionChanged(pw));
 }
 
 void ProjectsWindow::slotNewProject()
@@ -27,6 +41,7 @@ void ProjectsWindow::slotNewProject()
     pw->show();
     pw->raise();
     m_projects.push_back(pw);
+    slotFocusChanged(pw);
     emit (isEmpty(false));
     connect(pw, SIGNAL(openExperiment(int,int)), this, SLOT(slotOpenExperiment(int,int)));
     //connect(m_contextMenu, SIGNAL(openView(int)), wp, SLOT(slotOpenView(int)));
@@ -43,4 +58,5 @@ void ProjectsWindow::slotOpenExperiment(int projId, int expId)
     ew->show();
     ew->raise();
 }
+
 }

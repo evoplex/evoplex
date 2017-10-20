@@ -9,6 +9,7 @@
 #include <QVBoxLayout>
 
 #include "maingui.h"
+#include "projectwidget.h"
 
 namespace evoplex {
 
@@ -96,23 +97,26 @@ MainGUI::MainGUI(MainApp* mainApp, QWidget* parent)
     connect(m_actNewProject, &QAction::triggered, [this, acProjects](){ m_projects->slotNewProject(); slotPage(acProjects); });
     QAction* actOpenProject = new QAction("Open Project", this);
     connect(actOpenProject, SIGNAL(triggered(bool)), this, SLOT(slotOpenProject()));
-    QAction* actSave = new QAction("Save Project", this);
-    actSave->setEnabled(false);
-    connect(actSave, SIGNAL(triggered(bool)), this, SLOT(slotSave()));
-    QAction* actSaveAs = new QAction("Save Project As ...", this);
-    actSaveAs->setEnabled(false);
-    connect(actSaveAs, SIGNAL(triggered(bool)), this, SLOT(slotSaveAs()));
+
     QAction* actSaveAll = new QAction("Save All", this);
     actSaveAll->setEnabled(false);
     connect(actSaveAll, SIGNAL(triggered(bool)), this, SLOT(slotSaveAll()));
+    m_actSave = new QAction("Save", this);
+    m_actSave->setEnabled(false);
+    connect(m_actSave, SIGNAL(triggered(bool)), this, SLOT(slotSave()));
+    m_actSaveAs = new QAction("Save as", this);
+    m_actSaveAs->setEnabled(false);
+    connect(m_actSaveAs, SIGNAL(triggered(bool)), this, SLOT(slotSaveAs()));
+    connect(m_projects, SIGNAL(selectionChanged(ProjectWidget*)), SLOT(updateSaveButtons(ProjectWidget*)));
+
     QAction* actQuit = new QAction("Quit", this);
     connect(actQuit, SIGNAL(triggered(bool)), this, SLOT(close()));
 
     QMenu* menuFile = new QMenu("File", this);
     menuFile->addAction(m_actNewProject);
     menuFile->addAction(actOpenProject);
-    menuFile->addAction(actSave);
-    menuFile->addAction(actSaveAs);
+    menuFile->addAction(m_actSave);
+    menuFile->addAction(m_actSaveAs);
     menuFile->addAction(actSaveAll);
     menuFile->addSeparator();
     menuFile->addAction(actQuit);
@@ -164,4 +168,27 @@ void MainGUI::setPageVisible(Page page, bool visible)
             break;
     }
 }
+
+void MainGUI::updateSaveButtons(ProjectWidget* pw)
+{
+    if (!pw) {
+        m_actSave->setEnabled(false);
+        m_actSaveAs->setEnabled(false);
+        m_actSave->setText("Save");
+        m_actSaveAs->setText("Save as");
+    } else {
+        m_actSave->setEnabled(true);
+        m_actSaveAs->setEnabled(true);
+        m_actSave->setText(QString("Save \"%1\"").arg(pw->objectName()));
+        m_actSaveAs->setText(QString("Save \"%1\" as").arg(pw->objectName()));
+    }
+}
+
+void MainGUI::slotSave()
+{
+    // TODO:
+
+    m_projects->currentProject()->getProject()->saveProject(dest, projectName);
+}
+
 }

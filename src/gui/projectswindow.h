@@ -20,16 +20,22 @@ class ProjectsWindow : public QMainWindow
 public:
     explicit ProjectsWindow(MainApp* mainApp, QWidget *parent = 0);
 
+    inline const ProjectWidget* currentProject() const { return m_currentProject; }
+
 signals:
+    void selectionChanged(ProjectWidget*);
     void isEmpty(bool empty);
 
 public slots:
     void slotNewProject();
     void slotOpenExperiment(int projId, int expId);
 
+private slots:
+    void slotFocusChanged(QDockWidget* currTab);
+
 private:
     MainApp* m_mainApp;
-
+    ProjectWidget* m_currentProject;
     QVector<ProjectWidget*> m_projects; // opened projects
 };
 }

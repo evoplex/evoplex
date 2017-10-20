@@ -24,9 +24,10 @@ class MainGUI: public QMainWindow
 public:
     explicit MainGUI(MainApp* mainApp, QWidget* parent=0);
 
-public slots:
+private slots:
     void slotPage(QAction* action);
     void newProject() { m_actNewProject->trigger(); }
+    void updateSaveButtons(ProjectWidget* pw);
 
 protected:
     bool eventFilter(QObject *watched, QEvent *event);
@@ -49,6 +50,8 @@ private:
     Page m_curPage;
 
     QAction* m_actNewProject;
+    QAction* m_actSaveProject;
+    QAction* m_actSaveProjectAs;
 
     void setPageVisible(Page page, bool visible);
 };
