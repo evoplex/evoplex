@@ -38,11 +38,14 @@ void SaveDialog::save(Project* project)
         return;
 
     hide();
-    QProgressDialog progress("Saving project...", "Abort", 0, 100, this);
-    progress.setWindowModality(Qt::WindowModal);
+    QProgressDialog progress("Saving project...", QString(), 0, 100);
+    progress.setWindowModality(Qt::ApplicationModal);
     connect(project, SIGNAL(progressSave(int)), &progress, SLOT(setValue(int)));
+    progress.setValue(0);
+    progress.show();
     project->saveProject();
     m_currProject = project;
+    progress.setValue(100);
 }
 
 void SaveDialog::saveAs(Project* project)

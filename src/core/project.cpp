@@ -196,17 +196,18 @@ bool Project::saveProject(const QString& dest, const QString& projectName)
     QStringList header;
     QHash<int, Experiment*>::const_iterator it;
     for (it = m_experiments.begin(); it != m_experiments.end(); ++it) {
-        header.append(it.value()->getGeneralAttrs()->names().toList());
+        const Attributes* generalAttrs = it.value()->getGeneralAttrs();
+        header.append(generalAttrs->names().toList());
 
         // prefix all model attributes with the modelId
-        const QString& modelId = it.value()->getGeneralAttrs()->value(GENERAL_ATTRIBUTE_MODELID).toQString();
+        const QString& modelId = generalAttrs->value(GENERAL_ATTRIBUTE_MODELID).toQString();
         const QVector<QString>& modelAttrNames = it.value()->getModelAttrs()->names();
         foreach (const QString& attrName, modelAttrNames) {
             header.append(modelId + "_" + attrName);
         }
 
         // prefix all graph attributes with the graphId
-        const QString& graphId = it.value()->getGeneralAttrs()->value(GENERAL_ATTRIBUTE_GRAPHID).toQString();
+        const QString& graphId = generalAttrs->value(GENERAL_ATTRIBUTE_GRAPHID).toQString();
         const QVector<QString>& graphAttrNames = it.value()->getGraphAttrs()->names();
         foreach (const QString& attrName, graphAttrNames) {
             header.append(graphId + "_" + attrName);
@@ -226,25 +227,24 @@ bool Project::saveProject(const QString& dest, const QString& projectName)
         const Attributes* modelAttrs = it.value()->getModelAttrs();
         const Attributes* graphAttrs = it.value()->getGraphAttrs();
 
-        const QString& modelId = it.value()->getGeneralAttrs()->value(GENERAL_ATTRIBUTE_MODELID).toQString();
-        const QString& graphId = it.value()->getGeneralAttrs()->value(GENERAL_ATTRIBUTE_GRAPHID).toQString();
+        const QString modelId_ = generalAttrs->value(GENERAL_ATTRIBUTE_MODELID).toQString() + "_";
+        const QString graphId_ = generalAttrs->value(GENERAL_ATTRIBUTE_GRAPHID).toQString() + "_";
 
         QStringList values;
         foreach (QString attrName, header) {
             int idx = generalAttrs->indexOf(attrName);
             if (idx != -1) {
                 values.append(generalAttrs->value(idx).toQString());
-            } else if (attrName.startsWith(modelId)) {
-                idx = modelAttrs->indexOf(attrName.remove(modelId + "_"));
+            } else if (attrName.startsWith(modelId_)) {
+                idx = modelAttrs->indexOf(attrName.remove(modelId_));
                 if (idx != -1) values.append(modelAttrs->value(idx).toQString());
-            } else if (attrName.startsWith(graphId)) {
-                idx = graphAttrs->indexOf(attrName.remove(graphId + "_"));
+            } else if (attrName.startsWith(graphId_)) {
+                idx = graphAttrs->indexOf(attrName.remove(graphId_));
                 if (idx != -1) values.append(graphAttrs->value(idx).toQString());
             } else {
                 values.append(""); // not found; leave empty
             }
         }
-        Q_ASSERT(header.size() == values.size());
         out << values.join(",") + "\n";
     }
     experimentsFile.close();
