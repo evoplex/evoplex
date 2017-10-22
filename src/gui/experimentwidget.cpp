@@ -14,8 +14,9 @@
 
 namespace evoplex {
 
-ExperimentWidget::ExperimentWidget(Project* project, int expId, QWidget *parent)
+ExperimentWidget::ExperimentWidget(Project* project, int expId, QWidget* parent)
     : QDockWidget(parent)
+    , m_expId(expId)
     , m_project(project)
     , m_innerWindow(new QMainWindow(this))
     //, m_attrWidget(new AttributesWidget(project, this))
@@ -62,6 +63,6 @@ ExperimentWidget::~ExperimentWidget()
 void ExperimentWidget::closeEvent(QCloseEvent* event)
 {
     QDockWidget::closeEvent(event);
-    this->deleteLater();
+    emit (closed());
 }
 }

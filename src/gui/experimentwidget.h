@@ -18,13 +18,20 @@ class ExperimentWidget : public QDockWidget
 {
     Q_OBJECT
 public:
-    explicit ExperimentWidget(Project* project, int expId = -1, QWidget* parent = 0);
+    explicit ExperimentWidget(Project* project, int expId, QWidget* parent = 0);
     ~ExperimentWidget();
+
+    inline int expId() const { return m_expId; }
+    inline int projId() const { return m_project->getId(); }
+
+signals:
+    void closed();
 
 protected:
     void closeEvent(QCloseEvent *event);
 
 private:
+    const int m_expId;
     Project* m_project;
     QMainWindow* m_innerWindow;
     AttributesWidget* m_attrWidget;

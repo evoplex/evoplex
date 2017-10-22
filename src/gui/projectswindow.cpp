@@ -15,7 +15,7 @@ namespace evoplex {
 ProjectsWindow::ProjectsWindow(MainApp* mainApp, QWidget *parent)
     : QMainWindow(parent)
     , m_mainApp(mainApp)
-    , m_currentProject(nullptr)
+    , m_currProjectWidget(nullptr)
 {
     setTabPosition(Qt::AllDockWidgetAreas, QTabWidget::South);
     connect(this, SIGNAL(tabifiedDockWidgetActivated(QDockWidget*)),
@@ -25,7 +25,7 @@ ProjectsWindow::ProjectsWindow(MainApp* mainApp, QWidget *parent)
 void ProjectsWindow::slotFocusChanged(QDockWidget* currTab)
 {
     ProjectWidget* pw = qobject_cast<ProjectWidget*>(currTab);
-    m_currentProject = pw ? pw : nullptr;
+    m_currProjectWidget = pw ? pw : nullptr;
     emit (selectionChanged(pw));
 }
 
@@ -50,14 +50,27 @@ void ProjectsWindow::slotNewProject()
 
 void ProjectsWindow::slotOpenExperiment(int projId, int expId)
 {
-    ExperimentWidget* ew = new ExperimentWidget(m_mainApp->getProject(projId), expId, this);
-    if (m_projects.isEmpty()) {
-        this->addDockWidget(Qt::TopDockWidgetArea, ew);
-    } else {
-        this->tabifyDockWidget(m_projects.last(), ew);
+    ExperimentWidget* ew = nullptr;
+    foreach (ExperimentWidget* e, m_experiments) {
+        if (e->expId() == expId && e->projId() == projId) {
+            ew = e;
+            break;
+        }
+    }
+
+    if (!ew) {
+        ew = new ExperimentWidget(m_mainApp->getProject(projId), expId, this);
+        connect(ew, &ExperimentWidget::closed,
+                [this, ew](){ m_experiments.removeOne(ew); ew->deleteLater(); });
+
+        if (m_projects.isEmpty() && m_experiments.isEmpty()) {
+            addDockWidget(Qt::TopDockWidgetArea, ew);
+        } else {
+            tabifyDockWidget(m_projects.last(), ew);
+        }
+        m_experiments.append(ew);
     }
     ew->show();
     ew->raise();
 }
-
 }

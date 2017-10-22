@@ -12,6 +12,7 @@
 
 namespace evoplex {
 
+class ExperimentWidget;
 class ProjectWidget;
 
 class ProjectsWindow : public QMainWindow
@@ -20,7 +21,7 @@ class ProjectsWindow : public QMainWindow
 public:
     explicit ProjectsWindow(MainApp* mainApp, QWidget *parent = 0);
 
-    inline const ProjectWidget* currentProject() const { return m_currentProject; }
+    inline const ProjectWidget* currentProject() const { return m_currProjectWidget; }
 
 signals:
     void selectionChanged(ProjectWidget*);
@@ -36,8 +37,9 @@ private slots:
 
 private:
     MainApp* m_mainApp;
-    ProjectWidget* m_currentProject;
+    ProjectWidget* m_currProjectWidget;
     QVector<ProjectWidget*> m_projects; // opened projects
+    QVector<ExperimentWidget*> m_experiments; // opened experiments
 };
 }
 
