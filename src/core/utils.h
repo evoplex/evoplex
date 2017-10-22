@@ -60,7 +60,7 @@ public:
             qWarning() << "[Utils]: unable to validate parameter! It should not be empty.";
             return Value();
         } else if (space == "string") {
-            return Value(strdup(valueStr.toUtf8().constData()));
+            return Value(valueStr);
         } else if (space == "bool") {
             return QVariant(valueStr).toBool();
         } else if (space.contains('{') && space.endsWith('}')) {

@@ -199,21 +199,17 @@ bool Project::saveProject(const QString& dest, const QString& projectName)
     QStringList header;
     QHash<int, Experiment*>::const_iterator it;
     for (it = m_experiments.begin(); it != m_experiments.end(); ++it) {
-        const Attributes* generalAttrs = it.value()->getGeneralAttrs();
-        header.append(generalAttrs->names().toList());
-
+        Experiment* exp = it.value();
+        header.append(exp->getGeneralAttrs()->names().toList());
         // prefix all model attributes with the modelId
-        const QString& modelId = generalAttrs->value(GENERAL_ATTRIBUTE_MODELID).toQString();
-        const QVector<QString>& modelAttrNames = it.value()->getModelAttrs()->names();
+        const QVector<QString>& modelAttrNames = exp->getModelAttrs()->names();
         foreach (const QString& attrName, modelAttrNames) {
-            header.append(modelId + "_" + attrName);
+            header.append(exp->getModelId() + "_" + attrName);
         }
-
         // prefix all graph attributes with the graphId
-        const QString& graphId = generalAttrs->value(GENERAL_ATTRIBUTE_GRAPHID).toQString();
-        const QVector<QString>& graphAttrNames = it.value()->getGraphAttrs()->names();
+        const QVector<QString>& graphAttrNames = exp->getGraphAttrs()->names();
         foreach (const QString& attrName, graphAttrNames) {
-            header.append(graphId + "_" + attrName);
+            header.append(exp->getGraphId() + "_" + attrName);
         } 
     }
     // remove duplicates
@@ -226,12 +222,12 @@ bool Project::saveProject(const QString& dest, const QString& projectName)
 
     emit (progressSave(35));
     for (it = m_experiments.begin(); it != m_experiments.end(); ++it) {
-        const Attributes* generalAttrs = it.value()->getGeneralAttrs();
-        const Attributes* modelAttrs = it.value()->getModelAttrs();
-        const Attributes* graphAttrs = it.value()->getGraphAttrs();
-
-        const QString modelId_ = generalAttrs->value(GENERAL_ATTRIBUTE_MODELID).toQString() + "_";
-        const QString graphId_ = generalAttrs->value(GENERAL_ATTRIBUTE_GRAPHID).toQString() + "_";
+        Experiment* exp = it.value();
+        const Attributes* generalAttrs = exp->getGeneralAttrs();
+        const Attributes* modelAttrs = exp->getModelAttrs();
+        const Attributes* graphAttrs = exp->getGraphAttrs();
+        const QString modelId_ = exp->getModelId() + "_";
+        const QString graphId_ = exp->getGraphId() + "_";
 
         QStringList values;
         foreach (QString attrName, header) {

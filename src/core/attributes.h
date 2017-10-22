@@ -26,6 +26,7 @@ struct Value
     Value(const double value) : type(DOUBLE), toDouble(value) {}
     Value(const int value) : type(INT), toInt(value) {}
     Value(const char* value) : type(STRING), toString(value) {}
+    Value(const QString& value) : Value(strdup(value.toUtf8().constData())) {}
 
     inline bool isValid() const { return type != INVALID; }
     inline QString toQString() const {
