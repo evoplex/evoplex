@@ -19,7 +19,8 @@ SaveDialog::SaveDialog(QWidget *parent)
 {
     m_ui->setupUi(this);
 
-    connect(m_ui->browse, SIGNAL(clicked(bool)), this, SLOT(browseDir()));
+    connect(m_ui->browse, SIGNAL(clicked(bool)), SLOT(browseDir()));
+    connect(m_ui->btn, SIGNAL(rejected()), SLOT(hide()));
     connect(m_ui->btn, &QDialogButtonBox::accepted, [this]() {
         m_currProject->setName(m_ui->pname->text());
         m_currProject->setDest(m_ui->dest->text());
