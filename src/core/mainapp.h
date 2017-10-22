@@ -54,8 +54,8 @@ public:
 
 
 
-    // Create a new project; return its id
-    int newProject(const QString& name="", const QString& dir="");
+    // Create a new project
+    Project* newProject(const QString& name="", const QString& dest="");
 
     inline FileMgr* getFileMgr() { return m_fileMgr; }
     inline ExperimentsMgr* getExperimentsMgr() { return m_experimentsMgr; }

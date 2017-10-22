@@ -51,8 +51,10 @@ public:
     inline Experiment* getExperiment(int expId) { return m_experiments.value(expId); }
     inline const QHash<QString, MainApp::GraphPlugin*>& getGraphs() const { return m_mainApp->getGraphs(); }
     inline const QHash<QString, MainApp::ModelPlugin*>& getModels() const { return m_mainApp->getModels(); }
+    inline bool hasUnsavedChanges() const { return m_hasUnsavedChanges; }
 
 signals:
+    void hasUnsavedChanges(bool);
     // emit an integer [0,100] while saving this project
     void progressSave(int);
 
@@ -61,6 +63,7 @@ private:
     const int m_id;
     QString m_name;
     QString m_dest;
+    bool m_hasUnsavedChanges;
 
     int m_lastExpId;
     QHash<int, Experiment*> m_experiments;

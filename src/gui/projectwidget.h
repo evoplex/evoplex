@@ -30,10 +30,12 @@ public:
 
 signals:
     void openExperiment(int projId, int expId);
+    void hasUnsavedChanges(ProjectWidget*);
 
 private slots:
     void onItemDoubleClicked(QTableWidgetItem* item);
     void insertRow(const int& expId);
+    void slotHasUnsavedChanges(bool b);
 
 private:
     Ui_ProjectWidget* m_ui;

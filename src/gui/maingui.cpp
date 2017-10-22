@@ -109,6 +109,7 @@ MainGUI::MainGUI(MainApp* mainApp, QWidget* parent)
     m_actSaveAs->setEnabled(false);
     connect(m_actSaveAs, SIGNAL(triggered(bool)), this, SLOT(slotSaveAs()));
     connect(m_projects, SIGNAL(selectionChanged(ProjectWidget*)), SLOT(updateSaveButtons(ProjectWidget*)));
+    connect(m_projects, SIGNAL(hasUnsavedChanges(ProjectWidget*)), SLOT(updateSaveButtons(ProjectWidget*)));
 
     QAction* actQuit = new QAction("Quit", this);
     connect(actQuit, SIGNAL(triggered(bool)), this, SLOT(close()));
@@ -178,7 +179,8 @@ void MainGUI::updateSaveButtons(ProjectWidget* pw)
         m_actSave->setText("Save");
         m_actSaveAs->setText("Save as");
     } else {
-        m_actSave->setEnabled(true);
+        Project* project = pw->getProject();
+        m_actSave->setEnabled(project->hasUnsavedChanges());
         m_actSaveAs->setEnabled(true);
         m_actSave->setText(QString("Save \"%1\"").arg(pw->objectName()));
         m_actSaveAs->setText(QString("Save \"%1\" as").arg(pw->objectName()));

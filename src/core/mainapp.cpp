@@ -151,11 +151,12 @@ bool MainApp::loadModelPlugin(QObject* instance, QJsonObject& metaData)
     return true;
 }
 
-int MainApp::newProject(const QString& name, const QString& dir)
+Project* MainApp::newProject(const QString& name, const QString& dest)
 {
     ++m_lastProjectId;
-    m_projects.insert(m_lastProjectId, new Project(this, m_lastProjectId, name, dir));
-    return m_lastProjectId;
+    Project* project = new Project(this, m_lastProjectId, name, dest);
+    m_projects.insert(m_lastProjectId, project);
+    return project;
 }
 
 AttributesSpace MainApp::attributesSpace(const QJsonObject& metaData, const QString& name) const

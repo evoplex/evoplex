@@ -25,6 +25,7 @@ public:
 signals:
     void selectionChanged(ProjectWidget*);
     void isEmpty(bool empty);
+    void hasUnsavedChanges(ProjectWidget*);
 
 public slots:
     void slotNewProject();

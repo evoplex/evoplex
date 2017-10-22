@@ -58,6 +58,9 @@ ProjectWidget::ProjectWidget(Project* project, ExperimentsMgr* expMgr, QWidget* 
             m_ui->table->viewport(), SLOT(update()));
     connect(expMgr, SIGNAL(progressUpdated(Experiment*)),
             m_ui->table->viewport(), SLOT(update()));
+
+    connect(project, SIGNAL(hasUnsavedChanges(bool)),
+            SLOT(slotHasUnsavedChanges(bool)));
 }
 
 void ProjectWidget::insertRow(const int& expId)
@@ -118,5 +121,11 @@ void ProjectWidget::onItemDoubleClicked(QTableWidgetItem* item)
 {
     int expId = m_ui->table->item(item->row(), m_headerIdx.value(TableWidget::H_EXPID))->text().toInt();
     emit (openExperiment(m_project->getId(), expId));
+}
+
+void ProjectWidget::slotHasUnsavedChanges(bool b)
+{
+    setWindowTitle(objectName() + (b ? "*" : ""));
+    emit (hasUnsavedChanges(this));
 }
 }

@@ -21,6 +21,7 @@ Project::Project(MainApp* mainApp, int id, const QString& name, const QString& d
     , m_id(id)
     , m_name(name)
     , m_dest(dest)
+    , m_hasUnsavedChanges(false)
     , m_lastExpId(-1)
 {
     if (m_name.isEmpty()) {
@@ -130,7 +131,9 @@ const int Project::newExperiment(const QStringList& header, const QStringList& v
     ++m_lastExpId;
     m_experiments.insert(m_lastExpId,
         new Experiment(m_mainApp, m_lastExpId, m_id, generalAttrs, modelAttrs, graphAttrs));
-    qDebug() << "[Project]: New experiment has been loaded.";
+
+    m_hasUnsavedChanges = true;
+    emit (hasUnsavedChanges(true));
     return m_lastExpId;
 }
 
@@ -248,6 +251,8 @@ bool Project::saveProject(const QString& dest, const QString& projectName)
         out << values.join(",") + "\n";
     }
     experimentsFile.close();
+    m_hasUnsavedChanges = false;
+    emit (hasUnsavedChanges(false));
     emit (progressSave(100));
     return true;
 }
