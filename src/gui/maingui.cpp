@@ -4,6 +4,7 @@
  */
 
 #include <QMenuBar>
+#include <QMessageBox>
 #include <QToolBar>
 #include <QToolButton>
 #include <QVBoxLayout>
@@ -140,6 +141,19 @@ bool MainGUI::eventFilter(QObject* o, QEvent* e)
       return true;    // remove the tooltips
 
     return QMainWindow::eventFilter(o, e);
+}
+
+void MainGUI::closeEvent(QCloseEvent* event)
+{
+    QMessageBox::StandardButton res = QMessageBox::question(this,
+            "Evoplex", tr("Are you sure you want to close it?\n"),
+            QMessageBox::No | QMessageBox::Yes, QMessageBox::No);
+
+    if (res == QMessageBox::Yes) {
+        event->accept();
+    } else {
+        event->ignore();
+    }
 }
 
 void MainGUI::slotPage(QAction* action)
