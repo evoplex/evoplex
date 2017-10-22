@@ -25,6 +25,8 @@ public:
     explicit AttributesWidget(Project *project, QWidget *parent = 0);
     ~AttributesWidget();
 
+    void fill(Experiment* exp);
+
 signals:
     void experimentCreated(const int& expId);
 

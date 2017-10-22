@@ -33,6 +33,7 @@ signals:
     void hasUnsavedChanges(ProjectWidget*);
 
 private slots:
+    void onItemClicked(QTableWidgetItem* item);
     void onItemDoubleClicked(QTableWidgetItem* item);
     void insertRow(const int& expId);
     void slotHasUnsavedChanges(bool b);

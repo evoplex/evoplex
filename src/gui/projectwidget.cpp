@@ -52,7 +52,9 @@ ProjectWidget::ProjectWidget(Project* project, ExperimentsMgr* expMgr, QWidget* 
     connect(m_ui->runAll, &QPushButton::pressed, [this]() { m_project->runAll(); });
 
     connect(m_ui->table, SIGNAL(itemDoubleClicked(QTableWidgetItem*)),
-            this, SLOT(onItemDoubleClicked(QTableWidgetItem*)));
+            SLOT(onItemDoubleClicked(QTableWidgetItem*)));
+    connect(m_ui->table, SIGNAL(itemClicked(QTableWidgetItem*)),
+            SLOT(onItemClicked(QTableWidgetItem*)));
 
     connect(expMgr, SIGNAL(statusChanged(Experiment*)),
             m_ui->table->viewport(), SLOT(update()));
@@ -115,6 +117,14 @@ void ProjectWidget::insertItem(int row, TableWidget::Header header, QString labe
     item->setTextAlignment(Qt::AlignCenter);
     item->setToolTip(tooltip);
     m_ui->table->setItem(row, m_headerIdx.value(header), item);
+}
+
+void ProjectWidget::onItemClicked(QTableWidgetItem* item)
+{
+    int expId = m_ui->table->item(item->row(), m_headerIdx.value(TableWidget::H_EXPID))->text().toInt();
+    Experiment* exp = m_project->getExperiment(expId);
+    if (exp)
+        m_attrWidget->fill(exp);
 }
 
 void ProjectWidget::onItemDoubleClicked(QTableWidgetItem* item)

@@ -81,6 +81,55 @@ AttributesWidget::~AttributesWidget()
     delete m_ui;
 }
 
+void AttributesWidget::fill(Experiment* exp)
+{
+    QVector<QString> header = exp->getGeneralAttrs()->names();
+    foreach (QString attrName, exp->getGraphAttrs()->names())
+        header.append(exp->getGraphId() + "_" + attrName);
+    foreach (QString attrName, exp->getModelAttrs()->names())
+        header.append(exp->getModelId() + "_" + attrName);
+    header.append(GENERAL_ATTRIBUTE_GRAPHID); // ensure graphId will be filled at the end
+    header.squeeze();
+
+    QVector<Value> values = exp->getGeneralAttrs()->values();
+    values.append(exp->getGraphAttrs()->values());
+    values.append(exp->getModelAttrs()->values());
+    values.append(Value(exp->getGraphId()));
+    values.squeeze();
+
+    for (int i = 0; i < header.size(); ++i) {
+        QWidget* widget = m_widgetFields.value(header.at(i)).value<QWidget*>();
+        Q_ASSERT(widget);
+
+        QSpinBox* sp = qobject_cast<QSpinBox*>(widget);
+        if (sp) {
+            sp->setValue(values.at(i).toInt);
+            continue;
+        }
+        QDoubleSpinBox* dsp = qobject_cast<QDoubleSpinBox*>(widget);
+        if (dsp) {
+            dsp->setValue(values.at(i).toDouble);
+            continue;
+        }
+        QComboBox* cb = qobject_cast<QComboBox*>(widget);
+        if (cb) {
+            cb->setCurrentIndex(cb->findText(values.at(i).toQString()));
+            continue;
+        }
+        QCheckBox* chb = qobject_cast<QCheckBox*>(widget);
+        if (chb) {
+            chb->setChecked(values.at(i).toBool);
+            continue;
+        }
+        QLineEdit* le = qobject_cast<QLineEdit*>(widget);
+        if (le) {
+            le->setText(values.at(i).toQString());
+            continue;
+        }
+        qFatal("[AttributesWidget]: unable to know the widget type.");
+    }
+}
+
 void AttributesWidget::slotAgentFile()
 {
     QLineEdit* lineedit = m_widgetFields.value(GENERAL_ATTRIBUTE_AGENTS).value<QLineEdit*>();
@@ -106,15 +155,11 @@ void AttributesWidget::slotCreateExperiment()
     for (it = m_widgetFields.begin(); it != m_widgetFields.end(); ++it) {
         header << it.key();
         QWidget* widget = it.value().value<QWidget*>();
+        Q_ASSERT(widget);
 
-        QCheckBox* chb = qobject_cast<QCheckBox*>(widget);
-        if (chb) {
-            values << QString::number(chb->isChecked());
-            continue;
-        }
-        QComboBox* cb = qobject_cast<QComboBox*>(widget);
-        if (cb) {
-            values << cb->currentText();
+        QSpinBox* sp = qobject_cast<QSpinBox*>(widget);
+        if (sp) {
+            values << QString::number(sp->value());
             continue;
         }
         QDoubleSpinBox* dsp = qobject_cast<QDoubleSpinBox*>(widget);
@@ -122,9 +167,14 @@ void AttributesWidget::slotCreateExperiment()
             values << QString::number(dsp->value(), 'f', 2);
             continue;
         }
-        QSpinBox* sp = qobject_cast<QSpinBox*>(widget);
-        if (sp) {
-            values << QString::number(sp->value());
+        QComboBox* cb = qobject_cast<QComboBox*>(widget);
+        if (cb) {
+            values << cb->currentText();
+            continue;
+        }
+        QCheckBox* chb = qobject_cast<QCheckBox*>(widget);
+        if (chb) {
+            values << QString::number(chb->isChecked());
             continue;
         }
         QLineEdit* le = qobject_cast<QLineEdit*>(widget);
