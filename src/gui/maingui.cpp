@@ -101,7 +101,6 @@ MainGUI::MainGUI(MainApp* mainApp, QWidget* parent)
     connect(actOpenProject, SIGNAL(triggered(bool)), this, SLOT(slotOpenProject()));
 
     QAction* actSaveAll = new QAction("Save All", this);
-    actSaveAll->setEnabled(false);
     connect(actSaveAll, SIGNAL(triggered(bool)), this, SLOT(slotSaveAll()));
     m_actSave = new QAction("Save", this);
     m_actSave->setEnabled(false);
@@ -212,7 +211,19 @@ void MainGUI::slotSave()
     if (project->getDest().isEmpty()) {
         slotSaveAs();
     } else {
-        m_saveDialog->save(m_projects->currentProject()->getProject());
+        m_saveDialog->save(project);
+    }
+}
+
+void MainGUI::slotSaveAll()
+{
+    QHash<int, Project*>::const_iterator it = m_mainApp->getProjects().begin();
+    for (it; it != m_mainApp->getProjects().end(); ++it) {
+        if (it.value()->getDest().isEmpty()) {
+            slotSaveAs();
+        } else {
+            m_saveDialog->save(it.value());
+        }
     }
 }
 

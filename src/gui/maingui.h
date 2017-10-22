@@ -31,6 +31,7 @@ private slots:
     void updateSaveButtons(ProjectWidget* pw);
     void slotSave();
     void slotSaveAs();
+    void slotSaveAll();
 
 protected:
     void closeEvent(QCloseEvent* event);
