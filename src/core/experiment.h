@@ -50,6 +50,9 @@ public:
 
     ~Experiment();
 
+    void init(Attributes* generalAttrs, Attributes* modelAttrs, Attributes* graphAttrs);
+    void reset();
+
     // Updates the progress value.
     // This method might be expensive!
     void updateProgressValue();
@@ -64,6 +67,7 @@ public:
 
     // run all trials
     inline void play() { m_mainApp->getExperimentsMgr()->play(this); }
+    void playNext();
 
     // pause all trials at a specific step
     inline void pauseAt(int step) { m_pauseAt = step > m_stopAt ? m_stopAt : step; }
@@ -105,13 +109,13 @@ private:
     Attributes* m_generalAttrs;
     Attributes* m_modelAttrs;
     Attributes* m_graphAttrs;
-
     const MainApp::GraphPlugin* m_graphPlugin;
     const MainApp::ModelPlugin* m_modelPlugin;
-    const int m_numTrials;
-    const int m_seed;
+    int m_numTrials;
+    int m_seed;
     bool m_autoDelete;
     int m_stopAt;
+
     int m_pauseAt;
     Status m_expStatus;
     quint16 m_progress; // current progress value [0, 360]

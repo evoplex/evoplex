@@ -99,7 +99,7 @@ void ExperimentsMgr::finished(Experiment* exp)
     }
     emit (statusChanged(exp));
 
-    if (exp->getAutoDelete()) {
+    if (exp->getExpStatus() == Experiment::FINISHED && exp->getAutoDelete()) {
         exp->deleteTrials();
     }
 

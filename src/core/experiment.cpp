@@ -18,20 +18,9 @@ Experiment::Experiment(MainApp* mainApp, int id, int projId, Attributes* general
     : m_mainApp(mainApp)
     , m_id(id)
     , m_projId(projId)
-    , m_generalAttrs(generalAttrs)
-    , m_modelAttrs(modelAttrs)
-    , m_graphAttrs(graphAttrs)
-    , m_graphPlugin(m_mainApp->getGraph(generalAttrs->value(GENERAL_ATTRIBUTE_GRAPHID).toQString()))
-    , m_modelPlugin(m_mainApp->getModel(generalAttrs->value(GENERAL_ATTRIBUTE_MODELID).toQString()))
-    , m_numTrials(generalAttrs->value(GENERAL_ATTRIBUTE_TRIALS).toInt)
-    , m_seed(generalAttrs->value(GENERAL_ATTRIBUTE_SEED).toInt)
-    , m_autoDelete(generalAttrs->value(GENERAL_ATTRIBUTE_AUTODELETE).toBool)
-    , m_progress(0)
+    , m_expStatus(INVALID)
 {
-    m_trials.reserve(m_numTrials);
-    m_stopAt = m_generalAttrs->value(GENERAL_ATTRIBUTE_STOPAT).toInt;
-    m_pauseAt = m_stopAt;
-    m_expStatus = READY;
+    init(generalAttrs, modelAttrs, graphAttrs);
 }
 
 Experiment::~Experiment()
@@ -43,6 +32,37 @@ Experiment::~Experiment()
     m_modelAttrs = nullptr;
     delete m_graphAttrs;
     m_graphAttrs = nullptr;
+}
+
+void Experiment::init(Attributes* generalAttrs, Attributes* modelAttrs, Attributes* graphAttrs)
+{
+    m_generalAttrs = generalAttrs;
+    m_modelAttrs = modelAttrs;
+    m_graphAttrs = graphAttrs;
+    m_graphPlugin = m_mainApp->getGraph(generalAttrs->value(GENERAL_ATTRIBUTE_GRAPHID).toQString());
+    m_modelPlugin = m_mainApp->getModel(generalAttrs->value(GENERAL_ATTRIBUTE_MODELID).toQString());
+
+    m_numTrials = generalAttrs->value(GENERAL_ATTRIBUTE_TRIALS).toInt;
+    m_seed = generalAttrs->value(GENERAL_ATTRIBUTE_SEED).toInt;
+    m_autoDelete = generalAttrs->value(GENERAL_ATTRIBUTE_AUTODELETE).toBool;
+    m_stopAt = generalAttrs->value(GENERAL_ATTRIBUTE_STOPAT).toInt;
+
+    m_pauseAt = m_stopAt;
+    m_progress = 0;
+    m_expStatus = READY;
+    m_trials.reserve(m_numTrials);
+}
+
+void Experiment::reset()
+{
+    if (m_expStatus == RUNNING) {
+        qWarning() << "[Experiment]: tried to reset a running experiment. You should pause it first.";
+        return;
+    }
+    deleteTrials();
+    m_trials.reserve(m_numTrials);
+    m_expStatus = READY;
+    emit (m_mainApp->getExperimentsMgr()->statusChanged(this));
 }
 
 void Experiment::deleteTrials()
@@ -57,7 +77,7 @@ void Experiment::deleteTrials()
     // if the experiment has finished or became invalid,
     // it's more interesing to do NOT change the status
     if (m_expStatus != FINISHED && m_expStatus != INVALID) {
-        m_expStatus = READY;
+        setExpStatus(READY);
     }
 }
 
@@ -80,10 +100,23 @@ void Experiment::updateProgressValue()
 
 void Experiment::toggle()
 {
-    if (m_expStatus == RUNNING)
+    if (m_expStatus == RUNNING) {
         pause();
-    else if (m_expStatus == READY)
+    } else if (m_expStatus == READY) {
         play();
+    }
+}
+
+void Experiment::playNext()
+{
+    if (m_expStatus != READY) {
+        return;
+    } else if (m_trials.isEmpty()) {
+        pauseAt(1);
+    } else {
+        pauseAt(m_trials.value(0).currentStep + 1);
+    }
+    m_mainApp->getExperimentsMgr()->play(this);
 }
 
 void Experiment::processTrial(const int& trialId)
