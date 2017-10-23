@@ -50,7 +50,6 @@ private:
     const QPixmap kIcon_playon;
     const QPixmap kIcon_pause;
     const QPixmap kIcon_pauseon;
-    const QPixmap kIcon_restart;
     const QPixmap kIcon_x;
 
     QMap<Header, QString> m_headerLabel; // map Header to column label

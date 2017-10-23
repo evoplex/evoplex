@@ -19,7 +19,6 @@ TableWidget::TableWidget(QWidget *parent)
     , kIcon_playon(QPixmap(":/icons/play-circle-on.svg").scaledToWidth(28, Qt::SmoothTransformation))
     , kIcon_pause(QPixmap(":/icons/pause-circle.svg").scaledToWidth(28, Qt::SmoothTransformation))
     , kIcon_pauseon(QPixmap(":/icons/pause-circle-on.svg").scaledToWidth(28, Qt::SmoothTransformation))
-    , kIcon_restart(QPixmap(":/icons/restart.svg").scaledToWidth(18, Qt::SmoothTransformation))
     , kIcon_x(QPixmap(":/icons/x.svg").scaledToWidth(14, Qt::SmoothTransformation))
 {
     this->setMouseTracking(true);
@@ -168,12 +167,8 @@ void PlayButton::paintEvent(QPaintEvent* e)
             painter.setPen(m_penBlue);
             painter.drawArc(center.x()-14, center.y()-14, 28, 28, 90*16, -m_exp->getProgress()*16);
         }
-    } else if (status == Experiment::FINISHED) {
-        if (m_btnHovered || m_rowHovered) { // restart (when hovered)
-            painter.drawPixmap(center.x()-9, center.y()-9, m_table->kIcon_restart);
-        } else { // check (always)
-            painter.drawPixmap(center.x()-7, center.y()-7, m_table->kIcon_check);
-        }
+    } else if (status == Experiment::FINISHED) { // check (always)
+        painter.drawPixmap(center.x()-7, center.y()-7, m_table->kIcon_check);
     } else {
         painter.drawPixmap(center.x()-7, center.y()-7, m_table->kIcon_x);
     }
