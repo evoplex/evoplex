@@ -34,7 +34,7 @@ void ExperimentsMgr::updateProgressValues()
     }
 }
 
-void ExperimentsMgr::run(Experiment* exp)
+void ExperimentsMgr::play(Experiment* exp)
 {
     if (exp->getExpStatus() != Experiment::READY
             && exp->getExpStatus() != Experiment::QUEUED) {
@@ -105,7 +105,7 @@ void ExperimentsMgr::finished(Experiment* exp)
 
     // call next process in the queue
     if (!m_queued.isEmpty()) {
-        run(m_queued.first());
+        play(m_queued.first());
     }
 }
 
@@ -121,7 +121,7 @@ void ExperimentsMgr::setMaxThreadCount(const int newValue)
 
     if (newValue > previous) {
         for (int n = 0; n < diff && !m_queued.isEmpty(); ++n) {
-            run(m_queued.takeFirst());
+            play(m_queued.takeFirst());
         }
     } else if (newValue < previous) {
         for (int n = 0; n < diff && !m_running.isEmpty(); ++n) {

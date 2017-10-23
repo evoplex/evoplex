@@ -46,7 +46,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="runAll">
+      <widget class="QPushButton" name="playAll">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
          <horstretch>0</horstretch>
@@ -75,7 +75,7 @@ QPushButton::hover {
 }</string>
        </property>
        <property name="text">
-        <string>Run All</string>
+        <string>Play All</string>
        </property>
       </widget>
      </item>

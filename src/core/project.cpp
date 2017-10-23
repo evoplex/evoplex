@@ -34,11 +34,11 @@ Project::~Project()
     qDeleteAll(m_experiments);
 }
 
-void Project::runAll()
+void Project::playAll()
 {
     QHash<int, Experiment*>::iterator it;
     for (it = m_experiments.begin(); it != m_experiments.end(); ++it)
-        it.value()->run();
+        it.value()->play();
 }
 
 const int Project::newExperiment(const QStringList& header, const QStringList& values, QString& errorMsg)

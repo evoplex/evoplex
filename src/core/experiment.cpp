@@ -83,7 +83,7 @@ void Experiment::toggle()
     if (m_expStatus == RUNNING)
         pause();
     else if (m_expStatus == READY)
-        run();
+        play();
 }
 
 void Experiment::processTrial(const int& trialId)

@@ -63,7 +63,7 @@ public:
     void toggle();
 
     // run all trials
-    inline void run() { m_mainApp->getExperimentsMgr()->run(this); }
+    inline void play() { m_mainApp->getExperimentsMgr()->play(this); }
 
     // pause all trials at a specific step
     inline void pauseAt(int step) { m_pauseAt = step > m_stopAt ? m_stopAt : step; }
@@ -77,7 +77,7 @@ public:
     inline void pause() { m_pauseAt = 0; }
 
     // stop all trials asap
-    inline void stop() { pause(); m_stopAt = 0; run(); }
+    inline void stop() { pause(); m_stopAt = 0; play(); }
 
     inline const Status getExpStatus() const { return m_expStatus; }
     inline void setExpStatus(Status s) { m_mutex.lock(); m_expStatus = s; m_mutex.unlock(); }

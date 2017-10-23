@@ -39,7 +39,7 @@ public:
     bool saveProject(const QString &dest="", const QString &projectName="");
 
     // execute all experiments of this project.
-    void runAll();
+    void playAll();
 
     inline const QString& getName() const { return m_name; }
     inline void setName(const QString& name) { m_name = name; }

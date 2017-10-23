@@ -22,7 +22,7 @@ public:
     explicit ExperimentsMgr(int threads);
     ~ExperimentsMgr();
 
-    void run(Experiment* exp);
+    void play(Experiment* exp);
 
     void kill(Experiment* exp);
 
