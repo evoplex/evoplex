@@ -32,7 +32,7 @@ void ProjectsWindow::slotFocusChanged(QDockWidget* currTab)
 void ProjectsWindow::slotNewProject()
 {
     Project* project = m_mainApp->newProject();
-    ProjectWidget* pw = new ProjectWidget(project, m_mainApp->getExperimentsMgr(), this);
+    ProjectWidget* pw = new ProjectWidget(project, this);
     if (m_projects.isEmpty()) {
         this->addDockWidget(Qt::TopDockWidgetArea, pw);
     } else {
@@ -59,7 +59,7 @@ void ProjectsWindow::slotOpenExperiment(int projId, int expId)
     }
 
     if (!ew) {
-        ew = new ExperimentWidget(m_mainApp->getProject(projId), expId, this);
+        ew = new ExperimentWidget(m_mainApp->getProject(projId)->getExperiment(expId), this);
         connect(ew, &ExperimentWidget::closed,
                 [this, ew](){ m_experiments.removeOne(ew); ew->deleteLater(); });
 

@@ -22,6 +22,7 @@ public:
     explicit ProjectsWindow(MainApp* mainApp, QWidget *parent = 0);
 
     inline const ProjectWidget* currentProject() const { return m_currProjectWidget; }
+    inline MainApp* getMainApp() const { return m_mainApp; }
 
 signals:
     void selectionChanged(ProjectWidget*);

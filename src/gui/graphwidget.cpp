@@ -22,7 +22,8 @@ GraphWidget::GraphWidget(Experiment* experiment, QWidget* parent)
     , m_scale(25)
     , m_isValid(true)
 {
-    this->setWindowTitle("Graph");
+    setWindowTitle("Graph");
+    setAttribute(Qt::WA_DeleteOnClose, true);
 
     QPalette pal = palette();
     pal.setColor(QPalette::Background, QColor(239,235,231));

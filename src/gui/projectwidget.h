@@ -11,6 +11,7 @@
 #include <QMainWindow>
 
 #include "attributeswidget.h"
+#include "projectswindow.h"
 #include "tablewidget.h"
 #include "core/project.h"
 
@@ -23,7 +24,7 @@ class ProjectWidget : public QDockWidget
     Q_OBJECT
 
 public:
-    explicit ProjectWidget(Project* project, ExperimentsMgr *expMgr, QWidget *parent = 0);
+    explicit ProjectWidget(Project* project, ProjectsWindow* pwindow = 0);
     ~ProjectWidget() {}
 
     inline Project* getProject() const { return m_project; }

@@ -11,11 +11,12 @@
 
 #include "projectwidget.h"
 #include "ui_projectwidget.h"
+#include "core/experimentsmgr.h"
 
 namespace evoplex {
 
-ProjectWidget::ProjectWidget(Project* project, ExperimentsMgr* expMgr, QWidget* parent)
-    : QDockWidget(parent)
+ProjectWidget::ProjectWidget(Project* project, ProjectsWindow* pwindow)
+    : QDockWidget(pwindow)
     , m_ui(new Ui_ProjectWidget)
     , m_innerWindow(new QMainWindow(this, Qt::FramelessWindowHint))
     , m_attrWidget(new AttributesWidget(project, m_innerWindow))
@@ -49,13 +50,14 @@ ProjectWidget::ProjectWidget(Project* project, ExperimentsMgr* expMgr, QWidget* 
     m_headerIdx.insert(TableWidget::H_TRIALS, col++);
     m_ui->table->insertColumns(m_headerIdx.keys());
 
-    connect(m_ui->runAll, &QPushButton::pressed, [this]() { m_project->runAll(); });
+    connect(m_ui->playAll, &QPushButton::pressed, [this]() { m_project->playAll(); });
 
     connect(m_ui->table, SIGNAL(itemDoubleClicked(QTableWidgetItem*)),
             SLOT(onItemDoubleClicked(QTableWidgetItem*)));
     connect(m_ui->table, SIGNAL(itemClicked(QTableWidgetItem*)),
             SLOT(onItemClicked(QTableWidgetItem*)));
 
+    ExperimentsMgr* expMgr = pwindow->getMainApp()->getExperimentsMgr();
     connect(expMgr, SIGNAL(statusChanged(Experiment*)),
             m_ui->table->viewport(), SLOT(update()));
     connect(expMgr, SIGNAL(progressUpdated(Experiment*)),

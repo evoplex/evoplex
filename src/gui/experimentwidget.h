@@ -10,6 +10,7 @@
 #include <QMainWindow>
 
 #include "attributeswidget.h"
+#include "projectswindow.h"
 #include "core/project.h"
 
 namespace evoplex {
@@ -18,11 +19,11 @@ class ExperimentWidget : public QDockWidget
 {
     Q_OBJECT
 public:
-    explicit ExperimentWidget(Project* project, int expId, QWidget* parent = 0);
+    explicit ExperimentWidget(Experiment* exp, ProjectsWindow* pwindow = 0);
     ~ExperimentWidget();
 
-    inline int expId() const { return m_expId; }
-    inline int projId() const { return m_project->getId(); }
+    inline int expId() const { return m_exp->getId(); }
+    inline int projId() const { return m_exp->getProjId(); }
 
 signals:
     void closed();
@@ -30,11 +31,25 @@ signals:
 protected:
     void closeEvent(QCloseEvent *event);
 
+private slots:
+    void slotStatusChanged(Experiment* exp);
+
 private:
-    const int m_expId;
-    Project* m_project;
+    const QIcon m_kIcon_play;
+    const QIcon m_kIcon_pause;
+    const QIcon m_kIcon_next;
+    const QIcon m_kIcon_reset;
+    const QIcon m_kIcon_stop;
+
+    Experiment* m_exp;
     QMainWindow* m_innerWindow;
     AttributesWidget* m_attrWidget;
+
+    QAction* m_aPlayPause;
+    QAction* m_aNext;
+    QAction* m_aStop;
+    QAction* m_aReset;
+    QAction* m_aGraph;
 };
 }
 
