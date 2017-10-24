@@ -6,9 +6,6 @@
         <file>x.svg</file>
         <file>check.svg</file>
         <file>play.svg</file>
-        <file>play-on.svg</file>
-        <file>pause-on.svg</file>
-        <file>restart.svg</file>
         <file>pause.svg</file>
         <file>plugins.svg</file>
         <file>settings.svg</file>
@@ -16,5 +13,9 @@
         <file>pause-circle-on.svg</file>
         <file>play-circle.svg</file>
         <file>pause-circle.svg</file>
+        <file>stop.svg</file>
+        <file>next.svg</file>
+        <file>plugins2.svg</file>
+        <file>reset.svg</file>
     </qresource>
 </RCC>
