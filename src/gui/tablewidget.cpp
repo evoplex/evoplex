@@ -99,6 +99,8 @@ int TableWidget::insertRow(Experiment* exp)
     QTableWidgetItem* item = new QTableWidgetItem("");
     item->setData(Qt::UserRole, QVariant::fromValue(exp));
     setItem(row, 0, item); // always in the first column
+    horizontalHeader()->setSectionResizeMode(0, QHeaderView::Fixed);
+    horizontalHeader()->setDefaultSectionSize(60);
 
     setItemDelegateForRow(row, new RowsDelegate(exp, this));
 
