@@ -36,6 +36,10 @@ signals:
     void progressUpdated(Experiment* exp);
     void killed(int id);
 
+public slots:
+    void clearQueue();
+    void removeFromQueue(Experiment* exp);
+
 private slots:
     void updateProgressValues();
 

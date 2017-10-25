@@ -104,6 +104,8 @@ void Experiment::toggle()
         pause();
     } else if (m_expStatus == READY) {
         play();
+    } else if (m_expStatus == QUEUED) {
+        m_mainApp->getExperimentsMgr()->removeFromQueue(this);
     }
 }
 

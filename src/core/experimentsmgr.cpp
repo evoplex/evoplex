@@ -109,6 +109,26 @@ void ExperimentsMgr::finished(Experiment* exp)
     }
 }
 
+void ExperimentsMgr::removeFromQueue(Experiment* exp)
+{
+    if (exp->getExpStatus() == Experiment::QUEUED) {
+        exp->pause();
+        m_queued.removeOne(exp);
+        exp->setExpStatus(Experiment::READY);
+        emit (statusChanged(exp));
+    }
+}
+
+void ExperimentsMgr::clearQueue()
+{
+    foreach (Experiment* exp, m_queued) {
+        exp->pause();
+        exp->setExpStatus(Experiment::READY);
+        emit (statusChanged(exp));
+    }
+    m_queued.clear();
+}
+
 void ExperimentsMgr::setMaxThreadCount(const int newValue)
 {
     if (m_threads == newValue || newValue < 1) {
