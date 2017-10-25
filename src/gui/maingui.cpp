@@ -5,6 +5,7 @@
 
 #include <QMenuBar>
 #include <QMessageBox>
+#include <QMouseEvent>
 #include <QToolBar>
 #include <QToolButton>
 #include <QVBoxLayout>

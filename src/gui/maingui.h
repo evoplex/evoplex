@@ -35,7 +35,7 @@ private slots:
 
 protected:
     void closeEvent(QCloseEvent* event);
-    bool eventFilter(QObject *watched, QEvent *event);
+    bool eventFilter(QObject* watched, QEvent* event);
 
 private:
     enum Page {
