@@ -93,6 +93,7 @@ public:
     virtual bool init() = 0;
 
     // Resets the graph object to the original state.
+    // This method is triggered after a successful init()
     virtual void reset() = 0;
 };
 

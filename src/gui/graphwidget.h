@@ -17,7 +17,7 @@ class GraphWidget : public QDockWidget
     Q_OBJECT
 
 public:
-    explicit GraphWidget(Experiment* experiment, QWidget* parent = 0);
+    explicit GraphWidget(Experiment* exp, QWidget* parent = 0);
     ~GraphWidget();
 
 protected:

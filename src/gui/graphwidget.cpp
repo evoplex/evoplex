@@ -15,7 +15,7 @@
 
 namespace evoplex {
 
-GraphWidget::GraphWidget(Experiment* experiment, QWidget* parent)
+GraphWidget::GraphWidget(Experiment* exp, QWidget* parent)
     : QDockWidget(parent)
     //, m_graph(graph)
     , m_radius(10.f)
@@ -34,8 +34,7 @@ QTimer *timer = new QTimer(this);
 connect(timer, SIGNAL(timeout()), this, SLOT(update()));
 timer->start(0);
 
-    m_graph = experiment->getGraph(0);
-    //m_graph->resetCoordinates();
+    m_graph = exp->getGraph(0);
 }
 
 GraphWidget::~GraphWidget()
@@ -69,9 +68,13 @@ void GraphWidget::paintEvent(QPaintEvent* e)
                 painter.setBrush(Qt::red);
             }
         }
-        painter.setPen(QColor("black"));
+        painter.setPen(Qt::black);
         painter.drawEllipse(pos, m_radius, m_radius);
     }
+
+    painter.setBrush(Qt::gray);
+    painter.setPen(Qt::black);
+    painter.drawRect(e->rect().width()-160, e->rect().height()-60, 150, 50);
 
     painter.end();
 }
