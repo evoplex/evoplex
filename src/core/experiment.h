@@ -147,4 +147,8 @@ private:
 };
 }
 
+// Lets make the Experiment pointer known to QMetaType
+// It enable us to convert an Experiment* to a QVariant for example
+Q_DECLARE_METATYPE(evoplex::Experiment*)
+
 #endif // EXPERIMENT_H

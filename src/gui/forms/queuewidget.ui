@@ -26,7 +26,7 @@
    <property name="geometry">
     <rect>
      <x>0</x>
-     <y>-60</y>
+     <y>0</y>
      <width>474</width>
      <height>389</height>
     </rect>
@@ -113,7 +113,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="pushButton_2">
+          <widget class="QPushButton" name="bClearQueue">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
              <horstretch>0</horstretch>
@@ -194,7 +194,7 @@ QPushButton::hover {
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="pushButton_3">
+          <widget class="QPushButton" name="bClearIdle">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
              <horstretch>0</horstretch>

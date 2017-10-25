@@ -70,10 +70,7 @@ ProjectWidget::ProjectWidget(Project* project, ProjectsWindow* pwindow)
 void ProjectWidget::insertRow(const int& expId)
 {
     Experiment* exp = m_project->getExperiment(expId);
-    const int row = m_ui->table->insertRow();
-
-    // play/pause button
-    m_ui->table->insertPlayButton(row, m_headerIdx.value(TableWidget::H_BUTTON), exp);
+    const int row = m_ui->table->insertRow(exp);
 
     // general stuff
     const Attributes* gep = exp->getGeneralAttrs();

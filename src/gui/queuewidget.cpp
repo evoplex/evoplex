@@ -37,57 +37,54 @@ QueueWidget::QueueWidget(ExperimentsMgr* expMgr, QWidget* parent)
             this, SLOT(slotStatusChanged(Experiment*)));
     connect(m_expMgr, SIGNAL(progressUpdated(Experiment*)),
             m_ui->tableRunning->viewport(), SLOT(update()));
+    connect(m_ui->bClearQueue, SIGNAL(clicked(bool)),
+            expMgr, SLOT(clearQueue()));
+    connect(m_ui->tableIdle, &QTableWidget::cellClicked, [this]() {
+            m_ui->tableQueue->clearSelection(); m_ui->tableRunning->clearSelection();});
+    connect(m_ui->tableQueue, &QTableWidget::cellClicked, [this]() {
+            m_ui->tableIdle->clearSelection(); m_ui->tableRunning->clearSelection();});
+    connect(m_ui->tableRunning, &QTableWidget::cellClicked, [this]() {
+            m_ui->tableIdle->clearSelection(); m_ui->tableQueue->clearSelection();});
 }
 
 void QueueWidget::slotStatusChanged(Experiment* exp)
 {
-    const QString key = QString("%1.%2").arg(exp->getProjId()).arg(exp->getId());
+    const rowKey key = std::make_pair(exp->getProjId(), exp->getId());
     Row prev = m_rows.value(key, Row());
     Row next = prev;
 
     switch (exp->getExpStatus()) {
         case Experiment::RUNNING:
-            if (prev.table != T_RUNNING) {
-                next.item = insertRow(m_ui->tableRunning, exp);
-                next.table = T_RUNNING;
-                m_ui->running->show();
-            }
+            next.table = m_ui->tableRunning;
+            next.section = m_ui->running;
             break;
         case Experiment::QUEUED:
-            if (prev.table != T_QUEUED) {
-                next.item = insertRow(m_ui->tableQueue, exp);
-                next.table = T_QUEUED;
-                m_ui->queue->show();
-            }
+            next.table = m_ui->tableQueue;
+            next.section = m_ui->queue;
             break;
         default:
-            if (prev.table != T_IDLE) {
-                next.item = insertRow(m_ui->tableIdle, exp);
-                next.table = T_IDLE;
-                m_ui->idle->show();
-            }
+            next.table = m_ui->tableIdle;
+            next.section = m_ui->idle;
     }
 
-    if (prev.table != next.table) {
-        if (prev.table == T_RUNNING) {
-            m_ui->tableRunning->removeRow(prev.item->row());
-            m_ui->running->setVisible(m_ui->tableRunning->rowCount() > 0);
-        } else if (prev.table == T_QUEUED) {
-            m_ui->tableQueue->removeRow(prev.item->row());
-            m_ui->queue->setVisible(m_ui->tableQueue->rowCount() > 0);
-        } else if (prev.table == T_IDLE) {
-            m_ui->tableIdle->removeRow(prev.item->row());
-            m_ui->idle->setVisible(m_ui->tableIdle->rowCount() > 0);
-        }
+    next.section->show();
 
-        m_rows.insert(key, next);
-        emit (isEmpty(false));
+    if (prev.table == next.table) {
+        return;
+    } else if (prev.table) {
+        moveRow(prev.table, prev.item->row(), next.table, exp);
+        prev.section->setVisible(prev.table->rowCount() > 0);
+    } else {
+        next.item = insertRow(next.table, exp);
     }
+
+    m_rows.insert(key, next);
+    emit (isEmpty(false));
 }
 
 QTableWidgetItem* QueueWidget::insertRow(TableWidget* table, Experiment* exp)
 {
-    const int row = table->insertRow();
+    const int row = table->insertRow(exp);
 
     auto add = [this, table, row](TableWidget::Header header, int label) {
         QTableWidgetItem* item = new QTableWidgetItem(QString::number(label));
@@ -96,10 +93,20 @@ QTableWidgetItem* QueueWidget::insertRow(TableWidget* table, Experiment* exp)
         return item;
     };
 
-    table->insertPlayButton(row, m_headerIdx.value(TableWidget::H_BUTTON), exp);
     add(TableWidget::H_STOPAT, exp->getStopAt());
     add(TableWidget::H_TRIALS, exp->getNumTrials());
     add(TableWidget::H_PROJID, exp->getProjId());
     return add(TableWidget::H_EXPID, exp->getId());
+}
+
+void QueueWidget::moveRow(TableWidget* prevTable, int preRow, TableWidget* nextTable, Experiment* exp)
+{
+    const int nextRow = nextTable->insertRow(exp);
+    const int cols = prevTable->columnCount();
+    for (int col = 0; col < cols; ++col) {
+        QTableWidgetItem* item = prevTable->takeItem(preRow, col);
+        nextTable->setItem(nextRow, col, item);
+    }
+    prevTable->removeRow(preRow);
 }
 }

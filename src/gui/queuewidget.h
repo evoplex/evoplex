@@ -29,25 +29,22 @@ private slots:
     void slotStatusChanged(Experiment* exp);
 
 private:
-    enum Table {
-        T_RUNNING,
-        T_QUEUED,
-        T_IDLE,
-        T_INVALID
-    };
+    typedef std::pair<int, int> rowKey; // <projId, expId>
 
     struct Row {
-        QTableWidgetItem* item = nullptr;
-        Table table = T_INVALID;
+        QTableWidgetItem* item = nullptr; // hold an item just to get access to the current row number
+        TableWidget* table = nullptr;
+        QWidget* section = nullptr;
     };
 
     Ui_QueueWidget* m_ui;
     ExperimentsMgr* m_expMgr;
 
-    QHash<QString, Row> m_rows; // map 'projId.expId' to the row
+    QHash<rowKey, Row> m_rows; // map 'projId.expId' to the Row
     QMap<TableWidget::Header, int> m_headerIdx; // map Header to column index
 
-    QTableWidgetItem* insertRow(TableWidget *table, Experiment* exp);
+    QTableWidgetItem* insertRow(TableWidget* table, Experiment* exp);
+    void moveRow(TableWidget* prevTable, int preRow, TableWidget* nextTable, Experiment* exp);
 };
 }
 #endif // QUEUEWIDGET_H
