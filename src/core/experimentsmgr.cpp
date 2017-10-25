@@ -26,11 +26,11 @@ ExperimentsMgr::~ExperimentsMgr()
 
 void ExperimentsMgr::updateProgressValues()
 {
-    for (int i = 0; i < m_running.size(); ++i) {
-        quint16 p = m_running.at(i)->getProgress();
-        m_running.at(i)->updateProgressValue();
-        if (p != m_running.at(i)->getProgress())
-            emit (progressUpdated(m_running.at(i)));
+    for (Experiment* exp : m_running) {
+        quint16 p = exp->getProgress();
+        exp->updateProgressValue();
+        if (p != exp->getProgress())
+            emit (progressUpdated(exp));
     }
 }
 
@@ -44,10 +44,11 @@ void ExperimentsMgr::play(Experiment* exp)
     if (m_running.size() < m_threads) {
         exp->setExpStatus(Experiment::RUNNING);
         emit (statusChanged(exp));
-        m_queued.removeOne(exp);
+        m_queued.remove(exp);
 
         m_running.push_back(exp);
-        m_timer->start(500); // every half a second
+        if (!m_timer->isActive())
+            m_timer->start(500); // every half a second, check progress
 
         // both the QVector and the QFutureWatcher must live longer
         // so, they must be pointers.
@@ -78,8 +79,8 @@ void ExperimentsMgr::play(Experiment* exp)
 
 void ExperimentsMgr::finished(Experiment* exp)
 {
-    m_running.removeOne(exp);
-    if (m_running.isEmpty()) {
+    m_running.remove(exp);
+    if (m_running.empty()) {
         m_timer->stop();
     }
 
@@ -104,16 +105,15 @@ void ExperimentsMgr::finished(Experiment* exp)
     }
 
     // call next process in the queue
-    if (!m_queued.isEmpty()) {
-        play(m_queued.first());
+    if (!m_queued.empty()) {
+        play(m_queued.front());
     }
 }
 
 void ExperimentsMgr::removeFromQueue(Experiment* exp)
 {
     if (exp->getExpStatus() == Experiment::QUEUED) {
-        exp->pause();
-        m_queued.removeOne(exp);
+        m_queued.remove(exp);
         exp->setExpStatus(Experiment::READY);
         emit (statusChanged(exp));
     }
@@ -135,18 +135,18 @@ void ExperimentsMgr::setMaxThreadCount(const int newValue)
         return;
     }
 
-    const int diff = qAbs(newValue - m_threads);
     const int previous = m_threads;
     m_threads = newValue;
 
     if (newValue > previous) {
-        for (int n = 0; n < diff && !m_queued.isEmpty(); ++n) {
-            play(m_queued.takeFirst());
+        for (Experiment* exp : m_queued) {
+            play(exp);
         }
     } else if (newValue < previous) {
-        for (int n = 0; n < diff && !m_running.isEmpty(); ++n) {
-            Experiment* exp = m_running.takeLast();
-            m_queued.push_front(exp);
+        const int diff = previous - newValue;
+        int n = 0;
+        for (Experiment* exp : m_running) {
+            if (n < diff) break;
             exp->pause();
         }
     }
