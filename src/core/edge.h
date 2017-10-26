@@ -6,8 +6,9 @@
 #ifndef EDGE_H
 #define EDGE_H
 
-#include <QVariantHash>
 #include <QVector>
+
+#include "attributes.h"
 
 namespace evoplex {
 
@@ -21,22 +22,19 @@ class Edge
 public:
     explicit Edge(): m_neighbour(nullptr) {}
     explicit Edge(Agent* neighbour): m_neighbour(neighbour) {}
-    explicit Edge(Agent* neighbour, const QVariantHash& attributes)
-        : m_neighbour(neighbour), m_attributes(attributes) {}
+    explicit Edge(Agent* neighbour, Attributes attrs)
+        : m_neighbour(neighbour), m_attributes(attrs) {}
 
-    inline const QVariant getAttribute(const QString& name) const {
-        return m_attributes.value(name);
-    }
-    inline void setAttribute(const QString& name, const QVariant& value) {
-        m_attributes.insert(name, value);
-    }
+    inline const Value& attribute(const char* name) const { return m_attributes.value(name); }
+    inline const Value& attribute(const int id) const { return m_attributes.value(id); }
+    inline void setAttribute(const int id, const Value& value) { m_attributes.setValue(id, value); }
 
     inline Agent* getNeighbour() const { return m_neighbour; }
     inline void setNeighbour(Agent* neighbour) { m_neighbour = neighbour; }
 
 private:
     Agent* m_neighbour;
-    QVariantHash m_attributes;
+    Attributes m_attributes;
 };
 }
 #endif // EDGE_H
