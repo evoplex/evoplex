@@ -7,7 +7,6 @@
 #define MOORE_GRID_H
 
 #include <QObject>
-#include <QVariantHash>
 #include <QVector>
 
 #include "core/agent.h"

@@ -7,7 +7,6 @@
 #define ABSTRACT_MODEL_H
 
 #include <QObject>
-#include <QVariantHash>
 #include <QtPlugin>
 
 #include "abstractgraph.h"

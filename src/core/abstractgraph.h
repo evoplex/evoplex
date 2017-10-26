@@ -7,7 +7,7 @@
 #define ABSTRACT_GRAPH_H
 
 #include <QObject>
-#include <QVariantHash>
+#include <QHash>
 #include <QVector>
 #include <QtPlugin>
 

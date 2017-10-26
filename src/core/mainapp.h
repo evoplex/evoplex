@@ -7,7 +7,6 @@
 #define MAINAPP_H
 
 #include <QHash>
-#include <QVariantHash>
 #include <QVector>
 
 #include "abstractgraph.h"

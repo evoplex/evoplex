@@ -8,7 +8,6 @@
 
 #include <QMutex>
 #include <QString>
-#include <QVariantHash>
 #include <QVector>
 
 #include "experimentsmgr.h"

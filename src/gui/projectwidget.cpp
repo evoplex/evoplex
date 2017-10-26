@@ -6,7 +6,6 @@
 #include <QDebug>
 #include <QHBoxLayout>
 #include <QMainWindow>
-#include <QVariantHash>
 #include <QTableWidgetItem>
 
 #include "projectwidget.h"

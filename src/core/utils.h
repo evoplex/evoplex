@@ -7,7 +7,6 @@
 #define UTILS_H
 
 #include <QVariant>
-#include <QVariantHash>
 #include <QVector>
 #include <QtDebug>
 #include <float.h>
