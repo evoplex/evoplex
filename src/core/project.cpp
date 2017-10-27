@@ -220,7 +220,7 @@ bool Project::saveProject(const QString& dest, const QString& projectName)
     emit (progressSave(30));
     QTextStream out(&experimentsFile);
     for (int i = 0; i < header.size()-1; ++i) {
-        out << header.at(i) + ",";
+        out << header.at(i) << ",";
     }
     out << header.at(header.size()-1) << "\n";
 
@@ -248,7 +248,7 @@ bool Project::saveProject(const QString& dest, const QString& projectName)
                 values.append(""); // not found; leave empty
             }
         }
-        out << values.join(",") + "\n";
+        out << values.join(",") << "\n";
     }
     experimentsFile.close();
     m_hasUnsavedChanges = false;

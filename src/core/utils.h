@@ -19,6 +19,7 @@ namespace evoplex {
 class Utils
 {
 public:
+
     // convert a linear index to row and column
     static void ind2sub(const int ind, const int cols, int &row, int &col) {
         row = ind / cols;

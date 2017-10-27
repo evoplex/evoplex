@@ -6,10 +6,11 @@
 #ifndef ATTRIBUTES_H
 #define ATTRIBUTES_H
 
-#include <QMap>
 #include <QString>
-#include <QVector>
 #include <algorithm>
+#include <vector>
+
+//#include "utils.h"
 
 namespace evoplex {
 
@@ -92,8 +93,11 @@ public:
     inline int size() const { return m_values.size(); }
     inline void resize(int size) { m_names.resize(size); m_values.resize(size); }
 
-    inline int indexOf(const char* name) const { return std::find(m_names.begin(), m_names.end(), QString::fromLocal8Bit(name)) - m_names.begin(); }
-    inline int indexOf(const QString& name) const { return std::find(m_names.begin(), m_names.end(), name) - m_names.begin(); }
+    inline int indexOf(const char* name) const { return indexOf(QString::fromLocal8Bit(name)); }
+    inline int indexOf(const QString& name) const {
+        int idx = std::find(m_names.begin(), m_names.end(), name) - m_names.begin();
+        return idx == m_names.size() ? -1 : idx;
+    }
 
     inline void replace(int id, const QString& name, const Value& value) { m_names[id] = name; m_values[id] = value; }
     inline void push_back(const QString& name, const Value& value) { m_names.push_back(name); m_values.push_back(value); }
