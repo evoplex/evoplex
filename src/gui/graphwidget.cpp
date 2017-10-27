@@ -3,28 +3,51 @@
  * @author Marcos Cardinot <mcardinot@gmail.com>
  */
 
+#include <QDebug>
 #include <QBrush>
 #include <QPaintEvent>
 #include <QPainter>
-#include <QtDebug>
 #include <QtMath>
 #include <QVector>
+#include <QHBoxLayout>
+#include <QComboBox>
+#include <QLabel>
+#include <QSpacerItem>
 
 #include "graphwidget.h"
+#include "ui_graphwidget.h"
 #include <QTimer>
 
 namespace evoplex {
 
 GraphWidget::GraphWidget(Experiment* exp, QWidget* parent)
     : QDockWidget(parent)
+    , m_ui(new Ui_GraphWidget)
     //, m_graph(graph)
     , m_radius(10.f)
     , m_scale(25)
     , m_isValid(true)
+    , m_origin(0,0)
 {
     setWindowTitle("Graph");
     setAttribute(Qt::WA_DeleteOnClose, true);
 
+    QWidget* front = new QWidget;
+    m_ui->setupUi(front);
+    setWidget(front);
+
+    m_ui->inspector->hide();
+
+/*
+    QWidget* tbar = new QWidget;
+    tbar->setStyleSheet("background-color:rgb(51,51,51);");
+    QHBoxLayout* l = new QHBoxLayout;
+    l->addWidget(new QLabel("Trial"));
+    l->addWidget(new QComboBox);
+    tbar->setLayout(l);
+    setTitleBarWidget(tbar);
+
+*/
     QPalette pal = palette();
     pal.setColor(QPalette::Background, QColor(239,235,231));
     setAutoFillBackground(true);
@@ -39,6 +62,7 @@ timer->start(0);
 
 GraphWidget::~GraphWidget()
 {
+    delete m_ui;
 }
 
 void GraphWidget::paintEvent(QPaintEvent* e)
@@ -53,28 +77,29 @@ void GraphWidget::paintEvent(QPaintEvent* e)
     const int agentsSize = m_graph->getAgents().size();
     const Agents& agents = m_graph->getAgents();
     for (int id = 0; id < agentsSize; ++id) {
-        const Agent* agent = agents.at(id);
+        Agent* agent = agents.at(id);
         QPointF pos;
-        pos.setX(m_scale + (m_scale * agent->getX()));
-        pos.setY(m_scale + (m_scale * agent->getY()));
+        pos.setX(m_origin.x() + m_scale + (m_scale * agent->getX()));
+        pos.setY(m_origin.y() + m_scale + (m_scale * agent->getY()));
+
+        if (!e->region().contains(pos.toPoint()))
+            continue;
 
         if (m_posClicked.x() > pos.x()-m_radius && m_posClicked.x() < pos.x()+m_radius
                 && m_posClicked.y() > pos.y()-m_radius && m_posClicked.y() < pos.y()+m_radius) {
-            painter.setBrush(Qt::yellow);
-        } else {
-            if (agent->attribute("strategy").toInt == 0)
-                painter.setBrush(Qt::blue);
-            else {
-                painter.setBrush(Qt::red);
-            }
+            painter.setBrush(QColor(10,10,10,100));
+            painter.drawEllipse(pos, m_radius*1.5f, m_radius*1.5f);
         }
+
+        if (agent->attribute("strategy").toInt == 0)
+            painter.setBrush(Qt::blue);
+        else {
+            painter.setBrush(Qt::red);
+        }
+
         painter.setPen(Qt::black);
         painter.drawEllipse(pos, m_radius, m_radius);
     }
-
-    painter.setBrush(Qt::gray);
-    painter.setPen(Qt::black);
-    painter.drawRect(e->rect().width()-160, e->rect().height()-60, 150, 50);
 
     painter.end();
 }
@@ -89,5 +114,7 @@ void GraphWidget::mousePressEvent(QMouseEvent* e)
 
 void GraphWidget::mouseMoveEvent(QMouseEvent* e)
 {
+    m_origin = e->pos() - m_posClicked;
+    qDebug() << m_origin << e->pos() << m_posClicked;
 }
 }

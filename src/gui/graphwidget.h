@@ -10,6 +10,8 @@
 
 #include "core/experiment.h"
 
+class Ui_GraphWidget;
+
 namespace evoplex {
 
 class GraphWidget : public QDockWidget
@@ -25,11 +27,13 @@ protected:
     void mousePressEvent(QMouseEvent* e);
 
 private:
+    Ui_GraphWidget* m_ui;
     AbstractGraph* m_graph;
     bool m_isValid;
     float m_radius;
     int m_scale;
 
+    QPoint m_origin;
     QPoint m_posClicked;
 
     void paintEvent(QPaintEvent*) override;
