@@ -41,7 +41,7 @@ protected:
         setAdjacencyList(AdjacencyList());
         qDeleteAll(m_agents);
         m_agents.clear();
-        m_agents.squeeze();
+        Agents().swap(m_agents);
     }
 
     inline void setAdjacencyList(AdjacencyList adjacencylist) {
@@ -70,7 +70,7 @@ private:
     // takes the ownership of the agents
     inline void setup(PRG* prg, Agents& agents, Attributes* attrs) {
         // make sure it'll be called only once
-        Q_ASSERT(!m_prg && m_agents.isEmpty());
+        Q_ASSERT(!m_prg && m_agents.empty());
         m_prg = prg;
         m_agents = agents;
         m_attributes = attrs;

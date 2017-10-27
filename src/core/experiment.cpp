@@ -169,7 +169,7 @@ Experiment::Trial Experiment::createTrial(const int& trialSeed)
     m_mutex.lock(); // make it thread-safe
     Agents agents = createAgents();
     m_mutex.unlock();
-    if (agents.isEmpty()) {
+    if (agents.empty()) {
         return Trial();
     }
 
@@ -209,7 +209,7 @@ Agents Experiment::createAgents()
 {
     if (m_expStatus == INVALID) {
         return Agents();
-    } else if (!m_clonableAgents.isEmpty()) {
+    } else if (!m_clonableAgents.empty()) {
         if (m_trials.size() == m_numTrials - 1) {
             Agents agents = m_clonableAgents;
             m_clonableAgents = Agents();
@@ -240,7 +240,7 @@ Agents Experiment::createAgents()
                     m_modelPlugin->uid);
     }
 
-    if (agents.isEmpty()) {
+    if (agents.empty()) {
         qWarning() << "[Experiment]: unable to create the trials."
                    << "The set of agents could not be created."
                    << "Project:" << m_projId << "Experiment:" << m_id;

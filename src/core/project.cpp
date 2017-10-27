@@ -9,6 +9,7 @@
 #include <QVector>
 #include <QStringList>
 #include <QTextStream>
+#include <set>
 
 #include "project.h"
 #include "experiment.h"
@@ -196,29 +197,32 @@ bool Project::saveProject(const QString& dest, const QString& projectName)
     }
 
     emit (progressSave(10));
-    QStringList header;
+    std::vector<QString> header;
     QHash<int, Experiment*>::const_iterator it;
     for (it = m_experiments.begin(); it != m_experiments.end(); ++it) {
         Experiment* exp = it.value();
-        header.append(exp->getGeneralAttrs()->names().toList());
+        std::vector<QString> general = exp->getGeneralAttrs()->names();
+        header.insert(header.end(), general.begin(), general.end());
         // prefix all model attributes with the modelId
-        const QVector<QString>& modelAttrNames = exp->getModelAttrs()->names();
-        foreach (const QString& attrName, modelAttrNames) {
-            header.append(exp->getModelId() + "_" + attrName);
+        foreach (const QString& attrName, exp->getModelAttrs()->names()) {
+            header.push_back(exp->getModelId() + "_" + attrName);
         }
         // prefix all graph attributes with the graphId
-        const QVector<QString>& graphAttrNames = exp->getGraphAttrs()->names();
-        foreach (const QString& attrName, graphAttrNames) {
-            header.append(exp->getGraphId() + "_" + attrName);
+        foreach (const QString& attrName, exp->getGraphAttrs()->names()) {
+            header.push_back(exp->getGraphId() + "_" + attrName);
         } 
     }
     // remove duplicates
     emit (progressSave(25));
-    header = header.toSet().toList();
+    std::set<QString> s(header.begin(), header.end());
+    header.assign(s.begin(), s.end());
 
     emit (progressSave(30));
     QTextStream out(&experimentsFile);
-    out << header.join(",") + "\n";
+    for (int i = 0; i < header.size()-1; ++i) {
+        out << header.at(i) + ",";
+    }
+    out << header.at(header.size()-1) << "\n";
 
     emit (progressSave(35));
     for (it = m_experiments.begin(); it != m_experiments.end(); ++it) {

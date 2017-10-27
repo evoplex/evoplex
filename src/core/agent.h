@@ -12,7 +12,7 @@
 
 namespace evoplex {
 
-typedef QVector<Agent*> Agents;
+typedef std::vector<Agent*> Agents;
 
 class Agent
 {

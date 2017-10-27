@@ -81,7 +81,7 @@ Agents FileMgr::importAgents(const QString& filePath, const QString& modelId) co
         qDeleteAll(agents);
         agents.clear();
     }
-    agents.squeeze();
+    agents.shrink_to_fit();
 
     return agents;
 }
