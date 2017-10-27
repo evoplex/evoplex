@@ -12,9 +12,10 @@
 #include <QtPlugin>
 
 #include "agent.h"
+#include "constants.h"
 #include "edge.h"
-#include "prg.h"
 #include "enums.h"
+#include "prg.h"
 
 namespace evoplex {
 typedef QHash<Agent*, Edges*> AdjacencyList;
@@ -36,7 +37,7 @@ public:
 
 protected:
     explicit AbstractBaseGraph(const QString& name)
-        : m_graphName(name), m_prg(nullptr), m_attributes(nullptr) {}
+        : m_graphName(name), m_prg(nullptr), m_attributes(nullptr), m_type(INVALID_TYPE) {}
 
     virtual ~AbstractBaseGraph() {
         setAdjacencyList(AdjacencyList());
@@ -67,6 +68,7 @@ private:
     PRG* m_prg;
     AdjacencyList m_adjacencyList;
     Attributes* m_attributes;
+    GraphType m_type;
 
     // takes the ownership of the agents
     inline void setup(PRG* prg, Agents& agents, Attributes* attrs) {
@@ -75,6 +77,7 @@ private:
         m_prg = prg;
         m_agents = agents;
         m_attributes = attrs;
+        m_type = (GraphType) attrs->value(PLUGIN_ATTRIBUTE_GRAPH_TYPE).toInt;
     }
 };
 
