@@ -5,6 +5,7 @@
   "author": "Marcos Cardinot",
   "description": "Regular lattice grid with moore neighbourhood. That is, each agent has eight neighbours.",
   "graphAttributesSpace": [
+    {"graphType": "graphType{directed,undirected}"},
     {"height": "int[1,max]"},
     {"width": "int[1,max]"}
   ]

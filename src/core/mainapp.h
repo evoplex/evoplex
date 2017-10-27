@@ -12,6 +12,7 @@
 #include "abstractgraph.h"
 #include "abstractmodel.h"
 #include "attributes.h"
+#include "enums.h"
 
 namespace evoplex {
 
@@ -22,6 +23,7 @@ class Project;
 class MainApp
 {
 public:
+
     struct GraphPlugin {
         QString uid;
         QString author;
@@ -50,8 +52,6 @@ public:
 
     MainApp();
     ~MainApp();
-
-
 
     // Create a new project
     Project* newProject(const QString& name="", const QString& dest="");

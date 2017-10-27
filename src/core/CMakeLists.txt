@@ -1,5 +1,6 @@
 set(EVOPLEX_CORE_H
   constants.h
+  enums.h
   prg.h
   utils.h
 

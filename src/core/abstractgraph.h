@@ -14,6 +14,7 @@
 #include "agent.h"
 #include "edge.h"
 #include "prg.h"
+#include "enums.h"
 
 namespace evoplex {
 typedef QHash<Agent*, Edges*> AdjacencyList;

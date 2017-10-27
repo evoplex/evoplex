@@ -126,6 +126,11 @@ bool MainApp::loadGraphPlugin(QObject* instance, QJsonObject& metaData)
         return false;
     }
 
+    if (!graph->graphAttrSpace.contains(PLUGIN_ATTRIBUTE_GRAPH_TYPE)) {
+        qWarning() << "[MainApp] graph plugin -- missing 'graphType'.";
+        return false;
+    }
+
     m_graphs.insert(graph->uid, graph);
     return true;
 }

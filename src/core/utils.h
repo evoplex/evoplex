@@ -13,6 +13,7 @@
 
 #include "attributes.h"
 #include "prg.h"
+#include "enums.h"
 
 namespace evoplex {
 
@@ -55,6 +56,8 @@ public:
     //   - "double[min,max]     // doubles from min to max (including min and max)
     //   - "double{1.1,1.2}     // set of doubles
     //   * you can use 'max' to take the maximum value for the type
+    //
+    //   - "graphType"          // the GraphType enum
     static Value validateParameter(const QString& space, const QString& valueStr) {
         if (valueStr.isEmpty()) {
             qWarning() << "[Utils]: unable to validate parameter! It should not be empty.";
@@ -86,7 +89,7 @@ public:
         return Value();
     }
 
-    // assume that space is equal to 'int{ }' or 'double{ }'
+    // assume that space is equal to 'int{ }', 'double{ }' or 'graphType{ }'
     // return a vector with all elements with the proper type
     static bool paramSet(const QString& space, QVector<Value>& values) {
         QString spc = space;
@@ -103,6 +106,14 @@ public:
             valuesStr[0] = valuesStr[0].remove("double");
             foreach (QString vStr, valuesStr) {
                 values.push_back(vStr.toDouble(&ok));
+                if (!ok) break;
+            }
+        } else if (space.startsWith("graphType")) {
+            valuesStr[0] = valuesStr[0].remove("graphType");
+            foreach (QString vStr, valuesStr) {
+                int gt = enumFromString(vStr);
+                ok = gt != GraphType::INVALID_TYPE;
+                values.push_back(gt);
                 if (!ok) break;
             }
         }
