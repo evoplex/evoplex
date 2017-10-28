@@ -6,15 +6,15 @@
 #ifndef ATTRIBUTES_H
 #define ATTRIBUTES_H
 
+#include <QPair>
 #include <QString>
 #include <algorithm>
 #include <vector>
 
-//#include "utils.h"
-
 namespace evoplex {
 
-// QHash<attributeName, <id, space>>
+// An AttributeSpace corresponds to a QHash<attributeName, <id, space>> where 'id'
+// is an integer which is assigned in the same order as defined in metaData.json
 typedef QHash<QString, QPair<int, QString>> AttributesSpace;
 
 struct Value
@@ -89,6 +89,7 @@ class Attributes
 public:
     Attributes() {}
     Attributes(int size) { resize(size); }
+    ~Attributes() {}
 
     inline int size() const { return m_values.size(); }
     inline void resize(int size) { m_names.resize(size); m_values.resize(size); }
