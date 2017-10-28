@@ -57,6 +57,10 @@ AttributesWidget::AttributesWidget(Project* project, QWidget *parent)
     addTreeWidget(m_treeItemGeneral, GENERAL_ATTRIBUTE_STOPAT, QVariant::fromValue(newSpinBox(1, EVOPLEX_MAX_STEPS)));
     // trials
     addTreeWidget(m_treeItemGeneral, GENERAL_ATTRIBUTE_TRIALS, QVariant::fromValue(newSpinBox(1, EVOPLEX_MAX_STEPS)));
+    // auto delete
+    QCheckBox* chb = new QCheckBox(m_ui->treeWidget);
+    chb->setChecked(true);
+    addTreeWidget(m_treeItemGeneral, GENERAL_ATTRIBUTE_AUTODELETE, QVariant::fromValue(chb));
     // models available
     QComboBox* cb = new QComboBox(m_ui->treeWidget);
     connect(cb, SIGNAL(currentIndexChanged(QString)), this, SLOT(slotModelSelected(QString)));
@@ -66,10 +70,6 @@ AttributesWidget::AttributesWidget(Project* project, QWidget *parent)
     cb->setEnabled(false);
     connect(cb, SIGNAL(currentIndexChanged(QString)), this, SLOT(slotGraphSelected(QString)));
     addTreeWidget(m_treeItemGeneral, GENERAL_ATTRIBUTE_GRAPHID, QVariant::fromValue(cb));
-    // auto delete
-    QCheckBox* chb = new QCheckBox(m_ui->treeWidget);
-    chb->setChecked(true);
-    addTreeWidget(m_treeItemGeneral, GENERAL_ATTRIBUTE_AUTODELETE, QVariant::fromValue(chb));
 
     // create the trees with the plugin stuff
     slotUpdateModelPlugins();
