@@ -35,7 +35,7 @@ void WizardNewProject::slotBrowseModel()
                 this, tr("Load Model"), QDir::homePath(),
                 tr("Evoplex Model (*.so)"));
 
-    if (m_mainApp.loadModel(path).isEmpty()) {
+    if (!path.isEmpty() && m_mainApp.loadModel(path).isEmpty()) {
         QMessageBox::critical(this, tr("Load Model"), tr("Unable to load the selected model!"));
         return;
     }
@@ -45,7 +45,7 @@ void WizardNewProject::slotBrowseModel()
 void WizardNewProject::slotBrowseProjectDir()
 {
     QString dir = QFileDialog::getExistingDirectory(
-                this, tr("Project Directory"), m_ui->projectPath->text(),
+                this->parentWidget(), tr("Project Directory"), m_ui->projectPath->text(),
                 QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
     m_ui->projectPath->setText(dir);
 }
@@ -84,6 +84,9 @@ bool WizardNewProject::validateCurrentPage()
 void WizardNewProject::done(int result)
 {
     QWizard::done(result);
+    if (result == 0) {
+        return;
+    }
 
     QString mname = m_ui->modelList->currentIndex().data().toString();
     QString pname = m_ui->projectName->text();
