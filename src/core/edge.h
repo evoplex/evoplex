@@ -6,35 +6,39 @@
 #ifndef EDGE_H
 #define EDGE_H
 
-#include <QVector>
+#include <vector>
 
 #include "attributes.h"
+#include "enums.h"
 
 namespace evoplex {
 
 class Agent;
 class Edge;
 
-typedef QVector<Edge> Edges;  // alias: used to hold the neighbourhood of one agent
+typedef std::vector<Edge*> Edges;
 
 class Edge
 {
 public:
-    explicit Edge(): m_neighbour(nullptr) {}
-    explicit Edge(Agent* neighbour): m_neighbour(neighbour) {}
-    explicit Edge(Agent* neighbour, Attributes attrs)
-        : m_neighbour(neighbour), m_attributes(attrs) {}
+    explicit Edge();
+    explicit Edge(Agent* origin, Agent* neighbour, Attributes* attrs, bool isDirected);
+    explicit Edge(Agent* origin, Agent* neighbour, bool isDirected)
+        : Edge(origin, neighbour, new Attributes(), isDirected) {}
+    explicit Edge(Agent* origin, Agent* neighbour)
+        : Edge(origin, neighbour, new Attributes(), true) {}
+    ~Edge();
 
-    inline const Value& attribute(const char* name) const { return m_attributes.value(name); }
-    inline const Value& attribute(const int id) const { return m_attributes.value(id); }
-    inline void setAttribute(const int id, const Value& value) { m_attributes.setValue(id, value); }
-
+    inline const Value& attribute(const char* name) const { return m_attrs->value(name); }
+    inline const Value& attribute(const int id) const { return m_attrs->value(id); }
+    inline void setAttribute(const int id, const Value& value) { m_attrs->setValue(id, value); }
     inline Agent* getNeighbour() const { return m_neighbour; }
-    inline void setNeighbour(Agent* neighbour) { m_neighbour = neighbour; }
 
 private:
+    Agent* m_origin;
     Agent* m_neighbour;
-    Attributes m_attributes;
+    Attributes* m_attrs;
+    bool m_isDirected;
 };
 }
 #endif // EDGE_H

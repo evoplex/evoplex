@@ -9,16 +9,16 @@
 namespace evoplex {
 
 enum GraphType {
-    INVALID_TYPE,
-    DIRECTED,
-    UNDIRECTED
+    Invalid_Type,
+    Directed,
+    Undirected
 };
 
 static GraphType enumFromString(const QString& str)
 {
-    if (str == "directed") return DIRECTED;
-    if (str == "undirected") return UNDIRECTED;
-    return INVALID_TYPE;
+    if (str == "directed") return Directed;
+    if (str == "undirected") return Undirected;
+    return Invalid_Type;
 }
 
 }

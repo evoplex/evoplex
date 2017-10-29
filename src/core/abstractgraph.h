@@ -18,17 +18,19 @@
 #include "prg.h"
 
 namespace evoplex {
+
 typedef QHash<Agent*, Edges*> AdjacencyList;
 
 class AbstractBaseGraph
 {
+    friend class AbstractGraph;
     friend class Experiment;
 
 public:
-    inline const Attributes* getAttributes() const { return m_attributes; }
-    inline const QString& getGraphName() const { return m_graphName; }
+    inline const QString& name() const { return m_name; }
+    inline const GraphType type() const { return m_type; }
+    inline const Attributes* getAttributes() const { return m_attrs; }
     inline const Agents& getAgents() const { return m_agents; }
-    inline const AdjacencyList& getAdjacencyList() const { return m_adjacencyList; }
 
     inline Agent* getAgent(int id) const { return m_agents.at(id); }
     inline Agent* getRandomAgent() const {
@@ -36,39 +38,27 @@ public:
     }
 
 protected:
+    Agents m_agents;
+    Edges m_edges;
+
+private:
+    const QString m_name;
+    GraphType m_type;
+    Attributes* m_attrs;
+    PRG* m_prg;
+
     explicit AbstractBaseGraph(const QString& name)
-        : m_graphName(name), m_prg(nullptr), m_attributes(nullptr), m_type(INVALID_TYPE) {}
+        : m_name(name), m_type(Invalid_Type), m_attrs(nullptr), m_prg(nullptr) {}
 
     virtual ~AbstractBaseGraph() {
-        setAdjacencyList(AdjacencyList());
         qDeleteAll(m_agents);
         m_agents.clear();
         Agents().swap(m_agents);
-    }
 
-    inline void setAdjacencyList(AdjacencyList adjacencylist) {
-        // delete all edges
-        AdjacencyList::iterator it = m_adjacencyList.begin();
-        while (it != m_adjacencyList.end()) {
-            it.value()->clear();
-            it.value()->squeeze();
-            delete it.value();
-            ++it;
-        }
-        // clear the QHash but do not touch the agents
-        m_adjacencyList.clear();
-        m_adjacencyList.squeeze();
-        // assign to the new adjacency list
-        m_adjacencyList = adjacencylist;
+        qDeleteAll(m_edges);
+        m_edges.clear();
+        Edges().swap(m_edges);
     }
-
-private:
-    const QString m_graphName;
-    Agents m_agents;
-    PRG* m_prg;
-    AdjacencyList m_adjacencyList;
-    Attributes* m_attributes;
-    GraphType m_type;
 
     // takes the ownership of the agents
     inline void setup(PRG* prg, Agents& agents, Attributes* attrs) {
@@ -76,7 +66,7 @@ private:
         Q_ASSERT(!m_prg && m_agents.empty());
         m_prg = prg;
         m_agents = agents;
-        m_attributes = attrs;
+        m_attrs = attrs;
         m_type = (GraphType) attrs->value(PLUGIN_ATTRIBUTE_GRAPH_TYPE).toInt;
     }
 };
@@ -86,7 +76,8 @@ class AbstractGraph : public AbstractBaseGraph
 {
 public:
     // constructor
-    explicit AbstractGraph(const QString& name): AbstractBaseGraph(name) {}
+    explicit AbstractGraph(const QString& name)
+        : AbstractBaseGraph(name) {}
 
     // Provide the destructor to keep compilers happy.
     virtual ~AbstractGraph() {}

@@ -16,18 +16,20 @@ typedef std::vector<Agent*> Agents;
 
 class Agent
 {
+    friend class Edge;
+
 public:
     explicit Agent() : Agent(Attributes()) {}
     explicit Agent(Attributes attr)
-        : m_attributes(attr), m_edges(nullptr), m_x(0), m_y(0) {}
+        : m_attrs(attr), m_x(0), m_y(0) {}
 
     ~Agent() {}
 
-    inline Agent* clone() { return new Agent(m_attributes); }
+    inline Agent* clone() { return new Agent(m_attrs); }
 
-    inline const Value& attribute(const char* name) const { return m_attributes.value(name); }
-    inline const Value& attribute(const int id) const { return m_attributes.value(id); }
-    inline void setAttribute(const int id, const Value& value) { m_attributes.setValue(id, value); }
+    inline const Value& attribute(const char* name) const { return m_attrs.value(name); }
+    inline const Value& attribute(const int id) const { return m_attrs.value(id); }
+    inline void setAttribute(const int id, const Value& value) { m_attrs.setValue(id, value); }
 
     inline const int getX() const { return m_x; }
     inline void setX(int x) { m_x = x; }
@@ -35,18 +37,17 @@ public:
     inline void setY(int y) { m_y = y; }
     inline void setCoords(int x, int y) { setX(x); setY(y); }
 
-    inline const Edges* getEdges() const { return m_edges; }
-    inline void setEdges(Edges* edges) { m_edges = edges; }
-    inline Agent* getNeighbour(int localId) const { return m_edges->at(localId).getNeighbour(); }
+    inline const Edges getEdges() const { return m_edges; }
+    inline Agent* getNeighbour(int localId) const { return m_edges.at(localId)->getNeighbour(); }
     inline Agent* getRandomNeighbour(PRG* prg) const {
-        return m_edges->at(prg->randI(m_edges->size())).getNeighbour();
+        return m_edges.at(prg->randI(m_edges.size()))->getNeighbour();
     }
 
 private:
     int m_x;
     int m_y;
-    Attributes m_attributes;
-    Edges* m_edges; // pointer owned by the graph
+    Attributes m_attrs;
+    Edges m_edges;
 };
 }
 

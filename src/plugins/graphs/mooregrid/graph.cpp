@@ -32,76 +32,77 @@ bool MooreGrid::init()
 
 void MooreGrid::reset()
 {
-    AdjacencyList adjacencyList;
-    adjacencyList.reserve(getAgents().size());
+    qDeleteAll(m_edges);
+    m_edges.clear();
+    Edges().swap(m_edges);
 
-    for (int id = 0; id < getAgents().size(); ++id) {
-        Agent* agent = getAgent(id);
-
+    for (int id = 0; id < m_agents.size(); ++id) {
         int x, y;
         Utils::ind2sub(id, m_width, y, x);
-        agent->setCoords(x, y);
-
-        Edges* edges = createEdges(id);
-        agent->setEdges(edges);
-        adjacencyList.insert(agent, edges);
+        m_agents.at(id)->setCoords(x, y);
+        createEdges(id);
     }
-    setAdjacencyList(adjacencyList);
 }
 
-Edges* MooreGrid::createEdges(const int id) const
+void MooreGrid::createEdges(const int id)
+{
+    bool directed;
+    std::vector<QPair<int,int>> neighbors;
+    if (type() == Directed) {
+        neighbors = directedEdges(id);
+        directed = true;
+    } else {
+        neighbors = undirectedEdges(id);
+        directed = false;
+    }
+
+    for (QPair<int,int> neighbor : neighbors) {
+        if (neighbor.first < 0) {
+            neighbor.first = m_height - 1;
+        } else if (neighbor.first > m_height - 1) {
+            neighbor.first = 0;
+        }
+
+        if (neighbor.second < 0) {
+            neighbor.second = m_width - 1;
+        } else if (neighbor.second > m_width - 1) {
+            neighbor.second = 0;
+        }
+
+        int nId = Utils::linearIdx(neighbor, m_width);
+        Q_ASSERT(nId < m_agents.size()); // neighbor must exist
+        m_edges.push_back(new Edge(getAgent(id), getAgent(nId), directed));
+    }
+}
+
+std::vector<QPair<int,int>> MooreGrid::directedEdges(const int id)
 {
     int row, col;
     Utils::ind2sub(id, m_width, row, col);
-    int nbs[8][2];
-    // nw
-    nbs[0][0] = row - 1;
-    nbs[0][1] = col - 1;
-    //n
-    nbs[1][0] = row - 1;
-    nbs[1][1] = col;
-    // ne
-    nbs[2][0] = row - 1;
-    nbs[2][1] = col + 1;
-    // w
-    nbs[3][0] = row;
-    nbs[3][1] = col - 1;
-    // e
-    nbs[4][0] = row;
-    nbs[4][1] = col + 1;
-    // sw
-    nbs[5][0] = row + 1;
-    nbs[5][1] = col - 1;
-    // s
-    nbs[6][0] = row + 1;
-    nbs[6][1] = col;
-    // se
-    nbs[7][0] = row + 1;
-    nbs[7][1] = col + 1;
-
-    Edges* edges = new Edges();
-    edges->reserve(8);
-    for (int i = 0; i < 8; ++i) {
-        if (nbs[i][0] < 0) {
-            nbs[i][0] = m_height - 1;
-        } else if (nbs[i][0] > m_height - 1) {
-            nbs[i][0] = 0;
-        }
-
-        if (nbs[i][1] < 0) {
-            nbs[i][1] = m_width - 1;
-        } else if (nbs[i][1] > m_width - 1) {
-            nbs[i][1] = 0;
-        }
-
-        int idx = Utils::linearIdx(nbs[i][0], nbs[i][1], m_width);
-        if (idx < getAgents().size()) {
-            edges->push_back(Edge(getAgent(idx)));
-        } else {
-            qWarning() << "[MooreNeighborhood]: the agent"
-                       << idx << "does not exist!";
-        }
-    }
-    return edges;
+    std::vector<QPair<int,int>> neighbors;
+    neighbors.reserve(8);
+    neighbors.push_back(qMakePair(row-1, col-1)); // nw
+    neighbors.push_back(qMakePair(row-1, col  )); // n
+    neighbors.push_back(qMakePair(row-1, col+1)); // ne
+    neighbors.push_back(qMakePair(row  , col-1)); // w
+    neighbors.push_back(qMakePair(row  , col+1)); // e
+    neighbors.push_back(qMakePair(row+1, col-1)); // sw
+    neighbors.push_back(qMakePair(row+1, col  )); // s
+    neighbors.push_back(qMakePair(row+1, col+1)); // se
+    return neighbors;
 }
+
+std::vector<QPair<int,int>> MooreGrid::undirectedEdges(const int id)
+{
+    int row, col;
+    Utils::ind2sub(id, m_width, row, col);
+    std::vector<QPair<int,int>> neighbors;
+    neighbors.reserve(4);
+    neighbors.push_back(qMakePair(row-1, col-1)); // nw
+    neighbors.push_back(qMakePair(row-1, col  )); // n
+    neighbors.push_back(qMakePair(row-1, col+1)); // ne
+    neighbors.push_back(qMakePair(row  , col-1)); // w
+    return neighbors;
+}
+
 }

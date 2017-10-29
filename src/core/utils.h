@@ -32,6 +32,10 @@ public:
         return row * cols + col;
     }
 
+    static int linearIdx(QPair<int,int> rowCol, const int cols) {
+        return linearIdx(rowCol.first, rowCol.second, cols);
+    }
+
     static Value valueFromString(Value::Type type, const QString& str) {
         Value value;
         bool ok;
@@ -112,7 +116,7 @@ public:
             valuesStr[0] = valuesStr[0].remove("graphType");
             foreach (QString vStr, valuesStr) {
                 int gt = enumFromString(vStr);
-                ok = gt != GraphType::INVALID_TYPE;
+                ok = gt != GraphType::Invalid_Type;
                 values.push_back(gt);
                 if (!ok) break;
             }

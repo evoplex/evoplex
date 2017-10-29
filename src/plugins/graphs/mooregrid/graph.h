@@ -6,8 +6,8 @@
 #ifndef MOORE_GRID_H
 #define MOORE_GRID_H
 
-#include <QObject>
-#include <QVector>
+#include <QPair>
+#include <vector>
 
 #include "core/agent.h"
 #include "core/abstractgraph.h"
@@ -23,11 +23,13 @@ public:
 
 private:
     // graph parameters
-    enum GraphAttr { Height, Width };
+    enum GraphAttr { Type, Height, Width };
     int m_width;
     int m_height;
 
-    Edges* createEdges(const int id) const;
+    void createEdges(const int id);
+    std::vector<QPair<int,int>> directedEdges(const int id);
+    std::vector<QPair<int,int>> undirectedEdges(const int id);
 };
 }
 

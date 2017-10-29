@@ -17,6 +17,7 @@ set(EVOPLEX_CORE_H
   mainapp.h
 )
 set(EVOPLEX_CORE_CXX
+  edge.cpp
   filemgr.cpp
   experiment.cpp
   experimentsmgr.cpp
