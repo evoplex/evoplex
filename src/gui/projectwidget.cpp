@@ -72,8 +72,8 @@ void ProjectWidget::insertRow(const int& expId)
     const int row = m_ui->table->insertRow(exp);
 
     // general stuff
-    const Attributes* gep = exp->getGeneralAttrs();
-    insertItem(row, TableWidget::H_EXPID, QString::number(exp->getId()));
+    const Attributes* gep = exp->generalAttrs();
+    insertItem(row, TableWidget::H_EXPID, QString::number(exp->id()));
     insertItem(row, TableWidget::H_SEED, gep->value(GENERAL_ATTRIBUTE_SEED).toQString());
     insertItem(row, TableWidget::H_STOPAT, gep->value(GENERAL_ATTRIBUTE_STOPAT).toQString());
     insertItem(row, TableWidget::H_TRIALS, gep->value(GENERAL_ATTRIBUTE_TRIALS).toQString());
@@ -103,10 +103,10 @@ void ProjectWidget::insertRow(const int& expId)
     };
 
     // model stuff
-    pluginAtbs(TableWidget::H_MODEL, exp->getModelId(), exp->getModelAttrs());
+    pluginAtbs(TableWidget::H_MODEL, exp->modelId(), exp->modelAttrs());
 
     // graph stuff
-    pluginAtbs(TableWidget::H_GRAPH, exp->getGraphId(), exp->getGraphAttrs());
+    pluginAtbs(TableWidget::H_GRAPH, exp->graphId(), exp->graphAttrs());
 }
 
 void ProjectWidget::insertItem(int row, TableWidget::Header header, QString label, QString tooltip)

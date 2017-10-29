@@ -177,7 +177,7 @@ void RowsDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option,
     painter->save();
     painter->setRenderHint(QPainter::Antialiasing);
     QPoint center = opt.rect.center();
-    Experiment::Status status = m_exp->getExpStatus();
+    Experiment::Status status = m_exp->expStatus();
     if (status == Experiment::READY) {
         if (btnIsHovered) { //play (only when hovered)
             painter->drawPixmap(center.x()-14, center.y()-14, m_table->kIcon_playon);

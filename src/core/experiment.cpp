@@ -114,9 +114,9 @@ void Experiment::playNext()
     if (m_expStatus != READY) {
         return;
     } else if (m_trials.isEmpty()) {
-        pauseAt(1);
+        setPauseAt(1);
     } else {
-        pauseAt(m_trials.value(0).currentStep + 1);
+        setPauseAt(m_trials.value(0).currentStep + 1);
     }
     m_mainApp->getExperimentsMgr()->play(this);
 }
@@ -261,7 +261,7 @@ Agents Experiment::cloneAgents(const Agents& agents) const
     return cloned;
 }
 
-AbstractGraph* Experiment::getGraph(int trialId) const
+AbstractGraph* Experiment::graph(int trialId) const
 {
     QHash<int, Trial>::const_iterator it = m_trials.find(trialId);
     if (it == m_trials.end() || !it.value().modelObj)

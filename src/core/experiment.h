@@ -69,12 +69,12 @@ public:
     void playNext();
 
     // pause all trials at a specific step
-    inline void pauseAt(int step) { m_pauseAt = step > m_stopAt ? m_stopAt : step; }
-    inline int getPauseAt() { return m_pauseAt; }
+    inline int pauseAt() const { return m_pauseAt; }
+    inline void setPauseAt(int step) { m_pauseAt = step > m_stopAt ? m_stopAt : step; }
 
     // stop all trials at a specific step
-    inline void stopAt(int step) { m_stopAt = step > EVOPLEX_MAX_STEPS ? EVOPLEX_MAX_STEPS : step; }
-    inline int getStopAt() { return m_stopAt; }
+    inline int stopAt() const { return m_stopAt; }
+    inline void setStopAt(int step) { m_stopAt = step > EVOPLEX_MAX_STEPS ? EVOPLEX_MAX_STEPS : step; }
 
     // pause all trials asap
     inline void pause() { m_pauseAt = 0; }
@@ -82,22 +82,22 @@ public:
     // stop all trials asap
     inline void stop() { pause(); m_stopAt = 0; play(); }
 
-    inline const Status getExpStatus() const { return m_expStatus; }
+    inline const Status expStatus() const { return m_expStatus; }
     inline void setExpStatus(Status s) { m_mutex.lock(); m_expStatus = s; m_mutex.unlock(); }
 
-    inline bool getAutoDelete() const { return m_autoDelete; }
+    inline bool autoDelete() const { return m_autoDelete; }
     inline void setAutoDelete(bool b) { m_autoDelete = b; }
 
-    AbstractGraph* getGraph(int trialId) const;
-    inline int getId() const { return m_id; }
-    inline int getProjId() const { return m_projId; }
-    inline int getNumTrials() const { return m_numTrials; }
-    inline const QHash<int, Trial>& getTrials() const { return m_trials; }
-    inline const Attributes* getGeneralAttrs() const { return m_generalAttrs; }
-    inline const Attributes* getModelAttrs() const { return m_modelAttrs; }
-    inline const Attributes* getGraphAttrs() const { return m_graphAttrs; }
-    inline const QString& getModelId() const { return m_modelPlugin->uid; }
-    inline const QString& getGraphId() const { return m_graphPlugin->uid; }
+    AbstractGraph* graph(int trialId) const;
+    inline int id() const { return m_id; }
+    inline int projId() const { return m_projId; }
+    inline int numTrials() const { return m_numTrials; }
+    inline const QHash<int, Trial>& trials() const { return m_trials; }
+    inline const Attributes* generalAttrs() const { return m_generalAttrs; }
+    inline const Attributes* modelAttrs() const { return m_modelAttrs; }
+    inline const Attributes* graphAttrs() const { return m_graphAttrs; }
+    inline const QString& modelId() const { return m_modelPlugin->uid; }
+    inline const QString& graphId() const { return m_graphPlugin->uid; }
 
 private:
     QMutex m_mutex;

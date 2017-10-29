@@ -25,7 +25,7 @@ ExperimentWidget::ExperimentWidget(Experiment* exp, ProjectsWindow* pwindow)
     , m_innerWindow(new QMainWindow(this))
     //, m_attrWidget(new AttributesWidget(project, this))
 {
-    setObjectName(QString("P%1.E%2").arg(m_exp->getProjId()).arg(m_exp->getId()));
+    setObjectName(QString("P%1.E%2").arg(m_exp->projId()).arg(m_exp->id()));
     setWindowTitle(objectName());
 
     // setup the inner qmainwindow
@@ -83,7 +83,7 @@ void ExperimentWidget::closeEvent(QCloseEvent* event)
 
 void ExperimentWidget::slotStatusChanged(Experiment* exp)
 {
-    Experiment::Status status = exp->getExpStatus();
+    Experiment::Status status = exp->expStatus();
     if (status == Experiment::READY) {
         m_aPlayPause->setIcon(m_kIcon_play);
         m_aPlayPause->setEnabled(true);

@@ -20,9 +20,9 @@ MooreGrid::MooreGrid(const QString& name)
 
 bool MooreGrid::init()
 {
-    m_height = getAttributes()->value(Height).toInt;
-    m_width = getAttributes()->value(Width).toInt;
-    if (getAgents().size() != m_height * m_width) {
+    m_height = attributes()->value(Height).toInt;
+    m_width = attributes()->value(Width).toInt;
+    if (agents().size() != m_height * m_width) {
         qWarning() << "[MooreGrid]: the agent set is not compatible with the required shape."
                    << "The number of agents should be equal to 'height'*'width'.";
         return false;
@@ -71,7 +71,7 @@ void MooreGrid::createEdges(const int id)
 
         int nId = Utils::linearIdx(neighbor, m_width);
         Q_ASSERT(nId < m_agents.size()); // neighbor must exist
-        m_edges.push_back(new Edge(getAgent(id), getAgent(nId), directed));
+        m_edges.push_back(new Edge(agent(id), agent(nId), directed));
     }
 }
 

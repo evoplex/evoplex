@@ -28,13 +28,10 @@ class AbstractBaseGraph
 public:
     inline const QString& name() const { return m_name; }
     inline const GraphType type() const { return m_type; }
-    inline const Attributes* getAttributes() const { return m_attrs; }
-    inline const Agents& getAgents() const { return m_agents; }
-
-    inline Agent* getAgent(int id) const { return m_agents.at(id); }
-    inline Agent* getRandomAgent() const {
-        return m_agents.at(m_prg->randI(m_agents.size()));
-    }
+    inline const Attributes* attributes() const { return m_attrs; }
+    inline const Agents& agents() const { return m_agents; }
+    inline Agent* agent(int id) const { return m_agents.at(id); }
+    inline Agent* randAgent() const { return m_agents.at(m_prg->randI(m_agents.size())); }
 
 protected:
     Agents m_agents;

@@ -36,8 +36,8 @@ void ExperimentsMgr::updateProgressValues()
 
 void ExperimentsMgr::play(Experiment* exp)
 {
-    if (exp->getExpStatus() != Experiment::READY
-            && exp->getExpStatus() != Experiment::QUEUED) {
+    if (exp->expStatus() != Experiment::READY
+            && exp->expStatus() != Experiment::QUEUED) {
         return;
     }
 
@@ -53,8 +53,8 @@ void ExperimentsMgr::play(Experiment* exp)
         // both the QVector and the QFutureWatcher must live longer
         // so, they must be pointers.
         QVector<int>* trialIds = new QVector<int>;
-        trialIds->reserve(exp->getNumTrials());
-        for (int id = 0; id < exp->getNumTrials(); ++id)
+        trialIds->reserve(exp->numTrials());
+        for (int id = 0; id < exp->numTrials(); ++id)
             trialIds->push_back(id);
 
         QFutureWatcher<void>* fw = new QFutureWatcher<void>(this);
@@ -70,7 +70,7 @@ void ExperimentsMgr::play(Experiment* exp)
 
         fw->setFuture(QtConcurrent::map(trialIds->begin(), trialIds->end(),
                 [this, exp](int& trialId) { exp->processTrial(trialId); }));
-    } else if (exp->getExpStatus() != Experiment::QUEUED) {
+    } else if (exp->expStatus() != Experiment::QUEUED) {
         exp->setExpStatus(Experiment::QUEUED);
         emit (statusChanged(exp));
         m_queued.push_back(exp);
@@ -84,11 +84,11 @@ void ExperimentsMgr::finished(Experiment* exp)
         m_timer->stop();
     }
 
-    exp->pauseAt(EVOPLEX_MAX_STEPS); // reset the pauseAt flag to maximum
+    exp->setPauseAt(EVOPLEX_MAX_STEPS); // reset the pauseAt flag to maximum
 
-    if(exp->getExpStatus() != Experiment::INVALID) {
+    if(exp->expStatus() != Experiment::INVALID) {
         exp->setExpStatus(Experiment::FINISHED);
-        const QHash<int, Experiment::Trial>& trials = exp->getTrials();
+        const QHash<int, Experiment::Trial>& trials = exp->trials();
         QHash<int, Experiment::Trial>::const_iterator it = trials.begin();
         while (it != trials.end()) {
             if (it.value().status != Experiment::FINISHED) {
@@ -100,7 +100,7 @@ void ExperimentsMgr::finished(Experiment* exp)
     }
     emit (statusChanged(exp));
 
-    if (exp->getExpStatus() == Experiment::FINISHED && exp->getAutoDelete()) {
+    if (exp->expStatus() == Experiment::FINISHED && exp->autoDelete()) {
         exp->deleteTrials();
     }
 
@@ -112,7 +112,7 @@ void ExperimentsMgr::finished(Experiment* exp)
 
 void ExperimentsMgr::removeFromQueue(Experiment* exp)
 {
-    if (exp->getExpStatus() == Experiment::QUEUED) {
+    if (exp->expStatus() == Experiment::QUEUED) {
         m_queued.remove(exp);
         exp->setExpStatus(Experiment::READY);
         emit (statusChanged(exp));

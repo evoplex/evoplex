@@ -49,11 +49,11 @@ QueueWidget::QueueWidget(ExperimentsMgr* expMgr, QWidget* parent)
 
 void QueueWidget::slotStatusChanged(Experiment* exp)
 {
-    const rowKey key = std::make_pair(exp->getProjId(), exp->getId());
+    const rowKey key = std::make_pair(exp->projId(), exp->id());
     Row prev = m_rows.value(key, Row());
     Row next = prev;
 
-    switch (exp->getExpStatus()) {
+    switch (exp->expStatus()) {
         case Experiment::RUNNING:
             next.table = m_ui->tableRunning;
             next.section = m_ui->running;
@@ -93,10 +93,10 @@ QTableWidgetItem* QueueWidget::insertRow(TableWidget* table, Experiment* exp)
         return item;
     };
 
-    add(TableWidget::H_STOPAT, exp->getStopAt());
-    add(TableWidget::H_TRIALS, exp->getNumTrials());
-    add(TableWidget::H_PROJID, exp->getProjId());
-    return add(TableWidget::H_EXPID, exp->getId());
+    add(TableWidget::H_STOPAT, exp->stopAt());
+    add(TableWidget::H_TRIALS, exp->numTrials());
+    add(TableWidget::H_PROJID, exp->projId());
+    return add(TableWidget::H_EXPID, exp->id());
 }
 
 void QueueWidget::moveRow(TableWidget* prevTable, int preRow, TableWidget* nextTable, Experiment* exp)

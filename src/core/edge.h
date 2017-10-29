@@ -32,7 +32,9 @@ public:
     inline const Value& attribute(const char* name) const { return m_attrs->value(name); }
     inline const Value& attribute(const int id) const { return m_attrs->value(id); }
     inline void setAttribute(const int id, const Value& value) { m_attrs->setValue(id, value); }
-    inline Agent* getNeighbour() const { return m_neighbour; }
+
+    inline Agent* origin() const { return m_origin; }
+    inline Agent* neighbour() const { return m_neighbour; }
 
 private:
     Agent* m_origin;

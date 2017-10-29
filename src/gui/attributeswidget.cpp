@@ -83,19 +83,19 @@ AttributesWidget::~AttributesWidget()
 
 void AttributesWidget::fill(Experiment* exp)
 {
-    std::vector<QString> header = exp->getGeneralAttrs()->names();
-    foreach (QString attrName, exp->getGraphAttrs()->names())
-        header.push_back(exp->getGraphId() + "_" + attrName);
-    foreach (QString attrName, exp->getModelAttrs()->names())
-        header.push_back(exp->getModelId() + "_" + attrName);
+    std::vector<QString> header = exp->generalAttrs()->names();
+    foreach (QString attrName, exp->graphAttrs()->names())
+        header.push_back(exp->graphId() + "_" + attrName);
+    foreach (QString attrName, exp->modelAttrs()->names())
+        header.push_back(exp->modelId() + "_" + attrName);
 
-    std::vector<Value> values = exp->getGeneralAttrs()->values();
-    values.insert(values.end(), exp->getGraphAttrs()->values().begin(), exp->getGraphAttrs()->values().end());
-    values.insert(values.end(), exp->getModelAttrs()->values().begin(), exp->getModelAttrs()->values().end());
+    std::vector<Value> values = exp->generalAttrs()->values();
+    values.insert(values.end(), exp->graphAttrs()->values().begin(), exp->graphAttrs()->values().end());
+    values.insert(values.end(), exp->modelAttrs()->values().begin(), exp->modelAttrs()->values().end());
 
     // ensure graphId will be filled at the end
     header.push_back(GENERAL_ATTRIBUTE_GRAPHID);
-    values.push_back(Value(exp->getGraphId()));
+    values.push_back(Value(exp->graphId()));
 
     header.shrink_to_fit();
     values.shrink_to_fit();

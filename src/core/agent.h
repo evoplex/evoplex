@@ -30,16 +30,16 @@ public:
     inline void setAttribute(const int id, const Value& value) { m_attrs.setValue(id, value); }
 
     inline const int id() const { return m_id; }
-    inline const int getX() const { return m_x; }
+    inline const int x() const { return m_x; }
     inline void setX(int x) { m_x = x; }
-    inline const int getY() const { return m_y; }
+    inline const int y() const { return m_y; }
     inline void setY(int y) { m_y = y; }
     inline void setCoords(int x, int y) { setX(x); setY(y); }
 
-    inline const Edges getEdges() const { return m_edges; }
-    inline Agent* getNeighbour(int localId) const { return m_edges.at(localId)->getNeighbour(); }
-    inline Agent* getRandomNeighbour(PRG* prg) const {
-        return m_edges.at(prg->randI(m_edges.size()))->getNeighbour();
+    inline const Edges edges() const { return m_edges; }
+    inline Agent* neighbour(int localId) const { return m_edges.at(localId)->neighbour(); }
+    inline Agent* randomNeighbour(PRG* prg) const {
+        return m_edges.at(prg->randI(m_edges.size()))->neighbour();
     }
 
 private:

@@ -22,8 +22,8 @@ public:
     explicit ExperimentWidget(Experiment* exp, ProjectsWindow* pwindow = 0);
     ~ExperimentWidget();
 
-    inline int expId() const { return m_exp->getId(); }
-    inline int projId() const { return m_exp->getProjId(); }
+    inline int expId() const { return m_exp->id(); }
+    inline int projId() const { return m_exp->projId(); }
 
 signals:
     void closed();
