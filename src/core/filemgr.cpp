@@ -53,6 +53,7 @@ Agents FileMgr::importAgents(const QString& filePath, const QString& modelId) co
     }
 
     // create agents
+    int id = 0;
     Agents agents;
     bool isValid = true;
     while (!in.atEnd()) {
@@ -73,7 +74,8 @@ Agents FileMgr::importAgents(const QString& filePath, const QString& modelId) co
             }
             attributes.replace(space.first, header.at(i), value);
         }
-        agents.push_back(new Agent(attributes));
+        agents.push_back(new Agent(id, attributes));
+        ++id;
     }
     file.close();
 

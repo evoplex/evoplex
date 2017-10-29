@@ -19,18 +19,17 @@ class Agent
     friend class Edge;
 
 public:
-    explicit Agent() : Agent(Attributes()) {}
-    explicit Agent(Attributes attr)
-        : m_attrs(attr), m_x(0), m_y(0) {}
-
+    explicit Agent(int id, Attributes attr)
+        : m_id(id), m_attrs(attr), m_x(0), m_y(0) {}
     ~Agent() {}
 
-    inline Agent* clone() { return new Agent(m_attrs); }
+    inline Agent* clone() { return new Agent(m_id, m_attrs); }
 
     inline const Value& attribute(const char* name) const { return m_attrs.value(name); }
     inline const Value& attribute(const int id) const { return m_attrs.value(id); }
     inline void setAttribute(const int id, const Value& value) { m_attrs.setValue(id, value); }
 
+    inline const int id() const { return m_id; }
     inline const int getX() const { return m_x; }
     inline void setX(int x) { m_x = x; }
     inline const int getY() const { return m_y; }
@@ -44,6 +43,7 @@ public:
     }
 
 private:
+    const int m_id;
     int m_x;
     int m_y;
     Attributes m_attrs;
