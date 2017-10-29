@@ -8,7 +8,6 @@
 
 #include <QObject>
 #include <QHash>
-#include <QVector>
 #include <QtPlugin>
 
 #include "agent.h"

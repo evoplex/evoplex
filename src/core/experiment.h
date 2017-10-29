@@ -6,9 +6,9 @@
 #ifndef EXPERIMENT_H
 #define EXPERIMENT_H
 
+#include <QHash>
 #include <QMutex>
 #include <QString>
-#include <QVector>
 
 #include "experimentsmgr.h"
 #include "mainapp.h"
