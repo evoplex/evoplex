@@ -12,6 +12,7 @@ set(EVOPLEX_GUI_H
   savedialog.h
   settingswidget.h
   tablewidget.h
+  titlebar.h
   welcomewidget.h
 )
 
@@ -27,6 +28,7 @@ set(EVOPLEX_GUI_CXX
   savedialog.cpp
   settingswidget.cpp
   tablewidget.cpp
+  titlebar.cpp
   welcomewidget.cpp
 )
 
@@ -37,6 +39,7 @@ qt5_wrap_ui(EVOPLEX_GUI_UI
   forms/projectwidget.ui
   forms/savedialog.ui
   forms/settingswidget.ui
+  forms/titlebar.ui
   forms/welcomewidget.ui
 )
 
