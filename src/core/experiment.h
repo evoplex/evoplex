@@ -98,6 +98,7 @@ public:
     inline const Attributes* graphAttrs() const { return m_graphAttrs; }
     inline const QString& modelId() const { return m_modelPlugin->uid; }
     inline const QString& graphId() const { return m_graphPlugin->uid; }
+    inline const MainApp::ModelPlugin* modelPlugin() const { return m_modelPlugin; }
 
 private:
     QMutex m_mutex;

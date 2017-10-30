@@ -25,9 +25,10 @@ public:
 
     inline Agent* clone() { return new Agent(m_id, m_attrs); }
 
-    inline const Value& attribute(const char* name) const { return m_attrs.value(name); }
-    inline const Value& attribute(const int id) const { return m_attrs.value(id); }
-    inline void setAttribute(const int id, const Value& value) { m_attrs.setValue(id, value); }
+    inline const Attributes& attrs() const { return m_attrs; }
+    inline const Value& attr(const char* name) const { return m_attrs.value(name); }
+    inline const Value& attr(const int id) const { return m_attrs.value(id); }
+    inline void setAttr(const int id, const Value& value) { m_attrs.setValue(id, value); }
 
     inline const int id() const { return m_id; }
     inline const int x() const { return m_x; }
