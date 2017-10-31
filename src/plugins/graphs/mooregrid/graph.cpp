@@ -71,7 +71,7 @@ void MooreGrid::createEdges(const int id)
 
         int nId = Utils::linearIdx(neighbor, m_width);
         Q_ASSERT(nId < m_agents.size()); // neighbor must exist
-        m_edges.push_back(new Edge(agent(id), agent(nId), directed));
+        m_edges.emplace_back(new Edge(agent(id), agent(nId), directed));
     }
 }
 
@@ -79,16 +79,16 @@ std::vector<QPair<int,int>> MooreGrid::directedEdges(const int id)
 {
     int row, col;
     Utils::ind2sub(id, m_width, row, col);
-    std::vector<QPair<int,int>> neighbors;
-    neighbors.reserve(8);
-    neighbors.push_back(qMakePair(row-1, col-1)); // nw
-    neighbors.push_back(qMakePair(row-1, col  )); // n
-    neighbors.push_back(qMakePair(row-1, col+1)); // ne
-    neighbors.push_back(qMakePair(row  , col-1)); // w
-    neighbors.push_back(qMakePair(row  , col+1)); // e
-    neighbors.push_back(qMakePair(row+1, col-1)); // sw
-    neighbors.push_back(qMakePair(row+1, col  )); // s
-    neighbors.push_back(qMakePair(row+1, col+1)); // se
+    std::vector<QPair<int,int>> neighbors {
+        qMakePair(row-1, col-1), // nw
+        qMakePair(row-1, col  ), // n
+        qMakePair(row-1, col+1), // ne
+        qMakePair(row  , col-1), // w
+        qMakePair(row  , col+1), // e
+        qMakePair(row+1, col-1), // sw
+        qMakePair(row+1, col  ), // s
+        qMakePair(row+1, col+1), // se
+    };
     return neighbors;
 }
 
@@ -96,12 +96,12 @@ std::vector<QPair<int,int>> MooreGrid::undirectedEdges(const int id)
 {
     int row, col;
     Utils::ind2sub(id, m_width, row, col);
-    std::vector<QPair<int,int>> neighbors;
-    neighbors.reserve(4);
-    neighbors.push_back(qMakePair(row-1, col-1)); // nw
-    neighbors.push_back(qMakePair(row-1, col  )); // n
-    neighbors.push_back(qMakePair(row-1, col+1)); // ne
-    neighbors.push_back(qMakePair(row  , col-1)); // w
+    std::vector<QPair<int,int>> neighbors {
+        qMakePair(row-1, col-1), // nw
+        qMakePair(row-1, col  ), // n
+        qMakePair(row-1, col+1), // ne
+        qMakePair(row  , col-1), // w
+    };
     return neighbors;
 }
 

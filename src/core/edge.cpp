@@ -25,14 +25,14 @@ Edge::Edge(Agent* origin, Agent* neighbour, Attributes* attrs, bool isDirected)
     , m_attrs(attrs)
     , m_isDirected(isDirected)
 {
-    origin->m_edges.push_back(this);
+    origin->m_edges.emplace_back(this);
     if (!isDirected) {
         std::shared_ptr<Edge> edge = std::make_shared<Edge>();
         edge->m_origin = neighbour;
         edge->m_neighbour = origin;
         edge->m_attrs = attrs;
         edge->m_isDirected = false;
-        neighbour->m_edges.push_back(edge.get());
+        neighbour->m_edges.emplace_back(edge.get());
     }
 }
 

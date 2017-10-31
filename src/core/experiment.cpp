@@ -231,7 +231,7 @@ Agents Experiment::createAgents()
             Q_ASSERT(attrs.size() == numAgents);
             agents.reserve(numAgents);
             for (int id = 0; id < numAgents; ++id) {
-                agents.push_back(new Agent(id, attrs.at(id)));
+                agents.emplace_back(new Agent(id, attrs.at(id)));
             }
         }
     } else { // read population from a text file
@@ -255,8 +255,8 @@ Agents Experiment::cloneAgents(const Agents& agents) const
 {
     Agents cloned;
     cloned.reserve(agents.size());
-    for (int id = 0; id < agents.size(); ++id) {
-        cloned.push_back(agents.at(id)->clone());
+    for (Agents::const_iterator it = agents.begin(); it != agents.end(); ++it) {
+        cloned.emplace_back((*it)->clone());
     }
     return cloned;
 }

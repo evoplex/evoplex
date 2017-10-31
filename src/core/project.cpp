@@ -205,11 +205,11 @@ bool Project::saveProject(const QString& dest, const QString& projectName)
         header.insert(header.end(), general.begin(), general.end());
         // prefix all model attributes with the modelId
         foreach (const QString& attrName, exp->modelAttrs()->names()) {
-            header.push_back(exp->modelId() + "_" + attrName);
+            header.emplace_back(exp->modelId() + "_" + attrName);
         }
         // prefix all graph attributes with the graphId
         foreach (const QString& attrName, exp->graphAttrs()->names()) {
-            header.push_back(exp->graphId() + "_" + attrName);
+            header.emplace_back(exp->graphId() + "_" + attrName);
         }
     }
     // remove duplicates

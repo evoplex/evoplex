@@ -101,7 +101,7 @@ public:
     }
 
     inline void replace(int id, const QString& name, const Value& value) { m_names[id] = name; m_values[id] = value; }
-    inline void push_back(const QString& name, const Value& value) { m_names.push_back(name); m_values.push_back(value); }
+    inline void push_back(const QString& name, const Value& value) { m_names.emplace_back(name); m_values.emplace_back(value); }
 
     inline const QString& name(int id) const { return m_names.at(id); }
     inline const std::vector<QString>& names() const { return m_names; }

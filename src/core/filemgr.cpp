@@ -74,7 +74,7 @@ Agents FileMgr::importAgents(const QString& filePath, const QString& modelId) co
             }
             attributes.replace(space.first, header.at(i), value);
         }
-        agents.push_back(new Agent(id, attributes));
+        agents.emplace_back(new Agent(id, attributes));
         ++id;
     }
     file.close();

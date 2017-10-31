@@ -31,6 +31,7 @@ public:
     inline void setAttr(const int id, const Value& value) { m_attrs.setValue(id, value); }
 
     inline const int id() const { return m_id; }
+
     inline const int x() const { return m_x; }
     inline void setX(int x) { m_x = x; }
     inline const int y() const { return m_y; }
