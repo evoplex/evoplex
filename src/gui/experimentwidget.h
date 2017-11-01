@@ -44,6 +44,7 @@ private:
     Experiment* m_exp;
     QMainWindow* m_innerWindow;
     AttributesWidget* m_attrWidget;
+    QTimer* m_timer;
 
     QAction* m_aPlayPause;
     QAction* m_aNext;

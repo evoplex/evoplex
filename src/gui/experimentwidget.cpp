@@ -24,6 +24,7 @@ ExperimentWidget::ExperimentWidget(Experiment* exp, ProjectsWindow* pwindow)
     , m_exp(exp)
     , m_innerWindow(new QMainWindow(this))
     //, m_attrWidget(new AttributesWidget(project, this))
+    , m_timer(new QTimer)
 {
     setObjectName(QString("P%1.E%2").arg(m_exp->projId()).arg(m_exp->id()));
     setWindowTitle(objectName());
@@ -67,12 +68,16 @@ ExperimentWidget::ExperimentWidget(Experiment* exp, ProjectsWindow* pwindow)
     layout->addWidget(tb);
     setWidget(layout->parentWidget());
     connect(m_aGraph, &QAction::triggered, [this]() {
-        m_innerWindow->addDockWidget(Qt::TopDockWidgetArea, new GraphWidget(m_exp, this));
+        GraphWidget* graph = new GraphWidget(m_exp, this);
+        m_innerWindow->addDockWidget(Qt::TopDockWidgetArea, graph);
+        connect(m_timer, SIGNAL(timeout()), graph, SLOT(update()));
     });
+    m_timer->start(0);
 }
 
 ExperimentWidget::~ExperimentWidget()
 {
+    delete m_timer;
 }
 
 void ExperimentWidget::closeEvent(QCloseEvent* event)
