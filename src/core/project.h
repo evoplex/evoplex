@@ -27,7 +27,7 @@ public:
     // attributes start with 'uid_'. It is very important to avoid clashes
     // between different attributes which use the same name.
     // @return the experimentId or -1 if unsuccessful
-    const int newExperiment(const QStringList& header, const QStringList& values, QString& errorMsg);
+    const int newExperiment(const QStringList& header, const QStringList& values, bool outputEnabled, QString& errorMsg);
 
     // Import a set of experiments from a csv file
     // return the number of failures or -1 if everything went wrong.

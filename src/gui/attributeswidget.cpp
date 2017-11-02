@@ -72,7 +72,7 @@ AttributesWidget::AttributesWidget(Project* project, QWidget *parent)
     m_treeItemOutputs = new QTreeWidgetItem(m_ui->treeWidget);
     m_treeItemOutputs->setText(0, "Outputs");
     m_treeItemOutputs->setExpanded(true);
-    // -- enabled (just for internal use; this field won't be send to the Experiment)
+    // -- enabled
     m_enableOutputs = new QCheckBox("save to file");
     QTreeWidgetItem* itemEnabled = new QTreeWidgetItem(m_treeItemOutputs);
     itemEnabled->setText(0, "enable");
@@ -257,7 +257,7 @@ void AttributesWidget::slotCreateExperiment()
     }
 
     QString errorMsg;
-    int expId = m_project->newExperiment(header, values, errorMsg);
+    int expId = m_project->newExperiment(header, values, m_enableOutputs->isChecked(), errorMsg);
     if (expId >= 0) {
         emit (experimentCreated(expId));
     } else {

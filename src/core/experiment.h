@@ -44,8 +44,8 @@ public:
         Status status = INVALID;
     };
 
-    explicit Experiment(MainApp* mainApp, int id, int projId, Attributes *generalAttrs,
-        Attributes *modelAttrs, Attributes *graphAttrs);
+    explicit Experiment(MainApp* mainApp, int id, int projId, bool outputEnabled,
+        Attributes *generalAttrs, Attributes *modelAttrs, Attributes *graphAttrs);
 
     ~Experiment();
 
@@ -105,6 +105,7 @@ private:
     MainApp* m_mainApp;
     const int m_id;
     const int m_projId;
+    bool m_outputEnabled;
 
     Attributes* m_generalAttrs;
     Attributes* m_modelAttrs;

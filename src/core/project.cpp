@@ -42,7 +42,7 @@ void Project::playAll()
         it.value()->play();
 }
 
-const int Project::newExperiment(const QStringList& header, const QStringList& values, QString& errorMsg)
+const int Project::newExperiment(const QStringList& header, const QStringList& values, bool outputEnabled, QString& errorMsg)
 {
     if (header.isEmpty() || values.isEmpty() || header.size() != values.size()) {
         errorMsg = "The 'header' and 'values' cannot be empty and must have the same number of elements.";
@@ -90,8 +90,12 @@ const int Project::newExperiment(const QStringList& header, const QStringList& v
 
         AttributesSpace::const_iterator gps = m_mainApp->getGeneralAttrSpace().find(attrName);
         if (gps != m_mainApp->getGeneralAttrSpace().end()) {
+            if (vStr.isEmpty() && outputEnabled) {
+                failedAttributes.append(attrName);
+                continue;
+            }
             Value value = Utils::validateParameter(gps.value().second, vStr);
-            if (value.isValid()) {
+            if (value.isValid() && (!vStr.isEmpty() || !outputEnabled)) {
                 generalAttrs->replace(gps.value().first, attrName, value);
             } else {
                 failedAttributes.append(attrName);
@@ -131,7 +135,7 @@ const int Project::newExperiment(const QStringList& header, const QStringList& v
     // that's great! everything seems to be valid
     ++m_lastExpId;
     m_experiments.insert(m_lastExpId,
-        new Experiment(m_mainApp, m_lastExpId, m_id, generalAttrs, modelAttrs, graphAttrs));
+        new Experiment(m_mainApp, m_lastExpId, m_id, outputEnabled, generalAttrs, modelAttrs, graphAttrs));
 
     m_hasUnsavedChanges = true;
     emit (hasUnsavedChanges(true));

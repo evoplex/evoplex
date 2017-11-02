@@ -13,11 +13,12 @@
 
 namespace evoplex {
 
-Experiment::Experiment(MainApp* mainApp, int id, int projId, Attributes* generalAttrs,
-                       Attributes* modelAttrs, Attributes* graphAttrs)
+Experiment::Experiment(MainApp* mainApp, int id, int projId, bool, outputEnabled,
+                       Attributes* generalAttrs, Attributes* modelAttrs, Attributes* graphAttrs)
     : m_mainApp(mainApp)
     , m_id(id)
     , m_projId(projId)
+    , m_outputEnabled(outputEnabled)
     , m_expStatus(INVALID)
 {
     init(generalAttrs, modelAttrs, graphAttrs);
@@ -144,8 +145,15 @@ void Experiment::processTrial(const int& trialId)
 
     bool algorithmConverged = false;
     while (trial.currentStep < m_pauseAt && !algorithmConverged) {
+        if (outputEnabled) {
+            saveStep(trial.currentStep);
+        }
         algorithmConverged = trial.modelObj->algorithmStep();
         ++trial.currentStep;
+    }
+
+    if (outputEnabled) {
+        saveStep(trial.currentStep);
     }
 
     if (trial.currentStep >= m_stopAt || algorithmConverged) {
