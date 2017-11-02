@@ -240,9 +240,9 @@ void GraphWidget::mouseReleaseEvent(QMouseEvent *e)
 
 void GraphWidget::resizeEvent(QResizeEvent* e)
 {
+    m_cache.clear();
     m_resizeTimer.start(500);
     QWidget::resizeEvent(e);
-    updateCache();
 }
 
 }
