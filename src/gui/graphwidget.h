@@ -7,6 +7,8 @@
 #define GRAPHWIDGET_H
 
 #include <QDockWidget>
+#include <QLineEdit>
+#include <vector>
 
 #include "core/experiment.h"
 
@@ -23,20 +25,44 @@ public:
     ~GraphWidget();
 
 protected:
-    void mouseMoveEvent(QMouseEvent* e);
     void mousePressEvent(QMouseEvent* e);
+    void mouseReleaseEvent(QMouseEvent* e);
+    void paintEvent(QPaintEvent*);
+    void resizeEvent(QResizeEvent* e);
+
+private slots:
+    void updateCache();
+    void setGraph(int trialId);
+    void zoomIn();
+    void zoomOut();
+    void resetView();
 
 private:
     Ui_GraphWidget* m_ui;
+    Experiment* m_exp;
     AbstractGraph* m_graph;
-    bool m_isValid;
-    float m_radius;
-    int m_scale;
 
+    bool m_showAgents;
+    bool m_showEdges;
+
+    int m_zoomLevel;
+    float m_nodeSizeRate;
+    float m_edgeSizeRate;
+    float m_nodeRadius;
+
+    int m_selectedAgent;
     QPoint m_origin;
-    QPoint m_posClicked;
+    QPoint m_posEntered;
+    QTimer m_resizeTimer;
 
-    void paintEvent(QPaintEvent*) override;
+    QHash<int, QLineEdit*> m_attrs;
+
+    struct Cache {
+        Agent* agent = nullptr;
+        QPointF xy;
+        std::vector<QLineF> edges;
+    };
+    std::vector<Cache> m_cache;
 };
 }
 
