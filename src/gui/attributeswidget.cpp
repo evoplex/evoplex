@@ -31,14 +31,11 @@ AttributesWidget::AttributesWidget(Project* project, QWidget *parent)
     connect(m_ui->btnSubmit, SIGNAL(clicked(bool)), this, SLOT(slotCreateExperiment()));
     m_ui->treeWidget->setFocusPolicy(Qt::NoFocus);
 
-    //
     // setup the tree widget: general attributes
-    //
     m_treeItemGeneral = new QTreeWidgetItem(m_ui->treeWidget);
     m_treeItemGeneral->setText(0, "General");
     m_treeItemGeneral->setExpanded(true);
-
-    // add custom widget -- agents from file
+    // -- add custom widget -- agents from file
     QLineEdit* agentsPath = new QLineEdit(m_project->getDest());
     QPushButton* btBrowseFile = new QPushButton("...");
     btBrowseFile->setMaximumWidth(20);
@@ -51,25 +48,74 @@ AttributesWidget::AttributesWidget(Project* project, QWidget *parent)
     QTreeWidgetItem* item = new QTreeWidgetItem(m_treeItemGeneral);
     item->setText(0, GENERAL_ATTRIBUTE_AGENTS);
     m_ui->treeWidget->setItemWidget(item, 1, agentsLayout->parentWidget());
-    // seed
+    // -- seed
     addTreeWidget(m_treeItemGeneral, GENERAL_ATTRIBUTE_SEED, QVariant::fromValue(newSpinBox(0, INT32_MAX)));
-    // stop at
+    // --  stop at
     addTreeWidget(m_treeItemGeneral, GENERAL_ATTRIBUTE_STOPAT, QVariant::fromValue(newSpinBox(1, EVOPLEX_MAX_STEPS)));
-    // trials
+    // --  trials
     addTreeWidget(m_treeItemGeneral, GENERAL_ATTRIBUTE_TRIALS, QVariant::fromValue(newSpinBox(1, EVOPLEX_MAX_STEPS)));
-    // auto delete
+    // --  auto delete
     QCheckBox* chb = new QCheckBox(m_ui->treeWidget);
     chb->setChecked(true);
     addTreeWidget(m_treeItemGeneral, GENERAL_ATTRIBUTE_AUTODELETE, QVariant::fromValue(chb));
-    // models available
+    // --  models available
     QComboBox* cb = new QComboBox(m_ui->treeWidget);
     connect(cb, SIGNAL(currentIndexChanged(QString)), this, SLOT(slotModelSelected(QString)));
     addTreeWidget(m_treeItemGeneral, GENERAL_ATTRIBUTE_MODELID, QVariant::fromValue(cb));
-    // graphs available
+    // --  graphs available
     cb = new QComboBox(m_ui->treeWidget);
     cb->setEnabled(false);
     connect(cb, SIGNAL(currentIndexChanged(QString)), this, SLOT(slotGraphSelected(QString)));
     addTreeWidget(m_treeItemGeneral, GENERAL_ATTRIBUTE_GRAPHID, QVariant::fromValue(cb));
+
+    // setup the tree widget: outputs
+    m_treeItemOutputs = new QTreeWidgetItem(m_ui->treeWidget);
+    m_treeItemOutputs->setText(0, "Outputs");
+    m_treeItemOutputs->setExpanded(true);
+    // -- enabled (just for internal use; this field won't be send to the Experiment)
+    m_enableOutputs = new QCheckBox("save to file");
+    QTreeWidgetItem* itemEnabled = new QTreeWidgetItem(m_treeItemOutputs);
+    itemEnabled->setText(0, "enable");
+    m_ui->treeWidget->setItemWidget(itemEnabled, 1, m_enableOutputs);
+    // -- add custom widget: output directory
+    QLineEdit* outDir = new QLineEdit(m_project->getDest());
+    QPushButton* outBrowseDir = new QPushButton("...");
+    outBrowseDir->setMaximumWidth(20);
+    connect(outBrowseDir, SIGNAL(clicked(bool)), this, SLOT(slotOutputDir()));
+    QHBoxLayout* outLayout = new QHBoxLayout(new QWidget(m_ui->treeWidget));
+    outLayout->setMargin(0);
+    outLayout->insertWidget(0, outDir);
+    outLayout->insertWidget(1, outBrowseDir);
+    m_widgetFields.insert(OUTPUT_DIR, QVariant::fromValue(outDir));
+    QTreeWidgetItem* itemDir = new QTreeWidgetItem(m_treeItemOutputs);
+    itemDir->setText(0, OUTPUT_DIR);
+    m_ui->treeWidget->setItemWidget(itemDir, 1, outLayout->parentWidget());
+    // -- avgTrials
+    QCheckBox* outAvgTrials = new QCheckBox("average trials");
+    addTreeWidget(m_treeItemOutputs, OUTPUT_AVGTRIALS, QVariant::fromValue(outAvgTrials));
+    // -- add custom widget: output directory
+    QLineEdit* outHeader = new QLineEdit(m_project->getDest());
+    QPushButton* outBuildHeader = new QPushButton("...");
+    outBuildHeader->setMaximumWidth(20);
+    connect(outBuildHeader, SIGNAL(clicked(bool)), this, SLOT(slotOutputHeader()));
+    QHBoxLayout* headerLayout = new QHBoxLayout(new QWidget(m_ui->treeWidget));
+    headerLayout->setMargin(0);
+    headerLayout->insertWidget(0, outHeader);
+    headerLayout->insertWidget(1, outBuildHeader);
+    m_widgetFields.insert(OUTPUT_HEADER, QVariant::fromValue(outHeader));
+    QTreeWidgetItem* itemHeader = new QTreeWidgetItem(m_treeItemOutputs);
+    itemHeader->setText(0, OUTPUT_HEADER);
+    m_ui->treeWidget->setItemWidget(itemHeader, 1, headerLayout->parentWidget());
+
+    connect(m_enableOutputs, &QCheckBox::clicked,
+            [outDir, outBrowseDir, outHeader, outBuildHeader, outAvgTrials](bool b) {
+                outDir->setEnabled(b);
+                outBrowseDir->setEnabled(b);
+                outHeader->setEnabled(b);
+                outBuildHeader->setEnabled(b);
+                outAvgTrials->setEnabled(b);
+    });
+    m_enableOutputs->setChecked(false);
 
     // create the trees with the plugin stuff
     slotUpdateModelPlugins();
@@ -142,6 +188,20 @@ void AttributesWidget::slotAgentFile()
     }
 }
 
+void AttributesWidget::slotOutputDir()
+{
+    QLineEdit* lineedit = m_widgetFields.value(OUTPUT_DIR).value<QLineEdit*>();
+    QString path = QFileDialog::getExistingDirectory(this, "Output Directory", lineedit->text());
+    if (!path.isEmpty()) {
+        lineedit->setText(path);
+    }
+}
+
+void AttributesWidget::slotOutputHeader()
+{
+    // TODO
+}
+
 void AttributesWidget::slotCreateExperiment()
 {
     if (m_selectedModelId == STRING_NULL_PLUGINID) {
@@ -157,6 +217,13 @@ void AttributesWidget::slotCreateExperiment()
     QVariantHash::iterator it;
     for (it = m_widgetFields.begin(); it != m_widgetFields.end(); ++it) {
         header << it.key();
+
+        if (!m_enableOutputs->isChecked()
+                && (it.key() == OUTPUT_DIR || it.key() == OUTPUT_HEADER)) {
+            values << "";
+            continue;
+        }
+
         QWidget* widget = it.value().value<QWidget*>();
         Q_ASSERT(widget);
 

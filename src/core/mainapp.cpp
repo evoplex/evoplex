@@ -34,6 +34,9 @@ MainApp::MainApp()
     m_generalAttrSpace.insert(GENERAL_ATTRIBUTE_STOPAT, qMakePair(id++, QString("int[1,%1]").arg(EVOPLEX_MAX_STEPS)));
     m_generalAttrSpace.insert(GENERAL_ATTRIBUTE_TRIALS, qMakePair(id++, QString("int[1,%1]").arg(EVOPLEX_MAX_TRIALS)));
     m_generalAttrSpace.insert(GENERAL_ATTRIBUTE_AUTODELETE, qMakePair(id++, QString("bool")));
+    m_generalAttrSpace.insert(OUTPUT_DIR, qMakePair(id++, QString("string")));
+    m_generalAttrSpace.insert(OUTPUT_HEADER, qMakePair(id++, QString("string")));
+    m_generalAttrSpace.insert(OUTPUT_AVGTRIALS, qMakePair(id++, QString("bool")));
 
     // load plugins
     QDir pluginsDir = QDir(qApp->applicationDirPath());

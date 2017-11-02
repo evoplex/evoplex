@@ -63,11 +63,11 @@ public:
     //
     //   - "graphType"          // the GraphType enum
     static Value validateParameter(const QString& space, const QString& valueStr) {
-        if (valueStr.isEmpty()) {
+        if (space == "string") {
+            return Value(valueStr);
+        } else if (valueStr.isEmpty()) {
             qWarning() << "[Utils]: unable to validate parameter! It should not be empty.";
             return Value();
-        } else if (space == "string") {
-            return Value(valueStr);
         } else if (space == "bool") {
             return QVariant(valueStr).toBool();
         } else if (space.contains('{') && space.endsWith('}')) {

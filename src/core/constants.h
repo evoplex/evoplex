@@ -20,6 +20,10 @@
 #define GENERAL_ATTRIBUTE_TRIALS "trials"               // number of times the experiment has to be repeated
 #define GENERAL_ATTRIBUTE_AUTODELETE "autoDelete"       // automatically deletes the experiment from memory
 
+#define OUTPUT_DIR "directory"              // path to the directory in which the file will be saved
+#define OUTPUT_AVGTRIALS "avgTrials"        // 1 to indicate if the output should be done across all trials; 0 otherwise
+#define OUTPUT_HEADER "header"              // valid header
+
 // Plugin stuff
 #define PLUGIN_ATTRIBUTE_TYPE "type"                    // plugin's type
 #define PLUGIN_ATTRIBUTE_UID "uid"                      // plugin's unique id
