@@ -1,9 +1,7 @@
 add_subdirectory(core)
-
 add_subdirectory(gui)
-
-# built-in plugins (models and graph generators)
-add_subdirectory(plugins)
+add_subdirectory(plugins) # built-in plugins (models and graph generators)
+add_subdirectory(test)
 
 #### EXECUTABLE ####
 ADD_EXECUTABLE(evoplex main.cpp gui/icons/icons.qrc)
