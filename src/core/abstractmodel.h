@@ -68,7 +68,9 @@ public:
 
     // This method allows you to create custom outputs which, for example,
     // might be used by the GUI to generate custom plots or to be stored in a file.
-    virtual QVariantList requestCustomOutputs(QStringList requestedHeader) const {}
+    virtual QStringList requestCustomOutputs(QStringList requestedHeader) const {
+        return QStringList();
+    }
 };
 
 class IPluginModel

@@ -5,6 +5,7 @@
   "author": "Marcos Cardinot",
   "description": "just another model",
   "supportedGraphs": "mooreGrid,squareGrid",
+  "customOutputs": "",
   "agentAttributesSpace": [
     {"strategy": "int{0,1}"}
   ],
