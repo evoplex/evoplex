@@ -49,19 +49,17 @@ public:
         return value;
     }
 
-    static QStringList count(const Agents& agents)
+    static QStringList countAttr(const Agents& agents, const int attrIdx)
     {
-        // TODO
         std::vector<Value> values;
         std::vector<int> count;
-
-        for (Agent* agent : agents) {
-            pos = find(values, agent->attr(idx));
-            if (pos) {
-                ++count[pos];
-            } else {
-                values.emplace_back(value);
+        for (const Agent* agent : agents) {
+            int i = std::find(values.begin(), values.end(), agent->attr(attrIdx)) - values.end();
+            if (i == values.size()) { // not found
+                values.emplace_back(agent->attr(attrIdx));
                 count.emplace_back(1);
+            } else {
+                ++count[i];
             }
         }
     }

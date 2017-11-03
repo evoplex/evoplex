@@ -281,6 +281,6 @@ AbstractGraph* Experiment::graph(int trialId) const
 
 void Experiment::writeStep(Trial trial)
 {
-    trial.modelObj->graph()
+    //trial.modelObj->graph();
 }
 }
