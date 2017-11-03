@@ -49,6 +49,23 @@ public:
         return value;
     }
 
+    static QStringList count(const Agents& agents)
+    {
+        // TODO
+        std::vector<Value> values;
+        std::vector<int> count;
+
+        for (Agent* agent : agents) {
+            pos = find(values, agent->attr(idx));
+            if (pos) {
+                ++count[pos];
+            } else {
+                values.emplace_back(value);
+                count.emplace_back(1);
+            }
+        }
+    }
+
     // Check if the value belongs to the parameter space.
     // If true, return a valid QVariant with the correct type
     //

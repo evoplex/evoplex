@@ -13,12 +13,11 @@
 
 namespace evoplex {
 
-Experiment::Experiment(MainApp* mainApp, int id, int projId, bool, outputEnabled,
-                       Attributes* generalAttrs, Attributes* modelAttrs, Attributes* graphAttrs)
+Experiment::Experiment(MainApp* mainApp, int id, int projId, Attributes* generalAttrs,
+                       Attributes* modelAttrs, Attributes* graphAttrs)
     : m_mainApp(mainApp)
     , m_id(id)
     , m_projId(projId)
-    , m_outputEnabled(outputEnabled)
     , m_expStatus(INVALID)
 {
     init(generalAttrs, modelAttrs, graphAttrs);
@@ -47,6 +46,9 @@ void Experiment::init(Attributes* generalAttrs, Attributes* modelAttrs, Attribut
     m_seed = generalAttrs->value(GENERAL_ATTRIBUTE_SEED).toInt;
     m_autoDelete = generalAttrs->value(GENERAL_ATTRIBUTE_AUTODELETE).toBool;
     m_stopAt = generalAttrs->value(GENERAL_ATTRIBUTE_STOPAT).toInt;
+
+    m_writeEnabled = !generalAttrs->value(OUTPUT_DIR).toQString().isEmpty()
+            && !generalAttrs->value(OUTPUT_HEADER).toQString().isEmpty();
 
     m_pauseAt = m_stopAt;
     m_progress = 0;
@@ -145,15 +147,15 @@ void Experiment::processTrial(const int& trialId)
 
     bool algorithmConverged = false;
     while (trial.currentStep < m_pauseAt && !algorithmConverged) {
-        if (outputEnabled) {
-            saveStep(trial.currentStep);
+        if (m_writeEnabled) {
+            writeStep(trial);
         }
         algorithmConverged = trial.modelObj->algorithmStep();
         ++trial.currentStep;
     }
 
-    if (outputEnabled) {
-        saveStep(trial.currentStep);
+    if (m_writeEnabled) {
+        writeStep(trial);
     }
 
     if (trial.currentStep >= m_stopAt || algorithmConverged) {
@@ -277,4 +279,8 @@ AbstractGraph* Experiment::graph(int trialId) const
     return it.value().modelObj->graph();
 }
 
+void Experiment::writeStep(Trial trial)
+{
+    trial.modelObj->graph()
+}
 }

@@ -257,7 +257,7 @@ void AttributesWidget::slotCreateExperiment()
     }
 
     QString errorMsg;
-    int expId = m_project->newExperiment(header, values, m_enableOutputs->isChecked(), errorMsg);
+    int expId = m_project->newExperiment(header, values, errorMsg);
     if (expId >= 0) {
         emit (experimentCreated(expId));
     } else {
