@@ -11,6 +11,7 @@
 #include <QtDebug>
 #include <float.h>
 
+#include "agent.h"
 #include "attributes.h"
 #include "prg.h"
 #include "enums.h"
@@ -49,12 +50,11 @@ public:
         return value;
     }
 
-    static QStringList countAttr(const Agents& agents, const int attrIdx)
+    static void countAttr(const Agents& agents, const int attrIdx,
+                          std::vector<Value>& values, std::vector<int>& count)
     {
-        std::vector<Value> values;
-        std::vector<int> count;
         for (const Agent* agent : agents) {
-            int i = std::find(values.begin(), values.end(), agent->attr(attrIdx)) - values.end();
+            int i = std::find(values.begin(), values.end(), agent->attr(attrIdx)) - values.begin();
             if (i == values.size()) { // not found
                 values.emplace_back(agent->attr(attrIdx));
                 count.emplace_back(1);
