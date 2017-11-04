@@ -6,45 +6,35 @@
 #ifndef STATS_H
 #define STATS_H
 
-#include "agent.h"
-#include "attributes.h"
+#include <vector>
 
 namespace evoplex {
 
 class Stats
 {
 public:
-
-    enum Function {
-        Count
-    };
-
-    enum Entity {
-        Agents,
-        Edges
-    };
-
-    // <Function, Entity, attrIdx>
-    typedef std::tuple<Function, Entity, int> Operation;
-
-    static void doOperation(Operation op)
+    template<typename Iterator>
+    std::vector<int> count(Iterator entityBegin, Iterator entityEnd,
+                           const int attrIdx, std::vector<Value> header)
     {
-        // TODO
-    }
-
-    static void count(const Agents& agents, const int attrIdx,
-                      std::vector<Value>& values, std::vector<int>& count)
-    {
-        for (const Agent* agent : agents) {
-            int i = std::find(values.begin(), values.end(), agent->attr(attrIdx)) - values.begin();
-            if (i == values.size()) { // not found
-                values.emplace_back(agent->attr(attrIdx));
-                count.emplace_back(1);
-            } else {
+        std::vector<int> count;
+        count.resize(header.size());
+        while (entityBegin != entityEnd) {
+            int i = std::find(header.begin(), header.end(), (*entityBegin)->attr(attrIdx)) - header.begin();
+            if (i != header.size()) {
                 ++count[i];
             }
+            ++entityBegin;
         }
+        return count;
+    }
+
+    template<typename Container>
+    std::vector<int> count(Container entity, const int attrIdx, std::vector<Value> values)
+    {
+        return count(entity.begin(), entity.end(), attrIdx, values);
     }
 };
+
 }
-#endif // UTILS_H
+#endif // STATS_H

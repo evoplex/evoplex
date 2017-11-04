@@ -50,20 +50,6 @@ public:
         return value;
     }
 
-    static void countAttr(const Agents& agents, const int attrIdx,
-                          std::vector<Value>& values, std::vector<int>& count)
-    {
-        for (const Agent* agent : agents) {
-            int i = std::find(values.begin(), values.end(), agent->attr(attrIdx)) - values.begin();
-            if (i == values.size()) { // not found
-                values.emplace_back(agent->attr(attrIdx));
-                count.emplace_back(1);
-            } else {
-                ++count[i];
-            }
-        }
-    }
-
     // Check if the value belongs to the parameter space.
     // If true, return a valid QVariant with the correct type
     //
