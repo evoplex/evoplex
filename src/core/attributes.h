@@ -48,6 +48,7 @@ struct Value
         if (type == CHAR) return toChar == v.toChar;
         if (type == DOUBLE) return toDouble == v.toDouble;
         if (type == INT) return toInt == v.toInt;
+        if (type == STRING) return toString == v.toString;
         Q_ASSERT(false);
     }
 
