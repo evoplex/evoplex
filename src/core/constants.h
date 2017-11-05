@@ -32,7 +32,9 @@
 #define PLUGIN_ATTRIBUTE_DESCRIPTION "description"      // plugin's description
 // model (only)
 #define PLUGIN_ATTRIBUTE_AGENTSPACE "agentAttributesSpace"  // domain of the agent's attributes
+#define PLUGIN_ATTRIBUTE_EDGESPACE "edgeAttributesSpace"    // domain of the edge's attributes
 #define PLUGIN_ATTRIBUTE_MODELSPACE "modelAttributesSpace"  // domain of the model's attributes
+#define PLUGIN_ATTRIBUTE_CUSTOMOUTPUTS "customOutputs"      // custom outputs defined in the model
 #define PLUGIN_ATTRIBUTE_SUPPORTEDGRAPHS "supportedGraphs"  // graphIds allowed in the model
 // graph (only)
 #define PLUGIN_ATTRIBUTE_GRAPH_TYPE "graphType"             // graph types of a graph generator

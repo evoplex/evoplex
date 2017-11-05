@@ -41,10 +41,14 @@ public:
         QString name;
         QString description;
         QVector<QString> supportedGraphs;
+        QVector<QString> customOutputs;
         AttributesSpace agentAttrSpace;
+        AttributesSpace edgeAttrSpace;
         AttributesSpace modelAttrSpace;
         Attributes agentAttrMin;
         Attributes agentAttrMax;
+        Attributes edgeAttrMin;
+        Attributes edgeAttrMax;
         Attributes modelAttrMin;
         Attributes modelAttrMax;
         IPluginModel* factory;

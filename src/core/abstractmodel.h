@@ -19,6 +19,14 @@ class AbstractBaseModel
 {
     friend class Experiment;
 
+public:
+    inline AbstractGraph* graph() const { return m_graph; }
+    inline const PRG* prg() const { return m_prg; }
+    inline const Attributes* attrs() const { return m_attributes; }
+    inline const Value attr(const QString& name) { return m_attributes->value(name); }
+    inline const Value attr(int attrId) { return m_attributes->value(attrId); }
+    inline const QString& attrName(int attrId) { return m_attributes->name(attrId); }
+
 protected:
     explicit AbstractBaseModel() : m_graph(nullptr), m_prg(nullptr) {}
 
@@ -28,13 +36,6 @@ protected:
         delete m_prg;
         m_prg = nullptr;
     }
-
-    inline AbstractGraph* graph() const { return m_graph; }
-    inline PRG* prg() const { return m_prg; }
-    inline const Attributes* attrs() const { return m_attributes; }
-    inline const Value attr(const QString& name) { return m_attributes->value(name); }
-    inline const Value attr(int attrId) { return m_attributes->value(attrId); }
-    inline const QString& attrName(int attrId) { return m_attributes->name(attrId); }
 
 private:
     AbstractGraph* m_graph;

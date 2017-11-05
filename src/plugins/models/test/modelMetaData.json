@@ -9,6 +9,9 @@
   "agentAttributesSpace": [
     {"strategy": "int{0,1}"}
   ],
+  "edgeAttributesSpace": [
+    {"weight": "double[0,1]"}
+  ],
   "modelAttributesSpace": [
     {"temptation": "double[1,2]"},
     {"loners": "double[0,1]"}
