@@ -31,7 +31,7 @@ protected:
 
     inline AbstractGraph* graph() const { return m_graph; }
     inline PRG* prg() const { return m_prg; }
-    inline const Attributes* attributes() const { return m_attributes; }
+    inline const Attributes* attrs() const { return m_attributes; }
     inline const Value attr(const QString& name) { return m_attributes->value(name); }
     inline const Value attr(int attrId) { return m_attributes->value(attrId); }
     inline const QString& attrName(int attrId) { return m_attributes->name(attrId); }

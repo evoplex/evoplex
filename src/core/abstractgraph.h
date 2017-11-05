@@ -28,7 +28,7 @@ class AbstractBaseGraph
 public:
     inline const QString& name() const { return m_name; }
     inline const GraphType type() const { return m_type; }
-    inline const Attributes* attributes() const { return m_attrs; }
+    inline const Attributes* attrs() const { return m_attrs; }
     inline const Agents& agents() const { return m_agents; }
     inline Agent* agent(int id) const { return m_agents.at(id); }
     inline Agent* randAgent() const { return m_agents.at(m_prg->randI(m_agents.size())); }

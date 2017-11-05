@@ -29,9 +29,9 @@ public:
         : Edge(origin, neighbour, new Attributes(), true) {}
     ~Edge();
 
-    inline const Value& attribute(const char* name) const { return m_attrs->value(name); }
-    inline const Value& attribute(const int id) const { return m_attrs->value(id); }
-    inline void setAttribute(const int id, const Value& value) { m_attrs->setValue(id, value); }
+    inline const Value& attr(const char* name) const { return m_attrs->value(name); }
+    inline const Value& attr(const int id) const { return m_attrs->value(id); }
+    inline void setAttr(const int id, const Value& value) { m_attrs->setValue(id, value); }
 
     inline Agent* origin() const { return m_origin; }
     inline Agent* neighbour() const { return m_neighbour; }
