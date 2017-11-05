@@ -66,10 +66,11 @@ public:
     // If return is true, algorithm converged and simulation will stop asap.
     virtual bool algorithmStep() = 0;
 
-    // This method allows you to create custom outputs which, for example,
+    // This method allows you to custom outputs which, for example,
     // might be used by the GUI to generate custom plots or to be stored in a file.
-    virtual QStringList requestCustomOutputs(QStringList requestedHeader) const {
-        return QStringList();
+    // The requested "header" must be defined in the modelMetaData.json file.
+    virtual std::vector<Value> customOutputs(const std::vector<std::string>& header) const {
+        return std::vector<Value>();
     }
 };
 
