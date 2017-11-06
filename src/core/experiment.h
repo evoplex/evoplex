@@ -9,10 +9,12 @@
 #include <QHash>
 #include <QMutex>
 #include <QString>
+#include <QTextStream>
 
 #include "experimentsmgr.h"
 #include "mainapp.h"
 #include "constants.h"
+#include "output.h"
 
 namespace evoplex {
 
@@ -44,12 +46,14 @@ public:
         Status status = INVALID;
     };
 
-    explicit Experiment(MainApp* mainApp, int id, int projId,
-        Attributes *generalAttrs, Attributes *modelAttrs, Attributes *graphAttrs);
+    explicit Experiment(MainApp* mainApp, int id, int projId, Attributes* generalAttrs,
+            Attributes* modelAttrs, Attributes* graphAttrs, std::vector<Output*> fileOutputs);
 
     ~Experiment();
 
-    void init(Attributes* generalAttrs, Attributes* modelAttrs, Attributes* graphAttrs);
+    void init(Attributes* generalAttrs, Attributes* modelAttrs,
+              Attributes* graphAttrs, std::vector<Output*> fileOutputs);
+
     void reset();
 
     // Updates the progress value.
@@ -105,7 +109,6 @@ private:
     MainApp* m_mainApp;
     const int m_id;
     const int m_projId;
-    bool m_writeEnabled;
 
     Attributes* m_generalAttrs;
     Attributes* m_modelAttrs;
@@ -116,6 +119,10 @@ private:
     int m_seed;
     bool m_autoDelete;
     int m_stopAt;
+
+    QString m_fileHeader;
+    std::vector<Output*> m_fileOutputs;
+    QHash<int, QTextStream*> m_fileStreams; // <trialId, stream>
 
     int m_pauseAt;
     Status m_expStatus;
@@ -131,7 +138,7 @@ private:
     // We can safely consider that all parameters are valid at this point.
     // However, some things might fail (eg, missing agents, broken graph etc),
     // and, in that case, an invalid Trial() is returned.
-    Trial createTrial(const int& trialSeed);
+    Trial createTrial(const int trialId);
 
     // The trials are meant to have the same initial population.
     // So, considering that it might be a very expensive operation (eg, I/O),
@@ -146,7 +153,7 @@ private:
 
     void deleteTrials();
 
-    void writeStep(Trial trial);
+    void writeStep(const int trialId, AbstractModel* modelObj);
 };
 }
 

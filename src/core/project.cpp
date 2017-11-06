@@ -120,8 +120,24 @@ const int Project::newExperiment(const QStringList& header, const QStringList& v
         }
     }
 
+    QString outHeader = generalAttrs->value(OUTPUT_HEADER).toQString();
+    std::vector<Output*> outputs;
+    if (!outHeader.isEmpty()) {
+        outputs = Output::parseHeader(outHeader.split(","),
+                mPlugin->agentAttrMin, mPlugin->edgeAttrMin, errorMsg);
+        if (outputs.empty()) {
+            failedAttributes.append(OUTPUT_HEADER);
+        }
+
+        QFileInfo outDir(generalAttrs->value(OUTPUT_DIR).toQString());
+        if (!outDir.isDir() || !outDir.isWritable()) {
+            errorMsg += "The output directory must be valid and writable!\n";
+            failedAttributes.append(OUTPUT_DIR);
+        }
+    }
+
     if (!failedAttributes.isEmpty()) {
-        errorMsg = QString("The following attributes are missing/invalid: %1").arg(failedAttributes.join(","));
+        errorMsg += QString("The following attributes are missing/invalid: %1").arg(failedAttributes.join(","));
         delete generalAttrs;
         delete graphAttrs;
         delete modelAttrs;
@@ -131,7 +147,7 @@ const int Project::newExperiment(const QStringList& header, const QStringList& v
     // that's great! everything seems to be valid
     ++m_lastExpId;
     m_experiments.insert(m_lastExpId,
-        new Experiment(m_mainApp, m_lastExpId, m_id, generalAttrs, modelAttrs, graphAttrs));
+        new Experiment(m_mainApp, m_lastExpId, m_id, generalAttrs, modelAttrs, graphAttrs, outputs));
 
     m_hasUnsavedChanges = true;
     emit (hasUnsavedChanges(true));

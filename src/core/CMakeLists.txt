@@ -1,6 +1,7 @@
 set(EVOPLEX_CORE_H
   constants.h
   enums.h
+  output.cpp
   output.h
   prg.h
   stats.h
