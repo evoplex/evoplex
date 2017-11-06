@@ -70,7 +70,7 @@ AttributesWidget::AttributesWidget(Project* project, QWidget *parent)
 
     // setup the tree widget: outputs
     m_treeItemOutputs = new QTreeWidgetItem(m_ui->treeWidget);
-    m_treeItemOutputs->setText(0, "Outputs");
+    m_treeItemOutputs->setText(0, "File Outputs");
     m_treeItemOutputs->setExpanded(true);
     // -- enabled
     m_enableOutputs = new QCheckBox("save to file");
@@ -209,6 +209,11 @@ void AttributesWidget::slotCreateExperiment()
         return;
     } else if (m_selectedGraphId == STRING_NULL_PLUGINID) {
         QMessageBox::warning(this, "Experiment", "Please, select a valid 'graphId'.");
+        return;
+    } else if (m_enableOutputs->isChecked()
+               && (m_widgetFields.value(OUTPUT_DIR).value<QLineEdit*>()->text().isEmpty()
+                   || m_widgetFields.value(OUTPUT_HEADER).value<QLineEdit*>()->text().isEmpty())) {
+        QMessageBox::warning(this, "Experiment", "Please, insert a valid output directory and a output header.");
         return;
     }
 

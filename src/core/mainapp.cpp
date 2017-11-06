@@ -149,7 +149,7 @@ bool MainApp::loadModelPlugin(QObject* instance, QJsonObject& metaData)
     model->customOutputs = metaData[PLUGIN_ATTRIBUTE_CUSTOMOUTPUTS].toString().split(",").toVector();
     model->factory = qobject_cast<IPluginModel*>(instance);
     model->agentAttrSpace = attributesSpace(metaData, PLUGIN_ATTRIBUTE_AGENTSPACE);
-    model->agentAttrSpace = attributesSpace(metaData, PLUGIN_ATTRIBUTE_EDGESPACE);
+    model->edgeAttrSpace = attributesSpace(metaData, PLUGIN_ATTRIBUTE_EDGESPACE);
     model->modelAttrSpace = attributesSpace(metaData, PLUGIN_ATTRIBUTE_MODELSPACE);
 
     if (!Utils::boundaryValues(model->agentAttrSpace, model->agentAttrMin, model->agentAttrMax)
