@@ -154,6 +154,7 @@ void Experiment::processTrial(const int& trialId)
             return;
         }
         m_trials.insert(trialId, trial);
+        writeStep(trialId, trial.modelObj);
     }
 
     Trial& trial = m_trials[trialId];
@@ -165,11 +166,10 @@ void Experiment::processTrial(const int& trialId)
 
     bool algorithmConverged = false;
     while (trial.currentStep < m_pauseAt && !algorithmConverged) {
-        writeStep(trialId, trial.modelObj);
         algorithmConverged = trial.modelObj->algorithmStep();
+        writeStep(trialId, trial.modelObj);
         ++trial.currentStep;
     }
-    writeStep(trialId, trial.modelObj);
 
     if (trial.currentStep >= m_stopAt || algorithmConverged) {
         for (QTextStream* stream : m_fileStreams) {

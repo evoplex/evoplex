@@ -17,25 +17,37 @@ namespace evoplex {
 class Output
 {
 public:
-    virtual std::vector<Value> doOperation(const AbstractModel* model) = 0;
+    explicit Output(bool enableCache = false);
+
+    virtual Values doOperation(const AbstractModel* model) = 0;
 
     // Printable header with all columns of this operation separated by commas.
-    // Format:
-    // - CustomOutput : "custom_nameDefinedInTheModel"
-    // - DefaultOutput : "function_entity_attrName_value"
     virtual QString printableHeader() = 0;
 
     static std::vector<Output*> parseHeader(const QStringList& header, const Attributes& agentAttrMin,
                                             const Attributes &edgeAttrMin, QString &errorMsg);
+
+    const std::vector<Values> readCache() const { return m_cache; }
+    void flushCache();
+
+    bool cacheEnabled() const { return m_cacheEnabled; }
+    void setEnableCache(bool enabled) { m_cacheEnabled = enabled; }
+
+private:
+    bool m_cacheEnabled;
+    std::vector<Values> m_cache;
 };
 
 
 class CustomOutput: public Output
 {
 public:
-    CustomOutput(const std::vector<std::string>& header);
+    explicit CustomOutput(const std::vector<std::string>& header);
 
     virtual std::vector<Value> doOperation(const AbstractModel* model);
+
+    // Printable header with all columns of this operation separated by commas.
+    // Format: "custom_nameDefinedInTheModel"
     virtual QString printableHeader();
 
 private:
@@ -56,10 +68,13 @@ public:
         E_Edges
     };
 
-    DefaultOutput(Function f, Entity e, const QString& attrName,
-                  int attrIdx, const std::vector<Value>& header);
+    explicit DefaultOutput(Function f, Entity e, const QString& attrName,
+                           int attrIdx, const std::vector<Value>& header);
 
     virtual std::vector<Value> doOperation(const AbstractModel* model);
+
+    // Printable header with all columns of this operation separated by commas.
+    // Format: "function_entity_attrName_value"
     virtual QString printableHeader();
 
 private:

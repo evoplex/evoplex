@@ -17,6 +17,8 @@ namespace evoplex {
 // is an integer which is assigned in the same order as defined in metaData.json
 typedef QHash<QString, QPair<int, QString>> AttributesSpace;
 
+typedef std::vector<Value> Values;
+
 struct Value
 {
     enum Type { BOOL, CHAR, DOUBLE, INT, STRING, INVALID } type;

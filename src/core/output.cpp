@@ -81,6 +81,17 @@ QString CustomOutput::printableHeader()
 /*******************************************************/
 /*******************************************************/
 
+Output::Output(bool enableCache)
+    : m_cacheEnabled(enableCache)
+{
+}
+
+void flushCache()
+{
+    m_cache.clear();
+    m_cache.shrink_to_fit();
+}
+
 std::vector<Output*> Output::parseHeader(const QStringList& header, const Attributes& agentAttrMin,
                                          const Attributes& edgeAttrMin, QString& errorMsg)
 {
