@@ -11,6 +11,7 @@
 #include <QLineEdit>
 #include <QMessageBox>
 #include <QVariant>
+#include <QRadioButton>
 
 #include "attributeswidget.h"
 #include "ui_attributeswidget.h"
@@ -90,9 +91,6 @@ AttributesWidget::AttributesWidget(Project* project, QWidget *parent)
     QTreeWidgetItem* itemDir = new QTreeWidgetItem(m_treeItemOutputs);
     itemDir->setText(0, OUTPUT_DIR);
     m_ui->treeWidget->setItemWidget(itemDir, 1, outLayout->parentWidget());
-    // -- avgTrials
-    QCheckBox* outAvgTrials = new QCheckBox("average trials");
-    addTreeWidget(m_treeItemOutputs, OUTPUT_AVGTRIALS, QVariant::fromValue(outAvgTrials));
     // -- add custom widget: output directory
     QLineEdit* outHeader = new QLineEdit(m_project->getDest());
     QPushButton* outBuildHeader = new QPushButton("...");
@@ -107,13 +105,35 @@ AttributesWidget::AttributesWidget(Project* project, QWidget *parent)
     itemHeader->setText(0, OUTPUT_HEADER);
     m_ui->treeWidget->setItemWidget(itemHeader, 1, headerLayout->parentWidget());
 
+/* TODO: make the buttons to avgTrials and saveSteps work
+    // -- avgTrials
+    QCheckBox* outAvgTrials = new QCheckBox("average trials");
+    addTreeWidget(m_treeItemOutputs, OUTPUT_AVGTRIALS, QVariant::fromValue(outAvgTrials));
+    // -- steps to save
+    QRadioButton* outAllSteps = new QRadioButton("all");
+    outAllSteps->setChecked(true);
+    QRadioButton* outLastSteps = new QRadioButton("last");
+    QSpinBox* outNumSteps = new QSpinBox();
+    outNumSteps->setButtonSymbols(QSpinBox::NoButtons);
+    outNumSteps->setMinimum(0);
+    outNumSteps->setMaximum(EVOPLEX_MAX_STEPS);
+    QHBoxLayout* outStepsLayout = new QHBoxLayout(new QWidget(m_ui->treeWidget));
+    outStepsLayout->setMargin(0);
+    outStepsLayout->insertWidget(0, outAllSteps);
+    outStepsLayout->insertWidget(1, outLastSteps);
+    outStepsLayout->insertWidget(2, outNumSteps);
+    outStepsLayout->insertSpacerItem(3, new QSpacerItem(5,5,QSizePolicy::MinimumExpanding));
+    QTreeWidgetItem* itemOut = new QTreeWidgetItem(m_treeItemOutputs);
+    itemOut->setText(0, OUTPUT_SAVESTEPS);
+    m_ui->treeWidget->setItemWidget(itemOut, 1, outStepsLayout->parentWidget());
+*/
     connect(m_enableOutputs, &QCheckBox::clicked,
-            [outDir, outBrowseDir, outHeader, outBuildHeader, outAvgTrials](bool b) {
+            [outDir, outBrowseDir, outHeader, outBuildHeader](bool b) {
                 outDir->setEnabled(b);
                 outBrowseDir->setEnabled(b);
                 outHeader->setEnabled(b);
                 outBuildHeader->setEnabled(b);
-                outAvgTrials->setEnabled(b);
+//                outAvgTrials->setEnabled(b);
     });
     m_enableOutputs->setChecked(false);
 

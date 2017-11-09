@@ -23,6 +23,7 @@
 #define OUTPUT_DIR "directory"              // path to the directory in which the file will be saved
 #define OUTPUT_AVGTRIALS "avgTrials"        // 1 to indicate if the output should be done across all trials; 0 otherwise
 #define OUTPUT_HEADER "header"              // valid header
+#define OUTPUT_SAVESTEPS "saveSteps"        // n=0 to save all steps; n>0 to save the last n steps
 
 // Plugin stuff
 #define PLUGIN_ATTRIBUTE_TYPE "type"                    // plugin's type
