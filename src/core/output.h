@@ -24,6 +24,8 @@ public:
     // Printable header with all columns of this operation separated by commas.
     virtual QString printableHeader() = 0;
 
+    virtual bool operator==(const Output& output) = 0;
+
     static std::vector<Output*> parseHeader(const QStringList& header,
             const Attributes& agentAttrMin, const Attributes &edgeAttrMin, QString &errorMsg);
 
@@ -50,6 +52,8 @@ public:
     // Format: "custom_nameDefinedInTheModel"
     virtual QString printableHeader();
 
+    virtual bool operator==(const Output& output);
+
 private:
     const std::vector<std::string> m_header;
 };
@@ -69,7 +73,7 @@ public:
     };
 
     explicit DefaultOutput(Function f, Entity e, const QString& attrName, int attrIdx,
-                           const std::vector<Value>& header, bool enableCache);
+                           const Values& inputs, bool enableCache);
 
     virtual Values doOperation(const AbstractModel* model);
 
@@ -77,12 +81,19 @@ public:
     // Format: "function_entity_attrName_value"
     virtual QString printableHeader();
 
+    virtual bool operator==(const Output& output);
+
+    inline Function function() const { return m_func; }
+    inline Entity entity() const { return m_entity; }
+    inline int attrIdx() const { return m_attrIdx; }
+    inline const Values& inputs() const { return m_inputs; }
+
 private:
     const Function m_func;
     const Entity m_entity;
     const QString m_attrName;
     const int m_attrIdx;
-    const std::vector<Value> m_header;
+    const std::vector<Value> m_inputs;
 };
 
 }

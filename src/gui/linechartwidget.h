@@ -7,8 +7,7 @@
 #define LINECHARTWIDGET_H
 
 #include <QDockWidget>
-#include <QLineEdit>
-#include <vector>
+#include <QtCharts/QSplineSeries>
 
 #include "core/experiment.h"
 
@@ -27,7 +26,7 @@ private slots:
 
 private:
     Experiment* m_exp;
-    QTimer m_resizeTimer;
+    QtCharts::QSplineSeries* m_series;
 };
 }
 

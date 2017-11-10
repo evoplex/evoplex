@@ -93,6 +93,7 @@ public:
     inline void setAutoDelete(bool b) { m_autoDelete = b; }
 
     inline void addOutput(Output* output) { m_extraOutputs.emplace_back(output); }
+    Output* searchOutput()
 
     AbstractGraph* graph(int trialId) const;
     inline int id() const { return m_id; }

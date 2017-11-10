@@ -12,13 +12,13 @@
 namespace evoplex {
 
 DefaultOutput::DefaultOutput(Function f, Entity e, const QString& attrName, int attrIdx,
-                             const std::vector<Value>& header, bool enableCache)
+                             const Values& inputs, bool enableCache)
     : Output(enableCache)
     , m_func(f)
     , m_entity(e)
     , m_attrName(attrName)
     , m_attrIdx(attrIdx)
-    , m_header(header)
+    , m_inputs(inputs)
 {
 }
 
@@ -61,6 +61,15 @@ QString DefaultOutput::printableHeader()
     }
     ret.chop(1);
     return ret;
+}
+
+bool DefaultOutput::operator==(const Output* output)
+{
+    DefaultOutput* other = dynamic_cast<DefaultOutput*>(ouput);
+    if (!other) return false;
+    if (m_func != other->function()) return false;
+    if (m_entity != other->entity()) return false;
+    // TODO
 }
 
 /*******************************************************/
