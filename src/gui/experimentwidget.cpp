@@ -10,6 +10,7 @@
 #include <QLabel>
 
 #include "experimentwidget.h"
+#include "linechartwidget.h"
 #include "graphwidget.h"
 
 namespace evoplex {
@@ -72,6 +73,7 @@ ExperimentWidget::ExperimentWidget(Experiment* exp, ProjectsWindow* pwindow)
         m_innerWindow->addDockWidget(Qt::TopDockWidgetArea, graph);
         connect(m_timer, SIGNAL(timeout()), graph, SLOT(update()));
     });
+m_innerWindow->addDockWidget(Qt::TopDockWidgetArea, new LineChartWidget(m_exp, this));
     m_timer->start(0);
 }
 

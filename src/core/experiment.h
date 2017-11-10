@@ -92,6 +92,8 @@ public:
     inline bool autoDelete() const { return m_autoDelete; }
     inline void setAutoDelete(bool b) { m_autoDelete = b; }
 
+    inline void addOutput(Output* output) { m_extraOutputs.emplace_back(output); }
+
     AbstractGraph* graph(int trialId) const;
     inline int id() const { return m_id; }
     inline int projId() const { return m_projId; }
@@ -122,6 +124,7 @@ private:
 
     QString m_fileHeader;
     std::vector<Output*> m_fileOutputs;
+    std::vector<Output*> m_extraOutputs;
     QHash<int, QTextStream*> m_fileStreams; // <trialId, stream>
 
     int m_pauseAt;

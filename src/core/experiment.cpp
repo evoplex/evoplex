@@ -323,7 +323,7 @@ void Experiment::writeStep(const int trialId, AbstractModel* modelObj)
 
     QString values;
     for (Output* output : m_fileOutputs) {
-        std::vector<Value> vals = output->doOperation(modelObj);
+        Values vals = output->doOperation(modelObj);
         for (Value val : vals) {
             values += val.toQString() + ",";
         }
@@ -331,5 +331,9 @@ void Experiment::writeStep(const int trialId, AbstractModel* modelObj)
     values.chop(1);
     values += "\n";
     m_fileStreams.value(trialId)->operator <<(values);
+
+    for (Output* output : m_extraOutputs) {
+        output->doOperation(modelObj);
+    }
 }
 }

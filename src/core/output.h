@@ -24,16 +24,16 @@ public:
     // Printable header with all columns of this operation separated by commas.
     virtual QString printableHeader() = 0;
 
-    static std::vector<Output*> parseHeader(const QStringList& header, const Attributes& agentAttrMin,
-                                            const Attributes &edgeAttrMin, QString &errorMsg);
+    static std::vector<Output*> parseHeader(const QStringList& header,
+            const Attributes& agentAttrMin, const Attributes &edgeAttrMin, QString &errorMsg);
 
     const std::vector<Values> readCache() const { return m_cache; }
     void flushCache();
 
-    bool cacheEnabled() const { return m_cacheEnabled; }
-    void setEnableCache(bool enabled) { m_cacheEnabled = enabled; }
+    inline bool cacheEnabled() const { return m_cacheEnabled; }
+    inline void setEnableCache(bool enabled) { m_cacheEnabled = enabled; }
 
-private:
+protected:
     bool m_cacheEnabled;
     std::vector<Values> m_cache;
 };
@@ -42,9 +42,9 @@ private:
 class CustomOutput: public Output
 {
 public:
-    explicit CustomOutput(const std::vector<std::string>& header);
+    explicit CustomOutput(const std::vector<std::string>& header, bool enableCache);
 
-    virtual std::vector<Value> doOperation(const AbstractModel* model);
+    virtual Values doOperation(const AbstractModel* model);
 
     // Printable header with all columns of this operation separated by commas.
     // Format: "custom_nameDefinedInTheModel"
@@ -68,10 +68,10 @@ public:
         E_Edges
     };
 
-    explicit DefaultOutput(Function f, Entity e, const QString& attrName,
-                           int attrIdx, const std::vector<Value>& header);
+    explicit DefaultOutput(Function f, Entity e, const QString& attrName, int attrIdx,
+                           const std::vector<Value>& header, bool enableCache);
 
-    virtual std::vector<Value> doOperation(const AbstractModel* model);
+    virtual Values doOperation(const AbstractModel* model);
 
     // Printable header with all columns of this operation separated by commas.
     // Format: "function_entity_attrName_value"

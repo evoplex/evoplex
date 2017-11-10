@@ -5,6 +5,7 @@ set(EVOPLEX_GUI_H
   attributeswidget.h
   #contextmenutable.h
   experimentwidget.h
+  linechartwidget.h
   graphwidget.h
   projectwidget.h
   projectswindow.h
@@ -21,6 +22,7 @@ set(EVOPLEX_GUI_CXX
   attributeswidget.cpp
   #contextmenutable.cpp
   experimentwidget.cpp
+  linechartwidget.cpp
   graphwidget.cpp
   projectwidget.cpp
   projectswindow.cpp
@@ -45,4 +47,4 @@ qt5_wrap_ui(EVOPLEX_GUI_UI
 
 add_library(EvoplexGUILib SHARED ${EVOPLEX_GUI_CXX} ${EVOPLEX_GUI_UI})
 
-target_link_libraries(EvoplexGUILib EvoplexCore Qt5::Core Qt5::Widgets)
+target_link_libraries(EvoplexGUILib EvoplexCore Qt5::Core Qt5::Widgets Qt5::Charts)

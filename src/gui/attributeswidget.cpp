@@ -105,11 +105,11 @@ AttributesWidget::AttributesWidget(Project* project, QWidget *parent)
     itemHeader->setText(0, OUTPUT_HEADER);
     m_ui->treeWidget->setItemWidget(itemHeader, 1, headerLayout->parentWidget());
 
-/* TODO: make the buttons to avgTrials and saveSteps work
+/* TODO: make the buttons to avgTrials and saveSteps work*/
     // -- avgTrials
     QCheckBox* outAvgTrials = new QCheckBox("average trials");
     addTreeWidget(m_treeItemOutputs, OUTPUT_AVGTRIALS, QVariant::fromValue(outAvgTrials));
-    // -- steps to save
+/*    // -- steps to save
     QRadioButton* outAllSteps = new QRadioButton("all");
     outAllSteps->setChecked(true);
     QRadioButton* outLastSteps = new QRadioButton("last");

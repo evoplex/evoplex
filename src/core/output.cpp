@@ -11,9 +11,10 @@
 
 namespace evoplex {
 
-DefaultOutput::DefaultOutput(Function f, Entity e, const QString& attrName,
-                             int attrIdx, const std::vector<Value>& header)
-    : m_func(f)
+DefaultOutput::DefaultOutput(Function f, Entity e, const QString& attrName, int attrIdx,
+                             const std::vector<Value>& header, bool enableCache)
+    : Output(enableCache)
+    , m_func(f)
     , m_entity(e)
     , m_attrName(attrName)
     , m_attrIdx(attrIdx)
@@ -21,19 +22,26 @@ DefaultOutput::DefaultOutput(Function f, Entity e, const QString& attrName,
 {
 }
 
-std::vector<Value> DefaultOutput::doOperation(const AbstractModel* model)
+Values DefaultOutput::doOperation(const AbstractModel* model)
 {
+    Values vals;
+
     switch (m_func) {
     case F_Count:
         if (m_entity == E_Agents)
-            return Stats::count(model->graph()->agents(), m_attrIdx, m_header);
+            vals = Stats::count(model->graph()->agents(), m_attrIdx, m_header);
         else
-            return Stats::count(model->graph()->edges(), m_attrIdx, m_header);
+            vals = Stats::count(model->graph()->edges(), m_attrIdx, m_header);
         break;
     default:
         qFatal("doOperation() invalid function!");
         break;
     }
+
+    if (m_cacheEnabled) {
+        m_cache.emplace_back(vals);
+    }
+    return vals;
 }
 
 QString DefaultOutput::printableHeader()
@@ -58,14 +66,19 @@ QString DefaultOutput::printableHeader()
 /*******************************************************/
 /*******************************************************/
 
-CustomOutput::CustomOutput(const std::vector<std::string>& header)
-        : m_header(header)
+CustomOutput::CustomOutput(const std::vector<std::string>& header, bool enableCache)
+        : Output(enableCache)
+        , m_header(header)
 {
 }
 
-std::vector<Value> CustomOutput::doOperation(const AbstractModel* model)
+Values CustomOutput::doOperation(const AbstractModel* model)
 {
-    return model->customOutputs(m_header);
+    Values vals = model->customOutputs(m_header);
+    if (m_cacheEnabled) {
+        m_cache.emplace_back(vals);
+    }
+    return vals;
 }
 
 QString CustomOutput::printableHeader()
@@ -86,7 +99,7 @@ Output::Output(bool enableCache)
 {
 }
 
-void flushCache()
+void Output::flushCache()
 {
     m_cache.clear();
     m_cache.shrink_to_fit();
@@ -157,11 +170,11 @@ std::vector<Output*> Output::parseHeader(const QStringList& header, const Attrib
             attrHeader.emplace_back(val);
         }
 
-        outputs.emplace_back(new DefaultOutput(func, entity, entityAttrMin.name(attrIdx), attrIdx, attrHeader));
+        outputs.emplace_back(new DefaultOutput(func, entity, entityAttrMin.name(attrIdx), attrIdx, attrHeader, false));
     }
 
     if (!customHeader.empty()) {
-        outputs.emplace_back(new CustomOutput(customHeader));
+        outputs.emplace_back(new CustomOutput(customHeader, false));
     }
 
     return outputs;
