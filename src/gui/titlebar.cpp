@@ -29,6 +29,8 @@ TitleBar::TitleBar(Experiment* exp, QDockWidget* parent)
         m_ui->cbTrial->insertItem(trialId, QString::number(trialId));
     }
     connect(m_ui->cbTrial, SIGNAL(currentIndexChanged(int)), SIGNAL(trialSelected(int)));
+
+    connect(m_ui->bSettings, SIGNAL(clicked(bool)), SIGNAL(openSettingsDlg()));
 }
 
 TitleBar::~TitleBar()

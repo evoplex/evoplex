@@ -25,6 +25,7 @@ public:
 
 signals:
     void trialSelected(int);
+    void openSettingsDlg();
 
 protected:
     virtual void paintEvent(QPaintEvent* pe);
