@@ -52,6 +52,16 @@ struct Value
         Q_ASSERT(false);
     }
 
+    bool operator !=(Value v) {
+        Q_ASSERT(type == v.type);
+        if (type != BOOL) return toBool != v.toBool;
+        if (type != CHAR) return toChar != v.toChar;
+        if (type != DOUBLE) return toDouble != v.toDouble;
+        if (type != INT) return toInt != v.toInt;
+        if (type != STRING) return toString != v.toString;
+        Q_ASSERT(false);
+    }
+
     bool operator <(Value v) {
         Q_ASSERT(type == v.type);
         if (type == CHAR) return toChar < v.toChar;

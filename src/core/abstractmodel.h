@@ -70,7 +70,7 @@ public:
     // This method allows you to custom outputs which, for example,
     // might be used by the GUI to generate custom plots or to be stored in a file.
     // The requested "header" must be defined in the modelMetaData.json file.
-    virtual std::vector<Value> customOutputs(const std::vector<std::string>& header) const {
+    virtual std::vector<Value> customOutputs(const Values& inputs) const {
         return std::vector<Value>();
     }
 };
