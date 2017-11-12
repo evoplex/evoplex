@@ -9,9 +9,10 @@
 #include <QList>
 #include <QMetaProperty>
 #include <QObject>
+#include <QVariantHash>
 
 #include "core/interfaces.h"
-#include "core/processes.h"
+#include "core/processesmgr.h"
 
 class Project;
 class Simulation;
@@ -25,7 +26,9 @@ public:
         QString author;
         QString name;
         QString description;
-        QVariantMap params;
+        QVariantHash agentParamsDomain;
+        QVariantHash defaultModelParams;
+        QVariantHash defaultInspectorParams;
         IModelFactory* factory;
     };
 
@@ -37,12 +40,12 @@ public:
     Project* newProject(const QString& modelName, const QString& name,
             const QString& descr, const QString& dir);
 
-    inline const Processes* getProcesses() { return m_processes; }
+    inline ProcessesMgr* getProcessesMgr() { return m_processesMgr; }
     inline const QList<Model*> getModels() { return m_models.values(); }
     inline const Model* getModel(QString name) { return m_models.value(name); }
 
 private:
-    Processes* m_processes;
+    ProcessesMgr* m_processesMgr;
     QMap<QString, Model*> m_models;
     QList<Project*> m_openedProjects;
 

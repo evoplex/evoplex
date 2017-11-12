@@ -11,7 +11,7 @@
 #include "core/project.h"
 
 MainApp::MainApp()
-    : m_processes(new Processes())
+    : m_processesMgr(new ProcessesMgr())
 {
 }
 
@@ -22,6 +22,9 @@ MainApp::~MainApp()
         p = NULL;
     }
     m_openedProjects.clear();
+
+    delete m_processesMgr;
+    m_processesMgr = NULL;
 }
 
 QString MainApp::loadModel(QString path)
@@ -44,11 +47,10 @@ QString MainApp::loadModel(QString path)
     }
 
     IModel* mi = model->factory->create();
-    const QMetaObject* meta = mi->metaObject();
-    for(int i = 1; i < meta->propertyCount(); ++i) { // skip objectName
-        QMetaProperty p = meta->property(i);
-        model->params.insert(p.name(), p.read(mi));
-    }
+    model->defaultModelParams = mi->getModelParams();
+    model->defaultInspectorParams = mi->getInspectorParams();
+    model->agentParamsDomain = mi->agentParamsDomain();
+    delete mi;
 
     m_models.insert(model->name, model);
     return model->name;
@@ -57,7 +59,7 @@ QString MainApp::loadModel(QString path)
 Project* MainApp::newProject(const QString& modelName, const QString& name,
         const QString& descr, const QString& dir)
 {
-    Project* p = new Project(*this, m_models.value(modelName), name, descr, dir);
+    Project* p = new Project(this, m_models.value(modelName), name, descr, dir);
     m_openedProjects.append(p);
     return p;
 }
