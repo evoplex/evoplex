@@ -6,6 +6,9 @@ SET(CMAKE_INCLUDE_CURRENT_DIR ON)
 # Instruct CMake to run moc automatically when needed.
 SET(CMAKE_AUTOMOC ON)
 
+# Generate the commands
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 # c++11
 SET (CMAKE_CXX_STANDARD 11)
 
