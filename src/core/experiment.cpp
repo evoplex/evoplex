@@ -50,10 +50,11 @@ void Experiment::init(Attributes* generalAttrs, Attributes* modelAttrs,
     m_modelAttrs = modelAttrs;
     m_graphAttrs = graphAttrs;
     m_fileOutputs = fileOutputs;
-    m_fileHeader = "";
 
+    m_fileHeader = "";
     if (!m_fileOutputs.empty()) {
         for (Output* output : m_fileOutputs) {
+            Q_ASSERT(output->inputs().size() > 0);
             m_fileHeader += output->printableHeader() + ",";
         }
         m_fileHeader.chop(1);
@@ -154,7 +155,7 @@ void Experiment::processTrial(const int& trialId)
             return;
         }
         m_trials.insert(trialId, trial);
-        writeStep(trialId, trial.modelObj);
+        writeStep(trialId);
     }
 
     Trial& trial = m_trials[trialId];
@@ -167,7 +168,15 @@ void Experiment::processTrial(const int& trialId)
     bool algorithmConverged = false;
     while (trial.currentStep < m_pauseAt && !algorithmConverged) {
         algorithmConverged = trial.modelObj->algorithmStep();
-        writeStep(trialId, trial.modelObj);
+
+        for (Output* output : m_fileOutputs)
+            output->doOperation(trial.modelObj);
+        for (Output* output : m_extraOutputs)
+            output->doOperation(trial.modelObj);
+
+        // TODO: write only after X steps
+        writeStep(trialId);
+
         ++trial.currentStep;
     }
 
@@ -315,25 +324,40 @@ AbstractGraph* Experiment::graph(int trialId) const
     return it.value().modelObj->graph();
 }
 
-void Experiment::writeStep(const int trialId, AbstractModel* modelObj)
+void Experiment::writeStep(const int trialId)
 {
-    if (m_fileOutputs.empty()) {
+    if (m_fileOutputs.empty() || m_fileOutputs.front()->isEmpty(0)) {
         return;
     }
 
-    QString values;
+    QString rows;
+    while (!m_fileOutputs.front()->isEmpty(0)) {
+        for (Output* output : m_fileOutputs) {
+            Values vals = output->readFrontRow(0);
+            output->flushFrontRow(0);
+            for (Value val : vals) {
+                rows += val.toQString() + ",";
+            }
+        }
+        rows.chop(1);
+        rows += "\n";
+    }
+
+    m_fileStreams.value(trialId)->operator <<(rows);
+}
+
+Output* Experiment::searchOutput(const Output* find)
+{
     for (Output* output : m_fileOutputs) {
-        Values vals = output->doOperation(modelObj);
-        for (Value val : vals) {
-            values += val.toQString() + ",";
+        if (output->operator ==(find)) {
+            return output;
         }
     }
-    values.chop(1);
-    values += "\n";
-    m_fileStreams.value(trialId)->operator <<(values);
-
     for (Output* output : m_extraOutputs) {
-        output->doOperation(modelObj);
+        if (output->operator ==(find)) {
+            return output;
+        }
     }
+    return nullptr;
 }
 }

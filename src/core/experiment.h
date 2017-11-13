@@ -93,7 +93,7 @@ public:
     inline void setAutoDelete(bool b) { m_autoDelete = b; }
 
     inline void addOutput(Output* output) { m_extraOutputs.emplace_back(output); }
-    Output* searchOutput()
+    Output* searchOutput(const Output* find);
 
     AbstractGraph* graph(int trialId) const;
     inline int id() const { return m_id; }
@@ -123,7 +123,7 @@ private:
     bool m_autoDelete;
     int m_stopAt;
 
-    QString m_fileHeader;
+    QString m_fileHeader;   // file header is the same for all trials; let's save it then
     std::vector<Output*> m_fileOutputs;
     std::vector<Output*> m_extraOutputs;
     QHash<int, QTextStream*> m_fileStreams; // <trialId, stream>
@@ -157,7 +157,7 @@ private:
 
     void deleteTrials();
 
-    void writeStep(const int trialId, AbstractModel* modelObj);
+    void writeStep(const int trialId);
 };
 }
 
