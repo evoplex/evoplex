@@ -37,8 +37,9 @@ set(EVOPLEX_GUI_CXX
 qt5_wrap_ui(EVOPLEX_GUI_UI
   forms/attributeswidget.ui
   forms/graphwidget.ui
-  forms/queuewidget.ui
+  forms/linechartsettings.ui
   forms/projectwidget.ui
+  forms/queuewidget.ui
   forms/savedialog.ui
   forms/settingswidget.ui
   forms/titlebar.ui
