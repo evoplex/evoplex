@@ -6,10 +6,12 @@
 #ifndef LINECHARTWIDGET_H
 #define LINECHARTWIDGET_H
 
+#include <QDialog>
 #include <QDockWidget>
-#include <QtCharts/QSplineSeries>
+#include <QtCharts/QLineSeries>
 
 #include "core/experiment.h"
+#include "ui_linechartsettings.h"
 
 namespace evoplex {
 
@@ -23,10 +25,25 @@ public:
 
 private slots:
     void setSelectedTrial(int trialId);
+    void slotAddSeries();
+    void slotEntityChanged(bool isAgent);
+    void slotFuncChanged(int idx);
+    void updateSeries();
 
 private:
+    struct Series {
+        QtCharts::QLineSeries* series;
+        Output* output;
+        int cacheIdx = 0;
+        int rowsSkipped = 0;
+    };
+
+    Ui_LineChartSettings* m_settingsDlg;
     Experiment* m_exp;
-    QtCharts::QSplineSeries* m_series;
+    QtCharts::QChart* m_chart;
+    std::vector<Series> m_series;
+    float m_maxY;
+    bool m_finished;
 };
 }
 
