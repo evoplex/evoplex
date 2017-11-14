@@ -51,6 +51,7 @@ ExperimentWidget::ExperimentWidget(Experiment* exp, ProjectsWindow* pwindow)
     m_aReset = tb->addAction(m_kIcon_reset, "Reset");
     tb->addSeparator();
     m_aGraph = tb->addAction("graph");
+    m_aLineChart = tb->addAction("line");
     tb->setMovable(false);
     tb->setFloatable(false);
     tb->setIconSize(QSize(16,16));
@@ -73,8 +74,13 @@ ExperimentWidget::ExperimentWidget(Experiment* exp, ProjectsWindow* pwindow)
         m_innerWindow->addDockWidget(Qt::TopDockWidgetArea, graph);
         connect(m_timer, SIGNAL(timeout()), graph, SLOT(update()));
     });
-m_innerWindow->addDockWidget(Qt::TopDockWidgetArea, new LineChartWidget(m_exp, this));
-    m_timer->start(0);
+    connect(m_aLineChart, &QAction::triggered, [this]() {
+        LineChartWidget* lineChart = new LineChartWidget(m_exp, this);
+        m_innerWindow->addDockWidget(Qt::TopDockWidgetArea, lineChart);
+        connect(m_timer, SIGNAL(timeout()), lineChart, SLOT(updateSeries()));
+    });
+
+    m_timer->start(100);
 }
 
 ExperimentWidget::~ExperimentWidget()

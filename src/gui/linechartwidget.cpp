@@ -90,8 +90,6 @@ void LineChartWidget::slotEntityChanged(bool isAgent)
 void LineChartWidget::slotAddSeries()
 {
     int row = m_settingsDlg->table->rowCount();
-    m_settingsDlg->table->insertRow(row);
-
     QString attrName = m_settingsDlg->attr->currentText();
 
     Output* output;
@@ -118,6 +116,7 @@ void LineChartWidget::slotAddSeries()
 
         output = new DefaultOutput(func, entity, attrName, m_settingsDlg->attr->currentIndex(), {input});
 
+        m_settingsDlg->table->insertRow(row);
         m_settingsDlg->table->setItem(row, 0, new QTableWidgetItem("Default"));
         m_settingsDlg->table->setItem(row, 1, new QTableWidgetItem(m_settingsDlg->func->currentText()));
         m_settingsDlg->table->setItem(row, 2, new QTableWidgetItem(entity == DefaultOutput::E_Agents ? "Agent" : "Edge"));
@@ -128,6 +127,7 @@ void LineChartWidget::slotAddSeries()
         input = Value(m_settingsDlg->func->currentText());
         output = new CustomOutput({input});
 
+        m_settingsDlg->table->insertRow(row);
         m_settingsDlg->table->setItem(row, 0, new QTableWidgetItem("Custom"));
         m_settingsDlg->table->setItem(row, 1, new QTableWidgetItem(m_settingsDlg->func->currentText()));
     }
