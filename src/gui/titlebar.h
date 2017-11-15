@@ -23,15 +23,21 @@ public:
     explicit TitleBar(Experiment* exp, QDockWidget* parent);
     ~TitleBar();
 
+    void changeCurrentTrial(int trialId);
+
 signals:
     void trialSelected(int);
     void openSettingsDlg();
+
+private slots:
+    void slotTrialChanged(int trialId);
 
 protected:
     virtual void paintEvent(QPaintEvent* pe);
 
 private:
     Ui_TitleBar* m_ui;
+    Experiment* m_exp;
 };
 }
 

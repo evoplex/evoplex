@@ -3,6 +3,7 @@
  * @author Marcos Cardinot <mcardinot@gmail.com>
  */
 
+#include <QMessageBox>
 #include <QPainter>
 
 #include "titlebar.h"
@@ -13,6 +14,7 @@ namespace evoplex {
 TitleBar::TitleBar(Experiment* exp, QDockWidget* parent)
     : QWidget(parent)
     , m_ui(new Ui_TitleBar)
+    , m_exp(exp)
 {
     m_ui->setupUi(this);
 
@@ -28,9 +30,17 @@ TitleBar::TitleBar(Experiment* exp, QDockWidget* parent)
     for (int trialId = 0; trialId < exp->numTrials(); ++trialId) {
         m_ui->cbTrial->insertItem(trialId, QString::number(trialId));
     }
-    connect(m_ui->cbTrial, SIGNAL(currentIndexChanged(int)), SIGNAL(trialSelected(int)));
 
-    connect(m_ui->bSettings, SIGNAL(clicked(bool)), SIGNAL(openSettingsDlg()));
+    connect(m_ui->cbTrial, SIGNAL(currentIndexChanged(int)), SLOT(slotTrialChanged(int)));
+
+    connect(m_ui->bSettings, &QPushButton::clicked,
+    [this]() {
+        if (m_exp->expStatus() == Experiment::READY) {
+            emit (openSettingsDlg());
+        } else {
+            QMessageBox::warning(this, "Experiment", "You should pause the experiment first.");
+        }
+    });
 }
 
 TitleBar::~TitleBar()
@@ -46,4 +56,21 @@ void TitleBar::paintEvent(QPaintEvent* pe)
     style()->drawPrimitive(QStyle::PE_Widget, &opt, &p, this);
     QWidget::paintEvent(pe);
 }
+
+void TitleBar::slotTrialChanged(int trialId)
+{
+    if (m_exp->expStatus() == Experiment::READY) {
+        emit (trialSelected(trialId));
+    } else {
+        QMessageBox::warning(this, "Experiment", "You should pause the experiment first.");
+    }
+}
+
+void TitleBar::changeCurrentTrial(int trialId)
+{
+    m_ui->cbTrial->blockSignals(true);
+    m_ui->cbTrial->setCurrentIndex(trialId);
+    m_ui->cbTrial->blockSignals(false);
+}
+
 }
