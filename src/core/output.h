@@ -7,6 +7,8 @@
 #define OUTPUT_H
 
 #include <forward_list>
+#include <set>
+#include <unordered_map>
 #include <vector>
 
 #include "abstractmodel.h"
@@ -18,45 +20,69 @@ namespace evoplex {
 class Output
 {
 public:
-    explicit Output(Values inputs);
+    explicit Output(Values inputs, const std::vector<int> trialIds);
 
-    virtual void doOperation(const AbstractModel* model) = 0;
+    virtual void doOperation(const int trialId, const AbstractModel* model) = 0;
 
     // Printable header with all columns of this operation separated by commas.
     virtual QString printableHeader() = 0;
 
     virtual bool operator==(const Output* output) = 0;
 
-    static std::vector<Output*> parseHeader(const QStringList& header,
+    static std::vector<Output*> parseHeader(const QStringList& header, const std::vector<int> trialIds,
             const Attributes& agentAttrMin, const Attributes &edgeAttrMin, QString &errorMsg);
 
-    const int addCache(Values inputs);
-    inline bool isEmpty(int cacheId) const { return m_caches.at(cacheId).rows.empty(); }
-    inline const Values& readFrontRow(int cacheId) const { return m_caches.at(cacheId).rows.front(); }
-    inline void flushFrontRow(int cacheId) { m_caches.at(cacheId).rows.pop_front(); }
+    const int addCache(Values inputs, const std::vector<int> trialIds);
 
-    inline const Values& inputs() const { return m_inputs; }
+    inline bool isEmpty() const
+    { return m_caches.empty(); }
+
+    inline bool isEmpty(const int cacheId, const int trialId) const
+    { return m_caches.at(cacheId).trials.at(trialId).rows.empty(); }
+
+    inline const Values& readFrontRow(const int cacheId, const int trialId) const
+    { return m_caches.at(cacheId).trials.at(trialId).rows.front(); }
+
+    inline void flushFrontRow(const int cacheId, const int trialId)
+    { m_caches.at(cacheId).trials.at(trialId).rows.pop_front(); }
+
+    // CAUTION! We trust it will NEVER be called in a running experiment.
+    // Make sure it is paused first.
+    void removeCache(const int cacheId, const int trialId);
+
+    inline const Values& allInputs() const
+    { return m_allInputs; }
+
+    inline const Values& inputs(const int cacheId, const int trialId) const
+    { return m_caches.at(cacheId).inputs; }
 
 protected:
-    struct Cache {
-        Values inputs; // columns
+    struct Data {
         std::forward_list<Values> rows;
         std::forward_list<Values>::iterator last;
     };
-    std::vector<Cache> m_caches;
-    Values m_inputs;
+
+    struct Cache {
+        Values inputs; // columns
+        std::unordered_map<int, Data> trials;
+    };
+
+    int m_lastCacheId;
+    std::unordered_map<int, Cache> m_caches;
+    std::set<int> m_trialIds;   // convenient to handle 'doOperation' requests
+    Values m_allInputs;
 
     // auxiliar method for 'doOperation()'
-    void updateCaches(const Values& allValues);
+    void updateCaches(const int trialId, const Values& allValues);
 };
 
 
 class CustomOutput: public Output
 {
 public:
-    explicit CustomOutput(Values inputs);
+    explicit CustomOutput(Values inputs, const std::vector<int> trialIds);
 
-    virtual void doOperation(const AbstractModel* model);
+    virtual void doOperation(const int trialId, const AbstractModel* model);
 
     // Printable header with all columns of this operation separated by commas.
     // Format: "custom_nameDefinedInTheModel"
@@ -90,9 +116,10 @@ public:
         return "invalid";
     }
 
-    explicit DefaultOutput(Function f, Entity e, const QString& attrName, int attrIdx, Values inputs);
+    explicit DefaultOutput(const Function f, const Entity e, const QString& attrName,
+                           const int attrIdx, Values inputs, const std::vector<int> trialIds);
 
-    virtual void doOperation(const AbstractModel* model);
+    virtual void doOperation(const int trialId, const AbstractModel* model);
 
     // Printable header with all columns of this operation separated by commas.
     // Format: "function_entity_attrName_value"

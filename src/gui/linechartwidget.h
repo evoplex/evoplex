@@ -29,6 +29,7 @@ private slots:
     void slotEntityChanged(bool isAgent);
     void slotFuncChanged(int idx);
     void updateSeries();
+    void removeSeries(int seriesId);
 
 private:
     struct Series {
@@ -41,9 +42,10 @@ private:
     Ui_LineChartSettings* m_settingsDlg;
     Experiment* m_exp;
     QtCharts::QChart* m_chart;
-    std::vector<Series> m_series;
+    std::unordered_map<int, Series> m_series;
     float m_maxY;
     bool m_finished;
+    int m_currentTrialId;
 };
 }
 

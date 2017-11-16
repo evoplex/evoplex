@@ -54,7 +54,7 @@ void Experiment::init(Attributes* generalAttrs, Attributes* modelAttrs,
     m_fileHeader = "";
     if (!m_fileOutputs.empty()) {
         for (Output* output : m_fileOutputs) {
-            Q_ASSERT(output->inputs().size() > 0);
+            Q_ASSERT(output->allInputs().size() > 0);
             m_fileHeader += output->printableHeader() + ",";
         }
         m_fileHeader.chop(1);
@@ -170,9 +170,9 @@ void Experiment::processTrial(const int& trialId)
         algorithmConverged = trial.modelObj->algorithmStep();
 
         for (Output* output : m_fileOutputs)
-            output->doOperation(trial.modelObj);
+            output->doOperation(trialId, trial.modelObj);
         for (Output* output : m_extraOutputs)
-            output->doOperation(trial.modelObj);
+            output->doOperation(trialId, trial.modelObj);
 
         // TODO: write only after X steps
         writeStep(trialId);
@@ -326,15 +326,17 @@ AbstractGraph* Experiment::graph(int trialId) const
 
 void Experiment::writeStep(const int trialId)
 {
-    if (m_fileOutputs.empty() || m_fileOutputs.front()->isEmpty(0)) {
+    // the cacheId for fileOutputs is always 0
+    const int cacheId = 0;
+    if (m_fileOutputs.empty() || m_fileOutputs.front()->isEmpty(cacheId, trialId)) {
         return;
     }
 
     QString rows;
-    while (!m_fileOutputs.front()->isEmpty(0)) {
+    while (!m_fileOutputs.front()->isEmpty(cacheId, trialId)) {
         for (Output* output : m_fileOutputs) {
-            Values vals = output->readFrontRow(0);
-            output->flushFrontRow(0);
+            Values vals = output->readFrontRow(cacheId, trialId);
+            output->flushFrontRow(cacheId, trialId);
             for (Value val : vals) {
                 rows += val.toQString() + ",";
             }
@@ -344,6 +346,32 @@ void Experiment::writeStep(const int trialId)
     }
 
     m_fileStreams.value(trialId)->operator <<(rows);
+}
+
+bool Experiment::removeOutput(Output* output)
+{
+    if (m_expStatus != Experiment::READY) {
+        qWarning() << "[Experiment] : tried to remove an 'Output' from a running experiment. You should pause it first.";
+        return false;
+    }
+
+    std::vector<Output*>::iterator it;
+    it = std::find(m_extraOutputs.begin(), m_extraOutputs.end(), output);
+    if (it == m_extraOutputs.end()) {
+        qWarning() << "[Experiment] : tried to remove a non-existent 'Output'.";
+        return false;
+    }
+
+    if (!(*it)->isEmpty()) {
+        qWarning() << "[Experiment] : tried to remove an 'Output' that seems to be used somewhere. It should be cleaned first.";
+        return false;
+    }
+
+    m_extraOutputs.erase(it);
+    delete *it;
+    *it = nullptr;
+
+    return true;
 }
 
 Output* Experiment::searchOutput(const Output* find)

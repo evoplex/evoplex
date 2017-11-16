@@ -120,10 +120,16 @@ const int Project::newExperiment(const QStringList& header, const QStringList& v
         }
     }
 
+    int numTrials = generalAttrs->value(GENERAL_ATTRIBUTE_TRIALS).toInt;
     QString outHeader = generalAttrs->value(OUTPUT_HEADER).toQString();
     std::vector<Output*> outputs;
-    if (!outHeader.isEmpty()) {
-        outputs = Output::parseHeader(outHeader.split(","),
+    if (!outHeader.isEmpty() && numTrials > 0) {
+        std::vector<int> trialIds;
+        for (int i = 0; i < numTrials; ++i) {
+            trialIds.emplace_back(i);
+        }
+
+        outputs = Output::parseHeader(outHeader.split(","), trialIds,
                 mPlugin->agentAttrMin, mPlugin->edgeAttrMin, errorMsg);
         if (outputs.empty()) {
             failedAttributes.append(OUTPUT_HEADER);

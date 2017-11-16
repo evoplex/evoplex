@@ -20,6 +20,7 @@ LineChartWidget::LineChartWidget(Experiment* exp, QWidget* parent)
     , m_chart(new QtCharts::QChart())
     , m_maxY(0)
     , m_finished(false)
+    , m_currentTrialId(0)
 {
     setWindowTitle("Line Chart");
     setAttribute(Qt::WA_DeleteOnClose, true);
@@ -62,6 +63,39 @@ LineChartWidget::~LineChartWidget()
 
 void LineChartWidget::setSelectedTrial(int trialId)
 {
+    if (m_series.empty()) {
+        m_currentTrialId = trialId;
+        return;
+    }
+
+    int res = QMessageBox::warning(this, "Line Chart",
+                         "Are you sure you want to change the trial?\n"
+                         "It'll delete the current chart.",
+                         QMessageBox::Yes, QMessageBox::Cancel);
+    if (res == QMessageBox::Cancel) {
+        return;
+    }
+
+    // FIXME
+    for (auto& i : m_series) {
+        Series& s = i.second;
+        m_chart->removeSeries(s.series);
+        s.output->addCache({s.output->inputs(s.cacheIdx, m_currentTrialId)}, {trialId});
+        s.output->removeCache(s.cacheIdx, m_currentTrialId);
+    }
+
+    m_currentTrialId = trialId;
+}
+
+void LineChartWidget::removeSeries(int seriesId)
+{
+    Series& s = m_series.at(seriesId);
+    m_chart->removeSeries(s.series);
+    s.output->removeCache(s.cacheIdx, m_currentTrialId);
+    if (s.output->isEmpty()) {
+        m_exp->removeOutput(s.output);
+    }
+    m_series.erase(seriesId);
 }
 
 void LineChartWidget::slotFuncChanged(int idx)
@@ -114,7 +148,7 @@ void LineChartWidget::slotAddSeries()
         DefaultOutput::Function func = DefaultOutput::funcFromString(m_settingsDlg->func->currentText());
         Q_ASSERT(func != DefaultOutput::F_Invalid);
 
-        output = new DefaultOutput(func, entity, attrName, m_settingsDlg->attr->currentIndex(), {input});
+        output = new DefaultOutput(func, entity, attrName, m_settingsDlg->attr->currentIndex(), {input}, {m_currentTrialId});
 
         m_settingsDlg->table->insertRow(row);
         m_settingsDlg->table->setItem(row, 0, new QTableWidgetItem("Default"));
@@ -125,7 +159,7 @@ void LineChartWidget::slotAddSeries()
 
     } else { // custom output
         input = Value(m_settingsDlg->func->currentText());
-        output = new CustomOutput({input});
+        output = new CustomOutput({input}, {m_currentTrialId});
 
         m_settingsDlg->table->insertRow(row);
         m_settingsDlg->table->setItem(row, 0, new QTableWidgetItem("Custom"));
@@ -138,16 +172,16 @@ void LineChartWidget::slotAddSeries()
     Output* existingOutput = m_exp->searchOutput(output);
     if (existingOutput) {
         delete output;
-        s.cacheIdx = existingOutput->addCache({input});
+        s.cacheIdx = existingOutput->addCache({input}, {m_currentTrialId});
         s.output = existingOutput;
     } else {
         s.cacheIdx = 0;
         s.output = output;
         m_exp->addOutput(output);
     }
-    m_series.emplace_back(s);
+    m_series.insert({row, s});
 
-    m_chart->addSeries(m_series.back().series);
+    m_chart->addSeries(s.series);
 }
 
 void LineChartWidget::updateSeries()
@@ -157,17 +191,18 @@ void LineChartWidget::updateSeries()
     }
 
     float maxY = m_maxY;
-    for (Series& s : m_series) {
+    for (auto& i : m_series) {
+        Series& s = i.second;
         QVector<QPointF> points = s.series->pointsVector();
         int x = points.size() + s.rowsSkipped;
         float y = 0.f;
 
         // read only the top 10k (max) lines to avoid blocking the UI
         bool lastWasDuplicated = false;
-        for (int i = 0; i < 10000 && !s.output->isEmpty(s.cacheIdx); ++i) {
-            Values row = s.output->readFrontRow(s.cacheIdx);
+        for (int i = 0; i < 10000 && !s.output->isEmpty(s.cacheIdx, m_currentTrialId); ++i) {
+            Values row = s.output->readFrontRow(s.cacheIdx, m_currentTrialId);
             Q_ASSERT(row.size() == 1);
-            s.output->flushFrontRow(s.cacheIdx);
+            s.output->flushFrontRow(s.cacheIdx, m_currentTrialId);
 
             if (row.at(0).type == Value::INT) {
                 y = row.at(0).toInt;
@@ -207,7 +242,8 @@ void LineChartWidget::updateSeries()
         m_chart->axisY()->setRange(0, m_maxY + 1);
     }
 
-    m_finished = m_series.front().output->isEmpty(m_series.front().cacheIdx)
+    const Series& s = m_series.cbegin()->second;
+    m_finished = s.output->isEmpty(s.cacheIdx, m_currentTrialId)
                     && m_exp->expStatus() == Experiment::FINISHED;
 }
 
