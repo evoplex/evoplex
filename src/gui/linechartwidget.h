@@ -36,7 +36,6 @@ private:
         QtCharts::QLineSeries* series;
         Output* output;
         int cacheIdx = 0;
-        int rowsSkipped = 0;
     };
 
     Ui_LineChartSettings* m_settingsDlg;

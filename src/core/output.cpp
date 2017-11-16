@@ -114,9 +114,14 @@ Output::Output(Values inputs, const std::vector<int> trialIds)
     addCache(inputs, trialIds);
 }
 
+void Output::flushFrontRow(const int cacheId, const int trialId)
+{
+    m_caches.at(cacheId).trials.at(trialId).rows.pop_front();
+    ++m_caches.at(cacheId).trials.at(trialId).firstRowNumber;
+}
+
 const int Output::addCache(Values inputs, const std::vector<int> trialIds)
 {
-    m_allInputs.insert(m_allInputs.end(), inputs.begin(), inputs.end());
     Cache cache;
     cache.inputs = inputs;
     for (int trialId : trialIds) {
@@ -124,6 +129,7 @@ const int Output::addCache(Values inputs, const std::vector<int> trialIds)
         m_trialIds.insert(trialId);
     }
     m_caches.insert({++m_lastCacheId, cache});
+    updateListOfInputs();
     return m_lastCacheId;
 }
 
@@ -131,15 +137,22 @@ void Output::removeCache(const int cacheId, const int trialId)
 {
     m_trialIds.erase(trialId);
     m_caches.at(cacheId).trials.erase(trialId);
-    if (!m_caches.at(cacheId).trials.empty()) {
-        return;
+    if (m_caches.at(cacheId).trials.empty()) {
+        m_caches.erase(cacheId);
+        updateListOfInputs();
     }
+}
 
-    for (Value& val : m_caches.at(cacheId).inputs) {
-        m_allInputs.erase(std::remove(m_allInputs.begin(), m_allInputs.end(), val), m_allInputs.end());
+void Output::updateListOfInputs()
+{
+    m_allInputs.clear();
+    for (auto& itCache : m_caches) {
+        const Values& inputs = itCache.second.inputs;
+        m_allInputs.insert(m_allInputs.end(), inputs.begin(), inputs.end());
     }
-
-    m_caches.erase(cacheId);
+    // remove duplicates
+    std::sort(m_allInputs.begin(), m_allInputs.end());
+    m_allInputs.erase(std::unique(m_allInputs.begin(), m_allInputs.end()), m_allInputs.end());
 }
 
 void Output::updateCaches(const int trialId, const Values& allValues)

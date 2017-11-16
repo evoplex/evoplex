@@ -35,10 +35,11 @@ Experiment::~Experiment()
     delete m_graphAttrs;
     m_graphAttrs = nullptr;
 
-    for (QTextStream* stream : m_fileStreams) {
-        stream->flush();
-        delete stream;
-        stream = nullptr;
+    QHash<int,QTextStream*>::iterator it;
+    for (it = m_fileStreams.begin(); it != m_fileStreams.end(); ++it) {
+        it.value()->flush();
+        delete it.value();
+        it.value() = nullptr;
     }
     qDeleteAll(m_fileOutputs);
 }
@@ -181,8 +182,9 @@ void Experiment::processTrial(const int& trialId)
     }
 
     if (trial.currentStep >= m_stopAt || algorithmConverged) {
-        for (QTextStream* stream : m_fileStreams) {
-            stream->flush();
+        QHash<int,QTextStream*>::iterator it;
+        for (it = m_fileStreams.begin(); it != m_fileStreams.end(); ++it) {
+            it.value()->flush();
         }
         trial.status = FINISHED;
     } else {

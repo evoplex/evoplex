@@ -40,11 +40,13 @@ public:
     inline bool isEmpty(const int cacheId, const int trialId) const
     { return m_caches.at(cacheId).trials.at(trialId).rows.empty(); }
 
+    inline const int readFrontRowNumber(const int cacheId, const int trialId) const
+    { return m_caches.at(cacheId).trials.at(trialId).firstRowNumber; }
+
     inline const Values& readFrontRow(const int cacheId, const int trialId) const
     { return m_caches.at(cacheId).trials.at(trialId).rows.front(); }
 
-    inline void flushFrontRow(const int cacheId, const int trialId)
-    { m_caches.at(cacheId).trials.at(trialId).rows.pop_front(); }
+    void flushFrontRow(const int cacheId, const int trialId);
 
     // CAUTION! We trust it will NEVER be called in a running experiment.
     // Make sure it is paused first.
@@ -58,6 +60,7 @@ public:
 
 protected:
     struct Data {
+        int firstRowNumber = 0;
         std::forward_list<Values> rows;
         std::forward_list<Values>::iterator last;
     };
@@ -74,6 +77,10 @@ protected:
 
     // auxiliar method for 'doOperation()'
     void updateCaches(const int trialId, const Values& allValues);
+
+private:
+    // auxiliar method to update the vector with all the current inputs
+    void updateListOfInputs();
 };
 
 

@@ -76,12 +76,12 @@ void LineChartWidget::setSelectedTrial(int trialId)
         return;
     }
 
-    // FIXME
     for (auto& i : m_series) {
         Series& s = i.second;
-        m_chart->removeSeries(s.series);
-        s.output->addCache({s.output->inputs(s.cacheIdx, m_currentTrialId)}, {trialId});
+        s.series->clear(); // remove all points
+        Values inputs = s.output->inputs(s.cacheIdx, m_currentTrialId); // keep the same inputs
         s.output->removeCache(s.cacheIdx, m_currentTrialId);
+        s.cacheIdx = s.output->addCache(inputs, {trialId});
     }
 
     m_currentTrialId = trialId;
@@ -168,7 +168,7 @@ void LineChartWidget::slotAddSeries()
 
     Series s;
     s.series = new QtCharts::QLineSeries();
-    s.series->setUseOpenGL(true);
+    //s.series->setUseOpenGL(true); TODO: make sure we can call it
     Output* existingOutput = m_exp->searchOutput(output);
     if (existingOutput) {
         delete output;
@@ -191,17 +191,23 @@ void LineChartWidget::updateSeries()
     }
 
     float maxY = m_maxY;
-    for (auto& i : m_series) {
-        Series& s = i.second;
+    for (auto& it : m_series) {
+        Series& s = it.second;
+        if (s.output->isEmpty(s.cacheIdx, m_currentTrialId)) {
+            continue;
+        }
+
         QVector<QPointF> points = s.series->pointsVector();
-        int x = points.size() + s.rowsSkipped;
+        float x = 0.f;
         float y = 0.f;
 
         // read only the top 10k (max) lines to avoid blocking the UI
+        int i = 0;
         bool lastWasDuplicated = false;
-        for (int i = 0; i < 10000 && !s.output->isEmpty(s.cacheIdx, m_currentTrialId); ++i) {
+        do {
             Values row = s.output->readFrontRow(s.cacheIdx, m_currentTrialId);
             Q_ASSERT(row.size() == 1);
+            x = s.output->readFrontRowNumber(s.cacheIdx, m_currentTrialId);
             s.output->flushFrontRow(s.cacheIdx, m_currentTrialId);
 
             if (row.at(0).type == Value::INT) {
@@ -216,17 +222,19 @@ void LineChartWidget::updateSeries()
             if (!points.isEmpty()) {
                 bool currIsDuplicated = qFuzzyCompare(y, (float) points.last().y());
                 if (lastWasDuplicated && currIsDuplicated) {
-                    points.last().setX(x++);
-                    ++s.rowsSkipped;
+                    points.last().setX(x);
                     lastWasDuplicated = currIsDuplicated;
                     continue;
                 }
                 lastWasDuplicated = currIsDuplicated;
             }
 
-            points.push_back(QPointF(x++, y));
-            if (y > maxY) maxY = y;
-        }
+            points.push_back(QPointF(x, y));
+            if (y > maxY) {
+                maxY = y;
+            }
+            ++i;
+        } while (i < 10000 && !s.output->isEmpty(s.cacheIdx, m_currentTrialId));
 
         if (lastWasDuplicated) {
             points.push_back(QPointF(x, y));
