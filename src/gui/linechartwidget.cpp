@@ -205,15 +205,15 @@ void LineChartWidget::updateSeries()
         int i = 0;
         bool lastWasDuplicated = false;
         do {
-            Values row = s.output->readFrontRow(s.cacheIdx, m_currentTrialId);
-            Q_ASSERT(row.size() == 1);
-            x = s.output->readFrontRowNumber(s.cacheIdx, m_currentTrialId);
+            const Output::Row& row = s.output->readFrontRow(s.cacheIdx, m_currentTrialId);
+            Q_ASSERT(row.second.size() == 1);
+            x = row.first;
             s.output->flushFrontRow(s.cacheIdx, m_currentTrialId);
 
-            if (row.at(0).type == Value::INT) {
-                y = row.at(0).toInt;
-            } else if (row.at(0).type == Value::DOUBLE) {
-                y = row.at(0).toDouble;
+            if (row.second.at(0).type == Value::INT) {
+                y = row.second.at(0).toInt;
+            } else if (row.second.at(0).type == Value::DOUBLE) {
+                y = row.second.at(0).toDouble;
             } else {
                 qFatal("[LineChart] : the type is invalid!");
             }

@@ -39,7 +39,7 @@ void DefaultOutput::doOperation(const int trialId, const AbstractModel* model)
         qFatal("doOperation() invalid function!");
         break;
     }
-    updateCaches(trialId, allValues);
+    updateCaches(trialId, model->currStep(), allValues);
 }
 
 QString DefaultOutput::printableHeader()
@@ -80,7 +80,7 @@ void CustomOutput::doOperation(const int trialId, const AbstractModel* model)
     if (m_trialIds.find(trialId) == m_trialIds.end()) {
         return;
     }
-    updateCaches(trialId, model->customOutputs(m_allInputs));
+    updateCaches(trialId, model->currStep(), model->customOutputs(m_allInputs));
 }
 
 QString CustomOutput::printableHeader()
@@ -112,12 +112,6 @@ Output::Output(Values inputs, const std::vector<int> trialIds)
     : m_lastCacheId(-1)
 {
     addCache(inputs, trialIds);
-}
-
-void Output::flushFrontRow(const int cacheId, const int trialId)
-{
-    m_caches.at(cacheId).trials.at(trialId).rows.pop_front();
-    ++m_caches.at(cacheId).trials.at(trialId).firstRowNumber;
 }
 
 const int Output::addCache(Values inputs, const std::vector<int> trialIds)
@@ -155,7 +149,7 @@ void Output::updateListOfInputs()
     m_allInputs.erase(std::unique(m_allInputs.begin(), m_allInputs.end()), m_allInputs.end());
 }
 
-void Output::updateCaches(const int trialId, const Values& allValues)
+void Output::updateCaches(const int trialId, const int currStep, const Values& allValues)
 {
     if (m_caches.size() == 0) {
         return;
@@ -169,13 +163,14 @@ void Output::updateCaches(const int trialId, const Values& allValues)
         }
 
         Data& data = itData->second;
-        Values newRow;
-        newRow.reserve(cache.inputs.size());
+        Row newRow;
+        newRow.first = currStep;
+        newRow.second.reserve(cache.inputs.size());
 
         for (Value input : cache.inputs) {
             int col = std::find(m_allInputs.begin(), m_allInputs.end(), input) - m_allInputs.begin();
             Q_ASSERT(col != m_allInputs.size()); // input must exist
-            newRow.emplace_back(allValues.at(col));
+            newRow.second.emplace_back(allValues.at(col));
         }
         if (data.rows.empty()) data.last = data.rows.before_begin();
         data.last = data.rows.emplace_after(data.last, newRow);

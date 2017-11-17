@@ -20,6 +20,8 @@ namespace evoplex {
 class Output
 {
 public:
+    typedef std::pair<int, Values> Row; // <rowNumber, values>
+
     explicit Output(Values inputs, const std::vector<int> trialIds);
 
     virtual void doOperation(const int trialId, const AbstractModel* model) = 0;
@@ -40,13 +42,11 @@ public:
     inline bool isEmpty(const int cacheId, const int trialId) const
     { return m_caches.at(cacheId).trials.at(trialId).rows.empty(); }
 
-    inline const int readFrontRowNumber(const int cacheId, const int trialId) const
-    { return m_caches.at(cacheId).trials.at(trialId).firstRowNumber; }
-
-    inline const Values& readFrontRow(const int cacheId, const int trialId) const
+    inline const Row& readFrontRow(const int cacheId, const int trialId) const
     { return m_caches.at(cacheId).trials.at(trialId).rows.front(); }
 
-    void flushFrontRow(const int cacheId, const int trialId);
+    inline void flushFrontRow(const int cacheId, const int trialId)
+    { m_caches.at(cacheId).trials.at(trialId).rows.pop_front(); }
 
     // CAUTION! We trust it will NEVER be called in a running experiment.
     // Make sure it is paused first.
@@ -60,9 +60,8 @@ public:
 
 protected:
     struct Data {
-        int firstRowNumber = 0;
-        std::forward_list<Values> rows;
-        std::forward_list<Values>::iterator last;
+        std::forward_list<Row> rows;
+        std::forward_list<Row>::const_iterator last;
     };
 
     struct Cache {
@@ -76,7 +75,7 @@ protected:
     Values m_allInputs;
 
     // auxiliar method for 'doOperation()'
-    void updateCaches(const int trialId, const Values& allValues);
+    void updateCaches(const int trialId, const int currStep, const Values& allValues);
 
 private:
     // auxiliar method to update the vector with all the current inputs
