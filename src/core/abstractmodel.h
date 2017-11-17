@@ -23,9 +23,10 @@ public:
     inline AbstractGraph* graph() const { return m_graph; }
     inline const PRG* prg() const { return m_prg; }
     inline const Attributes* attrs() const { return m_attributes; }
-    inline const Value attr(const QString& name) { return m_attributes->value(name); }
-    inline const Value attr(int attrId) { return m_attributes->value(attrId); }
-    inline const QString& attrName(int attrId) { return m_attributes->name(attrId); }
+    inline const Value attr(const QString& name) const { return m_attributes->value(name); }
+    inline const Value attr(int attrId) const { return m_attributes->value(attrId);  }
+    inline const QString& attrName(int attrId) const { return m_attributes->name(attrId); }
+    inline const int currStep() const { return m_currStep; }
 
 protected:
     explicit AbstractBaseModel() : m_graph(nullptr), m_prg(nullptr) {}
@@ -41,6 +42,7 @@ private:
     AbstractGraph* m_graph;
     PRG* m_prg;
     Attributes* m_attributes;
+    int m_currStep;
 
     // takes the ownership of the graph and the PRG
     inline void setup(PRG* prg, AbstractGraph* graphObj, Attributes* attrs) {

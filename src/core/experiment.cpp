@@ -114,7 +114,7 @@ void Experiment::updateProgressValue()
         float p = 0.f;
         QHash<int, Trial>::iterator it = m_trials.begin();
         while (it != m_trials.end()) {
-            p += ((float) it.value().currentStep / m_pauseAt);
+            p += ((float) it.value().modelObj->m_currStep / m_pauseAt);
             ++it;
         }
         m_progress = ceil(p * 360.f / m_numTrials);
@@ -139,7 +139,7 @@ void Experiment::playNext()
     } else if (m_trials.isEmpty()) {
         setPauseAt(1);
     } else {
-        setPauseAt(m_trials.value(0).currentStep + 1);
+        setPauseAt(m_trials.value(0).modelObj->m_currStep + 1);
     }
     m_mainApp->getExperimentsMgr()->play(this);
 }
@@ -167,7 +167,7 @@ void Experiment::processTrial(const int& trialId)
     trial.status = RUNNING;
 
     bool algorithmConverged = false;
-    while (trial.currentStep < m_pauseAt && !algorithmConverged) {
+    while (trial.modelObj->m_currStep < m_pauseAt && !algorithmConverged) {
         algorithmConverged = trial.modelObj->algorithmStep();
 
         for (Output* output : m_fileOutputs)
@@ -178,13 +178,14 @@ void Experiment::processTrial(const int& trialId)
         // TODO: write only after X steps
         writeStep(trialId);
 
-        ++trial.currentStep;
+        ++trial.modelObj->m_currStep;
     }
 
-    if (trial.currentStep >= m_stopAt || algorithmConverged) {
-        QHash<int,QTextStream*>::iterator it;
-        for (it = m_fileStreams.begin(); it != m_fileStreams.end(); ++it) {
-            it.value()->flush();
+    if (trial.modelObj->m_currStep >= m_stopAt || algorithmConverged) {
+        if (!m_fileStreams.empty()) {
+            for (QTextStream* stream : m_fileStreams) {
+                stream->flush();
+            }
         }
         trial.status = FINISHED;
     } else {
@@ -337,7 +338,7 @@ void Experiment::writeStep(const int trialId)
     QString rows;
     while (!m_fileOutputs.front()->isEmpty(cacheId, trialId)) {
         for (Output* output : m_fileOutputs) {
-            Values vals = output->readFrontRow(cacheId, trialId);
+            Values vals = output->readFrontRow(cacheId, trialId).second;
             output->flushFrontRow(cacheId, trialId);
             for (Value val : vals) {
                 rows += val.toQString() + ",";

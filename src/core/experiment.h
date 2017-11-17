@@ -42,7 +42,6 @@ public:
     // the seed '111', the seeds of the trials will be '111', '112' and '113'.
     struct Trial {
         AbstractModel* modelObj = nullptr;
-        int currentStep = 0;
         Status status = INVALID;
     };
 
