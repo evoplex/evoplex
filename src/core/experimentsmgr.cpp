@@ -88,14 +88,11 @@ void ExperimentsMgr::finished(Experiment* exp)
 
     if(exp->expStatus() != Experiment::INVALID) {
         exp->setExpStatus(Experiment::FINISHED);
-        const QHash<int, Experiment::Trial>& trials = exp->trials();
-        QHash<int, Experiment::Trial>::const_iterator it = trials.begin();
-        while (it != trials.end()) {
-            if (it.value().status != Experiment::FINISHED) {
+        for (auto& trial : exp->trials()) {
+            if (trial.second.status != Experiment::FINISHED) {
                 exp->setExpStatus(Experiment::READY);
                 break;
             }
-            ++it;
         }
     }
     emit (statusChanged(exp));

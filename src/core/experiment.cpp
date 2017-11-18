@@ -90,12 +90,10 @@ void Experiment::reset()
 
 void Experiment::deleteTrials()
 {
-    QHash<int, Trial>::iterator it;
-    for (it = m_trials.begin(); it != m_trials.end(); ++it) {
-        delete it.value().modelObj;
+    for (auto& trial : m_trials) {
+        delete trial.second.modelObj;
     }
     m_trials.clear();
-    m_trials.squeeze();
 
     // if the experiment has finished or became invalid,
     // it's more interesing to do NOT change the status
@@ -112,10 +110,8 @@ void Experiment::updateProgressValue()
         m_progress = 0;
     } else if (m_expStatus == RUNNING) {
         float p = 0.f;
-        QHash<int, Trial>::iterator it = m_trials.begin();
-        while (it != m_trials.end()) {
-            p += ((float) it.value().modelObj->m_currStep / m_pauseAt);
-            ++it;
+        for (auto& trial : m_trials) {
+            p += ((float) trial.second.modelObj->m_currStep / m_pauseAt);
         }
         m_progress = ceil(p * 360.f / m_numTrials);
     }
@@ -136,10 +132,15 @@ void Experiment::playNext()
 {
     if (m_expStatus != READY) {
         return;
-    } else if (m_trials.isEmpty()) {
-        setPauseAt(1);
+    } else if (m_trials.empty()) {
+        setPauseAt(0);
     } else {
-        setPauseAt(m_trials.value(0).modelObj->m_currStep + 1);
+        int maxCurrStep = -1;
+        for (auto& trial : m_trials) {
+            int currStep = trial.second.modelObj->m_currStep;
+            if (currStep > maxCurrStep) maxCurrStep = currStep;
+        }
+        setPauseAt(maxCurrStep);
     }
     m_mainApp->getExperimentsMgr()->play(this);
 }
@@ -148,18 +149,17 @@ void Experiment::processTrial(const int& trialId)
 {
     if (m_expStatus == INVALID) {
         return;
-    } else if (!m_trials.contains(trialId)) {
+    } else if (m_trials.find(trialId) == m_trials.end()) {
         Trial trial = createTrial(trialId);
         if (trial.status == INVALID) {
             setExpStatus(INVALID);
             pause();
             return;
         }
-        m_trials.insert(trialId, trial);
-        writeStep(trialId);
+        m_trials.insert({trialId, trial});
     }
 
-    Trial& trial = m_trials[trialId];
+    Trial& trial = m_trials.at(trialId);
     if (trial.status != READY) {
         return;
     }
@@ -167,9 +167,7 @@ void Experiment::processTrial(const int& trialId)
     trial.status = RUNNING;
 
     bool algorithmConverged = false;
-    while (trial.modelObj->m_currStep < m_pauseAt && !algorithmConverged) {
-        algorithmConverged = trial.modelObj->algorithmStep();
-
+    while (trial.modelObj->m_currStep <= m_pauseAt && !algorithmConverged) {
         for (Output* output : m_fileOutputs)
             output->doOperation(trialId, trial.modelObj);
         for (Output* output : m_extraOutputs)
@@ -178,10 +176,11 @@ void Experiment::processTrial(const int& trialId)
         // TODO: write only after X steps
         writeStep(trialId);
 
+        algorithmConverged = trial.modelObj->algorithmStep();
         ++trial.modelObj->m_currStep;
     }
 
-    if (trial.modelObj->m_currStep >= m_stopAt || algorithmConverged) {
+    if (trial.modelObj->m_currStep > m_stopAt || algorithmConverged) {
         if (!m_fileStreams.empty()) {
             for (QTextStream* stream : m_fileStreams) {
                 stream->flush();
@@ -321,10 +320,10 @@ Agents Experiment::cloneAgents(const Agents& agents) const
 
 AbstractGraph* Experiment::graph(int trialId) const
 {
-    QHash<int, Trial>::const_iterator it = m_trials.find(trialId);
-    if (it == m_trials.end() || !it.value().modelObj)
+    auto it = m_trials.find(trialId);
+    if (it == m_trials.end() || !it->second.modelObj)
         return nullptr;
-    return it.value().modelObj->graph();
+    return it->second.modelObj->graph();
 }
 
 void Experiment::writeStep(const int trialId)

@@ -50,6 +50,7 @@ private:
         m_prg = prg;
         m_graph = graphObj;
         m_attributes = attrs;
+        m_currStep = 0;
     }
 };
 

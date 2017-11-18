@@ -10,6 +10,7 @@
 #include <QMutex>
 #include <QString>
 #include <QTextStream>
+#include <unordered_map>
 
 #include "experimentsmgr.h"
 #include "mainapp.h"
@@ -99,7 +100,7 @@ public:
     inline int id() const { return m_id; }
     inline int projId() const { return m_projId; }
     inline int numTrials() const { return m_numTrials; }
-    inline const QHash<int, Trial>& trials() const { return m_trials; }
+    inline const std::unordered_map<int, Trial>& trials() const { return m_trials; }
     inline const Attributes* generalAttrs() const { return m_generalAttrs; }
     inline const Attributes* modelAttrs() const { return m_modelAttrs; }
     inline const Attributes* graphAttrs() const { return m_graphAttrs; }
@@ -132,7 +133,7 @@ private:
     Status m_expStatus;
     quint16 m_progress; // current progress value [0, 360]
 
-    QHash<int, Trial> m_trials;
+    std::unordered_map<int, Trial> m_trials;
 
     // It holds the initial population for further use (internal only).
     // If this experiment has only one trial, then it won't be used anyway.
