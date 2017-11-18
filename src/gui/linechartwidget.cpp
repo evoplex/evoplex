@@ -207,9 +207,8 @@ void LineChartWidget::updateSeries()
         do {
             const Output::Row& row = s.output->readFrontRow(s.cacheIdx, m_currentTrialId);
             Q_ASSERT(row.second.size() == 1);
-            x = row.first;
-            s.output->flushFrontRow(s.cacheIdx, m_currentTrialId);
 
+            x = row.first;
             if (row.second.at(0).type == Value::INT) {
                 y = row.second.at(0).toInt;
             } else if (row.second.at(0).type == Value::DOUBLE) {
@@ -217,6 +216,7 @@ void LineChartWidget::updateSeries()
             } else {
                 qFatal("[LineChart] : the type is invalid!");
             }
+            s.output->flushFrontRow(s.cacheIdx, m_currentTrialId);
 
             // we skip the duplicated rows to reduce the amount of unnecessary points
             if (!points.isEmpty()) {
