@@ -30,11 +30,6 @@ LineChartWidget::LineChartWidget(Experiment* exp, QWidget* parent)
     connect(titleBar, SIGNAL(trialSelected(int)), this, SLOT(setSelectedTrial(int)));
     setSelectedTrial(0);
 
-    QPalette pal = palette();
-    pal.setColor(QPalette::Background, QColor(239,235,231));
-    setAutoFillBackground(true);
-    setPalette(pal);
-
     QDialog* dlg = new QDialog(this);
     m_settingsDlg->setupUi(dlg);
     connect(titleBar, SIGNAL(openSettingsDlg()), dlg, SLOT(show()));
@@ -52,8 +47,13 @@ LineChartWidget::LineChartWidget(Experiment* exp, QWidget* parent)
     m_settingsDlg->entityAgent->setChecked(true);
 
     m_chart->legend()->hide();
+    m_chart->setAnimationOptions(QtCharts::QChart::GridAxisAnimations);
+    m_chart->setTheme(QtCharts::QChart::ChartThemeLight);
+    m_chart->setBackgroundVisible(false);
+
     QtCharts::QChartView *chartView = new QtCharts::QChartView(m_chart);
     chartView->setRenderHint(QPainter::Antialiasing);
+    chartView->setBackgroundBrush(QColor(239,235,231));
     setWidget(chartView);
 }
 
@@ -247,7 +247,9 @@ void LineChartWidget::updateSeries()
         m_maxY = maxY;
         m_chart->createDefaultAxes();
         m_chart->axisX()->setRange(0, m_exp->stopAt());
+        m_chart->axisX()->setGridLineVisible(false);
         m_chart->axisY()->setRange(0, m_maxY + 1);
+        m_chart->axisY()->setGridLineVisible(false);
     }
 
     const Series& s = m_series.cbegin()->second;
