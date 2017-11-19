@@ -129,7 +129,7 @@ const int Project::newExperiment(const QStringList& header, const QStringList& v
             trialIds.emplace_back(i);
         }
 
-        outputs = Output::parseHeader(outHeader.split(","), trialIds,
+        outputs = Output::parseHeader(outHeader.split(";"), trialIds,
                 mPlugin->agentAttrMin, mPlugin->edgeAttrMin, errorMsg);
         if (outputs.empty()) {
             failedAttributes.append(OUTPUT_HEADER);

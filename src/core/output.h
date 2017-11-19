@@ -58,6 +58,9 @@ public:
     inline const Values& inputs(const int cacheId, const int trialId) const
     { return m_caches.at(cacheId).inputs; }
 
+    inline const std::set<int>& trialIds() const
+    { return m_trialIds; }
+
 protected:
     struct Data {
         std::forward_list<Row> rows;
@@ -134,8 +137,10 @@ public:
     virtual bool operator==(const Output* output);
 
     inline Function function() const { return m_func; }
+    inline QString functionStr()  const { return DefaultOutput::stringFromFunc(m_func); }
     inline Entity entity() const { return m_entity; }
     inline int attrIdx() const { return m_attrIdx; }
+    inline QString attrName() const { return m_attrName; }
 
 private:
     const Function m_func;

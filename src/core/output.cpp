@@ -51,7 +51,7 @@ QString DefaultOutput::printableHeader()
 
     QString ret;
     for (Value val : m_allInputs) {
-        ret += prefix + val.toQString() + ",";
+        ret += prefix + val.toQString() + ";";
     }
     ret.chop(1);
     return ret;
@@ -87,7 +87,7 @@ QString CustomOutput::printableHeader()
 {
     QString ret;
     for (Value h : m_allInputs) {
-        ret += h.toQString() + ",";
+        ret += h.toQString() + "_";
     }
     ret.chop(1);
     return ret;
