@@ -42,7 +42,7 @@ struct Value
         }
     }
 
-    bool operator ==(Value v) {
+    bool operator ==(Value v) const {
         Q_ASSERT(type == v.type);
         if (type == BOOL) return toBool == v.toBool;
         if (type == CHAR) return toChar == v.toChar;
@@ -52,7 +52,7 @@ struct Value
         Q_ASSERT(false);
     }
 
-    bool operator !=(Value v) {
+    bool operator !=(Value v) const {
         Q_ASSERT(type == v.type);
         if (type != BOOL) return toBool != v.toBool;
         if (type != CHAR) return toChar != v.toChar;
@@ -62,7 +62,7 @@ struct Value
         Q_ASSERT(false);
     }
 
-    bool operator <(Value v) {
+    bool operator <(Value v) const {
         Q_ASSERT(type == v.type);
         if (type == CHAR) return toChar < v.toChar;
         if (type == DOUBLE) return toDouble < v.toDouble;
@@ -70,7 +70,7 @@ struct Value
         Q_ASSERT(false);
     }
 
-    bool operator >(Value v) {
+    bool operator >(Value v) const {
         Q_ASSERT(type == v.type);
         if (type == CHAR) return toChar > v.toChar;
         if (type == DOUBLE) return toDouble > v.toDouble;
@@ -78,7 +78,7 @@ struct Value
         Q_ASSERT(false);
     }
 
-    bool operator <=(Value v) {
+    bool operator <=(Value v) const {
         Q_ASSERT(type == v.type);
         if (type <= CHAR) return toChar <= v.toChar;
         if (type <= DOUBLE) return toDouble <= v.toDouble;
@@ -86,7 +86,7 @@ struct Value
         Q_ASSERT(false);
     }
 
-    bool operator >=(Value v) {
+    bool operator >=(Value v) const {
         Q_ASSERT(type == v.type);
         if (type <= CHAR) return toChar >= v.toChar;
         if (type <= DOUBLE) return toDouble >= v.toDouble;
