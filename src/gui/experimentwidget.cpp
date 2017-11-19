@@ -74,8 +74,8 @@ ExperimentWidget::ExperimentWidget(Experiment* exp, ProjectsWindow* pwindow)
         m_innerWindow->addDockWidget(Qt::TopDockWidgetArea, graph);
         connect(m_timer, SIGNAL(timeout()), graph, SLOT(update()));
     });
-    connect(m_aLineChart, &QAction::triggered, [this]() {
-        LineChartWidget* lineChart = new LineChartWidget(m_exp, this);
+    connect(m_aLineChart, &QAction::triggered, [this, expMgr]() {
+        LineChartWidget* lineChart = new LineChartWidget(expMgr, m_exp, this);
         m_innerWindow->addDockWidget(Qt::TopDockWidgetArea, lineChart);
         connect(m_timer, SIGNAL(timeout()), lineChart, SLOT(updateSeries()));
     });

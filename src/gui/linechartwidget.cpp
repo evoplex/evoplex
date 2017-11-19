@@ -13,7 +13,7 @@
 
 namespace evoplex {
 
-LineChartWidget::LineChartWidget(Experiment* exp, QWidget* parent)
+LineChartWidget::LineChartWidget(ExperimentsMgr* expMgr, Experiment* exp, QWidget* parent)
     : QDockWidget(parent)
     , m_settingsDlg(new Ui_LineChartSettings)
     , m_exp(exp)
@@ -55,10 +55,25 @@ LineChartWidget::LineChartWidget(Experiment* exp, QWidget* parent)
     chartView->setRenderHint(QPainter::Antialiasing);
     chartView->setBackgroundBrush(QColor(239,235,231));
     setWidget(chartView);
+
+    connect(expMgr, SIGNAL(restarted(Experiment*)), SLOT(slotRestarted(Experiment*)));
 }
 
 LineChartWidget::~LineChartWidget()
 {
+}
+
+void LineChartWidget::slotRestarted(Experiment* exp)
+{
+    if (exp != m_exp) {
+        return;
+    }
+
+    for (auto& i : m_series) {
+        Series& s = i.second;
+        s.series->clear(); // remove all points
+    }
+    m_finished = false;
 }
 
 void LineChartWidget::setSelectedTrial(int trialId)

@@ -34,6 +34,7 @@ public:
 signals:
     void statusChanged(Experiment* exp);
     void progressUpdated(Experiment* exp);
+    void restarted(Experiment* exp);
     void killed(int id);
 
 public slots:

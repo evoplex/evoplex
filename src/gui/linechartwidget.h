@@ -20,10 +20,11 @@ class LineChartWidget : public QDockWidget
     Q_OBJECT
 
 public:
-    explicit LineChartWidget(Experiment* exp, QWidget* parent = 0);
+    explicit LineChartWidget(ExperimentsMgr* expMgr, Experiment* exp, QWidget* parent);
     ~LineChartWidget();
 
 private slots:
+    void slotRestarted(Experiment* exp);
     void setSelectedTrial(int trialId);
     void slotAddSeries();
     void slotEntityChanged(bool isAgent);

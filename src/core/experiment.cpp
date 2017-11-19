@@ -86,6 +86,8 @@ void Experiment::reset()
     m_trials.reserve(m_numTrials);
     m_expStatus = READY;
     emit (m_mainApp->getExperimentsMgr()->statusChanged(this));
+    emit (m_mainApp->getExperimentsMgr()->restarted(this));
+
 }
 
 void Experiment::deleteTrials()
