@@ -9,9 +9,9 @@
 namespace evoplex {
 
 enum GraphType {
-    Invalid_Type,
-    Directed,
-    Undirected
+    Invalid_Type = 0,
+    Undirected = 1,
+    Directed = 2
 };
 
 static GraphType enumFromString(const QString& str)

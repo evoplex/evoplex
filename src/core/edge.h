@@ -23,10 +23,7 @@ class Edge
 public:
     explicit Edge();
     explicit Edge(Agent* origin, Agent* neighbour, Attributes* attrs, bool isDirected);
-    explicit Edge(Agent* origin, Agent* neighbour, bool isDirected)
-        : Edge(origin, neighbour, new Attributes(), isDirected) {}
-    explicit Edge(Agent* origin, Agent* neighbour)
-        : Edge(origin, neighbour, new Attributes(), true) {}
+    explicit Edge(Agent* origin, Agent* neighbour, bool isDirected);
     ~Edge();
 
     inline const Value& attr(const char* name) const { return m_attrs->value(name); }
@@ -40,7 +37,13 @@ private:
     Agent* m_origin;
     Agent* m_neighbour;
     Attributes* m_attrs;
-    bool m_isDirected;
+
+    // If it's an undirected edge, it'll create a new edge in the
+    // opposite direction with the same attrs.
+    // This new edge is added for the sake of letting the neighbour
+    // aware that an edge has been attached to him, allowing him to
+    // access the attrs of this connection.
+    Edge* m_undirectedEdge;
 };
 }
 #endif // EDGE_H
