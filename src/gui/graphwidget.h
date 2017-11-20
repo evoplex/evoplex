@@ -21,7 +21,7 @@ class GraphWidget : public QDockWidget
     Q_OBJECT
 
 public:
-    explicit GraphWidget(Experiment* exp, QWidget* parent = 0);
+    explicit GraphWidget(ExperimentsMgr* expMgr, Experiment* exp, QWidget* parent = 0);
     ~GraphWidget();
 
 protected:
@@ -41,6 +41,7 @@ private:
     Ui_GraphWidget* m_ui;
     Experiment* m_exp;
     AbstractGraph* m_graph;
+    int m_currTrialId;
 
     bool m_showAgents;
     bool m_showEdges;

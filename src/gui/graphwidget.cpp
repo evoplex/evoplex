@@ -19,7 +19,7 @@
 
 namespace evoplex {
 
-GraphWidget::GraphWidget(Experiment* exp, QWidget* parent)
+GraphWidget::GraphWidget(ExperimentsMgr* expMgr, Experiment* exp, QWidget* parent)
     : QDockWidget(parent)
     , m_ui(new Ui_GraphWidget)
     , m_exp(exp)
@@ -41,8 +41,11 @@ GraphWidget::GraphWidget(Experiment* exp, QWidget* parent)
 
     TitleBar* titleBar = new TitleBar(exp, this);
     setTitleBarWidget(titleBar);
-    connect(titleBar, SIGNAL(trialSelected(int)), this, SLOT(setGraph(int)));
+    connect(titleBar, SIGNAL(trialSelected(int)), SLOT(setGraph(int)));
     setGraph(0);
+
+    connect(expMgr, &ExperimentsMgr::statusChanged,
+        [this](Experiment* exp) { if (exp == m_exp) setGraph(m_currTrialId); });
 
     connect(m_ui->bZoomIn, SIGNAL(clicked(bool)), SLOT(zoomIn()));
     connect(m_ui->bZoomOut, SIGNAL(clicked(bool)), SLOT(zoomOut()));
@@ -81,6 +84,7 @@ GraphWidget::~GraphWidget()
 
 void GraphWidget::setGraph(int trialId)
 {
+    m_currTrialId = trialId;
     m_graph = m_exp->graph(trialId);
     updateCache();
 }

@@ -69,8 +69,8 @@ ExperimentWidget::ExperimentWidget(Experiment* exp, ProjectsWindow* pwindow)
     layout->addWidget(m_innerWindow);
     layout->addWidget(tb);
     setWidget(layout->parentWidget());
-    connect(m_aGraph, &QAction::triggered, [this]() {
-        GraphWidget* graph = new GraphWidget(m_exp, this);
+    connect(m_aGraph, &QAction::triggered, [this, expMgr]() {
+        GraphWidget* graph = new GraphWidget(expMgr, m_exp, this);
         m_innerWindow->addDockWidget(Qt::TopDockWidgetArea, graph);
         connect(m_timer, SIGNAL(timeout()), graph, SLOT(update()));
     });

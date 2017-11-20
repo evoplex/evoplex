@@ -200,7 +200,8 @@ Experiment::Trial Experiment::createTrial(const int trialId)
         return Trial();
     } if (m_trials.size() == m_numTrials) {
         qWarning() << "[Experiment]: all the trials for this experiment have already been created."
-                   << "Project:" << m_projId << "Experiment:" << m_id << "Trial:" << trialId;
+                   << "Project:" << m_projId << "Experiment:" << m_id << "Trial:" << trialId
+                   << " (" << m_trials.size() << "/" << numTrials() << ")";
         return Trial();
     }
 
@@ -277,7 +278,7 @@ Agents Experiment::createAgents()
         return cloneAgents(m_clonableAgents);
     }
 
-    Q_ASSERT(m_trials.size() == 0);
+    Q_ASSERT(m_trials.empty());
 
     Agents agents;
     bool isInt;
