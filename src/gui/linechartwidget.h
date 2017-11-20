@@ -10,8 +10,9 @@
 #include <QDockWidget>
 #include <QtCharts/QLineSeries>
 
-#include "core/experiment.h"
+#include "outputwidget.h"
 #include "ui_linechartsettings.h"
+#include "core/experiment.h"
 
 namespace evoplex {
 
@@ -26,9 +27,7 @@ public:
 private slots:
     void slotRestarted(Experiment* exp);
     void setSelectedTrial(int trialId);
-    void slotAddSeries();
-    void slotEntityChanged(bool isAgent);
-    void slotFuncChanged(int idx);
+    void slotAddSeries(std::vector<Output*> newOutputs);
     void updateSeries();
     void removeSeries(int seriesId);
 
@@ -46,6 +45,7 @@ private:
     float m_maxY;
     bool m_finished;
     int m_currentTrialId;
+    int m_lastSeriesId;
 };
 }
 

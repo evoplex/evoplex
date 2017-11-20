@@ -6,6 +6,7 @@ set(EVOPLEX_GUI_H
   #contextmenutable.h
   experimentwidget.h
   linechartwidget.h
+  outputwidget.h
   graphwidget.h
   projectwidget.h
   projectswindow.h
@@ -23,6 +24,7 @@ set(EVOPLEX_GUI_CXX
   #contextmenutable.cpp
   experimentwidget.cpp
   linechartwidget.cpp
+  outputwidget.cpp
   graphwidget.cpp
   projectwidget.cpp
   projectswindow.cpp
@@ -38,6 +40,7 @@ qt5_wrap_ui(EVOPLEX_GUI_UI
   forms/attributeswidget.ui
   forms/graphwidget.ui
   forms/linechartsettings.ui
+  forms/outputwidget.ui
   forms/projectwidget.ui
   forms/queuewidget.ui
   forms/savedialog.ui

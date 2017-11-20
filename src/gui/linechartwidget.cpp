@@ -9,7 +9,6 @@
 
 #include "linechartwidget.h"
 #include "titlebar.h"
-#include "core/utils.h"
 
 namespace evoplex {
 
@@ -21,6 +20,7 @@ LineChartWidget::LineChartWidget(ExperimentsMgr* expMgr, Experiment* exp, QWidge
     , m_maxY(0)
     , m_finished(false)
     , m_currentTrialId(0)
+    , m_lastSeriesId(-1)
 {
     setWindowTitle("Line Chart");
     setAttribute(Qt::WA_DeleteOnClose, true);
@@ -32,19 +32,12 @@ LineChartWidget::LineChartWidget(ExperimentsMgr* expMgr, Experiment* exp, QWidge
 
     QDialog* dlg = new QDialog(this);
     m_settingsDlg->setupUi(dlg);
-    connect(titleBar, SIGNAL(openSettingsDlg()), dlg, SLOT(show()));
+    OutputWidget* outputWidget = new OutputWidget(m_exp->modelPlugin(), this);
+    m_settingsDlg->seriesLayout->addWidget(outputWidget);
+    connect(outputWidget, SIGNAL(closed(std::vector<Output*>)), SLOT(slotAddSeries(std::vector<Output*>)));
+    connect(titleBar, &TitleBar::openSettingsDlg,
+            [this, outputWidget, dlg]() { outputWidget->setTrialIds({m_currentTrialId}); dlg->show(); });
     dlg->hide();
-
-    for (QString funcName : DefaultOutput::availableFunctions()) {
-        m_settingsDlg->func->addItem(funcName, 0); // default function
-    }
-    for (QString funcName : m_exp->modelPlugin()->customOutputs) {
-        m_settingsDlg->func->addItem(funcName, 1); // custom function
-    }
-    connect(m_settingsDlg->add, SIGNAL(clicked(bool)), SLOT(slotAddSeries()));
-    connect(m_settingsDlg->func, SIGNAL(currentIndexChanged(int)), SLOT(slotFuncChanged(int)));
-    connect(m_settingsDlg->entityAgent, SIGNAL(toggled(bool)), SLOT(slotEntityChanged(bool)));
-    m_settingsDlg->entityAgent->setChecked(true);
 
     m_chart->legend()->hide();
     m_chart->setAnimationOptions(QtCharts::QChart::GridAxisAnimations);
@@ -113,90 +106,28 @@ void LineChartWidget::removeSeries(int seriesId)
     m_series.erase(seriesId);
 }
 
-void LineChartWidget::slotFuncChanged(int idx)
+void LineChartWidget::slotAddSeries(std::vector<Output*> newOutputs)
 {
-    m_settingsDlg->input->clear();
-    m_settingsDlg->attr->setEnabled(m_settingsDlg->func->itemData(idx) == 0);
-    m_settingsDlg->input->setEnabled(m_settingsDlg->func->itemData(idx) == 0);
-}
-
-void LineChartWidget::slotEntityChanged(bool isAgent)
-{
-    m_settingsDlg->attr->clear();
-    m_settingsDlg->input->clear();
-    if (isAgent) {
-        for (QString n : m_exp->modelPlugin()->agentAttrMin.names()) {
-            m_settingsDlg->attr->addItem(n);
-        }
-    } else {
-        for (QString n : m_exp->modelPlugin()->edgeAttrMin.names()) {
-            m_settingsDlg->attr->addItem(n);
-        }
-    }
-    m_settingsDlg->input->setEnabled(m_settingsDlg->attr->count() > 0);
-}
-
-void LineChartWidget::slotAddSeries()
-{
-    int row = m_settingsDlg->table->rowCount();
-    QString attrName = m_settingsDlg->attr->currentText();
-
-    Output* output;
-    Value input;
-    if (m_settingsDlg->func->currentData().toInt() == 0) { // default output
-        DefaultOutput::Entity entity;
-        if (m_settingsDlg->entityAgent->isChecked()) {
-            entity = DefaultOutput::E_Agents;
-            input = Utils::validateParameter(m_exp->modelPlugin()->agentAttrSpace.value(attrName).second,
-                                             m_settingsDlg->input->text());
+    for (Output* output : newOutputs) {
+        Series s;
+        s.series = new QtCharts::QLineSeries();
+        //s.series->setUseOpenGL(true); TODO: make sure we can call it
+        Output* existingOutput = m_exp->searchOutput(output);
+        if (existingOutput) {
+            s.cacheIdx = existingOutput->addCache({output->allInputs()}, {m_currentTrialId});
+            s.output = existingOutput;
+            if (existingOutput != output) {
+                delete output;
+                output = nullptr;
+            }
         } else {
-            entity = DefaultOutput::E_Edges;
-            input = Utils::validateParameter(m_exp->modelPlugin()->edgeAttrSpace.value(attrName).second,
-                                             m_settingsDlg->input->text());
+            s.cacheIdx = 0;
+            s.output = output;
+            m_exp->addOutput(output);
         }
-
-        if (!input.isValid()) {
-            QMessageBox::warning(this, "Wrong Input", "The 'input' is not valid for the current 'attribute'.");
-            return;
-        }
-
-        DefaultOutput::Function func = DefaultOutput::funcFromString(m_settingsDlg->func->currentText());
-        Q_ASSERT(func != DefaultOutput::F_Invalid);
-
-        output = new DefaultOutput(func, entity, attrName, m_settingsDlg->attr->currentIndex(), {input}, {m_currentTrialId});
-
-        m_settingsDlg->table->insertRow(row);
-        m_settingsDlg->table->setItem(row, 0, new QTableWidgetItem("Default"));
-        m_settingsDlg->table->setItem(row, 1, new QTableWidgetItem(m_settingsDlg->func->currentText()));
-        m_settingsDlg->table->setItem(row, 2, new QTableWidgetItem(entity == DefaultOutput::E_Agents ? "Agent" : "Edge"));
-        m_settingsDlg->table->setItem(row, 3, new QTableWidgetItem(m_settingsDlg->attr->currentText()));
-        m_settingsDlg->table->setItem(row, 4, new QTableWidgetItem(m_settingsDlg->input->text()));
-
-    } else { // custom output
-        input = Value(m_settingsDlg->func->currentText());
-        output = new CustomOutput({input}, {m_currentTrialId});
-
-        m_settingsDlg->table->insertRow(row);
-        m_settingsDlg->table->setItem(row, 0, new QTableWidgetItem("Custom"));
-        m_settingsDlg->table->setItem(row, 1, new QTableWidgetItem(m_settingsDlg->func->currentText()));
+        m_series.insert({++m_lastSeriesId, s});
+        m_chart->addSeries(s.series);
     }
-
-    Series s;
-    s.series = new QtCharts::QLineSeries();
-    //s.series->setUseOpenGL(true); TODO: make sure we can call it
-    Output* existingOutput = m_exp->searchOutput(output);
-    if (existingOutput) {
-        delete output;
-        s.cacheIdx = existingOutput->addCache({input}, {m_currentTrialId});
-        s.output = existingOutput;
-    } else {
-        s.cacheIdx = 0;
-        s.output = output;
-        m_exp->addOutput(output);
-    }
-    m_series.insert({row, s});
-
-    m_chart->addSeries(s.series);
 }
 
 void LineChartWidget::updateSeries()
