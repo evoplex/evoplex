@@ -34,7 +34,7 @@ signals:
 private slots:
     void slotAgentFile();
     void slotOutputDir();
-    void slotOutputHeader();
+    void slotOutputWidget();
     void slotCreateExperiment();
     void slotModelSelected(const QString& modelId);
     void slotGraphSelected(const QString& graphId);

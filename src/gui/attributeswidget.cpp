@@ -14,6 +14,7 @@
 #include <QRadioButton>
 
 #include "attributeswidget.h"
+#include "outputwidget.h"
 #include "ui_attributeswidget.h"
 
 #define STRING_NULL_PLUGINID "--"
@@ -29,7 +30,7 @@ AttributesWidget::AttributesWidget(Project* project, QWidget *parent)
 {
     m_ui->setupUi(this);
 
-    connect(m_ui->btnSubmit, SIGNAL(clicked(bool)), this, SLOT(slotCreateExperiment()));
+    connect(m_ui->btnSubmit, SIGNAL(clicked(bool)), SLOT(slotCreateExperiment()));
     m_ui->treeWidget->setFocusPolicy(Qt::NoFocus);
 
     // setup the tree widget: general attributes
@@ -40,7 +41,7 @@ AttributesWidget::AttributesWidget(Project* project, QWidget *parent)
     QLineEdit* agentsPath = new QLineEdit(m_project->getDest());
     QPushButton* btBrowseFile = new QPushButton("...");
     btBrowseFile->setMaximumWidth(20);
-    connect(btBrowseFile, SIGNAL(clicked(bool)), this, SLOT(slotAgentFile()));
+    connect(btBrowseFile, SIGNAL(clicked(bool)), SLOT(slotAgentFile()));
     QHBoxLayout* agentsLayout = new QHBoxLayout(new QWidget(m_ui->treeWidget));
     agentsLayout->setMargin(0);
     agentsLayout->insertWidget(0, agentsPath);
@@ -61,12 +62,12 @@ AttributesWidget::AttributesWidget(Project* project, QWidget *parent)
     addTreeWidget(m_treeItemGeneral, GENERAL_ATTRIBUTE_AUTODELETE, QVariant::fromValue(chb));
     // --  models available
     QComboBox* cb = new QComboBox(m_ui->treeWidget);
-    connect(cb, SIGNAL(currentIndexChanged(QString)), this, SLOT(slotModelSelected(QString)));
+    connect(cb, SIGNAL(currentIndexChanged(QString)), SLOT(slotModelSelected(QString)));
     addTreeWidget(m_treeItemGeneral, GENERAL_ATTRIBUTE_MODELID, QVariant::fromValue(cb));
     // --  graphs available
     cb = new QComboBox(m_ui->treeWidget);
     cb->setEnabled(false);
-    connect(cb, SIGNAL(currentIndexChanged(QString)), this, SLOT(slotGraphSelected(QString)));
+    connect(cb, SIGNAL(currentIndexChanged(QString)), SLOT(slotGraphSelected(QString)));
     addTreeWidget(m_treeItemGeneral, GENERAL_ATTRIBUTE_GRAPHID, QVariant::fromValue(cb));
 
     // setup the tree widget: outputs
@@ -82,7 +83,7 @@ AttributesWidget::AttributesWidget(Project* project, QWidget *parent)
     QLineEdit* outDir = new QLineEdit(m_project->getDest());
     QPushButton* outBrowseDir = new QPushButton("...");
     outBrowseDir->setMaximumWidth(20);
-    connect(outBrowseDir, SIGNAL(clicked(bool)), this, SLOT(slotOutputDir()));
+    connect(outBrowseDir, SIGNAL(clicked(bool)), SLOT(slotOutputDir()));
     QHBoxLayout* outLayout = new QHBoxLayout(new QWidget(m_ui->treeWidget));
     outLayout->setMargin(0);
     outLayout->insertWidget(0, outDir);
@@ -95,7 +96,7 @@ AttributesWidget::AttributesWidget(Project* project, QWidget *parent)
     QLineEdit* outHeader = new QLineEdit(m_project->getDest());
     QPushButton* outBuildHeader = new QPushButton("...");
     outBuildHeader->setMaximumWidth(20);
-    connect(outBuildHeader, SIGNAL(clicked(bool)), this, SLOT(slotOutputHeader()));
+    connect(outBuildHeader, SIGNAL(clicked(bool)), SLOT(slotOutputWidget()));
     QHBoxLayout* headerLayout = new QHBoxLayout(new QWidget(m_ui->treeWidget));
     headerLayout->setMargin(0);
     headerLayout->insertWidget(0, outHeader);
@@ -217,9 +218,66 @@ void AttributesWidget::slotOutputDir()
     }
 }
 
-void AttributesWidget::slotOutputHeader()
+void AttributesWidget::slotOutputWidget()
 {
-    // TODO
+    if (m_selectedModelId == STRING_NULL_PLUGINID) {
+        QMessageBox::warning(this, "Experiment", "Please, select a valid 'modelId' first.");
+        return;
+    }
+
+    int numTrials = m_widgetFields.value(GENERAL_ATTRIBUTE_TRIALS).value<QSpinBox*>()->value();
+    std::vector<int> trialIds;
+    trialIds.reserve(numTrials);
+    for (int id = 0; id < numTrials; ++id) {
+        trialIds.emplace_back(id);
+    }
+
+    std::vector<Output*> currentOutputs;
+    MainApp::ModelPlugin* model = m_project->getModels().value(m_selectedModelId);
+    QString currentHeader = m_widgetFields.value(OUTPUT_HEADER).value<QLineEdit*>()->text();
+    if (!currentHeader.isEmpty()) {
+        QString errorMsg;
+        currentOutputs = Output::parseHeader(currentHeader.split(";"), trialIds,
+                model->agentAttrMin, model->edgeAttrMin, errorMsg);
+        if (!errorMsg.isEmpty()) {
+            QMessageBox::warning(this, "Output Creator", errorMsg);
+            qDeleteAll(currentOutputs);
+            currentOutputs.clear();
+        }
+    }
+
+    OutputWidget* ow = new OutputWidget(model);
+    ow->setAttribute(Qt::WA_DeleteOnClose, true);
+    ow->setWindowModality(Qt::ApplicationModal);
+    ow->setTrialIds(trialIds);
+    ow->fill(currentOutputs);
+    ow->show();
+
+    connect(ow, &OutputWidget::closed,
+    [this](std::vector<Output*> outputs) {
+        // join all Output objects which have the same function, entity and attribute
+        QStringList uniqueOutputs;
+        for (int o1 = 0; o1 < outputs.size(); ++o1) {
+            if (!outputs.at(o1)) {
+                continue;
+            }
+            QString outputStr = outputs.at(o1)->printableHeader();
+            //Values allInputs;
+            for (int o2 = 0; o2 < outputs.size(); ++o2) {
+                if (o1 == o2 || !outputs.at(o2) || !outputs.at(o1)->operator ==(outputs.at(o2))) {
+                    continue;
+                }
+                //allInputs.insert(allInputs.end(), o2->allInputs().begin(), o2->allInputs().end());
+                outputStr += "_" + outputs.at(o2)->allInputs().front().toQString();
+                delete outputs.at(o2);
+                outputs.at(o2) = nullptr;
+            }
+            uniqueOutputs.push_back(outputStr);
+        }
+
+        m_widgetFields.value(OUTPUT_HEADER)
+                .value<QLineEdit*>()->setText(uniqueOutputs.join(";"));
+    });
 }
 
 void AttributesWidget::slotCreateExperiment()
