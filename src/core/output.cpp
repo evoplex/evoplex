@@ -42,7 +42,7 @@ void DefaultOutput::doOperation(const int trialId, const AbstractModel* model)
     updateCaches(trialId, model->currStep(), allValues);
 }
 
-QString DefaultOutput::printableHeader()
+QString DefaultOutput::printableHeader(const char sep)
 {
     QString prefix = QString("%1_%2_%3_")
             .arg(stringFromFunc(m_func))
@@ -51,7 +51,7 @@ QString DefaultOutput::printableHeader()
 
     QString ret;
     for (Value val : m_allInputs) {
-        ret += prefix + val.toQString() + ";";
+        ret += prefix + val.toQString() + sep;
     }
     ret.chop(1);
     return ret;
@@ -83,11 +83,11 @@ void CustomOutput::doOperation(const int trialId, const AbstractModel* model)
     updateCaches(trialId, model->currStep(), model->customOutputs(m_allInputs));
 }
 
-QString CustomOutput::printableHeader()
+QString CustomOutput::printableHeader(const char sep)
 {
     QString ret;
     for (Value h : m_allInputs) {
-        ret += h.toQString() + "_";
+        ret += "custom_" + h.toQString() + sep;
     }
     ret.chop(1);
     return ret;

@@ -27,7 +27,7 @@ public:
     virtual void doOperation(const int trialId, const AbstractModel* model) = 0;
 
     // Printable header with all columns of this operation separated by commas.
-    virtual QString printableHeader() = 0;
+    virtual QString printableHeader(const char sep) = 0;
 
     virtual bool operator==(const Output* output) = 0;
 
@@ -95,7 +95,7 @@ public:
 
     // Printable header with all columns of this operation separated by commas.
     // Format: "custom_nameDefinedInTheModel"
-    virtual QString printableHeader();
+    virtual QString printableHeader(const char sep);
 
     virtual bool operator==(const Output* output);
 };
@@ -132,7 +132,7 @@ public:
 
     // Printable header with all columns of this operation separated by commas.
     // Format: "function_entity_attrName_value"
-    virtual QString printableHeader();
+    virtual QString printableHeader(const char sep);
 
     virtual bool operator==(const Output* output);
 

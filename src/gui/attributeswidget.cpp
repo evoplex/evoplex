@@ -261,13 +261,11 @@ void AttributesWidget::slotOutputWidget()
             if (!outputs.at(o1)) {
                 continue;
             }
-            QString outputStr = outputs.at(o1)->printableHeader();
-            //Values allInputs;
+            QString outputStr = outputs.at(o1)->printableHeader(';');
             for (int o2 = 0; o2 < outputs.size(); ++o2) {
                 if (o1 == o2 || !outputs.at(o2) || !outputs.at(o1)->operator ==(outputs.at(o2))) {
                     continue;
                 }
-                //allInputs.insert(allInputs.end(), o2->allInputs().begin(), o2->allInputs().end());
                 outputStr += "_" + outputs.at(o2)->allInputs().front().toQString();
                 delete outputs.at(o2);
                 outputs.at(o2) = nullptr;
@@ -276,7 +274,7 @@ void AttributesWidget::slotOutputWidget()
         }
 
         m_widgetFields.value(OUTPUT_HEADER)
-                .value<QLineEdit*>()->setText(uniqueOutputs.join(";"));
+                .value<QLineEdit*>()->setText(uniqueOutputs.join(';'));
     });
 }
 

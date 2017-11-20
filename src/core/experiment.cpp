@@ -56,7 +56,7 @@ void Experiment::init(Attributes* generalAttrs, Attributes* modelAttrs,
     if (!m_fileOutputs.empty()) {
         for (Output* output : m_fileOutputs) {
             Q_ASSERT(output->allInputs().size() > 0);
-            m_fileHeader += output->printableHeader() + ",";
+            m_fileHeader += output->printableHeader(',') + ",";
         }
         m_fileHeader.chop(1);
         m_fileHeader += "\n";
