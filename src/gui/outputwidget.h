@@ -27,10 +27,10 @@ public:
     void fill(std::vector<Output*> outputs);
 
 protected:
-    virtual void closeEvent(QCloseEvent *event);
+    virtual void hideEvent(QHideEvent* event);
 
 signals:
-    void closed(std::vector<Output*> outputs);
+    void closed(std::vector<Output*> newOutputs);
 
 private slots:
     void slotEntityChanged(bool isAgent);
@@ -42,7 +42,8 @@ private:
     const MainApp::ModelPlugin* m_modelPlugin;
     std::vector<int> m_trialIds;
 
-    std::vector<Output*> m_outputs;
+    std::vector<Output*> m_allOutputs;
+    std::vector<Output*> m_newOutputs;
 };
 }
 #endif // OUTPUTWIDGET_H

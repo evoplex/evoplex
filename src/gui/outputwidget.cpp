@@ -34,10 +34,13 @@ OutputWidget::~OutputWidget()
     delete m_ui;
 }
 
-void OutputWidget::closeEvent(QCloseEvent* event)
+void OutputWidget::hideEvent(QHideEvent* event)
 {
-    emit (closed(m_outputs));
-    QWidget::closeEvent(event);
+    if (!m_newOutputs.empty()) {
+        emit (closed(m_newOutputs));
+        m_newOutputs.clear();
+    }
+    QWidget::hideEvent(event);
 }
 
 void OutputWidget::slotFuncChanged(int idx)
@@ -109,22 +112,26 @@ void OutputWidget::slotAdd()
     }
 
     // make sure it is unique
-    for (Output* existing : m_outputs) {
-        if (existing->operator ==(output)
+    for (Output* existing : m_allOutputs) {
+        if (existing && existing->operator ==(output)
                 && existing->allInputs().front().operator ==(output->allInputs().front())) {
             m_ui->table->removeRow(row);
+            delete output;
+            output = nullptr;
             return;
         }
     }
 
-    m_outputs.emplace_back(output);
+    m_newOutputs.emplace_back(output);
+    m_allOutputs.emplace_back(output);
 }
 
 void OutputWidget::fill(std::vector<Output*> outputs)
 {
     m_ui->table->clearContents();
-    qDeleteAll(m_outputs);
-    m_outputs.clear();
+    qDeleteAll(m_allOutputs);
+    m_allOutputs.clear();
+    m_newOutputs.clear();
 
     for (Output* output : outputs) {
         int row = m_ui->table->rowCount();
@@ -134,7 +141,7 @@ void OutputWidget::fill(std::vector<Output*> outputs)
 
             for (Value input : df->allInputs()) {
                 // we create one Output object for each input
-                m_outputs.emplace_back(new DefaultOutput(
+                m_newOutputs.emplace_back(new DefaultOutput(
                         df->function(), df->entity(), df->attrName(),
                         df->attrIdx(), {input}, trialIds));
 
@@ -152,7 +159,7 @@ void OutputWidget::fill(std::vector<Output*> outputs)
 
             for (Value func : cs->allInputs()) {
                 // we create one Output object for each input
-                m_outputs.emplace_back(new CustomOutput({func}, trialIds));
+                m_newOutputs.emplace_back(new CustomOutput({func}, trialIds));
 
                 m_ui->table->insertRow(row);
                 m_ui->table->setItem(row, 0, new QTableWidgetItem("Custom"));
@@ -162,6 +169,7 @@ void OutputWidget::fill(std::vector<Output*> outputs)
         } else {
             qFatal("[OutputWidget] : error! invalid Output object.");
         }
+        m_allOutputs.emplace_back(m_newOutputs.back());
     }
 }
 
