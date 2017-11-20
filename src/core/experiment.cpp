@@ -137,7 +137,7 @@ void Experiment::playNext()
     } else if (m_trials.empty()) {
         setPauseAt(0);
     } else {
-        int maxCurrStep = -1;
+        int maxCurrStep = 0;
         for (auto& trial : m_trials) {
             int currStep = trial.second.modelObj->m_currStep;
             if (currStep > maxCurrStep) maxCurrStep = currStep;
@@ -200,7 +200,7 @@ Experiment::Trial Experiment::createTrial(const int trialId)
         return Trial();
     } if (m_trials.size() == m_numTrials) {
         qWarning() << "[Experiment]: all the trials for this experiment have already been created."
-                   << "Project:" << m_projId << "Experiment:" << m_id;
+                   << "Project:" << m_projId << "Experiment:" << m_id << "Trial:" << trialId;
         return Trial();
     }
 
