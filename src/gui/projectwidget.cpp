@@ -36,7 +36,7 @@ ProjectWidget::ProjectWidget(Project* project, ProjectsWindow* pwindow)
     m_innerWindow->addDockWidget(Qt::RightDockWidgetArea, m_attrWidget);
     m_attrWidget->setTitleBarWidget(new QWidget());
     m_attrWidget->setFeatures(QDockWidget::NoDockWidgetFeatures);
-    connect(m_attrWidget, SIGNAL(experimentCreated(int)), this, SLOT(insertRow(int)));
+    connect(m_project, SIGNAL(expAdded(int)), this, SLOT(slotInsertRow(int)));
 
     int col = 0;
     m_headerIdx.insert(TableWidget::H_BUTTON, col++);
@@ -66,7 +66,7 @@ ProjectWidget::ProjectWidget(Project* project, ProjectsWindow* pwindow)
             SLOT(slotHasUnsavedChanges(bool)));
 }
 
-void ProjectWidget::insertRow(const int& expId)
+void ProjectWidget::slotInsertRow(int expId)
 {
     Experiment* exp = m_project->getExperiment(expId);
     const int row = m_ui->table->insertRow(exp);

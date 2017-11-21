@@ -16,7 +16,8 @@ WelcomeWidget::WelcomeWidget(MainGUI* maingui)
 {
     m_ui->setupUi(this);
 
-    connect(m_ui->bNewProject, SIGNAL(pressed()), m_maingui, SLOT(newProject()));
+    connect(m_ui->bNewProject, SIGNAL(pressed()), m_maingui, SIGNAL(newProject()));
+    connect(m_ui->bOpenProject, SIGNAL(pressed()), m_maingui, SIGNAL(openProject()));
 }
 
 WelcomeWidget::~WelcomeWidget()

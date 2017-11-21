@@ -339,9 +339,7 @@ void AttributesWidget::slotCreateExperiment()
 
     QString errorMsg;
     int expId = m_project->newExperiment(header, values, errorMsg);
-    if (expId >= 0) {
-        emit (experimentCreated(expId));
-    } else {
+    if (expId < 0) {
         QMessageBox::warning(this, "Experiment",
                 "Unable to create the experiment.\nError: \"" + errorMsg + "\"");
     }

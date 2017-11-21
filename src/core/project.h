@@ -47,13 +47,16 @@ public:
     inline const QString& getDest() const { return m_dest; }
     inline void setDest(const QString& dest) { m_dest = dest; }
 
+    inline Experiment* getExperiment(int expId) const { return m_experiments.value(expId); }
+    inline const QHash<int, Experiment*> getExperiments() const { return m_experiments; }
+
     inline int getId() const { return m_id; }
-    inline Experiment* getExperiment(int expId) { return m_experiments.value(expId); }
     inline const QHash<QString, MainApp::GraphPlugin*>& getGraphs() const { return m_mainApp->getGraphs(); }
     inline const QHash<QString, MainApp::ModelPlugin*>& getModels() const { return m_mainApp->getModels(); }
     inline bool hasUnsavedChanges() const { return m_hasUnsavedChanges; }
 
 signals:
+    void expAdded(int expId);
     void hasUnsavedChanges(bool);
     // emit an integer [0,100] while saving this project
     void progressSave(int);

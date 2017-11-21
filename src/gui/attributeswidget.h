@@ -28,9 +28,6 @@ public:
 
     void fill(Experiment* exp);
 
-signals:
-    void experimentCreated(const int& expId);
-
 private slots:
     void slotAgentFile();
     void slotOutputDir();

@@ -31,6 +31,7 @@ signals:
 
 public slots:
     void slotNewProject();
+    bool slotOpenProject();
     void slotOpenExperiment(int projId, int expId);
 
 private slots:
@@ -41,6 +42,8 @@ private:
     ProjectWidget* m_currProjectWidget;
     QVector<ProjectWidget*> m_projects; // opened projects
     QVector<ExperimentWidget*> m_experiments; // opened experiments
+
+    void addProjectWidget(Project* project);
 };
 }
 

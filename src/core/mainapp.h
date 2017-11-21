@@ -60,6 +60,10 @@ public:
     // Create a new project
     Project* newProject(const QString& name="", const QString& dest="");
 
+    Project* openProject(const QString& filepath);
+
+    void closeProject(int projId);
+
     inline FileMgr* getFileMgr() { return m_fileMgr; }
     inline ExperimentsMgr* getExperimentsMgr() { return m_experimentsMgr; }
     inline const QHash<QString, GraphPlugin*>& getGraphs() { return m_graphs; }

@@ -25,10 +25,13 @@ class MainGUI: public QMainWindow
 public:
     explicit MainGUI(MainApp* mainApp, QWidget* parent=0);
 
+signals:
+    void newProject();
+    void openProject();
+
 private slots:
-    void slotPage(QAction* action);
-    void newProject() { m_actNewProject->trigger(); }
     void updateSaveButtons(ProjectWidget* pw);
+    void slotPage(QAction* action);
     void slotSave();
     void slotSaveAs();
     void slotSaveAll();
@@ -56,6 +59,7 @@ private:
     Page m_curPage;
 
     QAction* m_actNewProject;
+    QAction* m_actOpenProject;
     QAction* m_actSave;
     QAction* m_actSaveAs;
 

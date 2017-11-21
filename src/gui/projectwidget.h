@@ -33,11 +33,13 @@ signals:
     void openExperiment(int projId, int expId);
     void hasUnsavedChanges(ProjectWidget*);
 
+public slots:
+    void slotInsertRow(int expId);
+    void slotHasUnsavedChanges(bool b);
+
 private slots:
     void onItemClicked(QTableWidgetItem* item);
     void onItemDoubleClicked(QTableWidgetItem* item);
-    void insertRow(const int& expId);
-    void slotHasUnsavedChanges(bool b);
 
 private:
     Ui_ProjectWidget* m_ui;

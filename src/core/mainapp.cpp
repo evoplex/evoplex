@@ -169,6 +169,28 @@ Project* MainApp::newProject(const QString& name, const QString& dest)
     return project;
 }
 
+void MainApp::closeProject(int projId)
+{
+    delete m_projects.take(projId);
+}
+
+Project* MainApp::openProject(const QString& filepath)
+{
+    QFileInfo fi(filepath);
+    if (!fi.isReadable() || fi.suffix() != "csv") {
+        qWarning() << "[Project] : failed to open a project!" << filepath;
+        return nullptr;
+    }
+
+    Project* project = newProject(fi.baseName(), fi.absolutePath());
+    if (project->importExperiments(filepath) == -1) {
+        qWarning() << "[Project] : failed to open a project!" << filepath;
+        closeProject(project->getId());
+        return nullptr;
+    }
+    return project;
+}
+
 AttributesSpace MainApp::attributesSpace(const QJsonObject& metaData, const QString& name) const
 {
     AttributesSpace ret;

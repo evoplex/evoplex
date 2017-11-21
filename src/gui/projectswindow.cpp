@@ -5,6 +5,7 @@
 
 #include <QApplication>
 #include <QDebug>
+#include <QFileDialog>
 
 #include "experimentwidget.h"
 #include "projectwidget.h"
@@ -29,9 +30,8 @@ void ProjectsWindow::slotFocusChanged(QDockWidget* currTab)
     emit (selectionChanged(pw));
 }
 
-void ProjectsWindow::slotNewProject()
+void ProjectsWindow::addProjectWidget(Project* project)
 {
-    Project* project = m_mainApp->newProject();
     ProjectWidget* pw = new ProjectWidget(project, this);
     if (m_projects.isEmpty()) {
         this->addDockWidget(Qt::TopDockWidgetArea, pw);
@@ -46,6 +46,30 @@ void ProjectsWindow::slotNewProject()
     connect(pw, SIGNAL(openExperiment(int,int)), this, SLOT(slotOpenExperiment(int,int)));
     connect(pw, SIGNAL(hasUnsavedChanges(ProjectWidget*)), SIGNAL(hasUnsavedChanges(ProjectWidget*)));
     //connect(m_contextMenu, SIGNAL(openView(int)), wp, SLOT(slotOpenView(int)));
+
+    QHash<int, Experiment*>::const_iterator it = project->getExperiments().cbegin();
+    for (it; it != project->getExperiments().cend(); ++it) {
+        pw->slotInsertRow(it.key());
+    }
+}
+
+void ProjectsWindow::slotNewProject()
+{
+    addProjectWidget(m_mainApp->newProject());
+}
+
+bool ProjectsWindow::slotOpenProject()
+{
+    QString path = QFileDialog::getOpenFileName(this, tr("Open Project"));
+    if (path.isEmpty()) {
+        return false;
+    }
+    Project* project = m_mainApp->openProject(path);
+    if (!project) {
+        return false;
+    }
+    addProjectWidget(project);
+    return true;
 }
 
 void ProjectsWindow::slotOpenExperiment(int projId, int expId)

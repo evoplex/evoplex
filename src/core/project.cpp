@@ -157,6 +157,7 @@ const int Project::newExperiment(const QStringList& header, const QStringList& v
 
     m_hasUnsavedChanges = true;
     emit (hasUnsavedChanges(true));
+    emit (expAdded(m_lastExpId));
     return m_lastExpId;
 }
 

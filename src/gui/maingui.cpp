@@ -97,9 +97,14 @@ MainGUI::MainGUI(MainApp* mainApp, QWidget* parent)
     // menubar
     //
     m_actNewProject = new QAction("New Project", this);
-    connect(m_actNewProject, &QAction::triggered, [this, acProjects](){ m_projects->slotNewProject(); slotPage(acProjects); });
-    QAction* actOpenProject = new QAction("Open Project", this);
-    connect(actOpenProject, SIGNAL(triggered(bool)), this, SLOT(slotOpenProject()));
+    connect(this, SIGNAL(newProject()), m_actNewProject, SIGNAL(triggered()));
+    connect(m_actNewProject, &QAction::triggered,
+            [this, acProjects](){ m_projects->slotNewProject(); slotPage(acProjects); });
+    m_actOpenProject = new QAction("Open Project", this);
+
+    connect(this, SIGNAL(openProject()), m_actOpenProject, SIGNAL(triggered()));
+    connect(m_actOpenProject, &QAction::triggered,
+            [this, acProjects](){ if (m_projects->slotOpenProject()) slotPage(acProjects); });
 
     QAction* actSaveAll = new QAction("Save All", this);
     connect(actSaveAll, SIGNAL(triggered(bool)), this, SLOT(slotSaveAll()));
@@ -117,7 +122,7 @@ MainGUI::MainGUI(MainApp* mainApp, QWidget* parent)
 
     QMenu* menuFile = new QMenu("File", this);
     menuFile->addAction(m_actNewProject);
-    menuFile->addAction(actOpenProject);
+    menuFile->addAction(m_actOpenProject);
     menuFile->addAction(m_actSave);
     menuFile->addAction(m_actSaveAs);
     menuFile->addAction(actSaveAll);
