@@ -192,17 +192,17 @@ void MainGUI::setPageVisible(Page page, bool visible)
 
 void MainGUI::updateSaveButtons(ProjectWidget* pw)
 {
-    if (!pw) {
-        m_actSave->setEnabled(false);
-        m_actSaveAs->setEnabled(false);
-        m_actSave->setText("Save");
-        m_actSaveAs->setText("Save as");
-    } else {
+    if (pw) {
         Project* project = pw->getProject();
         m_actSave->setEnabled(project->hasUnsavedChanges());
         m_actSaveAs->setEnabled(true);
         m_actSave->setText(QString("Save \"%1\"").arg(pw->objectName()));
         m_actSaveAs->setText(QString("Save \"%1\" as").arg(pw->objectName()));
+    } else {
+        m_actSave->setEnabled(false);
+        m_actSaveAs->setEnabled(false);
+        m_actSave->setText("Save");
+        m_actSaveAs->setText("Save as");
     }
 }
 
