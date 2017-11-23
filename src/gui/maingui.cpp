@@ -86,8 +86,11 @@ MainGUI::MainGUI(MainApp* mainApp, QWidget* parent)
         btn->installEventFilter(this);
 
     connect(actionGroup, SIGNAL(triggered(QAction*)), this, SLOT(slotPage(QAction*)));
-    connect(m_projects, SIGNAL(isEmpty(bool)), acProjects, SLOT(setDisabled(bool)));
-    connect(m_queue, SIGNAL(isEmpty(bool)), acQueue, SLOT(setDisabled(bool)));
+    connect(m_projects, &ProjectsWindow::isEmpty,
+        [acWelcome, acProjects](bool b) { acProjects->setDisabled(b); if (b) acWelcome->trigger(); });
+    connect(m_queue, &QueueWidget::isEmpty,
+        [acWelcome, acQueue](bool b) { acQueue->setDisabled(b); if (b) acWelcome->trigger(); });
+
     acProjects->setDisabled(true);
     acQueue->setDisabled(true);
     acWelcome->setChecked(true);

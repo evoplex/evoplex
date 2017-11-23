@@ -23,6 +23,7 @@ ProjectWidget::ProjectWidget(Project* project, ProjectsWindow* pwindow)
 {
     setObjectName(m_project->getName());
     setWindowTitle(objectName());
+    setAttribute(Qt::WA_DeleteOnClose, true);
 
     QHBoxLayout* lh = new QHBoxLayout(new QWidget(this));
     lh->addWidget(m_innerWindow);
@@ -64,6 +65,18 @@ ProjectWidget::ProjectWidget(Project* project, ProjectsWindow* pwindow)
 
     connect(project, SIGNAL(hasUnsavedChanges(bool)),
             SLOT(slotHasUnsavedChanges(bool)));
+}
+
+ProjectWidget::~ProjectWidget()
+{
+    delete m_ui;
+    delete m_innerWindow;
+}
+
+void ProjectWidget::closeEvent(QCloseEvent* event)
+{
+    QDockWidget::closeEvent(event);
+    emit (closed());
 }
 
 void ProjectWidget::slotInsertRow(int expId)

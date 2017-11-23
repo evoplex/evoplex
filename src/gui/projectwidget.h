@@ -25,11 +25,15 @@ class ProjectWidget : public QDockWidget
 
 public:
     explicit ProjectWidget(Project* project, ProjectsWindow* pwindow = 0);
-    ~ProjectWidget() {}
+    ~ProjectWidget();
 
     inline Project* getProject() const { return m_project; }
 
+protected:
+    void closeEvent(QCloseEvent *event);
+
 signals:
+    void closed();
     void openExperiment(int projId, int expId);
     void hasUnsavedChanges(ProjectWidget*);
 

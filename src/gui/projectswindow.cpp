@@ -43,9 +43,15 @@ void ProjectsWindow::addProjectWidget(Project* project)
     m_projects.push_back(pw);
     slotFocusChanged(pw);
     emit (isEmpty(false));
+
+    //connect(m_contextMenu, SIGNAL(openView(int)), wp, SLOT(slotOpenView(int)));
     connect(pw, SIGNAL(openExperiment(int,int)), this, SLOT(slotOpenExperiment(int,int)));
     connect(pw, SIGNAL(hasUnsavedChanges(ProjectWidget*)), SIGNAL(hasUnsavedChanges(ProjectWidget*)));
-    //connect(m_contextMenu, SIGNAL(openView(int)), wp, SLOT(slotOpenView(int)));
+    connect(pw, &ProjectWidget::closed, [this, pw]() {
+        m_projects.removeOne(pw);
+        pw->deleteLater();
+        emit (isEmpty(m_projects.isEmpty()));
+    });
 
     QHash<int, Experiment*>::const_iterator it = project->getExperiments().cbegin();
     for (it; it != project->getExperiments().cend(); ++it) {
