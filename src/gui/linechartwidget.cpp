@@ -54,6 +54,8 @@ LineChartWidget::LineChartWidget(ExperimentsMgr* expMgr, Experiment* exp, QWidge
 
 LineChartWidget::~LineChartWidget()
 {
+    delete m_settingsDlg;
+    delete m_chart;
 }
 
 void LineChartWidget::slotRestarted(Experiment* exp)
