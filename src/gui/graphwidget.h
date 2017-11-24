@@ -10,6 +10,7 @@
 #include <QLineEdit>
 #include <vector>
 
+#include "ui_graphsettings.h"
 #include "core/experiment.h"
 
 class Ui_GraphWidget;
@@ -36,12 +37,17 @@ private slots:
     void zoomIn();
     void zoomOut();
     void resetView();
+    void setAgentAttr(int idx);
+    void setEdgeAttr(int idx);
 
 private:
     Ui_GraphWidget* m_ui;
+    Ui_GraphSettings* m_settingsDlg;
     Experiment* m_exp;
     AbstractGraph* m_graph;
     int m_currTrialId;
+    int m_agentAttr;
+    int m_edgeAttr;
 
     bool m_showAgents;
     bool m_showEdges;

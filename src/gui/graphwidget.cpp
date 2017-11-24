@@ -22,8 +22,11 @@ namespace evoplex {
 GraphWidget::GraphWidget(ExperimentsMgr* expMgr, Experiment* exp, QWidget* parent)
     : QDockWidget(parent)
     , m_ui(new Ui_GraphWidget)
+    , m_settingsDlg(new Ui_GraphSettings)
     , m_exp(exp)
     , m_graph(nullptr)
+    , m_agentAttr(0)
+    , m_edgeAttr(0)
     , m_zoomLevel(0)
     , m_nodeSizeRate(10.f)
     , m_edgeSizeRate(25.f)
@@ -43,9 +46,21 @@ GraphWidget::GraphWidget(ExperimentsMgr* expMgr, Experiment* exp, QWidget* paren
     setTitleBarWidget(titleBar);
     connect(titleBar, SIGNAL(trialSelected(int)), SLOT(setGraph(int)));
     setGraph(0);
-
     connect(expMgr, &ExperimentsMgr::statusChanged,
         [this](Experiment* exp) { if (exp == m_exp) setGraph(m_currTrialId); });
+
+    QDialog* dlg = new QDialog(this);
+    m_settingsDlg->setupUi(dlg);
+    connect(titleBar, SIGNAL(openSettingsDlg()), dlg, SLOT(show()));
+
+    for (QString n : m_exp->modelPlugin()->agentAttrMin.names()) {
+        m_settingsDlg->agentAttr->addItem(n);
+    }
+    for (QString n : m_exp->modelPlugin()->edgeAttrMin.names()) {
+        m_settingsDlg->edgeAttr->addItem(n);
+    }
+    connect(m_settingsDlg->agentAttr, SIGNAL(currentIndexChanged), SLOT(setAgentAttr(int)));
+    connect(m_settingsDlg->edgeAttr, SIGNAL(currentIndexChanged), SLOT(setEdgeAttr(int)));
 
     connect(m_ui->bZoomIn, SIGNAL(clicked(bool)), SLOT(zoomIn()));
     connect(m_ui->bZoomOut, SIGNAL(clicked(bool)), SLOT(zoomOut()));
@@ -80,6 +95,17 @@ GraphWidget::GraphWidget(ExperimentsMgr* expMgr, Experiment* exp, QWidget* paren
 GraphWidget::~GraphWidget()
 {
     delete m_ui;
+    delete m_settingsDlg;
+}
+
+void GraphWidget::setAgentAttr(int idx)
+{
+    m_agentAttr = idx;
+}
+
+void GraphWidget::setEdgeAttr(int idx)
+{
+    m_edgeAttr = idx;
 }
 
 void GraphWidget::setGraph(int trialId)
@@ -183,7 +209,7 @@ void GraphWidget::paintEvent(QPaintEvent* e)
                 painter.drawEllipse(cache.xy, m_nodeRadius*1.5f, m_nodeRadius*1.5f);
             }
 
-            if (cache.agent->attr("strategy").toInt == 0)
+            if (cache.agent->attr(m_agentAttr).toInt == 0)
                 painter.setBrush(Qt::blue);
             else {
                 painter.setBrush(Qt::red);

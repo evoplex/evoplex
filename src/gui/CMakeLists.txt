@@ -39,6 +39,7 @@ set(EVOPLEX_GUI_CXX
 qt5_wrap_ui(EVOPLEX_GUI_UI
   forms/attributeswidget.ui
   forms/graphwidget.ui
+  forms/graphsettings.ui
   forms/linechartsettings.ui
   forms/outputwidget.ui
   forms/projectwidget.ui
