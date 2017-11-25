@@ -12,6 +12,7 @@ set(EVOPLEX_CORE_H
   attributes.h
   agent.h
   edge.h
+  value.h
 
   filemgr.h
   experiment.h
