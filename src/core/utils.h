@@ -50,6 +50,14 @@ public:
         return value;
     }
 
+    static bool isASet(const QString& space) {
+        return space.contains('{') && space.endsWith('}');
+    }
+
+    static bool isAnInterval(const QString& space) {
+        return space.contains('[') && space.endsWith(']');
+    }
+
     // Check if the value belongs to the parameter space.
     // If true, return a valid QVariant with the correct type
     //
@@ -71,7 +79,7 @@ public:
             return Value();
         } else if (space == "bool") {
             return QVariant(valueStr).toBool();
-        } else if (space.contains('{') && space.endsWith('}')) {
+        } else if (isASet(space)) {
             QVector<Value> values;
             if (paramSet(space, values)) {
                 Value valSrc = valueFromString(values.first().type, valueStr);
@@ -79,7 +87,7 @@ public:
                     if (val == valSrc) return val;
                 }
             }
-        } else if (space.contains('[') && space.endsWith(']')) {
+        } else if (isAnInterval(space)) {
             Value min, max;
             if (paramInterval(space, min, max)) {
                 Value valSrc = valueFromString(min.type, valueStr);
