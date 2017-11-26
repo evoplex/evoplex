@@ -8,10 +8,9 @@
 
 #include <vector>
 
-namespace evoplex {
-
+namespace evoplex
+{
 class Value;
-
 typedef std::vector<Value> Values;
 
 class Value
@@ -92,7 +91,36 @@ public:
         Q_ASSERT(false);
     }
 };
+}
 
+namespace std
+{
+// http://www.cse.yorku.ca/~oz/hash.html
+template <>
+struct hash<char*>
+{
+    size_t operator()(const char *s) const {
+        size_t h = 5381;
+        int c;
+        while (c = *s++) {
+            h = ((h << 5) + h) + c;
+        }
+        return h;
+    }
+};
+
+template <>
+struct hash<evoplex::Value>
+{
+    std::size_t operator()(const evoplex::Value& v) const {
+        if (v.type == evoplex::Value::BOOL) return std::hash<bool>{}(v.toBool);
+        if (v.type == evoplex::Value::CHAR) return std::hash<char>{}(v.toChar);
+        if (v.type == evoplex::Value::DOUBLE) return std::hash<double>{}(v.toDouble);
+        if (v.type == evoplex::Value::INT) return std::hash<int>{}(v.toInt);
+        if (v.type == evoplex::Value::STRING) return std::hash<char*>{}(v.toString);
+        Q_ASSERT(false);
+    }
+};
 }
 
 #endif // VALUE_H
