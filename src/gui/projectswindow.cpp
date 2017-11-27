@@ -47,10 +47,11 @@ void ProjectsWindow::addProjectWidget(Project* project)
     //connect(m_contextMenu, SIGNAL(openView(int)), wp, SLOT(slotOpenView(int)));
     connect(pw, SIGNAL(openExperiment(int,int)), this, SLOT(slotOpenExperiment(int,int)));
     connect(pw, SIGNAL(hasUnsavedChanges(ProjectWidget*)), SIGNAL(hasUnsavedChanges(ProjectWidget*)));
-    connect(pw, &ProjectWidget::closed, [this, pw]() {
+    connect(pw, &ProjectWidget::closed, [this, pw, project]() {
         m_projects.removeOne(pw);
         pw->deleteLater();
         emit (isEmpty(m_projects.isEmpty()));
+        m_mainApp->closeProject(project->getId());
     });
 
     QHash<int, Experiment*>::const_iterator it = project->getExperiments().cbegin();
