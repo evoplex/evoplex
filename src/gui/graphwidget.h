@@ -10,6 +10,7 @@
 #include <QLineEdit>
 #include <vector>
 
+#include "colormap.h"
 #include "ui_graphsettings.h"
 #include "core/experiment.h"
 
@@ -48,6 +49,7 @@ private:
     int m_currTrialId;
     int m_agentAttr;
     int m_edgeAttr;
+    ColorMap m_agentCMap;
 
     bool m_showAgents;
     bool m_showEdges;
