@@ -3,6 +3,7 @@ INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/src)
 set(EVOPLEX_GUI_H
   maingui.h
   attributeswidget.h
+  colormap.h
   #contextmenutable.h
   experimentwidget.h
   linechartwidget.h
@@ -21,6 +22,7 @@ set(EVOPLEX_GUI_H
 set(EVOPLEX_GUI_CXX
   maingui.cpp
   attributeswidget.cpp
+  colormap.cpp
   #contextmenutable.cpp
   experimentwidget.cpp
   linechartwidget.cpp
