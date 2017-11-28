@@ -28,20 +28,13 @@ Experiment::Experiment(MainApp* mainApp, int id, int projId, Attributes* general
 Experiment::~Experiment()
 {
     deleteTrials();
+    qDeleteAll(m_fileOutputs);
     delete m_generalAttrs;
     m_generalAttrs = nullptr;
     delete m_modelAttrs;
     m_modelAttrs = nullptr;
     delete m_graphAttrs;
     m_graphAttrs = nullptr;
-
-    QHash<int,QTextStream*>::iterator it;
-    for (it = m_fileStreams.begin(); it != m_fileStreams.end(); ++it) {
-        it.value()->flush();
-        delete it.value();
-        it.value() = nullptr;
-    }
-    qDeleteAll(m_fileOutputs);
 }
 
 void Experiment::init(Attributes* generalAttrs, Attributes* modelAttrs,
@@ -92,16 +85,29 @@ void Experiment::reset()
 
 void Experiment::deleteTrials()
 {
+    QHash<int,QTextStream*>::iterator it;
+    for (it = m_fileStreams.begin(); it != m_fileStreams.end(); ++it) {
+        it.value()->flush();
+        delete it.value();
+    }
+
     for (auto& trial : m_trials) {
         delete trial.second.modelObj;
     }
     m_trials.clear();
 
+    qDeleteAll(m_clonableAgents);
+    m_clonableAgents.clear();
+    Agents().swap(m_clonableAgents);
+
     // if the experiment has finished or became invalid,
     // it's more interesing to do NOT change the status
     if (m_expStatus != FINISHED && m_expStatus != INVALID) {
         setExpStatus(READY);
+        emit (m_mainApp->getExperimentsMgr()->statusChanged(this));
     }
+
+    emit (m_mainApp->getExperimentsMgr()->trialsDeleted(this));
 }
 
 void Experiment::updateProgressValue()
@@ -272,7 +278,7 @@ Agents Experiment::createAgents()
     } else if (!m_clonableAgents.empty()) {
         if (m_trials.size() == m_numTrials - 1) {
             Agents agents = m_clonableAgents;
-            m_clonableAgents = Agents();
+            Agents().swap(m_clonableAgents);
             return agents;
         }
         return cloneAgents(m_clonableAgents);

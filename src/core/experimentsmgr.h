@@ -24,10 +24,6 @@ public:
 
     void play(Experiment* exp);
 
-    void kill(Experiment* exp);
-
-    void killAll();
-
     inline const int maxThreadsCount() const { return m_threads; }
     void setMaxThreadCount(const int newValue);
 
@@ -35,10 +31,11 @@ signals:
     void statusChanged(Experiment* exp);
     void progressUpdated(Experiment* exp);
     void restarted(Experiment* exp);
-    void killed(int id);
+    void trialsDeleted(Experiment* exp);
 
 public slots:
     void clearQueue();
+    void clearIdle();
     void removeFromQueue(Experiment* exp);
 
 private slots:
@@ -50,7 +47,6 @@ private:
     std::list<Experiment*> m_running;
     std::list<Experiment*> m_queued;
     std::list<Experiment*> m_idle;
-    QVector<Experiment*> m_toKill;
 
     // trigged when an experiment ends (futurewatcher)
     void finished(Experiment* exp);

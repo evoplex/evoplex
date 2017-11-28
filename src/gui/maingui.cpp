@@ -87,9 +87,17 @@ MainGUI::MainGUI(MainApp* mainApp, QWidget* parent)
 
     connect(actionGroup, SIGNAL(triggered(QAction*)), this, SLOT(slotPage(QAction*)));
     connect(m_projects, &ProjectsWindow::isEmpty,
-        [acWelcome, acProjects](bool b) { acProjects->setDisabled(b); if (b) acWelcome->trigger(); });
+        [this, acWelcome, acProjects](bool b) {
+            acProjects->setDisabled(b);
+            if (b && m_curPage == PAGE_PROJECTS)
+                acWelcome->trigger();
+    });
     connect(m_queue, &QueueWidget::isEmpty,
-        [acWelcome, acQueue](bool b) { acQueue->setDisabled(b); if (b) acWelcome->trigger(); });
+        [this, acWelcome, acQueue](bool b) {
+            acQueue->setDisabled(b);
+            if (b && m_curPage == PAGE_QUEUE)
+                acWelcome->trigger();
+    });
 
     acProjects->setDisabled(true);
     acQueue->setDisabled(true);

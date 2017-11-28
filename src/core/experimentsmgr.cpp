@@ -21,7 +21,7 @@ ExperimentsMgr::ExperimentsMgr(int threads)
 
 ExperimentsMgr::~ExperimentsMgr()
 {
-    killAll();
+    delete m_timer;
 }
 
 void ExperimentsMgr::updateProgressValues()
@@ -46,7 +46,7 @@ void ExperimentsMgr::play(Experiment* exp)
         emit (statusChanged(exp));
         m_queued.remove(exp);
 
-        m_running.push_back(exp);
+        m_running.emplace_back(exp);
         if (!m_timer->isActive())
             m_timer->start(500); // every half a second, check progress
 
@@ -73,7 +73,7 @@ void ExperimentsMgr::play(Experiment* exp)
     } else if (exp->expStatus() != Experiment::QUEUED) {
         exp->setExpStatus(Experiment::QUEUED);
         emit (statusChanged(exp));
-        m_queued.push_back(exp);
+        m_queued.emplace_back(exp);
     }
 }
 
@@ -99,6 +99,8 @@ void ExperimentsMgr::finished(Experiment* exp)
 
     if (exp->expStatus() == Experiment::FINISHED && exp->autoDelete()) {
         exp->deleteTrials();
+    } else {
+        m_idle.emplace_back(exp);
     }
 
     // call next process in the queue
@@ -118,12 +120,20 @@ void ExperimentsMgr::removeFromQueue(Experiment* exp)
 
 void ExperimentsMgr::clearQueue()
 {
-    foreach (Experiment* exp, m_queued) {
+    for (Experiment* exp : m_queued) {
         exp->pause();
         exp->setExpStatus(Experiment::READY);
         emit (statusChanged(exp));
     }
     m_queued.clear();
+}
+
+void ExperimentsMgr::clearIdle()
+{
+    for (Experiment* exp : m_idle) {
+        exp->deleteTrials();
+    }
+    m_idle.clear();
 }
 
 void ExperimentsMgr::setMaxThreadCount(const int newValue)
@@ -153,24 +163,4 @@ void ExperimentsMgr::setMaxThreadCount(const int newValue)
              << previous << "to" << newValue;
 }
 
-void ExperimentsMgr::kill(Experiment* exp)
-{
-/*
-    if (m_running.contains(exp)) {
-        m_toKill.push_back(exp);
-    } else {
-        m_toKill.removeOne(exp);
-        delete m_trials.take(trialId);
-        emit (killed(trialId));
-    }
-    m_queued.removeAt(trialId); // just in case...
-*/
-}
-
-void ExperimentsMgr::killAll()
-{
-    foreach (Experiment* exp, m_toKill) {
-        kill(exp);
-    }
-}
 }

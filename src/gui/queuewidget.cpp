@@ -33,18 +33,33 @@ QueueWidget::QueueWidget(ExperimentsMgr* expMgr, QWidget* parent)
     m_ui->queue->hide();
     m_ui->idle->hide();
 
+    connect(m_expMgr, SIGNAL(trialsDeleted(Experiment*)),
+            this, SLOT(slotRemoveRow(Experiment*)));
     connect(m_expMgr, SIGNAL(statusChanged(Experiment*)),
             this, SLOT(slotStatusChanged(Experiment*)));
     connect(m_expMgr, SIGNAL(progressUpdated(Experiment*)),
             m_ui->tableRunning->viewport(), SLOT(update()));
     connect(m_ui->bClearQueue, SIGNAL(clicked(bool)),
             expMgr, SLOT(clearQueue()));
+    connect(m_ui->bClearIdle, SIGNAL(clicked(bool)),
+            expMgr, SLOT(clearIdle()));
     connect(m_ui->tableIdle, &QTableWidget::cellClicked, [this]() {
             m_ui->tableQueue->clearSelection(); m_ui->tableRunning->clearSelection();});
     connect(m_ui->tableQueue, &QTableWidget::cellClicked, [this]() {
             m_ui->tableIdle->clearSelection(); m_ui->tableRunning->clearSelection();});
     connect(m_ui->tableRunning, &QTableWidget::cellClicked, [this]() {
             m_ui->tableIdle->clearSelection(); m_ui->tableQueue->clearSelection();});
+}
+
+void QueueWidget::slotRemoveRow(Experiment *exp)
+{
+    Row row = m_rows.take(std::make_pair(exp->projId(), exp->id()));
+    if (!row.table) {
+        return;
+    }
+    row.table->removeRow(row.item->row());
+    row.section->setVisible(row.table->rowCount() > 0);
+    emit (isEmpty(!m_ui->idle->isVisible() && !m_ui->running->isVisible() && !m_ui->queue->isVisible()));
 }
 
 void QueueWidget::slotStatusChanged(Experiment* exp)

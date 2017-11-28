@@ -26,6 +26,7 @@ signals:
     void isEmpty(bool empty);
 
 private slots:
+    void slotRemoveRow(Experiment* exp);
     void slotStatusChanged(Experiment* exp);
 
 private:

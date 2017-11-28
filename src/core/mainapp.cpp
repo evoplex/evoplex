@@ -49,13 +49,13 @@ MainApp::MainApp()
 
 MainApp::~MainApp()
 {
+    qDeleteAll(m_projects);
+    qDeleteAll(m_models);
+    qDeleteAll(m_graphs);
     delete m_fileMgr;
     m_fileMgr = nullptr;
     delete m_experimentsMgr;
     m_experimentsMgr = nullptr;
-    qDeleteAll(m_projects);
-    qDeleteAll(m_models);
-    qDeleteAll(m_graphs);
 }
 
 const QString MainApp::loadPlugin(const QString& path)
