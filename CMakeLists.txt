@@ -3,40 +3,52 @@
 #  Copyright (C) 2016-2017 by Marcos Cardinot <mcardinot@gmail.com>
 #=============================================================================
 
-CMAKE_MINIMUM_REQUIRED(VERSION 3.1.0 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.1.0 FATAL_ERROR)
 
-PROJECT(evoplex)
-SET (EVOPLEX_VERSION 0.0.0)
+project(evoplex)
+set(EVOPLEX_VERSION 0.0.0)
 
 # Find includes in corresponding build directories
-SET(CMAKE_INCLUDE_CURRENT_DIR ON)
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 # Instruct CMake to run moc automatically when needed.
-SET(CMAKE_AUTOMOC ON)
-SET(CMAKE_AUTORCC ON)
-
-# Move the libs to /lib and executable to /bin
-SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
 
 # Generate the commands
-SET(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # c++11
-SET (CMAKE_CXX_STANDARD 11)
+set (CMAKE_CXX_STANDARD 11)
 
 if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Release)
 endif()
 
+# https://cmake.org/Wiki/CMake_RPATH_handling
+# use, i.e. don't skip the full RPATH for the build tree
+set(CMAKE_SKIP_BUILD_RPATH  FALSE)
+# when building, don't use the install RPATH already (but later on when installing)
+set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
+set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib/evoplex")
+# add the automatically determined parts of the RPATH
+# which point to directories outside the build tree to the install RPATH
+set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+# the RPATH to be used when installing, but only if it's not a system directory
+list(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/lib/evoplex" isSystemDir)
+if("${isSystemDir}" STREQUAL "-1")
+   set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib/evoplex")
+endif("${isSystemDir}" STREQUAL "-1")
+
 # pass some of the CMake settings to the source code
-CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/src/config.h.in" "${CMAKE_BINARY_DIR}/src/config.h")
+configure_file("${CMAKE_SOURCE_DIR}/src/config.h.in" "${CMAKE_BINARY_DIR}/src/config.h")
 
 # Find qt5 packages
-FIND_PACKAGE(Qt5Core 5.8.0 REQUIRED)
-FIND_PACKAGE(Qt5Concurrent 5.8.0 REQUIRED)
-FIND_PACKAGE(Qt5Charts 5.8.0 REQUIRED)
-FIND_PACKAGE(Qt5Widgets 5.8.0 REQUIRED)
+find_package(Qt5Core 5.8.0 REQUIRED)
+find_package(Qt5Concurrent 5.8.0 REQUIRED)
+find_package(Qt5Charts 5.8.0 REQUIRED)
+find_package(Qt5Widgets 5.8.0 REQUIRED)
 find_package(Qt5Test 5.8.0 REQUIRED)
 
 # Compile source
-ADD_SUBDIRECTORY(src)
+add_subdirectory(src)

@@ -1,7 +1,6 @@
 set(EVOPLEX_CORE_H
   constants.h
   enums.h
-  output.cpp
   output.h
   prg.h
   stats.h
@@ -25,21 +24,30 @@ set(EVOPLEX_CORE_CXX
   filemgr.cpp
   experiment.cpp
   experimentsmgr.cpp
+  output.cpp
   project.cpp
   mainapp.cpp
 )
 
-add_library(EvoplexCore SHARED ${EVOPLEX_CORE_CXX} ${EVOPLEX_CORE_H})
+add_library(EvoplexCore SHARED ${EVOPLEX_CORE_CXX})
 target_link_libraries(EvoplexCore Qt5::Core Qt5::Concurrent)
 set_target_properties(EvoplexCore PROPERTIES
-  LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib/evoplex/core)
+  LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib/evoplex)
 
-install(FILES ${EVOPLEX_CORE_H} DESTINATION include/evoplex/core)
-install(TARGETS EvoplexCore EXPORT EvoplexCoreTargets
-  RUNTIME DESTINATION bin
-  LIBRARY DESTINATION lib/evoplex/core
-  ARCHIVE DESTINATION lib/evoplex/core
+install(
+  TARGETS EvoplexCore
+  EXPORT EvoplexCoreTargets
+  LIBRARY DESTINATION lib/evoplex
+  ARCHIVE DESTINATION lib/evoplex
   INCLUDES DESTINATION include/evoplex/core
+)
+
+install(
+  FILES
+    ${EVOPLEX_CORE_H}
+    "${CMAKE_CURRENT_BINARY_DIR}/evoplexcore_export.h"
+  DESTINATION include/evoplex/core
+  COMPONENT Devel
 )
 
 include(GenerateExportHeader)
@@ -62,7 +70,7 @@ configure_file(cmake/EvoplexCoreConfig.cmake
   COPYONLY
 )
 
-set(ConfigPackageLocation lib/cmake/evoplex/core)
+set(ConfigPackageLocation share/evoplex/cmake)
 install(EXPORT EvoplexCoreTargets
   FILE EvoplexCoreTargets.cmake
   NAMESPACE Evoplex::
