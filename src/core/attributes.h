@@ -9,6 +9,7 @@
 #include <QPair>
 #include <QString>
 #include <algorithm>
+#include <stdexcept>
 #include <vector>
 
 #include "value.h"
@@ -38,11 +39,30 @@ public:
     inline void replace(int id, const QString& name, const Value& value) { m_names[id] = name; m_values[id] = value; }
     inline void push_back(const QString& name, const Value& value) { m_names.emplace_back(name); m_values.emplace_back(value); }
 
-    inline const QString& name(int id) const { return m_names.at(id); }
     inline const std::vector<QString>& names() const { return m_names; }
+    inline const QString& name(int id) const {
+        try {
+            return m_names.at(id);
+        } catch (const std::out_of_range&) {
+            qFatal("[Attributes::name()]: Out of range error!");
+        }
+    }
 
-    inline const Value& value(int id) const { return m_values.at(id); }
-    inline void setValue(int id, const Value& value) { m_values[id] = value; }
+    inline const Value& value(int id) const {
+        try {
+            return m_values.at(id);
+        } catch (const std::out_of_range&) {
+            qFatal("[Attributes::value()]: Out of range error!");
+        }
+    }
+
+    inline void setValue(int id, const Value& value) {
+        try {
+            m_values.at(id) = value;
+        } catch (const std::out_of_range&) {
+            qFatal("[Attributes::setValue()]: Out of range error!");
+        }
+    }
 
     inline const Value& value(const char* name) const { return value(indexOf(name)); }
     inline const Value& value(const QString& name) const { return value(indexOf(name)); }
