@@ -6,9 +6,6 @@
 #ifndef ABSTRACT_MODEL_H
 #define ABSTRACT_MODEL_H
 
-#include <QObject>
-#include <QtPlugin>
-
 #include "abstractgraph.h"
 #include "agent.h"
 #include "prg.h"
@@ -23,8 +20,8 @@ public:
     inline AbstractGraph* graph() const { return m_graph; }
     inline const PRG* prg() const { return m_prg; }
     inline const Attributes* attrs() const { return m_attributes; }
-    inline const Value attr(const QString& name) const { return m_attributes->value(name); }
-    inline const Value attr(int attrId) const { return m_attributes->value(attrId);  }
+    inline const Value& attr(const QString& name) const { return m_attributes->value(name); }
+    inline const Value& attr(int attrId) const { return m_attributes->value(attrId);  }
     inline const QString& attrName(int attrId) const { return m_attributes->name(attrId); }
     inline const int currStep() const { return m_currStep; }
 
@@ -77,32 +74,6 @@ public:
         return std::vector<Value>();
     }
 };
-
-class IPluginModel
-{
-public:
-    // provide the destructor to keep compilers happy.
-    virtual ~IPluginModel() {}
-
-    // create the real model object.
-    virtual AbstractModel* create() = 0;
-};
-}
-Q_DECLARE_INTERFACE(evoplex::IPluginModel, "org.evoplex.IPluginModel")
-
-
-#define REGISTER_MODEL(CLASSNAME)                                           \
-    namespace evoplex {                                                     \
-    class PM_##CLASSNAME: public QObject, public IPluginModel               \
-    {                                                                       \
-    Q_OBJECT                                                                \
-    Q_PLUGIN_METADATA(IID "org.evoplex.IPluginModel"                        \
-                      FILE "modelMetaData.json")                            \
-    Q_INTERFACES(evoplex::IPluginModel)                                     \
-    public:                                                                 \
-        AbstractModel* create() {                                           \
-            return dynamic_cast<AbstractModel*>(new CLASSNAME());           \
-        }                                                                   \
-    };}
+} // evoplex
 
 #endif // ABSTRACT_MODEL_H

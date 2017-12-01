@@ -9,8 +9,7 @@
 #include <QHash>
 #include <QVector>
 
-#include "abstractgraph.h"
-#include "abstractmodel.h"
+#include "plugininterfaces.h"
 #include "attributes.h"
 #include "enums.h"
 

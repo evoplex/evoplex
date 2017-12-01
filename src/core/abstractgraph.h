@@ -6,10 +6,6 @@
 #ifndef ABSTRACT_GRAPH_H
 #define ABSTRACT_GRAPH_H
 
-#include <QObject>
-#include <QHash>
-#include <QtPlugin>
-
 #include "agent.h"
 #include "constants.h"
 #include "edge.h"
@@ -25,10 +21,10 @@ class AbstractBaseGraph
 
 public:
     inline const QString& name() const { return m_name; }
-    inline const GraphType type() const { return m_type; }
+    inline const GraphType& type() const { return m_type; }
     inline const Attributes* attrs() const { return m_attrs; }
-    inline const Edges& edges() const { return m_edges; }
-    inline const Agents& agents() const { return m_agents; }
+    inline Edges edges() const { return m_edges; }
+    inline Agents agents() const { return m_agents; }
     inline Agent* agent(int id) const { return m_agents.at(id); }
     inline Agent* randAgent() const { return m_agents.at(m_prg->randI(m_agents.size())); }
 
@@ -86,33 +82,6 @@ public:
     // This method is triggered after a successful init()
     virtual void reset() = 0;
 };
-
-
-class IPluginGraph
-{
-public:
-    // provide the destructor to keep compilers happy.
-    virtual ~IPluginGraph() {}
-
-    // create the real graph object.
-    virtual AbstractGraph* create() = 0;
-};
-}
-Q_DECLARE_INTERFACE(evoplex::IPluginGraph, "org.evoplex.IPluginGraph")
-
-
-#define REGISTER_GRAPH(CLASSNAME)                                           \
-    namespace evoplex {                                                     \
-    class PG_##CLASSNAME: public QObject, public IPluginGraph               \
-    {                                                                       \
-    Q_OBJECT                                                                \
-    Q_PLUGIN_METADATA(IID "org.evoplex.IPluginGraph"                        \
-                      FILE "graphMetaData.json")                            \
-    Q_INTERFACES(evoplex::IPluginGraph)                                     \
-    public:                                                                 \
-        AbstractGraph* create() {                                           \
-            return dynamic_cast<AbstractGraph*>(new CLASSNAME(#CLASSNAME)); \
-        }                                                                   \
-    };}
+} // evoplex
 
 #endif // ABSTRACT_GRAPH_H

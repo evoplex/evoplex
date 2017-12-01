@@ -2,6 +2,7 @@ set(EVOPLEX_CORE_H
   constants.h
   enums.h
   output.h
+  plugininterfaces.h
   prg.h
   stats.h
   utils.h
