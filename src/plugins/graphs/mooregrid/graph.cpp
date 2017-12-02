@@ -106,3 +106,5 @@ std::vector<QPair<int,int>> MooreGrid::undirectedEdges(const int id)
 }
 
 }
+REGISTER_GRAPH(MooreGrid)
+#include "graph.moc"

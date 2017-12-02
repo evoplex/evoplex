@@ -10,10 +10,9 @@
 #include <vector>
 
 #include "core/agent.h"
-#include "core/abstractgraph.h"
+#include "core/plugininterfaces.h"
 
 namespace evoplex {
-
 class MooreGrid: public AbstractGraph
 {
 public:
@@ -32,7 +31,5 @@ private:
     std::vector<QPair<int,int>> undirectedEdges(const int id);
 };
 }
-
-REGISTER_GRAPH(MooreGrid)
 
 #endif // MOORE_GRID_H

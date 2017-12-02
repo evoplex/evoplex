@@ -6,22 +6,19 @@
 #ifndef TEST_H
 #define TEST_H
 
-#include "core/abstractmodel.h"
+#include "core/plugininterfaces.h"
 
 namespace evoplex {
-
 class ModelTest: public AbstractModel
 {
 public:
-    bool init() { return true; }
-    bool algorithmStep();
+    virtual bool init();
+    virtual bool algorithmStep();
 
 private:
     enum ModelAttr { Temptation, Loners };
     enum AgentAttr { Strategy };
 };
 }
-
-REGISTER_MODEL(ModelTest)
 
 #endif // TEST_H
