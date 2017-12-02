@@ -141,7 +141,7 @@ void Experiment::playNext()
     if (m_expStatus != READY) {
         return;
     } else if (m_trials.empty()) {
-        setPauseAt(0);
+        setPauseAt(-1);
     } else {
         int maxCurrStep = 0;
         for (auto& trial : m_trials) {
