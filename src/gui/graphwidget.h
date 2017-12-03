@@ -45,7 +45,7 @@ private:
     Ui_GraphWidget* m_ui;
     Ui_GraphSettings* m_settingsDlg;
     Experiment* m_exp;
-    AbstractGraph* m_graph;
+    AbstractModel* m_model;
     int m_currTrialId;
     int m_agentAttr;
     int m_edgeAttr;

@@ -328,12 +328,12 @@ Agents Experiment::cloneAgents(const Agents& agents) const
     return cloned;
 }
 
-AbstractGraph* Experiment::graph(int trialId) const
+AbstractModel* Experiment::trial(int trialId) const
 {
     auto it = m_trials.find(trialId);
     if (it == m_trials.end() || !it->second)
         return nullptr;
-    return it->second->graph();
+    return it->second;
 }
 
 void Experiment::writeStep(const int trialId)

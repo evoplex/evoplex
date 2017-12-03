@@ -24,7 +24,7 @@ GraphWidget::GraphWidget(ExperimentsMgr* expMgr, Experiment* exp, QWidget* paren
     , m_ui(new Ui_GraphWidget)
     , m_settingsDlg(new Ui_GraphSettings)
     , m_exp(exp)
-    , m_graph(nullptr)
+    , m_model(nullptr)
     , m_agentCMap(ColorMap::DivergingSet1, exp->modelPlugin()->agentAttrSpace)
     , m_zoomLevel(0)
     , m_nodeSizeRate(10.f)
@@ -113,7 +113,7 @@ void GraphWidget::setEdgeAttr(int idx)
 void GraphWidget::setGraph(int trialId)
 {
     m_currTrialId = trialId;
-    m_graph = m_exp->graph(trialId);
+    m_model = m_exp->trial(trialId);
     updateCache();
 }
 
@@ -146,12 +146,14 @@ void GraphWidget::updateCache()
     m_cache.clear();
     m_cache.shrink_to_fit();
 
-    if (!m_graph)
+    if (!m_model)
         return;
 
+    const Agents agents = m_model->graph()->agents();
     float edgeSizeRate = m_edgeSizeRate * std::pow(1.25f, m_zoomLevel);
-    m_cache.reserve(m_graph->agents().size());
-    for (Agent* agent : m_graph->agents()) {
+    m_cache.reserve(agents.size());
+
+    for (Agent* agent : agents) {
         QPointF xy(m_origin.x() + edgeSizeRate * (1.0 + agent->x()),
                    m_origin.y() + edgeSizeRate * (1.0 + agent->y()));
 
@@ -177,7 +179,7 @@ void GraphWidget::updateCache()
 
 void GraphWidget::paintEvent(QPaintEvent* e)
 {
-    if (!m_graph)
+    if (!m_model)
         return;
 
     QPainter painter;
@@ -228,7 +230,7 @@ void GraphWidget::mousePressEvent(QMouseEvent* e)
 
 void GraphWidget::mouseReleaseEvent(QMouseEvent *e)
 {
-    if (!m_graph || e->button() != Qt::LeftButton
+    if (!m_model || e->button() != Qt::LeftButton
             || (m_ui->inspector->isVisible()
                 && m_ui->inspector->geometry().contains(e->pos()))) {
         return;

@@ -86,11 +86,12 @@ public:
     bool removeOutput(Output* output);
     Output* searchOutput(const Output* find);
 
-    AbstractGraph* graph(int trialId) const;
+    AbstractModel* trial(int trialId) const;
+    inline const std::unordered_map<int, AbstractModel*>& trials() const { return m_trials; }
+
     inline int id() const { return m_id; }
     inline int projId() const { return m_projId; }
     inline int numTrials() const { return m_numTrials; }
-    inline const std::unordered_map<int, AbstractModel*>& trials() const { return m_trials; }
     inline const Attributes* generalAttrs() const { return m_generalAttrs; }
     inline const Attributes* modelAttrs() const { return m_modelAttrs; }
     inline const Attributes* graphAttrs() const { return m_graphAttrs; }
