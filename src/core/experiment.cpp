@@ -78,6 +78,11 @@ void Experiment::reset()
     deleteTrials();
     m_trials.reserve(m_numTrials);
     m_expStatus = READY;
+
+    m_stopAt = m_generalAttrs->value(GENERAL_ATTRIBUTE_STOPAT).toInt;
+    m_pauseAt = m_stopAt;
+    m_progress = 0;
+
     emit (m_mainApp->getExperimentsMgr()->statusChanged(this));
     emit (m_mainApp->getExperimentsMgr()->restarted(this));
 
@@ -92,7 +97,7 @@ void Experiment::deleteTrials()
     }
 
     for (auto& trial : m_trials) {
-        delete trial.second.modelObj;
+        delete trial.second;
     }
     m_trials.clear();
 
@@ -119,7 +124,7 @@ void Experiment::updateProgressValue()
     } else if (m_expStatus == RUNNING) {
         float p = 0.f;
         for (auto& trial : m_trials) {
-            p += ((float) trial.second.modelObj->m_currStep / m_pauseAt);
+            p += ((float) trial.second->m_currStep / m_pauseAt);
         }
         m_progress = ceil(p * 360.f / m_numTrials);
     }
@@ -145,7 +150,7 @@ void Experiment::playNext()
     } else {
         int maxCurrStep = 0;
         for (auto& trial : m_trials) {
-            int currStep = trial.second.modelObj->m_currStep;
+            int currStep = trial.second->m_currStep;
             if (currStep > maxCurrStep) maxCurrStep = currStep;
         }
         setPauseAt(maxCurrStep);
@@ -158,8 +163,8 @@ void Experiment::processTrial(const int& trialId)
     if (m_expStatus == INVALID) {
         return;
     } else if (m_trials.find(trialId) == m_trials.end()) {
-        Trial trial = createTrial(trialId);
-        if (trial.status == INVALID) {
+        AbstractModel* trial = createTrial(trialId);
+        if (!trial) {
             setExpStatus(INVALID);
             pause();
             return;
@@ -167,55 +172,55 @@ void Experiment::processTrial(const int& trialId)
         m_trials.insert({trialId, trial});
     }
 
-    Trial& trial = m_trials.at(trialId);
-    if (trial.status != READY) {
+    AbstractModel* trial = m_trials.at(trialId);
+    if (trial->m_status != READY) {
         return;
     }
 
-    trial.status = RUNNING;
+    trial->m_status = RUNNING;
 
     bool algorithmConverged = false;
-    while (trial.modelObj->m_currStep <= m_pauseAt && !algorithmConverged) {
+    while (trial->m_currStep <= m_pauseAt && !algorithmConverged) {
         for (Output* output : m_fileOutputs)
-            output->doOperation(trialId, trial.modelObj);
+            output->doOperation(trialId, trial);
         for (Output* output : m_extraOutputs)
-            output->doOperation(trialId, trial.modelObj);
+            output->doOperation(trialId, trial);
 
         // TODO: write only after X steps
         writeStep(trialId);
 
-        algorithmConverged = trial.modelObj->algorithmStep();
-        ++trial.modelObj->m_currStep;
+        algorithmConverged = trial->algorithmStep();
+        ++trial->m_currStep;
     }
 
-    if (trial.modelObj->m_currStep > m_stopAt || algorithmConverged) {
+    if (trial->m_currStep > m_stopAt || algorithmConverged) {
         if (!m_fileStreams.empty()) {
             for (QTextStream* stream : m_fileStreams) {
                 stream->flush();
             }
         }
-        trial.status = FINISHED;
+        trial->m_status = FINISHED;
     } else {
-        trial.status = READY;
+        trial->m_status = READY;
     }
 }
 
-Experiment::Trial Experiment::createTrial(const int trialId)
+AbstractModel* Experiment::createTrial(const int trialId)
 {
     if (m_expStatus == INVALID) {
-        return Trial();
+        return nullptr;
     } if (m_trials.size() == m_numTrials) {
         qWarning() << "[Experiment]: all the trials for this experiment have already been created."
                    << "Project:" << m_projId << "Experiment:" << m_id << "Trial:" << trialId
                    << " (" << m_trials.size() << "/" << numTrials() << ")";
-        return Trial();
+        return nullptr;
     }
 
     m_mutex.lock(); // make it thread-safe
     Agents agents = createAgents();
     m_mutex.unlock();
     if (agents.empty()) {
-        return Trial();
+        return nullptr;
     }
 
     PRG* prg = new PRG(m_seed + trialId);
@@ -229,7 +234,7 @@ Experiment::Trial Experiment::createTrial(const int trialId)
         graphObj = nullptr;
         delete prg;
         prg = nullptr;
-        return Trial();
+        return nullptr;
     }
     graphObj->reset();
 
@@ -240,8 +245,7 @@ Experiment::Trial Experiment::createTrial(const int trialId)
                    << "The model could not be initialized."
                    << "Project:" << m_projId << "Experiment:" << m_id;
         delete modelObj;
-        modelObj = nullptr;
-        return Trial();
+        return nullptr;
     }
 
     if (!m_fileOutputs.empty()) {
@@ -256,8 +260,7 @@ Experiment::Trial Experiment::createTrial(const int trialId)
             qWarning() << "[Experiment] unable to create the trials."
                        << "Could not write in " << fpath;
             delete modelObj;
-            modelObj = nullptr;
-            return Trial();
+            return nullptr;
         }
 
         QTextStream* stream = new QTextStream(file);
@@ -265,10 +268,8 @@ Experiment::Trial Experiment::createTrial(const int trialId)
         m_fileStreams.insert(trialId, stream);
     }
 
-    Trial trial;
-    trial.modelObj = modelObj;
-    trial.status = READY;
-    return trial;
+    modelObj->m_status = READY;
+    return modelObj;
 }
 
 Agents Experiment::createAgents()
@@ -330,9 +331,9 @@ Agents Experiment::cloneAgents(const Agents& agents) const
 AbstractGraph* Experiment::graph(int trialId) const
 {
     auto it = m_trials.find(trialId);
-    if (it == m_trials.end() || !it->second.modelObj)
+    if (it == m_trials.end() || !it->second)
         return nullptr;
-    return it->second.modelObj->graph();
+    return it->second->graph();
 }
 
 void Experiment::writeStep(const int trialId)

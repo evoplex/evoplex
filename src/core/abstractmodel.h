@@ -24,9 +24,12 @@ public:
     inline const Value& attr(int attrId) const { return m_attributes->value(attrId);  }
     inline const QString& attrName(int attrId) const { return m_attributes->name(attrId); }
     inline const int currStep() const { return m_currStep; }
+    inline const int status() const { return m_status; }
 
 protected:
-    explicit AbstractBaseModel() : m_graph(nullptr), m_prg(nullptr) {}
+    explicit AbstractBaseModel()
+        : m_graph(nullptr), m_prg(nullptr), m_attributes(nullptr),
+          m_currStep(0), m_status(0) {}
 
     virtual ~AbstractBaseModel() {
         delete m_graph;
@@ -40,6 +43,7 @@ private:
     PRG* m_prg;
     Attributes* m_attributes;
     int m_currStep;
+    int m_status;
 
     // takes the ownership of the graph and the PRG
     inline void setup(PRG* prg, AbstractGraph* graphObj, Attributes* attrs) {

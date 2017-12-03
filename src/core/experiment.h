@@ -36,16 +36,6 @@ public:
         FINISHED, // all is done
     };
 
-    // A trial is part of an experiment which might have several other trials.
-    // All trials of an experiment are meant to use exactly the same parameters
-    // and population of agents. Be aware that each trial will use the root
-    // seed incremented by 1. For exemple, if an experiment with 3 trials has
-    // the seed '111', the seeds of the trials will be '111', '112' and '113'.
-    struct Trial {
-        AbstractModel* modelObj = nullptr;
-        Status status = INVALID;
-    };
-
     explicit Experiment(MainApp* mainApp, int id, int projId, Attributes* generalAttrs,
             Attributes* modelAttrs, Attributes* graphAttrs, std::vector<Output*> fileOutputs);
 
@@ -100,7 +90,7 @@ public:
     inline int id() const { return m_id; }
     inline int projId() const { return m_projId; }
     inline int numTrials() const { return m_numTrials; }
-    inline const std::unordered_map<int, Trial>& trials() const { return m_trials; }
+    inline const std::unordered_map<int, AbstractModel*>& trials() const { return m_trials; }
     inline const Attributes* generalAttrs() const { return m_generalAttrs; }
     inline const Attributes* modelAttrs() const { return m_modelAttrs; }
     inline const Attributes* graphAttrs() const { return m_graphAttrs; }
@@ -133,7 +123,12 @@ private:
     Status m_expStatus;
     quint16 m_progress; // current progress value [0, 360]
 
-    std::unordered_map<int, Trial> m_trials;
+    // A trial is part of an experiment which might have several other trials.
+    // All trials of an experiment are meant to use exactly the same parameters
+    // and population of agents. Be aware that each trial will use the root
+    // seed incremented by 1. For exemple, if an experiment with 3 trials has
+    // the seed '111', the seeds of the trials will be '111', '112' and '113'.
+    std::unordered_map<int, AbstractModel*> m_trials;
 
     // It holds the initial population for further use (internal only).
     // If this experiment has only one trial, then it won't be used anyway.
@@ -142,8 +137,8 @@ private:
 
     // We can safely consider that all parameters are valid at this point.
     // However, some things might fail (eg, missing agents, broken graph etc),
-    // and, in that case, an invalid Trial() is returned.
-    Trial createTrial(const int trialId);
+    // and, in that case, a null pointer is returned.
+    AbstractModel* createTrial(const int trialId);
 
     // The trials are meant to have the same initial population.
     // So, considering that it might be a very expensive operation (eg, I/O),

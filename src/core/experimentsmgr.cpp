@@ -89,7 +89,7 @@ void ExperimentsMgr::finished(Experiment* exp)
     if(exp->expStatus() != Experiment::INVALID) {
         exp->setExpStatus(Experiment::FINISHED);
         for (auto& trial : exp->trials()) {
-            if (trial.second.status != Experiment::FINISHED) {
+            if (trial.second->status() != Experiment::FINISHED) {
                 exp->setExpStatus(Experiment::READY);
                 break;
             }
