@@ -34,7 +34,7 @@ protected:
 
 private slots:
     void updateCache();
-    void setGraph(int trialId);
+    void setTrial(int trialId);
     void zoomIn();
     void zoomOut();
     void resetView();

@@ -43,10 +43,10 @@ GraphWidget::GraphWidget(ExperimentsMgr* expMgr, Experiment* exp, QWidget* paren
 
     TitleBar* titleBar = new TitleBar(exp, this);
     setTitleBarWidget(titleBar);
-    connect(titleBar, SIGNAL(trialSelected(int)), SLOT(setGraph(int)));
-    setGraph(0);
+    connect(titleBar, SIGNAL(trialSelected(int)), SLOT(setTrial(int)));
+    setTrial(0);
     connect(expMgr, &ExperimentsMgr::statusChanged,
-        [this](Experiment* exp) { if (exp == m_exp) setGraph(m_currTrialId); });
+        [this](Experiment* exp) { if (exp == m_exp) setTrial(m_currTrialId); });
 
     QDialog* dlg = new QDialog(this);
     m_settingsDlg->setupUi(dlg);
@@ -110,10 +110,15 @@ void GraphWidget::setEdgeAttr(int idx)
     m_edgeAttr = idx;
 }
 
-void GraphWidget::setGraph(int trialId)
+void GraphWidget::setTrial(int trialId)
 {
     m_currTrialId = trialId;
     m_model = m_exp->trial(trialId);
+    if (m_model) {
+        m_ui->currStep->setText(QString::number(m_model->currStep()));
+    } else {
+        m_ui->currStep->setText("--");
+    }
     updateCache();
 }
 
@@ -218,6 +223,8 @@ void GraphWidget::paintEvent(QPaintEvent* e)
             painter.drawEllipse(cache.xy, m_nodeRadius, m_nodeRadius);
         }
     }
+
+    m_ui->currStep->setText(QString::number(m_model->currStep()));
 
     painter.end();
 }
