@@ -20,7 +20,8 @@ private:
 
     double m_temptation;
 
-    double playGame(int sX, int sY);
+    const double playGame(const int sX, const int sY) const;
+    const int binarize(const int strategy) const;
 };
 }
 

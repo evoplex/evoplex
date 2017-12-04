@@ -15,6 +15,30 @@ bool ModelNowak::init()
 
 bool ModelNowak::algorithmStep()
 {
+    std::vector<char> bestStrategies;
+    bestStrategies.reserve(graph()->agents().size());
+
+    for (Agent* agent : graph()->agents()) {
+        int bestStrategy = agent->attr(Strategy).toInt;
+        double highestScore = agent->attr(Score).toDouble;
+        for (const Edge* edge : agent->edges()) {
+            const double neighbourScore = edge->neighbour()->attr(Score).toDouble;
+            if (neighbourScore > highestScore) {
+                highestScore = neighbourScore;
+                bestStrategy = edge->neighbour()->attr(Strategy).toInt;
+            }
+        }
+        bestStrategies.emplace_back(binarize(bestStrategy));
+    }
+
+    int i = 0;
+    for (Agent* agent : graph()->agents()) {
+        int s = binarize(agent->attr(Strategy).toInt);
+        s = (s == bestStrategies.at(i)) ? s : bestStrategies.at(i) + 2;
+        agent->setAttr(Strategy, s);
+        ++i;
+    }
+
     for (Agent* agent : graph()->agents()) {
         const int sX = agent->attr(Strategy).toInt;
         double score = 0.0;
@@ -24,25 +48,14 @@ bool ModelNowak::algorithmStep()
         agent->setAttr(Score, score);
     }
 
-    for (Agent* agent : graph()->agents()) {
-        int bestStrategy = agent->attr(Strategy).toInt;
-        double highestScore = agent->attr(Score).toDouble;
-        for (const Edge* edge : agent->edges()) {
-            double neighbourScore = edge->neighbour()->attr(Score).toDouble;
-            if (!qFuzzyCompare(neighbourScore, highestScore) && neighbourScore > highestScore) {
-                highestScore = neighbourScore;
-                bestStrategy = edge->neighbour()->attr(Strategy).toInt;
-            }
-        }
-        agent->setAttr(Strategy, bestStrategy);
-    }
-
     return false;
 }
 
-double ModelNowak::playGame(int sX, int sY)
+// 0) cooperator; 1) new cooperator
+// 2) defector;   3) new defector
+const double ModelNowak::playGame(const int sX, const int sY) const
 {
-    switch (sX * 2 + sY) {
+    switch (binarize(sX) * 2 + binarize(sY)) {
     case 0: return 1.0;             // CC : Reward for mutual cooperation
     case 1: return 0.0;             // CD : Sucker's payoff
     case 2: return m_temptation;    // DC : Temptation to defect
@@ -50,6 +63,13 @@ double ModelNowak::playGame(int sX, int sY)
     default:
         qFatal("[ModelNowak::playGame()] Error! strategy should be 0 or 1!");
     }
+}
+
+// transform from 0|2 -> 0 (cooperator)
+//                1|3 -> 1 (defector)
+const int ModelNowak::binarize(const int strategy) const
+{
+    return (strategy < 2) ? strategy : strategy - 2;
 }
 
 } // evoplex

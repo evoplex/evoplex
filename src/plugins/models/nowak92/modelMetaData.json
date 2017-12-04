@@ -6,7 +6,7 @@
   "description": "Nowak 1992",
   "supportedGraphs": "mooreGrid,squareGrid",
   "agentAttributesSpace": [
-    {"strategy": "int{0,1}"},
+    {"strategy": "int{0,1,2,3}"},
     {"score": "double[0,16]"}
   ],
   "modelAttributesSpace": [
