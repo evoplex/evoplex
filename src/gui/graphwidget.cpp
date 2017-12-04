@@ -218,7 +218,8 @@ void GraphWidget::paintEvent(QPaintEvent* e)
                 painter.drawEllipse(cache.xy, m_nodeRadius*1.5f, m_nodeRadius*1.5f);
             }
 
-            painter.setBrush(m_agentCMap.colorFromValue(cache.agent->attr(m_agentAttr)));
+            const Value& value = cache.agent->attr(m_agentAttr);
+            painter.setBrush(m_agentCMap.colorFromValue(value));
             painter.setPen(Qt::black);
             painter.drawEllipse(cache.xy, m_nodeRadius, m_nodeRadius);
         }

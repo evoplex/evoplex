@@ -17,7 +17,7 @@ namespace evoplex {
 class ColorMapValue
 {
 public:
-    virtual const QColor& colorFromValue(const Value& val) const = 0;
+    virtual const QColor colorFromValue(const Value& val) const = 0;
 };
 
 class ColorMapInterval : public ColorMapValue
@@ -25,7 +25,7 @@ class ColorMapInterval : public ColorMapValue
 public:
     ColorMapInterval(const std::vector<QColor>& colors, const Value& min, const Value& max);
 
-    const QColor& colorFromValue(const Value& val) const;
+    const QColor colorFromValue(const Value& val) const;
 
 private:
     const std::vector<QColor> m_colors;
@@ -38,7 +38,7 @@ class ColorMapSet : public ColorMapValue
 public:
     ColorMapSet(const std::vector<QColor>& colors, const QVector<Value>& vals);
 
-    const QColor& colorFromValue(const Value& val) const;
+    const QColor colorFromValue(const Value& val) const;
 
 private:
     std::unordered_map<Value, QColor> m_cmap;
@@ -56,7 +56,7 @@ public:
 
     void setAttr(const QString& attrName);
 
-    inline const QColor& colorFromValue(const Value& val) const
+    inline const QColor colorFromValue(Value val) const
     { return m_mapValue->colorFromValue(val); }
 
 private:

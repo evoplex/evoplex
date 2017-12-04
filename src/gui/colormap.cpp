@@ -70,7 +70,7 @@ ColorMapInterval::ColorMapInterval(const std::vector<QColor>& colors, const Valu
     }
 }
 
-const QColor& ColorMapInterval::colorFromValue(const Value& val) const
+const QColor ColorMapInterval::colorFromValue(const Value& val) const
 {
     float value;
     if (val.type == Value::INT) {
@@ -96,9 +96,13 @@ ColorMapSet::ColorMapSet(const std::vector<QColor>& colors, const QVector<Value>
     }
 }
 
-const QColor& ColorMapSet::colorFromValue(const Value& val) const
+const QColor ColorMapSet::colorFromValue(const Value& val) const
 {
-    return m_cmap.at(val);
+    std::unordered_map<Value, QColor>::const_iterator i = m_cmap.find(val);
+    if (i == m_cmap.end()) {
+        qFatal("[ColorMapSet]: invalid value! (%s)", val.toQString());
+    }
+    return i->second;
 }
 
 }
