@@ -6,6 +6,7 @@
 #ifndef VALUE_H
 #define VALUE_H
 
+#include <QString>
 #include <vector>
 
 namespace evoplex
@@ -28,67 +29,80 @@ public:
     Value(const QString& value) : Value(strdup(value.toUtf8().constData())) {}
 
     inline bool isValid() const { return type != INVALID; }
+
     inline QString toQString() const {
         switch (type) {
-            case BOOL: return QString::number(toBool);
-            case CHAR: return QString(toChar);
-            case DOUBLE: return QString::number(toDouble);
-            case INT: return QString::number(toInt);
-            case STRING: return QString::fromUtf8(toString);
-            default: return QString();
+        case INT: return QString::number(toInt);
+        case DOUBLE: return QString::number(toDouble);
+        case BOOL: return QString::number(toBool);
+        case CHAR: return QString(toChar);
+        case STRING: return QString::fromUtf8(toString);
+        default: Q_ASSERT(false);
         }
     }
 
     bool operator==(const Value& v) const {
         Q_ASSERT(type == v.type);
-        if (type == BOOL) return toBool == v.toBool;
-        if (type == CHAR) return toChar == v.toChar;
-        if (type == DOUBLE) return toDouble == v.toDouble;
-        if (type == INT) return toInt == v.toInt;
-        if (type == STRING) return toString == v.toString;
-        Q_ASSERT(false);
+        switch (type) {
+        case INT: return toInt == v.toInt;
+        case DOUBLE: return toDouble == v.toDouble;
+        case BOOL: return toBool == v.toBool;
+        case CHAR: return toChar == v.toChar;
+        case STRING: return toString == v.toString;
+        default: Q_ASSERT(false);
+        }
     }
 
     bool operator!=(const Value& v) const {
         Q_ASSERT(type == v.type);
-        if (type != BOOL) return toBool != v.toBool;
-        if (type != CHAR) return toChar != v.toChar;
-        if (type != DOUBLE) return toDouble != v.toDouble;
-        if (type != INT) return toInt != v.toInt;
-        if (type != STRING) return toString != v.toString;
-        Q_ASSERT(false);
+        switch (type) {
+        case INT: return toInt != v.toInt;
+        case DOUBLE: return toDouble != v.toDouble;
+        case BOOL: return toBool != v.toBool;
+        case CHAR: return toChar != v.toChar;
+        case STRING: return toString != v.toString;
+        default: Q_ASSERT(false);
+        }
     }
 
     bool operator<(const Value& v) const {
         Q_ASSERT(type == v.type);
-        if (type == CHAR) return toChar < v.toChar;
-        if (type == DOUBLE) return toDouble < v.toDouble;
-        if (type == INT) return toInt < v.toInt;
-        Q_ASSERT(false);
+        switch (type) {
+        case INT: return toInt < v.toInt;
+        case DOUBLE: return toDouble < v.toDouble;
+        case CHAR: return toChar < v.toChar;
+        default: Q_ASSERT(false);
+        }
     }
 
     bool operator>(const Value& v) const {
         Q_ASSERT(type == v.type);
-        if (type == CHAR) return toChar > v.toChar;
-        if (type == DOUBLE) return toDouble > v.toDouble;
-        if (type == INT) return toInt > v.toInt;
-        Q_ASSERT(false);
+        switch (type) {
+        case INT: return toInt > v.toInt;
+        case DOUBLE: return toDouble > v.toDouble;
+        case CHAR: return toChar > v.toChar;
+        default: Q_ASSERT(false);
+        }
     }
 
     bool operator<=(const Value& v) const {
         Q_ASSERT(type == v.type);
-        if (type <= CHAR) return toChar <= v.toChar;
-        if (type <= DOUBLE) return toDouble <= v.toDouble;
-        if (type <= INT) return toInt <= v.toInt;
-        Q_ASSERT(false);
+        switch (type) {
+        case INT: return toInt <= v.toInt;
+        case DOUBLE: return toDouble <= v.toDouble;
+        case CHAR: return toChar <= v.toChar;
+        default: Q_ASSERT(false);
+        }
     }
 
     bool operator>=(const Value& v) const {
         Q_ASSERT(type == v.type);
-        if (type <= CHAR) return toChar >= v.toChar;
-        if (type <= DOUBLE) return toDouble >= v.toDouble;
-        if (type <= INT) return toInt >= v.toInt;
-        Q_ASSERT(false);
+        switch (type) {
+        case INT: return toInt >= v.toInt;
+        case DOUBLE: return toDouble >= v.toDouble;
+        case CHAR: return toChar >= v.toChar;
+        default: Q_ASSERT(false);
+        }
     }
 };
 }
@@ -112,13 +126,15 @@ struct hash<char*>
 template <>
 struct hash<evoplex::Value>
 {
-    std::size_t operator()(const evoplex::Value& v) const {
-        if (v.type == evoplex::Value::BOOL) return std::hash<bool>{}(v.toBool);
-        if (v.type == evoplex::Value::CHAR) return std::hash<char>{}(v.toChar);
-        if (v.type == evoplex::Value::DOUBLE) return std::hash<double>{}(v.toDouble);
-        if (v.type == evoplex::Value::INT) return std::hash<int>{}(v.toInt);
-        if (v.type == evoplex::Value::STRING) return std::hash<char*>{}(v.toString);
-        Q_ASSERT(false);
+    size_t operator()(const evoplex::Value& v) const {
+        switch (v.type) {
+        case evoplex::Value::INT: return hash<int>()(v.toInt);
+        case evoplex::Value::DOUBLE: return hash<double>()(v.toDouble);
+        case evoplex::Value::BOOL: return hash<bool>()(v.toBool);
+        case evoplex::Value::CHAR: return hash<char>()(v.toChar);
+        case evoplex::Value::STRING: return hash<char*>()(v.toString);
+        default: Q_ASSERT(false);
+        }
     }
 };
 }
