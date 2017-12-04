@@ -36,8 +36,8 @@ public:
         return idx == m_names.size() ? -1 : idx;
     }
 
-    inline void replace(int id, const QString& name, const Value& value) { m_names[id] = name; m_values[id] = value; }
-    inline void push_back(const QString& name, const Value& value) { m_names.emplace_back(name); m_values.emplace_back(value); }
+    inline void replace(int id, QString newName, Value newValue) { m_names[id] = newName; m_values[id] = newValue; }
+    inline void push_back(QString name, Value value) { m_names.emplace_back(name); m_values.emplace_back(value); }
 
     inline const std::vector<QString>& names() const { return m_names; }
     inline const QString& name(int id) const {
@@ -56,7 +56,7 @@ public:
         }
     }
 
-    inline void setValue(int id, const Value& value) {
+    inline void setValue(int id, Value value) {
         try {
             m_values.at(id) = value;
         } catch (const std::out_of_range&) {

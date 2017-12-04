@@ -16,7 +16,7 @@ bool ModelNowak::init()
 bool ModelNowak::algorithmStep()
 {
     for (Agent* agent : graph()->agents()) {
-        int sX = agent->attr(Strategy).toInt;
+        const int sX = agent->attr(Strategy).toInt;
         double score = 0.0;
         for (const Edge* edge : agent->edges()) {
             score += playGame(sX, edge->neighbour()->attr(Strategy).toInt);
@@ -28,8 +28,9 @@ bool ModelNowak::algorithmStep()
         int bestStrategy = agent->attr(Strategy).toInt;
         double highestScore = agent->attr(Score).toDouble;
         for (const Edge* edge : agent->edges()) {
-            if (highestScore < edge->neighbour()->attr(Score).toDouble) {
-                highestScore = edge->neighbour()->attr(Score).toDouble;
+            double neighbourScore = edge->neighbour()->attr(Score).toDouble;
+            if (!qFuzzyCompare(neighbourScore, highestScore) && neighbourScore > highestScore) {
+                highestScore = neighbourScore;
                 bestStrategy = edge->neighbour()->attr(Strategy).toInt;
             }
         }
