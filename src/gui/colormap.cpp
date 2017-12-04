@@ -15,13 +15,25 @@ ColorMap::ColorMap(CMap cmap, const AttributesSpace& attrsSpace)
     : m_attrsSpace(attrsSpace)
     , m_mapValue(nullptr)
 {
-    if (cmap == DivergingSet1) {
+    switch (cmap) {
+    case DivergingSet1:
         m_colors = {
             QColor(43,131,186),  // blue
             QColor(215,25,28),   // red
             QColor(171,221,164), // green
             QColor(253,174,97)   // orange
         };
+        break;
+    case Blues:
+        m_colors = {
+            QColor(239,243,255),
+            QColor(189,215,231),
+            QColor(107,174,214),
+            QColor(33,113,181),
+        };
+        break;
+    default:
+        qFatal("[ColorMap]: invalid colormap!");
     }
     m_colors.shrink_to_fit();
 }

@@ -216,6 +216,7 @@ void GraphWidget::paintEvent(QPaintEvent* e)
             if (m_selectedAgent == cache.agent->id()) {
                 painter.setBrush(QColor(10,10,10,100));
                 painter.drawEllipse(cache.xy, m_nodeRadius*1.5f, m_nodeRadius*1.5f);
+                updateInspector(cache.agent);
             }
 
             const Value& value = cache.agent->attr(m_agentAttr);
@@ -258,11 +259,7 @@ void GraphWidget::mouseReleaseEvent(QMouseEvent *e)
                 && e->pos().y() > cache.xy.y()-m_nodeRadius
                 && e->pos().y() < cache.xy.y()+m_nodeRadius) {
             m_selectedAgent = cache.agent->id();
-            m_ui->agentId->setText(QString::number(m_selectedAgent));
-            m_ui->neighbors->setText(QString::number(cache.edges.size()));
-            for (int id = 0; id < cache.agent->attrs().size(); ++id) {
-                m_attrs.value(id)->setText(cache.agent->attr(id).toQString());
-            }
+            updateInspector(cache.agent);
             m_ui->inspector->show();
             break;
         }
@@ -280,6 +277,15 @@ void GraphWidget::resizeEvent(QResizeEvent* e)
     m_cache.clear();
     m_resizeTimer.start(500);
     QWidget::resizeEvent(e);
+}
+
+void GraphWidget::updateInspector(const Agent* agent)
+{
+    m_ui->agentId->setText(QString::number(agent->id()));
+    m_ui->neighbors->setText(QString::number(agent->edges().size()));
+    for (int id = 0; id < agent->attrs().size(); ++id) {
+        m_attrs.value(id)->setText(agent->attr(id).toQString());
+    }
 }
 
 }

@@ -72,6 +72,8 @@ private:
         std::vector<QLineF> edges;
     };
     std::vector<Cache> m_cache;
+
+    void updateInspector(const Agent* agent);
 };
 }
 

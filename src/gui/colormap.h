@@ -48,7 +48,8 @@ class ColorMap
 {
 public:
     enum CMap {
-        DivergingSet1
+        DivergingSet1,
+        Blues
     };
 
     ColorMap(CMap cmap, const AttributesSpace& attrsSpace);
