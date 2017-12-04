@@ -1,2 +1,2 @@
 ADD_SUBDIRECTORY(mooregrid)
-#ADD_SUBDIRECTORY(squaregrid)
+ADD_SUBDIRECTORY(squaregrid)

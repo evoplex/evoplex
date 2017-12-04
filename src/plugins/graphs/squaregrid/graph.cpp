@@ -11,26 +11,26 @@
 
 namespace evoplex {
 
-MooreGrid::MooreGrid(const QString& name)
+SquareGrid::SquareGrid(const QString& name)
     : AbstractGraph(name)
     , m_height(0)
     , m_width(0)
 {
 }
 
-bool MooreGrid::init()
+bool SquareGrid::init()
 {
     m_height = attrs()->value(Height).toInt;
     m_width = attrs()->value(Width).toInt;
     if (agents().size() != m_height * m_width) {
-        qWarning() << "[MooreGrid]: the agent set is not compatible with the required shape."
+        qWarning() << "[SquareGrid]: the agent set is not compatible with the required shape."
                    << "The number of agents should be equal to 'height'*'width'.";
         return false;
     }
     return true;
 }
 
-void MooreGrid::reset()
+void SquareGrid::reset()
 {
     qDeleteAll(m_edges);
     m_edges.clear();
@@ -44,7 +44,7 @@ void MooreGrid::reset()
     }
 }
 
-void MooreGrid::createEdges(const int id)
+void SquareGrid::createEdges(const int id)
 {
     bool directed;
     std::vector<QPair<int,int>> neighbors;
@@ -75,36 +75,31 @@ void MooreGrid::createEdges(const int id)
     }
 }
 
-std::vector<QPair<int,int>> MooreGrid::directedEdges(const int id)
+
+std::vector<QPair<int,int>> SquareGrid::directedEdges(const int id)
 {
     int row, col;
     Utils::ind2sub(id, m_width, row, col);
     std::vector<QPair<int,int>> neighbors {
-        qMakePair(row-1, col-1), // nw
         qMakePair(row-1, col  ), // n
-        qMakePair(row-1, col+1), // ne
         qMakePair(row  , col-1), // w
         qMakePair(row  , col+1), // e
-        qMakePair(row+1, col-1), // sw
         qMakePair(row+1, col  ), // s
-        qMakePair(row+1, col+1), // se
     };
     return neighbors;
 }
 
-std::vector<QPair<int,int>> MooreGrid::undirectedEdges(const int id)
+std::vector<QPair<int,int>> SquareGrid::undirectedEdges(const int id)
 {
     int row, col;
     Utils::ind2sub(id, m_width, row, col);
     std::vector<QPair<int,int>> neighbors {
-        qMakePair(row-1, col-1), // nw
         qMakePair(row-1, col  ), // n
-        qMakePair(row-1, col+1), // ne
         qMakePair(row  , col-1), // w
     };
     return neighbors;
 }
 
 } // evoplex
-REGISTER_GRAPH(MooreGrid)
+REGISTER_GRAPH(SquareGrid)
 #include "graph.moc"
