@@ -6,10 +6,14 @@
 get_filename_component(MODEL_NAME ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 set(MODEL_NAME EvoplexModel_${MODEL_NAME})
 
-qt5_generate_moc(model.h moc_model.cpp)
-add_library(${MODEL_NAME} SHARED model.cpp model.h moc_model.cpp)
+add_library(${MODEL_NAME} SHARED model.cpp)
 target_link_libraries(${MODEL_NAME} EvoplexCore Qt5::Core)
 set_target_properties(${MODEL_NAME} PROPERTIES
   LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib/evoplex/plugins)
+
+target_include_directories(${MODEL_NAME} PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src>
+  $<INSTALL_INTERFACE:include/evoplex>
+)
 
 install(TARGETS ${MODEL_NAME} LIBRARY DESTINATION lib/evoplex/plugins)

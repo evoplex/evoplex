@@ -1,0 +1,15 @@
+{
+  "type": "model",
+  "uid": "nowak92",
+  "name": "Evolutionary games and spatial chaos",
+  "author": "Marcos Cardinot",
+  "description": "Nowak 1992",
+  "supportedGraphs": "mooreGrid,squareGrid",
+  "agentAttributesSpace": [
+    {"strategy": "int{0,1}"},
+    {"score": "double[0,16]"}
+  ],
+  "modelAttributesSpace": [
+    {"temptation": "double[1,2]"}
+  ]
+}
