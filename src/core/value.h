@@ -30,78 +30,109 @@ public:
 
     inline bool isValid() const { return type != INVALID; }
 
-    inline QString toQString() const {
+    inline QString toQString() const
+    {
         switch (type) {
         case INT: return QString::number(toInt);
         case DOUBLE: return QString::number(toDouble);
         case BOOL: return QString::number(toBool);
         case CHAR: return QString(toChar);
         case STRING: return QString::fromUtf8(toString);
-        default: Q_ASSERT(false);
+        default: throw std::invalid_argument("invalid type");
         }
     }
 
-    bool operator==(const Value& v) const {
-        Q_ASSERT(type == v.type);
+    bool operator==(const Value& v) const
+    {
+        if (type != v.type)
+            return false;
+
         switch (type) {
         case INT: return toInt == v.toInt;
         case DOUBLE: return toDouble == v.toDouble;
         case BOOL: return toBool == v.toBool;
         case CHAR: return toChar == v.toChar;
-        case STRING: return toString == v.toString;
-        default: Q_ASSERT(false);
+        case STRING: return strcmp (toString, v.toString) == 0;
+        default: throw std::invalid_argument("invalid type");
         }
     }
 
-    bool operator!=(const Value& v) const {
-        Q_ASSERT(type == v.type);
+    bool operator!=(const Value& v) const
+    {
+        if (type != v.type)
+            return true;
+
         switch (type) {
         case INT: return toInt != v.toInt;
         case DOUBLE: return toDouble != v.toDouble;
         case BOOL: return toBool != v.toBool;
         case CHAR: return toChar != v.toChar;
-        case STRING: return toString != v.toString;
-        default: Q_ASSERT(false);
+        case STRING: return strcmp (toString, v.toString) != 0;
+        default: throw std::invalid_argument("invalid type");
         }
     }
 
-    bool operator<(const Value& v) const {
-        Q_ASSERT(type == v.type);
+    bool operator<(const Value& v) const
+    {
+        if (type != v.type) {
+            throw std::invalid_argument("[operator<] type should be the same");
+        }
+
         switch (type) {
         case INT: return toInt < v.toInt;
         case DOUBLE: return toDouble < v.toDouble;
+        case BOOL: return toBool < v.toBool;
         case CHAR: return toChar < v.toChar;
-        default: Q_ASSERT(false);
+        case STRING: throw std::invalid_argument("[operator<] cannot do that with strings");
+        default: throw std::invalid_argument("invalid type");
         }
     }
 
-    bool operator>(const Value& v) const {
-        Q_ASSERT(type == v.type);
+    bool operator>(const Value& v) const
+    {
+        if (type != v.type) {
+            throw std::invalid_argument("[operator>] type should be the same");
+        }
+
         switch (type) {
         case INT: return toInt > v.toInt;
         case DOUBLE: return toDouble > v.toDouble;
+        case BOOL: return toBool > v.toBool;
         case CHAR: return toChar > v.toChar;
-        default: Q_ASSERT(false);
+        case STRING: throw std::invalid_argument("[operator>] cannot do that with strings");
+        default: throw std::invalid_argument("invalid type");
         }
     }
 
-    bool operator<=(const Value& v) const {
-        Q_ASSERT(type == v.type);
+    bool operator<=(const Value& v) const
+    {
+        if (type != v.type) {
+            throw std::invalid_argument("[operator<=] type should be the same");
+        }
+
         switch (type) {
         case INT: return toInt <= v.toInt;
         case DOUBLE: return toDouble <= v.toDouble;
+        case BOOL: return toBool <= v.toBool;
         case CHAR: return toChar <= v.toChar;
-        default: Q_ASSERT(false);
+        case STRING: throw std::invalid_argument("[operator<=] cannot do that with strings");
+        default: throw std::invalid_argument("invalid type");
         }
     }
 
-    bool operator>=(const Value& v) const {
-        Q_ASSERT(type == v.type);
+    bool operator>=(const Value& v) const
+    {
+        if (type != v.type) {
+            throw std::invalid_argument("[operator>=] type should be the same");
+        }
+
         switch (type) {
         case INT: return toInt >= v.toInt;
         case DOUBLE: return toDouble >= v.toDouble;
+        case BOOL: return toBool >= v.toBool;
         case CHAR: return toChar >= v.toChar;
-        default: Q_ASSERT(false);
+        case STRING: throw std::invalid_argument("[operator>=] cannot do that with strings");
+        default: throw std::invalid_argument("invalid type");
         }
     }
 };
