@@ -12,6 +12,7 @@
 #include "experimentwidget.h"
 #include "linechartwidget.h"
 #include "graphwidget.h"
+#include "gridwidget.h"
 
 namespace evoplex {
 
@@ -51,6 +52,7 @@ ExperimentWidget::ExperimentWidget(Experiment* exp, ProjectsWindow* pwindow)
     m_aReset = tb->addAction(m_kIcon_reset, "Reset");
     tb->addSeparator();
     m_aGraph = tb->addAction("graph");
+    m_aGrid = tb->addAction("grid");
     m_aLineChart = tb->addAction("line");
     tb->setMovable(false);
     tb->setFloatable(false);
@@ -73,6 +75,11 @@ ExperimentWidget::ExperimentWidget(Experiment* exp, ProjectsWindow* pwindow)
         GraphWidget* graph = new GraphWidget(expMgr, m_exp, this);
         m_innerWindow->addDockWidget(Qt::TopDockWidgetArea, graph);
         connect(m_timer, SIGNAL(timeout()), graph, SLOT(update()));
+    });
+    connect(m_aGrid, &QAction::triggered, [this, expMgr]() {
+        GridWidget* grid = new GridWidget(expMgr, m_exp, this);
+        m_innerWindow->addDockWidget(Qt::TopDockWidgetArea, grid);
+        connect(m_timer, SIGNAL(timeout()), grid, SLOT(update()));
     });
     connect(m_aLineChart, &QAction::triggered, [this, expMgr]() {
         LineChartWidget* lineChart = new LineChartWidget(expMgr, m_exp, this);

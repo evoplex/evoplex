@@ -51,6 +51,7 @@ private:
     QAction* m_aStop;
     QAction* m_aReset;
     QAction* m_aGraph;
+    QAction* m_aGrid;
     QAction* m_aLineChart;
 };
 }

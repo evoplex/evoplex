@@ -7,6 +7,7 @@ set(EVOPLEX_GUI_H
   linechartwidget.h
   outputwidget.h
   graphwidget.h
+  gridwidget.h
   projectwidget.h
   projectswindow.h
   queuewidget.h
@@ -26,6 +27,7 @@ set(EVOPLEX_GUI_CXX
   linechartwidget.cpp
   outputwidget.cpp
   graphwidget.cpp
+  gridwidget.cpp
   projectwidget.cpp
   projectswindow.cpp
   queuewidget.cpp
