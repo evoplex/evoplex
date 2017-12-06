@@ -38,6 +38,8 @@ GridWidget::GridWidget(ExperimentsMgr* expMgr, Experiment* exp, QWidget* parent)
 
     QWidget* front = new QWidget;
     m_ui->setupUi(front);
+    m_ui->bShowAgents->hide();
+    m_ui->bShowEdges->hide();
     setWidget(front);
 
     TitleBar* titleBar = new TitleBar(exp, this);
