@@ -56,6 +56,9 @@ public:
     MainApp();
     ~MainApp();
 
+    // load plugin from a .so file; return true if successful
+    const QString loadPlugin(const QString& path, QString* error = nullptr);
+
     // Create a new project
     Project* newProject(const QString& name="", const QString& dest="");
 
@@ -88,9 +91,6 @@ private:
     // lets build a hash with the name and space of the essential parameters
     // it is important to validate the contents of csv files
     AttributesSpace m_generalAttrSpace;
-
-    // load plugin from a .so file; return true if successful
-    const QString loadPlugin(const QString& path);
 
     // load graph from a .so file
     // return the graph uid

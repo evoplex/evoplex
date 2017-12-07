@@ -9,6 +9,7 @@
 #include <QAction>
 #include <QMainWindow>
 
+#include "pluginswidget.h"
 #include "projectswindow.h"
 #include "queuewidget.h"
 #include "savedialog.h"
@@ -55,6 +56,7 @@ private:
     WelcomeWidget* m_welcome;
     QueueWidget* m_queue;
     ProjectsWindow* m_projects;
+    PluginsWidget* m_plugins;
     SettingsWidget* m_settings;
     Page m_curPage;
 

@@ -8,6 +8,7 @@ set(EVOPLEX_GUI_H
   outputwidget.h
   graphwidget.h
   gridwidget.h
+  pluginswidget.h
   projectwidget.h
   projectswindow.h
   queuewidget.h
@@ -28,6 +29,7 @@ set(EVOPLEX_GUI_CXX
   outputwidget.cpp
   graphwidget.cpp
   gridwidget.cpp
+  pluginswidget.cpp
   projectwidget.cpp
   projectswindow.cpp
   queuewidget.cpp
@@ -44,6 +46,7 @@ qt5_wrap_ui(EVOPLEX_GUI_UI
   forms/graphsettings.ui
   forms/linechartsettings.ui
   forms/outputwidget.ui
+  forms/pluginswidget.ui
   forms/projectwidget.ui
   forms/queuewidget.ui
   forms/savedialog.ui

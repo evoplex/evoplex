@@ -22,6 +22,7 @@ MainGUI::MainGUI(MainApp* mainApp, QWidget* parent)
     , m_welcome(new WelcomeWidget(this))
     , m_queue(new QueueWidget(mainApp->getExperimentsMgr(), this))
     , m_projects(new ProjectsWindow(mainApp, this))
+    , m_plugins(new PluginsWidget(mainApp, this))
     , m_settings(new SettingsWidget(mainApp, this))
     , m_curPage(PAGE_NULL)
 {
@@ -40,11 +41,13 @@ MainGUI::MainGUI(MainApp* mainApp, QWidget* parent)
     centralLayout->addWidget(m_welcome);
     centralLayout->addWidget(m_queue);
     centralLayout->addWidget(m_projects);
+    centralLayout->addWidget(m_plugins);
     centralLayout->addWidget(m_settings);
     this->setCentralWidget(centralLayout->parentWidget());
     m_welcome->hide();
     m_queue->hide();
     m_projects->hide();
+    m_plugins->hide();
     m_settings->hide();
 
     //
@@ -191,6 +194,9 @@ void MainGUI::setPageVisible(Page page, bool visible)
             break;
         case PAGE_PROJECTS:
             m_projects->setVisible(visible);
+            break;
+        case PAGE_PLUGINS:
+            m_plugins->setVisible(visible);
             break;
         case PAGE_SETTINGS:
             m_settings->setVisible(visible);

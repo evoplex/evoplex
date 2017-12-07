@@ -58,55 +58,60 @@ MainApp::~MainApp()
     m_experimentsMgr = nullptr;
 }
 
-const QString MainApp::loadPlugin(const QString& path)
+const QString MainApp::loadPlugin(const QString& path, QString* error)
 {
     if (!QFile(path).exists()) {
-        qWarning() << "[MainApp] unable to find the .so file." << path;
+        *error = "Unable to find the .so file. " + path;
+        qWarning() << "[MainApp] " << *error;
         return "";
     }
 
     QPluginLoader loader(path);
     QJsonObject metaData = loader.metaData().value("MetaData").toObject();
     if (metaData.isEmpty()) {
-        qWarning() << "[MainApp] unable to load the plugin."
-                   << "Couldn't find the meta data json file." << path;
+        *error = "Unable to load the plugin.\nWe couldn't find the meta data for this plugin.\n" + path;
+        qWarning() << "[MainApp] " << *error;
         return "";
     } else if (!metaData.contains(PLUGIN_ATTRIBUTE_UID)) {
-        qWarning() << "[MainApp] unable to load the plugin."
-                   << PLUGIN_ATTRIBUTE_UID << " cannot be empty" << path;
+        *error = QString("Unable to load the plugin.\n'%1' cannot be empty. %2")
+                .arg(PLUGIN_ATTRIBUTE_UID).arg(path);
+        qWarning() << "[MainApp] " << *error;
         return "";
     } else if (!metaData.contains(PLUGIN_ATTRIBUTE_TYPE)) {
-        qWarning() << "[MainApp] unable to load the plugin."
-                   << PLUGIN_ATTRIBUTE_TYPE << " cannot be empty" << path;
+        *error = QString("Unable to load the plugin.\n'%1' cannot be empty. %2")
+                .arg(PLUGIN_ATTRIBUTE_TYPE).arg(path);
+        qWarning() << "[MainApp] " << *error;
         return "";
     }
 
     QString type = metaData[PLUGIN_ATTRIBUTE_TYPE].toString();
     if (type != "graph" && type != "model") {
-        qWarning() << "[MainApp] unable to load the plugin."
-                   << PLUGIN_ATTRIBUTE_TYPE << " must be equal to 'graph' or 'model'" << path;
+        *error = QString("Unable to load the plugin.\n'%1' must be equal to 'graph' or 'model'. %2")
+                .arg(PLUGIN_ATTRIBUTE_TYPE).arg(path);
+        qWarning() << "[MainApp] " << *error;
         return "";
     }
 
     QString uid = metaData[PLUGIN_ATTRIBUTE_UID].toString();
     if (m_models.contains(uid) || m_graphs.contains(uid)) {
-        qWarning() << "[MainApp] unable to load the plugin."
-                   << PLUGIN_ATTRIBUTE_UID << " must be unique!" << path;
+        *error = QString("Unable to load the plugin.\n'%1' must be unique! %2")
+                .arg(PLUGIN_ATTRIBUTE_UID).arg(path);
+        qWarning() << "[MainApp] " << *error;
         return "";
     }
 
     QObject* instance = loader.instance(); // it'll load the plugin
     if (!instance) {
-        qWarning() << "[MainApp] unable to load the plugin."
-                   << "Is it a valid .so file?" << path;
+        *error = QString("Unable to load the plugin.\nIs it a valid .so file?\n%1").arg(path);
+        qWarning() << "[MainApp] " << *error;
         loader.unload();
         return "";
     }
 
     if ((type == "graph" && !loadGraphPlugin(instance, metaData))
             || (type == "model" && !loadModelPlugin(instance, metaData))) {
-        qWarning() << "[MainApp] unable to load the plugin."
-                   << "Please, check the metaData.json file.";
+        *error = QString("Unable to load the plugin.\nPlease, check the metaData.json file.\n%1").arg(path);
+        qWarning() << "[MainApp] " << *error;
         loader.unload();
         return "";
     }
