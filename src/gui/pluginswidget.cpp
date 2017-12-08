@@ -24,14 +24,14 @@ PluginsWidget::PluginsWidget(MainApp* mainApp, QWidget *parent)
     connect(m_ui->bImport, SIGNAL(pressed()), SLOT(importPlugin()));
     connect(m_ui->table, SIGNAL(itemSelectionChanged()), SLOT(rowSelectionChanged()));
 
-    QHash<QString, MainApp::GraphPlugin*>::const_iterator it;
+    QHash<QString, GraphPlugin*>::const_iterator it;
     for (it = m_mainApp->getGraphs().begin(); it != m_mainApp->getGraphs().end(); ++it) {
-        insertRow(it.value()->uid, it.value()->name, Graph);
+        insertRow(it.value()->id(), it.value()->name(), Graph);
     }
 
-    QHash<QString, MainApp::ModelPlugin*>::const_iterator it2;
+    QHash<QString, ModelPlugin*>::const_iterator it2;
     for (it2 = m_mainApp->getModels().begin(); it2 != m_mainApp->getModels().end(); ++it2) {
-        insertRow(it2.value()->uid, it2.value()->name, Model);
+        insertRow(it2.value()->id(), it2.value()->name(), Model);
     }
 }
 
@@ -53,30 +53,30 @@ void PluginsWidget::rowSelectionChanged()
     }
 }
 
-void PluginsWidget::loadHtml(const MainApp::GraphPlugin* plugin)
+void PluginsWidget::loadHtml(const GraphPlugin* plugin)
 {
     if (!plugin) {
         qFatal("[PluginsWidget]: invalid plugin object! It should never happen.");
     }
 
-    QString html = "<h2>" + plugin->name + "</h2><br>"
-                 + "<b>Author:</b> " + plugin->author + "<br>"
+    QString html = "<h2>" + plugin->name() + "</h2><br>"
+                 + "<b>Author:</b> " + plugin->author() + "<br>"
                  + "<b>Plugin Type:</b> Graph<br>"
-                 + "<b>Description:</b> " + plugin->description + "<br>";
+                 + "<b>Description:</b> " + plugin->description() + "<br>";
 
     m_ui->browser->setHtml(html);
 }
 
-void PluginsWidget::loadHtml(const MainApp::ModelPlugin* plugin)
+void PluginsWidget::loadHtml(const ModelPlugin* plugin)
 {
     if (!plugin) {
         qFatal("[PluginsWidget]: invalid plugin object! It should never happen.");
     }
 
-    QString html = "<h2>" + plugin->name + "</h2><br>"
-                 + "<b>Author:</b> " + plugin->author + "<br>"
+    QString html = "<h2>" + plugin->name() + "</h2><br>"
+                 + "<b>Author:</b> " + plugin->author() + "<br>"
                  + "<b>Plugin Type:</b> Model<br>"
-                 + "<b>Description:</b> " + plugin->description + "<br>";
+                 + "<b>Description:</b> " + plugin->description() + "<br>";
 
     m_ui->browser->setHtml(html);
 }
@@ -91,19 +91,19 @@ void PluginsWidget::importPlugin()
     }
 
     QString error;
-    QString uid = m_mainApp->loadPlugin(fileName, &error);
+    QString uid = m_mainApp->loadPlugin(fileName, error);
 
     if (!error.isEmpty()) {
         QMessageBox::warning(this, "Error", error);
         return;
     }
 
-    const MainApp::ModelPlugin* mPlugin = m_mainApp->getModel(uid);
+    const ModelPlugin* mPlugin = m_mainApp->getModel(uid);
     if (mPlugin) {
-        insertRow(uid, mPlugin->name, Model);
+        insertRow(uid, mPlugin->name(), Model);
     } else {
-        const MainApp::GraphPlugin* gPlugin = m_mainApp->getGraph(uid);
-        insertRow(uid, gPlugin->name, Graph);
+        const GraphPlugin* gPlugin = m_mainApp->getGraph(uid);
+        insertRow(uid, gPlugin->name(), Graph);
     }
 }
 

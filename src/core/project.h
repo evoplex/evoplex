@@ -51,8 +51,8 @@ public:
     inline const QHash<int, Experiment*> getExperiments() const { return m_experiments; }
 
     inline int getId() const { return m_id; }
-    inline const QHash<QString, MainApp::GraphPlugin*>& getGraphs() const { return m_mainApp->getGraphs(); }
-    inline const QHash<QString, MainApp::ModelPlugin*>& getModels() const { return m_mainApp->getModels(); }
+    inline const QHash<QString, GraphPlugin*>& getGraphs() const { return m_mainApp->getGraphs(); }
+    inline const QHash<QString, ModelPlugin*>& getModels() const { return m_mainApp->getModels(); }
     inline bool hasUnsavedChanges() const { return m_hasUnsavedChanges; }
 
 signals:

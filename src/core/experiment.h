@@ -16,6 +16,8 @@
 #include "mainapp.h"
 #include "constants.h"
 #include "output.h"
+#include "graphplugin.h"
+#include "modelplugin.h"
 
 namespace evoplex {
 
@@ -95,9 +97,9 @@ public:
     inline const Attributes* generalAttrs() const { return m_generalAttrs; }
     inline const Attributes* modelAttrs() const { return m_modelAttrs; }
     inline const Attributes* graphAttrs() const { return m_graphAttrs; }
-    inline const QString& modelId() const { return m_modelPlugin->uid; }
-    inline const QString& graphId() const { return m_graphPlugin->uid; }
-    inline const MainApp::ModelPlugin* modelPlugin() const { return m_modelPlugin; }
+    inline const QString& modelId() const { return m_modelPlugin->id(); }
+    inline const QString& graphId() const { return m_graphPlugin->id(); }
+    inline const ModelPlugin* modelPlugin() const { return m_modelPlugin; }
 
 private:
     QMutex m_mutex;
@@ -108,8 +110,8 @@ private:
     Attributes* m_generalAttrs;
     Attributes* m_modelAttrs;
     Attributes* m_graphAttrs;
-    const MainApp::GraphPlugin* m_graphPlugin;
-    const MainApp::ModelPlugin* m_modelPlugin;
+    const GraphPlugin* m_graphPlugin;
+    const ModelPlugin* m_modelPlugin;
     int m_numTrials;
     int m_seed;
     bool m_autoDelete;

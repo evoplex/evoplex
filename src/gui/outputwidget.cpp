@@ -10,7 +10,7 @@
 
 namespace evoplex {
 
-OutputWidget::OutputWidget(const MainApp::ModelPlugin* modelPlugin, QWidget *parent)
+OutputWidget::OutputWidget(const ModelPlugin* modelPlugin, QWidget *parent)
     : QWidget(parent)
     , m_ui(new Ui_OutputWidget)
     , m_modelPlugin(modelPlugin)
@@ -20,7 +20,7 @@ OutputWidget::OutputWidget(const MainApp::ModelPlugin* modelPlugin, QWidget *par
     for (QString funcName : DefaultOutput::availableFunctions()) {
         m_ui->func->addItem(funcName, 0); // default function
     }
-    for (QString funcName : m_modelPlugin->customOutputs) {
+    for (QString funcName : m_modelPlugin->customOutputs()) {
         m_ui->func->addItem(funcName, 1); // custom function
     }
     connect(m_ui->add, SIGNAL(clicked(bool)), SLOT(slotAdd()));
@@ -55,11 +55,11 @@ void OutputWidget::slotEntityChanged(bool isAgent)
     m_ui->attr->clear();
     m_ui->input->clear();
     if (isAgent) {
-        for (QString n : m_modelPlugin->agentAttrMin.names()) {
+        for (QString n : m_modelPlugin->agentAttrRange().min.names()) {
             m_ui->attr->addItem(n);
         }
     } else {
-        for (QString n : m_modelPlugin->edgeAttrMin.names()) {
+        for (QString n : m_modelPlugin->edgeAttrRange().min.names()) {
             m_ui->attr->addItem(n);
         }
     }
@@ -77,11 +77,11 @@ void OutputWidget::slotAdd()
         DefaultOutput::Entity entity;
         if (m_ui->entityAgent->isChecked()) {
             entity = DefaultOutput::E_Agents;
-            input = Utils::validateParameter(m_modelPlugin->agentAttrSpace.value(attrName).second,
+            input = Utils::validateParameter(m_modelPlugin->agentAttrSpace().value(attrName).second,
                                              m_ui->input->text());
         } else {
             entity = DefaultOutput::E_Edges;
-            input = Utils::validateParameter(m_modelPlugin->edgeAttrSpace.value(attrName).second,
+            input = Utils::validateParameter(m_modelPlugin->edgeAttrSpace().value(attrName).second,
                                              m_ui->input->text());
         }
 

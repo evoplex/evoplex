@@ -58,8 +58,8 @@ const int Project::newExperiment(const QStringList& header, const QStringList& v
     }
 
     // check if the model and graph are available
-    const MainApp::GraphPlugin* gPlugin = m_mainApp->getGraph(values.at(headerGraphId));
-    const MainApp::ModelPlugin* mPlugin = m_mainApp->getModel(values.at(headerModelId));
+    const GraphPlugin* gPlugin = m_mainApp->getGraph(values.at(headerGraphId));
+    const ModelPlugin* mPlugin = m_mainApp->getModel(values.at(headerModelId));
     if (!gPlugin || !mPlugin) {
         errorMsg = QString("The graphId (%1) or modelId (%2) are not available."
                            " Make sure to load them before trying to add this experiment.")
@@ -68,22 +68,22 @@ const int Project::newExperiment(const QStringList& header, const QStringList& v
     }
 
     // make sure that the chosen graphId is allowed in this model
-    if (!mPlugin->supportedGraphs.contains(gPlugin->uid)) {
-        QString supportedGraphs = mPlugin->supportedGraphs.toList().join(", ");
+    if (!mPlugin->supportedGraphs().contains(gPlugin->id())) {
+        QString supportedGraphs = mPlugin->supportedGraphs().toList().join(", ");
         errorMsg = QString("The graphId (%1) cannot be used in this model (%2). The allowed ones are: %3")
-                           .arg(gPlugin->uid).arg(mPlugin->uid).arg(supportedGraphs);
+                           .arg(gPlugin->id()).arg(mPlugin->id()).arg(supportedGraphs);
         return -1;
     }
 
     // we assume that all graph/model attributes start with 'uid_'
-    const QString& graphId_ = gPlugin->uid + "_";
-    const QString& modelId_ = mPlugin->uid + "_";
+    const QString& graphId_ = gPlugin->id() + "_";
+    const QString& modelId_ = mPlugin->id() + "_";
 
     // get the value of each attribute and make sure they are valid
     QStringList failedAttributes;
     Attributes* generalAttrs = new Attributes(m_mainApp->getGeneralAttrSpace().size());
-    Attributes* modelAttrs = new Attributes(mPlugin->modelAttrSpace.size());
-    Attributes* graphAttrs = new Attributes(gPlugin->graphAttrSpace.size());
+    Attributes* modelAttrs = new Attributes(mPlugin->modelAttrSpace().size());
+    Attributes* graphAttrs = new Attributes(gPlugin->graphAttrSpace().size());
     for (int i = 0; i < values.size(); ++i) {
         const QString& vStr = values.at(i);
         QString attrName = header.at(i);
@@ -101,11 +101,11 @@ const int Project::newExperiment(const QStringList& header, const QStringList& v
             Attributes* attributes = nullptr;
             if (attrName.startsWith(modelId_)) {
                 attrName = attrName.remove(modelId_);
-                attrSpace = mPlugin->modelAttrSpace.value(attrName);
+                attrSpace = mPlugin->modelAttrSpace().value(attrName);
                 attributes = modelAttrs;
             } else if (attrName.startsWith(graphId_)) {
                 attrName = attrName.remove(graphId_);
-                attrSpace = gPlugin->graphAttrSpace.value(attrName);
+                attrSpace = gPlugin->graphAttrSpace().value(attrName);
                 attributes = graphAttrs;
             }
 
@@ -130,7 +130,7 @@ const int Project::newExperiment(const QStringList& header, const QStringList& v
         }
 
         outputs = Output::parseHeader(outHeader.split(";"), trialIds,
-                mPlugin->agentAttrMin, mPlugin->edgeAttrMin, errorMsg);
+                mPlugin->agentAttrRange(), mPlugin->edgeAttrRange(), errorMsg);
         if (outputs.empty()) {
             failedAttributes.append(OUTPUT_HEADER);
         }

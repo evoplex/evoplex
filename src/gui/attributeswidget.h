@@ -52,7 +52,7 @@ private:
     QCheckBox* m_enableOutputs;
 
     void insertPluginAttributes(QTreeWidgetItem* itemRoot, const QString &uid,
-                                const Attributes &min, const Attributes &max);
+                                const AttributesRange &range);
 
     QSpinBox* newSpinBox(const int min, const int max);
     QDoubleSpinBox* newDoubleSpinBox(const int min, const int max);

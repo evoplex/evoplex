@@ -233,12 +233,12 @@ void AttributesWidget::slotOutputWidget()
     }
 
     std::vector<Output*> currentOutputs;
-    MainApp::ModelPlugin* model = m_project->getModels().value(m_selectedModelId);
+    ModelPlugin* model = m_project->getModels().value(m_selectedModelId);
     QString currentHeader = m_widgetFields.value(OUTPUT_HEADER).value<QLineEdit*>()->text();
     if (!currentHeader.isEmpty()) {
         QString errorMsg;
         currentOutputs = Output::parseHeader(currentHeader.split(";"), trialIds,
-                model->agentAttrMin, model->edgeAttrMin, errorMsg);
+                model->agentAttrRange(), model->edgeAttrRange(), errorMsg);
         if (!errorMsg.isEmpty()) {
             QMessageBox::warning(this, "Output Creator", errorMsg);
             qDeleteAll(currentOutputs);
@@ -386,8 +386,8 @@ void AttributesWidget::slotUpdateGraphPlugins()
     cb->blockSignals(false);
 
     // create the trees to hold the graphs' attributes
-    foreach (MainApp::GraphPlugin* graph, m_project->getGraphs()) {
-        if (graph->graphAttrMin.size() > 0 && m_treeItemGraphs.contains(graph->uid)) {
+    foreach (GraphPlugin* graph, m_project->getGraphs()) {
+        if (graph->graphAttrRange().min.size() > 0 && m_treeItemGraphs.contains(graph->id())) {
             continue;
         }
 
@@ -395,10 +395,10 @@ void AttributesWidget::slotUpdateGraphPlugins()
         QTreeWidgetItem* itemRoot = new QTreeWidgetItem(m_ui->treeWidget);
         itemRoot->setText(0, "Graph");
         itemRoot->setHidden(true);
-        m_treeItemGraphs.insert(graph->uid, itemRoot);
+        m_treeItemGraphs.insert(graph->id(), itemRoot);
 
         // the graph stuff
-        insertPluginAttributes(itemRoot, graph->uid, graph->graphAttrMin, graph->graphAttrMax);
+        insertPluginAttributes(itemRoot, graph->id(), graph->graphAttrRange());
     }
 }
 
@@ -413,8 +413,8 @@ void AttributesWidget::slotUpdateModelPlugins()
     cb->blockSignals(false);
 
     // create the trees to hold the models' attributes
-    foreach (MainApp::ModelPlugin* model, m_project->getModels()) {
-        if (m_treeItemModels.contains(model->uid)) {
+    foreach (ModelPlugin* model, m_project->getModels()) {
+        if (m_treeItemModels.contains(model->id())) {
             continue;
         }
 
@@ -422,34 +422,35 @@ void AttributesWidget::slotUpdateModelPlugins()
         QTreeWidgetItem* itemRoot = new QTreeWidgetItem(m_ui->treeWidget);
         itemRoot->setText(0, "Model");
         itemRoot->setHidden(true);
-        m_treeItemModels.insert(model->uid, itemRoot);
+        m_treeItemModels.insert(model->id(), itemRoot);
 
         // the model stuff
-        insertPluginAttributes(itemRoot, model->uid, model->modelAttrMin, model->modelAttrMax);
+        insertPluginAttributes(itemRoot, model->id(), model->modelAttrRange());
     }
 }
 
-void AttributesWidget::insertPluginAttributes(QTreeWidgetItem* itemRoot, const QString& uid,
-                                              const Attributes& min, const Attributes& max)
+void AttributesWidget::insertPluginAttributes(QTreeWidgetItem* itemRoot,
+                                              const QString& uid,
+                                              const AttributesRange& range)
 {
     const QString& uid_ = uid + "_";
-    for (int i = 0; i < min.size(); ++i) {
+    for (int i = 0; i < range.min.size(); ++i) {
         QTreeWidgetItem* item = new QTreeWidgetItem(itemRoot);
-        item->setText(0, min.name(i));
+        item->setText(0, range.min.name(i));
 
         QWidget* widget = nullptr;
-        if (min.value(i).type == Value::DOUBLE) {
-            widget = newDoubleSpinBox(min.value(i).toDouble, max.value(i).toDouble);
-        } else if (min.value(i).type == Value::INT) {
-            widget = newSpinBox(min.value(i).toInt, max.value(i).toInt);
+        if (range.min.value(i).type == Value::DOUBLE) {
+            widget = newDoubleSpinBox(range.min.value(i).toDouble, range.max.value(i).toDouble);
+        } else if (range.min.value(i).type == Value::INT) {
+            widget = newSpinBox(range.min.value(i).toInt, range.max.value(i).toInt);
         } else {
             QLineEdit* le = new QLineEdit();
-            le->setText(min.value(i).toQString());
+            le->setText(range.min.value(i).toQString());
             widget = le;
         }
         m_ui->treeWidget->setItemWidget(item, 1, widget);
         // add the uid as prefix to avoid clashes.
-        m_widgetFields.insert(uid_ + min.name(i), QVariant::fromValue(widget));
+        m_widgetFields.insert(uid_ + range.min.name(i), QVariant::fromValue(widget));
     }
 }
 

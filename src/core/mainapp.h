@@ -12,6 +12,8 @@
 #include "plugininterfaces.h"
 #include "attributes.h"
 #include "enums.h"
+#include "graphplugin.h"
+#include "modelplugin.h"
 
 namespace evoplex {
 
@@ -22,42 +24,11 @@ class Project;
 class MainApp
 {
 public:
-
-    struct GraphPlugin {
-        QString uid;
-        QString author;
-        QString name;
-        QString description;
-        AttributesSpace graphAttrSpace;
-        Attributes graphAttrMin;
-        Attributes graphAttrMax;
-        IPluginGraph* factory;
-    };
-
-    struct ModelPlugin {
-        QString uid;
-        QString author;
-        QString name;
-        QString description;
-        QVector<QString> supportedGraphs;
-        QVector<QString> customOutputs;
-        AttributesSpace agentAttrSpace;
-        AttributesSpace edgeAttrSpace;
-        AttributesSpace modelAttrSpace;
-        Attributes agentAttrMin;
-        Attributes agentAttrMax;
-        Attributes edgeAttrMin;
-        Attributes edgeAttrMax;
-        Attributes modelAttrMin;
-        Attributes modelAttrMax;
-        IPluginModel* factory;
-    };
-
     MainApp();
     ~MainApp();
 
     // load plugin from a .so file; return true if successful
-    const QString loadPlugin(const QString& path, QString* error = nullptr);
+    const QString loadPlugin(const QString& path, QString& error);
 
     // Create a new project
     Project* newProject(const QString& name="", const QString& dest="");
@@ -99,8 +70,6 @@ private:
     // load model from a .so file
     // return the model uid
     bool loadModelPlugin(QObject* instance, QJsonObject& metaData);
-
-    AttributesSpace attributesSpace(const QJsonObject &metaData, const QString& name) const;
 };
 }
 

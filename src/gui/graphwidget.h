@@ -64,7 +64,7 @@ private:
     QPoint m_posEntered;
     QTimer m_resizeTimer;
 
-    QHash<int, QLineEdit*> m_attrs;
+    std::vector<QLineEdit*> m_attrs;
 
     struct Cache {
         Agent* agent = nullptr;

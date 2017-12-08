@@ -176,14 +176,13 @@ public:
     }
 
     // return the boundary value for each parameter (min and max)
-    static bool boundaryValues(const AttributesSpace& attributesSpace,
-                               Attributes& minValues, Attributes& maxValues) {
+    static bool boundaryValues(const AttributesSpace& attributesSpace, AttributesRange& range) {
         if (attributesSpace.isEmpty()) {
             return false;
         }
 
-        minValues.resize(attributesSpace.size());
-        maxValues.resize(attributesSpace.size());
+        range.min.resize(attributesSpace.size());
+        range.max.resize(attributesSpace.size());
 
         AttributesSpace::const_iterator it = attributesSpace.begin();
         for (it; it != attributesSpace.end(); ++it) {
@@ -193,20 +192,20 @@ public:
             bool ok = false;
 
             if (space.isEmpty()) {
-                minValues.replace(id, attrName, 0);
-                maxValues.replace(id, attrName, 0);
+                range.min.replace(id, attrName, 0);
+                range.max.replace(id, attrName, 0);
             } else if (space.contains("{") && space.endsWith("}")) {
                 QVector<Value> values;
                 if (paramSet(space, values)) {
-                    minValues.replace(id, attrName, values.first());
-                    maxValues.replace(id, attrName, values.last());
+                    range.min.replace(id, attrName, values.first());
+                    range.max.replace(id, attrName, values.last());
                     ok = true;
                 }
             } else if (space.contains("[") && space.endsWith("]")) {
                 Value max, min;
                 if (paramInterval(space, min, max)) {
-                    minValues.replace(id, attrName, min);
-                    maxValues.replace(id, attrName, max);
+                    range.min.replace(id, attrName, min);
+                    range.max.replace(id, attrName, max);
                     ok = true;
                 }
             }

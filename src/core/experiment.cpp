@@ -224,7 +224,7 @@ AbstractModel* Experiment::createTrial(const int trialId)
     }
 
     PRG* prg = new PRG(m_seed + trialId);
-    AbstractGraph* graphObj = m_graphPlugin->factory->create();
+    AbstractGraph* graphObj = m_graphPlugin->create();
     graphObj->setup(prg, agents, m_graphAttrs);
     if (!graphObj || !graphObj->init()) {
         qWarning() << "[Experiment]: unable to create the trials."
@@ -238,7 +238,7 @@ AbstractModel* Experiment::createTrial(const int trialId)
     }
     graphObj->reset();
 
-    AbstractModel* modelObj = m_modelPlugin->factory->create();
+    AbstractModel* modelObj = m_modelPlugin->create();
     modelObj->setup(prg, graphObj, m_modelAttrs);
     if (!modelObj || !modelObj->init()) {
         qWarning() << "[Experiment]: unable to create the trials."
@@ -293,7 +293,7 @@ Agents Experiment::createAgents()
     if (isInt) { // create a population of agents with random properties?
         if (numAgents > 0) {
             PRG* prg = new PRG(m_seed);
-            QVector<Attributes> attrs = Utils::randomAttrs(m_modelPlugin->agentAttrSpace, prg, numAgents);
+            QVector<Attributes> attrs = Utils::randomAttrs(m_modelPlugin->agentAttrSpace(), prg, numAgents);
             delete prg;
             Q_ASSERT(attrs.size() == numAgents);
             agents.reserve(numAgents);
@@ -304,7 +304,7 @@ Agents Experiment::createAgents()
     } else { // read population from a text file
         agents = m_mainApp->getFileMgr()->importAgents(
                     m_generalAttrs->value(GENERAL_ATTRIBUTE_AGENTS).toQString(),
-                    m_modelPlugin->uid);
+                    m_modelPlugin->id());
     }
 
     if (agents.empty()) {

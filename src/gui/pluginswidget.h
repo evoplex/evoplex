@@ -42,8 +42,8 @@ private:
 
     void insertRow(const QString& uid, const QString& name, PluginType type);
 
-    void loadHtml(const MainApp::GraphPlugin* plugin);
-    void loadHtml(const MainApp::ModelPlugin* plugin);
+    void loadHtml(const GraphPlugin* plugin);
+    void loadHtml(const ModelPlugin* plugin);
 };
 }
 #endif // PLUGINSWIDGET_H

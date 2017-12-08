@@ -28,15 +28,15 @@ Agents FileMgr::importAgents(const QString& filePath, const QString& modelId) co
     }
 
     QTextStream in(&file);
-    const MainApp::ModelPlugin* modelPlugin = m_mainApp->getModel(modelId);
+    const ModelPlugin* modelPlugin = m_mainApp->getModel(modelId);
 
     // read and validate header
     QStringList header;
     if (!in.atEnd() && modelPlugin) {
         header = in.readLine().split(",");
-        if (header.size() == modelPlugin->agentAttrSpace.size()) {
+        if (header.size() == modelPlugin->agentAttrSpace().size()) {
             foreach (QString attrName, header) {
-                if (!modelPlugin->agentAttrSpace.contains(attrName)) {
+                if (!modelPlugin->agentAttrSpace().contains(attrName)) {
                     header.clear();
                     break;
                 }
@@ -48,7 +48,7 @@ Agents FileMgr::importAgents(const QString& filePath, const QString& modelId) co
 
     if (header.isEmpty()) {
         qWarning() << "[FileMgr]: unable to read the set of agents from" << filePath
-                   << "Expected properties:" << modelPlugin->agentAttrSpace.keys();
+                   << "Expected properties:" << modelPlugin->agentAttrSpace().keys();
         return Agents();
     }
 
@@ -66,7 +66,7 @@ Agents FileMgr::importAgents(const QString& filePath, const QString& modelId) co
 
         Attributes attributes(values.size());
         for (int i = 0; i < values.size(); ++i) {
-            QPair<int, QString> space = modelPlugin->agentAttrSpace.value(header.at(i));
+            QPair<int, QString> space = modelPlugin->agentAttrSpace().value(header.at(i));
             Value value = Utils::validateParameter(space.second, values.at(i));
             if (!value.isValid()) {
                 isValid = false;

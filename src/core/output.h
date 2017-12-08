@@ -32,7 +32,7 @@ public:
     virtual bool operator==(const Output* output) = 0;
 
     static std::vector<Output*> parseHeader(const QStringList& header, const std::vector<int> trialIds,
-            const Attributes& agentAttrMin, const Attributes &edgeAttrMin, QString &errorMsg);
+            const AttributesRange& agentAttrRange, const AttributesRange& edgeAttrRange, QString& errorMsg);
 
     const int addCache(Values inputs, const std::vector<int> trialIds);
 

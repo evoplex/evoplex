@@ -178,7 +178,7 @@ void Output::updateCaches(const int trialId, const int currStep, const Values& a
 }
 
 std::vector<Output*> Output::parseHeader(const QStringList& header, const std::vector<int> trialIds,
-        const Attributes& agentAttrMin, const Attributes& edgeAttrMin, QString& errorMsg)
+        const AttributesRange& agentAttrRange, const AttributesRange& edgeAttrRange, QString& errorMsg)
 {
     std::vector<Output*> outputs;
     std::vector<Value> customHeader;
@@ -213,11 +213,11 @@ std::vector<Output*> Output::parseHeader(const QStringList& header, const std::v
         if (h.startsWith("agents_")) {
             h.remove("agents_");
             entity = DefaultOutput::E_Agents;
-            entityAttrMin = agentAttrMin;
+            entityAttrMin = agentAttrRange.min;
         } else if (h.startsWith("edges_")) {
             h.remove("edges_");
             entity = DefaultOutput::E_Edges;
-            entityAttrMin = edgeAttrMin;
+            entityAttrMin = edgeAttrRange.min;
         } else {
             errorMsg = QString("[OutputHeader] invalid header! Entity does not exist. (%1)\n").arg(h);
             qWarning() << errorMsg;

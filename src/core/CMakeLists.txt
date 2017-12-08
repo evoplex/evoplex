@@ -9,6 +9,9 @@ set(EVOPLEX_CORE_H
 
   abstractgraph.h
   abstractmodel.h
+  abstractplugin.h
+  graphplugin.h
+  modelplugin.h
   attributes.h
   agent.h
   edge.h
@@ -21,6 +24,10 @@ set(EVOPLEX_CORE_H
   mainapp.h
 )
 set(EVOPLEX_CORE_CXX
+  abstractplugin.cpp
+  graphplugin.cpp
+  modelplugin.cpp
+
   edge.cpp
   filemgr.cpp
   experiment.cpp

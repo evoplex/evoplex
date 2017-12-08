@@ -19,7 +19,7 @@ class OutputWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit OutputWidget(const MainApp::ModelPlugin* modelPlugin, QWidget* parent = 0);
+    explicit OutputWidget(const ModelPlugin* modelPlugin, QWidget* parent = 0);
     ~OutputWidget();
 
     inline void setTrialIds(const std::vector<int>& trialIds) { m_trialIds = trialIds; }
@@ -39,7 +39,7 @@ private slots:
 
 private:
     Ui_OutputWidget* m_ui;
-    const MainApp::ModelPlugin* m_modelPlugin;
+    const ModelPlugin* m_modelPlugin;
     std::vector<int> m_trialIds;
 
     std::vector<Output*> m_allOutputs;

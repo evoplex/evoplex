@@ -25,7 +25,7 @@ GraphWidget::GraphWidget(ExperimentsMgr* expMgr, Experiment* exp, QWidget* paren
     , m_settingsDlg(new Ui_GraphSettings)
     , m_exp(exp)
     , m_model(nullptr)
-    , m_agentCMap(ColorMap::DivergingSet1, exp->modelPlugin()->agentAttrSpace)
+    , m_agentCMap(ColorMap::DivergingSet1, exp->modelPlugin()->agentAttrSpace())
     , m_zoomLevel(0)
     , m_nodeSizeRate(10.f)
     , m_edgeSizeRate(25.f)
@@ -52,11 +52,15 @@ GraphWidget::GraphWidget(ExperimentsMgr* expMgr, Experiment* exp, QWidget* paren
     m_settingsDlg->setupUi(dlg);
     connect(titleBar, SIGNAL(openSettingsDlg()), dlg, SLOT(show()));
 
-    for (QString n : m_exp->modelPlugin()->agentAttrMin.names()) {
-        m_settingsDlg->agentAttr->addItem(n);
+    for (QString name : m_exp->modelPlugin()->agentAttrNames()) {
+        m_settingsDlg->agentAttr->addItem(name);
+        QLineEdit* le = new QLineEdit();
+        le->setReadOnly(true);
+        m_attrs.emplace_back(le);
+        m_ui->inspectorLayout->addRow(name, le);
     }
-    for (QString n : m_exp->modelPlugin()->edgeAttrMin.names()) {
-        m_settingsDlg->edgeAttr->addItem(n);
+    for (QString name : m_exp->modelPlugin()->edgeAttrNames()) {
+        m_settingsDlg->edgeAttr->addItem(name);
     }
     connect(m_settingsDlg->agentAttr, SIGNAL(currentIndexChanged(int)), SLOT(setAgentAttr(int)));
     connect(m_settingsDlg->edgeAttr, SIGNAL(currentIndexChanged(int)), SLOT(setEdgeAttr(int)));
@@ -71,13 +75,6 @@ GraphWidget::GraphWidget(ExperimentsMgr* expMgr, Experiment* exp, QWidget* paren
     m_showAgents = m_ui->bShowAgents->isChecked();
     m_showEdges = m_ui->bShowEdges->isChecked();
 
-    Attributes attrs = m_exp->modelPlugin()->agentAttrMin;
-    for (int id = 0; id < attrs.size(); ++id) {
-        QLineEdit* le = new QLineEdit();
-        le->setReadOnly(true);
-        m_attrs.insert(id, le);
-        m_ui->inspectorLayout->addRow(attrs.name(id), le);
-    }
     m_ui->inspector->hide();
     connect(m_ui->bCloseInspector, SIGNAL(clicked(bool)), m_ui->inspector, SLOT(hide()));
 
@@ -284,7 +281,7 @@ void GraphWidget::updateInspector(const Agent* agent)
     m_ui->agentId->setText(QString::number(agent->id()));
     m_ui->neighbors->setText(QString::number(agent->edges().size()));
     for (int id = 0; id < agent->attrs().size(); ++id) {
-        m_attrs.value(id)->setText(agent->attr(id).toQString());
+        m_attrs.at(id)->setText(agent->attr(id).toQString());
     }
 }
 
