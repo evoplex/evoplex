@@ -32,15 +32,10 @@ private:
         NAME = 2
     };
 
-    enum PluginType {
-        Graph,
-        Model
-    };
-
     Ui_PluginsWidget* m_ui;
     MainApp* m_mainApp;
 
-    void insertRow(const QString& uid, const QString& name, PluginType type);
+    void insertRow(const AbstractPlugin *plugin);
 
     void loadHtml(const GraphPlugin* plugin);
     void loadHtml(const ModelPlugin* plugin);

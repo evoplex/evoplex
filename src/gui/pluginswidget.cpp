@@ -24,14 +24,11 @@ PluginsWidget::PluginsWidget(MainApp* mainApp, QWidget *parent)
     connect(m_ui->bImport, SIGNAL(pressed()), SLOT(importPlugin()));
     connect(m_ui->table, SIGNAL(itemSelectionChanged()), SLOT(rowSelectionChanged()));
 
-    QHash<QString, GraphPlugin*>::const_iterator it;
-    for (it = m_mainApp->getGraphs().begin(); it != m_mainApp->getGraphs().end(); ++it) {
-        insertRow(it.value()->id(), it.value()->name(), Graph);
+    for (GraphPlugin* g : m_mainApp->getGraphs()) {
+        insertRow(g);
     }
-
-    QHash<QString, ModelPlugin*>::const_iterator it2;
-    for (it2 = m_mainApp->getModels().begin(); it2 != m_mainApp->getModels().end(); ++it2) {
-        insertRow(it2.value()->id(), it2.value()->name(), Model);
+    for (ModelPlugin* m : m_mainApp->getModels()) {
+        insertRow(m);
     }
 }
 
@@ -44,9 +41,9 @@ void PluginsWidget::rowSelectionChanged()
 {
     int row = m_ui->table->currentRow();
     int type = m_ui->table->item(row, TYPE)->data(Qt::UserRole).toInt();
-    if (type == Graph) {
+    if (type == AbstractPlugin::GraphPlugin) {
         loadHtml(m_mainApp->getGraph(m_ui->table->item(row, UID)->text()));
-    } else if (type == Model) {
+    } else if (type == AbstractPlugin::ModelPlugin) {
         loadHtml(m_mainApp->getModel(m_ui->table->item(row, UID)->text()));
     } else {
         qFatal("[PluginsWidget]: invalid plugin type! It should never happen.");
@@ -98,31 +95,29 @@ void PluginsWidget::importPlugin()
         return;
     }
 
-    const ModelPlugin* mPlugin = m_mainApp->getModel(uid);
-    if (mPlugin) {
-        insertRow(uid, mPlugin->name(), Model);
-    } else {
-        const GraphPlugin* gPlugin = m_mainApp->getGraph(uid);
-        insertRow(uid, gPlugin->name(), Graph);
+    const AbstractPlugin* plugin = m_mainApp->getModel(uid);
+    if (plugin) {
+        plugin = m_mainApp->getGraph(uid);
     }
+    insertRow(plugin);
 }
 
-void PluginsWidget::insertRow(const QString& uid, const QString& name, PluginType type)
+void PluginsWidget::insertRow(const AbstractPlugin* plugin)
 {
     QTableWidgetItem* typeItem;
-    if (type == Model) {
+    if (plugin->type() == AbstractPlugin::ModelPlugin) {
         typeItem = new QTableWidgetItem("model");
-    } else if (type == Graph) {
+    } else if (plugin->type() == AbstractPlugin::GraphPlugin) {
         typeItem = new QTableWidgetItem("graph");
     } else {
         qFatal("[PluginsWidget]: invalid plugin type! It should never happen.");
     }
-    typeItem->setData(Qt::UserRole, type);
+    typeItem->setData(Qt::UserRole, plugin->type());
 
     int row = m_ui->table->rowCount();
     m_ui->table->insertRow(row);
-    m_ui->table->setItem(row, UID, new QTableWidgetItem(uid));
-    m_ui->table->setItem(row, NAME, new QTableWidgetItem(name));
+    m_ui->table->setItem(row, UID, new QTableWidgetItem(plugin->id()));
+    m_ui->table->setItem(row, NAME, new QTableWidgetItem(plugin->name()));
     m_ui->table->setItem(row, TYPE, typeItem);
 }
 

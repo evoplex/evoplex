@@ -15,9 +15,16 @@ namespace evoplex {
 class AbstractPlugin
 {
 public:
+    enum PluginType {
+        GraphPlugin,
+        ModelPlugin
+    };
+
     AbstractPlugin(const QJsonObject* metaData);
 
     inline const bool isValid() const { return m_isValid; }
+
+    inline const PluginType type() const { return m_type; }
     inline const QString& id() const { return m_id; }
     inline const QString& author() const { return m_author; }
     inline const QString& name() const { return m_name; }
@@ -28,6 +35,7 @@ protected:
     AttributesSpace attrsSpace(const QJsonObject* metaData, const QString& name) const;
 
 private:
+    PluginType m_type;
     QString m_id;
     QString m_author;
     QString m_name;

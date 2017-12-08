@@ -14,6 +14,15 @@ namespace evoplex {
 AbstractPlugin::AbstractPlugin(const QJsonObject* metaData)
     : m_isValid(false)
 {
+    QString t = metaData->value(PLUGIN_ATTRIBUTE_TYPE).toString();
+    if (t == "graph") {
+        m_type = GraphPlugin;
+    } else if (t == "model") {
+        m_type = ModelPlugin;
+    } else {
+        return;
+    }
+
     m_id = metaData->value(PLUGIN_ATTRIBUTE_UID).toString();
     m_author = metaData->value(PLUGIN_ATTRIBUTE_AUTHOR).toString();
     m_name = metaData->value(PLUGIN_ATTRIBUTE_NAME).toString();
