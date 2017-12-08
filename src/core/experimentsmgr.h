@@ -31,6 +31,7 @@ signals:
     void statusChanged(Experiment* exp);
     void progressUpdated(Experiment* exp);
     void restarted(Experiment* exp);
+    void trialCreated(Experiment* exp, int trialId);
     void trialsDeleted(Experiment* exp);
 
 public slots:

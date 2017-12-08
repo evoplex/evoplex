@@ -170,6 +170,7 @@ void Experiment::processTrial(const int& trialId)
             return;
         }
         m_trials.insert({trialId, trial});
+        emit (m_mainApp->getExperimentsMgr()->trialCreated(this, trialId));
     }
 
     AbstractModel* trial = m_trials.at(trialId);

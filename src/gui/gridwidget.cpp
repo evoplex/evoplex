@@ -25,6 +25,7 @@ GridWidget::GridWidget(ExperimentsMgr* expMgr, Experiment* exp, QWidget* parent)
     , m_settingsDlg(new Ui_GraphSettings)
     , m_exp(exp)
     , m_model(nullptr)
+    , m_currTrialId(0)
     , m_agentCMap(ColorMap::DivergingSet1, exp->modelPlugin()->agentAttrSpace())
     , m_zoomLevel(0)
     , m_pixelSizeRate(10.f)
@@ -45,9 +46,11 @@ GridWidget::GridWidget(ExperimentsMgr* expMgr, Experiment* exp, QWidget* parent)
     TitleBar* titleBar = new TitleBar(exp, this);
     setTitleBarWidget(titleBar);
     connect(titleBar, SIGNAL(trialSelected(int)), SLOT(setTrial(int)));
-    setTrial(0);
-    connect(expMgr, &ExperimentsMgr::statusChanged,
-        [this](Experiment* exp) { if (exp == m_exp) setTrial(m_currTrialId); });
+    connect(expMgr, &ExperimentsMgr::trialCreated,
+        [this](Experiment* exp, int trialId) {
+            if (exp == m_exp && trialId == m_currTrialId)
+                setTrial(m_currTrialId);
+    });
 
     QDialog* dlg = new QDialog(this);
     m_settingsDlg->setupUi(dlg);
@@ -82,8 +85,6 @@ GridWidget::GridWidget(ExperimentsMgr* expMgr, Experiment* exp, QWidget* parent)
     pal.setColor(QPalette::Background, QColor(239,235,231));
     setAutoFillBackground(true);
     setPalette(pal);
-
-    updateCache();
 }
 
 GridWidget::~GridWidget()
