@@ -21,17 +21,21 @@
 
 namespace evoplex {
 
-AttributesWidget::AttributesWidget(Project* project, QWidget *parent)
+AttributesWidget::AttributesWidget(MainApp* mainApp, Project* project, QWidget *parent)
     : QDockWidget(parent)
+    , m_mainApp(mainApp)
     , m_project(project)
+    , m_exp(nullptr)
     , m_selectedGraphId(STRING_NULL_PLUGINID)
     , m_selectedModelId(STRING_NULL_PLUGINID)
     , m_ui(new Ui_AttributesWidget)
 {
     m_ui->setupUi(this);
 
-    connect(m_ui->btnSubmit, SIGNAL(clicked(bool)), SLOT(slotCreateExperiment()));
     m_ui->treeWidget->setFocusPolicy(Qt::NoFocus);
+    m_ui->bEdit->hide();
+    connect(m_ui->bSubmit, SIGNAL(clicked(bool)), SLOT(slotCreateExperiment()));
+    connect(m_ui->bEdit, SIGNAL(clicked(bool)), SLOT(slotEditExperiment()));
 
     // setup the tree widget: general attributes
     m_treeItemGeneral = new QTreeWidgetItem(m_ui->treeWidget);
@@ -148,8 +152,17 @@ AttributesWidget::~AttributesWidget()
     delete m_ui;
 }
 
-void AttributesWidget::fill(Experiment* exp)
+void AttributesWidget::setExperiment(Experiment* exp)
 {
+    if (!exp) {
+        m_exp = nullptr;
+        m_ui->bEdit->hide();
+        return;
+    }
+
+    m_exp = exp;
+    m_ui->bEdit->show();
+
     std::vector<QString> header = exp->generalAttrs()->names();
     foreach (QString attrName, exp->graphAttrs()->names())
         header.emplace_back(exp->graphId() + "_" + attrName);
@@ -278,19 +291,19 @@ void AttributesWidget::slotOutputWidget()
     });
 }
 
-void AttributesWidget::slotCreateExperiment()
+Experiment::ExperimentInputs* AttributesWidget::readInputs()
 {
     if (m_selectedModelId == STRING_NULL_PLUGINID) {
         QMessageBox::warning(this, "Experiment", "Please, select a valid 'modelId'.");
-        return;
+        return nullptr;
     } else if (m_selectedGraphId == STRING_NULL_PLUGINID) {
         QMessageBox::warning(this, "Experiment", "Please, select a valid 'graphId'.");
-        return;
+        return nullptr;
     } else if (m_enableOutputs->isChecked()
                && (m_widgetFields.value(OUTPUT_DIR).value<QLineEdit*>()->text().isEmpty()
                    || m_widgetFields.value(OUTPUT_HEADER).value<QLineEdit*>()->text().isEmpty())) {
         QMessageBox::warning(this, "Experiment", "Please, insert a valid output directory and a output header.");
-        return;
+        return nullptr;
     }
 
     QStringList header;
@@ -338,10 +351,26 @@ void AttributesWidget::slotCreateExperiment()
     }
 
     QString errorMsg;
-    int expId = m_project->newExperiment(header, values, errorMsg);
-    if (expId < 0) {
+    Experiment::ExperimentInputs* inputs = Experiment::readInputs(m_mainApp, header, values, errorMsg);
+    if (!inputs) {
         QMessageBox::warning(this, "Experiment",
                 "Unable to create the experiment.\nError: \"" + errorMsg + "\"");
+    }
+    return inputs;
+}
+
+void AttributesWidget::slotCreateExperiment()
+{
+    m_exp = m_project->newExperiment(readInputs());
+}
+
+void AttributesWidget::slotEditExperiment()
+{
+    Q_ASSERT(m_exp);
+    if (!m_project->editExperiment(m_exp->id(), readInputs())) {
+        QMessageBox::warning(this, "Experiment",
+                "Unable to edit the experiment.\n"
+                "If it is running, you should pause it first.");
     }
 }
 

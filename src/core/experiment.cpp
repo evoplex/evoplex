@@ -6,6 +6,7 @@
 #include <QDebug>
 #include <QElapsedTimer>
 #include <QFile>
+#include <QFileInfo>
 
 #include "agent.h"
 #include "experiment.h"
@@ -13,16 +14,16 @@
 #include "filemgr.h"
 #include "utils.h"
 
-namespace evoplex {
+namespace evoplex
+{
 
-Experiment::Experiment(MainApp* mainApp, int id, int projId, Attributes* generalAttrs,
-        Attributes* modelAttrs, Attributes* graphAttrs, std::vector<Output*> fileOutputs)
+Experiment::Experiment(MainApp* mainApp, int id, int projId, ExperimentInputs* inputs)
     : m_mainApp(mainApp)
     , m_id(id)
     , m_projId(projId)
     , m_expStatus(INVALID)
 {
-    init(generalAttrs, modelAttrs, graphAttrs, fileOutputs);
+    init(inputs);
 }
 
 Experiment::~Experiment()
@@ -37,13 +38,26 @@ Experiment::~Experiment()
     m_graphAttrs = nullptr;
 }
 
-void Experiment::init(Attributes* generalAttrs, Attributes* modelAttrs,
-                      Attributes* graphAttrs, std::vector<Output*> fileOutputs)
+bool Experiment::init(ExperimentInputs* inputs)
 {
-    m_generalAttrs = generalAttrs;
-    m_modelAttrs = modelAttrs;
-    m_graphAttrs = graphAttrs;
-    m_fileOutputs = fileOutputs;
+    if (m_expStatus == RUNNING) {
+        qWarning() << "[Experiment]: tried to init() a running experiment.";
+        delete inputs;
+        return false;
+    } else if (m_expStatus != INVALID) {
+        m_expStatus = INVALID;
+        deleteTrials();
+        qDeleteAll(m_fileOutputs);
+        delete m_generalAttrs;
+        delete m_modelAttrs;
+        delete m_graphAttrs;
+    }
+
+    m_generalAttrs = inputs->generalAttrs;
+    m_modelAttrs = inputs->modelAttrs;
+    m_graphAttrs = inputs->graphAttrs;
+    m_fileOutputs = inputs->fileOutputs;
+    delete inputs;
 
     m_fileHeader = "";
     if (!m_fileOutputs.empty()) {
@@ -55,18 +69,20 @@ void Experiment::init(Attributes* generalAttrs, Attributes* modelAttrs,
         m_fileHeader += "\n";
     }
 
-    m_numTrials = generalAttrs->value(GENERAL_ATTRIBUTE_TRIALS).toInt;
-    m_seed = generalAttrs->value(GENERAL_ATTRIBUTE_SEED).toInt;
-    m_autoDelete = generalAttrs->value(GENERAL_ATTRIBUTE_AUTODELETE).toBool;
-    m_stopAt = generalAttrs->value(GENERAL_ATTRIBUTE_STOPAT).toInt;
+    m_numTrials = m_generalAttrs->value(GENERAL_ATTRIBUTE_TRIALS).toInt;
+    m_seed = m_generalAttrs->value(GENERAL_ATTRIBUTE_SEED).toInt;
+    m_autoDelete = m_generalAttrs->value(GENERAL_ATTRIBUTE_AUTODELETE).toBool;
+    m_stopAt = m_generalAttrs->value(GENERAL_ATTRIBUTE_STOPAT).toInt;
 
-    m_graphPlugin = m_mainApp->getGraph(generalAttrs->value(GENERAL_ATTRIBUTE_GRAPHID).toQString());
-    m_modelPlugin = m_mainApp->getModel(generalAttrs->value(GENERAL_ATTRIBUTE_MODELID).toQString());
+    m_graphPlugin = m_mainApp->getGraph(m_generalAttrs->value(GENERAL_ATTRIBUTE_GRAPHID).toQString());
+    m_modelPlugin = m_mainApp->getModel(m_generalAttrs->value(GENERAL_ATTRIBUTE_MODELID).toQString());
 
     m_pauseAt = m_stopAt;
     m_progress = 0;
     m_trials.reserve(m_numTrials);
     m_expStatus = READY;
+
+    return true;
 }
 
 void Experiment::reset()
@@ -401,4 +417,125 @@ Output* Experiment::searchOutput(const Output* find)
     }
     return nullptr;
 }
+
+Experiment::ExperimentInputs* Experiment::readInputs(const MainApp* mainApp,
+        const QStringList& header, const QStringList& values, QString& errorMsg)
+{
+    if (header.isEmpty() || values.isEmpty() || header.size() != values.size()) {
+        errorMsg = "The 'header' and 'values' cannot be empty and must have the same number of elements.";
+        return nullptr;
+    }
+
+    // find the model and graph for this experiment
+    const int headerGraphId = header.indexOf(GENERAL_ATTRIBUTE_GRAPHID);
+    const int headerModelId = header.indexOf(GENERAL_ATTRIBUTE_MODELID);
+    if (headerGraphId < 0 && headerModelId < 0) {
+        errorMsg = "The experiment should have both graphId and modelId.";
+        return nullptr;
+    }
+
+    // check if the model and graph are available
+    const GraphPlugin* gPlugin = mainApp->getGraph(values.at(headerGraphId));
+    const ModelPlugin* mPlugin = mainApp->getModel(values.at(headerModelId));
+    if (!gPlugin || !mPlugin) {
+        errorMsg = QString("The graphId (%1) or modelId (%2) are not available."
+                           " Make sure to load them before trying to add this experiment.")
+                           .arg(values.at(headerGraphId)).arg(values.at(headerModelId));
+        return nullptr;
+    }
+
+    // make sure that the chosen graphId is allowed in this model
+    if (!mPlugin->supportedGraphs().contains(gPlugin->id())) {
+        QString supportedGraphs = mPlugin->supportedGraphs().toList().join(", ");
+        errorMsg = QString("The graphId (%1) cannot be used in this model (%2). The allowed ones are: %3")
+                           .arg(gPlugin->id()).arg(mPlugin->id()).arg(supportedGraphs);
+        return nullptr;
+    }
+
+    // we assume that all graph/model attributes start with 'uid_'
+    const QString& graphId_ = gPlugin->id() + "_";
+    const QString& modelId_ = mPlugin->id() + "_";
+
+    // get the value of each attribute and make sure they are valid
+    QStringList failedAttributes;
+    Attributes* generalAttrs = new Attributes(mainApp->getGeneralAttrSpace().size());
+    Attributes* modelAttrs = new Attributes(mPlugin->modelAttrSpace().size());
+    Attributes* graphAttrs = new Attributes(gPlugin->graphAttrSpace().size());
+    for (int i = 0; i < values.size(); ++i) {
+        const QString& vStr = values.at(i);
+        QString attrName = header.at(i);
+
+        AttributesSpace::const_iterator gps = mainApp->getGeneralAttrSpace().find(attrName);
+        if (gps != mainApp->getGeneralAttrSpace().end()) {
+            Value value = Utils::validateParameter(gps.value().second, vStr);
+            if (value.isValid()) {
+                generalAttrs->replace(gps.value().first, attrName, value);
+            } else {
+                failedAttributes.append(attrName);
+            }
+        } else {
+            QPair<int, QString> attrSpace;
+            Attributes* attributes = nullptr;
+            if (attrName.startsWith(modelId_)) {
+                attrName = attrName.remove(modelId_);
+                attrSpace = mPlugin->modelAttrSpace().value(attrName);
+                attributes = modelAttrs;
+            } else if (attrName.startsWith(graphId_)) {
+                attrName = attrName.remove(graphId_);
+                attrSpace = gPlugin->graphAttrSpace().value(attrName);
+                attributes = graphAttrs;
+            }
+
+            if (attributes && !attrSpace.second.isEmpty()) {
+                Value value = Utils::validateParameter(attrSpace.second, vStr);
+                if (value.isValid()) {
+                    attributes->replace(attrSpace.first, attrName, value);
+                } else {
+                    failedAttributes.append(attrName);
+                }
+            }
+        }
+    }
+
+    int numTrials = generalAttrs->value(GENERAL_ATTRIBUTE_TRIALS).toInt;
+    QString outHeader = generalAttrs->value(OUTPUT_HEADER).toQString();
+    std::vector<Output*> outputs;
+    if (!outHeader.isEmpty() && numTrials > 0) {
+        std::vector<int> trialIds;
+        for (int i = 0; i < numTrials; ++i) {
+            trialIds.emplace_back(i);
+        }
+
+        outputs = Output::parseHeader(outHeader.split(";"), trialIds,
+                mPlugin->agentAttrRange(), mPlugin->edgeAttrRange(), errorMsg);
+        if (outputs.empty()) {
+            failedAttributes.append(OUTPUT_HEADER);
+        }
+
+        QFileInfo outDir(generalAttrs->value(OUTPUT_DIR).toQString());
+        if (!outDir.isDir() || !outDir.isWritable()) {
+            errorMsg += "The output directory must be valid and writable!\n";
+            failedAttributes.append(OUTPUT_DIR);
+        }
+    }
+
+    if (!failedAttributes.isEmpty()) {
+        errorMsg += QString("The following attributes are missing/invalid: %1").arg(failedAttributes.join(","));
+        delete generalAttrs;
+        delete graphAttrs;
+        delete modelAttrs;
+        qDeleteAll(outputs);
+        return nullptr;
+    }
+
+    // that's great! everything seems to be valid
+    ExperimentInputs* inputs = new ExperimentInputs;
+    inputs->generalAttrs = generalAttrs;
+    inputs->modelAttrs = modelAttrs;
+    inputs->graphAttrs = graphAttrs;
+    inputs->fileOutputs = outputs;
+
+    return inputs;
 }
+
+} // evoplex

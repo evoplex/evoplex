@@ -19,12 +19,9 @@
 #include "graphplugin.h"
 #include "modelplugin.h"
 
-namespace evoplex {
-
+namespace evoplex
+{
 // Evoplex assumes that any experiment belong to a project.
-// Cosidering that a project might have a massive amount of experiments, this class
-// should be as light as possible and should not do any parameter validation. So,
-// we assume that everything is valid at this point.
 class Experiment
 {
     friend class ExperimentsMgr;
@@ -38,13 +35,25 @@ public:
         FINISHED, // all is done
     };
 
-    explicit Experiment(MainApp* mainApp, int id, int projId, Attributes* generalAttrs,
-            Attributes* modelAttrs, Attributes* graphAttrs, std::vector<Output*> fileOutputs);
+    struct ExperimentInputs {
+        Attributes* generalAttrs = nullptr;
+        Attributes* modelAttrs = nullptr;
+        Attributes* graphAttrs = nullptr;
+        std::vector<Output*> fileOutputs;
+    };
+
+    // Read and validates the experiment inputs.
+    // We assume that all graph/model attributes start with 'uid_'. It is very
+    // important to avoid clashes between different attributes which use the same name.
+    // @return nullptr if unsuccessful
+    static ExperimentInputs* readInputs(const MainApp* mainApp,
+            const QStringList& header, const QStringList& values, QString& errorMsg);
+
+    explicit Experiment(MainApp* mainApp, int id, int projId, ExperimentInputs* inputs);
 
     ~Experiment();
 
-    void init(Attributes* generalAttrs, Attributes* modelAttrs,
-              Attributes* graphAttrs, std::vector<Output*> fileOutputs);
+    bool init(ExperimentInputs* inputs);
 
     void reset();
 

@@ -13,8 +13,8 @@
 #include "mainapp.h"
 #include "experiment.h"
 
-namespace evoplex {
-
+namespace evoplex
+{
 class Project : public QObject
 {
     Q_OBJECT
@@ -23,11 +23,12 @@ public:
     Project(MainApp* mainApp, int id, const QString& name="", const QString& dest="");
     virtual ~Project();
 
-    // Add a new experiment to this project. We assume that all graph/model
-    // attributes start with 'uid_'. It is very important to avoid clashes
-    // between different attributes which use the same name.
-    // @return the experimentId or -1 if unsuccessful
-    const int newExperiment(const QStringList& header, const QStringList& values, QString& errorMsg);
+    // Add a new experiment to this project.
+    // @return nullptr if unsuccessful
+    Experiment* newExperiment(Experiment::ExperimentInputs* inputs);
+
+    // Edit an experiment of this project.
+    bool editExperiment(int expId, Experiment::ExperimentInputs* newInputs);
 
     // Import a set of experiments from a csv file
     // return the number of failures or -1 if everything went wrong.
@@ -57,6 +58,7 @@ public:
 
 signals:
     void expAdded(int expId);
+    void expEdited(int expId);
     void hasUnsavedChanges(bool);
     // emit an integer [0,100] while saving this project
     void progressSave(int);

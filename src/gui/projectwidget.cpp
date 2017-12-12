@@ -14,11 +14,11 @@
 
 namespace evoplex {
 
-ProjectWidget::ProjectWidget(Project* project, ProjectsWindow* pwindow)
+ProjectWidget::ProjectWidget(MainApp* mainApp, Project* project, ProjectsWindow* pwindow)
     : QDockWidget(pwindow)
     , m_ui(new Ui_ProjectWidget)
     , m_innerWindow(new QMainWindow(this, Qt::FramelessWindowHint))
-    , m_attrWidget(new AttributesWidget(project, m_innerWindow))
+    , m_attrWidget(new AttributesWidget(mainApp, project, m_innerWindow))
     , m_project(project)
 {
     setObjectName(m_project->getName());
@@ -37,7 +37,8 @@ ProjectWidget::ProjectWidget(Project* project, ProjectsWindow* pwindow)
     m_innerWindow->addDockWidget(Qt::RightDockWidgetArea, m_attrWidget);
     m_attrWidget->setTitleBarWidget(new QWidget());
     m_attrWidget->setFeatures(QDockWidget::NoDockWidgetFeatures);
-    connect(m_project, SIGNAL(expAdded(int)), this, SLOT(slotInsertRow(int)));
+    connect(m_project, SIGNAL(expAdded(int)), SLOT(slotInsertRow(int)));
+    connect(m_project, SIGNAL(expEdited(int)), SLOT(slotUpdateRow(int)));
 
     int col = 0;
     m_headerIdx.insert(TableWidget::H_BUTTON, col++);
@@ -79,10 +80,9 @@ void ProjectWidget::closeEvent(QCloseEvent* event)
     emit (closed());
 }
 
-void ProjectWidget::slotInsertRow(int expId)
+void ProjectWidget::fillRow(int row, Experiment* exp)
 {
-    Experiment* exp = m_project->getExperiment(expId);
-    const int row = m_ui->table->insertRow(exp);
+    Q_ASSERT(exp);
 
     // general stuff
     const Attributes* gep = exp->generalAttrs();
@@ -122,6 +122,24 @@ void ProjectWidget::slotInsertRow(int expId)
     pluginAtbs(TableWidget::H_GRAPH, exp->graphId(), exp->graphAttrs());
 }
 
+void ProjectWidget::slotInsertRow(int expId)
+{
+    Experiment* exp = m_project->getExperiment(expId);
+    fillRow(m_ui->table->insertRow(exp), exp);
+}
+
+void ProjectWidget::slotUpdateRow(int expId)
+{
+    const int expIdCol = m_headerIdx.value(TableWidget::H_EXPID);
+    for (int row = 0; row < m_ui->table->rowCount(); ++row) {
+        if (expId == m_ui->table->item(row, expIdCol)->text().toInt()) {
+            fillRow(row, m_project->getExperiment(expId));
+            return;
+        }
+    }
+    qFatal("[Experiment]: failed to update row! It should never happen.");
+}
+
 void ProjectWidget::insertItem(int row, TableWidget::Header header, QString label, QString tooltip)
 {
     QTableWidgetItem* item = new QTableWidgetItem(label);
@@ -132,10 +150,14 @@ void ProjectWidget::insertItem(int row, TableWidget::Header header, QString labe
 
 void ProjectWidget::onItemClicked(QTableWidgetItem* item)
 {
+    if (m_ui->table->selectedItems().isEmpty()) {
+        m_attrWidget->setExperiment(nullptr);
+        return;
+    }
+
     int expId = m_ui->table->item(item->row(), m_headerIdx.value(TableWidget::H_EXPID))->text().toInt();
     Experiment* exp = m_project->getExperiment(expId);
-    if (exp)
-        m_attrWidget->fill(exp);
+    m_attrWidget->setExperiment(exp);
 }
 
 void ProjectWidget::onItemDoubleClicked(QTableWidgetItem* item)

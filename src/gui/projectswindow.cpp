@@ -32,7 +32,7 @@ void ProjectsWindow::slotFocusChanged(QDockWidget* currTab)
 
 void ProjectsWindow::addProjectWidget(Project* project)
 {
-    ProjectWidget* pw = new ProjectWidget(project, this);
+    ProjectWidget* pw = new ProjectWidget(m_mainApp, project, this);
     if (m_projects.isEmpty()) {
         this->addDockWidget(Qt::TopDockWidgetArea, pw);
     } else {

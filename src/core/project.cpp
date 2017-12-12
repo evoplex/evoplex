@@ -15,7 +15,8 @@
 #include "experiment.h"
 #include "utils.h"
 
-namespace evoplex {
+namespace evoplex
+{
 
 Project::Project(MainApp* mainApp, int id, const QString& name, const QString& dest)
     : m_mainApp(mainApp)
@@ -42,123 +43,31 @@ void Project::playAll()
         it.value()->play();
 }
 
-const int Project::newExperiment(const QStringList& header, const QStringList& values, QString& errorMsg)
+Experiment* Project::newExperiment(Experiment::ExperimentInputs* inputs)
 {
-    if (header.isEmpty() || values.isEmpty() || header.size() != values.size()) {
-        errorMsg = "The 'header' and 'values' cannot be empty and must have the same number of elements.";
-        return -1;
+    if (!inputs) {
+        return nullptr;
     }
 
-    // find the model and graph for this experiment
-    const int headerGraphId = header.indexOf(GENERAL_ATTRIBUTE_GRAPHID);
-    const int headerModelId = header.indexOf(GENERAL_ATTRIBUTE_MODELID);
-    if (headerGraphId < 0 && headerModelId < 0) {
-        errorMsg = "The experiment should have both graphId and modelId.";
-        return -1;
-    }
-
-    // check if the model and graph are available
-    const GraphPlugin* gPlugin = m_mainApp->getGraph(values.at(headerGraphId));
-    const ModelPlugin* mPlugin = m_mainApp->getModel(values.at(headerModelId));
-    if (!gPlugin || !mPlugin) {
-        errorMsg = QString("The graphId (%1) or modelId (%2) are not available."
-                           " Make sure to load them before trying to add this experiment.")
-                           .arg(values.at(headerGraphId)).arg(values.at(headerModelId));
-        return -1;
-    }
-
-    // make sure that the chosen graphId is allowed in this model
-    if (!mPlugin->supportedGraphs().contains(gPlugin->id())) {
-        QString supportedGraphs = mPlugin->supportedGraphs().toList().join(", ");
-        errorMsg = QString("The graphId (%1) cannot be used in this model (%2). The allowed ones are: %3")
-                           .arg(gPlugin->id()).arg(mPlugin->id()).arg(supportedGraphs);
-        return -1;
-    }
-
-    // we assume that all graph/model attributes start with 'uid_'
-    const QString& graphId_ = gPlugin->id() + "_";
-    const QString& modelId_ = mPlugin->id() + "_";
-
-    // get the value of each attribute and make sure they are valid
-    QStringList failedAttributes;
-    Attributes* generalAttrs = new Attributes(m_mainApp->getGeneralAttrSpace().size());
-    Attributes* modelAttrs = new Attributes(mPlugin->modelAttrSpace().size());
-    Attributes* graphAttrs = new Attributes(gPlugin->graphAttrSpace().size());
-    for (int i = 0; i < values.size(); ++i) {
-        const QString& vStr = values.at(i);
-        QString attrName = header.at(i);
-
-        AttributesSpace::const_iterator gps = m_mainApp->getGeneralAttrSpace().find(attrName);
-        if (gps != m_mainApp->getGeneralAttrSpace().end()) {
-            Value value = Utils::validateParameter(gps.value().second, vStr);
-            if (value.isValid()) {
-                generalAttrs->replace(gps.value().first, attrName, value);
-            } else {
-                failedAttributes.append(attrName);
-            }
-        } else {
-            QPair<int, QString> attrSpace;
-            Attributes* attributes = nullptr;
-            if (attrName.startsWith(modelId_)) {
-                attrName = attrName.remove(modelId_);
-                attrSpace = mPlugin->modelAttrSpace().value(attrName);
-                attributes = modelAttrs;
-            } else if (attrName.startsWith(graphId_)) {
-                attrName = attrName.remove(graphId_);
-                attrSpace = gPlugin->graphAttrSpace().value(attrName);
-                attributes = graphAttrs;
-            }
-
-            if (attributes && !attrSpace.second.isEmpty()) {
-                Value value = Utils::validateParameter(attrSpace.second, vStr);
-                if (value.isValid()) {
-                    attributes->replace(attrSpace.first, attrName, value);
-                } else {
-                    failedAttributes.append(attrName);
-                }
-            }
-        }
-    }
-
-    int numTrials = generalAttrs->value(GENERAL_ATTRIBUTE_TRIALS).toInt;
-    QString outHeader = generalAttrs->value(OUTPUT_HEADER).toQString();
-    std::vector<Output*> outputs;
-    if (!outHeader.isEmpty() && numTrials > 0) {
-        std::vector<int> trialIds;
-        for (int i = 0; i < numTrials; ++i) {
-            trialIds.emplace_back(i);
-        }
-
-        outputs = Output::parseHeader(outHeader.split(";"), trialIds,
-                mPlugin->agentAttrRange(), mPlugin->edgeAttrRange(), errorMsg);
-        if (outputs.empty()) {
-            failedAttributes.append(OUTPUT_HEADER);
-        }
-
-        QFileInfo outDir(generalAttrs->value(OUTPUT_DIR).toQString());
-        if (!outDir.isDir() || !outDir.isWritable()) {
-            errorMsg += "The output directory must be valid and writable!\n";
-            failedAttributes.append(OUTPUT_DIR);
-        }
-    }
-
-    if (!failedAttributes.isEmpty()) {
-        errorMsg += QString("The following attributes are missing/invalid: %1").arg(failedAttributes.join(","));
-        delete generalAttrs;
-        delete graphAttrs;
-        delete modelAttrs;
-        return -1;
-    }
-
-    // that's great! everything seems to be valid
     ++m_lastExpId;
-    m_experiments.insert(m_lastExpId,
-        new Experiment(m_mainApp, m_lastExpId, m_id, generalAttrs, modelAttrs, graphAttrs, outputs));
+    Experiment* exp = new Experiment(m_mainApp, m_lastExpId, m_id, inputs);
+    m_experiments.insert(m_lastExpId, exp);
 
     m_hasUnsavedChanges = true;
-    emit (hasUnsavedChanges(true));
+    emit (hasUnsavedChanges(m_hasUnsavedChanges));
     emit (expAdded(m_lastExpId));
-    return m_lastExpId;
+    return exp;
+}
+
+bool Project::editExperiment(int expId, Experiment::ExperimentInputs* newInputs)
+{
+    Experiment* exp = m_experiments.value(expId);
+    Q_ASSERT(exp);
+    if (!exp->init(newInputs)) {
+        return false;
+    }
+    emit (expEdited(expId));
+    return true;
 }
 
 const int Project::importExperiments(const QString& filePath)
@@ -185,7 +94,8 @@ const int Project::importExperiments(const QString& filePath)
     while (!in.atEnd()) {
         const QStringList values = in.readLine().split(",");
         QString errorMsg;
-        if (newExperiment(header, values, errorMsg) == -1) {
+        Experiment::ExperimentInputs* inputs = Experiment::readInputs(m_mainApp, header, values, errorMsg);
+        if (!inputs || !newExperiment(inputs)) {
             qWarning() << "[FileMgr]: unable to read the experiment at" << row << filePath
                        << "\nError: \"" << errorMsg;
             ++failures;

@@ -23,23 +23,26 @@ class AttributesWidget : public QDockWidget
     Q_OBJECT
 
 public:
-    explicit AttributesWidget(Project *project, QWidget *parent = 0);
+    explicit AttributesWidget(MainApp* mainApp, Project *project, QWidget *parent = 0);
     ~AttributesWidget();
 
-    void fill(Experiment* exp);
+    void setExperiment(Experiment* exp);
 
 private slots:
     void slotAgentFile();
     void slotOutputDir();
     void slotOutputWidget();
     void slotCreateExperiment();
+    void slotEditExperiment();
     void slotModelSelected(const QString& modelId);
     void slotGraphSelected(const QString& graphId);
     void slotUpdateModelPlugins();
     void slotUpdateGraphPlugins();
 
 private:
+    MainApp* m_mainApp;
     Project* m_project;
+    Experiment* m_exp;
     QString m_selectedGraphId;
     QString m_selectedModelId;
 
@@ -57,6 +60,8 @@ private:
     QSpinBox* newSpinBox(const int min, const int max);
     QDoubleSpinBox* newDoubleSpinBox(const int min, const int max);
     void addTreeWidget(QTreeWidgetItem* itemRoot, const QString& label, const QVariant& widget);
+
+    Experiment::ExperimentInputs* readInputs();
 };
 }
 

@@ -67,7 +67,30 @@ QTreeWidget::item:has-children {
        </spacer>
       </item>
       <item>
-       <widget class="QPushButton" name="btnSubmit">
+       <widget class="QPushButton" name="bEdit">
+        <property name="minimumSize">
+         <size>
+          <width>80</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QPushButton  {
+	border: 1px solid white;
+    border-radius: 8px;
+    background-color: transparent;
+}
+QPushButton::hover {
+	background-color: #4285f4;
+}</string>
+        </property>
+        <property name="text">
+         <string>Edit</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="bSubmit">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
           <horstretch>0</horstretch>

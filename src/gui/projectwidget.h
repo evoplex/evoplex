@@ -24,7 +24,7 @@ class ProjectWidget : public QDockWidget
     Q_OBJECT
 
 public:
-    explicit ProjectWidget(Project* project, ProjectsWindow* pwindow = 0);
+    explicit ProjectWidget(MainApp* mainApp, Project* project, ProjectsWindow* pwindow = 0);
     ~ProjectWidget();
 
     inline Project* getProject() const { return m_project; }
@@ -39,6 +39,7 @@ signals:
 
 public slots:
     void slotInsertRow(int expId);
+    void slotUpdateRow(int expId);
     void slotHasUnsavedChanges(bool b);
 
 private slots:
@@ -52,6 +53,8 @@ private:
     Project* m_project;
 
     QMap<TableWidget::Header, int> m_headerIdx; // map Header to column index
+
+    void fillRow(int row, Experiment* exp);
 
     void insertItem(int row, TableWidget::Header header, QString label, QString tooltip="");
 };
