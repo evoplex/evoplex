@@ -20,7 +20,7 @@ GraphPlugin::GraphPlugin(const QObject* instance, const QJsonObject* metaData)
 
     m_graphAttrSpace = attrsSpace(metaData, PLUGIN_ATTRIBUTE_GRAPHSPACE);
     if (!m_graphAttrSpace.isEmpty() && !Utils::boundaryValues(m_graphAttrSpace, m_graphAttrRange)) {
-        qWarning() << "[ModelPlugin]: failed to read the graph's attributes!";
+        qWarning() << "[GraphPlugin]: failed to read the graph's attributes!";
         m_isValid = false;
         return;
     }
