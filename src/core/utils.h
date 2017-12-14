@@ -194,6 +194,15 @@ public:
             if (space.isEmpty()) {
                 range.min.replace(id, attrName, 0);
                 range.max.replace(id, attrName, 0);
+                ok = false;
+            } else if (space == "bool") {
+                range.min.replace(id, attrName, false);
+                range.max.replace(id, attrName, true);
+                ok = true;
+            } else if (space == "string") {
+                range.min.replace(id, attrName, "");
+                range.max.replace(id, attrName, "");
+                ok = true;
             } else if (space.contains("{") && space.endsWith("}")) {
                 QVector<Value> values;
                 if (paramSet(space, values)) {
