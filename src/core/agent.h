@@ -20,7 +20,7 @@ class Agent
 
 public:
     explicit Agent(int id, Attributes attr)
-        : m_id(id), m_attrs(attr), m_x(0), m_y(0) {}
+        : m_id(id), m_attrs(attr), m_x(0), m_y(m_id) {}
     ~Agent() {}
 
     inline Agent* clone() { return new Agent(m_id, m_attrs); }
