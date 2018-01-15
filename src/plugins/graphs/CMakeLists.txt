@@ -1,2 +1,3 @@
+ADD_SUBDIRECTORY(customgraph)
 ADD_SUBDIRECTORY(mooregrid)
 ADD_SUBDIRECTORY(squaregrid)

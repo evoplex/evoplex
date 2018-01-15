@@ -1,0 +1,11 @@
+{
+  "type": "graph",
+  "uid": "customGraph",
+  "name": "Custom Graph",
+  "author": "Marcos Cardinot",
+  "description": "Custom graph.",
+  "graphAttributesSpace": [
+    {"graphType": "graphType{undirected,directed}"},
+    {"filePath": "string"}
+  ]
+}
