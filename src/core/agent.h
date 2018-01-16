@@ -19,8 +19,10 @@ class Agent
     friend class Edge;
 
 public:
+    explicit Agent(int id, Attributes attr, int x, int y)
+        : m_id(id), m_attrs(attr), m_x(x), m_y(y) {}
     explicit Agent(int id, Attributes attr)
-        : m_id(id), m_attrs(attr), m_x(0), m_y(m_id) {}
+        : Agent(id, attr, 0, id) {}
     ~Agent() {}
 
     inline Agent* clone() { return new Agent(m_id, m_attrs); }

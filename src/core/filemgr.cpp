@@ -34,15 +34,12 @@ Agents FileMgr::importAgents(const QString& filePath, const QString& modelId) co
     QStringList header;
     if (!in.atEnd() && modelPlugin) {
         header = in.readLine().split(",");
-        if (header.size() == modelPlugin->agentAttrSpace().size()) {
-            foreach (QString attrName, header) {
-                if (!modelPlugin->agentAttrSpace().contains(attrName)) {
-                    header.clear();
-                    break;
-                }
+        foreach (QString attrName, header) {
+            if (attrName != "x" && attrName != "y"
+                    && !modelPlugin->agentAttrSpace().contains(attrName)) {
+                header.clear();
+                break;
             }
-        } else {
-            header.clear();
         }
     }
 
@@ -64,17 +61,25 @@ Agents FileMgr::importAgents(const QString& filePath, const QString& modelId) co
             break;
         }
 
+        int coordX = 0;
+        int coordY = id;
         Attributes attributes(values.size());
         for (int i = 0; i < values.size(); ++i) {
-            QPair<int, QString> space = modelPlugin->agentAttrSpace().value(header.at(i));
-            Value value = Utils::validateParameter(space.second, values.at(i));
-            if (!value.isValid()) {
-                isValid = false;
-                break;
+            if (header.at(i) == "x") {
+                coordX = values.at(i).toInt(&isValid);
+            } else if (header.at(i) == "y") {
+                coordY = values.at(i).toInt(&isValid);
+            } else {
+                QPair<int, QString> space = modelPlugin->agentAttrSpace().value(header.at(i));
+                Value value = Utils::validateParameter(space.second, values.at(i));
+                if (!value.isValid()) {
+                    isValid = false;
+                    break;
+                }
+                attributes.replace(space.first, header.at(i), value);
             }
-            attributes.replace(space.first, header.at(i), value);
         }
-        agents.emplace_back(new Agent(id, attributes));
+        agents.emplace_back(new Agent(id, attributes, coordX, coordY));
         ++id;
     }
     file.close();
