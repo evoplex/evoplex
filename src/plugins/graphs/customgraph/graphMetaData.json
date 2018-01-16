@@ -6,6 +6,6 @@
   "description": "Custom graph.",
   "graphAttributesSpace": [
     {"graphType": "graphType{undirected,directed}"},
-    {"filePath": "string"}
+    {"filePath": "filepath"}
   ]
 }

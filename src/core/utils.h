@@ -6,6 +6,7 @@
 #ifndef UTILS_H
 #define UTILS_H
 
+#include <QFileInfo>
 #include <QVariant>
 #include <QVector>
 #include <QtDebug>
@@ -59,11 +60,13 @@ public:
     }
 
     // Check if the value belongs to the parameter space.
-    // If true, return a valid QVariant with the correct type
+    // If true, return a valid Value with the correct type
     //
     // Parameter space can be:
     //   - "bool"               // a boolean
     //   - "string"             // a string
+    //   - "dirpath"            // a string containing a valid dirpath
+    //   - "filepath"           // a string containing a valid filepath
     //   - "int[min,max]"       // integers from min to max (including min and max)
     //   - "int{1,2,3}"         // set of integers
     //   - "double[min,max]     // doubles from min to max (including min and max)
@@ -77,6 +80,16 @@ public:
         } else if (valueStr.isEmpty()) {
             qWarning() << "[Utils]: unable to validate parameter! It should not be empty.";
             return Value();
+        } else if (space == "dirpath") {
+            QFileInfo dir(valueStr);
+            if (dir.exists() && dir.isDir()) {
+                return Value(valueStr);
+            }
+        } else if (space == "filepath") {
+            QFileInfo file(valueStr);
+            if (file.exists() && file.isFile()) {
+                return Value(valueStr);
+            }
         } else if (space == "bool") {
             return QVariant(valueStr).toBool();
         } else if (isASet(space)) {
@@ -199,7 +212,7 @@ public:
                 range.min.replace(id, attrName, false);
                 range.max.replace(id, attrName, true);
                 ok = true;
-            } else if (space == "string") {
+            } else if (space == "string" || space == "dirpath" || space == "filepath") {
                 range.min.replace(id, attrName, "");
                 range.max.replace(id, attrName, "");
                 ok = true;
