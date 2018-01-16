@@ -46,7 +46,6 @@ void CustomGraph::reset()
         header = in.readLine().split(",");
         if (header.size() < 2 || header.at(0) != "origin" || header.at(1) != "target") {
             header.clear();
-            break;
         }
     }
 

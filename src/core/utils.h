@@ -78,7 +78,8 @@ public:
         if (space == "string") {
             return Value(valueStr);
         } else if (valueStr.isEmpty()) {
-            qWarning() << "[Utils]: unable to validate parameter! It should not be empty.";
+            qWarning() << "[Utils]: unable to validate parameter! It should not be empty."
+                       << "Space:" << space;
             return Value();
         } else if (space == "dirpath") {
             QFileInfo dir(valueStr);
