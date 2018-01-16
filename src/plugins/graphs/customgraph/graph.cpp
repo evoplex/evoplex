@@ -45,11 +45,16 @@ void CustomGraph::reset()
     if (!in.atEnd()) {
         header = in.readLine().split(",");
         if (header.size() < 2 || header.at(0) != "origin" || header.at(1) != "target") {
-            qWarning() << "[CustomGraph]: header is invalid."
-                       << "It should have at least three columns: 'origin', 'target' and 'directed'."
-                       << m_filePath;
-            return;
+            header.clear();
+            break;
         }
+    }
+
+    if (header.isEmpty()) {
+        qWarning() << "[CustomGraph]: header is invalid."
+                   << "It should have at least two columns: 'origin' and 'target'."
+                   << m_filePath;
+        return;
     }
 
     // create edges
