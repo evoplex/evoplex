@@ -4,7 +4,7 @@
   "name": "test",
   "author": "Marcos Cardinot",
   "description": "just another model",
-  "supportedGraphs": "mooreGrid,squareGrid",
+  "supportedGraphs": "mooreGrid,squareGrid,customGraph",
   "customOutputs": "",
   "agentAttributesSpace": [
     {"strategy": "int{0,1}"}
