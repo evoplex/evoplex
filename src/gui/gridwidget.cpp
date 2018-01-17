@@ -46,6 +46,7 @@ GridWidget::GridWidget(ExperimentsMgr* expMgr, Experiment* exp, QWidget* parent)
     TitleBar* titleBar = new TitleBar(exp, this);
     setTitleBarWidget(titleBar);
     connect(titleBar, SIGNAL(trialSelected(int)), SLOT(setTrial(int)));
+    setTrial(0);
     connect(expMgr, &ExperimentsMgr::trialCreated,
         [this](Experiment* exp, int trialId) {
             if (exp == m_exp && trialId == m_currTrialId)
@@ -85,6 +86,8 @@ GridWidget::GridWidget(ExperimentsMgr* expMgr, Experiment* exp, QWidget* parent)
     pal.setColor(QPalette::Background, QColor(239,235,231));
     setAutoFillBackground(true);
     setPalette(pal);
+
+    updateCache();
 }
 
 GridWidget::~GridWidget()
