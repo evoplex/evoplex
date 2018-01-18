@@ -51,7 +51,7 @@ void ColorMap::setAttr(const QString& attrName)
     const QString& attrSpace = m_attrsSpace.value(attrName).second;
 
     if (Utils::isASet(attrSpace)) {
-        QVector<Value> vals;
+        Values vals;
         ok = Utils::paramSet(attrSpace, vals);
         m_mapValue = new ColorMapSet(m_colors, vals);
     } else if (Utils::isAnInterval(attrSpace)) {
@@ -97,7 +97,7 @@ const QColor ColorMapInterval::colorFromValue(const Value& val) const
 
 /************************************************************************/
 
-ColorMapSet::ColorMapSet(const std::vector<QColor>& colors, const QVector<Value>& vals)
+ColorMapSet::ColorMapSet(const std::vector<QColor>& colors, const Values &vals)
 {
     Q_ASSERT(colors.size() > 0);
 

@@ -36,7 +36,7 @@ private:
 class ColorMapSet : public ColorMapValue
 {
 public:
-    ColorMapSet(const std::vector<QColor>& colors, const QVector<Value>& vals);
+    ColorMapSet(const std::vector<QColor>& colors, const Values& vals);
 
     const QColor colorFromValue(const Value& val) const;
 

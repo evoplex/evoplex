@@ -94,9 +94,9 @@ public:
         } else if (space == "bool") {
             return QVariant(valueStr).toBool();
         } else if (isASet(space)) {
-            QVector<Value> values;
+            Values values;
             if (paramSet(space, values)) {
-                Value valSrc = valueFromString(values.first().type, valueStr);
+                Value valSrc = valueFromString(values.front().type, valueStr);
                 foreach (Value val, values) {
                     if (val == valSrc) return val;
                 }
@@ -118,7 +118,7 @@ public:
 
     // assume that space is equal to 'int{ }', 'double{ }' or 'graphType{ }'
     // return a vector with all elements with the proper type
-    static bool paramSet(const QString& space, QVector<Value>& values) {
+    static bool paramSet(const QString& space, Values& values) {
         QString spc = space;
         QStringList valuesStr = spc.remove("{").remove("}").split(",");
         bool ok = false;
@@ -218,10 +218,10 @@ public:
                 range.max.replace(id, attrName, "");
                 ok = true;
             } else if (space.contains("{") && space.endsWith("}")) {
-                QVector<Value> values;
+                Values values;
                 if (paramSet(space, values)) {
-                    range.min.replace(id, attrName, values.first());
-                    range.max.replace(id, attrName, values.last());
+                    range.min.replace(id, attrName, values.front());
+                    range.max.replace(id, attrName, values.back());
                     ok = true;
                 }
             } else if (space.contains("[") && space.endsWith("]")) {
@@ -264,7 +264,7 @@ public:
             bool ok = false;
 
             if (space.contains("{") && space.endsWith("}")) {
-                QVector<Value> set;
+                Values set;
                 ok = paramSet(space, set);
                 for (int j = 0; j < size && ok; ++j)
                     ret[j].replace(attrId, attrName, set.at(prg->randI(set.size())));
