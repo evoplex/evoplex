@@ -16,6 +16,7 @@ set(EVOPLEX_CORE_H
   agent.h
   edge.h
   value.h
+  valuespace.h
 
   filemgr.h
   experiment.h
@@ -34,6 +35,7 @@ set(EVOPLEX_CORE_CXX
   experimentsmgr.cpp
   output.cpp
   project.cpp
+  valuespace.cpp
   mainapp.cpp
 )
 
