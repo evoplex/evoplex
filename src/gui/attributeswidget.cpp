@@ -37,10 +37,19 @@ AttributesWidget::AttributesWidget(MainApp* mainApp, Project* project, QWidget *
     connect(m_ui->bSubmit, SIGNAL(clicked(bool)), SLOT(slotCreateExperiment()));
     connect(m_ui->bEdit, SIGNAL(clicked(bool)), SLOT(slotEditExperiment()));
 
-    // setup the tree widget: general attributes
-    m_treeItemGeneral = new QTreeWidgetItem(m_ui->treeWidget);
-    m_treeItemGeneral->setText(0, "General");
-    m_treeItemGeneral->setExpanded(true);
+    // setup the tree widget: model
+    m_treeItemModels = new QTreeWidgetItem(m_ui->treeWidget);
+    m_treeItemModels->setText(0, "Model");
+    m_treeItemModels->setExpanded(true);
+    // --  models available
+    QComboBox* cb = new QComboBox(m_ui->treeWidget);
+    connect(cb, SIGNAL(currentIndexChanged(QString)), SLOT(slotModelSelected(QString)));
+    addTreeWidget(m_treeItemModels, GENERAL_ATTRIBUTE_MODELID, QVariant::fromValue(cb));
+
+    // setup the tree widget: graph
+    m_treeItemGraphs = new QTreeWidgetItem(m_ui->treeWidget);
+    m_treeItemGraphs->setText(0, "Graph");
+    m_treeItemGraphs->setExpanded(false);
     // -- add custom widget -- agents from file
     QLineEdit* agentsPath = new QLineEdit(m_project->getDest());
     QPushButton* btBrowseFile = new QPushButton("...");
@@ -51,9 +60,18 @@ AttributesWidget::AttributesWidget(MainApp* mainApp, Project* project, QWidget *
     agentsLayout->insertWidget(0, agentsPath);
     agentsLayout->insertWidget(1, btBrowseFile);
     m_widgetFields.insert(GENERAL_ATTRIBUTE_AGENTS, QVariant::fromValue(agentsPath));
-    QTreeWidgetItem* item = new QTreeWidgetItem(m_treeItemGeneral);
+    QTreeWidgetItem* item = new QTreeWidgetItem(m_treeItemGraphs);
     item->setText(0, GENERAL_ATTRIBUTE_AGENTS);
     m_ui->treeWidget->setItemWidget(item, 1, agentsLayout->parentWidget());
+    // --  graphs available
+    cb = new QComboBox(m_ui->treeWidget);
+    connect(cb, SIGNAL(currentIndexChanged(QString)), SLOT(slotGraphSelected(QString)));
+    addTreeWidget(m_treeItemGraphs, GENERAL_ATTRIBUTE_GRAPHID, QVariant::fromValue(cb));
+
+    // setup the tree widget: general attributes
+    m_treeItemGeneral = new QTreeWidgetItem(m_ui->treeWidget);
+    m_treeItemGeneral->setText(0, "Simulation");
+    m_treeItemGeneral->setExpanded(false);
     // -- seed
     addTreeWidget(m_treeItemGeneral, GENERAL_ATTRIBUTE_SEED, QVariant::fromValue(newSpinBox(0, INT32_MAX)));
     // --  stop at
@@ -64,20 +82,11 @@ AttributesWidget::AttributesWidget(MainApp* mainApp, Project* project, QWidget *
     QCheckBox* chb = new QCheckBox(m_ui->treeWidget);
     chb->setChecked(true);
     addTreeWidget(m_treeItemGeneral, GENERAL_ATTRIBUTE_AUTODELETE, QVariant::fromValue(chb));
-    // --  models available
-    QComboBox* cb = new QComboBox(m_ui->treeWidget);
-    connect(cb, SIGNAL(currentIndexChanged(QString)), SLOT(slotModelSelected(QString)));
-    addTreeWidget(m_treeItemGeneral, GENERAL_ATTRIBUTE_MODELID, QVariant::fromValue(cb));
-    // --  graphs available
-    cb = new QComboBox(m_ui->treeWidget);
-    cb->setEnabled(false);
-    connect(cb, SIGNAL(currentIndexChanged(QString)), SLOT(slotGraphSelected(QString)));
-    addTreeWidget(m_treeItemGeneral, GENERAL_ATTRIBUTE_GRAPHID, QVariant::fromValue(cb));
 
     // setup the tree widget: outputs
     m_treeItemOutputs = new QTreeWidgetItem(m_ui->treeWidget);
     m_treeItemOutputs->setText(0, "File Outputs");
-    m_treeItemOutputs->setExpanded(true);
+    m_treeItemOutputs->setExpanded(false);
     // -- enabled
     m_enableOutputs = new QCheckBox("save to file");
     QTreeWidgetItem* itemEnabled = new QTreeWidgetItem(m_treeItemOutputs);
@@ -375,37 +384,37 @@ void AttributesWidget::slotEditExperiment()
 
 void AttributesWidget::slotGraphSelected(const QString& graphId)
 {
-    // hide last and show the selected graph tree
-    QTreeWidgetItem* item = m_treeItemGraphs.value(m_selectedGraphId);
-    if (item) { item->setHidden(true); }
-    item = m_treeItemGraphs.value(graphId);
-    if (item) {
-        item->setHidden(false);
-        item->setExpanded(true);
-    }
     m_selectedGraphId = graphId;
+    QTreeWidgetItemIterator it(m_ui->treeWidget);
+    while (*it) {
+        if ((*it)->parent() == m_treeItemGraphs) {
+            QString id = (*it)->data(0, Qt::UserRole).toString();
+            (*it)->setHidden(!id.isEmpty() && id != graphId);
+        }
+        ++it;
+    }
 }
 
 void AttributesWidget::slotModelSelected(const QString& modelId)
 {
-    QTreeWidgetItem* itemModel = m_treeItemModels.value(m_selectedModelId);
-    if (itemModel) itemModel->setHidden(true);
-
-    QComboBox* cb = m_widgetFields.value(GENERAL_ATTRIBUTE_GRAPHID).value<QComboBox*>();
-    cb->setCurrentIndex(0); // reset graphId
-    cb->setEnabled(modelId != STRING_NULL_PLUGINID);
-
-    itemModel = m_treeItemModels.value(modelId);
-    if (itemModel) {
-        itemModel->setHidden(false);
-        itemModel->setExpanded(true);
-    }
     m_selectedModelId = modelId;
+    QTreeWidgetItemIterator it(m_ui->treeWidget);
+    while (*it) {
+        if ((*it)->parent() == m_treeItemModels) {
+            QString id = (*it)->data(0, Qt::UserRole).toString();
+            (*it)->setHidden(!id.isEmpty() && id != modelId);
+        }
+        ++it;
+    }
+
+    bool nullModel = modelId == STRING_NULL_PLUGINID;
+    m_treeItemGeneral->setHidden(nullModel);
+    m_treeItemGraphs->setHidden(nullModel);
+    m_treeItemOutputs->setHidden(nullModel);
 }
 
 void AttributesWidget::slotUpdateGraphPlugins()
 {
-    // list all graphs
     QComboBox* cb = m_widgetFields.value(GENERAL_ATTRIBUTE_GRAPHID).value<QComboBox*>();
     cb->blockSignals(true);
     cb->clear();
@@ -413,26 +422,31 @@ void AttributesWidget::slotUpdateGraphPlugins()
     cb->insertItems(1, m_project->getGraphs().keys());
     cb->blockSignals(false);
 
-    // create the trees to hold the graphs' attributes
     foreach (GraphPlugin* graph, m_project->getGraphs()) {
-        if (graph->graphAttrSpace().size() > 0 && m_treeItemGraphs.contains(graph->id())) {
-            continue;
+        if (graph->graphAttrNames().size() <= 0) {
+            continue; // nothing to add
         }
 
-        // the root node
-        QTreeWidgetItem* itemRoot = new QTreeWidgetItem(m_ui->treeWidget);
-        itemRoot->setText(0, "Graph");
-        itemRoot->setHidden(true);
-        m_treeItemGraphs.insert(graph->id(), itemRoot);
+        bool newGraph = true;
+        QTreeWidgetItemIterator it(m_treeItemGraphs);
+        while (*it) {
+            if ((*it)->parent() == m_treeItemGraphs
+                    && (*it)->data(0, Qt::UserRole).toString() == graph->id()) {
+                newGraph = false;
+                break;
+            }
+            ++it;
+        }
 
-        // the graph stuff
-        insertPluginAttributes(itemRoot, graph->id(), graph->graphAttrSpace());
+        if (newGraph) {
+            insertPluginAttributes(m_treeItemGraphs, graph->id(), graph->graphAttrSpace());
+        }
     }
+    slotGraphSelected(cb->currentText());
 }
 
 void AttributesWidget::slotUpdateModelPlugins()
 {
-    // list all models
     QComboBox* cb = m_widgetFields.value(GENERAL_ATTRIBUTE_MODELID).value<QComboBox*>();
     cb->blockSignals(true);
     cb->clear();
@@ -440,21 +454,27 @@ void AttributesWidget::slotUpdateModelPlugins()
     cb->insertItems(1, m_project->getModels().keys());
     cb->blockSignals(false);
 
-    // create the trees to hold the models' attributes
     foreach (ModelPlugin* model, m_project->getModels()) {
-        if (m_treeItemModels.contains(model->id())) {
-            continue;
+        if (model->modelAttrNames().size() <= 0) {
+            continue; // nothing to add
         }
 
-        // the root node
-        QTreeWidgetItem* itemRoot = new QTreeWidgetItem(m_ui->treeWidget);
-        itemRoot->setText(0, "Model");
-        itemRoot->setHidden(true);
-        m_treeItemModels.insert(model->id(), itemRoot);
+        bool newModel = true;
+        QTreeWidgetItemIterator it(m_ui->treeWidget);
+        while (*it) {
+            if ((*it)->parent() == m_treeItemModels
+                    && (*it)->data(0, Qt::UserRole).toString() == model->id()) {
+                newModel = false;
+                break;
+            }
+            ++it;
+        }
 
-        // the model stuff
-        insertPluginAttributes(itemRoot, model->id(), model->modelAttrSpace());
+        if (newModel) {
+            insertPluginAttributes(m_treeItemModels, model->id(), model->modelAttrSpace());
+        }
     }
+    slotModelSelected(cb->currentText());
 }
 
 void AttributesWidget::insertPluginAttributes(QTreeWidgetItem* itemRoot,
@@ -467,6 +487,7 @@ void AttributesWidget::insertPluginAttributes(QTreeWidgetItem* itemRoot,
         const ValueSpace* valSpace = it.value();
         QTreeWidgetItem* item = new QTreeWidgetItem(itemRoot);
         item->setText(0, valSpace->attrName());
+        item->setData(0, Qt::UserRole, uid);
 
         QWidget* widget = nullptr;
         if (valSpace->type() == ValueSpace::Double_Interval) {

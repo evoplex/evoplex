@@ -49,8 +49,8 @@ private:
     Ui_AttributesWidget* m_ui;
     QTreeWidgetItem* m_treeItemGeneral;
     QTreeWidgetItem* m_treeItemOutputs;
-    QHash<QString, QTreeWidgetItem*> m_treeItemGraphs;
-    QHash<QString, QTreeWidgetItem*> m_treeItemModels;
+    QTreeWidgetItem* m_treeItemModels;
+    QTreeWidgetItem* m_treeItemGraphs;
     QVariantHash m_widgetFields;
     QCheckBox* m_enableOutputs;
 
