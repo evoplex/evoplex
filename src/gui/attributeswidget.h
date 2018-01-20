@@ -55,10 +55,10 @@ private:
     QCheckBox* m_enableOutputs;
 
     void insertPluginAttributes(QTreeWidgetItem* itemRoot, const QString &uid,
-                                const AttributesRange &range);
+                                const AttributesSpace& attrsSpace);
 
     QSpinBox* newSpinBox(const int min, const int max);
-    QDoubleSpinBox* newDoubleSpinBox(const int min, const int max);
+    QDoubleSpinBox* newDoubleSpinBox(const double min, const double max);
     void addTreeWidget(QTreeWidgetItem* itemRoot, const QString& label, const QVariant& widget);
 
     Experiment::ExperimentInputs* readInputs();

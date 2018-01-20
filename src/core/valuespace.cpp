@@ -57,9 +57,11 @@ ValueSpace::ValueSpace()
 {
 }
 
-Value ValueSpace::validate(const QString& valueStr)
+Value ValueSpace::validate(const QString& valueStr) const
 {
-    if (valueStr.isEmpty()) {
+    if (m_type == String) {
+        return Value(valueStr);
+    } else if (valueStr.isEmpty()) {
         qWarning() << "[ValueSpace::validate]: unable to validate parameter! It should not be empty."
                    << "Space:" << m_space;
         return Value();
@@ -67,15 +69,12 @@ Value ValueSpace::validate(const QString& valueStr)
 
     switch (m_type) {
     case Bool: {
-        if (valueStr == "true") {
+        if (valueStr == "true" || valueStr == "1") {
             return Value(true);
-        } else if (valueStr == "false") {
+        } else if (valueStr == "false" || valueStr == "0") {
             return Value(false);
         }
         break;
-    }
-    case String: {
-        return Value(valueStr);
     }
     case DirPath: {
         QFileInfo dir(valueStr);
@@ -93,7 +92,7 @@ Value ValueSpace::validate(const QString& valueStr)
     }
     case Int_Interval:
     case Double_Interval: {
-        IntervalSpace* ispace = dynamic_cast<IntervalSpace*>(this);
+        const IntervalSpace* ispace = dynamic_cast<const IntervalSpace*>(this);
         Value valSrc = Utils::valueFromString(ispace->min().type, valueStr);
         if (valSrc.isValid() && valSrc >= ispace->min() && valSrc <= ispace->max()) {
             return valSrc;
@@ -102,7 +101,7 @@ Value ValueSpace::validate(const QString& valueStr)
     }
     case Int_Set:
     case Double_Set: {
-        SetSpace* sspace = dynamic_cast<SetSpace*>(this);
+        const SetSpace* sspace = dynamic_cast<const SetSpace*>(this);
         Value valSrc = Utils::valueFromString(sspace->values().front().type, valueStr);
         foreach (Value val, sspace->values()) {
             if (val == valSrc) return val;

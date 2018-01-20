@@ -20,19 +20,19 @@ ModelPlugin::ModelPlugin(const QObject* instance, const QJsonObject* metaData)
     m_supportedGraphs = metaData->value(PLUGIN_ATTRIBUTE_SUPPORTEDGRAPHS).toString().split(",").toVector();
     m_customOutputs = metaData->value(PLUGIN_ATTRIBUTE_CUSTOMOUTPUTS).toString().split(",").toVector();
 
-    if (!attrsSpace(metaData, PLUGIN_ATTRIBUTE_AGENTSPACE, m_agentAttrSpace)) {
+    if (!attrsSpace(metaData, PLUGIN_ATTRIBUTE_AGENTSPACE, m_agentAttrSpace, m_agentAttrNames)) {
         qWarning() << "[ModelPlugin]: failed to read the agent's attributes!";
         m_isValid = false;
         return;
     }
 
-    if (!attrsSpace(metaData, PLUGIN_ATTRIBUTE_EDGESPACE, m_edgeAttrSpace)) {
+    if (!attrsSpace(metaData, PLUGIN_ATTRIBUTE_EDGESPACE, m_edgeAttrSpace, m_edgeAttrNames)) {
         qWarning() << "[ModelPlugin]: failed to read the edge's attributes!";
         m_isValid = false;
         return;
     }
 
-    if (!attrsSpace(metaData, PLUGIN_ATTRIBUTE_MODELSPACE, m_modelAttrSpace)) {
+    if (!attrsSpace(metaData, PLUGIN_ATTRIBUTE_MODELSPACE, m_modelAttrSpace, m_modelAttrNames)) {
         qWarning() << "[ModelPlugin]: failed to read the model's attributes!";
         m_isValid = false;
         return;

@@ -69,10 +69,5 @@ private:
     std::vector<Value> m_values;
 };
 
-typedef struct {
-    Attributes min;
-    Attributes max;
-} AttributesRange;
-
 }
 #endif // ATTRIBUTES_H

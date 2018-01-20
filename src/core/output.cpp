@@ -11,13 +11,12 @@
 
 namespace evoplex {
 
-DefaultOutput::DefaultOutput(const Function f, const Entity e, const QString& attrName,
-                             const int attrIdx, Values inputs, const std::vector<int> trialIds)
+DefaultOutput::DefaultOutput(const Function f, const Entity e, const ValueSpace *valSpace,
+                             Values inputs, const std::vector<int> trialIds)
     : Output(inputs, trialIds)
     , m_func(f)
     , m_entity(e)
-    , m_attrName(attrName)
-    , m_attrIdx(attrIdx)
+    , m_valueSpace(valSpace)
 {
 }
 
@@ -30,10 +29,11 @@ void DefaultOutput::doOperation(const int trialId, const AbstractModel* model)
     Values allValues;
     switch (m_func) {
     case F_Count:
-        if (m_entity == E_Agents)
-            allValues = Stats::count(model->graph()->agents(), m_attrIdx, m_allInputs);
-        else
-            allValues = Stats::count(model->graph()->edges(), m_attrIdx, m_allInputs);
+        if (m_entity == E_Agents) {
+            allValues = Stats::count(model->graph()->agents(), m_valueSpace->id(), m_allInputs);
+        } else {
+            allValues = Stats::count(model->graph()->edges(), m_valueSpace->id(), m_allInputs);
+        }
         break;
     default:
         qFatal("doOperation() invalid function!");
@@ -47,7 +47,7 @@ QString DefaultOutput::printableHeader(const char sep)
     QString prefix = QString("%1_%2_%3_")
             .arg(stringFromFunc(m_func))
             .arg((m_entity == E_Agents ? "agents" : "edges"))
-            .arg(m_attrName);
+            .arg(m_valueSpace->attrName());
 
     QString ret;
     for (Value val : m_allInputs) {
@@ -63,7 +63,7 @@ bool DefaultOutput::operator==(const Output* output)
     if (!other) return false;
     if (m_func != other->function()) return false;
     if (m_entity != other->entity()) return false;
-    if (m_attrIdx != other->attrIdx()) return false;
+    if (m_valueSpace->id() != other->valueSpace()->id()) return false;
     return true;
 }
 
@@ -178,7 +178,7 @@ void Output::updateCaches(const int trialId, const int currStep, const Values& a
 }
 
 std::vector<Output*> Output::parseHeader(const QStringList& header, const std::vector<int> trialIds,
-        const AttributesRange& agentAttrRange, const AttributesRange& edgeAttrRange, QString& errorMsg)
+                                         const ModelPlugin* model, QString& errorMsg)
 {
     std::vector<Output*> outputs;
     std::vector<Value> customHeader;
@@ -208,16 +208,16 @@ std::vector<Output*> Output::parseHeader(const QStringList& header, const std::v
             return outputs;
         }
 
-        Attributes entityAttrMin;
+        AttributesSpace entityAttrSpace;
         DefaultOutput::Entity entity;
         if (h.startsWith("agents_")) {
             h.remove("agents_");
             entity = DefaultOutput::E_Agents;
-            entityAttrMin = agentAttrRange.min;
+            entityAttrSpace = model->agentAttrSpace();
         } else if (h.startsWith("edges_")) {
             h.remove("edges_");
             entity = DefaultOutput::E_Edges;
-            entityAttrMin = edgeAttrRange.min;
+            entityAttrSpace = model->agentAttrSpace();
         } else {
             errorMsg = QString("[OutputHeader] invalid header! Entity does not exist. (%1)\n").arg(h);
             qWarning() << errorMsg;
@@ -227,8 +227,8 @@ std::vector<Output*> Output::parseHeader(const QStringList& header, const std::v
         }
 
         QStringList attrHeaderStr = h.split("_");
-        int attrIdx = entityAttrMin.indexOf(attrHeaderStr.first());
-        if (attrIdx < 0) {
+        ValueSpace* valSpace = entityAttrSpace.value(attrHeaderStr.first());
+        if (!valSpace->isValid()) {
             errorMsg = QString("[OutputHeader] invalid header! Attribute does not exist. (%1)\n").arg(h);
             qWarning() << errorMsg;
             qDeleteAll(outputs);
@@ -239,7 +239,7 @@ std::vector<Output*> Output::parseHeader(const QStringList& header, const std::v
         std::vector<Value> attrHeader; //inputs
         attrHeaderStr.removeFirst();
         for (QString valStr : attrHeaderStr) {
-            Value val = Utils::valueFromString(entityAttrMin.value(attrIdx).type, valStr);
+            Value val = valSpace->validate(valStr);
             if (!val.isValid()) {
                 errorMsg = QString("[OutputHeader] invalid header! Value of attribute is invalid. (%1)\n").arg(valStr);
                 qWarning() << errorMsg;
@@ -258,7 +258,7 @@ std::vector<Output*> Output::parseHeader(const QStringList& header, const std::v
             return outputs;
         }
 
-        outputs.emplace_back(new DefaultOutput(func, entity, entityAttrMin.name(attrIdx), attrIdx, attrHeader, trialIds));
+        outputs.emplace_back(new DefaultOutput(func, entity, valSpace, attrHeader, trialIds));
     }
 
     if (!customHeader.empty()) {

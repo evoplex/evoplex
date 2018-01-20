@@ -24,17 +24,14 @@ public:
     inline const QVector<QString>& supportedGraphs() const { return m_supportedGraphs; }
     inline const QVector<QString>& customOutputs() const { return m_customOutputs; }
 
-    inline const std::vector<QString>& agentAttrNames() const { return m_agentAttrRange.min.names(); }
+    inline const std::vector<QString>& agentAttrNames() const { return m_agentAttrNames; }
     inline const AttributesSpace& agentAttrSpace() const { return m_agentAttrSpace; }
-    inline const AttributesRange& agentAttrRange() const { return m_agentAttrRange; }
 
-    inline const std::vector<QString>& edgeAttrNames() const { return m_edgeAttrRange.min.names(); }
+    inline const std::vector<QString>& edgeAttrNames() const { return m_edgeAttrNames; }
     inline const AttributesSpace& edgeAttrSpace() const { return m_edgeAttrSpace; }
-    inline const AttributesRange& edgeAttrRange() const { return m_edgeAttrRange; }
 
-    inline const std::vector<QString>& modelAttrNames() const { return m_modelAttrRange.min.names(); }
+    inline const std::vector<QString>& modelAttrNames() const { return m_modelAttrNames; }
     inline const AttributesSpace& modelAttrSpace() const { return m_modelAttrSpace; }
-    inline const AttributesRange& modelAttrRange() const { return m_modelAttrRange; }
 
 private:
     IPluginModel* m_factory;
@@ -43,13 +40,13 @@ private:
     QVector<QString> m_customOutputs;
 
     AttributesSpace m_agentAttrSpace;
-    AttributesRange m_agentAttrRange;
+    std::vector<QString> m_agentAttrNames;
 
     AttributesSpace m_edgeAttrSpace;
-    AttributesRange m_edgeAttrRange;
+    std::vector<QString> m_edgeAttrNames;
 
     AttributesSpace m_modelAttrSpace;
-    AttributesRange m_modelAttrRange;
+    std::vector<QString> m_modelAttrNames;
 };
 }
 

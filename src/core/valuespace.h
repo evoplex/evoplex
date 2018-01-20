@@ -42,9 +42,10 @@ public:
     inline int id() const { return m_id; }
     inline const QString& attrName() const { return m_attrName; }
     inline const QString& space() const { return m_space; }
+    inline SpaceType type() const { return m_type; }
     inline Value validValue() const { return m_validValue; }
 
-    Value validate(const QString& valueStr);
+    Value validate(const QString& valueStr) const;
 
 private:
     const int m_id;

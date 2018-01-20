@@ -19,17 +19,16 @@ public:
 
     inline AbstractGraph* create() const { return m_factory->create(); }
 
-    inline const std::vector<QString>& graphAttrNames() const { return m_graphAttrRange.min.names(); }
+    inline const std::vector<QString>& graphAttrNames() const { return m_graphAttrNames; }
 
     inline const AttributesSpace& graphAttrSpace() const { return m_graphAttrSpace; }
-    inline const AttributesRange& graphAttrRange() const { return m_graphAttrRange; }
 
 private:
     IPluginGraph* m_factory;
 
     std::vector<AbstractGraph::GraphType> m_validGraphTypes;
     AttributesSpace m_graphAttrSpace;
-    AttributesRange m_graphAttrRange;
+    std::vector<QString> m_graphAttrNames;
 };
 }
 

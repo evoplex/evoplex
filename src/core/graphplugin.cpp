@@ -38,7 +38,7 @@ GraphPlugin::GraphPlugin(const QObject* instance, const QJsonObject* metaData)
         }
     }
 
-    if (!attrsSpace(metaData, PLUGIN_ATTRIBUTE_GRAPHSPACE, m_graphAttrSpace)) {
+    if (!attrsSpace(metaData, PLUGIN_ATTRIBUTE_GRAPHSPACE, m_graphAttrSpace, m_graphAttrNames)) {
         qWarning() << "[GraphPlugin]: failed to read the graph's attributes!";
         m_isValid = false;
         return;

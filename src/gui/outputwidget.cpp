@@ -55,11 +55,11 @@ void OutputWidget::slotEntityChanged(bool isAgent)
     m_ui->attr->clear();
     m_ui->input->clear();
     if (isAgent) {
-        for (QString n : m_modelPlugin->agentAttrRange().min.names()) {
+        for (QString n : m_modelPlugin->agentAttrNames()) {
             m_ui->attr->addItem(n);
         }
     } else {
-        for (QString n : m_modelPlugin->edgeAttrRange().min.names()) {
+        for (QString n : m_modelPlugin->edgeAttrNames()) {
             m_ui->attr->addItem(n);
         }
     }
@@ -74,15 +74,17 @@ void OutputWidget::slotAdd()
     Output* output;
     Value input;
     if (m_ui->func->currentData().toInt() == 0) { // default output
+        const ValueSpace* valSpace;
         DefaultOutput::Entity entity;
         if (m_ui->entityAgent->isChecked()) {
             entity = DefaultOutput::E_Agents;
-            input = m_modelPlugin->agentAttrSpace().value(attrName)->validate(m_ui->input->text());
+            valSpace = m_modelPlugin->agentAttrSpace().value(attrName);
         } else {
             entity = DefaultOutput::E_Edges;
-            input = m_modelPlugin->edgeAttrSpace().value(attrName)->validate(m_ui->input->text());
+            valSpace = m_modelPlugin->edgeAttrSpace().value(attrName);
         }
 
+        input = valSpace->validate(m_ui->input->text());
         if (!input.isValid()) {
             QMessageBox::warning(this, "Wrong Input", "The 'input' is not valid for the current 'attribute'.");
             return;
@@ -91,7 +93,7 @@ void OutputWidget::slotAdd()
         DefaultOutput::Function func = DefaultOutput::funcFromString(m_ui->func->currentText());
         Q_ASSERT(func != DefaultOutput::F_Invalid);
 
-        output = new DefaultOutput(func, entity, attrName, m_ui->attr->currentIndex(), {input}, m_trialIds);
+        output = new DefaultOutput(func, entity, valSpace, {input}, m_trialIds);
 
         m_ui->table->insertRow(row);
         m_ui->table->setItem(row, 0, new QTableWidgetItem("Default"));
@@ -139,15 +141,14 @@ void OutputWidget::fill(std::vector<Output*> outputs)
 
             for (Value input : df->allInputs()) {
                 // we create one Output object for each input
-                m_newOutputs.emplace_back(new DefaultOutput(
-                        df->function(), df->entity(), df->attrName(),
-                        df->attrIdx(), {input}, trialIds));
+                m_newOutputs.emplace_back(new DefaultOutput(df->function(),
+                        df->entity(), df->valueSpace(), {input}, trialIds));
 
                 m_ui->table->insertRow(row);
                 m_ui->table->setItem(row, 0, new QTableWidgetItem("Default"));
                 m_ui->table->setItem(row, 1, new QTableWidgetItem(df->functionStr()));
                 m_ui->table->setItem(row, 2, new QTableWidgetItem(df->entity() == DefaultOutput::E_Agents ? "Agent" : "Edge"));
-                m_ui->table->setItem(row, 3, new QTableWidgetItem(df->attrName()));
+                m_ui->table->setItem(row, 3, new QTableWidgetItem(df->valueSpace()->attrName()));
                 m_ui->table->setItem(row, 4, new QTableWidgetItem(input.toQString()));
                 ++row;
             }

@@ -506,8 +506,7 @@ Experiment::ExperimentInputs* Experiment::readInputs(const MainApp* mainApp,
             trialIds.emplace_back(i);
         }
 
-        outputs = Output::parseHeader(outHeader.split(";"), trialIds,
-                mPlugin->agentAttrRange(), mPlugin->edgeAttrRange(), errorMsg);
+        outputs = Output::parseHeader(outHeader.split(";"), trialIds, mPlugin, errorMsg);
         if (outputs.empty()) {
             failedAttributes.append(OUTPUT_HEADER);
         }

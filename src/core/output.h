@@ -13,6 +13,7 @@
 
 #include "abstractmodel.h"
 #include "attributes.h"
+#include "modelplugin.h"
 #include "stats.h"
 
 namespace evoplex {
@@ -31,8 +32,8 @@ public:
 
     virtual bool operator==(const Output* output) = 0;
 
-    static std::vector<Output*> parseHeader(const QStringList& header, const std::vector<int> trialIds,
-            const AttributesRange& agentAttrRange, const AttributesRange& edgeAttrRange, QString& errorMsg);
+    static std::vector<Output*> parseHeader(const QStringList& header,
+        const std::vector<int> trialIds, const ModelPlugin* model, QString& errorMsg);
 
     const int addCache(Values inputs, const std::vector<int> trialIds);
 
@@ -125,8 +126,8 @@ public:
         return "invalid";
     }
 
-    explicit DefaultOutput(const Function f, const Entity e, const QString& attrName,
-                           const int attrIdx, Values inputs, const std::vector<int> trialIds);
+    explicit DefaultOutput(const Function f, const Entity e, const ValueSpace* valSpace,
+                           Values inputs, const std::vector<int> trialIds);
 
     virtual void doOperation(const int trialId, const AbstractModel* model);
 
@@ -139,14 +140,13 @@ public:
     inline Function function() const { return m_func; }
     inline QString functionStr()  const { return DefaultOutput::stringFromFunc(m_func); }
     inline Entity entity() const { return m_entity; }
-    inline int attrIdx() const { return m_attrIdx; }
-    inline QString attrName() const { return m_attrName; }
+    inline const ValueSpace* valueSpace() const { return m_valueSpace; }
 
 private:
     const Function m_func;
     const Entity m_entity;
+    const ValueSpace* m_valueSpace;
     const QString m_attrName;
-    const int m_attrIdx;
 };
 
 }

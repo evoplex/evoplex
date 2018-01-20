@@ -180,58 +180,6 @@ public:
         return true;
     }
 
-    // return the boundary value for each parameter (min and max)
-    static bool boundaryValues(const AttributesSpace& attributesSpace, AttributesRange& range) {
-        if (attributesSpace.isEmpty()) {
-            return false;
-        }
-
-        range.min.resize(attributesSpace.size());
-        range.max.resize(attributesSpace.size());
-
-        AttributesSpace::const_iterator it = attributesSpace.begin();
-        for (it; it != attributesSpace.end(); ++it) {
-            const QString& attrName = it.key();
-            const int id = it.value()->id();
-            const QString& space = it.value()->space();
-            bool ok = false;
-
-            if (space.isEmpty()) {
-                range.min.replace(id, attrName, 0);
-                range.max.replace(id, attrName, 0);
-                ok = false;
-            } else if (space == "bool") {
-                range.min.replace(id, attrName, false);
-                range.max.replace(id, attrName, true);
-                ok = true;
-            } else if (space == "string" || space == "dirpath" || space == "filepath") {
-                range.min.replace(id, attrName, "");
-                range.max.replace(id, attrName, "");
-                ok = true;
-            } else if (space.contains("{") && space.endsWith("}")) {
-                Values values;
-                if (paramSet(space, values)) {
-                    range.min.replace(id, attrName, values.front());
-                    range.max.replace(id, attrName, values.back());
-                    ok = true;
-                }
-            } else if (space.contains("[") && space.endsWith("]")) {
-                Value max, min;
-                if (paramInterval(space, min, max)) {
-                    range.min.replace(id, attrName, min);
-                    range.max.replace(id, attrName, max);
-                    ok = true;
-                }
-            }
-
-            if (!ok) {
-                qWarning() << "[Utils]: unable to parse the parameter space of" << attrName << space;
-                return false;
-            }
-        }
-        return true;
-    }
-
     // return a vector of valid random set of attributes.
     // attributesSpace must be valid at this point
     static QVector<Attributes> randomAttrs(const AttributesSpace& attributesSpace, PRG* prg, const int size=1)

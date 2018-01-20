@@ -246,12 +246,11 @@ void AttributesWidget::slotOutputWidget()
     }
 
     std::vector<Output*> currentOutputs;
-    ModelPlugin* model = m_project->getModels().value(m_selectedModelId);
+    const ModelPlugin* model = m_project->getModels().value(m_selectedModelId);
     QString currentHeader = m_widgetFields.value(OUTPUT_HEADER).value<QLineEdit*>()->text();
     if (!currentHeader.isEmpty()) {
         QString errorMsg;
-        currentOutputs = Output::parseHeader(currentHeader.split(";"), trialIds,
-                model->agentAttrRange(), model->edgeAttrRange(), errorMsg);
+        currentOutputs = Output::parseHeader(currentHeader.split(";"), trialIds, model, errorMsg);
         if (!errorMsg.isEmpty()) {
             QMessageBox::warning(this, "Output Creator", errorMsg);
             qDeleteAll(currentOutputs);
@@ -416,7 +415,7 @@ void AttributesWidget::slotUpdateGraphPlugins()
 
     // create the trees to hold the graphs' attributes
     foreach (GraphPlugin* graph, m_project->getGraphs()) {
-        if (graph->graphAttrRange().min.size() > 0 && m_treeItemGraphs.contains(graph->id())) {
+        if (graph->graphAttrSpace().size() > 0 && m_treeItemGraphs.contains(graph->id())) {
             continue;
         }
 
@@ -427,7 +426,7 @@ void AttributesWidget::slotUpdateGraphPlugins()
         m_treeItemGraphs.insert(graph->id(), itemRoot);
 
         // the graph stuff
-        insertPluginAttributes(itemRoot, graph->id(), graph->graphAttrRange());
+        insertPluginAttributes(itemRoot, graph->id(), graph->graphAttrSpace());
     }
 }
 
@@ -454,32 +453,36 @@ void AttributesWidget::slotUpdateModelPlugins()
         m_treeItemModels.insert(model->id(), itemRoot);
 
         // the model stuff
-        insertPluginAttributes(itemRoot, model->id(), model->modelAttrRange());
+        insertPluginAttributes(itemRoot, model->id(), model->modelAttrSpace());
     }
 }
 
 void AttributesWidget::insertPluginAttributes(QTreeWidgetItem* itemRoot,
                                               const QString& uid,
-                                              const AttributesRange& range)
+                                              const AttributesSpace& attrsSpace)
 {
     const QString& uid_ = uid + "_";
-    for (int i = 0; i < range.min.size(); ++i) {
+    AttributesSpace::const_iterator it = attrsSpace.constBegin();
+    for (it; it != attrsSpace.constEnd(); ++it) {
+        const ValueSpace* valSpace = it.value();
         QTreeWidgetItem* item = new QTreeWidgetItem(itemRoot);
-        item->setText(0, range.min.name(i));
+        item->setText(0, valSpace->attrName());
 
         QWidget* widget = nullptr;
-        if (range.min.value(i).type == Value::DOUBLE) {
-            widget = newDoubleSpinBox(range.min.value(i).toDouble, range.max.value(i).toDouble);
-        } else if (range.min.value(i).type == Value::INT) {
-            widget = newSpinBox(range.min.value(i).toInt, range.max.value(i).toInt);
+        if (valSpace->type() == ValueSpace::Double_Interval) {
+            const IntervalSpace* iSpace = dynamic_cast<const IntervalSpace*>(valSpace);
+            widget = newDoubleSpinBox(iSpace->min().toDouble, iSpace->max().toDouble);
+        } else if (valSpace->type() == ValueSpace::Int_Interval) {
+            const IntervalSpace* iSpace = dynamic_cast<const IntervalSpace*>(valSpace);
+            widget = newSpinBox(iSpace->min().toInt, iSpace->max().toInt);
         } else {
             QLineEdit* le = new QLineEdit();
-            le->setText(range.min.value(i).toQString());
+            le->setText(valSpace->validValue().toQString());
             widget = le;
         }
         m_ui->treeWidget->setItemWidget(item, 1, widget);
         // add the uid as prefix to avoid clashes.
-        m_widgetFields.insert(uid_ + range.min.name(i), QVariant::fromValue(widget));
+        m_widgetFields.insert(uid_ + valSpace->attrName(), QVariant::fromValue(widget));
     }
 }
 
@@ -492,7 +495,7 @@ QSpinBox* AttributesWidget::newSpinBox(const int min, const int max)
     return sp;
 }
 
-QDoubleSpinBox* AttributesWidget::newDoubleSpinBox(const int min, const int max)
+QDoubleSpinBox* AttributesWidget::newDoubleSpinBox(const double min, const double max)
 {
     QDoubleSpinBox* sp = new QDoubleSpinBox(m_ui->treeWidget);
     sp->setMaximum(max);

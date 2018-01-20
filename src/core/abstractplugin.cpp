@@ -31,7 +31,8 @@ AbstractPlugin::AbstractPlugin(const QJsonObject* metaData)
     m_isValid = !(m_id.isEmpty() || m_author.isEmpty() || m_name.isEmpty() || m_descr.isEmpty());
 }
 
-bool AbstractPlugin::attrsSpace(const QJsonObject* metaData, const QString& name, AttributesSpace& ret) const
+bool AbstractPlugin::attrsSpace(const QJsonObject* metaData, const QString& name,
+                                AttributesSpace& space, std::vector<QString>& keys) const
 {
     if (metaData->contains(name)) {
         QJsonArray json = metaData->value(name).toArray();
@@ -40,11 +41,14 @@ bool AbstractPlugin::attrsSpace(const QJsonObject* metaData, const QString& name
             ValueSpace* valSpace = ValueSpace::parse(id, attrs.firstKey(), attrs.first().toString());
             if (!valSpace->isValid()) {
                 delete valSpace;
-                qDeleteAll(ret);
-                ret.clear();
+                qDeleteAll(space);
+                space.clear();
+                keys.clear();
+                keys.shrink_to_fit();
                 return false;
             }
-            ret.insert(valSpace->attrName(), valSpace);
+            space.insert(valSpace->attrName(), valSpace);
+            keys.push_back(valSpace->attrName());
         }
     }
     return true;

@@ -34,7 +34,8 @@ public:
 
 protected:
     bool m_isValid;
-    bool attrsSpace(const QJsonObject* metaData, const QString& name, AttributesSpace &ret) const;
+    bool attrsSpace(const QJsonObject* metaData, const QString& name,
+                    AttributesSpace &space, std::vector<QString>& keys) const;
 
 private:
     PluginType m_type;
