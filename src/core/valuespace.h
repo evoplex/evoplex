@@ -31,19 +31,24 @@ public:
         FilePath
     };
 
-    static ValueSpace parse(int id, const QString& attrName, QString space);
+    static ValueSpace* parse(int id, const QString& attrName, QString space);
 
     explicit ValueSpace();
-    explicit ValueSpace(int id, const QString& attrName, SpaceType type, Value validValue);
+    explicit ValueSpace(int id, const QString& attrName, const QString& space, SpaceType type, Value validValue);
     virtual ~ValueSpace() {}
 
+    inline bool isValid() const { return m_type != Invalid; }
+
+    inline int id() const { return m_id; }
+    inline const QString& attrName() const { return m_attrName; }
+    inline const QString& space() const { return m_space; }
     inline Value validValue() const { return m_validValue; }
 
     Value validate(const QString& valueStr);
 
 private:
     const int m_id;
-    const QString m_name;
+    const QString m_attrName;
     const QString m_space;
     const SpaceType m_type;
 
@@ -53,8 +58,8 @@ private:
 class IntervalSpace : public ValueSpace
 {
 public:
-    IntervalSpace(int id, const QString& attrName, SpaceType type, Value min, Value max)
-        : ValueSpace(id, attrName, type, min), m_min(min), m_max(max) {}
+    IntervalSpace(int id, const QString& attrName, const QString& space, SpaceType type, Value min, Value max)
+        : ValueSpace(id, attrName, space, type, min), m_min(min), m_max(max) {}
 
     virtual ~IntervalSpace() {}
 
@@ -70,8 +75,8 @@ private:
 class SetSpace : public ValueSpace
 {
 public:
-    SetSpace(int id, const QString& attrName, SpaceType type, Values values)
-        : ValueSpace(id, attrName, type, values.front()), m_values(values) {}
+    SetSpace(int id, const QString& attrName, const QString& space, SpaceType type, Values values)
+        : ValueSpace(id, attrName, space, type, values.front()), m_values(values) {}
 
     virtual ~SetSpace() {}
 
@@ -81,6 +86,8 @@ public:
 private:
     Values m_values;
 };
+
+typedef QHash<QString, ValueSpace*> AttributesSpace;
 
 } // evoplex
 #endif // VALUESPACE_H

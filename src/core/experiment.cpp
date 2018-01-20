@@ -467,29 +467,29 @@ Experiment::ExperimentInputs* Experiment::readInputs(const MainApp* mainApp,
 
         AttributesSpace::const_iterator gps = mainApp->getGeneralAttrSpace().find(attrName);
         if (gps != mainApp->getGeneralAttrSpace().end()) {
-            Value value = Utils::validateParameter(gps.value().second, vStr);
+            Value value = gps.value()->validate(vStr);
             if (value.isValid()) {
-                generalAttrs->replace(gps.value().first, attrName, value);
+                generalAttrs->replace(gps.value()->id(), attrName, value);
             } else {
                 failedAttributes.append(attrName);
             }
         } else {
-            QPair<int, QString> attrSpace;
+            ValueSpace* valSpace = nullptr;
             Attributes* attributes = nullptr;
             if (attrName.startsWith(modelId_)) {
                 attrName = attrName.remove(modelId_);
-                attrSpace = mPlugin->modelAttrSpace().value(attrName);
+                valSpace = mPlugin->modelAttrSpace().value(attrName);
                 attributes = modelAttrs;
             } else if (attrName.startsWith(graphId_)) {
                 attrName = attrName.remove(graphId_);
-                attrSpace = gPlugin->graphAttrSpace().value(attrName);
+                valSpace = gPlugin->graphAttrSpace().value(attrName);
                 attributes = graphAttrs;
             }
 
-            if (attributes && !attrSpace.second.isEmpty()) {
-                Value value = Utils::validateParameter(attrSpace.second, vStr);
+            if (attributes && valSpace) {
+                Value value = valSpace->validate(vStr);
                 if (value.isValid()) {
-                    attributes->replace(attrSpace.first, attrName, value);
+                    attributes->replace(valSpace->id(), attrName, value);
                 } else {
                     failedAttributes.append(attrName);
                 }

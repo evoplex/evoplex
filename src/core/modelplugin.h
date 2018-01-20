@@ -17,6 +17,7 @@ class ModelPlugin : public AbstractPlugin
 {
 public:
     ModelPlugin(const QObject* instance, const QJsonObject* metaData);
+    virtual ~ModelPlugin();
 
     AbstractModel* create() const { return m_factory->create(); }
 

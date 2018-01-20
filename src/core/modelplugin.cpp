@@ -20,28 +20,32 @@ ModelPlugin::ModelPlugin(const QObject* instance, const QJsonObject* metaData)
     m_supportedGraphs = metaData->value(PLUGIN_ATTRIBUTE_SUPPORTEDGRAPHS).toString().split(",").toVector();
     m_customOutputs = metaData->value(PLUGIN_ATTRIBUTE_CUSTOMOUTPUTS).toString().split(",").toVector();
 
-    m_agentAttrSpace = attrsSpace(metaData, PLUGIN_ATTRIBUTE_AGENTSPACE);
-    if (!m_agentAttrSpace.isEmpty() && !Utils::boundaryValues(m_agentAttrSpace, m_agentAttrRange)) {
+    if (!attrsSpace(metaData, PLUGIN_ATTRIBUTE_AGENTSPACE, m_agentAttrSpace)) {
         qWarning() << "[ModelPlugin]: failed to read the agent's attributes!";
         m_isValid = false;
         return;
     }
 
-    m_edgeAttrSpace = attrsSpace(metaData, PLUGIN_ATTRIBUTE_EDGESPACE);
-    if (!m_edgeAttrSpace.isEmpty() && !Utils::boundaryValues(m_edgeAttrSpace, m_edgeAttrRange)) {
+    if (!attrsSpace(metaData, PLUGIN_ATTRIBUTE_EDGESPACE, m_edgeAttrSpace)) {
         qWarning() << "[ModelPlugin]: failed to read the edge's attributes!";
         m_isValid = false;
         return;
     }
 
-    m_modelAttrSpace = attrsSpace(metaData, PLUGIN_ATTRIBUTE_MODELSPACE);
-    if (!m_modelAttrSpace.isEmpty() && !Utils::boundaryValues(m_modelAttrSpace, m_modelAttrRange)) {
+    if (!attrsSpace(metaData, PLUGIN_ATTRIBUTE_MODELSPACE, m_modelAttrSpace)) {
         qWarning() << "[ModelPlugin]: failed to read the model's attributes!";
         m_isValid = false;
         return;
     }
 
     m_isValid = true;
+}
+
+ModelPlugin::~ModelPlugin()
+{
+    qDeleteAll(m_agentAttrSpace);
+    qDeleteAll(m_edgeAttrSpace);
+    qDeleteAll(m_modelAttrSpace);
 }
 
 } // evoplex

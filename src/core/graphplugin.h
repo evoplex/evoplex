@@ -15,6 +15,7 @@ class GraphPlugin : public AbstractPlugin
 {
 public:
     GraphPlugin(const QObject* instance, const QJsonObject* metaData);
+    virtual ~GraphPlugin();
 
     inline AbstractGraph* create() const { return m_factory->create(); }
 

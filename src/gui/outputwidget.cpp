@@ -77,12 +77,10 @@ void OutputWidget::slotAdd()
         DefaultOutput::Entity entity;
         if (m_ui->entityAgent->isChecked()) {
             entity = DefaultOutput::E_Agents;
-            input = Utils::validateParameter(m_modelPlugin->agentAttrSpace().value(attrName).second,
-                                             m_ui->input->text());
+            input = m_modelPlugin->agentAttrSpace().value(attrName)->validate(m_ui->input->text());
         } else {
             entity = DefaultOutput::E_Edges;
-            input = Utils::validateParameter(m_modelPlugin->edgeAttrSpace().value(attrName).second,
-                                             m_ui->input->text());
+            input = m_modelPlugin->edgeAttrSpace().value(attrName)->validate(m_ui->input->text());
         }
 
         if (!input.isValid()) {

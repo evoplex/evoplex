@@ -70,13 +70,13 @@ Agents FileMgr::importAgents(const QString& filePath, const QString& modelId) co
             } else if (header.at(i) == "y") {
                 coordY = values.at(i).toInt(&isValid);
             } else {
-                QPair<int, QString> space = modelPlugin->agentAttrSpace().value(header.at(i));
-                Value value = Utils::validateParameter(space.second, values.at(i));
+                ValueSpace* valSpace = modelPlugin->agentAttrSpace().value(header.at(i));
+                Value value = valSpace->validate(values.at(i));
                 if (!value.isValid()) {
                     isValid = false;
                     break;
                 }
-                attributes.replace(space.first, header.at(i), value);
+                attributes.replace(valSpace->id(), header.at(i), value);
             }
         }
         agents.emplace_back(new Agent(id, attributes, coordX, coordY));

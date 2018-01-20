@@ -16,10 +16,6 @@
 
 namespace evoplex {
 
-// An AttributeSpace corresponds to a QHash<attributeName, <id, space>> where 'id'
-// is an integer which is assigned in the same order as defined in metaData.json
-typedef QHash<QString, QPair<int, QString>> AttributesSpace;
-
 class Attributes
 {
 public:

@@ -10,6 +10,7 @@
 #include <QString>
 
 #include "attributes.h"
+#include "valuespace.h"
 
 namespace evoplex {
 class AbstractPlugin
@@ -21,6 +22,7 @@ public:
     };
 
     AbstractPlugin(const QJsonObject* metaData);
+    virtual ~AbstractPlugin() {}
 
     inline const bool isValid() const { return m_isValid; }
 
@@ -32,7 +34,7 @@ public:
 
 protected:
     bool m_isValid;
-    AttributesSpace attrsSpace(const QJsonObject* metaData, const QString& name) const;
+    bool attrsSpace(const QJsonObject* metaData, const QString& name, AttributesSpace &ret) const;
 
 private:
     PluginType m_type;

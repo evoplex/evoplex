@@ -31,17 +31,23 @@ AbstractPlugin::AbstractPlugin(const QJsonObject* metaData)
     m_isValid = !(m_id.isEmpty() || m_author.isEmpty() || m_name.isEmpty() || m_descr.isEmpty());
 }
 
-AttributesSpace AbstractPlugin::attrsSpace(const QJsonObject* metaData, const QString& name) const
+bool AbstractPlugin::attrsSpace(const QJsonObject* metaData, const QString& name, AttributesSpace& ret) const
 {
-    AttributesSpace ret;
     if (metaData->contains(name)) {
         QJsonArray json = metaData->value(name).toArray();
-        for (int i = 0; i < json.size(); ++i) {
-            QVariantMap attrs = json.at(i).toObject().toVariantMap();
-            ret.insert(attrs.firstKey(), qMakePair(i, attrs.first().toString()));
+        for (int id = 0; id < json.size(); ++id) {
+            QVariantMap attrs = json.at(id).toObject().toVariantMap();
+            ValueSpace* valSpace = ValueSpace::parse(id, attrs.firstKey(), attrs.first().toString());
+            if (!valSpace->isValid()) {
+                delete valSpace;
+                qDeleteAll(ret);
+                ret.clear();
+                return false;
+            }
+            ret.insert(valSpace->attrName(), valSpace);
         }
     }
-    return ret;
+    return true;
 }
 
 } // evoplex

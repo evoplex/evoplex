@@ -16,6 +16,7 @@
 #include "attributes.h"
 #include "prg.h"
 #include "enums.h"
+#include "valuespace.h"
 
 namespace evoplex {
 
@@ -201,8 +202,8 @@ public:
         AttributesSpace::const_iterator it = attributesSpace.begin();
         for (it; it != attributesSpace.end(); ++it) {
             const QString& attrName = it.key();
-            const int id = it.value().first;
-            const QString& space = it.value().second;
+            const int id = it.value()->id();
+            const QString& space = it.value()->space();
             bool ok = false;
 
             if (space.isEmpty()) {
@@ -259,8 +260,8 @@ public:
         AttributesSpace::const_iterator it = attributesSpace.begin();
         for (it; it != attributesSpace.end(); ++it) {
             const QString& attrName = it.key();
-            int attrId = it.value().first;
-            const QString& space = it.value().second;
+            int attrId = it.value()->id();
+            const QString& space = it.value()->space();
             bool ok = false;
 
             if (space.contains("{") && space.endsWith("}")) {

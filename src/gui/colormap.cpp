@@ -48,7 +48,7 @@ void ColorMap::setAttr(const QString& attrName)
 {
     if (m_mapValue) delete m_mapValue;
     bool ok = false;
-    const QString& attrSpace = m_attrsSpace.value(attrName).second;
+    const QString& attrSpace = m_attrsSpace.value(attrName)->space();
 
     if (Utils::isASet(attrSpace)) {
         Values vals;

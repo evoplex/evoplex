@@ -11,6 +11,7 @@
 #include <vector>
 
 #include "core/attributes.h"
+#include "core/valuespace.h"
 
 namespace evoplex {
 

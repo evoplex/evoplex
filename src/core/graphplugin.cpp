@@ -18,8 +18,7 @@ GraphPlugin::GraphPlugin(const QObject* instance, const QJsonObject* metaData)
 
     m_factory = qobject_cast<IPluginGraph*>(instance);
 
-    m_graphAttrSpace = attrsSpace(metaData, PLUGIN_ATTRIBUTE_GRAPHSPACE);
-    if (!m_graphAttrSpace.isEmpty() && !Utils::boundaryValues(m_graphAttrSpace, m_graphAttrRange)) {
+    if (!attrsSpace(metaData, PLUGIN_ATTRIBUTE_GRAPHSPACE, m_graphAttrSpace)) {
         qWarning() << "[GraphPlugin]: failed to read the graph's attributes!";
         m_isValid = false;
         return;
@@ -32,6 +31,11 @@ GraphPlugin::GraphPlugin(const QObject* instance, const QJsonObject* metaData)
     }
 
     m_isValid = true;
+}
+
+GraphPlugin::~GraphPlugin()
+{
+    qDeleteAll(m_graphAttrSpace);
 }
 
 } // evoplex
