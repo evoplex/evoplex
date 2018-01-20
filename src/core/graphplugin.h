@@ -27,6 +27,7 @@ public:
 private:
     IPluginGraph* m_factory;
 
+    std::vector<AbstractGraph::GraphType> m_validGraphTypes;
     AttributesSpace m_graphAttrSpace;
     AttributesRange m_graphAttrRange;
 };

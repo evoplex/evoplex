@@ -4,8 +4,8 @@
   "name": "Custom Graph",
   "author": "Marcos Cardinot",
   "description": "Custom graph.",
+  "validGraphTypes": [ "undirected", "directed" ],
   "graphAttributesSpace": [
-    {"graphType": "graphType{undirected,directed}"},
     {"filePath": "filepath"}
   ]
 }

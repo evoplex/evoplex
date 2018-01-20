@@ -9,7 +9,6 @@
 #include <vector>
 
 #include "attributes.h"
-#include "enums.h"
 
 namespace evoplex {
 

@@ -38,7 +38,7 @@
 #define PLUGIN_ATTRIBUTE_CUSTOMOUTPUTS "customOutputs"      // custom outputs defined in the model
 #define PLUGIN_ATTRIBUTE_SUPPORTEDGRAPHS "supportedGraphs"  // graphIds allowed in the model
 // graph (only)
-#define PLUGIN_ATTRIBUTE_GRAPH_TYPE "graphType"             // graph types of a graph generator
+#define PLUGIN_ATTRIBUTE_VALIDGRAPHTYPES "validGraphTypes"  // valid graph types of a graph generator
 #define PLUGIN_ATTRIBUTE_GRAPHSPACE "graphAttributesSpace"  // domain of the graph's attributes
 
 

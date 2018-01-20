@@ -11,7 +11,6 @@
 
 #include "plugininterfaces.h"
 #include "attributes.h"
-#include "enums.h"
 #include "graphplugin.h"
 #include "modelplugin.h"
 

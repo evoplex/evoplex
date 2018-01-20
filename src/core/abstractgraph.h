@@ -9,7 +9,6 @@
 #include "agent.h"
 #include "constants.h"
 #include "edge.h"
-#include "enums.h"
 #include "prg.h"
 
 namespace evoplex {
@@ -20,6 +19,19 @@ class AbstractBaseGraph
     friend class Experiment;
 
 public:
+    enum GraphType {
+        Invalid_Type = 0,
+        Undirected = 1,
+        Directed = 2
+    };
+
+    static GraphType enumFromString(const QString& str)
+    {
+        if (str == "directed") return Directed;
+        if (str == "undirected") return Undirected;
+        return Invalid_Type;
+    }
+
     inline const QString& name() const { return m_name; }
     inline const GraphType& type() const { return m_type; }
     inline const Attributes* attrs() const { return m_attrs; }
@@ -58,7 +70,7 @@ private:
         m_prg = prg;
         m_agents = agents;
         m_attrs = attrs;
-        m_type = (GraphType) attrs->value(PLUGIN_ATTRIBUTE_GRAPH_TYPE).toInt;
+        m_type = (GraphType) attrs->value(PLUGIN_ATTRIBUTE_VALIDGRAPHTYPES).toInt;
     }
 };
 

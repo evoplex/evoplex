@@ -4,8 +4,8 @@
   "name": "Square Grid",
   "author": "Marcos Cardinot",
   "description": "Regular lattice grid with Von Neumann neighbourhood. That is, each agent has four neighbours.",
+  "validGraphTypes": [ "undirected", "directed" ],
   "graphAttributesSpace": [
-    {"graphType": "graphType{undirected,directed}"},
     {"height": "int[1,max]"},
     {"width": "int[1,max]"}
   ]
