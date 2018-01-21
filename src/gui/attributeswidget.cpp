@@ -489,17 +489,33 @@ void AttributesWidget::insertPluginAttributes(QTreeWidgetItem* itemRoot,
         item->setData(0, Qt::UserRole, uid);
 
         QWidget* widget = nullptr;
-        if (valSpace->type() == ValueSpace::Double_Interval) {
+        switch (valSpace->type()) {
+        case ValueSpace::Double_Interval: {
             const IntervalSpace* iSpace = dynamic_cast<const IntervalSpace*>(valSpace);
             widget = newDoubleSpinBox(iSpace->min().toDouble, iSpace->max().toDouble);
-        } else if (valSpace->type() == ValueSpace::Int_Interval) {
+            break;
+        }
+        case ValueSpace::Int_Interval: {
             const IntervalSpace* iSpace = dynamic_cast<const IntervalSpace*>(valSpace);
             widget = newSpinBox(iSpace->min().toInt, iSpace->max().toInt);
-        } else {
+            break;
+        }
+        case ValueSpace::Double_Set:
+        case ValueSpace::Int_Set: {
+            const SetSpace* sSpace = dynamic_cast<const SetSpace*>(valSpace);
+            QComboBox* cb = new QComboBox();
+            for (Value v : sSpace->values()) {
+                cb->addItem(v.toQString());
+            }
+            widget = cb;
+            break;
+        }
+        default:
             QLineEdit* le = new QLineEdit();
             le->setText(valSpace->validValue().toQString());
             widget = le;
         }
+
         m_ui->treeWidget->setItemWidget(item, 1, widget);
         // add the uid as prefix to avoid clashes.
         m_widgetFields.insert(uid_ + valSpace->attrName(), QVariant::fromValue(widget));

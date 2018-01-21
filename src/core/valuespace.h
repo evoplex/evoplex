@@ -65,9 +65,9 @@ public:
 
     virtual ~IntervalSpace() {}
 
-    Value rand(PRG* prg);
-    inline Value min() const { return m_min; }
-    inline Value max() const { return m_max; }
+    const Value& rand(PRG* prg);
+    inline const Value& min() const { return m_min; }
+    inline const Value& max() const { return m_max; }
 
 private:
     Value m_min;
@@ -82,8 +82,8 @@ public:
 
     virtual ~SetSpace() {}
 
-    Value rand(PRG* prg);
-    inline Values values() const { return m_values; }
+    const Value& rand(PRG* prg);
+    inline const Values& values() const { return m_values; }
 
 private:
     Values m_values;

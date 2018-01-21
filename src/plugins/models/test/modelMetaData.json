@@ -7,8 +7,10 @@
   "supportedGraphs": "mooreGrid,squareGrid,customGraph",
   "customOutputs": "",
   "pluginAttributesSpace": [
-    {"temptation": "double[1,2]"},
-    {"loners": "double[0,1]"}
+    {"doubleInterval": "double[1,2]"},
+    {"intInterval": "int[0,4]"},
+    {"doubleSet": "double{1.2,4.4}"},
+    {"intSet": "int{1,4}"}
   ],
   "agentAttributesSpace": [
     {"strategy": "int{0,1}"}
