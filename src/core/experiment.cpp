@@ -499,10 +499,11 @@ Experiment::ExperimentInputs* Experiment::readInputs(const MainApp* mainApp,
         }
     }
 
-    int numTrials = generalAttrs->value(GENERAL_ATTRIBUTE_TRIALS).toInt;
     QString outHeader = generalAttrs->value(OUTPUT_HEADER).toQString();
     std::vector<Output*> outputs;
-    if (!outHeader.isEmpty() && numTrials > 0) {
+    if (!outHeader.isEmpty()) {
+        const int numTrials = generalAttrs->value(GENERAL_ATTRIBUTE_TRIALS).toInt;
+        Q_ASSERT(numTrials > 0);
         std::vector<int> trialIds;
         for (int i = 0; i < numTrials; ++i) {
             trialIds.emplace_back(i);
@@ -528,6 +529,11 @@ Experiment::ExperimentInputs* Experiment::readInputs(const MainApp* mainApp,
         qDeleteAll(outputs);
         return nullptr;
     }
+
+    // make sure all attributes exist
+    Q_ASSERT(generalAttrs->indexOf("") == -1);
+    Q_ASSERT(modelAttrs->indexOf("") == -1);
+    Q_ASSERT(graphAttrs->indexOf("") == -1);
 
     // that's great! everything seems to be valid
     ExperimentInputs* inputs = new ExperimentInputs;

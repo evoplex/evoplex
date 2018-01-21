@@ -141,7 +141,7 @@ AttributesWidget::AttributesWidget(MainApp* mainApp, Project* project, QWidget *
     itemOut->setText(0, OUTPUT_SAVESTEPS);
     m_ui->treeWidget->setItemWidget(itemOut, 1, outStepsLayout->parentWidget());
 */
-    connect(m_enableOutputs, &QCheckBox::clicked,
+    connect(m_enableOutputs, &QCheckBox::toggled,
             [outDir, outBrowseDir, outHeader, outBuildHeader](bool b) {
                 outDir->setEnabled(b);
                 outBrowseDir->setEnabled(b);
@@ -149,6 +149,7 @@ AttributesWidget::AttributesWidget(MainApp* mainApp, Project* project, QWidget *
                 outBuildHeader->setEnabled(b);
 //                outAvgTrials->setEnabled(b);
     });
+    m_enableOutputs->setChecked(true);
     m_enableOutputs->setChecked(false);
 
     slotPluginsUpdated(AbstractPlugin::GraphPlugin);
@@ -317,16 +318,13 @@ Experiment::ExperimentInputs* AttributesWidget::readInputs()
     QStringList values;
     QVariantHash::iterator it;
     for (it = m_widgetFields.begin(); it != m_widgetFields.end(); ++it) {
-        header << it.key();
-
-        if (!m_enableOutputs->isChecked()
-                && (it.key() == OUTPUT_DIR || it.key() == OUTPUT_HEADER)) {
-            values << "";
+        QWidget* widget = it.value().value<QWidget*>();
+        Q_ASSERT(widget);
+        if (!widget->isEnabled()) {
             continue;
         }
 
-        QWidget* widget = it.value().value<QWidget*>();
-        Q_ASSERT(widget);
+        header << it.key();
 
         QSpinBox* sp = qobject_cast<QSpinBox*>(widget);
         if (sp) {
@@ -357,6 +355,11 @@ Experiment::ExperimentInputs* AttributesWidget::readInputs()
         qFatal("[AttributesWidget]: unable to know the widget type.");
     }
 
+    if (!m_enableOutputs->isChecked()) {
+        header << OUTPUT_DIR << OUTPUT_HEADER;
+        values << "" << "";
+    }
+
     QString errorMsg;
     Experiment::ExperimentInputs* inputs = Experiment::readInputs(m_mainApp, header, values, errorMsg);
     if (!inputs) {
@@ -384,32 +387,32 @@ void AttributesWidget::slotEditExperiment()
 void AttributesWidget::slotGraphSelected(const QString& graphId)
 {
     m_selectedGraphId = graphId;
-    QTreeWidgetItemIterator it(m_ui->treeWidget);
-    while (*it) {
-        if ((*it)->parent() == m_treeItemGraphs) {
-            QString id = (*it)->data(0, Qt::UserRole).toString();
-            (*it)->setHidden(!id.isEmpty() && id != graphId);
-        }
-        ++it;
-    }
+    pluginSelected(m_treeItemGraphs, graphId);
 }
 
 void AttributesWidget::slotModelSelected(const QString& modelId)
 {
     m_selectedModelId = modelId;
-    QTreeWidgetItemIterator it(m_ui->treeWidget);
-    while (*it) {
-        if ((*it)->parent() == m_treeItemModels) {
-            QString id = (*it)->data(0, Qt::UserRole).toString();
-            (*it)->setHidden(!id.isEmpty() && id != modelId);
-        }
-        ++it;
-    }
+    pluginSelected(m_treeItemModels, modelId);
 
     bool nullModel = modelId == STRING_NULL_PLUGINID;
     m_treeItemGeneral->setHidden(nullModel);
     m_treeItemGraphs->setHidden(nullModel);
     m_treeItemOutputs->setHidden(nullModel);
+}
+
+void AttributesWidget::pluginSelected(QTreeWidgetItem* item, const QString& pluginId)
+{
+    QTreeWidgetItemIterator it(m_ui->treeWidget);
+    while (*it) {
+        if ((*it)->parent() == item) {
+            QString id = (*it)->data(0, Qt::UserRole).toString();
+            bool hide = !id.isEmpty() && id != pluginId;
+            (*it)->setHidden(hide);
+            m_ui->treeWidget->itemWidget((*it), 1)->setDisabled(hide);
+        }
+        ++it;
+    }
 }
 
 void AttributesWidget::slotPluginsUpdated(AbstractPlugin::PluginType type)

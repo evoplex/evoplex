@@ -61,6 +61,8 @@ private:
     void addTreeWidget(QTreeWidgetItem* itemRoot, const QString& label, const QVariant& widget);
 
     Experiment::ExperimentInputs* readInputs();
+
+    void pluginSelected(QTreeWidgetItem* item, const QString& pluginId);
 };
 }
 
