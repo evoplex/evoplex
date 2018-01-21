@@ -510,6 +510,10 @@ void AttributesWidget::insertPluginAttributes(QTreeWidgetItem* itemRoot,
             widget = cb;
             break;
         }
+        case ValueSpace::Bool: {
+            widget = new QCheckBox();
+            break;
+        }
         default:
             QLineEdit* le = new QLineEdit();
             le->setText(valSpace->validValue().toQString());

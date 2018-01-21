@@ -10,7 +10,8 @@
     {"doubleInterval": "double[1,2]"},
     {"intInterval": "int[0,4]"},
     {"doubleSet": "double{1.2,4.4}"},
-    {"intSet": "int{1,4}"}
+    {"intSet": "int{1,4}"},
+    {"bool": "bool"}
   ],
   "agentAttributesSpace": [
     {"strategy": "int{0,1}"}
