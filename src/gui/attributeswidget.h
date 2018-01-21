@@ -52,6 +52,7 @@ private:
     QTreeWidgetItem* m_treeItemGraphs;
     QVariantHash m_widgetFields;
     QCheckBox* m_enableOutputs;
+    int m_customGraphIdx; // position of combobox in the graph tree
 
     void insertPluginAttributes(QTreeWidgetItem* itemRoot, const QString &uid,
                                 const AttributesSpace& attrsSpace);
@@ -62,7 +63,7 @@ private:
 
     Experiment::ExperimentInputs* readInputs();
 
-    void pluginSelected(QTreeWidgetItem* item, const QString& pluginId);
+    void pluginSelected(QTreeWidgetItem* itemRoot, const QString& pluginId);
 };
 }
 

@@ -242,8 +242,8 @@ AbstractModel* Experiment::createTrial(const int trialId)
 
     PRG* prg = new PRG(m_seed + trialId);
     AbstractGraph* graphObj = m_graphPlugin->create();
-    graphObj->setup(prg, agents, m_graphAttrs);
-    if (!graphObj || !graphObj->init()) {
+    QString gType = m_generalAttrs->value(GENERAL_ATTRIBUTE_GRAPHTYPE).toString;
+    if (!graphObj || !graphObj->setup(prg, agents, m_graphAttrs, gType) || !graphObj->init()) {
         qWarning() << "[Experiment]: unable to create the trials."
                    << "The graph could not be initialized."
                    << "Project:" << m_projId << "Experiment:" << m_id;
@@ -256,8 +256,7 @@ AbstractModel* Experiment::createTrial(const int trialId)
     graphObj->reset();
 
     AbstractModel* modelObj = m_modelPlugin->create();
-    modelObj->setup(prg, graphObj, m_modelAttrs);
-    if (!modelObj || !modelObj->init()) {
+    if (!modelObj || !modelObj->setup(prg, graphObj, m_modelAttrs) || !modelObj->init()) {
         qWarning() << "[Experiment]: unable to create the trials."
                    << "The model could not be initialized."
                    << "Project:" << m_projId << "Experiment:" << m_id;

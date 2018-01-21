@@ -22,7 +22,7 @@ public:
 
 private:
     // graph parameters
-    enum GraphAttr { Type, FilePath };
+    enum GraphAttr { FilePath };
     QString m_filePath;
 };
 }

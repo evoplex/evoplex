@@ -27,8 +27,8 @@ public:
 
     static GraphType enumFromString(const QString& str)
     {
-        if (str == "directed") return Directed;
         if (str == "undirected") return Undirected;
+        if (str == "directed") return Directed;
         return Invalid_Type;
     }
 
@@ -64,13 +64,18 @@ private:
     }
 
     // takes the ownership of the agents
-    inline void setup(PRG* prg, Agents& agents, Attributes* attrs) {
+    inline bool setup(PRG* prg, Agents& agents, Attributes* attrs, const QString& graphType) {
         // make sure it'll be called only once
         Q_ASSERT(!m_prg && m_agents.empty());
         m_prg = prg;
         m_agents = agents;
         m_attrs = attrs;
-        m_type = (GraphType) attrs->value(PLUGIN_ATTRIBUTE_VALIDGRAPHTYPES).toInt;
+        m_type = enumFromString(graphType);
+
+        if (!m_prg || m_agents.empty() || m_type == Invalid_Type) {
+            return false;
+        }
+        return true;
     }
 };
 

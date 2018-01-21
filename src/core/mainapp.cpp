@@ -27,36 +27,22 @@ MainApp::MainApp()
     , m_lastProjectId(-1)
 {
     int id = 0;
+    auto addAttrSpace = [this](int& id, const QString& name, const QString& space) {
+        m_generalAttrSpace.insert(name, ValueSpace::parse(id++, name, space));
+    };
 
-    m_generalAttrSpace.insert(GENERAL_ATTRIBUTE_AGENTS,
-        ValueSpace::parse(id++, GENERAL_ATTRIBUTE_AGENTS, "string"));
+    addAttrSpace(id, GENERAL_ATTRIBUTE_AGENTS, "string");
+    addAttrSpace(id, GENERAL_ATTRIBUTE_GRAPHID, "string");
+    addAttrSpace(id, GENERAL_ATTRIBUTE_MODELID, "string");
+    addAttrSpace(id, GENERAL_ATTRIBUTE_SEED, QString("int[0,%1]").arg(INT32_MAX));
+    addAttrSpace(id, GENERAL_ATTRIBUTE_STOPAT, QString("int[1,%1]").arg(EVOPLEX_MAX_STEPS));
+    addAttrSpace(id, GENERAL_ATTRIBUTE_TRIALS, QString("int[1,%1]").arg(EVOPLEX_MAX_TRIALS));
+    addAttrSpace(id, GENERAL_ATTRIBUTE_AUTODELETE, "bool");
+    addAttrSpace(id, GENERAL_ATTRIBUTE_GRAPHTYPE, "string");
 
-    m_generalAttrSpace.insert(GENERAL_ATTRIBUTE_GRAPHID,
-        ValueSpace::parse(id++, GENERAL_ATTRIBUTE_GRAPHID, "string"));
-
-    m_generalAttrSpace.insert(GENERAL_ATTRIBUTE_MODELID,
-        ValueSpace::parse(id++, GENERAL_ATTRIBUTE_MODELID, "string"));
-
-    m_generalAttrSpace.insert(GENERAL_ATTRIBUTE_SEED,
-        ValueSpace::parse(id++, GENERAL_ATTRIBUTE_SEED, QString("int[0,%1]").arg(INT32_MAX)));
-
-    m_generalAttrSpace.insert(GENERAL_ATTRIBUTE_STOPAT,
-        ValueSpace::parse(id++, GENERAL_ATTRIBUTE_STOPAT, QString("int[1,%1]").arg(EVOPLEX_MAX_STEPS)));
-
-    m_generalAttrSpace.insert(GENERAL_ATTRIBUTE_TRIALS,
-        ValueSpace::parse(id++, GENERAL_ATTRIBUTE_TRIALS, QString("int[1,%1]").arg(EVOPLEX_MAX_TRIALS)));
-
-    m_generalAttrSpace.insert(GENERAL_ATTRIBUTE_AUTODELETE,
-        ValueSpace::parse(id++, GENERAL_ATTRIBUTE_AUTODELETE, QString("bool")));
-
-    m_generalAttrSpace.insert(OUTPUT_DIR,
-        ValueSpace::parse(id++, OUTPUT_DIR, "string"));
-
-    m_generalAttrSpace.insert(OUTPUT_HEADER,
-        ValueSpace::parse(id++, OUTPUT_HEADER, "string"));
-
-    m_generalAttrSpace.insert(OUTPUT_AVGTRIALS,
-        ValueSpace::parse(id++, OUTPUT_AVGTRIALS, "bool"));
+    addAttrSpace(id, OUTPUT_DIR, "string");
+    addAttrSpace(id, OUTPUT_HEADER, "string");
+    addAttrSpace(id, OUTPUT_AVGTRIALS, "bool");
 
     // load plugins
     QDir pluginsDir = QDir(qApp->applicationDirPath());

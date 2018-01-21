@@ -67,6 +67,12 @@ AttributesWidget::AttributesWidget(MainApp* mainApp, Project* project, QWidget *
     cb = new QComboBox(m_ui->treeWidget);
     connect(cb, SIGNAL(currentIndexChanged(QString)), SLOT(slotGraphSelected(QString)));
     addTreeWidget(m_treeItemGraphs, GENERAL_ATTRIBUTE_GRAPHID, QVariant::fromValue(cb));
+    // --  graph type
+    cb = new QComboBox(m_ui->treeWidget);
+    cb->insertItem(0, "undirected", AbstractGraph::Undirected);
+    cb->insertItem(1, "directed", AbstractGraph::Directed);
+    m_customGraphIdx = m_treeItemGraphs->childCount();
+    addTreeWidget(m_treeItemGraphs, GENERAL_ATTRIBUTE_GRAPHTYPE, QVariant::fromValue(cb));
 
     // setup the tree widget: general attributes
     m_treeItemGeneral = new QTreeWidgetItem(m_ui->treeWidget);
@@ -388,6 +394,11 @@ void AttributesWidget::slotGraphSelected(const QString& graphId)
 {
     m_selectedGraphId = graphId;
     pluginSelected(m_treeItemGraphs, graphId);
+
+    bool validGraph = graphId != STRING_NULL_PLUGINID;
+    m_treeItemGraphs->child(m_customGraphIdx)->setHidden(!validGraph || graphId == "customGraph");
+    m_treeItemGeneral->setExpanded(validGraph);
+    m_treeItemOutputs->setExpanded(validGraph);
 }
 
 void AttributesWidget::slotModelSelected(const QString& modelId)
@@ -397,21 +408,19 @@ void AttributesWidget::slotModelSelected(const QString& modelId)
 
     bool nullModel = modelId == STRING_NULL_PLUGINID;
     m_treeItemGeneral->setHidden(nullModel);
-    m_treeItemGraphs->setHidden(nullModel);
     m_treeItemOutputs->setHidden(nullModel);
+    m_treeItemGraphs->setHidden(nullModel);
+    m_treeItemGraphs->setExpanded(!nullModel);
 }
 
-void AttributesWidget::pluginSelected(QTreeWidgetItem* item, const QString& pluginId)
+void AttributesWidget::pluginSelected(QTreeWidgetItem* itemRoot, const QString& pluginId)
 {
-    QTreeWidgetItemIterator it(m_ui->treeWidget);
-    while (*it) {
-        if ((*it)->parent() == item) {
-            QString id = (*it)->data(0, Qt::UserRole).toString();
-            bool hide = !id.isEmpty() && id != pluginId;
-            (*it)->setHidden(hide);
-            m_ui->treeWidget->itemWidget((*it), 1)->setDisabled(hide);
-        }
-        ++it;
+    for (int i = 0; i < itemRoot->childCount(); ++i) {
+        QTreeWidgetItem* row = itemRoot->child(i);
+        QString pId = row->data(0, Qt::UserRole).toString();
+        bool hide = !pId.isEmpty() && pId != pluginId;
+        row->setHidden(hide);
+        m_ui->treeWidget->itemWidget(row, 1)->setDisabled(hide);
     }
 }
 

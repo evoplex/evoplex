@@ -19,6 +19,7 @@
 #define GENERAL_ATTRIBUTE_STOPAT "stopAt"               // hard stop condition, ie., last simulation step
 #define GENERAL_ATTRIBUTE_TRIALS "trials"               // number of times the experiment has to be repeated
 #define GENERAL_ATTRIBUTE_AUTODELETE "autoDelete"       // automatically deletes the experiment from memory
+#define GENERAL_ATTRIBUTE_GRAPHTYPE "graphType"         // graph type of a graph generator
 
 #define OUTPUT_DIR "directory"              // path to the directory in which the file will be saved
 #define OUTPUT_AVGTRIALS "avgTrials"        // 1 to indicate if the output should be done across all trials; 0 otherwise

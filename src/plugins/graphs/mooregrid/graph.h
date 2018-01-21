@@ -22,7 +22,7 @@ public:
 
 private:
     // graph parameters
-    enum GraphAttr { Type, Height, Width };
+    enum GraphAttr { Height, Width };
     int m_width;
     int m_height;
 
