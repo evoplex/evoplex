@@ -6,6 +6,7 @@
 #ifndef VALUESPACE_H
 #define VALUESPACE_H
 
+#include <QHash>
 #include <vector>
 
 #include "prg.h"

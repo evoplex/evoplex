@@ -30,9 +30,6 @@ public:
     inline const std::vector<QString>& edgeAttrNames() const { return m_edgeAttrNames; }
     inline const AttributesSpace& edgeAttrSpace() const { return m_edgeAttrSpace; }
 
-    inline const std::vector<QString>& modelAttrNames() const { return m_modelAttrNames; }
-    inline const AttributesSpace& modelAttrSpace() const { return m_modelAttrSpace; }
-
 private:
     IPluginModel* m_factory;
 
@@ -44,9 +41,6 @@ private:
 
     AttributesSpace m_edgeAttrSpace;
     std::vector<QString> m_edgeAttrNames;
-
-    AttributesSpace m_modelAttrSpace;
-    std::vector<QString> m_modelAttrNames;
 };
 }
 

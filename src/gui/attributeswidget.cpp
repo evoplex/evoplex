@@ -151,9 +151,8 @@ AttributesWidget::AttributesWidget(MainApp* mainApp, Project* project, QWidget *
     });
     m_enableOutputs->setChecked(false);
 
-    // create the trees with the plugin stuff
-    slotUpdateModelPlugins();
-    slotUpdateGraphPlugins();
+    slotPluginsUpdated(AbstractPlugin::GraphPlugin);
+    slotPluginsUpdated(AbstractPlugin::ModelPlugin);
 }
 
 AttributesWidget::~AttributesWidget()
@@ -413,68 +412,58 @@ void AttributesWidget::slotModelSelected(const QString& modelId)
     m_treeItemOutputs->setHidden(nullModel);
 }
 
-void AttributesWidget::slotUpdateGraphPlugins()
+void AttributesWidget::slotPluginsUpdated(AbstractPlugin::PluginType type)
 {
-    QComboBox* cb = m_widgetFields.value(GENERAL_ATTRIBUTE_GRAPHID).value<QComboBox*>();
-    cb->blockSignals(true);
-    cb->clear();
-    cb->insertItem(0, STRING_NULL_PLUGINID);
-    cb->insertItems(1, m_project->getGraphs().keys());
-    cb->blockSignals(false);
-
-    foreach (GraphPlugin* graph, m_project->getGraphs()) {
-        if (graph->graphAttrNames().size() <= 0) {
-            continue; // nothing to add
-        }
-
-        bool newGraph = true;
-        QTreeWidgetItemIterator it(m_treeItemGraphs);
-        while (*it) {
-            if ((*it)->parent() == m_treeItemGraphs
-                    && (*it)->data(0, Qt::UserRole).toString() == graph->id()) {
-                newGraph = false;
-                break;
-            }
-            ++it;
-        }
-
-        if (newGraph) {
-            insertPluginAttributes(m_treeItemGraphs, graph->id(), graph->graphAttrSpace());
-        }
+    QTreeWidgetItem* tree;
+    QString treeId;
+    QStringList keys;
+    if (type == AbstractPlugin::GraphPlugin) {
+        tree = m_treeItemGraphs;
+        treeId = GENERAL_ATTRIBUTE_GRAPHID;
+        keys = m_project->getGraphs().keys();
+    } else if (type == AbstractPlugin::ModelPlugin) {
+        tree = m_treeItemModels;
+        treeId = GENERAL_ATTRIBUTE_MODELID;
+        keys = m_project->getModels().keys();
+    } else {
+        qFatal("[AttributesWidget]: invalid plugin type!");
     }
-    slotGraphSelected(cb->currentText());
-}
 
-void AttributesWidget::slotUpdateModelPlugins()
-{
-    QComboBox* cb = m_widgetFields.value(GENERAL_ATTRIBUTE_MODELID).value<QComboBox*>();
+    QComboBox* cb = m_widgetFields.value(treeId).value<QComboBox*>();
     cb->blockSignals(true);
     cb->clear();
     cb->insertItem(0, STRING_NULL_PLUGINID);
-    cb->insertItems(1, m_project->getModels().keys());
+    cb->insertItems(1, keys);
     cb->blockSignals(false);
 
-    foreach (ModelPlugin* model, m_project->getModels()) {
-        if (model->modelAttrNames().size() <= 0) {
-            continue; // nothing to add
+    auto addAttrs = [this, tree](AbstractPlugin* plugin) {
+        if (plugin->pluginAttrNames().size() <= 0) {
+            return; // nothing to add
         }
 
-        bool newModel = true;
         QTreeWidgetItemIterator it(m_ui->treeWidget);
         while (*it) {
-            if ((*it)->parent() == m_treeItemModels
-                    && (*it)->data(0, Qt::UserRole).toString() == model->id()) {
-                newModel = false;
-                break;
+            if ((*it)->parent() == tree
+                    && (*it)->data(0, Qt::UserRole).toString() == plugin->id()) {
+                return; // plugins already exists
             }
             ++it;
         }
 
-        if (newModel) {
-            insertPluginAttributes(m_treeItemModels, model->id(), model->modelAttrSpace());
+        insertPluginAttributes(tree, plugin->id(), plugin->pluginAttrSpace());
+    };
+
+    if (type == AbstractPlugin::GraphPlugin) {
+        foreach (AbstractPlugin* plugin, m_project->getGraphs()) {
+            addAttrs(plugin);
         }
+        slotGraphSelected(cb->currentText());
+    } else {
+        foreach (AbstractPlugin* plugin, m_project->getModels()) {
+            addAttrs(plugin);
+        }
+        slotModelSelected(cb->currentText());
     }
-    slotModelSelected(cb->currentText());
 }
 
 void AttributesWidget::insertPluginAttributes(QTreeWidgetItem* itemRoot,
@@ -482,9 +471,7 @@ void AttributesWidget::insertPluginAttributes(QTreeWidgetItem* itemRoot,
                                               const AttributesSpace& attrsSpace)
 {
     const QString& uid_ = uid + "_";
-    AttributesSpace::const_iterator it = attrsSpace.constBegin();
-    for (it; it != attrsSpace.constEnd(); ++it) {
-        const ValueSpace* valSpace = it.value();
+    foreach (const ValueSpace* valSpace, attrsSpace) {
         QTreeWidgetItem* item = new QTreeWidgetItem(itemRoot);
         item->setText(0, valSpace->attrName());
         item->setData(0, Qt::UserRole, uid);

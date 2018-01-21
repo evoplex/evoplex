@@ -3,6 +3,7 @@
  * @author Marcos Cardinot <mcardinot@gmail.com>
  */
 
+#include <QDebug>
 #include <QJsonArray>
 #include <QVariantMap>
 
@@ -28,7 +29,19 @@ AbstractPlugin::AbstractPlugin(const QJsonObject* metaData)
     m_name = metaData->value(PLUGIN_ATTRIBUTE_NAME).toString();
     m_descr = metaData->value(PLUGIN_ATTRIBUTE_DESCRIPTION).toString();
 
-    m_isValid = !(m_id.isEmpty() || m_author.isEmpty() || m_name.isEmpty() || m_descr.isEmpty());
+    if (m_id.isEmpty() || m_author.isEmpty() || m_name.isEmpty() || m_descr.isEmpty()
+            || !attrsSpace(metaData, PLUGIN_ATTRIBUTE_SPACE, m_pluginAttrSpace, m_pluginAttrNames)) {
+        qWarning() << "[AbstractPlugin]: failed to read the plugins's attributes!";
+        m_isValid = false;
+        return;
+    }
+
+    m_isValid = true;
+}
+
+AbstractPlugin::~AbstractPlugin()
+{
+    qDeleteAll(m_pluginAttrSpace);
 }
 
 bool AbstractPlugin::attrsSpace(const QJsonObject* metaData, const QString& name,

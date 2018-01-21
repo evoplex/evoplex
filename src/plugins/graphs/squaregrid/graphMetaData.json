@@ -5,7 +5,7 @@
   "author": "Marcos Cardinot",
   "description": "Regular lattice grid with Von Neumann neighbourhood. That is, each agent has four neighbours.",
   "validGraphTypes": [ "undirected", "directed" ],
-  "graphAttributesSpace": [
+  "pluginAttributesSpace": [
     {"height": "int[1,max]"},
     {"width": "int[1,max]"}
   ]

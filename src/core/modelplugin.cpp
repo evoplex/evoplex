@@ -32,12 +32,6 @@ ModelPlugin::ModelPlugin(const QObject* instance, const QJsonObject* metaData)
         return;
     }
 
-    if (!attrsSpace(metaData, PLUGIN_ATTRIBUTE_MODELSPACE, m_modelAttrSpace, m_modelAttrNames)) {
-        qWarning() << "[ModelPlugin]: failed to read the model's attributes!";
-        m_isValid = false;
-        return;
-    }
-
     m_isValid = true;
 }
 
@@ -45,7 +39,6 @@ ModelPlugin::~ModelPlugin()
 {
     qDeleteAll(m_agentAttrSpace);
     qDeleteAll(m_edgeAttrSpace);
-    qDeleteAll(m_modelAttrSpace);
 }
 
 } // evoplex

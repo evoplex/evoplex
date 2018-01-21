@@ -31,15 +31,14 @@
 #define PLUGIN_ATTRIBUTE_AUTHOR "author"                // authors' name
 #define PLUGIN_ATTRIBUTE_NAME "name"                    // plugin's name
 #define PLUGIN_ATTRIBUTE_DESCRIPTION "description"      // plugin's description
+#define PLUGIN_ATTRIBUTE_SPACE "pluginAttributesSpace"  // domain of the plugin's attributes
 // model (only)
 #define PLUGIN_ATTRIBUTE_AGENTSPACE "agentAttributesSpace"  // domain of the agent's attributes
 #define PLUGIN_ATTRIBUTE_EDGESPACE "edgeAttributesSpace"    // domain of the edge's attributes
-#define PLUGIN_ATTRIBUTE_MODELSPACE "modelAttributesSpace"  // domain of the model's attributes
 #define PLUGIN_ATTRIBUTE_CUSTOMOUTPUTS "customOutputs"      // custom outputs defined in the model
 #define PLUGIN_ATTRIBUTE_SUPPORTEDGRAPHS "supportedGraphs"  // graphIds allowed in the model
 // graph (only)
 #define PLUGIN_ATTRIBUTE_VALIDGRAPHTYPES "validGraphTypes"  // valid graph types of a graph generator
-#define PLUGIN_ATTRIBUTE_GRAPHSPACE "graphAttributesSpace"  // domain of the graph's attributes
 
 
 #endif // CONSTANTS_H

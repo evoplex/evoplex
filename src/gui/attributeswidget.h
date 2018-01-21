@@ -36,8 +36,7 @@ private slots:
     void slotEditExperiment();
     void slotModelSelected(const QString& modelId);
     void slotGraphSelected(const QString& graphId);
-    void slotUpdateModelPlugins();
-    void slotUpdateGraphPlugins();
+    void slotPluginsUpdated(AbstractPlugin::PluginType type);
 
 private:
     MainApp* m_mainApp;

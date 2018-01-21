@@ -459,8 +459,8 @@ Experiment::ExperimentInputs* Experiment::readInputs(const MainApp* mainApp,
     // get the value of each attribute and make sure they are valid
     QStringList failedAttributes;
     Attributes* generalAttrs = new Attributes(mainApp->getGeneralAttrSpace().size());
-    Attributes* modelAttrs = new Attributes(mPlugin->modelAttrSpace().size());
-    Attributes* graphAttrs = new Attributes(gPlugin->graphAttrSpace().size());
+    Attributes* modelAttrs = new Attributes(mPlugin->pluginAttrSpace().size());
+    Attributes* graphAttrs = new Attributes(gPlugin->pluginAttrSpace().size());
     for (int i = 0; i < values.size(); ++i) {
         const QString& vStr = values.at(i);
         QString attrName = header.at(i);
@@ -478,12 +478,14 @@ Experiment::ExperimentInputs* Experiment::readInputs(const MainApp* mainApp,
             Attributes* attributes = nullptr;
             if (attrName.startsWith(modelId_)) {
                 attrName = attrName.remove(modelId_);
-                valSpace = mPlugin->modelAttrSpace().value(attrName);
+                valSpace = mPlugin->pluginAttrSpace().value(attrName);
                 attributes = modelAttrs;
             } else if (attrName.startsWith(graphId_)) {
                 attrName = attrName.remove(graphId_);
-                valSpace = gPlugin->graphAttrSpace().value(attrName);
+                valSpace = gPlugin->pluginAttrSpace().value(attrName);
                 attributes = graphAttrs;
+            } else {
+                qFatal("[Experiment::readInputs()]: attribute name should start with the plugin id!");
             }
 
             if (attributes && valSpace) {

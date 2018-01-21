@@ -195,32 +195,34 @@ public:
             ret.push_back(attrs);
         }
 
-        AttributesSpace::const_iterator it = attributesSpace.begin();
-        for (it; it != attributesSpace.end(); ++it) {
-            const QString& attrName = it.key();
-            int attrId = it.value()->id();
-            const QString& space = it.value()->space();
-            bool ok = false;
-
-            if (space.contains("{") && space.endsWith("}")) {
-                Values set;
-                ok = paramSet(space, set);
-                for (int j = 0; j < size && ok; ++j)
-                    ret[j].replace(attrId, attrName, set.at(prg->randI(set.size())));
-            } else if (space.contains("[") && space.endsWith("]")) {
-                Value max, min;
-                ok = paramInterval(space, min, max);
-                if (min.type == Value::INT) {
-                    for (int j = 0; j < size && ok; ++j)
-                        ret[j].replace(attrId, attrName, prg->randI(min.toInt, max.toInt));
-                } else {
-                    for (int j = 0; j < size && ok; ++j)
-                        ret[j].replace(attrId, attrName, prg->randD(min.toDouble, max.toDouble));
+        foreach (const ValueSpace* valSpace, attributesSpace) {
+            const SetSpace* setSpace = dynamic_cast<const SetSpace*>(valSpace);
+            if (setSpace) {
+                for (int j = 0; j < size; ++j) {
+                    ret[j].replace(valSpace->id(), valSpace->attrName(),
+                            setSpace->values().at(prg->randI(setSpace->values().size())));
                 }
-            }
+            } else {
+                const IntervalSpace* iSpace = dynamic_cast<const IntervalSpace*>(valSpace);
+                if (!iSpace) {
+                    qWarning() << "[Utils]: unable to parse the parameter space of"
+                               << valSpace->attrName() << valSpace->space();
+                    return QVector<Attributes>();
+                }
 
-            if (!ok) {
-                qWarning() << "[Utils]: unable to parse the parameter space of" << attrName << space;
+                if (iSpace->type() == ValueSpace::Int_Interval) {
+                    for (int j = 0; j < size; ++j) {
+                        ret[j].replace(valSpace->id(), valSpace->attrName(),
+                                       prg->randI(iSpace->min().toInt, iSpace->max().toInt));
+                    }
+                } else if (iSpace->type() == ValueSpace::Double_Interval) {
+                    for (int j = 0; j < size; ++j) {
+                        ret[j].replace(valSpace->id(), valSpace->attrName(),
+                                       prg->randD(iSpace->min().toDouble, iSpace->max().toDouble));
+                    }
+                } else {
+                    qFatal("[Utils]: parameter space is invalid!");
+                }
             }
         }
         return ret;
