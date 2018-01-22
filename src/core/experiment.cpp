@@ -11,7 +11,6 @@
 #include "agent.h"
 #include "experiment.h"
 #include "project.h"
-#include "filemgr.h"
 #include "utils.h"
 
 namespace evoplex
@@ -303,25 +302,7 @@ Agents Experiment::createAgents()
 
     Q_ASSERT(m_trials.empty());
 
-    Agents agents;
-    bool isInt;
-    int numAgents = m_generalAttrs->value(GENERAL_ATTRIBUTE_AGENTS).toQString().toInt(&isInt);
-    if (isInt) { // create a population of agents with random properties?
-        if (numAgents > 0) {
-            PRG* prg = new PRG(m_seed);
-            QVector<Attributes> attrs = Utils::randomAttrs(m_modelPlugin->agentAttrSpace(), prg, numAgents);
-            delete prg;
-            Q_ASSERT(attrs.size() == numAgents);
-            agents.reserve(numAgents);
-            for (int id = 0; id < numAgents; ++id) {
-                agents.emplace_back(new Agent(id, attrs.at(id)));
-            }
-        }
-    } else { // read population from a text file
-        agents = m_mainApp->getFileMgr()->importAgents(
-                    m_generalAttrs->value(GENERAL_ATTRIBUTE_AGENTS).toQString(),
-                    m_modelPlugin->id());
-    }
+    Agents agents = Agent::createAgents(m_generalAttrs->value(GENERAL_ATTRIBUTE_AGENTS).toQString(), m_modelPlugin);
 
     if (agents.empty()) {
         qWarning() << "[Experiment]: unable to create the trials."

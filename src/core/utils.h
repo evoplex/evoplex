@@ -179,64 +179,6 @@ public:
         }
         return true;
     }
-
-    // return a vector of valid random set of attributes.
-    // attributesSpace must be valid at this point
-    static QVector<Attributes> randomAttrs(const AttributesSpace& attributesSpace, PRG* prg, const int size=1)
-    {
-        if (attributesSpace.isEmpty() || size < 1) {
-            return QVector<Attributes>();
-        }
-
-        QVector<Attributes> ret;
-        ret.reserve(size);
-        for (int j = 0; j < size; ++j) {
-            Attributes attrs(attributesSpace.size());
-            ret.push_back(attrs);
-        }
-
-        foreach (const ValueSpace* valSpace, attributesSpace) {
-            const SetSpace* setSpace = dynamic_cast<const SetSpace*>(valSpace);
-            if (setSpace) {
-                for (int j = 0; j < size; ++j) {
-                    ret[j].replace(valSpace->id(), valSpace->attrName(),
-                            setSpace->values().at(prg->randI(setSpace->values().size())));
-                }
-            } else {
-                const IntervalSpace* iSpace = dynamic_cast<const IntervalSpace*>(valSpace);
-                if (!iSpace) {
-                    qWarning() << "[Utils]: unable to parse the parameter space of"
-                               << valSpace->attrName() << valSpace->space();
-                    return QVector<Attributes>();
-                }
-
-                if (iSpace->type() == ValueSpace::Int_Interval) {
-                    for (int j = 0; j < size; ++j) {
-                        ret[j].replace(valSpace->id(), valSpace->attrName(),
-                                       prg->randI(iSpace->min().toInt, iSpace->max().toInt));
-                    }
-                } else if (iSpace->type() == ValueSpace::Double_Interval) {
-                    for (int j = 0; j < size; ++j) {
-                        ret[j].replace(valSpace->id(), valSpace->attrName(),
-                                       prg->randD(iSpace->min().toDouble, iSpace->max().toDouble));
-                    }
-                } else {
-                    qFatal("[Utils]: parameter space is invalid!");
-                }
-            }
-        }
-        return ret;
-    }
-
-    // return a valid random value for each attribute
-    static Attributes randomAttrs(const AttributesSpace& attributesSpace, PRG* prg)
-    {
-        QVector<Attributes> r = randomAttrs(attributesSpace, prg, 1);
-        if (r.isEmpty())
-            return Attributes();
-        else
-            return r.first();
-    }
 };
 }
 #endif // UTILS_H

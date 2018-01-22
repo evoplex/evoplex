@@ -21,6 +21,16 @@ class Agent
     friend class Edge;
 
 public:
+
+    // Expected commands:
+    //   path to a csv file
+    //     'filepath'
+    //   same mode for all attributes
+    //     '*numAgents;[min|max|rand_seed]'
+    //   specific mode for each attribute
+    //     '#numAgents;attrName_[min|max|rand_seed|value_val];...'
+    static Agents createAgents(const QString& command, const ModelPlugin* modelPlugin);
+
     // Import a set of agents from a csv file
     // Agents belong to some model. That's why we need the modelId,
     // which is also important to validate the inputs in the file.
