@@ -516,7 +516,7 @@ void AttributesWidget::insertPluginAttributes(QTreeWidgetItem* itemRoot,
         }
         default:
             QLineEdit* le = new QLineEdit();
-            le->setText(valSpace->validValue().toQString());
+            le->setText(valSpace->min().toQString());
             widget = le;
         }
 

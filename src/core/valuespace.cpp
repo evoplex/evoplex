@@ -12,17 +12,17 @@ namespace evoplex
 ValueSpace* ValueSpace::parse(int id, const QString& attrName, QString space)
 {
     if (space == "bool") {
-        return new ValueSpace(id, attrName, space, Bool, Value(false));
+        return new DefaultSpace(id, attrName, space, Bool, Value(false));
     } else if (space == "string") {
-        return new ValueSpace(id, attrName, space, String, Value(QString()));
+        return new DefaultSpace(id, attrName, space, String, Value(QString()));
     } else if (space == "dirpath") {
-        return new ValueSpace(id, attrName, space, DirPath, Value(QString()));
+        return new DefaultSpace(id, attrName, space, DirPath, Value(QString()));
     } else if (space == "filepath") {
-        return new ValueSpace(id, attrName, space, FilePath, Value(QString()));
+        return new DefaultSpace(id, attrName, space, FilePath, Value(QString()));
     } else if (space.contains('{') && space.endsWith('}')) {
         Values values;
         if (!Utils::paramSet(space, values)) {
-            return new ValueSpace();
+            return new DefaultSpace();
         } else if (space.startsWith("int")) {
             return new SetSpace(id, attrName, space, Int_Set, values);
         } else if (space.startsWith("double")) {
@@ -31,7 +31,7 @@ ValueSpace* ValueSpace::parse(int id, const QString& attrName, QString space)
     } else if (space.contains('[') && space.endsWith(']')) {
         Value min, max;
         if (!Utils::paramInterval(space, min, max)) {
-            return new ValueSpace();
+            return new DefaultSpace();
         } else if (space.startsWith("int")) {
             return new IntervalSpace(id, attrName, space, Int_Interval, min, max);
         } else if (space.startsWith("double")) {
@@ -40,21 +40,7 @@ ValueSpace* ValueSpace::parse(int id, const QString& attrName, QString space)
     }
 
     qWarning() << "[ValueSpace::parse]: unable to parse " << space;
-    return new ValueSpace();
-}
-
-ValueSpace::ValueSpace(int id, const QString& attrName, const QString& space, SpaceType type, Value validValue)
-    : m_id(id)
-    , m_attrName(attrName)
-    , m_space(space)
-    , m_type(type)
-    , m_validValue(validValue)
-{
-}
-
-ValueSpace::ValueSpace()
-    : ValueSpace(-1, "", "", Invalid, Value())
-{
+    return new DefaultSpace();
 }
 
 Value ValueSpace::validate(const QString& valueStr) const
@@ -117,5 +103,47 @@ Value ValueSpace::validate(const QString& valueStr) const
     return Value();
 }
 
+ValueSpace::ValueSpace(int id, const QString& attrName, const QString& space, SpaceType type)
+    : m_id(id)
+    , m_attrName(attrName)
+    , m_space(space)
+    , m_type(type)
+{
+}
+
+DefaultSpace::DefaultSpace(int id, const QString& attrName, const QString& space, SpaceType type, Value validValue)
+    : ValueSpace(id, attrName, space, type)
+    , m_validValue(validValue)
+{
+}
+
+DefaultSpace::DefaultSpace()
+    : DefaultSpace(-1, "", "", Invalid, Value())
+{
+}
+
+IntervalSpace::IntervalSpace(int id, const QString& attrName, const QString& space,
+                             SpaceType type, Value min, Value max)
+    : DefaultSpace(id, attrName, space, type, min)
+    , m_min(min)
+    , m_max(max)
+{
+    switch (m_type) {
+    case Double_Interval:
+        f_rand = &evoplex::IntervalSpace::randD;
+        break;
+    case Int_Interval:
+        f_rand = &evoplex::IntervalSpace::randI;
+        break;
+    default:
+        qFatal("[ValueSpace]: invalid type!");
+    }
+}
+
+SetSpace::SetSpace(int id, const QString& attrName, const QString& space, SpaceType type, Values values)
+    : DefaultSpace(id, attrName, space, type, values.front())
+    , m_values(values)
+{
+}
 
 } // evoplex
