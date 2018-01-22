@@ -36,7 +36,6 @@ public:
 
     void closeProject(int projId);
 
-    inline FileMgr* getFileMgr() const { return m_fileMgr; }
     inline ExperimentsMgr* getExperimentsMgr() const { return m_experimentsMgr; }
     inline const QHash<QString, GraphPlugin*>& getGraphs() const { return m_graphs; }
     inline const QHash<QString, ModelPlugin*>& getModels() const { return m_models; }
@@ -49,7 +48,6 @@ public:
     inline const AttributesSpace& getGeneralAttrSpace() const { return m_generalAttrSpace; }
 
 private:
-    FileMgr* m_fileMgr;
     ExperimentsMgr* m_experimentsMgr;
 
     int m_lastProjectId;

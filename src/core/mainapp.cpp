@@ -14,7 +14,6 @@
 
 #include "mainapp.h"
 #include "experimentsmgr.h"
-#include "filemgr.h"
 #include "project.h"
 #include "constants.h"
 #include "utils.h"
@@ -22,8 +21,7 @@
 namespace evoplex {
 
 MainApp::MainApp()
-    : m_fileMgr(new FileMgr(this))
-    , m_experimentsMgr(new ExperimentsMgr(QThread::idealThreadCount()))
+    : m_experimentsMgr(new ExperimentsMgr(QThread::idealThreadCount()))
     , m_lastProjectId(-1)
 {
     int id = 0;
@@ -60,8 +58,6 @@ MainApp::~MainApp()
     qDeleteAll(m_projects);
     qDeleteAll(m_models);
     qDeleteAll(m_graphs);
-    delete m_fileMgr;
-    m_fileMgr = nullptr;
     delete m_experimentsMgr;
     m_experimentsMgr = nullptr;
 }

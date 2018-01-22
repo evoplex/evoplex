@@ -17,7 +17,6 @@ set(EVOPLEX_CORE_H
   value.h
   valuespace.h
 
-  filemgr.h
   experiment.h
   experimentsmgr.h
   project.h
@@ -28,8 +27,8 @@ set(EVOPLEX_CORE_CXX
   graphplugin.cpp
   modelplugin.cpp
 
+  agent.cpp
   edge.cpp
-  filemgr.cpp
   experiment.cpp
   experimentsmgr.cpp
   output.cpp

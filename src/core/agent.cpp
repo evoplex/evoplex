@@ -1,25 +1,19 @@
 /**
- * Copyright (C) 2016 - Marcos Cardinot
+ * Copyright (C) 2018 - Marcos Cardinot
  * @author Marcos Cardinot <mcardinot@gmail.com>
  */
 
 #include <QFile>
-#include <QString>
 #include <QTextStream>
 #include <QtDebug>
 
 #include "agent.h"
-#include "filemgr.h"
-#include "project.h"
-#include "utils.h"
+#include "modelplugin.h"
 
-namespace evoplex {
-
-FileMgr::FileMgr(MainApp* mainApp): m_mainApp(mainApp)
+namespace evoplex
 {
-}
 
-Agents FileMgr::importAgents(const QString& filePath, const QString& modelId) const
+Agents Agent::readFromFile(const QString &filePath, const ModelPlugin* modelPlugin)
 {
     QFile file(filePath);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
@@ -28,7 +22,6 @@ Agents FileMgr::importAgents(const QString& filePath, const QString& modelId) co
     }
 
     QTextStream in(&file);
-    const ModelPlugin* modelPlugin = m_mainApp->getModel(modelId);
 
     // read and validate header
     QStringList header;
@@ -92,4 +85,18 @@ Agents FileMgr::importAgents(const QString& filePath, const QString& modelId) co
 
     return agents;
 }
+
+Agent::Agent(int id, Attributes attr, int x, int y)
+    : m_id(id)
+    , m_attrs(attr)
+    , m_x(x)
+    , m_y(y)
+{
+}
+
+Agent::Agent(int id, Attributes attr)
+    : Agent(id, attr, 0, id)
+{
+}
+
 }
