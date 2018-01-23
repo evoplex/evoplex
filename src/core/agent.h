@@ -14,31 +14,17 @@ namespace evoplex
 {
 
 typedef std::vector<Agent*> Agents;
-class ModelPlugin;
 
 class Agent
 {
     friend class Edge;
 
 public:
+    explicit Agent(int id, Attributes attr, int x, int y)
+        : m_id(id), m_attrs(attr), m_x(x), m_y(y) {}
 
-    // Expected commands:
-    //   path to a csv file
-    //     'filepath'
-    //   same mode for all attributes
-    //     '*numAgents;[min|max|rand_seed]'
-    //   specific mode for each attribute
-    //     '#numAgents;attrName_[min|max|rand_seed|value_val];...'
-    static Agents createAgents(const QString& command, const ModelPlugin* modelPlugin);
-
-    // Import a set of agents from a csv file
-    // Agents belong to some model. That's why we need the modelId,
-    // which is also important to validate the inputs in the file.
-    static Agents readFromFile(const QString& filePath, const ModelPlugin* modelPlugin);
-
-    explicit Agent(int id, Attributes attr, int x, int y);
-    explicit Agent(int id, Attributes attr);
-    ~Agent() {}
+    explicit Agent(int id, Attributes attr)
+        : Agent(id, attr, 0, id) {}
 
     inline Agent* clone() { return new Agent(m_id, m_attrs); }
 

@@ -9,6 +9,7 @@
 #include <QFileInfo>
 
 #include "agent.h"
+#include "agentsgenerator.h"
 #include "experiment.h"
 #include "project.h"
 #include "utils.h"
@@ -302,7 +303,13 @@ Agents Experiment::createAgents()
 
     Q_ASSERT(m_trials.empty());
 
-    Agents agents = Agent::createAgents(m_generalAttrs->value(GENERAL_ATTRIBUTE_AGENTS).toQString(), m_modelPlugin);
+    Agents agents;
+    AgentsGenerator* ag = AgentsGenerator::parse(m_modelPlugin->agentAttrSpace(),
+                m_generalAttrs->value(GENERAL_ATTRIBUTE_AGENTS).toQString());
+    if (ag) {
+        agents = ag->create();
+        delete ag;
+    }
 
     if (agents.empty()) {
         qWarning() << "[Experiment]: unable to create the trials."

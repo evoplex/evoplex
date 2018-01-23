@@ -13,6 +13,7 @@ set(EVOPLEX_CORE_H
   modelplugin.h
   attributes.h
   agent.h
+  agentsgenerator.h
   edge.h
   value.h
   valuespace.h
@@ -27,7 +28,7 @@ set(EVOPLEX_CORE_CXX
   graphplugin.cpp
   modelplugin.cpp
 
-  agent.cpp
+  agentsgenerator.cpp
   edge.cpp
   experiment.cpp
   experimentsmgr.cpp
