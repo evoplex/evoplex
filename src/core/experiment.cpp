@@ -70,7 +70,6 @@ bool Experiment::init(ExperimentInputs* inputs)
     }
 
     m_numTrials = m_generalAttrs->value(GENERAL_ATTRIBUTE_TRIALS).toInt;
-    m_seed = m_generalAttrs->value(GENERAL_ATTRIBUTE_SEED).toInt;
     m_autoDelete = m_generalAttrs->value(GENERAL_ATTRIBUTE_AUTODELETE).toBool;
     m_stopAt = m_generalAttrs->value(GENERAL_ATTRIBUTE_STOPAT).toInt;
 
@@ -240,7 +239,9 @@ AbstractModel* Experiment::createTrial(const int trialId)
         return nullptr;
     }
 
-    PRG* prg = new PRG(m_seed + trialId);
+    const int seed = m_generalAttrs->value(GENERAL_ATTRIBUTE_SEED).toInt;
+    PRG* prg = new PRG(seed + trialId);
+
     AbstractGraph* graphObj = m_graphPlugin->create();
     QString gType = m_generalAttrs->value(GENERAL_ATTRIBUTE_GRAPHTYPE).toString;
     if (!graphObj || !graphObj->setup(prg, agents, m_graphAttrs, gType) || !graphObj->init()) {

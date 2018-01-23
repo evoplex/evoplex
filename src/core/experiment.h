@@ -122,7 +122,6 @@ private:
     const GraphPlugin* m_graphPlugin;
     const ModelPlugin* m_modelPlugin;
     int m_numTrials;
-    int m_seed;
     bool m_autoDelete;
     int m_stopAt;
 
