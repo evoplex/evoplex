@@ -50,18 +50,17 @@ public:
 protected:
     const int m_id;
     const QString m_attrName;
-    const QString m_space;
     const SpaceType m_type;
+    QString m_space;
 
-    explicit ValueSpace(int id, const QString& attrName, const QString& space, SpaceType type);
+    explicit ValueSpace(int id, const QString& attrName, SpaceType type);
 };
 
 class DefaultSpace : public ValueSpace
 {
 public:
     explicit DefaultSpace();
-    explicit DefaultSpace(int id, const QString& attrName,
-            const QString& space, SpaceType type, Value validValue);
+    explicit DefaultSpace(int id, const QString& attrName, SpaceType type, Value validValue);
 
     virtual const Value& min() const { return m_validValue; }
     virtual const Value& max() const { return m_validValue; }
@@ -74,8 +73,7 @@ private:
 class IntervalSpace : public DefaultSpace
 {
 public:
-    IntervalSpace(int id, const QString& attrName,
-        const QString& space, SpaceType type, Value min, Value max);
+    IntervalSpace(int id, const QString& attrName, SpaceType type, Value min, Value max);
 
     virtual const Value& min() const { return m_min; }
     virtual const Value& max() const { return m_max; }
@@ -93,7 +91,7 @@ private:
 class SetSpace : public DefaultSpace
 {
 public:
-    SetSpace(int id, const QString& attrName, const QString& space, SpaceType type, Values values);
+    SetSpace(int id, const QString& attrName, SpaceType type, Values values);
 
     virtual const Value& min() const { return m_values.front(); }
     virtual const Value& max() const { return m_values.back(); }
