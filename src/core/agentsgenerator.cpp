@@ -20,6 +20,31 @@ AgentsGenerator::AgentsGenerator(const AttributesSpace& agentAttrsSpace)
 {
 }
 
+QString AgentsGenerator::enumToString(Function func)
+{
+    switch (func) {
+    case F_Min:
+        return "min";
+    case F_Max:
+        return "max";
+    case F_Rand:
+        return "rand";
+    case F_Value:
+        return "value";
+    default:
+        return "invalid";
+    }
+}
+
+AgentsGenerator::Function AgentsGenerator::enumFromString(const QString& funcStr)
+{
+    if (funcStr == "min") return F_Min;
+    else if (funcStr == "max") return F_Max;
+    else if (funcStr == "rand") return F_Rand;
+    else if (funcStr == "value") return F_Value;
+    else if (funcStr == "invalid") return F_Invalid;
+}
+
 /*********************/
 
 AGFromFile::AGFromFile(const AttributesSpace& attrsSpace, const QString& filePath)
@@ -210,7 +235,8 @@ Agents AGDiffFunctions::create()
 
 /*********************/
 
-AgentsGenerator* AgentsGenerator::parse(const AttributesSpace& agentAttrsSpace, const QString& command)
+AgentsGenerator* AgentsGenerator::parse(const AttributesSpace& agentAttrsSpace,
+                                        const QString& command, QString& errMsg)
 {
     AgentsGenerator* ag = nullptr;
 
@@ -219,8 +245,8 @@ AgentsGenerator* AgentsGenerator::parse(const AttributesSpace& agentAttrsSpace, 
     } else {
         QStringList cmds = command.split(";");
         if (cmds.size() < 2) {
-            qWarning() << "[Agent::createAgents()]: the command"
-                       << command << "is invalid!";
+            errMsg = QString("The command %1 is invalid!").arg(command);
+            qWarning() << "[Agent::createAgents()]:" << errMsg;
             return nullptr;
         }
 
@@ -228,45 +254,52 @@ AgentsGenerator* AgentsGenerator::parse(const AttributesSpace& agentAttrsSpace, 
         QString numAgentsStr = cmds.at(0);
         const int numAgents = numAgentsStr.remove(0,1).toInt(&ok);
         if (!ok) {
-            QString err = QString("[Agent::createAgents()]: unable to parse '%1'."
-                                  "'%2' should be an integer representing the number of agents."
-                                  ).arg(command).arg(numAgentsStr);
-            qWarning() << err;
+            errMsg = QString("Unable to parse '%1'."
+                    "\n'%2' should be an integer representing the number of agents.")
+                    .arg(command).arg(numAgentsStr);
+            qWarning() << "[Agent::createAgents()]:" << errMsg;
             return nullptr;
         }
 
         if (command.startsWith("*")) {
             if (cmds.size() != 2) {
-                qWarning() << "[Agent::createAgents()]: unable to parse" << command
-                           << "The command should looks like: '*numAgents;[min|max|rand_seed]'";
+                errMsg = QString("Unable to parse '%1'."
+                        "It should look like: '*numAgents;[min|max|rand_seed]'")
+                        .arg(command).arg(numAgentsStr);
+                qWarning() << "[Agent::createAgents()]:" << errMsg;
                 return nullptr;
             }
 
-            if (cmds.at(1) == "min") {
-                ag = new AGSameFuncForAll(agentAttrsSpace, numAgents, F_Min, Value());
-            } else if (cmds.at(1) == "max") {
-                ag = new AGSameFuncForAll(agentAttrsSpace, numAgents, F_Max, Value());
-            } else if (cmds.at(1).startsWith("rand_")) {
+            Function func = enumFromString(cmds.at(1));
+            Value value;
+
+            if (cmds.at(1).startsWith("rand_")) {
+                func = F_Rand;
                 QString seedStr = cmds.at(1);
-                int seed = seedStr.remove("rand_").toInt(&ok);
+                value = Value(seedStr.remove("rand_").toInt(&ok)); // seed
                 if (!ok) {
-                    qWarning() << "[Agent::createAgents()]: unable to parse" << command
-                               << "The command should looks like: '*numAgents;rand_seed'";
+                    errMsg = QString("Unable to parse '%1'."
+                            "It should look like: '*numAgents;rand_seed'")
+                            .arg(command);
+                    qWarning() << "[Agent::createAgents()]:" << errMsg;
                     return nullptr;
                 }
-                ag = new AGSameFuncForAll(agentAttrsSpace, numAgents, F_Rand, Value(seed));
-            } else {
-                qWarning() << "[Agent::createAgents()]: unable to parse" << command
-                           << "The command should looks like: '*numAgents;[min|max|rand_seed]'";
+            } else if (func == F_Invalid) {
+                errMsg = QString("Unable to parse '%1'."
+                        "It should look like: '*numAgents;[min|max|rand_seed]'")
+                        .arg(command);
+                qWarning() << "[Agent::createAgents()]:" << errMsg;
                 return nullptr;
             }
+            ag = new AGSameFuncForAll(agentAttrsSpace, numAgents, func, value);
         } else if (command.startsWith("#")) {
             cmds.removeFirst();
             if (cmds.size() != agentAttrsSpace.size()) {
-                qWarning() << "[Agent::createAgents()]: unable to parse" << command
-                           << "The command should looks like: '#numAgents;attrName_[min|max|rand_seed|value_value]'"
-                           << "and must contain all attributes of the current model (i.e., '"
-                           << agentAttrsSpace.keys() << "').";
+                errMsg = QString("Unable to parse '%1'."
+                        "It should look like: '#numAgents;attrName_[min|max|rand_seed|value_value]'"
+                        "and must contain all attributes of the current model (i.e., '%2')")
+                        .arg(command).arg(agentAttrsSpace.keys().join(", "));
+                qWarning() << "[Agent::createAgents()]:" << errMsg;
                 return nullptr;
             }
 
@@ -277,44 +310,36 @@ AgentsGenerator* AgentsGenerator::parse(const AttributesSpace& agentAttrsSpace, 
                 AGDiffFunctions::AttrCmd attrCmd;
                 QStringList attrCmdStr = cmd.split("_");
 
-                attrCmd.attrName = attrCmdStr.first();
+                attrCmd.attrName = attrCmdStr.at(0);
                 if (!agentAttrsSpace.contains(attrCmd.attrName)) {
-                    qWarning() << "[Agent::createAgents()]: unable to parse" << command
-                               << "The attribute '" << attrCmd.attrName << "' does not belong to the model.";
+                    errMsg = QString("Unable to parse '%1'."
+                            "The attribute '%2' does not belong to the current model.")
+                            .arg(command).arg(attrCmd.attrName);
+                    qWarning() << "[Agent::createAgents()]:" << errMsg;
                     return nullptr;
-                } else if (attrCmdStr.size() == 2) {
-                    if (attrCmdStr.at(1) == "min") {
-                        attrCmd.func = F_Min;
-                    } else if (attrCmdStr.at(1) == "max") {
-                        attrCmd.func = F_Max;
-                    } else {
-                        qWarning() << "[Agent::createAgents()]: unable to parse" << command
-                                   << "The command " << attrCmdStr.at(1) << "should be 'min' or 'max'";
+                }
+
+                attrCmd.func = enumFromString(attrCmdStr.at(1));
+                if (attrCmd.func == F_Invalid) {
+                    errMsg = QString("Unable to parse '%1'."
+                                "The function '%2' is invalid.")
+                                .arg(command).arg(attrCmdStr.at(1));
+                    qWarning() << "[Agent::createAgents()]:" << errMsg;
+                    return nullptr;
+                } else if (attrCmd.func == F_Rand) {
+                    attrCmd.funcInput = Value(attrCmdStr.at(2).toInt(&ok)); // seed
+                    if (!ok) {
+                        errMsg = QString("Unable to parse '%1'. The PRG seed should be an integer!").arg(command);
+                        qWarning() << "[Agent::createAgents()]:" << errMsg;
                         return nullptr;
                     }
-                } else if (attrCmdStr.size() == 3) {
-                    if (attrCmdStr.at(1) == "rand") {
-                        int seed = attrCmdStr.at(2).toInt(&ok);
-                        if (!ok) {
-                            qWarning() << "[Agent::createAgents()]: unable to parse" << command
-                                       << "The command should looks like: '#numAgents;attrName_rand_seed;...'";
-                            return nullptr;
-                        }
-                        attrCmd.func = F_Rand;
-                        attrCmd.funcInput = Value(seed);
-                    } else if (attrCmdStr.at(1) == "value"){
-                        attrCmd.func = F_Value;
-                        attrCmd.funcInput = agentAttrsSpace.value(attrCmd.attrName)->validate(attrCmdStr.at(2));
-                    } else {
-                        qWarning() << "[Agent::createAgents()]: unable to parse" << command
-                                   << "The command " << attrCmdStr.at(1) << "should be 'rand' or 'value'";
+                } else if (attrCmd.func == F_Value){
+                    attrCmd.funcInput = agentAttrsSpace.value(attrCmd.attrName)->validate(attrCmdStr.at(2));
+                    if (!attrCmd.funcInput.isValid()) {
+                        errMsg = QString("Unable to parse '%1'. The value is invalid!").arg(command);
+                        qWarning() << "[Agent::createAgents()]:" << errMsg;
                         return nullptr;
                     }
-                } else {
-                    qWarning() << "[Agent::createAgents()]: unable to parse" << command
-                               << "The command " << cmd
-                               << "should looks like: attrName_[min|max|rand_seed|value_value]";
-                    return nullptr;
                 }
 
                 attrCmds.emplace_back(attrCmd);
@@ -325,7 +350,8 @@ AgentsGenerator* AgentsGenerator::parse(const AttributesSpace& agentAttrsSpace, 
     }
 
     if (!ag) {
-        qWarning() << "[Agent::createAgents()]: the command" << command << "is invalid!";
+        errMsg = QString("the command '%1'. is invalid!").arg(command);
+        qWarning() << "[Agent::createAgents()]:" << errMsg;
         return nullptr;
     }
 
