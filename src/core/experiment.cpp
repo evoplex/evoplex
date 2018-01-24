@@ -305,17 +305,20 @@ Agents Experiment::createAgents()
     Q_ASSERT(m_trials.empty());
 
     Agents agents;
+    QString errMsg;
     AgentsGenerator* ag = AgentsGenerator::parse(m_modelPlugin->agentAttrSpace(),
-                m_generalAttrs->value(GENERAL_ATTRIBUTE_AGENTS).toQString());
+                m_generalAttrs->value(GENERAL_ATTRIBUTE_AGENTS).toQString(), errMsg);
     if (ag) {
         agents = ag->create();
         delete ag;
     }
 
     if (agents.empty()) {
-        qWarning() << "[Experiment]: unable to create the trials."
-                   << "The set of agents could not be created."
-                   << "Project:" << m_projId << "Experiment:" << m_id;
+        errMsg = QString("[Experiment]: unable to create the trials."
+                         "The set of agents could not be created (%1)."
+                         "Project: %2 Experiment: %3")
+                         .arg(errMsg).arg(m_projId).arg(m_id);
+        qWarning() << errMsg;
     } else if (m_numTrials > 1) {
         m_clonableAgents = cloneAgents(agents);
     }
