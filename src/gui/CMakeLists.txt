@@ -1,5 +1,6 @@
 set(EVOPLEX_GUI_H
   maingui.h
+  agentswidget.h
   attributeswidget.h
   colormap.h
   #contextmenutable.h
@@ -21,6 +22,7 @@ set(EVOPLEX_GUI_H
 
 set(EVOPLEX_GUI_CXX
   maingui.cpp
+  agentswidget.cpp
   attributeswidget.cpp
   colormap.cpp
   #contextmenutable.cpp
@@ -41,6 +43,7 @@ set(EVOPLEX_GUI_CXX
 )
 
 qt5_wrap_ui(EVOPLEX_GUI_UI
+  forms/agentswidget.ui
   forms/attributeswidget.ui
   forms/graphwidget.ui
   forms/graphsettings.ui
