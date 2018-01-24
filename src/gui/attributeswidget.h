@@ -29,7 +29,7 @@ public:
     void setExperiment(Experiment* exp);
 
 private slots:
-    void slotAgentFile();
+    void slotAgentsWidget();
     void slotOutputDir();
     void slotOutputWidget();
     void slotCreateExperiment();

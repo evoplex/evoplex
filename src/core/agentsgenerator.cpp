@@ -235,6 +235,12 @@ Agents AGDiffFunctions::create()
 
 /*********************/
 
+bool AgentsGenerator::saveToFile(const QString& filepath, Agents agents)
+{
+    // TODO
+    return false;
+}
+
 AgentsGenerator* AgentsGenerator::parse(const AttributesSpace& agentAttrsSpace,
                                         const QString& command, QString& errMsg)
 {

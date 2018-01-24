@@ -14,8 +14,11 @@
 #include <QRadioButton>
 
 #include "attributeswidget.h"
+#include "agentswidget.h"
 #include "outputwidget.h"
 #include "ui_attributeswidget.h"
+
+#include "core/agentsgenerator.h"
 
 #define STRING_NULL_PLUGINID "--"
 
@@ -50,16 +53,16 @@ AttributesWidget::AttributesWidget(MainApp* mainApp, Project* project, QWidget *
     m_treeItemGraphs = new QTreeWidgetItem(m_ui->treeWidget);
     m_treeItemGraphs->setText(0, "Graph");
     m_treeItemGraphs->setExpanded(false);
-    // -- add custom widget -- agents from file
-    QLineEdit* agentsPath = new QLineEdit(m_project->getDest());
-    QPushButton* btBrowseFile = new QPushButton("...");
-    btBrowseFile->setMaximumWidth(20);
-    connect(btBrowseFile, SIGNAL(clicked(bool)), SLOT(slotAgentFile()));
+    // -- add custom widget -- agents creator
+    QLineEdit* agentsCmd = new QLineEdit(m_project->getDest());
+    QPushButton* btAgentW = new QPushButton("...");
+    btAgentW->setMaximumWidth(20);
+    connect(btAgentW, SIGNAL(clicked(bool)), SLOT(slotAgentsWidget()));
     QHBoxLayout* agentsLayout = new QHBoxLayout(new QWidget(m_ui->treeWidget));
     agentsLayout->setMargin(0);
-    agentsLayout->insertWidget(0, agentsPath);
-    agentsLayout->insertWidget(1, btBrowseFile);
-    m_widgetFields.insert(GENERAL_ATTRIBUTE_AGENTS, QVariant::fromValue(agentsPath));
+    agentsLayout->insertWidget(0, agentsCmd);
+    agentsLayout->insertWidget(1, btAgentW);
+    m_widgetFields.insert(GENERAL_ATTRIBUTE_AGENTS, QVariant::fromValue(agentsCmd));
     QTreeWidgetItem* item = new QTreeWidgetItem(m_treeItemGraphs);
     item->setText(0, GENERAL_ATTRIBUTE_AGENTS);
     m_ui->treeWidget->setItemWidget(item, 1, agentsLayout->parentWidget());
@@ -228,13 +231,34 @@ void AttributesWidget::setExperiment(Experiment* exp)
     }
 }
 
-void AttributesWidget::slotAgentFile()
+void AttributesWidget::slotAgentsWidget()
 {
-    QLineEdit* lineedit = m_widgetFields.value(GENERAL_ATTRIBUTE_AGENTS).value<QLineEdit*>();
-    QString path = QFileDialog::getOpenFileName(this, "Initial Population", lineedit->text(), "Text Files (*.csv *.txt)");
-    if (!path.isEmpty()) {
-        lineedit->setText(path);
+    if (m_selectedModelId == STRING_NULL_PLUGINID) {
+        QMessageBox::warning(this, "Experiment", "Please, select a valid 'modelId' first.");
+        return;
     }
+
+    AgentsGenerator* ag = nullptr;
+    const ModelPlugin* model = m_project->getModels().value(m_selectedModelId);
+    QString cmd = m_widgetFields.value(GENERAL_ATTRIBUTE_AGENTS).value<QLineEdit*>()->text();
+    if (!cmd.isEmpty()) {
+        QString errorMsg;
+        ag = AgentsGenerator::parse(model->agentAttrSpace(), cmd, errorMsg);
+        if (!errorMsg.isEmpty()) {
+            QMessageBox::warning(this, "Agents Generator", errorMsg);
+            delete ag;
+        }
+    }
+
+    AgentsWidget* aw = new AgentsWidget(model->agentAttrSpace(), ag);
+    aw->show();
+
+    connect(aw, &AgentsWidget::closed,
+    [this, ag](const QString& cmd) {
+        m_widgetFields.value(GENERAL_ATTRIBUTE_AGENTS)
+                .value<QLineEdit*>()->setText(cmd);
+        delete ag;
+    });
 }
 
 void AttributesWidget::slotOutputDir()

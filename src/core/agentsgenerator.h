@@ -42,6 +42,9 @@ public:
     static AgentsGenerator* parse(const AttributesSpace& agentAttrsSpace,
                                   const QString& command, QString& errMsg);
 
+    // Export set of agents to a csv file
+    static bool saveToFile(const QString& filepath, Agents agents);
+
     virtual Agents create() = 0;
 
     inline const QString& command() { return m_command; }
