@@ -150,6 +150,7 @@ AGSameFuncForAll::AGSameFuncForAll(const AttributesSpace& attrsSpace, const int 
     case F_Rand:
         Q_ASSERT(funcInput.type == Value::INT);
         m_command = QString("*%1;rand_%2").arg(m_numAgents).arg(funcInput.toQString());
+        m_prg = new PRG(funcInput.toInt);
         f_value = [this](const ValueSpace* valSpace) { return valSpace->rand(m_prg); };
         break;
     default:
@@ -235,10 +236,47 @@ Agents AGDiffFunctions::create()
 
 /*********************/
 
-bool AgentsGenerator::saveToFile(const QString& filepath, Agents agents)
+bool AgentsGenerator::saveToFile(QString& filePath, Agents agents, std::function<void(int)>& progress)
 {
-    // TODO
-    return false;
+    progress(0);
+    if (agents.empty()) {
+        qWarning() << "[AgentsGenerator]: Tried to save an empty set of agents.";
+        return false;
+    }
+
+    if (!filePath.endsWith(".csv")) {
+        filePath += ".csv";
+    }
+
+    QFile file(filePath);
+    if (!file.open(QFile::WriteOnly | QFile::Truncate)) {
+        qWarning() << "[AgentsGenerator]: Failed to save the set of agents to file." << filePath;
+        return false;
+    }
+
+    progress(5);
+    QTextStream out(&file);
+    const std::vector<QString>& header = agents.front()->attrs().names();
+    for (const QString& col : header) {
+        out << col << ",";
+    }
+    out << "x,y\n";
+
+    progress(10);
+    for (Agent* agent : agents) {
+        for (const Value& value : agent->attrs().values()) {
+            out << value.toQString() << ",";
+        }
+        out << agent->x() << ",";
+        out << agent->y() << "\n";
+
+        progress(10.f + 100.f * agent->id() / agents.size());
+    }
+
+    file.close();
+    progress(100);
+
+    return true;
 }
 
 AgentsGenerator* AgentsGenerator::parse(const AttributesSpace& agentAttrsSpace,

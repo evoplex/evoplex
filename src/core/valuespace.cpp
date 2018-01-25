@@ -25,8 +25,10 @@ ValueSpace* ValueSpace::parse(int id, const QString& attrName, QString space)
         if (!Utils::paramSet(space, values)) {
             vs = new DefaultSpace();
         } else if (space.startsWith("int")) {
+            space.replace("max", QString::number(INT32_MAX));
             vs = new SetSpace(id, attrName, Int_Set, values);
         } else if (space.startsWith("double")) {
+            space.replace("max", QString::number(DBL_MAX));
             vs = new SetSpace(id, attrName, Double_Set, values);
         }
     } else if (space.contains('[') && space.endsWith(']')) {
@@ -34,8 +36,10 @@ ValueSpace* ValueSpace::parse(int id, const QString& attrName, QString space)
         if (!Utils::paramInterval(space, min, max)) {
             vs = new DefaultSpace();
         } else if (space.startsWith("int")) {
+            space.replace("max", QString::number(INT32_MAX));
             vs = new IntervalSpace(id, attrName, Int_Interval, min, max);
         } else if (space.startsWith("double")) {
+            space.replace("max", QString::number(DBL_MAX));
             vs = new IntervalSpace(id, attrName, Double_Interval, min, max);
         }
     }

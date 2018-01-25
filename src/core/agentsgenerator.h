@@ -43,7 +43,7 @@ public:
                                   const QString& command, QString& errMsg);
 
     // Export set of agents to a csv file
-    static bool saveToFile(const QString& filepath, Agents agents);
+    static bool saveToFile(QString& filepath, Agents agents, std::function<void(int)>& progress);
 
     virtual Agents create() = 0;
 

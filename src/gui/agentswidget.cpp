@@ -5,6 +5,8 @@
 
 #include <QFileDialog>
 #include <QMessageBox>
+#include <QProgressDialog>
+#include <functional>
 
 #include "agentswidget.h"
 
@@ -101,17 +103,30 @@ void AgentsWidget::slotSaveAs()
         return;
     }
 
+    QProgressDialog progress("Saving Agents...", QString(), 0, 100, this);
+    progress.setWindowModality(Qt::ApplicationModal);
+    progress.setValue(0);
+    progress.show();
+
     QString errMsg;
     AgentsGenerator* ag = AgentsGenerator::parse(m_agentAttrsSpace, cmd, errMsg);
     Q_ASSERT(errMsg.isEmpty());
+    progress.setValue(5);
 
     Agents agents = ag->create();
     Q_ASSERT(agents.size() > 0);
-    if (!AgentsGenerator::saveToFile(path, agents)) {
+    progress.setValue(50);
+
+    std::function<void(int)> f = [&progress](int p){ progress.setValue(50 + p / 2.f); };
+    if (!AgentsGenerator::saveToFile(path, agents, f)) {
         QMessageBox::warning(this, "Saving Agents",
             "ERROR! Unable to save the set of agents at:\n"
             + path + "\nPlease, make sure this directory is writable.");
     }
+    qDeleteAll(agents);
+    agents.clear();
+    Agents().swap(agents);
+    progress.setValue(100);
 }
 
 void AgentsWidget::fill(AgentsGenerator* ag)
