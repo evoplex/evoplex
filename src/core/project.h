@@ -36,8 +36,8 @@ public:
     const int importExperiments(const QString& filePath);
 
     // Save project into the dest directory.
-    // A project is composed by plain csv files
-    bool saveProject(const QString &dest="", const QString &projectName="");
+    // A project is composed of plain csv files
+    bool saveProject(QString& errMsg, std::function<void(int)>& progress);
 
     // execute all experiments of this project.
     void playAll();
@@ -60,8 +60,6 @@ signals:
     void expAdded(int expId);
     void expEdited(int expId);
     void hasUnsavedChanges(bool);
-    // emit an integer [0,100] while saving this project
-    void progressSave(int);
 
 private:
     MainApp* m_mainApp;

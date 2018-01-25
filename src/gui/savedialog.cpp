@@ -5,7 +5,9 @@
 
 #include <QDir>
 #include <QFileDialog>
+#include <QMessageBox>
 #include <QProgressDialog>
+#include <functional>
 
 #include "savedialog.h"
 #include "ui_savedialog.h"
@@ -13,7 +15,7 @@
 namespace evoplex {
 
 SaveDialog::SaveDialog(QWidget *parent)
-    : QWidget(parent)
+    : QDialog(parent)
     , m_ui(new Ui::SaveDialog)
     , m_currProject(nullptr)
 {
@@ -39,14 +41,17 @@ void SaveDialog::save(Project* project)
         return;
 
     hide();
-    QProgressDialog progress("Saving project...", QString(), 0, 100);
+    QProgressDialog progress("Saving project...", QString(), 0, 100, this);
     progress.setWindowModality(Qt::ApplicationModal);
-    connect(project, SIGNAL(progressSave(int)), &progress, SLOT(setValue(int)));
-    progress.setValue(0);
     progress.show();
-    project->saveProject();
+
+    QString errMsg;
+    std::function<void(int)> f = [&progress](int p){ progress.setValue(p); };
+    project->saveProject(errMsg, f);
     m_currProject = project;
-    progress.setValue(100);
+    if (!errMsg.isEmpty()) {
+        QMessageBox::warning(this, "Saving project...", errMsg);
+    }
 }
 
 void SaveDialog::saveAs(Project* project)

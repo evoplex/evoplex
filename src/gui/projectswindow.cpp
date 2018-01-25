@@ -48,6 +48,9 @@ void ProjectsWindow::addProjectWidget(Project* project)
     connect(pw, SIGNAL(openExperiment(int,int)), this, SLOT(slotOpenExperiment(int,int)));
     connect(pw, SIGNAL(hasUnsavedChanges(ProjectWidget*)), SIGNAL(hasUnsavedChanges(ProjectWidget*)));
     connect(pw, &ProjectWidget::closed, [this, pw, project]() {
+        for (ExperimentWidget* expW : m_experiments) {
+            expW->close();
+        }
         m_projects.removeOne(pw);
         pw->deleteLater();
         emit (isEmpty(m_projects.isEmpty()));
@@ -91,8 +94,11 @@ void ProjectsWindow::slotOpenExperiment(int projId, int expId)
 
     if (!ew) {
         ew = new ExperimentWidget(m_mainApp->getProject(projId)->getExperiment(expId), this);
-        connect(ew, &ExperimentWidget::closed,
-                [this, ew](){ m_experiments.removeOne(ew); ew->deleteLater(); });
+        connect(ew, &ExperimentWidget::closed, [this, ew]() {
+            m_projects.last()->raise();
+            m_experiments.removeOne(ew);
+            ew->deleteLater();
+        });
 
         if (m_projects.isEmpty() && m_experiments.isEmpty()) {
             addDockWidget(Qt::TopDockWidgetArea, ew);

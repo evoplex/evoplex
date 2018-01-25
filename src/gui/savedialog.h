@@ -1,7 +1,7 @@
 #ifndef SAVEDIALOG_H
 #define SAVEDIALOG_H
 
-#include <QWidget>
+#include <QDialog>
 
 #include "core/project.h"
 
@@ -9,7 +9,7 @@ class Ui_SaveDialog;
 
 namespace evoplex {
 
-class SaveDialog : public QWidget
+class SaveDialog : public QDialog
 {
     Q_OBJECT
 
@@ -26,7 +26,6 @@ private slots:
 private:
     Ui_SaveDialog* m_ui;
     Project* m_currProject;
-
 };
 }
 #endif // SAVEDIALOG_H

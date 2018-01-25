@@ -18,7 +18,7 @@ namespace evoplex {
 MainGUI::MainGUI(MainApp* mainApp, QWidget* parent)
     : QMainWindow(parent)
     , m_mainApp(mainApp)
-    , m_saveDialog(new SaveDialog())
+    , m_saveDialog(new SaveDialog(this))
     , m_welcome(new WelcomeWidget(this))
     , m_queue(new QueueWidget(mainApp->getExperimentsMgr(), this))
     , m_projects(new ProjectsWindow(mainApp, this))
@@ -209,27 +209,32 @@ void MainGUI::setPageVisible(Page page, bool visible)
 
 void MainGUI::updateSaveButtons(ProjectWidget* pw)
 {
-    if (pw) {
+    if (pw && pw == m_projects->currentProject() && pw->getProject()) {
         Project* project = pw->getProject();
         m_actSave->setEnabled(project->hasUnsavedChanges());
         m_actSaveAs->setEnabled(true);
         m_actSave->setText(QString("Save \"%1\"").arg(pw->objectName()));
-        m_actSaveAs->setText(QString("Save \"%1\" as").arg(pw->objectName()));
+        m_actSaveAs->setText(QString("Save \"%1\" As").arg(pw->objectName()));
     } else {
         m_actSave->setEnabled(false);
         m_actSaveAs->setEnabled(false);
         m_actSave->setText("Save");
-        m_actSaveAs->setText("Save as");
+        m_actSaveAs->setText("Save As");
     }
 }
 
 void MainGUI::slotSaveAs()
 {
-    m_saveDialog->saveAs(m_projects->currentProject()->getProject());
+    if (m_projects->currentProject()) {
+        m_saveDialog->saveAs(m_projects->currentProject()->getProject());
+    }
 }
 
 void MainGUI::slotSave()
 {
+    if (!m_projects->currentProject()) {
+        return;
+    }
     Project* project = m_projects->currentProject()->getProject();
     if (project->getDest().isEmpty()) {
         slotSaveAs();

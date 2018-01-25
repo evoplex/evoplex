@@ -106,34 +106,38 @@ const int Project::importExperiments(const QString& filePath)
     return failures;
 }
 
-bool Project::saveProject(const QString& dest, const QString& projectName)
+bool Project::saveProject(QString& errMsg, std::function<void(int)>& progress)
 {
-    emit (progressSave(0));
-    m_dest = dest.isEmpty() ? m_dest : dest;
-    m_name = projectName.isEmpty() ? m_name : projectName;
+    progress(0);
+    if (m_experiments.empty()) {
+        errMsg = QString("Unable to save %1.\n"
+                "This project is empty. There is nothing to save.").arg(m_name);
+        qWarning() << "[Project]" << errMsg;
+        return false;
+    }
 
     QDir dir(m_dest);
     if (m_dest.isEmpty() || m_name.isEmpty() || !dir.mkpath(m_name)) {
-        qWarning() << "[Project] unable to save project" << m_name
-                 << "The destination is invalid!" << m_dest;
+        errMsg = QString("Unable to save %1.\n"
+                "The destination is invalid!\n%2").arg(m_name).arg(m_dest);
+        qWarning() << "[Project]" << errMsg;
         return false;
     }
     dir.cd(m_name);
 
-    emit (progressSave(5));
+    progress(5);
     QFile experimentsFile(dir.absoluteFilePath(m_name + ".csv"));
     if (!experimentsFile.open(QFile::WriteOnly | QFile::Truncate)) {
-        qWarning() << "[Project] unable to save project" << m_name
-                   << "Make sure the destination directory is writtable."
-                   << dir.absolutePath();
+        errMsg = QString("Unable to save %1.\n"
+                "Make sure the destination directory is writtable.\n%2")
+                .arg(m_name).arg(dir.absolutePath());
+        qWarning() << "[Project]" << errMsg;
         return false;
     }
 
-    emit (progressSave(10));
+    progress((10));
     std::vector<QString> header;
-    QHash<int, Experiment*>::const_iterator it;
-    for (it = m_experiments.begin(); it != m_experiments.end(); ++it) {
-        Experiment* exp = it.value();
+    for (Experiment* exp : m_experiments) {
         std::vector<QString> general = exp->generalAttrs()->names();
         header.insert(header.end(), general.begin(), general.end());
         // prefix all model attributes with the modelId
@@ -146,20 +150,19 @@ bool Project::saveProject(const QString& dest, const QString& projectName)
         }
     }
     // remove duplicates
-    emit (progressSave(25));
+    progress((25));
     std::set<QString> s(header.begin(), header.end());
     header.assign(s.begin(), s.end());
 
-    emit (progressSave(30));
+    progress((30));
     QTextStream out(&experimentsFile);
     for (int i = 0; i < header.size()-1; ++i) {
         out << header.at(i) << ",";
     }
     out << header.at(header.size()-1) << "\n";
 
-    emit (progressSave(35));
-    for (it = m_experiments.begin(); it != m_experiments.end(); ++it) {
-        Experiment* exp = it.value();
+    progress((35));
+    for (Experiment* exp : m_experiments) {
         const Attributes* generalAttrs = exp->generalAttrs();
         const Attributes* modelAttrs = exp->modelAttrs();
         const Attributes* graphAttrs = exp->graphAttrs();
@@ -186,7 +189,7 @@ bool Project::saveProject(const QString& dest, const QString& projectName)
     experimentsFile.close();
     m_hasUnsavedChanges = false;
     emit (hasUnsavedChanges(false));
-    emit (progressSave(100));
+    progress((100));
     return true;
 }
 
