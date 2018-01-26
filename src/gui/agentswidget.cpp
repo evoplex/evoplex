@@ -15,7 +15,7 @@ namespace evoplex
 {
 
 AgentsWidget::AgentsWidget(const AttributesSpace& agentAttrsSpace, AgentsGenerator* ag, QWidget *parent)
-    : QWidget(parent)
+    : QDialog(parent)
     , m_ui(new Ui_AgentsWidget)
     , m_agentAttrsSpace(agentAttrsSpace)
 {

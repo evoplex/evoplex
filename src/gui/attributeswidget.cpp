@@ -250,7 +250,7 @@ void AttributesWidget::slotAgentsWidget()
         }
     }
 
-    AgentsWidget* aw = new AgentsWidget(model->agentAttrSpace(), ag);
+    AgentsWidget* aw = new AgentsWidget(model->agentAttrSpace(), ag, this);
     aw->show();
 
     connect(aw, &AgentsWidget::closed,

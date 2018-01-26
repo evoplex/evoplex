@@ -6,7 +6,7 @@
 #ifndef AGENTSWIDGET_H
 #define AGENTSWIDGET_H
 
-#include <QWidget>
+#include <QDialog>
 
 #include "ui_agentswidget.h"
 #include "core/agentsgenerator.h"
@@ -15,7 +15,7 @@
 namespace evoplex
 {
 
-class AgentsWidget : public QWidget
+class AgentsWidget : public QDialog
 {
     Q_OBJECT
 
