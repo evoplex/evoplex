@@ -6,14 +6,14 @@
 #include <QFileDialog>
 #include <QMessageBox>
 
-#include "ui_pluginswidget.h"
-#include "pluginswidget.h"
+#include "ui_pluginspage.h"
+#include "pluginspage.h"
 
 namespace evoplex {
 
-PluginsWidget::PluginsWidget(MainApp* mainApp, QWidget *parent)
+PluginsPage::PluginsPage(MainApp* mainApp, QWidget *parent)
     : QWidget(parent)
-    , m_ui(new Ui_PluginsWidget)
+    , m_ui(new Ui_PluginsPage)
     , m_mainApp(mainApp)
 {
     m_ui->setupUi(this);
@@ -32,12 +32,12 @@ PluginsWidget::PluginsWidget(MainApp* mainApp, QWidget *parent)
     }
 }
 
-PluginsWidget::~PluginsWidget()
+PluginsPage::~PluginsPage()
 {
     delete m_ui;
 }
 
-void PluginsWidget::rowSelectionChanged()
+void PluginsPage::rowSelectionChanged()
 {
     int row = m_ui->table->currentRow();
     int type = m_ui->table->item(row, TYPE)->data(Qt::UserRole).toInt();
@@ -46,14 +46,14 @@ void PluginsWidget::rowSelectionChanged()
     } else if (type == AbstractPlugin::ModelPlugin) {
         loadHtml(m_mainApp->getModel(m_ui->table->item(row, UID)->text()));
     } else {
-        qFatal("[PluginsWidget]: invalid plugin type! It should never happen.");
+        qFatal("[PluginsPage]: invalid plugin type! It should never happen.");
     }
 }
 
-void PluginsWidget::loadHtml(const GraphPlugin* plugin)
+void PluginsPage::loadHtml(const GraphPlugin* plugin)
 {
     if (!plugin) {
-        qFatal("[PluginsWidget]: invalid plugin object! It should never happen.");
+        qFatal("[PluginsPage]: invalid plugin object! It should never happen.");
     }
 
     QString html = "<h2>" + plugin->name() + "</h2><br>"
@@ -64,10 +64,10 @@ void PluginsWidget::loadHtml(const GraphPlugin* plugin)
     m_ui->browser->setHtml(html);
 }
 
-void PluginsWidget::loadHtml(const ModelPlugin* plugin)
+void PluginsPage::loadHtml(const ModelPlugin* plugin)
 {
     if (!plugin) {
-        qFatal("[PluginsWidget]: invalid plugin object! It should never happen.");
+        qFatal("[PluginsPage]: invalid plugin object! It should never happen.");
     }
 
     QString html = "<h2>" + plugin->name() + "</h2><br>"
@@ -78,7 +78,7 @@ void PluginsWidget::loadHtml(const ModelPlugin* plugin)
     m_ui->browser->setHtml(html);
 }
 
-void PluginsWidget::importPlugin()
+void PluginsPage::importPlugin()
 {
     QString fileName = QFileDialog::getOpenFileName(this, tr("Import Plugin"),
                                                     QDir::homePath(),
@@ -102,7 +102,7 @@ void PluginsWidget::importPlugin()
     insertRow(plugin);
 }
 
-void PluginsWidget::insertRow(const AbstractPlugin* plugin)
+void PluginsPage::insertRow(const AbstractPlugin* plugin)
 {
     QTableWidgetItem* typeItem;
     if (plugin->type() == AbstractPlugin::ModelPlugin) {
@@ -110,7 +110,7 @@ void PluginsWidget::insertRow(const AbstractPlugin* plugin)
     } else if (plugin->type() == AbstractPlugin::GraphPlugin) {
         typeItem = new QTableWidgetItem("graph");
     } else {
-        qFatal("[PluginsWidget]: invalid plugin type! It should never happen.");
+        qFatal("[PluginsPage]: invalid plugin type! It should never happen.");
     }
     typeItem->setData(Qt::UserRole, plugin->type());
 

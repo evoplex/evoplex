@@ -3,23 +3,23 @@
  * @author Marcos Cardinot <mcardinot@gmail.com>
  */
 
-#ifndef PLUGINSWIDGET_H
-#define PLUGINSWIDGET_H
+#ifndef PLUGINSPAGE_H
+#define PLUGINSPAGE_H
 
 #include <QWidget>
 
 #include "core/mainapp.h"
 
-class Ui_PluginsWidget;
+class Ui_PluginsPage;
 
 namespace evoplex {
-class PluginsWidget : public QWidget
+class PluginsPage : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit PluginsWidget(MainApp* mainApp, QWidget *parent = 0);
-    ~PluginsWidget();
+    explicit PluginsPage(MainApp* mainApp, QWidget *parent = 0);
+    ~PluginsPage();
 
 private slots:
     void importPlugin();
@@ -32,7 +32,7 @@ private:
         NAME = 2
     };
 
-    Ui_PluginsWidget* m_ui;
+    Ui_PluginsPage* m_ui;
     MainApp* m_mainApp;
 
     void insertRow(const AbstractPlugin *plugin);
@@ -41,4 +41,4 @@ private:
     void loadHtml(const ModelPlugin* plugin);
 };
 }
-#endif // PLUGINSWIDGET_H
+#endif // PLUGINSPAGE_H

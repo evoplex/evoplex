@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>QueueWidget</class>
- <widget class="QScrollArea" name="QueueWidget">
+ <class>QueuePage</class>
+ <widget class="QScrollArea" name="QueuePage">
   <property name="geometry">
    <rect>
     <x>0</x>

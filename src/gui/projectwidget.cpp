@@ -14,8 +14,8 @@
 
 namespace evoplex {
 
-ProjectWidget::ProjectWidget(MainApp* mainApp, Project* project, ProjectsWindow* pwindow)
-    : QDockWidget(pwindow)
+ProjectWidget::ProjectWidget(MainApp* mainApp, Project* project, ProjectsPage* ppage)
+    : QDockWidget(ppage)
     , m_ui(new Ui_ProjectWidget)
     , m_innerWindow(new QMainWindow(this, Qt::FramelessWindowHint))
     , m_attrWidget(new AttributesWidget(mainApp, project, m_innerWindow))
@@ -58,7 +58,7 @@ ProjectWidget::ProjectWidget(MainApp* mainApp, Project* project, ProjectsWindow*
     connect(m_ui->table, SIGNAL(itemClicked(QTableWidgetItem*)),
             SLOT(onItemClicked(QTableWidgetItem*)));
 
-    ExperimentsMgr* expMgr = pwindow->getMainApp()->getExperimentsMgr();
+    ExperimentsMgr* expMgr = ppage->getMainApp()->getExperimentsMgr();
     connect(expMgr, SIGNAL(statusChanged(Experiment*)),
             m_ui->table->viewport(), SLOT(update()));
     connect(expMgr, SIGNAL(progressUpdated(Experiment*)),

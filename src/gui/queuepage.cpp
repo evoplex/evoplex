@@ -6,14 +6,14 @@
 #include <QVBoxLayout>
 #include <QSpacerItem>
 
-#include "queuewidget.h"
-#include "ui_queuewidget.h"
+#include "queuepage.h"
+#include "ui_queuepage.h"
 
 namespace evoplex {
 
-QueueWidget::QueueWidget(ExperimentsMgr* expMgr, QWidget* parent)
+QueuePage::QueuePage(ExperimentsMgr* expMgr, QWidget* parent)
     : QScrollArea(parent)
-    , m_ui(new Ui_QueueWidget)
+    , m_ui(new Ui_QueuePage)
     , m_expMgr(expMgr)
 {
     m_ui->setupUi(this);
@@ -51,7 +51,7 @@ QueueWidget::QueueWidget(ExperimentsMgr* expMgr, QWidget* parent)
             m_ui->tableIdle->clearSelection(); m_ui->tableQueue->clearSelection();});
 }
 
-void QueueWidget::slotRemoveRow(Experiment *exp)
+void QueuePage::slotRemoveRow(Experiment *exp)
 {
     Row row = m_rows.take(std::make_pair(exp->projId(), exp->id()));
     if (!row.table) {
@@ -62,7 +62,7 @@ void QueueWidget::slotRemoveRow(Experiment *exp)
     emit (isEmpty(!m_ui->idle->isVisible() && !m_ui->running->isVisible() && !m_ui->queue->isVisible()));
 }
 
-void QueueWidget::slotStatusChanged(Experiment* exp)
+void QueuePage::slotStatusChanged(Experiment* exp)
 {
     const rowKey key = std::make_pair(exp->projId(), exp->id());
     Row prev = m_rows.value(key, Row());
@@ -97,7 +97,7 @@ void QueueWidget::slotStatusChanged(Experiment* exp)
     emit (isEmpty(false));
 }
 
-QTableWidgetItem* QueueWidget::insertRow(TableWidget* table, Experiment* exp)
+QTableWidgetItem* QueuePage::insertRow(TableWidget* table, Experiment* exp)
 {
     const int row = table->insertRow(exp);
 
@@ -114,7 +114,7 @@ QTableWidgetItem* QueueWidget::insertRow(TableWidget* table, Experiment* exp)
     return add(TableWidget::H_EXPID, exp->id());
 }
 
-void QueueWidget::moveRow(TableWidget* prevTable, int preRow, TableWidget* nextTable, Experiment* exp)
+void QueuePage::moveRow(TableWidget* prevTable, int preRow, TableWidget* nextTable, Experiment* exp)
 {
     const int nextRow = nextTable->insertRow(exp);
     const int cols = prevTable->columnCount();

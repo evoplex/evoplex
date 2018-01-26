@@ -10,7 +10,7 @@
 #include <QMainWindow>
 
 #include "attributeswidget.h"
-#include "projectswindow.h"
+#include "projectspage.h"
 #include "core/project.h"
 
 namespace evoplex {
@@ -19,7 +19,7 @@ class ExperimentWidget : public QDockWidget
 {
     Q_OBJECT
 public:
-    explicit ExperimentWidget(Experiment* exp, ProjectsWindow* pwindow = 0);
+    explicit ExperimentWidget(Experiment* exp, ProjectsPage* ppage = 0);
     ~ExperimentWidget();
 
     inline int expId() const { return m_exp->id(); }

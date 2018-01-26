@@ -3,24 +3,24 @@
  * @author Marcos Cardinot <mcardinot@gmail.com>
  */
 
-#ifndef QUEUEWIDGET_H
-#define QUEUEWIDGET_H
+#ifndef QUEUEPAGE_H
+#define QUEUEPAGE_H
 
 #include <QScrollArea>
 
 #include "tablewidget.h"
 #include "core/experimentsmgr.h"
 
-class Ui_QueueWidget;
+class Ui_QueuePage;
 
 namespace evoplex {
 
-class QueueWidget : public QScrollArea
+class QueuePage : public QScrollArea
 {
     Q_OBJECT
 
 public:
-    explicit QueueWidget(ExperimentsMgr* expMgr, QWidget* parent = nullptr);
+    explicit QueuePage(ExperimentsMgr* expMgr, QWidget* parent = nullptr);
 
 signals:
     void isEmpty(bool empty);
@@ -38,7 +38,7 @@ private:
         QWidget* section = nullptr;
     };
 
-    Ui_QueueWidget* m_ui;
+    Ui_QueuePage* m_ui;
     ExperimentsMgr* m_expMgr;
 
     QHash<rowKey, Row> m_rows; // map 'projId.expId' to the Row
@@ -48,4 +48,4 @@ private:
     void moveRow(TableWidget* prevTable, int preRow, TableWidget* nextTable, Experiment* exp);
 };
 }
-#endif // QUEUEWIDGET_H
+#endif // QUEUEPAGE_H

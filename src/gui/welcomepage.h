@@ -3,29 +3,29 @@
  * @author Marcos Cardinot <mcardinot@gmail.com>
  */
 
-#ifndef WELCOME_H
-#define WELCOME_H
+#ifndef WELCOMEPAGE_H
+#define WELCOMEPAGE_H
 
 #include <QWidget>
 
-class Ui_WelcomeWidget;
+class Ui_WelcomePage;
 
 namespace evoplex {
 
 class MainGUI;
 
-class WelcomeWidget : public QWidget
+class WelcomePage : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit WelcomeWidget(MainGUI* maingui);
-    ~WelcomeWidget();
+    explicit WelcomePage(MainGUI* maingui);
+    ~WelcomePage();
 
 private:
-    Ui_WelcomeWidget* m_ui;
+    Ui_WelcomePage* m_ui;
     MainGUI* m_maingui;
 };
 }
 
-#endif // WELCOME_H
+#endif // WELCOMEPAGE_H

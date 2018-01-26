@@ -7,12 +7,12 @@
 #include <QtCharts/QChart>
 #include <QtCharts/QChartView>
 
-#include "linechartwidget.h"
+#include "linechart.h"
 #include "titlebar.h"
 
 namespace evoplex {
 
-LineChartWidget::LineChartWidget(ExperimentsMgr* expMgr, Experiment* exp, QWidget* parent)
+LineChart::LineChart(ExperimentsMgr* expMgr, Experiment* exp, QWidget* parent)
     : QDockWidget(parent)
     , m_settingsDlg(new Ui_LineChartSettings)
     , m_exp(exp)
@@ -52,13 +52,13 @@ LineChartWidget::LineChartWidget(ExperimentsMgr* expMgr, Experiment* exp, QWidge
     connect(expMgr, SIGNAL(restarted(Experiment*)), SLOT(slotRestarted(Experiment*)));
 }
 
-LineChartWidget::~LineChartWidget()
+LineChart::~LineChart()
 {
     delete m_settingsDlg;
     delete m_chart;
 }
 
-void LineChartWidget::slotRestarted(Experiment* exp)
+void LineChart::slotRestarted(Experiment* exp)
 {
     if (exp != m_exp) {
         return;
@@ -71,7 +71,7 @@ void LineChartWidget::slotRestarted(Experiment* exp)
     m_finished = false;
 }
 
-void LineChartWidget::setSelectedTrial(int trialId)
+void LineChart::setSelectedTrial(int trialId)
 {
     if (m_series.empty()) {
         m_currentTrialId = trialId;
@@ -97,7 +97,7 @@ void LineChartWidget::setSelectedTrial(int trialId)
     m_currentTrialId = trialId;
 }
 
-void LineChartWidget::removeSeries(int seriesId)
+void LineChart::removeSeries(int seriesId)
 {
     Series& s = m_series.at(seriesId);
     m_chart->removeSeries(s.series);
@@ -108,7 +108,7 @@ void LineChartWidget::removeSeries(int seriesId)
     m_series.erase(seriesId);
 }
 
-void LineChartWidget::slotAddSeries(std::vector<Output*> newOutputs)
+void LineChart::slotAddSeries(std::vector<Output*> newOutputs)
 {
     for (Output* output : newOutputs) {
         Series s;
@@ -132,7 +132,7 @@ void LineChartWidget::slotAddSeries(std::vector<Output*> newOutputs)
     }
 }
 
-void LineChartWidget::updateSeries()
+void LineChart::updateSeries()
 {
     if (m_series.empty() || m_finished || !this->isVisible()) {
         return;

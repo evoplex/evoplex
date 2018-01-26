@@ -3,31 +3,31 @@
  * @author Marcos Cardinot <mcardinot@gmail.com>
  */
 
-#ifndef SETTINGSWIDGET_H
-#define SETTINGSWIDGET_H
+#ifndef SETTINGSPAGE_H
+#define SETTINGSPAGE_H
 
 #include <QWidget>
 
 #include "core/mainapp.h"
 
-class Ui_SettingsWidget;
+class Ui_SettingsPage;
 
 namespace evoplex {
 
-class SettingsWidget : public QWidget
+class SettingsPage : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit SettingsWidget(MainApp* mainApp, QWidget* parent = 0);
-    ~SettingsWidget();
+    explicit SettingsPage(MainApp* mainApp, QWidget* parent = 0);
+    ~SettingsPage();
 
 private slots:
     void slotNumThreads(int newValue);
 
 private:
-    Ui_SettingsWidget* m_ui;
+    Ui_SettingsPage* m_ui;
     MainApp* m_mainApp;
 };
 }
-#endif // SETTINGSWIDGET_H
+#endif // SETTINGSPAGE_H

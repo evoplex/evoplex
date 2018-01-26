@@ -3,8 +3,8 @@
  * @author Marcos Cardinot <mcardinot@gmail.com>
  */
 
-#ifndef PROJECTSWINDOW_H
-#define PROJECTSWINDOW_H
+#ifndef PROJECTSPAGE_H
+#define PROJECTSPAGE_H
 
 #include <QMainWindow>
 
@@ -15,11 +15,11 @@ namespace evoplex {
 class ExperimentWidget;
 class ProjectWidget;
 
-class ProjectsWindow : public QMainWindow
+class ProjectsPage : public QMainWindow
 {
     Q_OBJECT
 public:
-    explicit ProjectsWindow(MainApp* mainApp, QWidget *parent = 0);
+    explicit ProjectsPage(MainApp* mainApp, QWidget *parent = 0);
 
     inline const ProjectWidget* currentProject() const { return m_currProjectWidget; }
     inline MainApp* getMainApp() const { return m_mainApp; }
@@ -47,4 +47,4 @@ private:
 };
 }
 
-#endif // PROJECTSWINDOW_H
+#endif // PROJECTSPAGE_H

@@ -5,15 +5,15 @@
 
 #include <QThread>
 
-#include "settingswidget.h"
-#include "ui_settingswidget.h"
+#include "settingspage.h"
+#include "ui_settingspage.h"
 #include "core/experimentsmgr.h"
 
 namespace evoplex {
 
-SettingsWidget::SettingsWidget(MainApp* mainApp, QWidget* parent)
+SettingsPage::SettingsPage(MainApp* mainApp, QWidget* parent)
     : QWidget(parent)
-    , m_ui(new Ui_SettingsWidget)
+    , m_ui(new Ui_SettingsPage)
     , m_mainApp(mainApp)
 {
     m_ui->setupUi(this);
@@ -24,13 +24,13 @@ SettingsWidget::SettingsWidget(MainApp* mainApp, QWidget* parent)
     connect(m_ui->threads, SIGNAL(valueChanged(int)), this, SLOT(slotNumThreads(int)));
 }
 
-SettingsWidget::~SettingsWidget()
+SettingsPage::~SettingsPage()
 {
     delete m_ui;
     m_ui = nullptr;
 }
 
-void SettingsWidget::slotNumThreads(int newValue)
+void SettingsPage::slotNumThreads(int newValue)
 {
     m_mainApp->getExperimentsMgr()->setMaxThreadCount(newValue);
 }

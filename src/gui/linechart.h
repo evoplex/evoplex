@@ -3,8 +3,8 @@
  * @author Marcos Cardinot <mcardinot@gmail.com>
  */
 
-#ifndef LINECHARTWIDGET_H
-#define LINECHARTWIDGET_H
+#ifndef LINECHART_H
+#define LINECHART_H
 
 #include <QDialog>
 #include <QDockWidget>
@@ -16,13 +16,13 @@
 
 namespace evoplex {
 
-class LineChartWidget : public QDockWidget
+class LineChart : public QDockWidget
 {
     Q_OBJECT
 
 public:
-    explicit LineChartWidget(ExperimentsMgr* expMgr, Experiment* exp, QWidget* parent);
-    ~LineChartWidget();
+    explicit LineChart(ExperimentsMgr* expMgr, Experiment* exp, QWidget* parent);
+    ~LineChart();
 
 private slots:
     void slotRestarted(Experiment* exp);
@@ -49,4 +49,4 @@ private:
 };
 }
 
-#endif // LINECHARTWIDGET_H
+#endif // LINECHART_H

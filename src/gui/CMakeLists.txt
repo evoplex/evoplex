@@ -1,61 +1,63 @@
 set(EVOPLEX_GUI_H
   maingui.h
-  agentswidget.h
-  attributeswidget.h
+  agentsgeneratordlg.h
+  attributes.h
   colormap.h
   #contextmenutable.h
   experimentwidget.h
-  linechartwidget.h
+  linechart.h
   outputwidget.h
   graphwidget.h
   gridwidget.h
-  pluginswidget.h
   projectwidget.h
-  projectswindow.h
-  queuewidget.h
   savedialog.h
-  settingswidget.h
   tablewidget.h
   titlebar.h
-  welcomewidget.h
+
+  pluginspage.h
+  projectspage.h
+  queuepage.h
+  settingspage.h
+  welcomepage.h
 )
 
 set(EVOPLEX_GUI_CXX
   maingui.cpp
-  agentswidget.cpp
+  agentsgeneratordlg.cpp
   attributeswidget.cpp
   colormap.cpp
   #contextmenutable.cpp
   experimentwidget.cpp
-  linechartwidget.cpp
+  linechart.cpp
   outputwidget.cpp
   graphwidget.cpp
   gridwidget.cpp
-  pluginswidget.cpp
   projectwidget.cpp
-  projectswindow.cpp
-  queuewidget.cpp
   savedialog.cpp
-  settingswidget.cpp
   tablewidget.cpp
   titlebar.cpp
-  welcomewidget.cpp
+
+  pluginspage.cpp
+  projectspage.cpp
+  queuepage.cpp
+  settingspage.cpp
+  welcomepage.cpp
 )
 
 qt5_wrap_ui(EVOPLEX_GUI_UI
-  forms/agentswidget.ui
+  forms/agentsgeneratordlg.ui
   forms/attributeswidget.ui
   forms/graphwidget.ui
   forms/graphsettings.ui
   forms/linechartsettings.ui
   forms/outputwidget.ui
-  forms/pluginswidget.ui
+  forms/pluginspage.ui
   forms/projectwidget.ui
-  forms/queuewidget.ui
+  forms/queuepage.ui
   forms/savedialog.ui
-  forms/settingswidget.ui
+  forms/settingspage.ui
   forms/titlebar.ui
-  forms/welcomewidget.ui
+  forms/welcomepage.ui
 )
 
 add_library(EvoplexGUI SHARED ${EVOPLEX_GUI_CXX} ${EVOPLEX_GUI_UI})

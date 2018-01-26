@@ -3,25 +3,25 @@
  * @author Marcos Cardinot <mcardinot@gmail.com>
  */
 
-#ifndef AGENTSWIDGET_H
-#define AGENTSWIDGET_H
+#ifndef AGENTSGENERATORDLG_H
+#define AGENTSGENERATORDLG_H
 
 #include <QDialog>
 
-#include "ui_agentswidget.h"
+#include "ui_agentsgeneratordlg.h"
 #include "core/agentsgenerator.h"
 #include "core/valuespace.h"
 
 namespace evoplex
 {
 
-class AgentsWidget : public QDialog
+class AgentsGeneratorDlg : public QDialog
 {
     Q_OBJECT
 
 public:
-    explicit AgentsWidget(const AttributesSpace& agentAttrsSpace, AgentsGenerator* ag, QWidget *parent = 0);
-    ~AgentsWidget();
+    explicit AgentsGeneratorDlg(const AttributesSpace& agentAttrsSpace, AgentsGenerator* ag, QWidget *parent = 0);
+    ~AgentsGeneratorDlg();
 
 private slots:
     void slotSaveAs();
@@ -30,7 +30,7 @@ signals:
     void closed(const QString& cmd);
 
 private:
-    Ui_AgentsWidget* m_ui;
+    Ui_AgentsGeneratorDlg* m_ui;
     const AttributesSpace& m_agentAttrsSpace;
 
     void fill(AgentsGenerator* ag);
@@ -39,4 +39,4 @@ private:
 };
 
 } // evoplex
-#endif // AGENTSWIDGET_H
+#endif // AGENTSGENERATORDLG_H

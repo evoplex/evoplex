@@ -9,12 +9,12 @@
 #include <QAction>
 #include <QMainWindow>
 
-#include "pluginswidget.h"
-#include "projectswindow.h"
-#include "queuewidget.h"
+#include "pluginspage.h"
+#include "projectspage.h"
+#include "queuepage.h"
 #include "savedialog.h"
-#include "settingswidget.h"
-#include "welcomewidget.h"
+#include "settingspage.h"
+#include "welcomepage.h"
 #include "core/mainapp.h"
 
 namespace evoplex {
@@ -53,11 +53,11 @@ private:
 
     MainApp* m_mainApp;
     SaveDialog* m_saveDialog;
-    WelcomeWidget* m_welcome;
-    QueueWidget* m_queue;
-    ProjectsWindow* m_projects;
-    PluginsWidget* m_plugins;
-    SettingsWidget* m_settings;
+    WelcomePage* m_welcome;
+    QueuePage* m_queue;
+    ProjectsPage* m_projects;
+    PluginsPage* m_plugins;
+    SettingsPage* m_settings;
     Page m_curPage;
 
     QAction* m_actNewProject;

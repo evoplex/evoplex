@@ -8,15 +8,15 @@
 #include <QProgressDialog>
 #include <functional>
 
-#include "agentswidget.h"
+#include "agentsgeneratordlg.h"
 #include "core/agent.h"
 
 namespace evoplex
 {
 
-AgentsWidget::AgentsWidget(const AttributesSpace& agentAttrsSpace, AgentsGenerator* ag, QWidget *parent)
+AgentsGeneratorDlg::AgentsGeneratorDlg(const AttributesSpace& agentAttrsSpace, AgentsGenerator* ag, QWidget *parent)
     : QDialog(parent)
-    , m_ui(new Ui_AgentsWidget)
+    , m_ui(new Ui_AgentsGeneratorDlg)
     , m_agentAttrsSpace(agentAttrsSpace)
 {
     setAttribute(Qt::WA_DeleteOnClose, true);
@@ -93,12 +93,12 @@ AgentsWidget::AgentsWidget(const AttributesSpace& agentAttrsSpace, AgentsGenerat
     fill(ag);
 }
 
-AgentsWidget::~AgentsWidget()
+AgentsGeneratorDlg::~AgentsGeneratorDlg()
 {
     delete m_ui;
 }
 
-void AgentsWidget::slotSaveAs()
+void AgentsGeneratorDlg::slotSaveAs()
 {
     QString path = QFileDialog::getSaveFileName(this,
                                                 "Save Agents",
@@ -155,7 +155,7 @@ void AgentsWidget::slotSaveAs()
     }
 }
 
-void AgentsWidget::fill(AgentsGenerator* ag)
+void AgentsGeneratorDlg::fill(AgentsGenerator* ag)
 {
     if (!ag) {
         return;
@@ -191,7 +191,7 @@ void AgentsWidget::fill(AgentsGenerator* ag)
     }
 }
 
-QString AgentsWidget::readCommand()
+QString AgentsGeneratorDlg::readCommand()
 {
     QString command;
     if (m_ui->bFromFile->isChecked()) {
@@ -236,7 +236,7 @@ QString AgentsWidget::readCommand()
             ++row;
         }
     } else {
-        qFatal("[AgentsWidget::slotOk()]");
+        qFatal("[AgentsGeneratorDlg::slotOk()]");
     }
 
     return command;

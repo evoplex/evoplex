@@ -4,14 +4,14 @@
  */
 
 #include "maingui.h"
-#include "welcomewidget.h"
-#include "ui_welcomewidget.h"
+#include "welcomepage.h"
+#include "ui_welcomepage.h"
 
 namespace evoplex {
 
-WelcomeWidget::WelcomeWidget(MainGUI* maingui)
+WelcomePage::WelcomePage(MainGUI* maingui)
     : QWidget(maingui)
-    , m_ui(new Ui_WelcomeWidget)
+    , m_ui(new Ui_WelcomePage)
     , m_maingui(maingui)
 {
     m_ui->setupUi(this);
@@ -20,7 +20,7 @@ WelcomeWidget::WelcomeWidget(MainGUI* maingui)
     connect(m_ui->bOpenProject, SIGNAL(pressed()), m_maingui, SIGNAL(openProject()));
 }
 
-WelcomeWidget::~WelcomeWidget()
+WelcomePage::~WelcomePage()
 {
     delete m_ui;
     m_ui = nullptr;

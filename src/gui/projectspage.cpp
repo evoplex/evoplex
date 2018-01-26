@@ -9,11 +9,11 @@
 
 #include "experimentwidget.h"
 #include "projectwidget.h"
-#include "projectswindow.h"
+#include "projectspage.h"
 
 namespace evoplex {
 
-ProjectsWindow::ProjectsWindow(MainApp* mainApp, QWidget *parent)
+ProjectsPage::ProjectsPage(MainApp* mainApp, QWidget *parent)
     : QMainWindow(parent)
     , m_mainApp(mainApp)
     , m_currProjectWidget(nullptr)
@@ -23,14 +23,14 @@ ProjectsWindow::ProjectsWindow(MainApp* mainApp, QWidget *parent)
             SLOT(slotFocusChanged(QDockWidget*)));
 }
 
-void ProjectsWindow::slotFocusChanged(QDockWidget* currTab)
+void ProjectsPage::slotFocusChanged(QDockWidget* currTab)
 {
     ProjectWidget* pw = qobject_cast<ProjectWidget*>(currTab);
     m_currProjectWidget = pw ? pw : nullptr;
     emit (selectionChanged(pw));
 }
 
-void ProjectsWindow::addProjectWidget(Project* project)
+void ProjectsPage::addProjectWidget(Project* project)
 {
     ProjectWidget* pw = new ProjectWidget(m_mainApp, project, this);
     if (m_projects.isEmpty()) {
@@ -63,12 +63,12 @@ void ProjectsWindow::addProjectWidget(Project* project)
     }
 }
 
-void ProjectsWindow::slotNewProject()
+void ProjectsPage::slotNewProject()
 {
     addProjectWidget(m_mainApp->newProject());
 }
 
-bool ProjectsWindow::slotOpenProject()
+bool ProjectsPage::slotOpenProject()
 {
     QString path = QFileDialog::getOpenFileName(this, tr("Open Project"));
     if (path.isEmpty()) {
@@ -82,7 +82,7 @@ bool ProjectsWindow::slotOpenProject()
     return true;
 }
 
-void ProjectsWindow::slotOpenExperiment(int projId, int expId)
+void ProjectsPage::slotOpenExperiment(int projId, int expId)
 {
     ExperimentWidget* ew = nullptr;
     foreach (ExperimentWidget* e, m_experiments) {

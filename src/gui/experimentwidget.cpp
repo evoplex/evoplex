@@ -10,14 +10,14 @@
 #include <QLabel>
 
 #include "experimentwidget.h"
-#include "linechartwidget.h"
+#include "linechart.h"
 #include "graphwidget.h"
 #include "gridwidget.h"
 
 namespace evoplex {
 
-ExperimentWidget::ExperimentWidget(Experiment* exp, ProjectsWindow* pwindow)
-    : QDockWidget(pwindow)
+ExperimentWidget::ExperimentWidget(Experiment* exp, ProjectsPage* ppage)
+    : QDockWidget(ppage)
     , m_kIcon_play(QIcon(":/icons/play.svg"))
     , m_kIcon_pause(QIcon(":/icons/pause.svg"))
     , m_kIcon_next(QIcon(":/icons/next.svg"))
@@ -59,7 +59,7 @@ ExperimentWidget::ExperimentWidget(Experiment* exp, ProjectsWindow* pwindow)
     tb->setIconSize(QSize(16,16));
     tb->setStyleSheet("background: rgb(53,53,53);");
 
-    ExperimentsMgr* expMgr = pwindow->getMainApp()->getExperimentsMgr();
+    ExperimentsMgr* expMgr = ppage->getMainApp()->getExperimentsMgr();
     connect(expMgr, SIGNAL(statusChanged(Experiment*)), SLOT(slotStatusChanged(Experiment*)));
     connect(m_aPlayPause, &QAction::triggered, [this]() { m_exp->toggle(); });
     connect(m_aNext, &QAction::triggered, [this]() { m_exp->playNext(); });
@@ -82,7 +82,7 @@ ExperimentWidget::ExperimentWidget(Experiment* exp, ProjectsWindow* pwindow)
         connect(m_timer, SIGNAL(timeout()), grid, SLOT(update()));
     });
     connect(m_aLineChart, &QAction::triggered, [this, expMgr]() {
-        LineChartWidget* lineChart = new LineChartWidget(expMgr, m_exp, this);
+        LineChart* lineChart = new LineChart(expMgr, m_exp, this);
         m_innerWindow->addDockWidget(Qt::TopDockWidgetArea, lineChart);
         connect(m_timer, SIGNAL(timeout()), lineChart, SLOT(updateSeries()));
     });

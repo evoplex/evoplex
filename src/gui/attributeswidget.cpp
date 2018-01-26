@@ -14,7 +14,7 @@
 #include <QRadioButton>
 
 #include "attributeswidget.h"
-#include "agentswidget.h"
+#include "agentsgeneratordlg.h"
 #include "outputwidget.h"
 #include "ui_attributeswidget.h"
 
@@ -250,14 +250,14 @@ void AttributesWidget::slotAgentsWidget()
         }
     }
 
-    AgentsWidget* aw = new AgentsWidget(model->agentAttrSpace(), ag, this);
-    aw->show();
+    AgentsGeneratorDlg* adlg = new AgentsGeneratorDlg(model->agentAttrSpace(), ag, this);
+    adlg->show();
 
-    connect(aw, &AgentsWidget::closed,
-    [this, ag](const QString& cmd) {
+    connect(adlg, &AgentsGeneratorDlg::closed,
+    [this, adlg](const QString& cmd) {
         m_widgetFields.value(GENERAL_ATTRIBUTE_AGENTS)
                 .value<QLineEdit*>()->setText(cmd);
-        delete ag;
+        adlg->deleteLater();
     });
 }
 

@@ -19,11 +19,11 @@ MainGUI::MainGUI(MainApp* mainApp, QWidget* parent)
     : QMainWindow(parent)
     , m_mainApp(mainApp)
     , m_saveDialog(new SaveDialog(this))
-    , m_welcome(new WelcomeWidget(this))
-    , m_queue(new QueueWidget(mainApp->getExperimentsMgr(), this))
-    , m_projects(new ProjectsWindow(mainApp, this))
-    , m_plugins(new PluginsWidget(mainApp, this))
-    , m_settings(new SettingsWidget(mainApp, this))
+    , m_welcome(new WelcomePage(this))
+    , m_queue(new QueuePage(mainApp->getExperimentsMgr(), this))
+    , m_projects(new ProjectsPage(mainApp, this))
+    , m_plugins(new PluginsPage(mainApp, this))
+    , m_settings(new SettingsPage(mainApp, this))
     , m_curPage(PAGE_NULL)
 {
     // main window
@@ -89,13 +89,13 @@ MainGUI::MainGUI(MainApp* mainApp, QWidget* parent)
         btn->installEventFilter(this);
 
     connect(actionGroup, SIGNAL(triggered(QAction*)), this, SLOT(slotPage(QAction*)));
-    connect(m_projects, &ProjectsWindow::isEmpty,
+    connect(m_projects, &ProjectsPage::isEmpty,
         [this, acWelcome, acProjects](bool b) {
             acProjects->setDisabled(b);
             if (b && m_curPage == PAGE_PROJECTS)
                 acWelcome->trigger();
     });
-    connect(m_queue, &QueueWidget::isEmpty,
+    connect(m_queue, &QueuePage::isEmpty,
         [this, acWelcome, acQueue](bool b) {
             acQueue->setDisabled(b);
             if (b && m_curPage == PAGE_QUEUE)
