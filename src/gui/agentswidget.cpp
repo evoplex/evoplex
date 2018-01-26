@@ -23,6 +23,14 @@ AgentsWidget::AgentsWidget(const AttributesSpace& agentAttrsSpace, AgentsGenerat
     setWindowModality(Qt::ApplicationModal);
     m_ui->setupUi(this);
 
+    connect(m_ui->bFromFile, SIGNAL(toggled(bool)), m_ui->wFromFile, SLOT(setVisible(bool)));
+    connect(m_ui->bSameData, SIGNAL(toggled(bool)), m_ui->wSameData, SLOT(setVisible(bool)));
+    connect(m_ui->bDiffData, SIGNAL(toggled(bool)), m_ui->wDiffData, SLOT(setVisible(bool)));
+    m_ui->wFromFile->setVisible(false);
+    m_ui->wSameData->setVisible(false);
+    m_ui->wDiffData->setVisible(false);
+    m_ui->bSameData->setChecked(true);
+
     connect(m_ui->saveAs, SIGNAL(pressed()), SLOT(slotSaveAs()));
     connect(m_ui->cancel, SIGNAL(pressed()), SLOT(close()));
     connect(m_ui->ok, &QPushButton::pressed, [this](){
@@ -81,6 +89,7 @@ AgentsWidget::AgentsWidget(const AttributesSpace& agentAttrsSpace, AgentsGenerat
         m_ui->table->setCellWidget(row, 2, le);
     }
 
+    resize(width(), 250);
     fill(ag);
 }
 
