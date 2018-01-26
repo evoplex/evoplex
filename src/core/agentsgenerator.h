@@ -45,7 +45,7 @@ public:
     // Export set of agents to a csv file
     static bool saveToFile(QString& filepath, Agents agents, std::function<void(int)>& progress);
 
-    virtual Agents create() = 0;
+    virtual Agents create(std::function<void(int)> progress = [](int){}) = 0;
 
     inline const QString& command() { return m_command; }
 
@@ -61,7 +61,7 @@ class AGFromFile : public AgentsGenerator
 {
 public:
     explicit AGFromFile(const AttributesSpace& attrsSpace, const QString& filePath);
-    Agents create();
+    Agents create(std::function<void(int)> progress = [](int){});
     inline const QString& filePath() const { return m_filePath; }
 private:
     const QString m_filePath;
@@ -74,7 +74,7 @@ public:
     explicit AGSameFuncForAll(const AttributesSpace& attrsSpace, const int numAgents,
                               const Function& func, const Value& funcInput);
     ~AGSameFuncForAll();
-    Agents create();
+    Agents create(std::function<void(int)> progress = [](int){});
     inline const int numAgents() const { return m_numAgents; }
     inline const Function function() const { return m_function; }
     inline const Value& functionInput() const { return m_functionInput; }
@@ -99,7 +99,7 @@ public:
 
     explicit AGDiffFunctions(const AttributesSpace& attrsSpace, const int numAgents,
                              std::vector<AttrCmd> attrCmds);
-    Agents create();
+    Agents create(std::function<void(int)> progress = [](int){});
     inline const int numAgents() const { return m_numAgents; }
     inline const std::vector<AttrCmd> attrCmds() const { return m_attrCmds; }
 private:

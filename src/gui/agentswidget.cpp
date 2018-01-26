@@ -9,6 +9,7 @@
 #include <functional>
 
 #include "agentswidget.h"
+#include "core/agent.h"
 
 namespace evoplex
 {
@@ -98,35 +99,51 @@ void AgentsWidget::slotSaveAs()
         return;
     }
 
-    QString cmd = readCommand();
-    if (cmd.isEmpty()) {
-        return;
+    bool saved = false;
+    if (m_ui->bFromFile->isChecked()) {
+        saved = QFile::copy(m_ui->filepath->text(), path);
+    } else {
+        QString cmd = readCommand();
+        if (cmd.isEmpty()) {
+            return;
+        }
+
+        int numAgents = 0;
+        if (m_ui->bSameData->isChecked()) {
+            numAgents = m_ui->numAgents1->value();
+        } else {
+            numAgents = m_ui->numAgents2->value();
+        }
+
+        QProgressDialog progressDlg("Exporting Agents...", QString(), 0, 2 * numAgents, this);
+        progressDlg.setWindowModality(Qt::WindowModal);
+        progressDlg.setValue(0);
+
+        QString errMsg;
+        AgentsGenerator* ag = AgentsGenerator::parse(m_agentAttrsSpace, cmd, errMsg);
+        Q_ASSERT(errMsg.isEmpty());
+
+        int pValue = 0;
+        std::function<void(int)> progress = [&progressDlg, &pValue](int p) { progressDlg.setValue(pValue + p); };
+        Agents agents = ag->create(progress);
+        Q_ASSERT(agents.size() > 0);
+
+        pValue = numAgents;
+        saved = AgentsGenerator::saveToFile(path, agents, progress);
+
+        qDeleteAll(agents);
+        agents.clear();
+        Agents().swap(agents);
     }
 
-    QProgressDialog progress("Saving Agents...", QString(), 0, 100, this);
-    progress.setWindowModality(Qt::ApplicationModal);
-    progress.setValue(0);
-    progress.show();
-
-    QString errMsg;
-    AgentsGenerator* ag = AgentsGenerator::parse(m_agentAttrsSpace, cmd, errMsg);
-    Q_ASSERT(errMsg.isEmpty());
-    progress.setValue(5);
-
-    Agents agents = ag->create();
-    Q_ASSERT(agents.size() > 0);
-    progress.setValue(50);
-
-    std::function<void(int)> f = [&progress](int p){ progress.setValue(50 + p / 2.f); };
-    if (!AgentsGenerator::saveToFile(path, agents, f)) {
-        QMessageBox::warning(this, "Saving Agents",
-            "ERROR! Unable to save the set of agents at:\n"
-            + path + "\nPlease, make sure this directory is writable.");
+    if (saved) {
+        QMessageBox::information(this, "Exporting Agents",
+                "The set of agents was saved successfully!\n" + path);
+    } else {
+        QMessageBox::warning(this, "Exporting Agents",
+                "ERROR! Unable to save the set of agents at:\n"
+                + path + "\nPlease, make sure this directory is writable.");
     }
-    qDeleteAll(agents);
-    agents.clear();
-    Agents().swap(agents);
-    progress.setValue(100);
 }
 
 void AgentsWidget::fill(AgentsGenerator* ag)

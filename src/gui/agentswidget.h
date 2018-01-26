@@ -35,6 +35,7 @@ private:
 
     void fill(AgentsGenerator* ag);
     QString readCommand();
+
 };
 
 } // evoplex

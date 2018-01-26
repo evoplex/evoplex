@@ -54,7 +54,7 @@ AGFromFile::AGFromFile(const AttributesSpace& attrsSpace, const QString& filePat
     m_command = filePath;
 }
 
-Agents AGFromFile::create()
+Agents AGFromFile::create(std::function<void(int)> progress)
 {
     QFile file(m_filePath);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
@@ -113,6 +113,7 @@ Agents AGFromFile::create()
             }
         }
         agents.emplace_back(new Agent(id, attributes, coordX, coordY));
+        progress(id);
         ++id;
     }
     file.close();
@@ -164,7 +165,7 @@ AGSameFuncForAll::~AGSameFuncForAll()
     delete m_prg;
 }
 
-Agents AGSameFuncForAll::create()
+Agents AGSameFuncForAll::create(std::function<void(int)> progress)
 {
     Agents agents;
     for (int agentId = 0; agentId < m_numAgents; ++agentId) {
@@ -173,6 +174,7 @@ Agents AGSameFuncForAll::create()
             attrs.replace(valSpace->id(), valSpace->attrName(), f_value(valSpace));
         }
         agents.emplace_back(new Agent(agentId, attrs));
+        progress(agentId);
     }
     return agents;
 }
@@ -188,7 +190,7 @@ AGDiffFunctions::AGDiffFunctions(const AttributesSpace &attrsSpace, const int nu
 
 }
 
-Agents AGDiffFunctions::create()
+Agents AGDiffFunctions::create(std::function<void(int)> progress)
 {
     std::vector<Attributes> agentsAttrs;
     agentsAttrs.reserve(m_numAgents);
@@ -230,6 +232,7 @@ Agents AGDiffFunctions::create()
     agents.reserve(m_numAgents);
     for (int agentId = 0; agentId < m_numAgents; ++agentId) {
         agents.emplace_back(new Agent(agentId, agentsAttrs.at(agentId)));
+        progress(agentId);
     }
     return agents;
 }
@@ -238,7 +241,6 @@ Agents AGDiffFunctions::create()
 
 bool AgentsGenerator::saveToFile(QString& filePath, Agents agents, std::function<void(int)>& progress)
 {
-    progress(0);
     if (agents.empty()) {
         qWarning() << "[AgentsGenerator]: Tried to save an empty set of agents.";
         return false;
@@ -254,7 +256,6 @@ bool AgentsGenerator::saveToFile(QString& filePath, Agents agents, std::function
         return false;
     }
 
-    progress(5);
     QTextStream out(&file);
     const std::vector<QString>& header = agents.front()->attrs().names();
     for (const QString& col : header) {
@@ -262,7 +263,6 @@ bool AgentsGenerator::saveToFile(QString& filePath, Agents agents, std::function
     }
     out << "x,y\n";
 
-    progress(10);
     for (Agent* agent : agents) {
         for (const Value& value : agent->attrs().values()) {
             out << value.toQString() << ",";
@@ -270,12 +270,11 @@ bool AgentsGenerator::saveToFile(QString& filePath, Agents agents, std::function
         out << agent->x() << ",";
         out << agent->y() << "\n";
 
-        progress(10.f + 100.f * agent->id() / agents.size());
+        out.flush();
+        progress(agent->id());
     }
 
     file.close();
-    progress(100);
-
     return true;
 }
 
