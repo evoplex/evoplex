@@ -21,10 +21,10 @@ public:
     virtual const QColor colorFromValue(const Value& val) const = 0;
 };
 
-class ColorMapInterval : public ColorMapValue
+class ColorMapRange : public ColorMapValue
 {
 public:
-    ColorMapInterval(const std::vector<QColor>& colors, const Value& min, const Value& max);
+    ColorMapRange(const std::vector<QColor>& colors, const Value& min, const Value& max);
 
     const QColor colorFromValue(const Value& val) const;
 
@@ -53,7 +53,7 @@ public:
         Blues
     };
 
-    ColorMap(CMap cmap, const AttributesSpace& attrsSpace);
+    explicit ColorMap(CMap cmap, const AttributesSpace& attrsSpace);
     ~ColorMap();
 
     void setAttr(const QString& attrName);

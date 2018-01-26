@@ -41,32 +41,27 @@ ColorMap::ColorMap(CMap cmap, const AttributesSpace& attrsSpace)
 ColorMap::~ColorMap()
 {
     delete m_mapValue;
-    m_mapValue = nullptr;
 }
 
 void ColorMap::setAttr(const QString& attrName)
 {
-    if (m_mapValue) delete m_mapValue;
-    bool ok = false;
-    const QString& attrSpace = m_attrsSpace.value(attrName)->space();
-
-    if (Utils::isASet(attrSpace)) {
-        Values vals;
-        ok = Utils::paramSet(attrSpace, vals);
-        m_mapValue = new ColorMapSet(m_colors, vals);
-    } else if (Utils::isAnInterval(attrSpace)) {
-        Value min, max;
-        ok = Utils::paramInterval(attrSpace, min, max);
-        m_mapValue = new ColorMapInterval(m_colors, min, max);
+    if (m_mapValue) {
+        delete m_mapValue;
     }
-    if (!ok) {
-        qFatal("[ColorMap] : invalid attribute space! (%s)", attrSpace);
+    const ValueSpace* valSpace = m_attrsSpace.value(attrName);
+    const SetSpace* set = dynamic_cast<const SetSpace*>(valSpace);
+    if (set) {
+        m_mapValue = new ColorMapSet(m_colors, set->values());
+    } else if (dynamic_cast<const RangeSpace*>(valSpace)) {
+        m_mapValue = new ColorMapRange(m_colors, valSpace->min(), valSpace->max());
+    } else {
+        qFatal("[ColorMap] : invalid attribute space for %s", attrName);
     }
 }
 
 /************************************************************************/
 
-ColorMapInterval::ColorMapInterval(const std::vector<QColor>& colors, const Value& min, const Value& max)
+ColorMapRange::ColorMapRange(const std::vector<QColor>& colors, const Value& min, const Value& max)
     : m_colors(colors)
 {
     Q_ASSERT(colors.size() > 0);
@@ -78,11 +73,11 @@ ColorMapInterval::ColorMapInterval(const std::vector<QColor>& colors, const Valu
         m_max = max.toDouble;
         m_min = min.toDouble;
     } else {
-        qFatal("[ColorMapInterval] : invalid attribute space!");
+        qFatal("[ColorMapRange] : invalid attribute space!");
     }
 }
 
-const QColor ColorMapInterval::colorFromValue(const Value& val) const
+const QColor ColorMapRange::colorFromValue(const Value& val) const
 {
     float value;
     if (val.type == Value::INT) {
@@ -90,9 +85,9 @@ const QColor ColorMapInterval::colorFromValue(const Value& val) const
     } else if (val.type == Value::DOUBLE) {
         value = val.toDouble;
     } else {
-        qFatal("[ColorMapInterval] : invalid attribute space!");
+        qFatal("[ColorMapRange] : invalid attribute space!");
     }
-    return m_colors.at(std::round((value * (m_colors.size()-1)) / m_max  + m_min));
+    return m_colors.at(std::round((value * (m_colors.size()-1)) / m_max + m_min));
 }
 
 /************************************************************************/

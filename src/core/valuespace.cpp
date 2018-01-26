@@ -37,10 +37,10 @@ ValueSpace* ValueSpace::parse(int id, const QString& attrName, QString space)
             vs = new DefaultSpace();
         } else if (space.startsWith("int")) {
             space.replace("max", QString::number(INT32_MAX));
-            vs = new IntervalSpace(id, attrName, Int_Interval, min, max);
+            vs = new RangeSpace(id, attrName, Int_Range, min, max);
         } else if (space.startsWith("double")) {
             space.replace("max", QString::number(DBL_MAX));
-            vs = new IntervalSpace(id, attrName, Double_Interval, min, max);
+            vs = new RangeSpace(id, attrName, Double_Range, min, max);
         }
     }
 
@@ -85,9 +85,9 @@ Value ValueSpace::validate(const QString& valueStr) const
         }
         break;
     }
-    case Int_Interval:
-    case Double_Interval: {
-        const IntervalSpace* ispace = dynamic_cast<const IntervalSpace*>(this);
+    case Int_Range:
+    case Double_Range: {
+        const RangeSpace* ispace = dynamic_cast<const RangeSpace*>(this);
         Value valSrc = Utils::valueFromString(ispace->min().type, valueStr);
         if (valSrc.isValid() && valSrc >= ispace->min() && valSrc <= ispace->max()) {
             return valSrc;
@@ -146,23 +146,23 @@ DefaultSpace::DefaultSpace()
 {
 }
 
-IntervalSpace::IntervalSpace(int id, const QString& attrName, SpaceType type, Value min, Value max)
+RangeSpace::RangeSpace(int id, const QString& attrName, SpaceType type, Value min, Value max)
     : DefaultSpace(id, attrName, type, min)
     , m_min(min)
     , m_max(max)
 {
     switch (m_type) {
-    case Double_Interval:
+    case Double_Range:
         m_space = QString("double[%1,%2]").arg(min.toDouble).arg(max.toDouble);
-        f_rand = &evoplex::IntervalSpace::randD;
+        f_rand = &evoplex::RangeSpace::randD;
         break;
-    case Int_Interval:
+    case Int_Range:
         m_space = QString("int[%1,%2]").arg(min.toInt).arg(max.toInt);
-        f_rand = &evoplex::IntervalSpace::randI;
+        f_rand = &evoplex::RangeSpace::randI;
         break;
     default:
         m_space.clear();
-        qFatal("[IntervalSpace]: invalid type!");
+        qFatal("[RangeSpace]: invalid type!");
     }
 }
 

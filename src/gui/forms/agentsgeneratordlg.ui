@@ -17,7 +17,7 @@
    </sizepolicy>
   </property>
   <property name="windowTitle">
-   <string>Agent Creator</string>
+   <string>Agents Generator</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>

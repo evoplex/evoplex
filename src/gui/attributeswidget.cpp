@@ -514,14 +514,12 @@ void AttributesWidget::insertPluginAttributes(QTreeWidgetItem* itemRoot,
 
         QWidget* widget = nullptr;
         switch (valSpace->type()) {
-        case ValueSpace::Double_Interval: {
-            const IntervalSpace* iSpace = dynamic_cast<const IntervalSpace*>(valSpace);
-            widget = newDoubleSpinBox(iSpace->min().toDouble, iSpace->max().toDouble);
+        case ValueSpace::Double_Range: {
+            widget = newDoubleSpinBox(valSpace->min().toDouble, valSpace->max().toDouble);
             break;
         }
-        case ValueSpace::Int_Interval: {
-            const IntervalSpace* iSpace = dynamic_cast<const IntervalSpace*>(valSpace);
-            widget = newSpinBox(iSpace->min().toInt, iSpace->max().toInt);
+        case ValueSpace::Int_Range: {
+            widget = newSpinBox(valSpace->min().toInt, valSpace->max().toInt);
             break;
         }
         case ValueSpace::Double_Set:

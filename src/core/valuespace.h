@@ -21,11 +21,11 @@ public:
     enum SpaceType {
         Invalid,
 
-        Int_Interval,
-        Double_Interval,
+        Double_Range,
+        Int_Range,
 
-        Int_Set,        
         Double_Set,
+        Int_Set,
 
         Bool,
         String,
@@ -70,10 +70,10 @@ private:
     Value m_validValue;
 };
 
-class IntervalSpace : public DefaultSpace
+class RangeSpace : public DefaultSpace
 {
 public:
-    IntervalSpace(int id, const QString& attrName, SpaceType type, Value min, Value max);
+    RangeSpace(int id, const QString& attrName, SpaceType type, Value min, Value max);
 
     virtual const Value& min() const { return m_min; }
     virtual const Value& max() const { return m_max; }
@@ -83,7 +83,7 @@ private:
     Value m_min;
     Value m_max;
 
-    Value (evoplex::IntervalSpace::*f_rand)(PRG*) const;
+    Value (evoplex::RangeSpace::*f_rand)(PRG*) const;
     inline Value randD(PRG* prg) const { return prg->randD(m_min.toDouble, m_max.toDouble); }
     inline Value randI(PRG* prg) const { return prg->randI(m_min.toInt, m_max.toInt); }
 };
