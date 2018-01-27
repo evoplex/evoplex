@@ -19,14 +19,14 @@
 
 namespace evoplex {
 
-GridWidget::GridWidget(ExperimentsMgr* expMgr, Experiment* exp, QWidget* parent)
+GridWidget::GridWidget(MainGUI* mainGUI, Experiment* exp, QWidget* parent)
     : QDockWidget(parent)
     , m_ui(new Ui_GraphWidget)
     , m_settingsDlg(new Ui_GraphSettings)
     , m_exp(exp)
     , m_model(nullptr)
     , m_currTrialId(0)
-    , m_agentCMap(ColorMap::DivergingSet1, exp->modelPlugin()->agentAttrSpace())
+    , m_agentCMap(nullptr)
     , m_zoomLevel(0)
     , m_pixelSizeRate(10.f)
     , m_pixelSize(m_pixelSizeRate)
@@ -47,7 +47,7 @@ GridWidget::GridWidget(ExperimentsMgr* expMgr, Experiment* exp, QWidget* parent)
     setTitleBarWidget(titleBar);
     connect(titleBar, SIGNAL(trialSelected(int)), SLOT(setTrial(int)));
     setTrial(0);
-    connect(expMgr, &ExperimentsMgr::trialCreated,
+    connect(mainGUI->mainApp()->getExperimentsMgr(), &ExperimentsMgr::trialCreated,
         [this](Experiment* exp, int trialId) {
             if (exp == m_exp && trialId == m_currTrialId)
                 setTrial(m_currTrialId);
@@ -68,7 +68,7 @@ GridWidget::GridWidget(ExperimentsMgr* expMgr, Experiment* exp, QWidget* parent)
     for (QString name : m_exp->modelPlugin()->edgeAttrNames()) {
         m_settingsDlg->edgeAttr->addItem(name);
     }
-    connect(m_settingsDlg->agentAttr, SIGNAL(currentIndexChanged(int)), SLOT(setAgentAttr(int)));
+    connect(m_settingsDlg->agentAttr, SIGNAL(currentTextChanged(QString)), SLOT(setAgentAttr(QString)));
     setAgentAttr(0);
 
     connect(m_ui->bZoomIn, SIGNAL(clicked(bool)), SLOT(zoomIn()));
@@ -94,12 +94,15 @@ GridWidget::~GridWidget()
 {
     delete m_ui;
     delete m_settingsDlg;
+    delete m_agentCMap;
 }
 
-void GridWidget::setAgentAttr(int idx)
+void GridWidget::setAgentAttr(QString attrName)
 {
-    m_agentCMap.setAttr(m_settingsDlg->agentAttr->currentText());
-    m_agentAttr = idx;
+    delete m_agentCMap;
+    const ValueSpace* valSpace = m_exp->modelPlugin()->agentAttrSpace().value(attrName);
+    m_agentCMap = ColorMap::create(valSpace, {Qt::black});
+    m_agentAttr = valSpace->id();
 }
 
 void GridWidget::setTrial(int trialId)
@@ -182,7 +185,7 @@ void GridWidget::paintEvent(QPaintEvent* e)
             updateInspector(cache.agent);
         } else {
             const Value& value = cache.agent->attr(m_agentAttr);
-            color = m_agentCMap.colorFromValue(value);
+            color = m_agentCMap->colorFromValue(value);
         }
         painter.setBrush(color);
         painter.setPen(color);

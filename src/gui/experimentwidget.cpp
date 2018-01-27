@@ -16,7 +16,7 @@
 
 namespace evoplex {
 
-ExperimentWidget::ExperimentWidget(Experiment* exp, ProjectsPage* ppage)
+ExperimentWidget::ExperimentWidget(MainGUI* mainGUI, Experiment* exp, ProjectsPage* ppage)
     : QDockWidget(ppage)
     , m_kIcon_play(QIcon(":/icons/play.svg"))
     , m_kIcon_pause(QIcon(":/icons/pause.svg"))
@@ -71,13 +71,13 @@ ExperimentWidget::ExperimentWidget(Experiment* exp, ProjectsPage* ppage)
     layout->addWidget(m_innerWindow);
     layout->addWidget(tb);
     setWidget(layout->parentWidget());
-    connect(m_aGraph, &QAction::triggered, [this, expMgr]() {
-        GraphWidget* graph = new GraphWidget(expMgr, m_exp, this);
+    connect(m_aGraph, &QAction::triggered, [this, mainGUI]() {
+        GraphWidget* graph = new GraphWidget(mainGUI, m_exp, this);
         m_innerWindow->addDockWidget(Qt::TopDockWidgetArea, graph);
         connect(m_timer, SIGNAL(timeout()), graph, SLOT(update()));
     });
-    connect(m_aGrid, &QAction::triggered, [this, expMgr]() {
-        GridWidget* grid = new GridWidget(expMgr, m_exp, this);
+    connect(m_aGrid, &QAction::triggered, [this, mainGUI]() {
+        GridWidget* grid = new GridWidget(mainGUI, m_exp, this);
         m_innerWindow->addDockWidget(Qt::TopDockWidgetArea, grid);
         connect(m_timer, SIGNAL(timeout()), grid, SLOT(update()));
     });

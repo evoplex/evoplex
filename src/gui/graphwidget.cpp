@@ -19,13 +19,13 @@
 
 namespace evoplex {
 
-GraphWidget::GraphWidget(ExperimentsMgr* expMgr, Experiment* exp, QWidget* parent)
+GraphWidget::GraphWidget(MainGUI* mainGUI, Experiment* exp, QWidget* parent)
     : QDockWidget(parent)
     , m_ui(new Ui_GraphWidget)
     , m_settingsDlg(new Ui_GraphSettings)
     , m_exp(exp)
     , m_model(nullptr)
-    , m_agentCMap(ColorMap::DivergingSet1, exp->modelPlugin()->agentAttrSpace())
+    , m_agentCMap(nullptr)
     , m_zoomLevel(0)
     , m_nodeSizeRate(10.f)
     , m_edgeSizeRate(25.f)
@@ -45,7 +45,7 @@ GraphWidget::GraphWidget(ExperimentsMgr* expMgr, Experiment* exp, QWidget* paren
     setTitleBarWidget(titleBar);
     connect(titleBar, SIGNAL(trialSelected(int)), SLOT(setTrial(int)));
     setTrial(0);
-    connect(expMgr, &ExperimentsMgr::trialCreated,
+    connect(mainGUI->mainApp()->getExperimentsMgr(), &ExperimentsMgr::trialCreated,
         [this](Experiment* exp, int trialId) {
             if (exp == m_exp && trialId == m_currTrialId)
                 setTrial(m_currTrialId);
@@ -65,10 +65,13 @@ GraphWidget::GraphWidget(ExperimentsMgr* expMgr, Experiment* exp, QWidget* paren
     for (QString name : m_exp->modelPlugin()->edgeAttrNames()) {
         m_settingsDlg->edgeAttr->addItem(name);
     }
-    connect(m_settingsDlg->agentAttr, SIGNAL(currentIndexChanged(int)), SLOT(setAgentAttr(int)));
+    connect(m_settingsDlg->agentAttr, SIGNAL(currentTextChanged(QString)), SLOT(setAgentAttr(QString)));
     connect(m_settingsDlg->edgeAttr, SIGNAL(currentIndexChanged(int)), SLOT(setEdgeAttr(int)));
-    setAgentAttr(0);
-    setEdgeAttr(0);
+    setAgentAttr(m_settingsDlg->agentAttr->currentText());
+    setEdgeAttr(m_settingsDlg->edgeAttr->currentIndex());
+
+    //connect(m_settingsDlg->agentCM, SIGNAL(currentTextChanged(QString)), SLOT(setAgentCM(QString)));
+    //connect(m_settingsDlg->edgeCM, SIGNAL(currentTextChanged(QString)), SLOT(setEdgeCM(QString)));
 
     connect(m_ui->bZoomIn, SIGNAL(clicked(bool)), SLOT(zoomIn()));
     connect(m_ui->bZoomOut, SIGNAL(clicked(bool)), SLOT(zoomOut()));
@@ -97,12 +100,15 @@ GraphWidget::~GraphWidget()
 {
     delete m_ui;
     delete m_settingsDlg;
+    delete m_agentCMap;
 }
 
-void GraphWidget::setAgentAttr(int idx)
+void GraphWidget::setAgentAttr(QString attrName)
 {
-    m_agentCMap.setAttr(m_settingsDlg->agentAttr->currentText());
-    m_agentAttr = idx;
+    delete m_agentCMap;
+    const ValueSpace* valSpace = m_exp->modelPlugin()->agentAttrSpace().value(attrName);
+    m_agentCMap = ColorMap::create(valSpace, {Qt::black});
+    m_agentAttr = valSpace->id();
 }
 
 void GraphWidget::setEdgeAttr(int idx)
@@ -220,7 +226,7 @@ void GraphWidget::paintEvent(QPaintEvent* e)
             }
 
             const Value& value = cache.agent->attr(m_agentAttr);
-            painter.setBrush(m_agentCMap.colorFromValue(value));
+            painter.setBrush(m_agentCMap->colorFromValue(value));
             painter.setPen(Qt::black);
             painter.drawEllipse(cache.xy, m_nodeRadius, m_nodeRadius);
         }

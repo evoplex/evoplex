@@ -11,6 +11,7 @@
 #include <vector>
 
 #include "colormap.h"
+#include "maingui.h"
 #include "ui_graphsettings.h"
 #include "core/experiment.h"
 
@@ -23,7 +24,7 @@ class GraphWidget : public QDockWidget
     Q_OBJECT
 
 public:
-    explicit GraphWidget(ExperimentsMgr* expMgr, Experiment* exp, QWidget* parent = 0);
+    explicit GraphWidget(MainGUI* mainGUI, Experiment* exp, QWidget* parent = 0);
     ~GraphWidget();
 
 protected:
@@ -38,7 +39,7 @@ private slots:
     void zoomIn();
     void zoomOut();
     void resetView();
-    void setAgentAttr(int idx);
+    void setAgentAttr(QString attrName);
     void setEdgeAttr(int idx);
 
 private:
@@ -49,7 +50,7 @@ private:
     int m_currTrialId;
     int m_agentAttr;
     int m_edgeAttr;
-    ColorMap m_agentCMap;
+    ColorMap* m_agentCMap;
 
     bool m_showAgents;
     bool m_showEdges;

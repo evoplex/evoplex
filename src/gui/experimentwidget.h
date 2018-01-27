@@ -19,7 +19,7 @@ class ExperimentWidget : public QDockWidget
 {
     Q_OBJECT
 public:
-    explicit ExperimentWidget(Experiment* exp, ProjectsPage* ppage = 0);
+    explicit ExperimentWidget(MainGUI* mainGUI, Experiment* exp, ProjectsPage* ppage);
     ~ExperimentWidget();
 
     inline int expId() const { return m_exp->id(); }

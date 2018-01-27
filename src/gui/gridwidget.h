@@ -11,6 +11,7 @@
 #include <vector>
 
 #include "colormap.h"
+#include "maingui.h"
 #include "ui_graphsettings.h"
 #include "core/experiment.h"
 
@@ -23,7 +24,7 @@ class GridWidget : public QDockWidget
     Q_OBJECT
 
 public:
-    explicit GridWidget(ExperimentsMgr* expMgr, Experiment* exp, QWidget* parent = 0);
+    explicit GridWidget(MainGUI* mainGUI, Experiment* exp, QWidget* parent);
     ~GridWidget();
 
 protected:
@@ -38,7 +39,7 @@ private slots:
     void zoomIn();
     void zoomOut();
     void resetView();
-    void setAgentAttr(int idx);
+    void setAgentAttr(QString attrName);
 
 private:
     Ui_GraphWidget* m_ui;
@@ -47,7 +48,7 @@ private:
     AbstractModel* m_model;
     int m_currTrialId;
     int m_agentAttr;
-    ColorMap m_agentCMap;
+    ColorMap* m_agentCMap;
 
     int m_zoomLevel;
     float m_pixelSizeRate;
