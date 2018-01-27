@@ -13,58 +13,79 @@
 #include "core/attributes.h"
 #include "core/valuespace.h"
 
-namespace evoplex {
+namespace evoplex
+{
 
-class ColorMapValue
+typedef std::vector<QColor> Colors;
+
+class ColorMapMgr
 {
 public:
-    virtual const QColor colorFromValue(const Value& val) const = 0;
-};
+    struct CMap {
+        QString name;
+        QHash<int, Colors> colors; // colors.size as key
+    };
 
-class ColorMapRange : public ColorMapValue
-{
-public:
-    ColorMapRange(const std::vector<QColor>& colors, const Value& min, const Value& max);
+    explicit ColorMapMgr();
 
-    const QColor colorFromValue(const Value& val) const;
+    inline QStringList names() const { return m_colormaps.keys(); }
+    inline const QString& defaultColorMap() const { return m_defaultColorMap; }
+    inline void setDefaultColorMap(const QString& cm) { m_defaultColorMap = cm; }
 
 private:
-    const std::vector<QColor> m_colors;
-    float m_max;
-    float m_min;
-};
-
-class ColorMapSet : public ColorMapValue
-{
-public:
-    ColorMapSet(const std::vector<QColor>& colors, const Values& vals);
-
-    const QColor colorFromValue(const Value& val) const;
-
-private:
-    std::unordered_map<Value, QColor> m_cmap;
+    QHash<QString, CMap> m_colormaps;
+    QString m_defaultColorMap;
 };
 
 class ColorMap
 {
-public:
+public:/*
     enum CMap {
         DivergingSet1,
         Blues
     };
 
-    explicit ColorMap(CMap cmap, const AttributesSpace& attrsSpace);
-    ~ColorMap();
+    QColor divergingSet1[4] = {
+        QColor(43,131,186),  // blue
+        QColor(215,25,28),   // red
+        QColor(171,221,164), // green
+        QColor(253,174,97)   // orange
+    };
 
-    void setAttr(const QString& attrName);
+    QColor blues[4] = {
+        QColor(239,243,255),
+        QColor(189,215,231),
+        QColor(107,174,214),
+        QColor(33,113,181)
+    };
+    */
 
-    inline const QColor colorFromValue(Value val) const
-    { return m_mapValue->colorFromValue(val); }
+    static ColorMap* create(const ValueSpace* valSpace, const Colors& colors);
 
+    virtual const QColor colorFromValue(const Value& val) const = 0;
+
+protected:
+    explicit ColorMap(const Colors& colors);
+    const Colors& m_colors;
+};
+
+class ColorMapRange : public ColorMap
+{
+public:
+    explicit ColorMapRange(const Colors& colors, const RangeSpace* valSpace);
+    virtual const QColor colorFromValue(const Value& val) const;
 private:
-    const AttributesSpace& m_attrsSpace;
-    ColorMapValue* m_mapValue;
-    std::vector<QColor> m_colors;
+    float m_max;
+    float m_min;
+};
+
+class ColorMapSet : public ColorMap
+{
+public:
+    explicit ColorMapSet(const Colors& colors, const SetSpace* valSpace);
+    virtual const QColor colorFromValue(const Value& val) const;
+private:
+    std::unordered_map<Value, QColor> m_cmap;
 };
 
 }

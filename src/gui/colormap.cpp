@@ -3,75 +3,83 @@
  * @author Marcos Cardinot <mcardinot@gmail.com>
  */
 
-#include <QtDebug>
+#include <QDebug>
+#include <QFile>
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <QJsonObject>
 #include <cmath>
 
 #include "colormap.h"
-#include "core/utils.h"
 
-namespace evoplex {
-
-ColorMap::ColorMap(CMap cmap, const AttributesSpace& attrsSpace)
-    : m_attrsSpace(attrsSpace)
-    , m_mapValue(nullptr)
+namespace evoplex
 {
-    switch (cmap) {
-    case DivergingSet1:
-        m_colors = {
-            QColor(43,131,186),  // blue
-            QColor(215,25,28),   // red
-            QColor(171,221,164), // green
-            QColor(253,174,97)   // orange
-        };
-        break;
-    case Blues:
-        m_colors = {
-            QColor(239,243,255),
-            QColor(189,215,231),
-            QColor(107,174,214),
-            QColor(33,113,181),
-        };
-        break;
-    default:
-        qFatal("[ColorMap]: invalid colormap!");
+
+ColorMapMgr::ColorMapMgr()
+    : m_defaultColorMap("black")
+{
+    CMap df;
+    df.name = m_defaultColorMap;
+    df.colors.insert(1, {Qt::black});
+    m_colormaps.insert(m_defaultColorMap, df);
+
+    QFile file(":colormaps/colormaps.json");
+    if (!file.open(QIODevice::ReadOnly)) {
+        qWarning() << "[ColorMapMgr]: unable to open colormaps.json";
+        return;
     }
-    m_colors.shrink_to_fit();
-}
 
-ColorMap::~ColorMap()
-{
-    delete m_mapValue;
-}
-
-void ColorMap::setAttr(const QString& attrName)
-{
-    if (m_mapValue) {
-        delete m_mapValue;
-    }
-    const ValueSpace* valSpace = m_attrsSpace.value(attrName);
-    const SetSpace* set = dynamic_cast<const SetSpace*>(valSpace);
-    if (set) {
-        m_mapValue = new ColorMapSet(m_colors, set->values());
-    } else if (dynamic_cast<const RangeSpace*>(valSpace)) {
-        m_mapValue = new ColorMapRange(m_colors, valSpace->min(), valSpace->max());
-    } else {
-        qFatal("[ColorMap] : invalid attribute space for %s", attrName);
+    QJsonObject json = QJsonDocument::fromJson(file.readAll()).object();
+    for (QJsonObject::iterator it = json.begin(); it != json.end(); ++it) {
+        CMap cmap;
+        cmap.name = it.key();
+        QJsonObject objColor = it.value().toObject();
+        for (QJsonObject::iterator it2 = objColor.begin(); it2 != objColor.end(); ++it2) {
+            Colors colors;
+            for (QJsonValueRef rgb_ : it2.value().toArray()) {
+                QJsonArray rgb = rgb_.toArray();
+                colors.emplace_back(QColor(rgb.at(0).toInt(), rgb.at(1).toInt(), rgb.at(2).toInt()));
+            }
+            cmap.colors.insert(colors.size(), colors);
+        }
+        m_colormaps.insert(cmap.name, cmap);
     }
 }
 
 /************************************************************************/
 
-ColorMapRange::ColorMapRange(const std::vector<QColor>& colors, const Value& min, const Value& max)
+ColorMap* ColorMap::create(const ValueSpace* valSpace, const Colors& colors)
+{
+    const SetSpace* set = dynamic_cast<const SetSpace*>(valSpace);
+    if (set) {
+        return new ColorMapSet(colors, set);
+    }
+
+    const RangeSpace* range = dynamic_cast<const RangeSpace*>(valSpace);
+    if (range) {
+        return new ColorMapRange(colors, range);
+    }
+
+    qFatal("[ColorMap] : invalid attribute space for %s", valSpace->attrName());
+}
+
+ColorMap::ColorMap(const Colors& colors)
     : m_colors(colors)
 {
     Q_ASSERT(colors.size() > 0);
+}
 
-    if (min.type == Value::INT) {
-        m_max = max.toInt;
-        m_min = min.toInt;
-    } else if (min.type == Value::DOUBLE) {
-        m_max = max.toDouble;
-        m_min = min.toDouble;
+/************************************************************************/
+
+ColorMapRange::ColorMapRange(const Colors& colors, const RangeSpace* valSpace)
+    : ColorMap(colors)
+{
+    if (valSpace->type() == ValueSpace::Int_Range) {
+        m_max = valSpace->max().toInt;
+        m_min = valSpace->min().toInt;
+    } else if (valSpace->type() == ValueSpace::Double_Range) {
+        m_max = valSpace->max().toDouble;
+        m_min = valSpace->min().toDouble;
     } else {
         qFatal("[ColorMapRange] : invalid attribute space!");
     }
@@ -85,21 +93,20 @@ const QColor ColorMapRange::colorFromValue(const Value& val) const
     } else if (val.type == Value::DOUBLE) {
         value = val.toDouble;
     } else {
-        qFatal("[ColorMapRange] : invalid attribute space!");
+        qFatal("[ColorMapRange]: invalid attribute space!");
     }
     return m_colors.at(std::round((value * (m_colors.size()-1)) / m_max + m_min));
 }
 
 /************************************************************************/
 
-ColorMapSet::ColorMapSet(const std::vector<QColor>& colors, const Values &vals)
+ColorMapSet::ColorMapSet(const Colors& colors, const SetSpace* valSpace)
+    : ColorMap(colors)
 {
-    Q_ASSERT(colors.size() > 0);
-
     int c = 0;
-    for (int i = 0; i < vals.size(); ++i) {
-        m_cmap.insert({vals.at(i), colors.at(c++)});
-        c = (c == colors.size()) ? 0 : c;
+    for (const Value value : valSpace->values()) {
+        m_cmap.insert({value, m_colors.at(c++)});
+        c = (c == m_colors.size()) ? 0 : c;
     }
 }
 

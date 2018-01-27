@@ -39,6 +39,7 @@ private slots:
     void slotFocusChanged(QDockWidget* currTab);
 
 private:
+    MainGUI* m_mainGUI;
     MainApp* m_mainApp;
     ProjectWidget* m_currProjectWidget;
     QVector<ProjectWidget*> m_projects; // opened projects

@@ -23,12 +23,8 @@ public:
     explicit SettingsPage(MainGUI* mainGUI);
     ~SettingsPage();
 
-private slots:
-    void slotNumThreads(int newValue);
-
 private:
     Ui_SettingsPage* m_ui;
-    MainApp* m_mainApp;
 };
 }
 #endif // SETTINGSPAGE_H

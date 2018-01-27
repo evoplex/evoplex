@@ -15,6 +15,7 @@ namespace evoplex {
 
 ProjectsPage::ProjectsPage(MainGUI* mainGUI)
     : QMainWindow(mainGUI)
+    , m_mainGUI(mainGUI)
     , m_mainApp(mainGUI->mainApp())
     , m_currProjectWidget(nullptr)
 {
@@ -93,7 +94,8 @@ void ProjectsPage::slotOpenExperiment(int projId, int expId)
     }
 
     if (!ew) {
-        ew = new ExperimentWidget(m_mainApp->getProject(projId)->getExperiment(expId), this);
+        Experiment* exp = m_mainApp->getProject(projId)->getExperiment(expId);
+        ew = new ExperimentWidget(m_mainGUI, exp, this);
         connect(ew, &ExperimentWidget::closed, [this, ew]() {
             m_projects.last()->raise();
             m_experiments.removeOne(ew);
