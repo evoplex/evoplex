@@ -8,6 +8,7 @@
 
 #include <QWidget>
 
+#include "maingui.h"
 #include "core/mainapp.h"
 
 class Ui_PluginsPage;
@@ -18,7 +19,7 @@ class PluginsPage : public QWidget
     Q_OBJECT
 
 public:
-    explicit PluginsPage(MainApp* mainApp, QWidget *parent = 0);
+    explicit PluginsPage(MainGUI* mainGUI);
     ~PluginsPage();
 
 private slots:

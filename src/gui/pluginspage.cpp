@@ -11,10 +11,10 @@
 
 namespace evoplex {
 
-PluginsPage::PluginsPage(MainApp* mainApp, QWidget *parent)
-    : QWidget(parent)
+PluginsPage::PluginsPage(MainGUI* mainGUI)
+    : QWidget(mainGUI)
     , m_ui(new Ui_PluginsPage)
-    , m_mainApp(mainApp)
+    , m_mainApp(mainGUI->mainApp())
 {
     m_ui->setupUi(this);
 

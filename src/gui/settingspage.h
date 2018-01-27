@@ -8,6 +8,7 @@
 
 #include <QWidget>
 
+#include "maingui.h"
 #include "core/mainapp.h"
 
 class Ui_SettingsPage;
@@ -19,7 +20,7 @@ class SettingsPage : public QWidget
     Q_OBJECT
 
 public:
-    explicit SettingsPage(MainApp* mainApp, QWidget* parent = 0);
+    explicit SettingsPage(MainGUI* mainGUI);
     ~SettingsPage();
 
 private slots:

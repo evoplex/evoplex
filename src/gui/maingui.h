@@ -9,15 +9,19 @@
 #include <QAction>
 #include <QMainWindow>
 
-#include "pluginspage.h"
-#include "projectspage.h"
-#include "queuepage.h"
-#include "savedialog.h"
-#include "settingspage.h"
-#include "welcomepage.h"
+#include "colormap.h"
 #include "core/mainapp.h"
 
 namespace evoplex {
+
+class ProjectWidget;
+class SaveDialog;
+
+class PluginsPage;
+class ProjectsPage;
+class QueuePage;
+class SettingsPage;
+class WelcomePage;
 
 class MainGUI: public QMainWindow
 {
@@ -25,6 +29,10 @@ class MainGUI: public QMainWindow
 
 public:
     explicit MainGUI(MainApp* mainApp, QWidget* parent=0);
+    ~MainGUI();
+
+    inline MainApp* mainApp() const { return m_mainApp; }
+    inline ColorMapMgr* colorMapMgr() const { return m_colorMapMgr; }
 
 signals:
     void newProject();
@@ -52,6 +60,8 @@ private:
     };
 
     MainApp* m_mainApp;
+    ColorMapMgr* m_colorMapMgr;
+
     SaveDialog* m_saveDialog;
     WelcomePage* m_welcome;
     QueuePage* m_queue;

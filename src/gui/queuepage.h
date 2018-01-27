@@ -8,8 +8,8 @@
 
 #include <QScrollArea>
 
+#include "maingui.h"
 #include "tablewidget.h"
-#include "core/experimentsmgr.h"
 
 class Ui_QueuePage;
 
@@ -20,7 +20,7 @@ class QueuePage : public QScrollArea
     Q_OBJECT
 
 public:
-    explicit QueuePage(ExperimentsMgr* expMgr, QWidget* parent = nullptr);
+    explicit QueuePage(MainGUI* mainGUI);
 
 signals:
     void isEmpty(bool empty);
@@ -39,7 +39,6 @@ private:
     };
 
     Ui_QueuePage* m_ui;
-    ExperimentsMgr* m_expMgr;
 
     QHash<rowKey, Row> m_rows; // map 'projId.expId' to the Row
     QMap<TableWidget::Header, int> m_headerIdx; // map Header to column index

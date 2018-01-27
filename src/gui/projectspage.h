@@ -8,6 +8,7 @@
 
 #include <QMainWindow>
 
+#include "maingui.h"
 #include "core/mainapp.h"
 
 namespace evoplex {
@@ -19,7 +20,7 @@ class ProjectsPage : public QMainWindow
 {
     Q_OBJECT
 public:
-    explicit ProjectsPage(MainApp* mainApp, QWidget *parent = 0);
+    explicit ProjectsPage(MainGUI* mainGUI);
 
     inline const ProjectWidget* currentProject() const { return m_currProjectWidget; }
     inline MainApp* getMainApp() const { return m_mainApp; }

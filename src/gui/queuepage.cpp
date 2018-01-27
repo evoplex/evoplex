@@ -8,13 +8,13 @@
 
 #include "queuepage.h"
 #include "ui_queuepage.h"
+#include "core/mainapp.h"
 
 namespace evoplex {
 
-QueuePage::QueuePage(ExperimentsMgr* expMgr, QWidget* parent)
-    : QScrollArea(parent)
+QueuePage::QueuePage(MainGUI* mainGUI)
+    : QScrollArea(mainGUI)
     , m_ui(new Ui_QueuePage)
-    , m_expMgr(expMgr)
 {
     m_ui->setupUi(this);
 
@@ -33,11 +33,12 @@ QueuePage::QueuePage(ExperimentsMgr* expMgr, QWidget* parent)
     m_ui->queue->hide();
     m_ui->idle->hide();
 
-    connect(m_expMgr, SIGNAL(trialsDeleted(Experiment*)),
+    ExperimentsMgr* expMgr = mainGUI->mainApp()->getExperimentsMgr();
+    connect(expMgr, SIGNAL(trialsDeleted(Experiment*)),
             this, SLOT(slotRemoveRow(Experiment*)));
-    connect(m_expMgr, SIGNAL(statusChanged(Experiment*)),
+    connect(expMgr, SIGNAL(statusChanged(Experiment*)),
             this, SLOT(slotStatusChanged(Experiment*)));
-    connect(m_expMgr, SIGNAL(progressUpdated(Experiment*)),
+    connect(expMgr, SIGNAL(progressUpdated(Experiment*)),
             m_ui->tableRunning->viewport(), SLOT(update()));
     connect(m_ui->bClearQueue, SIGNAL(clicked(bool)),
             expMgr, SLOT(clearQueue()));

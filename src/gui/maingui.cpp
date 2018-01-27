@@ -12,18 +12,25 @@
 
 #include "maingui.h"
 #include "projectwidget.h"
+#include "savedialog.h"
+#include "pluginspage.h"
+#include "projectspage.h"
+#include "queuepage.h"
+#include "settingspage.h"
+#include "welcomepage.h"
 
 namespace evoplex {
 
 MainGUI::MainGUI(MainApp* mainApp, QWidget* parent)
     : QMainWindow(parent)
     , m_mainApp(mainApp)
+    , m_colorMapMgr(new ColorMapMgr)
     , m_saveDialog(new SaveDialog(this))
     , m_welcome(new WelcomePage(this))
-    , m_queue(new QueuePage(mainApp->getExperimentsMgr(), this))
-    , m_projects(new ProjectsPage(mainApp, this))
-    , m_plugins(new PluginsPage(mainApp, this))
-    , m_settings(new SettingsPage(mainApp, this))
+    , m_queue(new QueuePage(this))
+    , m_projects(new ProjectsPage(this))
+    , m_plugins(new PluginsPage(this))
+    , m_settings(new SettingsPage(this))
     , m_curPage(PAGE_NULL)
 {
     // main window
@@ -152,6 +159,11 @@ MainGUI::MainGUI(MainApp* mainApp, QWidget* parent)
     this->menuBar()->addMenu(menuSettings);
     QMenu* menuAbout = new QMenu("About", this);
     this->menuBar()->addMenu(menuAbout);
+}
+
+MainGUI::~MainGUI()
+{
+    delete m_colorMapMgr;
 }
 
 bool MainGUI::eventFilter(QObject* o, QEvent* e)

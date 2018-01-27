@@ -13,9 +13,9 @@
 
 namespace evoplex {
 
-ProjectsPage::ProjectsPage(MainApp* mainApp, QWidget *parent)
-    : QMainWindow(parent)
-    , m_mainApp(mainApp)
+ProjectsPage::ProjectsPage(MainGUI* mainGUI)
+    : QMainWindow(mainGUI)
+    , m_mainApp(mainGUI->mainApp())
     , m_currProjectWidget(nullptr)
 {
     setTabPosition(Qt::AllDockWidgetAreas, QTabWidget::South);
