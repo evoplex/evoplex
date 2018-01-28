@@ -16,6 +16,7 @@ namespace evoplex
 SettingsPage::SettingsPage(MainGUI* mainGUI)
     : QWidget(mainGUI)
     , m_ui(new Ui_SettingsPage)
+    , m_mainGUI(mainGUI)
 {
     m_ui->setupUi(this);
 
@@ -25,17 +26,29 @@ SettingsPage::SettingsPage(MainGUI* mainGUI)
     connect(m_ui->threads, static_cast<void(QSpinBox::*)(int)>(&QSpinBox::valueChanged),
             [expMgr](int newValue) { expMgr->setMaxThreadCount(newValue); });
 
-    QStringList cmaps = mainGUI->colorMapMgr()->names();
-    cmaps.sort();
-    m_ui->colormaps->insertItems(0, cmaps);
-    m_ui->colormaps->setCurrentText(mainGUI->colorMapMgr()->defaultColorMap());
-    connect(m_ui->colormaps, &QComboBox::currentTextChanged,
-            [mainGUI](QString df) { mainGUI->colorMapMgr()->setDefaultColorMap(df); });
+    m_ui->colormaps->insertItems(0, mainGUI->colorMapMgr()->names());
+    m_ui->colormaps->setCurrentText(mainGUI->colorMapMgr()->defaultColorMap().first);
+    setDfCMapName(m_ui->colormaps->currentText()); // fill sizes
+    setDfCMapSize(QString::number(mainGUI->colorMapMgr()->defaultColorMap().second));
+    connect(m_ui->colormaps, SIGNAL(currentIndexChanged(QString)), SLOT(setDfCMapName(QString)));
+    connect(m_ui->colormapsize, SIGNAL(currentTextChanged(QString)), SLOT(setDfCMapSize(QString)));
 }
 
 SettingsPage::~SettingsPage()
 {
     delete m_ui;
+}
+
+void SettingsPage::setDfCMapName(const QString& name)
+{
+    m_ui->colormapsize->clear();
+    m_ui->colormapsize->insertItems(0, m_mainGUI->colorMapMgr()->sizes(name));
+    m_mainGUI->colorMapMgr()->setDefaultColorMap(name, m_ui->colormapsize->currentText().toInt());
+}
+
+void SettingsPage::setDfCMapSize(const QString& sz)
+{
+    m_mainGUI->colorMapMgr()->setDefaultColorMap(m_ui->colormaps->currentText(), sz.toInt());
 }
 
 } // evoplex

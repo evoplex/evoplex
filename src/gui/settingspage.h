@@ -23,8 +23,13 @@ public:
     explicit SettingsPage(MainGUI* mainGUI);
     ~SettingsPage();
 
+private slots:
+    void setDfCMapName(const QString& name);
+    void setDfCMapSize(const QString& sz);
+
 private:
     Ui_SettingsPage* m_ui;
+    MainGUI* m_mainGUI;
 };
 }
 #endif // SETTINGSPAGE_H
