@@ -17,49 +17,31 @@ namespace evoplex
 {
 
 typedef std::vector<QColor> Colors;
+typedef QPair<QString, int> CMapKey; // <name,size>
 
 class ColorMapMgr
 {
 public:
-    struct CMap {
-        QString name;
-        QHash<int, Colors> colors; // colors.size as key
-    };
-
     explicit ColorMapMgr();
 
-    inline QStringList names() const { return m_colormaps.keys(); }
-    inline const QString& defaultColorMap() const { return m_defaultColorMap; }
-    inline void setDefaultColorMap(const QString& cm) { m_defaultColorMap = cm; }
+    const Colors colors(const CMapKey& key) const;
+    const Colors colors(const QString& name, int size) const;
+    inline QStringList names() const { return m_names; }
+    inline QStringList sizes(const QString& name) const { return m_sizesAvailable.value(name); }
+    inline const CMapKey& defaultColorMap() const { return m_dfCMap; }
+    inline void setDefaultColorMap(const CMapKey& key) { m_dfCMap = key; }
+    inline void setDefaultColorMap(const QString& name, int size) { m_dfCMap = CMapKey(name, size); }
 
 private:
-    QHash<QString, CMap> m_colormaps;
-    QString m_defaultColorMap;
+    CMapKey m_dfCMap;
+    QHash<CMapKey, Colors> m_colormaps;
+    QStringList m_names;
+    QHash<QString, QStringList> m_sizesAvailable;
 };
 
 class ColorMap
 {
-public:/*
-    enum CMap {
-        DivergingSet1,
-        Blues
-    };
-
-    QColor divergingSet1[4] = {
-        QColor(43,131,186),  // blue
-        QColor(215,25,28),   // red
-        QColor(171,221,164), // green
-        QColor(253,174,97)   // orange
-    };
-
-    QColor blues[4] = {
-        QColor(239,243,255),
-        QColor(189,215,231),
-        QColor(107,174,214),
-        QColor(33,113,181)
-    };
-    */
-
+public:
     static ColorMap* create(const ValueSpace* valSpace, const Colors& colors);
 
     virtual const QColor colorFromValue(const Value& val) const = 0;

@@ -8,6 +8,7 @@
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QStringList>
 #include <cmath>
 
 #include "colormap.h"
@@ -16,12 +17,11 @@ namespace evoplex
 {
 
 ColorMapMgr::ColorMapMgr()
-    : m_defaultColorMap("black")
 {
-    CMap df;
-    df.name = m_defaultColorMap;
-    df.colors.insert(1, {Qt::black});
-    m_colormaps.insert(m_defaultColorMap, df);
+    m_dfCMap = CMapKey("Black", 1);
+    m_colormaps.insert(m_dfCMap, {Qt::black});
+    m_names.append(m_dfCMap.first);
+    m_sizesAvailable.insert(m_dfCMap.first, {"1"});
 
     QFile file(":colormaps/colormaps.json");
     if (!file.open(QIODevice::ReadOnly)) {
@@ -31,19 +31,41 @@ ColorMapMgr::ColorMapMgr()
 
     QJsonObject json = QJsonDocument::fromJson(file.readAll()).object();
     for (QJsonObject::iterator it = json.begin(); it != json.end(); ++it) {
-        CMap cmap;
-        cmap.name = it.key();
-        QJsonObject objColor = it.value().toObject();
-        for (QJsonObject::iterator it2 = objColor.begin(); it2 != objColor.end(); ++it2) {
+        QString name = it.key();
+        QStringList sizes;
+        for (QJsonValueRef setOfColors : it.value().toObject()) {
+            if (!setOfColors.isArray()) {
+                continue;
+            }
             Colors colors;
-            for (QJsonValueRef rgb_ : it2.value().toArray()) {
+            for (QJsonValueRef rgb_ : setOfColors.toArray()) {
                 QJsonArray rgb = rgb_.toArray();
                 colors.emplace_back(QColor(rgb.at(0).toInt(), rgb.at(1).toInt(), rgb.at(2).toInt()));
             }
-            cmap.colors.insert(colors.size(), colors);
+            Q_ASSERT(colors.size() > 0);
+            CMapKey key(name, colors.size());
+            m_colormaps.insert(key, colors);
+            sizes.append(QString::number(key.second));
         }
-        m_colormaps.insert(cmap.name, cmap);
+        m_names.append(name);
+        qSort(sizes.begin(), sizes.end(), [](const QString& s1, const QString& s2){ return s1.toInt() < s2.toInt(); });
+        m_sizesAvailable.insert(name, sizes);
     }
+    m_names.sort();
+}
+
+const Colors ColorMapMgr::colors(const CMapKey& key) const
+{
+    const Colors colors = m_colormaps.value(key, Colors());
+    if (colors.empty()) {
+        return m_colormaps.value(m_dfCMap);
+    }
+    return colors;
+}
+
+const Colors ColorMapMgr::colors(const QString& name, int size) const
+{
+    return colors(CMapKey(name, size));
 }
 
 /************************************************************************/
