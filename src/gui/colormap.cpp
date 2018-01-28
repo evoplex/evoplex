@@ -82,13 +82,25 @@ ColorMap* ColorMap::create(const ValueSpace* valSpace, const Colors& colors)
         return new ColorMapRange(colors, range);
     }
 
-    qFatal("[ColorMap] : invalid attribute space for %s", valSpace->attrName());
+    return new SingleColor(colors.front());
 }
 
 ColorMap::ColorMap(const Colors& colors)
     : m_colors(colors)
 {
     Q_ASSERT(colors.size() > 0);
+}
+
+/************************************************************************/
+
+SingleColor::SingleColor(QColor color)
+    : ColorMap({color})
+{
+}
+
+const QColor SingleColor::colorFromValue(const Value &val) const
+{
+    return m_colors.front();
 }
 
 /************************************************************************/

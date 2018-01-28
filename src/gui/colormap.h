@@ -39,6 +39,8 @@ private:
     QHash<QString, QStringList> m_sizesAvailable;
 };
 
+/************************************************************************/
+
 class ColorMap
 {
 public:
@@ -51,6 +53,17 @@ protected:
     const Colors& m_colors;
 };
 
+/************************************************************************/
+
+class SingleColor : public ColorMap
+{
+public:
+    explicit SingleColor(QColor color);
+    virtual const QColor colorFromValue(const Value& val) const;
+};
+
+/************************************************************************/
+
 class ColorMapRange : public ColorMap
 {
 public:
@@ -60,6 +73,8 @@ private:
     float m_max;
     float m_min;
 };
+
+/************************************************************************/
 
 class ColorMapSet : public ColorMap
 {
