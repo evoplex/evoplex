@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
+    <width>494</width>
     <height>248</height>
    </rect>
   </property>
@@ -15,28 +15,47 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QGroupBox" name="groupBox">
+    <widget class="QGroupBox" name="agents">
      <property name="title">
       <string>Agents</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_3">
-      <item row="0" column="1">
-       <widget class="QComboBox" name="agentAttr"/>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_3">
+        <property name="text">
+         <string>Color Map:</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="3">
+       <widget class="QComboBox" name="agentCMapSize"/>
       </item>
       <item row="0" column="0">
        <widget class="QLabel" name="label">
         <property name="text">
          <string>Attribute:</string>
         </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
        </widget>
       </item>
-      <item row="1" column="1">
-       <widget class="QComboBox" name="agentCM"/>
+      <item row="0" column="1">
+       <widget class="QComboBox" name="agentAttr"/>
       </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="label_3">
+      <item row="1" column="1">
+       <widget class="QComboBox" name="agentCMapName"/>
+      </item>
+      <item row="1" column="2">
+       <widget class="QLabel" name="label_6">
         <property name="text">
-         <string>Color Map:</string>
+         <string>Size:</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
         </property>
        </widget>
       </item>
@@ -44,11 +63,21 @@
     </widget>
    </item>
    <item>
-    <widget class="QGroupBox" name="groupBox_2">
+    <widget class="QGroupBox" name="edges">
      <property name="title">
       <string>Edges</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_2">
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_4">
+        <property name="text">
+         <string>Color Map:</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+      </item>
       <item row="0" column="1">
        <widget class="QComboBox" name="edgeAttr"/>
       </item>
@@ -57,15 +86,24 @@
         <property name="text">
          <string>Attribute:</string>
         </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
        </widget>
       </item>
       <item row="1" column="1">
-       <widget class="QComboBox" name="edgeCM"/>
+       <widget class="QComboBox" name="edgeCMapName"/>
       </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="label_4">
+      <item row="1" column="3">
+       <widget class="QComboBox" name="edgeCMapSize"/>
+      </item>
+      <item row="1" column="2">
+       <widget class="QLabel" name="label_5">
         <property name="text">
-         <string>Color Map:</string>
+         <string>Size:</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
         </property>
        </widget>
       </item>

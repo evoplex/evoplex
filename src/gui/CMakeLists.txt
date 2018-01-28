@@ -7,8 +7,9 @@ set(EVOPLEX_GUI_H
   experimentwidget.h
   linechart.h
   outputwidget.h
+  graphview.h
+  gridview.h
   graphwidget.h
-  gridwidget.h
   projectwidget.h
   savedialog.h
   tablewidget.h
@@ -30,8 +31,9 @@ set(EVOPLEX_GUI_CXX
   experimentwidget.cpp
   linechart.cpp
   outputwidget.cpp
+  graphview.cpp
+  gridview.cpp
   graphwidget.cpp
-  gridwidget.cpp
   projectwidget.cpp
   savedialog.cpp
   tablewidget.cpp

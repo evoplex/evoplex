@@ -8,14 +8,15 @@
 
 #include <QDockWidget>
 #include <QLineEdit>
+#include <QMouseEvent>
 #include <vector>
 
 #include "colormap.h"
 #include "maingui.h"
-#include "ui_graphsettings.h"
 #include "core/experiment.h"
 
 class Ui_GraphWidget;
+class Ui_GraphSettings;
 
 namespace evoplex {
 
@@ -24,55 +25,53 @@ class GraphWidget : public QDockWidget
     Q_OBJECT
 
 public:
-    explicit GraphWidget(MainGUI* mainGUI, Experiment* exp, QWidget* parent = 0);
+    explicit GraphWidget(MainGUI* mainGUI, Experiment* exp, QWidget* parent);
     ~GraphWidget();
 
+    virtual void updateCache() = 0;
+
 protected:
-    void mousePressEvent(QMouseEvent* e);
-    void mouseReleaseEvent(QMouseEvent* e);
-    void paintEvent(QPaintEvent*);
-    void resizeEvent(QResizeEvent* e);
-
-private slots:
-    void updateCache();
-    void setTrial(int trialId);
-    void zoomIn();
-    void zoomOut();
-    void resetView();
-    void setAgentAttr(QString attrName);
-    void setEdgeAttr(int idx);
-
-private:
     Ui_GraphWidget* m_ui;
     Ui_GraphSettings* m_settingsDlg;
     Experiment* m_exp;
     AbstractModel* m_model;
-    int m_currTrialId;
-    int m_agentAttr;
-    int m_edgeAttr;
-    ColorMap* m_agentCMap;
 
-    bool m_showAgents;
-    bool m_showEdges;
+    int m_currStep;
+    int m_selectedAgent;
+    int m_agentAttr;
+    ColorMap* m_agentCMap;
 
     int m_zoomLevel;
     float m_nodeSizeRate;
-    float m_edgeSizeRate;
     float m_nodeRadius;
-
-    int m_selectedAgent;
     QPoint m_origin;
+
+    void mousePressEvent(QMouseEvent* e);
+    void mouseReleaseEvent(QMouseEvent* e);
+    void resizeEvent(QResizeEvent* e);
+
+    virtual void paintEvent(QPaintEvent*) = 0;
+    virtual const Agent* selectAgent(const QPoint& pos) const = 0;
+
+public slots:
+    void updateView();
+    void setTrial(int trialId);
+
+private slots:
+    void zoomIn();
+    void zoomOut();
+    void resetView();
+    void updateAgentCMap();
+    void slotAgentCMapName(const QString& name);
+    void setAgentAttr(int attrIdx);
+
+private:
     QPoint m_posEntered;
     QTimer m_resizeTimer;
+    int m_currTrialId;
+    const ColorMapMgr* m_colorMapMgr;
 
     std::vector<QLineEdit*> m_attrs;
-
-    struct Cache {
-        Agent* agent = nullptr;
-        QPointF xy;
-        std::vector<QLineF> edges;
-    };
-    std::vector<Cache> m_cache;
 
     void updateInspector(const Agent* agent);
 };

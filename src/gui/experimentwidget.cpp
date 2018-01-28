@@ -11,8 +11,8 @@
 
 #include "experimentwidget.h"
 #include "linechart.h"
-#include "graphwidget.h"
-#include "gridwidget.h"
+#include "graphview.h"
+#include "gridview.h"
 
 namespace evoplex {
 
@@ -72,14 +72,14 @@ ExperimentWidget::ExperimentWidget(MainGUI* mainGUI, Experiment* exp, ProjectsPa
     layout->addWidget(tb);
     setWidget(layout->parentWidget());
     connect(m_aGraph, &QAction::triggered, [this, mainGUI]() {
-        GraphWidget* graph = new GraphWidget(mainGUI, m_exp, this);
+        GraphView* graph = new GraphView(mainGUI, m_exp, this);
         m_innerWindow->addDockWidget(Qt::TopDockWidgetArea, graph);
-        connect(m_timer, SIGNAL(timeout()), graph, SLOT(update()));
+        connect(m_timer, SIGNAL(timeout()), graph, SLOT(updateView()));
     });
     connect(m_aGrid, &QAction::triggered, [this, mainGUI]() {
-        GridWidget* grid = new GridWidget(mainGUI, m_exp, this);
+        GridView* grid = new GridView(mainGUI, m_exp, this);
         m_innerWindow->addDockWidget(Qt::TopDockWidgetArea, grid);
-        connect(m_timer, SIGNAL(timeout()), grid, SLOT(update()));
+        connect(m_timer, SIGNAL(timeout()), grid, SLOT(updateView()));
     });
     connect(m_aLineChart, &QAction::triggered, [this, expMgr]() {
         LineChart* lineChart = new LineChart(expMgr, m_exp, this);

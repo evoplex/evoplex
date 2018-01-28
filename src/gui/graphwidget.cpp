@@ -3,21 +3,13 @@
  * @author Marcos Cardinot <mcardinot@gmail.com>
  */
 
-#include <QDebug>
-#include <QBrush>
-#include <QPaintEvent>
-#include <QPainter>
-#include <QtMath>
-#include <QHBoxLayout>
-#include <QComboBox>
-#include <QLabel>
-#include <QSpacerItem>
-
 #include "graphwidget.h"
 #include "ui_graphwidget.h"
+#include "ui_graphsettings.h"
 #include "titlebar.h"
 
-namespace evoplex {
+namespace evoplex
+{
 
 GraphWidget::GraphWidget(MainGUI* mainGUI, Experiment* exp, QWidget* parent)
     : QDockWidget(parent)
@@ -25,16 +17,16 @@ GraphWidget::GraphWidget(MainGUI* mainGUI, Experiment* exp, QWidget* parent)
     , m_settingsDlg(new Ui_GraphSettings)
     , m_exp(exp)
     , m_model(nullptr)
+    , m_currStep(-1)
+    , m_selectedAgent(-1)
     , m_agentCMap(nullptr)
     , m_zoomLevel(0)
     , m_nodeSizeRate(10.f)
-    , m_edgeSizeRate(25.f)
     , m_nodeRadius(m_nodeSizeRate)
-    , m_selectedAgent(-1)
     , m_origin(5,25)
     , m_posEntered(0,0)
+    , m_colorMapMgr(mainGUI->colorMapMgr())
 {
-    setWindowTitle("Graph");
     setAttribute(Qt::WA_DeleteOnClose, true);
 
     QWidget* front = new QWidget;
@@ -44,13 +36,14 @@ GraphWidget::GraphWidget(MainGUI* mainGUI, Experiment* exp, QWidget* parent)
     TitleBar* titleBar = new TitleBar(exp, this);
     setTitleBarWidget(titleBar);
     connect(titleBar, SIGNAL(trialSelected(int)), SLOT(setTrial(int)));
-    setTrial(0);
     connect(mainGUI->mainApp()->getExperimentsMgr(), &ExperimentsMgr::trialCreated,
         [this](Experiment* exp, int trialId) {
             if (exp == m_exp && trialId == m_currTrialId)
                 setTrial(m_currTrialId);
     });
 
+    // graph settings dialog
+    //
     QDialog* dlg = new QDialog(this);
     m_settingsDlg->setupUi(dlg);
     connect(titleBar, SIGNAL(openSettingsDlg()), dlg, SLOT(show()));
@@ -62,24 +55,23 @@ GraphWidget::GraphWidget(MainGUI* mainGUI, Experiment* exp, QWidget* parent)
         m_attrs.emplace_back(le);
         m_ui->inspectorLayout->addRow(name, le);
     }
-    for (QString name : m_exp->modelPlugin()->edgeAttrNames()) {
-        m_settingsDlg->edgeAttr->addItem(name);
-    }
-    connect(m_settingsDlg->agentAttr, SIGNAL(currentTextChanged(QString)), SLOT(setAgentAttr(QString)));
-    connect(m_settingsDlg->edgeAttr, SIGNAL(currentIndexChanged(int)), SLOT(setEdgeAttr(int)));
-    setAgentAttr(m_settingsDlg->agentAttr->currentText());
-    setEdgeAttr(m_settingsDlg->edgeAttr->currentIndex());
+    m_agentAttr = m_settingsDlg->agentAttr->currentIndex();
+    connect(m_settingsDlg->agentAttr, SIGNAL(currentIndexChanged(int)), SLOT(setAgentAttr(int)));
+    m_settingsDlg->edges->setHidden(true);
 
-    //connect(m_settingsDlg->agentCM, SIGNAL(currentTextChanged(QString)), SLOT(setAgentCM(QString)));
-    //connect(m_settingsDlg->edgeCM, SIGNAL(currentTextChanged(QString)), SLOT(setEdgeCM(QString)));
+    m_settingsDlg->agentCMapName->insertItems(0, m_colorMapMgr->names());
+    m_settingsDlg->agentCMapName->setCurrentText(m_colorMapMgr->defaultColorMap().first);
+    slotAgentCMapName(m_colorMapMgr->defaultColorMap().first); // fill sizes
+    m_settingsDlg->agentCMapSize->setCurrentText(QString::number(m_colorMapMgr->defaultColorMap().second));
+    connect(m_settingsDlg->agentCMapName, SIGNAL(currentIndexChanged(QString)), SLOT(slotAgentCMapName(QString)));
+    connect(m_settingsDlg->agentCMapSize, SIGNAL(currentIndexChanged(int)), SLOT(updateAgentCMap()));
+    updateAgentCMap();
 
+    // graph widget
+    //
     connect(m_ui->bZoomIn, SIGNAL(clicked(bool)), SLOT(zoomIn()));
     connect(m_ui->bZoomOut, SIGNAL(clicked(bool)), SLOT(zoomOut()));
-    connect(m_ui->bShowAgents, &QPushButton::clicked, [this](bool b) { m_showAgents = b; update(); });
-    connect(m_ui->bShowEdges, &QPushButton::clicked, [this](bool b) { m_showEdges = b; update(); });
     connect(m_ui->bReset, SIGNAL(clicked(bool)), SLOT(resetView()));
-    m_showAgents = m_ui->bShowAgents->isChecked();
-    m_showEdges = m_ui->bShowEdges->isChecked();
 
     m_ui->inspector->hide();
     connect(m_ui->bCloseInspector, SIGNAL(clicked(bool)), m_ui->inspector, SLOT(hide()));
@@ -92,8 +84,6 @@ GraphWidget::GraphWidget(MainGUI* mainGUI, Experiment* exp, QWidget* parent)
     pal.setColor(QPalette::Background, QColor(239,235,231));
     setAutoFillBackground(true);
     setPalette(pal);
-
-    updateCache();
 }
 
 GraphWidget::~GraphWidget()
@@ -103,17 +93,31 @@ GraphWidget::~GraphWidget()
     delete m_agentCMap;
 }
 
-void GraphWidget::setAgentAttr(QString attrName)
+void GraphWidget::updateAgentCMap()
 {
-    delete m_agentCMap;
+    QString attrName = m_settingsDlg->agentAttr->currentText();
     const ValueSpace* valSpace = m_exp->modelPlugin()->agentAttrSpace().value(attrName);
-    m_agentCMap = ColorMap::create(valSpace, {Qt::black});
-    m_agentAttr = valSpace->id();
+    Q_ASSERT(valSpace);
+    delete m_agentCMap;
+    m_agentCMap = ColorMap::create(valSpace,
+            m_colorMapMgr->colors(m_settingsDlg->agentCMapName->currentText(),
+                                  m_settingsDlg->agentCMapSize->currentText().toInt()));
+    update();
 }
 
-void GraphWidget::setEdgeAttr(int idx)
+void GraphWidget::slotAgentCMapName(const QString &name)
 {
-    m_edgeAttr = idx;
+    m_settingsDlg->agentCMapSize->blockSignals(true);
+    m_settingsDlg->agentCMapSize->clear();
+    m_settingsDlg->agentCMapSize->insertItems(0, m_colorMapMgr->sizes(name));
+    m_settingsDlg->agentCMapSize->blockSignals(false);
+    updateAgentCMap();
+}
+
+void GraphWidget::setAgentAttr(int attrIdx)
+{
+    m_agentAttr = attrIdx;
+    updateAgentCMap();
 }
 
 void GraphWidget::setTrial(int trialId)
@@ -152,91 +156,6 @@ void GraphWidget::resetView()
     updateCache();
 }
 
-void GraphWidget::updateCache()
-{
-    m_cache.clear();
-    m_cache.shrink_to_fit();
-
-    if (!m_model)
-        return;
-
-    const Agents agents = m_model->graph()->agents();
-    float edgeSizeRate = m_edgeSizeRate * std::pow(1.25f, m_zoomLevel);
-    m_cache.reserve(agents.size());
-
-    for (Agent* agent : agents) {
-        QPointF xy(m_origin.x() + edgeSizeRate * (1.0 + agent->x()),
-                   m_origin.y() + edgeSizeRate * (1.0 + agent->y()));
-
-        if (!rect().contains(xy.toPoint()))
-            continue;
-
-        Cache cache;
-        cache.agent = agent;
-        cache.xy = xy;
-        cache.edges.reserve(agent->edges().size());
-
-        for (Edge* edge : agent->edges()) {
-            QPointF xy2(m_origin.x() + edgeSizeRate * (1.0 + edge->neighbour()->x()),
-                        m_origin.y() + edgeSizeRate * (1.0 + edge->neighbour()->y()));
-            cache.edges.emplace_back(QLineF(xy, xy2));
-        }
-
-        m_cache.emplace_back(cache);
-    }
-    m_cache.shrink_to_fit();
-    update();
-}
-
-void GraphWidget::paintEvent(QPaintEvent* e)
-{
-    if (!m_model)
-        return;
-
-    QPainter painter;
-    painter.begin(this);
-    painter.setRenderHint(QPainter::Antialiasing);
-
-    if (m_showEdges) {
-        Cache cacheSelected;
-        for (Cache cache : m_cache) {
-            if (m_selectedAgent == cache.agent->id()) {
-                cacheSelected = cache;
-            }
-            for (QLineF edge : cache.edges) {
-                painter.setPen(Qt::gray);
-                painter.drawLine(edge);
-            }
-        }
-
-        if (cacheSelected.agent) {
-            for (QLineF edge : cacheSelected.edges) {
-                painter.setPen(QPen(Qt::black, 3));
-                painter.drawLine(edge);
-            }
-        }
-    }
-
-    if (m_showAgents) {
-        for (Cache cache : m_cache) {
-            if (m_selectedAgent == cache.agent->id()) {
-                painter.setBrush(QColor(10,10,10,100));
-                painter.drawEllipse(cache.xy, m_nodeRadius*1.5f, m_nodeRadius*1.5f);
-                updateInspector(cache.agent);
-            }
-
-            const Value& value = cache.agent->attr(m_agentAttr);
-            painter.setBrush(m_agentCMap->colorFromValue(value));
-            painter.setPen(Qt::black);
-            painter.drawEllipse(cache.xy, m_nodeRadius, m_nodeRadius);
-        }
-    }
-
-    m_ui->currStep->setText(QString::number(m_model->currStep()));
-
-    painter.end();
-}
-
 void GraphWidget::mousePressEvent(QMouseEvent* e)
 {
     if (e->button() == Qt::LeftButton)
@@ -259,19 +178,12 @@ void GraphWidget::mouseReleaseEvent(QMouseEvent *e)
         return;
     }
 
-    for (Cache cache : m_cache) {
-        if (e->pos().x() > cache.xy.x()-m_nodeRadius
-                && e->pos().x() < cache.xy.x()+m_nodeRadius
-                && e->pos().y() > cache.xy.y()-m_nodeRadius
-                && e->pos().y() < cache.xy.y()+m_nodeRadius) {
-            m_selectedAgent = cache.agent->id();
-            updateInspector(cache.agent);
-            m_ui->inspector->show();
-            break;
-        }
-    }
-
-    if (m_selectedAgent == -1) {
+    const Agent* agent = selectAgent(e->pos());
+    if (agent) {
+        m_selectedAgent = agent->id();
+        updateInspector(agent);
+        m_ui->inspector->show();
+    } else {
         m_ui->inspector->hide();
     }
 
@@ -280,7 +192,7 @@ void GraphWidget::mouseReleaseEvent(QMouseEvent *e)
 
 void GraphWidget::resizeEvent(QResizeEvent* e)
 {
-    m_cache.clear();
+    //m_cache.clear();
     m_resizeTimer.start(500);
     QWidget::resizeEvent(e);
 }
@@ -294,4 +206,14 @@ void GraphWidget::updateInspector(const Agent* agent)
     }
 }
 
+void GraphWidget::updateView()
+{
+    if (!m_model || m_model->currStep() == m_currStep) {
+        return;
+    }
+    m_currStep = m_model->currStep();
+    m_ui->currStep->setText(QString::number(m_currStep));
+    update();
 }
+
+} // evoplex
