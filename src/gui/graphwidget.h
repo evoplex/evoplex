@@ -12,11 +12,11 @@
 #include <vector>
 
 #include "colormap.h"
+#include "graphsettings.h"
 #include "maingui.h"
 #include "core/experiment.h"
 
 class Ui_GraphWidget;
-class Ui_GraphSettings;
 
 namespace evoplex {
 
@@ -32,7 +32,7 @@ public:
 
 protected:
     Ui_GraphWidget* m_ui;
-    Ui_GraphSettings* m_settingsDlg;
+    GraphSettings* m_settingsDlg;
     Experiment* m_exp;
     AbstractModel* m_model;
 
@@ -61,15 +61,12 @@ private slots:
     void zoomIn();
     void zoomOut();
     void resetView();
-    void updateAgentCMap();
-    void slotAgentCMapName(const QString& name);
-    void setAgentAttr(int attrIdx);
+    void setAgentCMap(ColorMap* cmap);
 
 private:
     QPoint m_posEntered;
     QTimer m_resizeTimer;
     int m_currTrialId;
-    const ColorMapMgr* m_colorMapMgr;
 
     std::vector<QLineEdit*> m_attrs;
 

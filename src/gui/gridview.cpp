@@ -7,6 +7,7 @@
 
 #include "gridview.h"
 #include "ui_graphwidget.h"
+#include "ui_graphsettings.h"
 
 namespace evoplex
 {
@@ -15,6 +16,7 @@ GridView::GridView(MainGUI* mainGUI, Experiment* exp, QWidget* parent)
     : GraphWidget(mainGUI, exp, parent)
 {
     setWindowTitle("Grid");
+    //m_settingsDlg->edges->setHidden(true);
     m_ui->bShowAgents->hide();
     m_ui->bShowEdges->hide();
     setTrial(0); // init at trial 0

@@ -31,12 +31,11 @@ private:
     std::vector<Cache> m_cache;
 
     int m_edgeAttr;
+    ColorMap* m_edgeCMap;
     float m_edgeSizeRate;
 
     bool m_showAgents;
     bool m_showEdges;
-
-    void setEdgeAttr(int idx);
 };
 
 } // evoplex

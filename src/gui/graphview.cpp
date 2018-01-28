@@ -18,25 +18,21 @@ GraphView::GraphView(MainGUI* mainGUI, Experiment* exp, QWidget* parent)
 {
     setWindowTitle("Graph");
 
-    m_settingsDlg->edges->setHidden(false);
-    for (QString name : m_exp->modelPlugin()->edgeAttrNames()) {
-        m_settingsDlg->edgeAttr->addItem(name);
-    }
-    connect(m_settingsDlg->edgeAttr, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-            [this](int idx) { setEdgeAttr(idx); });
-    setEdgeAttr(m_settingsDlg->edgeAttr->currentIndex());
+    m_edgeAttr = m_settingsDlg->edgeAttr();
+    m_edgeCMap = m_settingsDlg->edgeCMap();
+    connect(m_settingsDlg, &GraphSettings::edgeAttrUpdated, [this](int idx) { m_edgeAttr = idx; });
+    connect(m_settingsDlg, &GraphSettings::edgeCMapUpdated, [this](ColorMap* cmap) {
+        delete m_edgeCMap;
+        m_edgeCMap = cmap;
+        update();
+    });
 
-    connect(m_ui->bShowAgents, &QPushButton::clicked, [this](bool b) { m_showAgents = b; update(); });
-    connect(m_ui->bShowEdges, &QPushButton::clicked, [this](bool b) { m_showEdges = b; update(); });
     m_showAgents = m_ui->bShowAgents->isChecked();
     m_showEdges = m_ui->bShowEdges->isChecked();
+    connect(m_ui->bShowAgents, &QPushButton::clicked, [this](bool b) { m_showAgents = b; update(); });
+    connect(m_ui->bShowEdges, &QPushButton::clicked, [this](bool b) { m_showEdges = b; update(); });
 
     setTrial(0); // init at trial 0
-}
-
-void GraphView::setEdgeAttr(int idx)
-{
-    m_edgeAttr = idx;
 }
 
 void GraphView::updateCache()

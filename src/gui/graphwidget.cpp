@@ -5,7 +5,6 @@
 
 #include "graphwidget.h"
 #include "ui_graphwidget.h"
-#include "ui_graphsettings.h"
 #include "titlebar.h"
 
 namespace evoplex
@@ -14,18 +13,16 @@ namespace evoplex
 GraphWidget::GraphWidget(MainGUI* mainGUI, Experiment* exp, QWidget* parent)
     : QDockWidget(parent)
     , m_ui(new Ui_GraphWidget)
-    , m_settingsDlg(new Ui_GraphSettings)
+    , m_settingsDlg(new GraphSettings(mainGUI, exp, this))
     , m_exp(exp)
     , m_model(nullptr)
     , m_currStep(-1)
     , m_selectedAgent(-1)
-    , m_agentCMap(nullptr)
     , m_zoomLevel(0)
     , m_nodeSizeRate(10.f)
     , m_nodeRadius(m_nodeSizeRate)
     , m_origin(5,25)
     , m_posEntered(0,0)
-    , m_colorMapMgr(mainGUI->colorMapMgr())
 {
     setAttribute(Qt::WA_DeleteOnClose, true);
 
@@ -35,6 +32,7 @@ GraphWidget::GraphWidget(MainGUI* mainGUI, Experiment* exp, QWidget* parent)
 
     TitleBar* titleBar = new TitleBar(exp, this);
     setTitleBarWidget(titleBar);
+    connect(titleBar, SIGNAL(openSettingsDlg()), m_settingsDlg, SLOT(show()));
     connect(titleBar, SIGNAL(trialSelected(int)), SLOT(setTrial(int)));
     connect(mainGUI->mainApp()->getExperimentsMgr(), &ExperimentsMgr::trialCreated,
         [this](Experiment* exp, int trialId) {
@@ -42,37 +40,21 @@ GraphWidget::GraphWidget(MainGUI* mainGUI, Experiment* exp, QWidget* parent)
                 setTrial(m_currTrialId);
     });
 
-    // graph settings dialog
-    //
-    QDialog* dlg = new QDialog(this);
-    m_settingsDlg->setupUi(dlg);
-    connect(titleBar, SIGNAL(openSettingsDlg()), dlg, SLOT(show()));
+    connect(m_settingsDlg, &GraphSettings::agentAttrUpdated, [this](int idx) { m_agentAttr = idx; });
+    connect(m_settingsDlg, SIGNAL(agentCMapUpdated(ColorMap*)), SLOT(setAgentCMap(ColorMap*)));
+    m_agentAttr = m_settingsDlg->agentAttr();
+    m_agentCMap = m_settingsDlg->agentCMap();
 
-    for (QString name : m_exp->modelPlugin()->agentAttrNames()) {
-        m_settingsDlg->agentAttr->addItem(name);
+    connect(m_ui->bZoomIn, SIGNAL(clicked(bool)), SLOT(zoomIn()));
+    connect(m_ui->bZoomOut, SIGNAL(clicked(bool)), SLOT(zoomOut()));
+    connect(m_ui->bReset, SIGNAL(clicked(bool)), SLOT(resetView()));
+
+    for (QString name : exp->modelPlugin()->agentAttrNames()) {
         QLineEdit* le = new QLineEdit();
         le->setReadOnly(true);
         m_attrs.emplace_back(le);
         m_ui->inspectorLayout->addRow(name, le);
     }
-    m_agentAttr = m_settingsDlg->agentAttr->currentIndex();
-    connect(m_settingsDlg->agentAttr, SIGNAL(currentIndexChanged(int)), SLOT(setAgentAttr(int)));
-    m_settingsDlg->edges->setHidden(true);
-
-    m_settingsDlg->agentCMapName->insertItems(0, m_colorMapMgr->names());
-    m_settingsDlg->agentCMapName->setCurrentText(m_colorMapMgr->defaultColorMap().first);
-    slotAgentCMapName(m_colorMapMgr->defaultColorMap().first); // fill sizes
-    m_settingsDlg->agentCMapSize->setCurrentText(QString::number(m_colorMapMgr->defaultColorMap().second));
-    connect(m_settingsDlg->agentCMapName, SIGNAL(currentIndexChanged(QString)), SLOT(slotAgentCMapName(QString)));
-    connect(m_settingsDlg->agentCMapSize, SIGNAL(currentIndexChanged(int)), SLOT(updateAgentCMap()));
-    updateAgentCMap();
-
-    // graph widget
-    //
-    connect(m_ui->bZoomIn, SIGNAL(clicked(bool)), SLOT(zoomIn()));
-    connect(m_ui->bZoomOut, SIGNAL(clicked(bool)), SLOT(zoomOut()));
-    connect(m_ui->bReset, SIGNAL(clicked(bool)), SLOT(resetView()));
-
     m_ui->inspector->hide();
     connect(m_ui->bCloseInspector, SIGNAL(clicked(bool)), m_ui->inspector, SLOT(hide()));
 
@@ -89,35 +71,14 @@ GraphWidget::GraphWidget(MainGUI* mainGUI, Experiment* exp, QWidget* parent)
 GraphWidget::~GraphWidget()
 {
     delete m_ui;
-    delete m_settingsDlg;
     delete m_agentCMap;
 }
 
-void GraphWidget::updateAgentCMap()
+void GraphWidget::setAgentCMap(ColorMap* cmap)
 {
-    QString attrName = m_settingsDlg->agentAttr->currentText();
-    const ValueSpace* valSpace = m_exp->modelPlugin()->agentAttrSpace().value(attrName);
-    Q_ASSERT(valSpace);
     delete m_agentCMap;
-    m_agentCMap = ColorMap::create(valSpace,
-            m_colorMapMgr->colors(m_settingsDlg->agentCMapName->currentText(),
-                                  m_settingsDlg->agentCMapSize->currentText().toInt()));
+    m_agentCMap = cmap;
     update();
-}
-
-void GraphWidget::slotAgentCMapName(const QString &name)
-{
-    m_settingsDlg->agentCMapSize->blockSignals(true);
-    m_settingsDlg->agentCMapSize->clear();
-    m_settingsDlg->agentCMapSize->insertItems(0, m_colorMapMgr->sizes(name));
-    m_settingsDlg->agentCMapSize->blockSignals(false);
-    updateAgentCMap();
-}
-
-void GraphWidget::setAgentAttr(int attrIdx)
-{
-    m_agentAttr = attrIdx;
-    updateAgentCMap();
 }
 
 void GraphWidget::setTrial(int trialId)

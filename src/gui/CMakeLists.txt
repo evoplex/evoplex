@@ -9,6 +9,7 @@ set(EVOPLEX_GUI_H
   outputwidget.h
   graphview.h
   gridview.h
+  graphsettings.h
   graphwidget.h
   projectwidget.h
   savedialog.h
@@ -33,6 +34,7 @@ set(EVOPLEX_GUI_CXX
   outputwidget.cpp
   graphview.cpp
   gridview.cpp
+  graphsettings.cpp
   graphwidget.cpp
   projectwidget.cpp
   savedialog.cpp
