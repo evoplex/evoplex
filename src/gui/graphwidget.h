@@ -58,6 +58,8 @@ public slots:
     void setTrial(int trialId);
 
 private slots:
+    void slotRestarted(Experiment* exp);
+    void slotStatusChanged(Experiment* exp);
     void zoomIn();
     void zoomOut();
     void resetView();

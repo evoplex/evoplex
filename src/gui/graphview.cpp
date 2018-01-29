@@ -40,8 +40,10 @@ void GraphView::updateCache()
     m_cache.clear();
     m_cache.shrink_to_fit();
 
-    if (!m_model)
+    if (!m_model) {
+        update();
         return;
+    }
 
     const Agents agents = m_model->graph()->agents();
     float edgeSizeRate = m_edgeSizeRate * std::pow(1.25f, m_zoomLevel);

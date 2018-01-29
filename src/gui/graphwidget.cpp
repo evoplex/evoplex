@@ -3,6 +3,8 @@
  * @author Marcos Cardinot <mcardinot@gmail.com>
  */
 
+#include <QMessageBox>
+
 #include "graphwidget.h"
 #include "ui_graphwidget.h"
 #include "titlebar.h"
@@ -25,6 +27,9 @@ GraphWidget::GraphWidget(MainGUI* mainGUI, Experiment* exp, QWidget* parent)
     , m_posEntered(0,0)
 {
     setAttribute(Qt::WA_DeleteOnClose, true);
+
+    connect(mainGUI->mainApp()->expMgr(), SIGNAL(restarted(Experiment*)), SLOT(slotRestarted(Experiment*)));
+    connect(mainGUI->mainApp()->expMgr(), SIGNAL(statusChanged(Experiment*)), SLOT(slotStatusChanged(Experiment*)));
 
     QWidget* front = new QWidget;
     m_ui->setupUi(front);
@@ -49,11 +54,34 @@ GraphWidget::GraphWidget(MainGUI* mainGUI, Experiment* exp, QWidget* parent)
     connect(m_ui->bZoomOut, SIGNAL(clicked(bool)), SLOT(zoomOut()));
     connect(m_ui->bReset, SIGNAL(clicked(bool)), SLOT(resetView()));
 
-    for (QString name : exp->modelPlugin()->agentAttrNames()) {
+    for (const ValueSpace* valSpace : exp->modelPlugin()->agentAttrSpace()) {
         QLineEdit* le = new QLineEdit();
-        le->setReadOnly(true);
+        le->setToolTip(valSpace->space());
+        connect(le, &QLineEdit::editingFinished, [this, valSpace, le]() {
+            if (!m_model || !m_model->graph() || m_ui->agentId->value() < 0) {
+                return;
+            }
+            QString err;
+            Agent* agent = m_model->graph()->agent(m_ui->agentId->value());
+            if (m_model->status() != Experiment::READY) {
+                err = "You cannot change things in a running experiment.\n"
+                      "Please, pause it and try again.";
+            } else {
+                Value v = valSpace->validate(le->text());
+                if (v.isValid()) {
+                    agent->setAttr(valSpace->id(), v);
+                    update();
+                    return;
+                } else {
+                    err = "The input for '" + valSpace->attrName() + "' is invalid.\n"
+                          "Expected: " + valSpace->space();
+                }
+            }
+            QMessageBox::warning(this, "Graph", err);
+            le->setText(agent->attr(valSpace->id()).toQString());
+        });
         m_attrs.emplace_back(le);
-        m_ui->inspectorLayout->addRow(name, le);
+        m_ui->inspectorLayout->addRow(valSpace->attrName(), le);
     }
     m_ui->inspector->hide();
     connect(m_ui->bCloseInspector, SIGNAL(clicked(bool)), m_ui->inspector, SLOT(hide()));
@@ -70,8 +98,32 @@ GraphWidget::GraphWidget(MainGUI* mainGUI, Experiment* exp, QWidget* parent)
 
 GraphWidget::~GraphWidget()
 {
+    m_model = nullptr;
+    m_exp = nullptr;
     delete m_ui;
     delete m_agentCMap;
+}
+
+void GraphWidget::slotRestarted(Experiment* exp)
+{
+    if (exp != m_exp) {
+        return;
+    }
+    m_model = nullptr;
+    m_ui->currStep->setText("--");
+    updateCache();
+}
+
+void GraphWidget::slotStatusChanged(Experiment *exp)
+{
+    if (exp != m_exp) {
+        return;
+    } else if (exp->expStatus() == Experiment::FINISHED) {
+        m_currStep = -1;
+        updateView();
+    } else if (exp->expStatus() == Experiment::INVALID) {
+        QMessageBox::warning(this, "Graph", "Something went wrong with your settings!");
+    }
 }
 
 void GraphWidget::setAgentCMap(ColorMap* cmap)
@@ -160,7 +212,7 @@ void GraphWidget::resizeEvent(QResizeEvent* e)
 
 void GraphWidget::updateInspector(const Agent* agent)
 {
-    m_ui->agentId->setText(QString::number(agent->id()));
+    m_ui->agentId->setValue(agent->id());
     m_ui->neighbors->setText(QString::number(agent->edges().size()));
     for (int id = 0; id < agent->attrs().size(); ++id) {
         m_attrs.at(id)->setText(agent->attr(id).toQString());
