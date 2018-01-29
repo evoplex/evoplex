@@ -103,7 +103,7 @@ const int Project::importExperiments(const QString& filePath)
         ++row;
     }
     file.close();
-    return failures;
+    return failures == row - 1 ? -1 : failures;
 }
 
 bool Project::saveProject(QString& errMsg, std::function<void(int)>& progress)
