@@ -30,28 +30,28 @@ void TestValue::cleanupTestCase()
 void TestValue::tst_build()
 {
     Value v;
-    QVERIFY(v.type == Value::INVALID);
+    QVERIFY(v.type() == Value::INVALID);
     QVERIFY(v.isValid() == false);
 
     v = Value(true);
-    QVERIFY(v.type == Value::BOOL);
-    QVERIFY(v.toBool == true);
+    QVERIFY(v.type() == Value::BOOL);
+    QVERIFY(v.toBool() == true);
 
     v = Value(4.5123788);
-    QVERIFY(v.type == Value::DOUBLE);
-    QCOMPARE(v.toDouble, 4.5123788);
+    QVERIFY(v.type() == Value::DOUBLE);
+    QCOMPARE(v.toDouble(), 4.5123788);
 
     v = Value(-10);
-    QVERIFY(v.type == Value::INT);
-    QCOMPARE(v.toInt, -10);
+    QVERIFY(v.type() == Value::INT);
+    QCOMPARE(v.toInt(), -10);
 
     v = Value("abc£ãã&");
-    QVERIFY(v.type == Value::STRING);
-    QCOMPARE(v.toString, "abc£ãã&");
+    QVERIFY(v.type() == Value::STRING);
+    QCOMPARE(v.toString(), "abc£ãã&");
 
     v = Value(QString("abc£ãã&"));
-    QVERIFY(v.type == Value::STRING);
-    QCOMPARE(v.toString, "abc£ãã&");
+    QVERIFY(v.type() == Value::STRING);
+    QCOMPARE(v.toString(), "abc£ãã&");
 }
 
 void TestValue::tst_compare()

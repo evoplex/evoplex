@@ -95,7 +95,7 @@ public:
         } else if (isASet(space)) {
             Values values;
             if (paramSet(space, values)) {
-                Value valSrc = valueFromString(values.front().type, valueStr);
+                Value valSrc = valueFromString(values.front().type(), valueStr);
                 foreach (Value val, values) {
                     if (val == valSrc) return val;
                 }
@@ -103,7 +103,7 @@ public:
         } else if (isAnInterval(space)) {
             Value min, max;
             if (paramInterval(space, min, max)) {
-                Value valSrc = valueFromString(min.type, valueStr);
+                Value valSrc = valueFromString(min.type(), valueStr);
                 if (valSrc.isValid() && valSrc >= min && valSrc <= max) {
                     return valSrc;
                 }

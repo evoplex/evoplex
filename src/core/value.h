@@ -17,126 +17,135 @@ typedef std::vector<Value> Values;
 class Value
 {
 public:
-    enum Type { BOOL, CHAR, DOUBLE, INT, STRING, INVALID } type;
-    union { bool toBool; char toChar; double toDouble; int toInt; const char* toString; };
+    enum Type { BOOL, CHAR, DOUBLE, INT, STRING, INVALID };
 
-    Value() : type(INVALID) {}
-    Value(const bool value) : type(BOOL), toBool(value) {}
-    Value(const char value) : type(CHAR), toChar(value) {}
-    Value(const double value) : type(DOUBLE), toDouble(value) {}
-    Value(const int value) : type(INT), toInt(value) {}
-    Value(const char* value) : type(STRING), toString(value) {}
+    Value() : m_type(INVALID) {}
+    Value(const bool value) : m_type(BOOL) { m_data.b = value; }
+    Value(const char value) : m_type(CHAR) { m_data.c = value; }
+    Value(const double value) : m_type(DOUBLE) { m_data.d = value; }
+    Value(const int value) : m_type(INT) { m_data.i = value; }
+    Value(const char* value) : m_type(STRING) { m_data.s = value; }
     Value(const QString& value) : Value(strdup(value.toUtf8().constData())) {}
 
-    inline bool isValid() const { return type != INVALID; }
+    inline bool isValid() const { return m_type != INVALID; }
+    inline Type type() const { return m_type; }
+    inline const bool toBool() const { return m_data.b; }
+    inline const char toChar() const { return m_data.c; }
+    inline const double toDouble() const { return m_data.d; }
+    inline const int toInt() const { return m_data.i; }
+    inline const char* toString() const { return m_data.s; }
 
     inline QString toQString() const
     {
-        switch (type) {
-        case INT: return QString::number(toInt);
-        case DOUBLE: return QString::number(toDouble);
-        case BOOL: return QString::number(toBool);
-        case CHAR: return QString(toChar);
-        case STRING: return QString::fromUtf8(toString);
-        default: throw std::invalid_argument("invalid type");
+        switch (m_type) {
+        case INT: return QString::number(m_data.i);
+        case DOUBLE: return QString::number(m_data.d);
+        case BOOL: return QString::number(m_data.b);
+        case CHAR: return QString(m_data.c);
+        case STRING: return QString::fromUtf8(m_data.s);
+        default: throw std::invalid_argument("invalid type of Value");
         }
     }
 
     bool operator==(const Value& v) const
     {
-        if (type != v.type)
+        if (m_type != v.m_type)
             return false;
 
-        switch (type) {
-        case INT: return toInt == v.toInt;
-        case DOUBLE: return toDouble == v.toDouble;
-        case BOOL: return toBool == v.toBool;
-        case CHAR: return toChar == v.toChar;
-        case STRING: return strcmp (toString, v.toString) == 0;
-        default: throw std::invalid_argument("invalid type");
+        switch (m_type) {
+        case INT: return m_data.i == v.m_data.i;
+        case DOUBLE: return m_data.d == v.m_data.d;
+        case BOOL: return m_data.b == v.m_data.b;
+        case CHAR: return m_data.c == v.m_data.c;
+        case STRING: return strcmp (m_data.s, v.m_data.s) == 0;
+        default: throw std::invalid_argument("invalid type of Value");
         }
     }
 
     bool operator!=(const Value& v) const
     {
-        if (type != v.type)
+        if (m_type != v.m_type)
             return true;
 
-        switch (type) {
-        case INT: return toInt != v.toInt;
-        case DOUBLE: return toDouble != v.toDouble;
-        case BOOL: return toBool != v.toBool;
-        case CHAR: return toChar != v.toChar;
-        case STRING: return strcmp (toString, v.toString) != 0;
-        default: throw std::invalid_argument("invalid type");
+        switch (m_type) {
+        case INT: return m_data.i != v.m_data.i;
+        case DOUBLE: return m_data.d != v.m_data.d;
+        case BOOL: return m_data.b != v.m_data.b;
+        case CHAR: return m_data.c != v.m_data.c;
+        case STRING: return strcmp (m_data.s, v.m_data.s) != 0;
+        default: throw std::invalid_argument("invalid type of Value");
         }
     }
 
     bool operator<(const Value& v) const
     {
-        if (type != v.type) {
+        if (m_type != v.m_type) {
             throw std::invalid_argument("[operator<] type should be the same");
         }
 
-        switch (type) {
-        case INT: return toInt < v.toInt;
-        case DOUBLE: return toDouble < v.toDouble;
-        case BOOL: return toBool < v.toBool;
-        case CHAR: return toChar < v.toChar;
+        switch (m_type) {
+        case INT: return m_data.i < v.m_data.i;
+        case DOUBLE: return m_data.d < v.m_data.d;
+        case BOOL: return m_data.b < v.m_data.b;
+        case CHAR: return m_data.c < v.m_data.c;
         case STRING: throw std::invalid_argument("[operator<] cannot do that with strings");
-        default: throw std::invalid_argument("invalid type");
+        default: throw std::invalid_argument("invalid type of Value");
         }
     }
 
     bool operator>(const Value& v) const
     {
-        if (type != v.type) {
+        if (m_type != v.m_type) {
             throw std::invalid_argument("[operator>] type should be the same");
         }
 
-        switch (type) {
-        case INT: return toInt > v.toInt;
-        case DOUBLE: return toDouble > v.toDouble;
-        case BOOL: return toBool > v.toBool;
-        case CHAR: return toChar > v.toChar;
+        switch (m_type) {
+        case INT: return m_data.i > v.m_data.i;
+        case DOUBLE: return m_data.d > v.m_data.d;
+        case BOOL: return m_data.b > v.m_data.b;
+        case CHAR: return m_data.c > v.m_data.c;
         case STRING: throw std::invalid_argument("[operator>] cannot do that with strings");
-        default: throw std::invalid_argument("invalid type");
+        default: throw std::invalid_argument("invalid type of Value");
         }
     }
 
     bool operator<=(const Value& v) const
     {
-        if (type != v.type) {
+        if (m_type != v.m_type) {
             throw std::invalid_argument("[operator<=] type should be the same");
         }
 
-        switch (type) {
-        case INT: return toInt <= v.toInt;
-        case DOUBLE: return toDouble <= v.toDouble;
-        case BOOL: return toBool <= v.toBool;
-        case CHAR: return toChar <= v.toChar;
+        switch (m_type) {
+        case INT: return m_data.i <= v.m_data.i;
+        case DOUBLE: return m_data.d <= v.m_data.d;
+        case BOOL: return m_data.b <= v.m_data.b;
+        case CHAR: return m_data.c <= v.m_data.c;
         case STRING: throw std::invalid_argument("[operator<=] cannot do that with strings");
-        default: throw std::invalid_argument("invalid type");
+        default: throw std::invalid_argument("invalid type of Value");
         }
     }
 
     bool operator>=(const Value& v) const
     {
-        if (type != v.type) {
+        if (m_type != v.m_type) {
             throw std::invalid_argument("[operator>=] type should be the same");
         }
 
-        switch (type) {
-        case INT: return toInt >= v.toInt;
-        case DOUBLE: return toDouble >= v.toDouble;
-        case BOOL: return toBool >= v.toBool;
-        case CHAR: return toChar >= v.toChar;
+        switch (m_type) {
+        case INT: return m_data.i >= v.m_data.i;
+        case DOUBLE: return m_data.d >= v.m_data.d;
+        case BOOL: return m_data.b >= v.m_data.b;
+        case CHAR: return m_data.c >= v.m_data.c;
         case STRING: throw std::invalid_argument("[operator>=] cannot do that with strings");
-        default: throw std::invalid_argument("invalid type");
+        default: throw std::invalid_argument("invalid type of Value");
         }
     }
+
+private:
+    union { bool b; char c; double d; int i; const char* s; } m_data;
+    Type m_type;
 };
-}
+} // evoplex
 
 namespace std
 {
@@ -158,13 +167,13 @@ template <>
 struct hash<evoplex::Value>
 {
     size_t operator()(const evoplex::Value& v) const {
-        switch (v.type) {
-        case evoplex::Value::INT: return hash<int>()(v.toInt);
-        case evoplex::Value::DOUBLE: return hash<double>()(v.toDouble);
-        case evoplex::Value::BOOL: return hash<bool>()(v.toBool);
-        case evoplex::Value::CHAR: return hash<char>()(v.toChar);
-        case evoplex::Value::STRING: return hash<char*>()(v.toString);
-        default: Q_ASSERT(false);
+        switch (v.type()) {
+        case evoplex::Value::INT: return hash<int>()(v.toInt());
+        case evoplex::Value::DOUBLE: return hash<double>()(v.toDouble());
+        case evoplex::Value::BOOL: return hash<bool>()(v.toBool());
+        case evoplex::Value::CHAR: return hash<char>()(v.toChar());
+        case evoplex::Value::STRING: return hash<char*>()(v.toString());
+        default: throw std::invalid_argument("invalid type of Value");
         }
     }
 };

@@ -204,12 +204,12 @@ void AttributesWidget::setExperiment(Experiment* exp)
 
         QSpinBox* sp = qobject_cast<QSpinBox*>(widget);
         if (sp) {
-            sp->setValue(values.at(i).toInt);
+            sp->setValue(values.at(i).toInt());
             continue;
         }
         QDoubleSpinBox* dsp = qobject_cast<QDoubleSpinBox*>(widget);
         if (dsp) {
-            dsp->setValue(values.at(i).toDouble);
+            dsp->setValue(values.at(i).toDouble());
             continue;
         }
         QComboBox* cb = qobject_cast<QComboBox*>(widget);
@@ -219,7 +219,7 @@ void AttributesWidget::setExperiment(Experiment* exp)
         }
         QCheckBox* chb = qobject_cast<QCheckBox*>(widget);
         if (chb) {
-            chb->setChecked(values.at(i).toBool);
+            chb->setChecked(values.at(i).toBool());
             continue;
         }
         QLineEdit* le = qobject_cast<QLineEdit*>(widget);
@@ -515,11 +515,11 @@ void AttributesWidget::insertPluginAttributes(QTreeWidgetItem* itemRoot,
         QWidget* widget = nullptr;
         switch (valSpace->type()) {
         case ValueSpace::Double_Range: {
-            widget = newDoubleSpinBox(valSpace->min().toDouble, valSpace->max().toDouble);
+            widget = newDoubleSpinBox(valSpace->min().toDouble(), valSpace->max().toDouble());
             break;
         }
         case ValueSpace::Int_Range: {
-            widget = newSpinBox(valSpace->min().toInt, valSpace->max().toInt);
+            widget = newSpinBox(valSpace->min().toInt(), valSpace->max().toInt());
             break;
         }
         case ValueSpace::Double_Set:

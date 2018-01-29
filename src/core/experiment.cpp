@@ -69,9 +69,9 @@ bool Experiment::init(ExperimentInputs* inputs)
         m_fileHeader += "\n";
     }
 
-    m_numTrials = m_generalAttrs->value(GENERAL_ATTRIBUTE_TRIALS).toInt;
-    m_autoDelete = m_generalAttrs->value(GENERAL_ATTRIBUTE_AUTODELETE).toBool;
-    m_stopAt = m_generalAttrs->value(GENERAL_ATTRIBUTE_STOPAT).toInt;
+    m_numTrials = m_generalAttrs->value(GENERAL_ATTRIBUTE_TRIALS).toInt();
+    m_autoDelete = m_generalAttrs->value(GENERAL_ATTRIBUTE_AUTODELETE).toBool();
+    m_stopAt = m_generalAttrs->value(GENERAL_ATTRIBUTE_STOPAT).toInt();
 
     m_graphPlugin = m_mainApp->getGraph(m_generalAttrs->value(GENERAL_ATTRIBUTE_GRAPHID).toQString());
     m_modelPlugin = m_mainApp->getModel(m_generalAttrs->value(GENERAL_ATTRIBUTE_MODELID).toQString());
@@ -94,7 +94,7 @@ void Experiment::reset()
     m_trials.reserve(m_numTrials);
     m_expStatus = READY;
 
-    m_stopAt = m_generalAttrs->value(GENERAL_ATTRIBUTE_STOPAT).toInt;
+    m_stopAt = m_generalAttrs->value(GENERAL_ATTRIBUTE_STOPAT).toInt();
     m_pauseAt = m_stopAt;
     m_progress = 0;
 
@@ -239,11 +239,11 @@ AbstractModel* Experiment::createTrial(const int trialId)
         return nullptr;
     }
 
-    const int seed = m_generalAttrs->value(GENERAL_ATTRIBUTE_SEED).toInt;
+    const int seed = m_generalAttrs->value(GENERAL_ATTRIBUTE_SEED).toInt();
     PRG* prg = new PRG(seed + trialId);
 
     AbstractGraph* graphObj = m_graphPlugin->create();
-    QString gType = m_generalAttrs->value(GENERAL_ATTRIBUTE_GRAPHTYPE).toString;
+    QString gType = m_generalAttrs->value(GENERAL_ATTRIBUTE_GRAPHTYPE).toString();
     if (!graphObj || !graphObj->setup(prg, agents, m_graphAttrs, gType) || !graphObj->init()) {
         qWarning() << "[Experiment]: unable to create the trials."
                    << "The graph could not be initialized."
@@ -493,7 +493,7 @@ Experiment::ExperimentInputs* Experiment::readInputs(const MainApp* mainApp,
     QString outHeader = generalAttrs->value(OUTPUT_HEADER).toQString();
     std::vector<Output*> outputs;
     if (!outHeader.isEmpty()) {
-        const int numTrials = generalAttrs->value(GENERAL_ATTRIBUTE_TRIALS).toInt;
+        const int numTrials = generalAttrs->value(GENERAL_ATTRIBUTE_TRIALS).toInt();
         Q_ASSERT(numTrials > 0);
         std::vector<int> trialIds;
         for (int i = 0; i < numTrials; ++i) {

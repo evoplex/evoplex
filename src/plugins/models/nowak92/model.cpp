@@ -9,7 +9,7 @@ namespace evoplex {
 
 bool ModelNowak::init()
 {
-    m_temptation = attr("temptation").toDouble;
+    m_temptation = attr("temptation").toDouble();
     return m_temptation >=1.0 && m_temptation <= 2.0;
 }
 
@@ -19,13 +19,13 @@ bool ModelNowak::algorithmStep()
     bestStrategies.reserve(graph()->agents().size());
 
     for (Agent* agent : graph()->agents()) {
-        int bestStrategy = agent->attr(Strategy).toInt;
-        double highestScore = agent->attr(Score).toDouble;
+        int bestStrategy = agent->attr(Strategy).toInt();
+        double highestScore = agent->attr(Score).toDouble();
         for (const Edge* edge : agent->edges()) {
-            const double neighbourScore = edge->neighbour()->attr(Score).toDouble;
+            const double neighbourScore = edge->neighbour()->attr(Score).toDouble();
             if (neighbourScore > highestScore) {
                 highestScore = neighbourScore;
-                bestStrategy = edge->neighbour()->attr(Strategy).toInt;
+                bestStrategy = edge->neighbour()->attr(Strategy).toInt();
             }
         }
         bestStrategies.emplace_back(binarize(bestStrategy));
@@ -33,17 +33,17 @@ bool ModelNowak::algorithmStep()
 
     int i = 0;
     for (Agent* agent : graph()->agents()) {
-        int s = binarize(agent->attr(Strategy).toInt);
+        int s = binarize(agent->attr(Strategy).toInt());
         s = (s == bestStrategies.at(i)) ? s : bestStrategies.at(i) + 2;
         agent->setAttr(Strategy, s);
         ++i;
     }
 
     for (Agent* agent : graph()->agents()) {
-        const int sX = agent->attr(Strategy).toInt;
+        const int sX = agent->attr(Strategy).toInt();
         double score = 0.0;
         for (const Edge* edge : agent->edges()) {
-            score += playGame(sX, edge->neighbour()->attr(Strategy).toInt);
+            score += playGame(sX, edge->neighbour()->attr(Strategy).toInt());
         }
         agent->setAttr(Score, score);
     }

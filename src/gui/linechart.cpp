@@ -157,10 +157,10 @@ void LineChart::updateSeries()
             Q_ASSERT(row.second.size() == 1);
 
             x = row.first;
-            if (row.second.at(0).type == Value::INT) {
-                y = row.second.at(0).toInt;
-            } else if (row.second.at(0).type == Value::DOUBLE) {
-                y = row.second.at(0).toDouble;
+            if (row.second.at(0).type() == Value::INT) {
+                y = row.second.at(0).toInt();
+            } else if (row.second.at(0).type() == Value::DOUBLE) {
+                y = row.second.at(0).toDouble();
             } else {
                 qFatal("[LineChart] : the type is invalid!");
             }

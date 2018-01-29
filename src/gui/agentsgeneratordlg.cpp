@@ -172,7 +172,7 @@ void AgentsGeneratorDlg::fill(AgentsGenerator* ag)
         m_ui->numAgents1->setValue(agsame->numAgents());
         m_ui->func->setCurrentIndex(m_ui->func->findData(agsame->function()));
         Value v = agsame->functionInput();
-        m_ui->fseed->setValue(v.type == Value::INT ? v.toInt : 0);
+        m_ui->fseed->setValue(v.type() == Value::INT ? v.toInt() : 0);
         return;
     }
 

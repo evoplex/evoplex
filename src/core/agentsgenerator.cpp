@@ -149,9 +149,9 @@ AGSameFuncForAll::AGSameFuncForAll(const AttributesSpace& attrsSpace, const int 
         f_value = [](const ValueSpace* valSpace) { return valSpace->max(); };
         break;
     case F_Rand:
-        Q_ASSERT(funcInput.type == Value::INT);
+        Q_ASSERT(funcInput.type() == Value::INT);
         m_command = QString("*%1;rand_%2").arg(m_numAgents).arg(funcInput.toQString());
-        m_prg = new PRG(funcInput.toInt);
+        m_prg = new PRG(funcInput.toInt());
         f_value = [this](const ValueSpace* valSpace) { return valSpace->rand(m_prg); };
         break;
     default:
@@ -213,7 +213,7 @@ Agents AGDiffFunctions::create(std::function<void(int)> progress)
             value = [valSpace]() { return valSpace->max(); };
             break;
         case F_Rand:
-            prg = new PRG(cmd.funcInput.toInt);
+            prg = new PRG(cmd.funcInput.toInt());
             value = [valSpace, prg]() { return valSpace->rand(prg); };
             break;
         case F_Value:

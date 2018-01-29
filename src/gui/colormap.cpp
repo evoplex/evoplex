@@ -109,11 +109,11 @@ ColorMapRange::ColorMapRange(const Colors& colors, const RangeSpace* valSpace)
     : ColorMap(colors)
 {
     if (valSpace->type() == ValueSpace::Int_Range) {
-        m_max = valSpace->max().toInt;
-        m_min = valSpace->min().toInt;
+        m_max = valSpace->max().toInt();
+        m_min = valSpace->min().toInt();
     } else if (valSpace->type() == ValueSpace::Double_Range) {
-        m_max = valSpace->max().toDouble;
-        m_min = valSpace->min().toDouble;
+        m_max = valSpace->max().toDouble();
+        m_min = valSpace->min().toDouble();
     } else {
         qFatal("[ColorMapRange] : invalid attribute space!");
     }
@@ -122,10 +122,10 @@ ColorMapRange::ColorMapRange(const Colors& colors, const RangeSpace* valSpace)
 const QColor ColorMapRange::colorFromValue(const Value& val) const
 {
     float value;
-    if (val.type == Value::INT) {
-        value = val.toInt;
-    } else if (val.type == Value::DOUBLE) {
-        value = val.toDouble;
+    if (val.type() == Value::INT) {
+        value = val.toInt();
+    } else if (val.type() == Value::DOUBLE) {
+        value = val.toDouble();
     } else {
         qFatal("[ColorMapRange]: invalid attribute space!");
     }

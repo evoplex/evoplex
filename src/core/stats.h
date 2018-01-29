@@ -23,7 +23,7 @@ public:
         while (entityBegin != entityEnd) {
             int i = std::find(header.begin(), header.end(), (*entityBegin)->attr(attrIdx)) - header.begin();
             if (i != header.size()) {
-                ret[i].toInt = ret[i].toInt + 1;
+                ret[i] = ret[i].toInt() + 1;
             }
             ++entityBegin;
         }

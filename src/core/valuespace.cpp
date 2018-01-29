@@ -88,7 +88,7 @@ Value ValueSpace::validate(const QString& valueStr) const
     case Int_Range:
     case Double_Range: {
         const RangeSpace* ispace = dynamic_cast<const RangeSpace*>(this);
-        Value valSrc = Utils::valueFromString(ispace->min().type, valueStr);
+        Value valSrc = Utils::valueFromString(ispace->min().type(), valueStr);
         if (valSrc.isValid() && valSrc >= ispace->min() && valSrc <= ispace->max()) {
             return valSrc;
         }
@@ -97,7 +97,7 @@ Value ValueSpace::validate(const QString& valueStr) const
     case Int_Set:
     case Double_Set: {
         const SetSpace* sspace = dynamic_cast<const SetSpace*>(this);
-        Value valSrc = Utils::valueFromString(sspace->values().front().type, valueStr);
+        Value valSrc = Utils::valueFromString(sspace->values().front().type(), valueStr);
         foreach (Value val, sspace->values()) {
             if (val == valSrc) return val;
         }
@@ -153,11 +153,11 @@ RangeSpace::RangeSpace(int id, const QString& attrName, SpaceType type, Value mi
 {
     switch (m_type) {
     case Double_Range:
-        m_space = QString("double[%1,%2]").arg(min.toDouble).arg(max.toDouble);
+        m_space = QString("double[%1,%2]").arg(min.toDouble()).arg(max.toDouble());
         f_rand = &evoplex::RangeSpace::randD;
         break;
     case Int_Range:
-        m_space = QString("int[%1,%2]").arg(min.toInt).arg(max.toInt);
+        m_space = QString("int[%1,%2]").arg(min.toInt()).arg(max.toInt());
         f_rand = &evoplex::RangeSpace::randI;
         break;
     default:

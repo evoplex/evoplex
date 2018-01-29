@@ -20,8 +20,8 @@ SquareGrid::SquareGrid(const QString& name)
 
 bool SquareGrid::init()
 {
-    m_height = attrs()->value(Height).toInt;
-    m_width = attrs()->value(Width).toInt;
+    m_height = attrs()->value(Height).toInt();
+    m_width = attrs()->value(Width).toInt();
     if (agents().size() != m_height * m_width) {
         qWarning() << "[SquareGrid]: the agent set is not compatible with the required shape."
                    << "The number of agents should be equal to 'height'*'width'.";

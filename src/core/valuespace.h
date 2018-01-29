@@ -84,8 +84,8 @@ private:
     Value m_max;
 
     Value (evoplex::RangeSpace::*f_rand)(PRG*) const;
-    inline Value randD(PRG* prg) const { return prg->randD(m_min.toDouble, m_max.toDouble); }
-    inline Value randI(PRG* prg) const { return prg->randI(m_min.toInt, m_max.toInt); }
+    inline Value randD(PRG* prg) const { return prg->randD(m_min.toDouble(), m_max.toDouble()); }
+    inline Value randI(PRG* prg) const { return prg->randI(m_min.toInt(), m_max.toInt()); }
 };
 
 class SetSpace : public DefaultSpace

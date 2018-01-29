@@ -18,7 +18,7 @@ CustomGraph::CustomGraph(const QString& name)
 
 bool CustomGraph::init()
 {
-    m_filePath = attrs()->value(FilePath).toString;
+    m_filePath = attrs()->value(FilePath).toString();
     if (m_filePath.isEmpty()) {
         qWarning() << "[CustomGraph]: file path cannot be empty.";
         return false;
