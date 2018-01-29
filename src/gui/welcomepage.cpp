@@ -3,6 +3,8 @@
  * @author Marcos Cardinot <mcardinot@gmail.com>
  */
 
+#include <QSettings>
+
 #include "maingui.h"
 #include "welcomepage.h"
 #include "ui_welcomepage.h"
@@ -17,12 +19,28 @@ WelcomePage::WelcomePage(MainGUI* maingui)
     m_ui->setupUi(this);
 
     connect(m_ui->bNewProject, SIGNAL(pressed()), m_maingui, SIGNAL(newProject()));
-    connect(m_ui->bOpenProject, SIGNAL(pressed()), m_maingui, SIGNAL(openProject()));
+    connect(m_ui->bOpenProject, &QPushButton::pressed, [this]() { m_maingui->openProject(""); });
+
+    refreshList();
+    connect(maingui->mainApp(), SIGNAL(projectCreated(const Project*)), SLOT(refreshList()));
+    connect(m_ui->recent, &QListWidget::doubleClicked, [this](const QModelIndex& index) {
+        m_maingui->openProject(index.data().toString());
+    });
 }
 
 WelcomePage::~WelcomePage()
 {
     delete m_ui;
-    m_ui = nullptr;
 }
+
+void WelcomePage::refreshList()
+{
+    m_ui->recent->clear();
+    QSettings s;
+    QVariantList recentProjects = s.value("recentProjects").toList();
+    for (const QVariant& path : recentProjects) {
+        m_ui->recent->addItem(path.toString());
+    }
 }
+
+} // evoplex

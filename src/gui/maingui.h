@@ -37,7 +37,7 @@ public:
 
 signals:
     void newProject();
-    void openProject();
+    void openProject(QString path);
 
 private slots:
     void updateSaveButtons(ProjectWidget* pw);

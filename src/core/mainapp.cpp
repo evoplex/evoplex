@@ -9,6 +9,7 @@
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QPluginLoader>
+#include <QSettings>
 #include <QThread>
 #include <QtDebug>
 
@@ -143,6 +144,19 @@ Project* MainApp::newProject(const QString& name, const QString& dest)
     ++m_lastProjectId;
     Project* project = new Project(this, m_lastProjectId, name, dest);
     m_projects.insert(m_lastProjectId, project);
+
+    if (!dest.isEmpty() && !name.isEmpty()) {
+        QSettings s;
+        QVariantList recentProjects = s.value("recentProjects").toList();
+        QString path = QString("%1/%2.csv").arg(dest).arg(name);
+        recentProjects.removeOne(path);
+        recentProjects.push_front(path);
+        if (recentProjects.size() > 20) {
+            recentProjects.removeLast();
+        }
+        s.setValue("recentProjects", recentProjects);
+    }
+    emit (projectCreated(project));
     return project;
 }
 

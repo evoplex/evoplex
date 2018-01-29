@@ -32,7 +32,7 @@ signals:
 
 public slots:
     void slotNewProject();
-    bool slotOpenProject();
+    bool slotOpenProject(QString path);
     void slotOpenExperiment(int projId, int expId);
 
 private slots:

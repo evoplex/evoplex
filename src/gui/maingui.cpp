@@ -128,9 +128,10 @@ MainGUI::MainGUI(MainApp* mainApp, QWidget* parent)
             [this, acProjects](){ m_projectsPage->slotNewProject(); slotPage(acProjects); });
     m_actOpenProject = new QAction("Open Project", this);
 
-    connect(this, SIGNAL(openProject()), m_actOpenProject, SIGNAL(triggered()));
-    connect(m_actOpenProject, &QAction::triggered,
-            [this, acProjects](){ if (m_projectsPage->slotOpenProject()) slotPage(acProjects); });
+    connect(m_actOpenProject, &QAction::triggered, [this]() { emit(openProject("")); });
+    connect(this, &MainGUI::openProject, [this, acProjects](const QString& path) {
+        if (m_projectsPage->slotOpenProject(path)) slotPage(acProjects);
+    });
 
     QAction* actSaveAll = new QAction("Save All", this);
     connect(actSaveAll, SIGNAL(triggered(bool)), this, SLOT(slotSaveAll()));

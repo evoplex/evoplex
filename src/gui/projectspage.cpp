@@ -68,12 +68,15 @@ void ProjectsPage::slotNewProject()
     addProjectWidget(m_mainApp->newProject());
 }
 
-bool ProjectsPage::slotOpenProject()
+bool ProjectsPage::slotOpenProject(QString path)
 {
-    QString path = QFileDialog::getOpenFileName(this, tr("Open Project"));
     if (path.isEmpty()) {
-        return false;
+        path = QFileDialog::getOpenFileName(this, tr("Open Project"));
+        if (path.isEmpty()) {
+            return false;
+        }
     }
+
     Project* project = m_mainApp->openProject(path);
     if (!project) {
         return false;

@@ -7,6 +7,7 @@
 #define MAINAPP_H
 
 #include <QHash>
+#include <QObject>
 #include <QVector>
 
 #include "plugininterfaces.h"
@@ -20,10 +21,12 @@ class ExperimentsMgr;
 class FileMgr;
 class Project;
 
-class MainApp
+class MainApp : public QObject
 {
+    Q_OBJECT
+
 public:
-    MainApp();
+    explicit MainApp();
     ~MainApp();
 
     // load plugin from a .so file; return true if successful
@@ -46,6 +49,9 @@ public:
     inline Project* project(int projId) const { return m_projects.value(projId); }
 
     inline const AttributesSpace& generalAttrSpace() const { return m_generalAttrSpace; }
+
+signals:
+    void projectCreated(const Project* p);
 
 private:
     ExperimentsMgr* m_experimentsMgr;

@@ -22,6 +22,9 @@ public:
     explicit WelcomePage(MainGUI* maingui);
     ~WelcomePage();
 
+private slots:
+    void refreshList();
+
 private:
     Ui_WelcomePage* m_ui;
     MainGUI* m_maingui;
