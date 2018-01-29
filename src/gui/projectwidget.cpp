@@ -79,8 +79,9 @@ ProjectWidget::~ProjectWidget()
 void ProjectWidget::closeEvent(QCloseEvent* event)
 {
     if (m_project->hasUnsavedChanges()) {
-        QMessageBox::StandardButton res = QMessageBox::question(this, "Save Project?",
-                tr("Save project '%1' before closing?\nYour changes will be lost if you don’t save them.").arg(m_project->name()),
+        QMessageBox::StandardButton res = QMessageBox::question(this, "Evoplex",
+                tr("Do you want to save the changes you made to '%1'?\n"
+                   "Your changes will be lost if you don’t save them.").arg(m_project->name()),
                 QMessageBox::Discard | QMessageBox::Cancel | QMessageBox::Save, QMessageBox::Save);
 
         if (res == QMessageBox::Cancel || (res == QMessageBox::Save && !m_mainGUI->saveDialog()->save(m_project))) {
