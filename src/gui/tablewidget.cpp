@@ -185,9 +185,9 @@ void RowsDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option,
             painter->drawPixmap(center.x()-14, center.y()-14, m_table->kIcon_play);
         }
         // show progress
-        if (m_exp->getProgress() > 0) {
+        if (m_exp->progress() > 0) {
             painter->setPen(m_table->kPen_blue);
-            painter->drawArc(center.x()-14, center.y()-14, 28, 28, 90*16, -m_exp->getProgress()*16);
+            painter->drawArc(center.x()-14, center.y()-14, 28, 28, 90*16, -m_exp->progress()*16);
         }
     } else if (status == Experiment::RUNNING || status == Experiment::QUEUED) {
         if (btnIsHovered || rowIsHovered) { // pause (always show)
@@ -196,9 +196,9 @@ void RowsDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option,
             painter->drawPixmap(center.x()-14, center.y()-14, m_table->kIcon_pause);
         }
         // show progress
-        if (m_exp->getProgress() > 0) {
+        if (m_exp->progress() > 0) {
             painter->setPen(m_table->kPen_blue);
-            painter->drawArc(center.x()-14, center.y()-14, 28, 28, 90*16, -m_exp->getProgress()*16);
+            painter->drawArc(center.x()-14, center.y()-14, 28, 28, 90*16, -m_exp->progress()*16);
         }
     } else if (status == Experiment::FINISHED) { // check (always)
         painter->drawPixmap(center.x()-7, center.y()-7, m_table->kIcon_check);

@@ -73,8 +73,8 @@ bool Experiment::init(ExperimentInputs* inputs)
     m_autoDelete = m_generalAttrs->value(GENERAL_ATTRIBUTE_AUTODELETE).toBool();
     m_stopAt = m_generalAttrs->value(GENERAL_ATTRIBUTE_STOPAT).toInt();
 
-    m_graphPlugin = m_mainApp->getGraph(m_generalAttrs->value(GENERAL_ATTRIBUTE_GRAPHID).toQString());
-    m_modelPlugin = m_mainApp->getModel(m_generalAttrs->value(GENERAL_ATTRIBUTE_MODELID).toQString());
+    m_graphPlugin = m_mainApp->graph(m_generalAttrs->value(GENERAL_ATTRIBUTE_GRAPHID).toQString());
+    m_modelPlugin = m_mainApp->model(m_generalAttrs->value(GENERAL_ATTRIBUTE_MODELID).toQString());
 
     m_pauseAt = m_stopAt;
     m_progress = 0;
@@ -98,8 +98,8 @@ void Experiment::reset()
     m_pauseAt = m_stopAt;
     m_progress = 0;
 
-    emit (m_mainApp->getExperimentsMgr()->statusChanged(this));
-    emit (m_mainApp->getExperimentsMgr()->restarted(this));
+    emit (m_mainApp->expMgr()->statusChanged(this));
+    emit (m_mainApp->expMgr()->restarted(this));
 
 }
 
@@ -124,10 +124,10 @@ void Experiment::deleteTrials()
     // it's more interesing to do NOT change the status
     if (m_expStatus != FINISHED && m_expStatus != INVALID) {
         setExpStatus(READY);
-        emit (m_mainApp->getExperimentsMgr()->statusChanged(this));
+        emit (m_mainApp->expMgr()->statusChanged(this));
     }
 
-    emit (m_mainApp->getExperimentsMgr()->trialsDeleted(this));
+    emit (m_mainApp->expMgr()->trialsDeleted(this));
 }
 
 void Experiment::updateProgressValue()
@@ -152,7 +152,7 @@ void Experiment::toggle()
     } else if (m_expStatus == READY) {
         play();
     } else if (m_expStatus == QUEUED) {
-        m_mainApp->getExperimentsMgr()->removeFromQueue(this);
+        m_mainApp->expMgr()->removeFromQueue(this);
     }
 }
 
@@ -170,7 +170,7 @@ void Experiment::playNext()
         }
         setPauseAt(maxCurrStep);
     }
-    m_mainApp->getExperimentsMgr()->play(this);
+    m_mainApp->expMgr()->play(this);
 }
 
 void Experiment::processTrial(const int& trialId)
@@ -185,7 +185,7 @@ void Experiment::processTrial(const int& trialId)
             return;
         }
         m_trials.insert({trialId, trial});
-        emit (m_mainApp->getExperimentsMgr()->trialCreated(this, trialId));
+        emit (m_mainApp->expMgr()->trialCreated(this, trialId));
     }
 
     AbstractModel* trial = m_trials.at(trialId);
@@ -268,7 +268,7 @@ AbstractModel* Experiment::createTrial(const int trialId)
     if (!m_fileOutputs.empty()) {
         const QString fpath = QString("%1/%2_e%3_t%4.csv")
                 .arg(m_generalAttrs->value(OUTPUT_DIR).toQString())
-                .arg(m_mainApp->getProject(m_projId)->getName())
+                .arg(m_mainApp->project(m_projId)->name())
                 .arg(m_id)
                 .arg(trialId);
 
@@ -426,8 +426,8 @@ Experiment::ExperimentInputs* Experiment::readInputs(const MainApp* mainApp,
     }
 
     // check if the model and graph are available
-    const GraphPlugin* gPlugin = mainApp->getGraph(values.at(headerGraphId));
-    const ModelPlugin* mPlugin = mainApp->getModel(values.at(headerModelId));
+    const GraphPlugin* gPlugin = mainApp->graph(values.at(headerGraphId));
+    const ModelPlugin* mPlugin = mainApp->model(values.at(headerModelId));
     if (!gPlugin || !mPlugin) {
         errorMsg = QString("The graphId (%1) or modelId (%2) are not available."
                            " Make sure to load them before trying to add this experiment.")
@@ -449,15 +449,15 @@ Experiment::ExperimentInputs* Experiment::readInputs(const MainApp* mainApp,
 
     // get the value of each attribute and make sure they are valid
     QStringList failedAttributes;
-    Attributes* generalAttrs = new Attributes(mainApp->getGeneralAttrSpace().size());
+    Attributes* generalAttrs = new Attributes(mainApp->generalAttrSpace().size());
     Attributes* modelAttrs = new Attributes(mPlugin->pluginAttrSpace().size());
     Attributes* graphAttrs = new Attributes(gPlugin->pluginAttrSpace().size());
     for (int i = 0; i < values.size(); ++i) {
         const QString& vStr = values.at(i);
         QString attrName = header.at(i);
 
-        AttributesSpace::const_iterator gps = mainApp->getGeneralAttrSpace().find(attrName);
-        if (gps != mainApp->getGeneralAttrSpace().end()) {
+        AttributesSpace::const_iterator gps = mainApp->generalAttrSpace().find(attrName);
+        if (gps != mainApp->generalAttrSpace().end()) {
             Value value = gps.value()->validate(vStr);
             if (value.isValid()) {
                 generalAttrs->replace(gps.value()->id(), attrName, value);

@@ -27,7 +27,7 @@ public:
     explicit ProjectWidget(MainApp* mainApp, Project* project, ProjectsPage* ppage = 0);
     ~ProjectWidget();
 
-    inline Project* getProject() const { return m_project; }
+    inline Project* project() const { return m_project; }
 
 protected:
     void closeEvent(QCloseEvent *event);

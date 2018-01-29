@@ -33,7 +33,7 @@ QueuePage::QueuePage(MainGUI* mainGUI)
     m_ui->queue->hide();
     m_ui->idle->hide();
 
-    ExperimentsMgr* expMgr = mainGUI->mainApp()->getExperimentsMgr();
+    ExperimentsMgr* expMgr = mainGUI->mainApp()->expMgr();
     connect(expMgr, SIGNAL(trialsDeleted(Experiment*)),
             this, SLOT(slotRemoveRow(Experiment*)));
     connect(expMgr, SIGNAL(statusChanged(Experiment*)),

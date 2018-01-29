@@ -27,9 +27,9 @@ ExperimentsMgr::~ExperimentsMgr()
 void ExperimentsMgr::updateProgressValues()
 {
     for (Experiment* exp : m_running) {
-        quint16 p = exp->getProgress();
+        quint16 p = exp->progress();
         exp->updateProgressValue();
-        if (p != exp->getProgress())
+        if (p != exp->progress())
             emit (progressUpdated(exp));
     }
 }

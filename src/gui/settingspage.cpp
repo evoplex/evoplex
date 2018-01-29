@@ -20,7 +20,7 @@ SettingsPage::SettingsPage(MainGUI* mainGUI)
 {
     m_ui->setupUi(this);
 
-    ExperimentsMgr* expMgr = mainGUI->mainApp()->getExperimentsMgr();
+    ExperimentsMgr* expMgr = mainGUI->mainApp()->expMgr();
     m_ui->threads->setValue(expMgr->maxThreadsCount());
     m_ui->threads->setMaximum(QThread::idealThreadCount());
     connect(m_ui->threads, static_cast<void(QSpinBox::*)(int)>(&QSpinBox::valueChanged),

@@ -55,11 +55,11 @@ void ProjectsPage::addProjectWidget(Project* project)
         m_projects.removeOne(pw);
         pw->deleteLater();
         emit (isEmpty(m_projects.isEmpty()));
-        m_mainApp->closeProject(project->getId());
+        m_mainApp->closeProject(project->id());
     });
 
-    QHash<int, Experiment*>::const_iterator it = project->getExperiments().cbegin();
-    for (it; it != project->getExperiments().cend(); ++it) {
+    QHash<int, Experiment*>::const_iterator it = project->experiments().cbegin();
+    for (it; it != project->experiments().cend(); ++it) {
         pw->slotInsertRow(it.key());
     }
 }
@@ -94,7 +94,7 @@ void ProjectsPage::slotOpenExperiment(int projId, int expId)
     }
 
     if (!ew) {
-        Experiment* exp = m_mainApp->getProject(projId)->getExperiment(expId);
+        Experiment* exp = m_mainApp->project(projId)->experiment(expId);
         ew = new ExperimentWidget(m_mainGUI, exp, this);
         connect(ew, &ExperimentWidget::closed, [this, ew]() {
             m_projects.last()->raise();

@@ -24,10 +24,10 @@ PluginsPage::PluginsPage(MainGUI* mainGUI)
     connect(m_ui->bImport, SIGNAL(pressed()), SLOT(importPlugin()));
     connect(m_ui->table, SIGNAL(itemSelectionChanged()), SLOT(rowSelectionChanged()));
 
-    for (GraphPlugin* g : m_mainApp->getGraphs()) {
+    for (GraphPlugin* g : m_mainApp->graphs()) {
         insertRow(g);
     }
-    for (ModelPlugin* m : m_mainApp->getModels()) {
+    for (ModelPlugin* m : m_mainApp->models()) {
         insertRow(m);
     }
 }
@@ -42,9 +42,9 @@ void PluginsPage::rowSelectionChanged()
     int row = m_ui->table->currentRow();
     int type = m_ui->table->item(row, TYPE)->data(Qt::UserRole).toInt();
     if (type == AbstractPlugin::GraphPlugin) {
-        loadHtml(m_mainApp->getGraph(m_ui->table->item(row, UID)->text()));
+        loadHtml(m_mainApp->graph(m_ui->table->item(row, UID)->text()));
     } else if (type == AbstractPlugin::ModelPlugin) {
-        loadHtml(m_mainApp->getModel(m_ui->table->item(row, UID)->text()));
+        loadHtml(m_mainApp->model(m_ui->table->item(row, UID)->text()));
     } else {
         qFatal("[PluginsPage]: invalid plugin type! It should never happen.");
     }
@@ -95,9 +95,9 @@ void PluginsPage::importPlugin()
         return;
     }
 
-    const AbstractPlugin* plugin = m_mainApp->getModel(uid);
+    const AbstractPlugin* plugin = m_mainApp->model(uid);
     if (plugin) {
-        plugin = m_mainApp->getGraph(uid);
+        plugin = m_mainApp->graph(uid);
     }
     insertRow(plugin);
 }

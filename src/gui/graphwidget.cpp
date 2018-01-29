@@ -34,7 +34,7 @@ GraphWidget::GraphWidget(MainGUI* mainGUI, Experiment* exp, QWidget* parent)
     setTitleBarWidget(titleBar);
     connect(titleBar, SIGNAL(openSettingsDlg()), m_settingsDlg, SLOT(show()));
     connect(titleBar, SIGNAL(trialSelected(int)), SLOT(setTrial(int)));
-    connect(mainGUI->mainApp()->getExperimentsMgr(), &ExperimentsMgr::trialCreated,
+    connect(mainGUI->mainApp()->expMgr(), &ExperimentsMgr::trialCreated,
         [this](Experiment* exp, int trialId) {
             if (exp == m_exp && trialId == m_currTrialId)
                 setTrial(m_currTrialId);

@@ -84,7 +84,7 @@ const int Project::importExperiments(const QString& filePath)
     const QStringList header = in.readLine().split(",");
     if (header.isEmpty()) {
         qWarning() << "[FileMgr]: unable to read the experiments from" << filePath
-                   << "The header must have:" << m_mainApp->getGeneralAttrSpace();
+                   << "The header must have:" << m_mainApp->generalAttrSpace();
         return -1;
     }
 

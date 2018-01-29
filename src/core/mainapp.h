@@ -36,16 +36,16 @@ public:
 
     void closeProject(int projId);
 
-    inline ExperimentsMgr* getExperimentsMgr() const { return m_experimentsMgr; }
-    inline const QHash<QString, GraphPlugin*>& getGraphs() const { return m_graphs; }
-    inline const QHash<QString, ModelPlugin*>& getModels() const { return m_models; }
-    inline const QHash<int, Project*>& getProjects() const { return m_projects; }
+    inline ExperimentsMgr* expMgr() const { return m_experimentsMgr; }
+    inline const QHash<QString, GraphPlugin*>& graphs() const { return m_graphs; }
+    inline const QHash<QString, ModelPlugin*>& models() const { return m_models; }
+    inline const QHash<int, Project*>& projects() const { return m_projects; }
 
-    inline const GraphPlugin* getGraph(const QString& graphId) const { return m_graphs.value(graphId, nullptr); }
-    inline const ModelPlugin* getModel(const QString& modelId) const { return m_models.value(modelId, nullptr); }
-    inline Project* getProject(int projId) const { return m_projects.value(projId); }
+    inline const GraphPlugin* graph(const QString& graphId) const { return m_graphs.value(graphId, nullptr); }
+    inline const ModelPlugin* model(const QString& modelId) const { return m_models.value(modelId, nullptr); }
+    inline Project* project(int projId) const { return m_projects.value(projId); }
 
-    inline const AttributesSpace& getGeneralAttrSpace() const { return m_generalAttrSpace; }
+    inline const AttributesSpace& generalAttrSpace() const { return m_generalAttrSpace; }
 
 private:
     ExperimentsMgr* m_experimentsMgr;

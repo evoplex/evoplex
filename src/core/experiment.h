@@ -60,7 +60,7 @@ public:
     // Updates the progress value.
     // This method might be expensive!
     void updateProgressValue();
-    inline quint16 getProgress() const { return m_progress; }
+    inline quint16 progress() const { return m_progress; }
 
     // Here is where the actual simulation is performed.
     // This method will run in a worker thread until it reaches the max
@@ -70,7 +70,7 @@ public:
     void toggle();
 
     // run all trials
-    inline void play() { m_mainApp->getExperimentsMgr()->play(this); }
+    inline void play() { m_mainApp->expMgr()->play(this); }
     void playNext();
 
     // pause all trials at a specific step

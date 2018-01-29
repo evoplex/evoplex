@@ -221,8 +221,8 @@ void MainGUI::setPageVisible(Page page, bool visible)
 
 void MainGUI::updateSaveButtons(ProjectWidget* pw)
 {
-    if (pw && pw == m_projects->currentProject() && pw->getProject()) {
-        Project* project = pw->getProject();
+    if (pw && pw == m_projects->currentProject() && pw->project()) {
+        Project* project = pw->project();
         m_actSave->setEnabled(project->hasUnsavedChanges());
         m_actSaveAs->setEnabled(true);
         m_actSave->setText(QString("Save \"%1\"").arg(pw->objectName()));
@@ -238,7 +238,7 @@ void MainGUI::updateSaveButtons(ProjectWidget* pw)
 void MainGUI::slotSaveAs()
 {
     if (m_projects->currentProject()) {
-        m_saveDialog->saveAs(m_projects->currentProject()->getProject());
+        m_saveDialog->saveAs(m_projects->currentProject()->project());
     }
 }
 
@@ -247,8 +247,8 @@ void MainGUI::slotSave()
     if (!m_projects->currentProject()) {
         return;
     }
-    Project* project = m_projects->currentProject()->getProject();
-    if (project->getDest().isEmpty()) {
+    Project* project = m_projects->currentProject()->project();
+    if (project->dest().isEmpty()) {
         slotSaveAs();
     } else {
         m_saveDialog->save(project);
@@ -257,9 +257,9 @@ void MainGUI::slotSave()
 
 void MainGUI::slotSaveAll()
 {
-    QHash<int, Project*>::const_iterator it = m_mainApp->getProjects().begin();
-    for (it; it != m_mainApp->getProjects().end(); ++it) {
-        if (it.value()->getDest().isEmpty()) {
+    QHash<int, Project*>::const_iterator it = m_mainApp->projects().begin();
+    for (it; it != m_mainApp->projects().end(); ++it) {
+        if (it.value()->dest().isEmpty()) {
             slotSaveAs();
         } else {
             m_saveDialog->save(it.value());

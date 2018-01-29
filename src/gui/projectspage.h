@@ -23,7 +23,6 @@ public:
     explicit ProjectsPage(MainGUI* mainGUI);
 
     inline const ProjectWidget* currentProject() const { return m_currProjectWidget; }
-    inline MainApp* getMainApp() const { return m_mainApp; }
 
 signals:
     void selectionChanged(ProjectWidget*);

@@ -21,7 +21,7 @@ ProjectWidget::ProjectWidget(MainApp* mainApp, Project* project, ProjectsPage* p
     , m_attrWidget(new AttributesWidget(mainApp, project, m_innerWindow))
     , m_project(project)
 {
-    setObjectName(m_project->getName());
+    setObjectName(m_project->name());
     setWindowTitle(objectName());
     setAttribute(Qt::WA_DeleteOnClose, true);
 
@@ -58,10 +58,9 @@ ProjectWidget::ProjectWidget(MainApp* mainApp, Project* project, ProjectsPage* p
     connect(m_ui->table, SIGNAL(itemClicked(QTableWidgetItem*)),
             SLOT(onItemClicked(QTableWidgetItem*)));
 
-    ExperimentsMgr* expMgr = ppage->getMainApp()->getExperimentsMgr();
-    connect(expMgr, SIGNAL(statusChanged(Experiment*)),
+    connect(mainApp->expMgr(), SIGNAL(statusChanged(Experiment*)),
             m_ui->table->viewport(), SLOT(update()));
-    connect(expMgr, SIGNAL(progressUpdated(Experiment*)),
+    connect(mainApp->expMgr(), SIGNAL(progressUpdated(Experiment*)),
             m_ui->table->viewport(), SLOT(update()));
 
     connect(project, SIGNAL(hasUnsavedChanges(bool)),
@@ -124,7 +123,7 @@ void ProjectWidget::fillRow(int row, Experiment* exp)
 
 void ProjectWidget::slotInsertRow(int expId)
 {
-    Experiment* exp = m_project->getExperiment(expId);
+    Experiment* exp = m_project->experiment(expId);
     fillRow(m_ui->table->insertRow(exp), exp);
 }
 
@@ -133,7 +132,7 @@ void ProjectWidget::slotUpdateRow(int expId)
     const int expIdCol = m_headerIdx.value(TableWidget::H_EXPID);
     for (int row = 0; row < m_ui->table->rowCount(); ++row) {
         if (expId == m_ui->table->item(row, expIdCol)->text().toInt()) {
-            fillRow(row, m_project->getExperiment(expId));
+            fillRow(row, m_project->experiment(expId));
             return;
         }
     }
@@ -156,14 +155,14 @@ void ProjectWidget::onItemClicked(QTableWidgetItem* item)
     }
 
     int expId = m_ui->table->item(item->row(), m_headerIdx.value(TableWidget::H_EXPID))->text().toInt();
-    Experiment* exp = m_project->getExperiment(expId);
+    Experiment* exp = m_project->experiment(expId);
     m_attrWidget->setExperiment(exp);
 }
 
 void ProjectWidget::onItemDoubleClicked(QTableWidgetItem* item)
 {
     int expId = m_ui->table->item(item->row(), m_headerIdx.value(TableWidget::H_EXPID))->text().toInt();
-    emit (openExperiment(m_project->getId(), expId));
+    emit (openExperiment(m_project->id(), expId));
 }
 
 void ProjectWidget::slotHasUnsavedChanges(bool b)

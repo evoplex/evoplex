@@ -59,8 +59,8 @@ void SaveDialog::saveAs(Project* project)
     if (!project)
         return;
 
-    m_ui->pname->setText(project->getName());
-    m_ui->dest->setText(project->getDest().isEmpty() ? QDir::homePath() : project->getDest());
+    m_ui->pname->setText(project->name());
+    m_ui->dest->setText(project->dest().isEmpty() ? QDir::homePath() : project->dest());
     m_currProject = project;
     show();
 }

@@ -162,7 +162,7 @@ Project* MainApp::openProject(const QString& filepath)
     Project* project = newProject(fi.baseName(), fi.absolutePath());
     if (project->importExperiments(filepath) == -1) {
         qWarning() << "[Project] : failed to open a project!" << filepath;
-        closeProject(project->getId());
+        closeProject(project->id());
         return nullptr;
     }
     return project;

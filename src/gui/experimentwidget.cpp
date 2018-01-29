@@ -59,7 +59,7 @@ ExperimentWidget::ExperimentWidget(MainGUI* mainGUI, Experiment* exp, ProjectsPa
     tb->setIconSize(QSize(16,16));
     tb->setStyleSheet("background: rgb(53,53,53);");
 
-    ExperimentsMgr* expMgr = ppage->getMainApp()->getExperimentsMgr();
+    ExperimentsMgr* expMgr = mainGUI->mainApp()->expMgr();
     connect(expMgr, SIGNAL(statusChanged(Experiment*)), SLOT(slotStatusChanged(Experiment*)));
     connect(m_aPlayPause, &QAction::triggered, [this]() { m_exp->toggle(); });
     connect(m_aNext, &QAction::triggered, [this]() { m_exp->playNext(); });
