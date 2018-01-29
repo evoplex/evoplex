@@ -21,8 +21,9 @@ public:
 
     AbstractModel* create() const { return m_factory->create(); }
 
-    inline const QVector<QString>& supportedGraphs() const { return m_supportedGraphs; }
     inline const QVector<QString>& customOutputs() const { return m_customOutputs; }
+    inline const QVector<QString>& supportedGraphs() const { return m_supportedGraphs; }
+    inline bool graphIsSupported(const QString& graphId) const { return m_supportedGraphs.empty() || m_supportedGraphs.contains(graphId); }
 
     inline const std::vector<QString>& agentAttrNames() const { return m_agentAttrNames; }
     inline const AttributesSpace& agentAttrSpace() const { return m_agentAttrSpace; }

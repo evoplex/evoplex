@@ -4,8 +4,8 @@
   "name": "test",
   "author": "Marcos Cardinot",
   "description": "just another model",
-  "supportedGraphs": "mooreGrid,squareGrid,customGraph",
-  "customOutputs": "",
+  "supportedGraphs": [""],
+  "customOutputs": [""],
   "pluginAttributesSpace": [
     {"doubleInterval": "double[1,2]"},
     {"intInterval": "int[0,4]"},

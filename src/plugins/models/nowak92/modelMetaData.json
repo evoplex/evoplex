@@ -4,7 +4,7 @@
   "name": "Evolutionary games and spatial chaos",
   "author": "Marcos Cardinot",
   "description": "Nowak 1992",
-  "supportedGraphs": "mooreGrid,squareGrid,customGraph",
+  "supportedGraphs": ["mooreGrid","squareGrid","customGraph"],
   "pluginAttributesSpace": [
     {"temptation": "double[1,2]"}
   ],

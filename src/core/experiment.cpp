@@ -436,7 +436,7 @@ Experiment::ExperimentInputs* Experiment::readInputs(const MainApp* mainApp,
     }
 
     // make sure that the chosen graphId is allowed in this model
-    if (!mPlugin->supportedGraphs().contains(gPlugin->id())) {
+    if (!mPlugin->graphIsSupported(gPlugin->id())) {
         QString supportedGraphs = mPlugin->supportedGraphs().toList().join(", ");
         errorMsg = QString("The graphId (%1) cannot be used in this model (%2). The allowed ones are: %3")
                            .arg(gPlugin->id()).arg(mPlugin->id()).arg(supportedGraphs);

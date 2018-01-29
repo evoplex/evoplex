@@ -115,7 +115,7 @@ AttributesWidget::AttributesWidget(MainApp* mainApp, Project* project, QWidget *
     itemDir->setText(0, OUTPUT_DIR);
     m_ui->treeWidget->setItemWidget(itemDir, 1, outLayout->parentWidget());
     // -- add custom widget: output directory
-    QLineEdit* outHeader = new QLineEdit(m_project->dest());
+    QLineEdit* outHeader = new QLineEdit();
     QPushButton* outBuildHeader = new QPushButton("...");
     outBuildHeader->setMaximumWidth(20);
     connect(outBuildHeader, SIGNAL(clicked(bool)), SLOT(slotOutputWidget()));
