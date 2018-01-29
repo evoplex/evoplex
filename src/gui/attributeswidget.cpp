@@ -89,7 +89,7 @@ AttributesWidget::AttributesWidget(MainApp* mainApp, Project* project, QWidget *
     addTreeWidget(m_treeItemGeneral, GENERAL_ATTRIBUTE_TRIALS, QVariant::fromValue(newSpinBox(1, EVOPLEX_MAX_STEPS)));
     // --  auto delete
     QCheckBox* chb = new QCheckBox(m_ui->treeWidget);
-    chb->setChecked(true);
+    chb->setChecked(false);
     addTreeWidget(m_treeItemGeneral, GENERAL_ATTRIBUTE_AUTODELETE, QVariant::fromValue(chb));
 
     // setup the tree widget: outputs
