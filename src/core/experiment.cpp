@@ -161,14 +161,14 @@ void Experiment::playNext()
     if (m_expStatus != READY) {
         return;
     } else if (m_trials.empty()) {
-        setPauseAt(-1);
+        setPauseAt(-1); // just create and set the trials
     } else {
         int maxCurrStep = 0;
-        for (auto& trial : m_trials) {
+        for (const auto& trial : m_trials) {
             int currStep = trial.second->m_currStep;
             if (currStep > maxCurrStep) maxCurrStep = currStep;
         }
-        setPauseAt(maxCurrStep);
+        setPauseAt(maxCurrStep + 1);
     }
     m_mainApp->expMgr()->play(this);
 }
@@ -196,7 +196,7 @@ void Experiment::processTrial(const int& trialId)
     trial->m_status = RUNNING;
 
     bool algorithmConverged = false;
-    while (trial->m_currStep <= m_pauseAt && !algorithmConverged) {
+    while (trial->m_currStep < m_pauseAt && !algorithmConverged) {
         for (Output* output : m_fileOutputs)
             output->doOperation(trialId, trial);
         for (Output* output : m_extraOutputs)
@@ -209,7 +209,7 @@ void Experiment::processTrial(const int& trialId)
         ++trial->m_currStep;
     }
 
-    if (trial->m_currStep > m_stopAt || algorithmConverged) {
+    if (trial->m_currStep >= m_stopAt || algorithmConverged) {
         if (!m_fileStreams.empty()) {
             for (QTextStream* stream : m_fileStreams) {
                 stream->flush();
