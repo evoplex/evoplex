@@ -6,6 +6,7 @@
 #ifndef PROJECTWIDGET_H
 #define PROJECTWIDGET_H
 
+#include <QCloseEvent>
 #include <QDockWidget>
 #include <QMap>
 #include <QMainWindow>
@@ -24,16 +25,15 @@ class ProjectWidget : public QDockWidget
     Q_OBJECT
 
 public:
-    explicit ProjectWidget(MainApp* mainApp, Project* project, ProjectsPage* ppage = 0);
+    explicit ProjectWidget(MainGUI* mainGUI, Project* project, ProjectsPage* ppage);
     ~ProjectWidget();
 
     inline Project* project() const { return m_project; }
 
 protected:
-    void closeEvent(QCloseEvent *event);
+    void closeEvent(QCloseEvent* event);
 
 signals:
-    void closed();
     void openExperiment(int projId, int expId);
     void hasUnsavedChanges(ProjectWidget*);
 
@@ -48,6 +48,7 @@ private slots:
 
 private:
     Ui_ProjectWidget* m_ui;
+    MainGUI* m_mainGUI;
     QMainWindow* m_innerWindow;
     AttributesWidget* m_attrWidget;
     Project* m_project;

@@ -23,6 +23,7 @@ public:
     explicit ProjectsPage(MainGUI* mainGUI);
 
     inline const ProjectWidget* currentProject() const { return m_currProjectWidget; }
+    inline const QVector<ProjectWidget*> projects() const { return m_projects; }
 
 signals:
     void selectionChanged(ProjectWidget*);

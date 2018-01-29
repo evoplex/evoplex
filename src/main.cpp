@@ -9,6 +9,7 @@
 #include <QScopedPointer>
 #include <QStyleFactory>
 
+#include "config.h"
 #include "core/mainapp.h"
 #include "gui/maingui.h"
 
@@ -26,8 +27,13 @@ int main(int argc, char* argv[])
 {
     QScopedPointer<QCoreApplication> coreApp(createApp(argc, argv));
 
+    QCoreApplication::setOrganizationName("Evoplex");
+    QCoreApplication::setOrganizationDomain("evoplex.github.io");
+    QCoreApplication::setApplicationName("Evoplex");
+    QCoreApplication::setApplicationVersion(EVOPLEX_VERSION);
+
     qDebug() <<" *************************************************\n"
-             << "* Copyright (C) 2016 - Marcos Cardinot          *\n"
+             << "* Copyright (C) 2016-2018 - Evoplex" << EVOPLEX_VERSION << "      *\n"
              << "* @author Marcos Cardinot <mcardinot@gmail.com> *\n"
              << "*************************************************\n";
 

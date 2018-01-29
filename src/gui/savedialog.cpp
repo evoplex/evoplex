@@ -35,10 +35,13 @@ SaveDialog::~SaveDialog()
     delete m_ui;
 }
 
-void SaveDialog::save(Project* project)
+bool SaveDialog::save(Project* project)
 {
-    if (!project)
-        return;
+    if (!project) {
+        return false;
+    } else if (project->dest().isEmpty()) {
+        return saveAs(project);
+    }
 
     hide();
     QProgressDialog progress("Saving project...", QString(), 0, 100, this);
@@ -51,18 +54,20 @@ void SaveDialog::save(Project* project)
     m_currProject = project;
     if (!errMsg.isEmpty()) {
         QMessageBox::warning(this, "Saving project...", errMsg);
+        return false;
     }
+    return true;
 }
 
-void SaveDialog::saveAs(Project* project)
+bool SaveDialog::saveAs(Project* project)
 {
-    if (!project)
-        return;
-
+    if (!project) {
+        return false;
+    }
     m_ui->pname->setText(project->name());
     m_ui->dest->setText(project->dest().isEmpty() ? QDir::homePath() : project->dest());
     m_currProject = project;
-    show();
+    return exec() == QDialog::Accepted;
 }
 
 void SaveDialog::browseDir()

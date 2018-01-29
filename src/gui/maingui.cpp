@@ -3,9 +3,11 @@
  * @author Marcos Cardinot <mcardinot@gmail.com>
  */
 
+#include <QDebug>
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QMouseEvent>
+#include <QSettings>
 #include <QToolBar>
 #include <QToolButton>
 #include <QVBoxLayout>
@@ -19,6 +21,8 @@
 #include "settingspage.h"
 #include "welcomepage.h"
 
+#include "core/project.h"
+
 namespace evoplex {
 
 MainGUI::MainGUI(MainApp* mainApp, QWidget* parent)
@@ -28,7 +32,7 @@ MainGUI::MainGUI(MainApp* mainApp, QWidget* parent)
     , m_saveDialog(new SaveDialog(this))
     , m_welcome(new WelcomePage(this))
     , m_queue(new QueuePage(this))
-    , m_projects(new ProjectsPage(this))
+    , m_projectsPage(new ProjectsPage(this))
     , m_plugins(new PluginsPage(this))
     , m_settings(new SettingsPage(this))
     , m_curPage(PAGE_NULL)
@@ -47,13 +51,13 @@ MainGUI::MainGUI(MainApp* mainApp, QWidget* parent)
     QHBoxLayout* centralLayout = new QHBoxLayout(new QWidget(this));
     centralLayout->addWidget(m_welcome);
     centralLayout->addWidget(m_queue);
-    centralLayout->addWidget(m_projects);
+    centralLayout->addWidget(m_projectsPage);
     centralLayout->addWidget(m_plugins);
     centralLayout->addWidget(m_settings);
     this->setCentralWidget(centralLayout->parentWidget());
     m_welcome->hide();
     m_queue->hide();
-    m_projects->hide();
+    m_projectsPage->hide();
     m_plugins->hide();
     m_settings->hide();
 
@@ -61,6 +65,7 @@ MainGUI::MainGUI(MainApp* mainApp, QWidget* parent)
     // toolbar
     //
     QToolBar* toolbar = new QToolBar(this);
+    toolbar->setObjectName("toolbar");
     QActionGroup* actionGroup = new QActionGroup(toolbar);
     QAction* acWelcome = new QAction(QIcon(":/icons/evoplex.svg"), "Welcome", actionGroup);
     acWelcome->setCheckable(true);
@@ -96,7 +101,7 @@ MainGUI::MainGUI(MainApp* mainApp, QWidget* parent)
         btn->installEventFilter(this);
 
     connect(actionGroup, SIGNAL(triggered(QAction*)), this, SLOT(slotPage(QAction*)));
-    connect(m_projects, &ProjectsPage::isEmpty,
+    connect(m_projectsPage, &ProjectsPage::isEmpty,
         [this, acWelcome, acProjects](bool b) {
             acProjects->setDisabled(b);
             if (b && m_curPage == PAGE_PROJECTS)
@@ -120,12 +125,12 @@ MainGUI::MainGUI(MainApp* mainApp, QWidget* parent)
     m_actNewProject = new QAction("New Project", this);
     connect(this, SIGNAL(newProject()), m_actNewProject, SIGNAL(triggered()));
     connect(m_actNewProject, &QAction::triggered,
-            [this, acProjects](){ m_projects->slotNewProject(); slotPage(acProjects); });
+            [this, acProjects](){ m_projectsPage->slotNewProject(); slotPage(acProjects); });
     m_actOpenProject = new QAction("Open Project", this);
 
     connect(this, SIGNAL(openProject()), m_actOpenProject, SIGNAL(triggered()));
     connect(m_actOpenProject, &QAction::triggered,
-            [this, acProjects](){ if (m_projects->slotOpenProject()) slotPage(acProjects); });
+            [this, acProjects](){ if (m_projectsPage->slotOpenProject()) slotPage(acProjects); });
 
     QAction* actSaveAll = new QAction("Save All", this);
     connect(actSaveAll, SIGNAL(triggered(bool)), this, SLOT(slotSaveAll()));
@@ -135,8 +140,8 @@ MainGUI::MainGUI(MainApp* mainApp, QWidget* parent)
     m_actSaveAs = new QAction("Save as", this);
     m_actSaveAs->setEnabled(false);
     connect(m_actSaveAs, SIGNAL(triggered(bool)), this, SLOT(slotSaveAs()));
-    connect(m_projects, SIGNAL(selectionChanged(ProjectWidget*)), SLOT(updateSaveButtons(ProjectWidget*)));
-    connect(m_projects, SIGNAL(hasUnsavedChanges(ProjectWidget*)), SLOT(updateSaveButtons(ProjectWidget*)));
+    connect(m_projectsPage, SIGNAL(selectionChanged(ProjectWidget*)), SLOT(updateSaveButtons(ProjectWidget*)));
+    connect(m_projectsPage, SIGNAL(hasUnsavedChanges(ProjectWidget*)), SLOT(updateSaveButtons(ProjectWidget*)));
 
     QAction* actQuit = new QAction("Quit", this);
     connect(actQuit, SIGNAL(triggered(bool)), this, SLOT(close()));
@@ -159,6 +164,10 @@ MainGUI::MainGUI(MainApp* mainApp, QWidget* parent)
     this->menuBar()->addMenu(menuSettings);
     QMenu* menuAbout = new QMenu("About", this);
     this->menuBar()->addMenu(menuAbout);
+
+    QSettings s;
+    restoreGeometry(s.value("gui/geometry").toByteArray());
+    restoreState(s.value("gui/windowState").toByteArray());
 }
 
 MainGUI::~MainGUI()
@@ -176,15 +185,20 @@ bool MainGUI::eventFilter(QObject* o, QEvent* e)
 
 void MainGUI::closeEvent(QCloseEvent* event)
 {
-    QMessageBox::StandardButton res = QMessageBox::question(this,
-            "Evoplex", tr("Are you sure you want to close it?\n"),
-            QMessageBox::No | QMessageBox::Yes, QMessageBox::No);
-
-    if (res == QMessageBox::Yes) {
-        event->accept();
-    } else {
-        event->ignore();
+    for (ProjectWidget* pw : m_projectsPage->projects()) {
+        if (!pw->close()) {
+            event->ignore();
+            return;
+        }
     }
+
+    QSettings s;
+    s.setValue("gui/geometry", saveGeometry());
+    s.setValue("gui/windowState", saveState());
+    qDebug() << "[MainGUI]: user settings stored at " << s.fileName();
+
+    event->accept();
+    QMainWindow::closeEvent(event);
 }
 
 void MainGUI::slotPage(QAction* action)
@@ -205,7 +219,7 @@ void MainGUI::setPageVisible(Page page, bool visible)
             m_queue->setVisible(visible);
             break;
         case PAGE_PROJECTS:
-            m_projects->setVisible(visible);
+            m_projectsPage->setVisible(visible);
             break;
         case PAGE_PLUGINS:
             m_plugins->setVisible(visible);
@@ -221,7 +235,7 @@ void MainGUI::setPageVisible(Page page, bool visible)
 
 void MainGUI::updateSaveButtons(ProjectWidget* pw)
 {
-    if (pw && pw == m_projects->currentProject() && pw->project()) {
+    if (pw && pw == m_projectsPage->currentProject() && pw->project()) {
         Project* project = pw->project();
         m_actSave->setEnabled(project->hasUnsavedChanges());
         m_actSaveAs->setEnabled(true);
@@ -237,33 +251,22 @@ void MainGUI::updateSaveButtons(ProjectWidget* pw)
 
 void MainGUI::slotSaveAs()
 {
-    if (m_projects->currentProject()) {
-        m_saveDialog->saveAs(m_projects->currentProject()->project());
+    if (m_projectsPage->currentProject()) {
+        m_saveDialog->saveAs(m_projectsPage->currentProject()->project());
     }
 }
 
 void MainGUI::slotSave()
 {
-    if (!m_projects->currentProject()) {
-        return;
-    }
-    Project* project = m_projects->currentProject()->project();
-    if (project->dest().isEmpty()) {
-        slotSaveAs();
-    } else {
-        m_saveDialog->save(project);
+    if (m_projectsPage->currentProject()) {
+        m_saveDialog->save(m_projectsPage->currentProject()->project());
     }
 }
 
 void MainGUI::slotSaveAll()
 {
-    QHash<int, Project*>::const_iterator it = m_mainApp->projects().begin();
-    for (it; it != m_mainApp->projects().end(); ++it) {
-        if (it.value()->dest().isEmpty()) {
-            slotSaveAs();
-        } else {
-            m_saveDialog->save(it.value());
-        }
+    for (Project* p : m_mainApp->projects()) {
+        m_saveDialog->save(p);
     }
 }
 

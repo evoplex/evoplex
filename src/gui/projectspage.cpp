@@ -33,7 +33,7 @@ void ProjectsPage::slotFocusChanged(QDockWidget* currTab)
 
 void ProjectsPage::addProjectWidget(Project* project)
 {
-    ProjectWidget* pw = new ProjectWidget(m_mainApp, project, this);
+    ProjectWidget* pw = new ProjectWidget(m_mainGUI, project, this);
     if (m_projects.isEmpty()) {
         this->addDockWidget(Qt::TopDockWidgetArea, pw);
     } else {
@@ -48,12 +48,11 @@ void ProjectsPage::addProjectWidget(Project* project)
     //connect(m_contextMenu, SIGNAL(openView(int)), wp, SLOT(slotOpenView(int)));
     connect(pw, SIGNAL(openExperiment(int,int)), this, SLOT(slotOpenExperiment(int,int)));
     connect(pw, SIGNAL(hasUnsavedChanges(ProjectWidget*)), SIGNAL(hasUnsavedChanges(ProjectWidget*)));
-    connect(pw, &ProjectWidget::closed, [this, pw, project]() {
+    connect(pw, &ProjectWidget::destroyed, [this, pw, project]() {
         for (ExperimentWidget* expW : m_experiments) {
             expW->close();
         }
         m_projects.removeOne(pw);
-        pw->deleteLater();
         emit (isEmpty(m_projects.isEmpty()));
         m_mainApp->closeProject(project->id());
     });

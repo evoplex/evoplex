@@ -19,7 +19,6 @@ AgentsGeneratorDlg::AgentsGeneratorDlg(const AttributesSpace& agentAttrsSpace, A
     , m_ui(new Ui_AgentsGeneratorDlg)
     , m_agentAttrsSpace(agentAttrsSpace)
 {
-    setAttribute(Qt::WA_DeleteOnClose, true);
     setWindowModality(Qt::ApplicationModal);
     m_ui->setupUi(this);
 
@@ -32,11 +31,8 @@ AgentsGeneratorDlg::AgentsGeneratorDlg(const AttributesSpace& agentAttrsSpace, A
     m_ui->bSameData->setChecked(true);
 
     connect(m_ui->saveAs, SIGNAL(pressed()), SLOT(slotSaveAs()));
-    connect(m_ui->cancel, SIGNAL(pressed()), SLOT(close()));
-    connect(m_ui->ok, &QPushButton::pressed, [this](){
-        emit(closed(readCommand()));
-        close();
-    });
+    connect(m_ui->cancel, SIGNAL(pressed()), SLOT(reject()));
+    connect(m_ui->ok, SIGNAL(pressed()), SLOT(accept()));
 
     connect(m_ui->browseFile, &QPushButton::pressed, [this]() {
         QString path = QFileDialog::getOpenFileName(this,

@@ -135,7 +135,7 @@ bool Project::saveProject(QString& errMsg, std::function<void(int)>& progress)
         return false;
     }
 
-    progress((10));
+    progress(10);
     std::vector<QString> header;
     for (Experiment* exp : m_experiments) {
         std::vector<QString> general = exp->generalAttrs()->names();
@@ -150,18 +150,18 @@ bool Project::saveProject(QString& errMsg, std::function<void(int)>& progress)
         }
     }
     // remove duplicates
-    progress((25));
+    progress(25);
     std::set<QString> s(header.begin(), header.end());
     header.assign(s.begin(), s.end());
 
-    progress((30));
+    progress(30);
     QTextStream out(&experimentsFile);
     for (int i = 0; i < header.size()-1; ++i) {
         out << header.at(i) << ",";
     }
     out << header.at(header.size()-1) << "\n";
 
-    progress((35));
+    progress(35);
     for (Experiment* exp : m_experiments) {
         const Attributes* generalAttrs = exp->generalAttrs();
         const Attributes* modelAttrs = exp->modelAttrs();
@@ -190,6 +190,7 @@ bool Project::saveProject(QString& errMsg, std::function<void(int)>& progress)
     m_hasUnsavedChanges = false;
     emit (hasUnsavedChanges(false));
     progress((100));
+    qWarning() << "[Project]: project has been saved!" << m_name;
     return true;
 }
 

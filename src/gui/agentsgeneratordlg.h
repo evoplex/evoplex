@@ -20,22 +20,19 @@ class AgentsGeneratorDlg : public QDialog
     Q_OBJECT
 
 public:
-    explicit AgentsGeneratorDlg(const AttributesSpace& agentAttrsSpace, AgentsGenerator* ag, QWidget *parent = 0);
+    explicit AgentsGeneratorDlg(const AttributesSpace& agentAttrsSpace, AgentsGenerator* ag, QWidget *parent);
     ~AgentsGeneratorDlg();
+
+    QString readCommand();
 
 private slots:
     void slotSaveAs();
-
-signals:
-    void closed(const QString& cmd);
 
 private:
     Ui_AgentsGeneratorDlg* m_ui;
     const AttributesSpace& m_agentAttrsSpace;
 
     void fill(AgentsGenerator* ag);
-    QString readCommand();
-
 };
 
 } // evoplex

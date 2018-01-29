@@ -97,8 +97,8 @@ ExperimentWidget::~ExperimentWidget()
 
 void ExperimentWidget::closeEvent(QCloseEvent* event)
 {
-    QDockWidget::closeEvent(event);
     emit (closed());
+    QDockWidget::closeEvent(event);
 }
 
 void ExperimentWidget::slotStatusChanged(Experiment* exp)

@@ -6,19 +6,22 @@
 #include <QDebug>
 #include <QHBoxLayout>
 #include <QMainWindow>
+#include <QMessageBox>
 #include <QTableWidgetItem>
 
 #include "projectwidget.h"
+#include "savedialog.h"
 #include "ui_projectwidget.h"
 #include "core/experimentsmgr.h"
 
 namespace evoplex {
 
-ProjectWidget::ProjectWidget(MainApp* mainApp, Project* project, ProjectsPage* ppage)
+ProjectWidget::ProjectWidget(MainGUI* mainGUI, Project* project, ProjectsPage* ppage)
     : QDockWidget(ppage)
     , m_ui(new Ui_ProjectWidget)
+    , m_mainGUI(mainGUI)
     , m_innerWindow(new QMainWindow(this, Qt::FramelessWindowHint))
-    , m_attrWidget(new AttributesWidget(mainApp, project, m_innerWindow))
+    , m_attrWidget(new AttributesWidget(mainGUI->mainApp(), project, m_innerWindow))
     , m_project(project)
 {
     setObjectName(m_project->name());
@@ -58,9 +61,9 @@ ProjectWidget::ProjectWidget(MainApp* mainApp, Project* project, ProjectsPage* p
     connect(m_ui->table, SIGNAL(itemClicked(QTableWidgetItem*)),
             SLOT(onItemClicked(QTableWidgetItem*)));
 
-    connect(mainApp->expMgr(), SIGNAL(statusChanged(Experiment*)),
+    connect(m_mainGUI->mainApp()->expMgr(), SIGNAL(statusChanged(Experiment*)),
             m_ui->table->viewport(), SLOT(update()));
-    connect(mainApp->expMgr(), SIGNAL(progressUpdated(Experiment*)),
+    connect(m_mainGUI->mainApp()->expMgr(), SIGNAL(progressUpdated(Experiment*)),
             m_ui->table->viewport(), SLOT(update()));
 
     connect(project, SIGNAL(hasUnsavedChanges(bool)),
@@ -75,8 +78,18 @@ ProjectWidget::~ProjectWidget()
 
 void ProjectWidget::closeEvent(QCloseEvent* event)
 {
+    if (m_project->hasUnsavedChanges()) {
+        QMessageBox::StandardButton res = QMessageBox::question(this, "Save Project?",
+                tr("Save project '%1' before closing?\nYour changes will be lost if you don’t save them.").arg(m_project->name()),
+                QMessageBox::Discard | QMessageBox::Cancel | QMessageBox::Save, QMessageBox::Save);
+
+        if (res == QMessageBox::Cancel || (res == QMessageBox::Save && !m_mainGUI->saveDialog()->save(m_project))) {
+            event->ignore();
+            return;
+        }
+    }
+    event->accept();
     QDockWidget::closeEvent(event);
-    emit (closed());
 }
 
 void ProjectWidget::fillRow(int row, Experiment* exp)

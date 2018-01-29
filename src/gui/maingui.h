@@ -33,6 +33,7 @@ public:
 
     inline MainApp* mainApp() const { return m_mainApp; }
     inline ColorMapMgr* colorMapMgr() const { return m_colorMapMgr; }
+    inline SaveDialog* saveDialog() const { return m_saveDialog; }
 
 signals:
     void newProject();
@@ -65,7 +66,7 @@ private:
     SaveDialog* m_saveDialog;
     WelcomePage* m_welcome;
     QueuePage* m_queue;
-    ProjectsPage* m_projects;
+    ProjectsPage* m_projectsPage;
     PluginsPage* m_plugins;
     SettingsPage* m_settings;
     Page m_curPage;

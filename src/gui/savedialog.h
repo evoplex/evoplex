@@ -14,11 +14,11 @@ class SaveDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit SaveDialog(QWidget* parent = 0);
+    explicit SaveDialog(QWidget* parent);
     ~SaveDialog();
 
-    void save(Project* project);
-    void saveAs(Project* project);
+    bool save(Project* project);
+    bool saveAs(Project* project);
 
 private slots:
     void browseDir();

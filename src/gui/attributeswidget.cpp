@@ -249,16 +249,11 @@ void AttributesWidget::slotAgentsWidget()
             delete ag;
         }
     }
-
     AgentsGeneratorDlg* adlg = new AgentsGeneratorDlg(model->agentAttrSpace(), ag, this);
-    adlg->show();
-
-    connect(adlg, &AgentsGeneratorDlg::closed,
-    [this, adlg](const QString& cmd) {
-        m_widgetFields.value(GENERAL_ATTRIBUTE_AGENTS)
-                .value<QLineEdit*>()->setText(cmd);
-        adlg->deleteLater();
-    });
+    if (adlg->exec() == QDialog::Accepted) {
+        m_widgetFields.value(GENERAL_ATTRIBUTE_AGENTS).value<QLineEdit*>()->setText(adlg->readCommand());
+    }
+    adlg->deleteLater();
 }
 
 void AttributesWidget::slotOutputDir()
@@ -305,7 +300,7 @@ void AttributesWidget::slotOutputWidget()
     ow->show();
 
     connect(ow, &OutputWidget::closed,
-    [this](std::vector<Output*> outputs) {
+    [this, ow](std::vector<Output*> outputs) {
         // join all Output objects which have the same function, entity and attribute
         QStringList uniqueOutputs;
         for (int o1 = 0; o1 < outputs.size(); ++o1) {
@@ -324,8 +319,8 @@ void AttributesWidget::slotOutputWidget()
             uniqueOutputs.push_back(outputStr);
         }
 
-        m_widgetFields.value(OUTPUT_HEADER)
-                .value<QLineEdit*>()->setText(uniqueOutputs.join(';'));
+        m_widgetFields.value(OUTPUT_HEADER).value<QLineEdit*>()->setText(uniqueOutputs.join(';'));
+        ow->deleteLater();
     });
 }
 
