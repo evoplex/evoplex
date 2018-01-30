@@ -88,18 +88,12 @@ void PluginsPage::importPlugin()
     }
 
     QString error;
-    QString uid = m_mainApp->loadPlugin(fileName, error);
-
-    if (!error.isEmpty()) {
-        QMessageBox::warning(this, "Error", error);
-        return;
-    }
-
-    const AbstractPlugin* plugin = m_mainApp->model(uid);
+    const AbstractPlugin* plugin = m_mainApp->loadPlugin(fileName, error);
     if (plugin) {
-        plugin = m_mainApp->graph(uid);
+        insertRow(plugin);
+    } else {
+        QMessageBox::warning(this, "Error", error);
     }
-    insertRow(plugin);
 }
 
 void PluginsPage::insertRow(const AbstractPlugin* plugin)

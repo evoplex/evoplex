@@ -30,7 +30,7 @@ public:
     ~MainApp();
 
     // load plugin from a .so file; return true if successful
-    const QString loadPlugin(const QString& path, QString& error);
+    const AbstractPlugin* loadPlugin(const QString& path, QString& error);
 
     // Create a new project
     Project* newProject(const QString& name="", const QString& dest="");
