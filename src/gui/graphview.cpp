@@ -35,14 +35,15 @@ GraphView::GraphView(MainGUI* mainGUI, Experiment* exp, QWidget* parent)
     setTrial(0); // init at trial 0
 }
 
-void GraphView::updateCache()
+int GraphView::refreshCache()
 {
+    if (paintingActive()) {
+        return Scheduled;
+    }
     m_cache.clear();
     m_cache.shrink_to_fit();
-
     if (!m_model) {
-        update();
-        return;
+        return Ready;
     }
 
     const Agents agents = m_model->graph()->agents();
@@ -61,7 +62,7 @@ void GraphView::updateCache()
         cache.xy = xy;
         cache.edges.reserve(agent->edges().size());
 
-        for (Edge* edge : agent->edges()) {
+        for (const Edge* edge : agent->edges()) {
             QPointF xy2(m_origin.x() + edgeSizeRate * (1.0 + edge->neighbour()->x()),
                         m_origin.y() + edgeSizeRate * (1.0 + edge->neighbour()->y()));
             cache.edges.emplace_back(QLineF(xy, xy2));
@@ -70,12 +71,13 @@ void GraphView::updateCache()
         m_cache.emplace_back(cache);
     }
     m_cache.shrink_to_fit();
-    update();
+
+    return Ready;
 }
 
 void GraphView::paintEvent(QPaintEvent*)
 {
-    if (m_cache.empty()) {
+    if (m_cacheStatus != Ready) {
         return;
     }
 
@@ -85,18 +87,18 @@ void GraphView::paintEvent(QPaintEvent*)
 
     if (m_showEdges) {
         Cache cacheSelected;
-        for (Cache cache : m_cache) {
+        for (const Cache& cache : m_cache) {
             if (m_selectedAgent == cache.agent->id()) {
                 cacheSelected = cache;
             }
-            for (QLineF edge : cache.edges) {
+            for (const QLineF& edge : cache.edges) {
                 painter.setPen(Qt::gray);
                 painter.drawLine(edge);
             }
         }
 
         if (cacheSelected.agent) {
-            for (QLineF edge : cacheSelected.edges) {
+            for (const QLineF& edge : cacheSelected.edges) {
                 painter.setPen(QPen(Qt::black, 3));
                 painter.drawLine(edge);
             }
@@ -104,7 +106,7 @@ void GraphView::paintEvent(QPaintEvent*)
     }
 
     if (m_showAgents) {
-        for (Cache cache : m_cache) {
+        for (const Cache& cache : m_cache) {
             if (m_selectedAgent == cache.agent->id()) {
                 painter.setBrush(QColor(10,10,10,100));
                 painter.drawEllipse(cache.xy, m_nodeRadius*1.5f, m_nodeRadius*1.5f);
@@ -122,12 +124,14 @@ void GraphView::paintEvent(QPaintEvent*)
 
 const Agent* GraphView::selectAgent(const QPoint& pos) const
 {
-    for (Cache cache : m_cache) {
-        if (pos.x() > cache.xy.x()-m_nodeRadius
-                && pos.x() < cache.xy.x()+m_nodeRadius
-                && pos.y() > cache.xy.y()-m_nodeRadius
-                && pos.y() < cache.xy.y()+m_nodeRadius) {
-            return cache.agent;
+    if (m_cacheStatus == Ready) {
+        for (const Cache& cache : m_cache) {
+            if (pos.x() > cache.xy.x()-m_nodeRadius
+                    && pos.x() < cache.xy.x()+m_nodeRadius
+                    && pos.y() > cache.xy.y()-m_nodeRadius
+                    && pos.y() < cache.xy.y()+m_nodeRadius) {
+                return cache.agent;
+            }
         }
     }
     return nullptr;

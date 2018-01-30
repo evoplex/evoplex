@@ -8,8 +8,6 @@
 
 #include "graphwidget.h"
 
-class Ui_GraphWidget;
-
 namespace evoplex
 {
 
@@ -19,8 +17,6 @@ class GridView : public GraphWidget
 
 public:
     explicit GridView(MainGUI* mainGUI, Experiment* exp, QWidget* parent);
-
-    virtual void updateCache();
 
 protected:
     void paintEvent(QPaintEvent*) override;
@@ -32,6 +28,8 @@ private:
         QRectF rect;
     };
     std::vector<Cache> m_cache;
+
+    virtual int refreshCache();
 };
 
 } // evoplex

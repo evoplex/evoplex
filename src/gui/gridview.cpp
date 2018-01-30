@@ -22,14 +22,15 @@ GridView::GridView(MainGUI* mainGUI, Experiment* exp, QWidget* parent)
     setTrial(0); // init at trial 0
 }
 
-void GridView::updateCache()
+int GridView::refreshCache()
 {
+    if (paintingActive()) {
+        return Scheduled;
+    }
     m_cache.clear();
     m_cache.shrink_to_fit();
-
     if (!m_model) {
-        update();
-        return;
+        return Ready;
     }
 
     const Agents& agents = m_model->graph()->agents();
@@ -49,12 +50,13 @@ void GridView::updateCache()
         m_cache.emplace_back(c);
     }
     m_cache.shrink_to_fit();
-    update();
+
+    return Ready;
 }
 
 void GridView::paintEvent(QPaintEvent*)
 {
-    if (m_cache.empty()) {
+    if (m_cacheStatus != Ready) {
         return;
     }
 
@@ -62,7 +64,7 @@ void GridView::paintEvent(QPaintEvent*)
     painter.begin(this);
     painter.setRenderHint(QPainter::Antialiasing);
 
-    for (Cache cache : m_cache) {
+    for (const Cache& cache : m_cache) {
         QColor color;
         if (m_selectedAgent == cache.agent->id()) {
             color = QColor(10,10,10,100);
@@ -80,9 +82,11 @@ void GridView::paintEvent(QPaintEvent*)
 
 const Agent* GridView::selectAgent(const QPoint& pos) const
 {
-    for (Cache cache : m_cache) {
-        if (cache.rect.contains(pos)) {
-            return cache.agent;
+    if (m_cacheStatus == Ready) {
+        for (const Cache& cache : m_cache) {
+            if (cache.rect.contains(pos)) {
+                return cache.agent;
+            }
         }
     }
     return nullptr;

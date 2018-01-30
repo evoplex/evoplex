@@ -9,6 +9,7 @@
 #include <QDockWidget>
 #include <QLineEdit>
 #include <QMouseEvent>
+#include <QTimer>
 #include <vector>
 
 #include "colormap.h"
@@ -28,8 +29,6 @@ public:
     explicit GraphWidget(MainGUI* mainGUI, Experiment* exp, QWidget* parent);
     ~GraphWidget();
 
-    virtual void updateCache() = 0;
-
 protected:
     Ui_GraphWidget* m_ui;
     GraphSettings* m_settingsDlg;
@@ -45,6 +44,13 @@ protected:
     float m_nodeSizeRate;
     float m_nodeRadius;
     QPoint m_origin;
+
+    enum CacheStatus {
+        Ready,
+        Updating,
+        Scheduled
+    };
+    CacheStatus m_cacheStatus;
 
     void mousePressEvent(QMouseEvent* e);
     void mouseReleaseEvent(QMouseEvent* e);
@@ -66,13 +72,16 @@ private slots:
     void setAgentCMap(ColorMap* cmap);
 
 private:
+    QTimer m_updateCacheTimer;
     QPoint m_posEntered;
-    QTimer m_resizeTimer;
     int m_currTrialId;
 
     std::vector<QLineEdit*> m_attrs;
 
     void updateInspector(const Agent* agent);
+
+    void updateCache(bool force=false);
+    virtual int refreshCache() = 0;
 };
 }
 

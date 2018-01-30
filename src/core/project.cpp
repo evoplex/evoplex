@@ -118,13 +118,12 @@ bool Project::saveProject(QString& errMsg, std::function<void(int)>& progress)
     }
 
     QDir dir(m_dest);
-    if (m_dest.isEmpty() || m_name.isEmpty() || !dir.mkpath(m_name)) {
+    if (m_dest.isEmpty() || m_name.isEmpty() || !dir.mkpath(m_dest)) {
         errMsg = QString("Unable to save %1.\n"
                 "The destination is invalid!\n%2").arg(m_name).arg(m_dest);
         qWarning() << "[Project]" << errMsg;
         return false;
     }
-    dir.cd(m_name);
 
     progress(5);
     QFile experimentsFile(dir.absoluteFilePath(m_name + ".csv"));

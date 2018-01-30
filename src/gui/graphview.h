@@ -16,8 +16,6 @@ class GraphView : public GraphWidget
 public:
     explicit GraphView(MainGUI* mainGUI, Experiment* exp, QWidget* parent);
 
-    virtual void updateCache();
-
 protected:
     void paintEvent(QPaintEvent*) override;
     virtual const Agent* selectAgent(const QPoint& pos) const;
@@ -36,6 +34,8 @@ private:
 
     bool m_showAgents;
     bool m_showEdges;
+
+    virtual int refreshCache();
 };
 
 } // evoplex

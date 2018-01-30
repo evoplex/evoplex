@@ -3,7 +3,10 @@
  * @author Marcos Cardinot <mcardinot@gmail.com>
  */
 
+#include <QtConcurrent>
+#include <QFutureWatcher>
 #include <QMessageBox>
+#include <QMutex>
 
 #include "graphwidget.h"
 #include "ui_graphwidget.h"
@@ -25,6 +28,7 @@ GraphWidget::GraphWidget(MainGUI* mainGUI, Experiment* exp, QWidget* parent)
     , m_nodeRadius(m_nodeSizeRate)
     , m_origin(5,25)
     , m_posEntered(0,0)
+    , m_cacheStatus(Ready)
 {
     setAttribute(Qt::WA_DeleteOnClose, true);
 
@@ -39,11 +43,11 @@ GraphWidget::GraphWidget(MainGUI* mainGUI, Experiment* exp, QWidget* parent)
     setTitleBarWidget(titleBar);
     connect(titleBar, SIGNAL(openSettingsDlg()), m_settingsDlg, SLOT(show()));
     connect(titleBar, SIGNAL(trialSelected(int)), SLOT(setTrial(int)));
-    connect(mainGUI->mainApp()->expMgr(), &ExperimentsMgr::trialCreated,
+    connect(mainGUI->mainApp()->expMgr(), &ExperimentsMgr::trialCreated, this,
         [this](Experiment* exp, int trialId) {
             if (exp == m_exp && trialId == m_currTrialId)
                 setTrial(m_currTrialId);
-    });
+    }, Qt::QueuedConnection);
 
     connect(m_settingsDlg, &GraphSettings::agentAttrUpdated, [this](int idx) { m_agentAttr = idx; });
     connect(m_settingsDlg, SIGNAL(agentCMapUpdated(ColorMap*)), SLOT(setAgentCMap(ColorMap*)));
@@ -63,7 +67,7 @@ GraphWidget::GraphWidget(MainGUI* mainGUI, Experiment* exp, QWidget* parent)
             }
             QString err;
             Agent* agent = m_model->graph()->agent(m_ui->agentId->value());
-            if (m_model->status() != Experiment::READY) {
+            if (m_model->status() == Experiment::RUNNING) {
                 err = "You cannot change things in a running experiment.\n"
                       "Please, pause it and try again.";
             } else {
@@ -86,9 +90,8 @@ GraphWidget::GraphWidget(MainGUI* mainGUI, Experiment* exp, QWidget* parent)
     m_ui->inspector->hide();
     connect(m_ui->bCloseInspector, SIGNAL(clicked(bool)), m_ui->inspector, SLOT(hide()));
 
-    // update buffer when resize is done
-    m_resizeTimer.setSingleShot(true);
-    connect(&m_resizeTimer, &QTimer::timeout, [this](){ updateCache(); });
+    m_updateCacheTimer.setSingleShot(true);
+    connect(&m_updateCacheTimer, &QTimer::timeout, [this]() { updateCache(true); });
 
     QPalette pal = palette();
     pal.setColor(QPalette::Background, QColor(239,235,231));
@@ -102,6 +105,34 @@ GraphWidget::~GraphWidget()
     m_exp = nullptr;
     delete m_ui;
     delete m_agentCMap;
+}
+
+void GraphWidget::updateCache(bool force)
+{
+    if (!force) {
+        m_updateCacheTimer.start(10);
+        return;
+    }
+
+    if (m_cacheStatus == Updating) {
+        return;
+    }
+
+    QMutex mutex;
+    mutex.lock();
+    m_cacheStatus = Updating;
+    QFuture<int> future = QtConcurrent::run(this, &GraphWidget::refreshCache);
+    QFutureWatcher<int>* watcher = new QFutureWatcher<int>;
+    connect(watcher, &QFutureWatcher<int>::finished, [this, watcher]() {
+        m_cacheStatus = (CacheStatus) watcher->result();
+        watcher->deleteLater();
+        if (m_cacheStatus == Scheduled) {
+            m_updateCacheTimer.start(10);
+        }
+        update();
+    });
+    watcher->setFuture(future);
+    mutex.unlock();
 }
 
 void GraphWidget::slotRestarted(Experiment* exp)
@@ -184,29 +215,26 @@ void GraphWidget::mouseReleaseEvent(QMouseEvent *e)
     }
 
     m_selectedAgent = -1;
-    if (e->pos() != m_posEntered) {
+    if (e->pos() == m_posEntered) {
+        const Agent* agent = selectAgent(e->pos());
+        if (agent) {
+            m_selectedAgent = agent->id();
+            updateInspector(agent);
+            m_ui->inspector->show();
+        } else {
+            m_ui->inspector->hide();
+        }
+        update();
+    } else {
         m_origin += (e->pos() - m_posEntered);
         m_ui->inspector->hide();
         updateCache();
-        return;
     }
-
-    const Agent* agent = selectAgent(e->pos());
-    if (agent) {
-        m_selectedAgent = agent->id();
-        updateInspector(agent);
-        m_ui->inspector->show();
-    } else {
-        m_ui->inspector->hide();
-    }
-
-    update();
 }
 
 void GraphWidget::resizeEvent(QResizeEvent* e)
 {
-    //m_cache.clear();
-    m_resizeTimer.start(500);
+    updateCache();
     QWidget::resizeEvent(e);
 }
 
