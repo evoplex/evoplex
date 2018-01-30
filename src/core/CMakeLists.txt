@@ -79,7 +79,7 @@ configure_file(cmake/EvoplexCoreConfig.cmake
   COPYONLY
 )
 
-set(ConfigPackageLocation share/evoplex/cmake)
+set(ConfigPackageLocation lib/cmake/Evoplex)
 install(EXPORT EvoplexCoreTargets
   FILE EvoplexCoreTargets.cmake
   NAMESPACE Evoplex::
