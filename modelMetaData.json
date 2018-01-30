@@ -1,0 +1,14 @@
+{
+  "type": "model",
+  "uid": "modelTemplate",
+  "name": "Model Template",
+  "author": "Marcos Cardinot",
+  "description": "It's just a model template.",
+  "supportedGraphs": ["mooreGrid","squareGrid","customGraph"],
+  "pluginAttributesSpace": [
+    {"attrName": "double[1,2]"}
+  ],
+  "agentAttributesSpace": [
+    {"strategy": "int{0,1}"}
+  ]
+}
