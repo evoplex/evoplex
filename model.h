@@ -3,13 +3,13 @@
  * @author Marcos Cardinot <mcardinot@gmail.com>
  */
 
-#ifndef TEMPLATEMODEL_H
-#define TEMPLATEMODEL_H
+#ifndef MODELTEMPLATE_H
+#define MODELTEMPLATE_H
 
 #include <core/plugininterfaces.h>
 
 namespace evoplex {
-class ModelNowak: public AbstractModel
+class ModelTemplate: public AbstractModel
 {
 public:
     virtual bool init();

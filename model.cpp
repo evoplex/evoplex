@@ -8,16 +8,16 @@
 namespace evoplex
 {
 
-bool TemplateModel::init()
+bool ModelTemplate::init()
 {
     return true;
 }
 
-bool TemplateModel::algorithmStep()
+bool ModelTemplate::algorithmStep()
 {
     return false;
 }
 
 } // evoplex
-REGISTER_MODEL(TemplateModel)
+REGISTER_MODEL(ModelTemplate)
 #include "model.moc"
