@@ -50,7 +50,7 @@ public:
 
 protected:
     explicit ColorMap(const Colors& colors);
-    const Colors& m_colors;
+    const Colors m_colors;
 };
 
 /************************************************************************/

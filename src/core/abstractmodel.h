@@ -18,7 +18,7 @@ class AbstractBaseModel
 
 public:
     inline AbstractGraph* graph() const { return m_graph; }
-    inline const PRG* prg() const { return m_prg; }
+    inline PRG* prg() const { return m_prg; }
     inline const Attributes* attrs() const { return m_attributes; }
     inline const Value& attr(const QString& name) const { return m_attributes->value(name); }
     inline const Value& attr(int attrId) const { return m_attributes->value(attrId);  }

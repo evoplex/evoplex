@@ -466,23 +466,25 @@ Experiment::ExperimentInputs* Experiment::readInputs(const MainApp* mainApp,
             }
         } else {
             ValueSpace* valSpace = nullptr;
-            Attributes* attributes = nullptr;
+            Attributes* pluginAttrs = nullptr;
             if (attrName.startsWith(modelId_)) {
                 attrName = attrName.remove(modelId_);
                 valSpace = mPlugin->pluginAttrSpace().value(attrName);
-                attributes = modelAttrs;
+                pluginAttrs = modelAttrs;
             } else if (attrName.startsWith(graphId_)) {
                 attrName = attrName.remove(graphId_);
                 valSpace = gPlugin->pluginAttrSpace().value(attrName);
-                attributes = graphAttrs;
-            } else {
-                qFatal("[Experiment::readInputs()]: attribute name should start with the plugin id!");
+                pluginAttrs = graphAttrs;
             }
 
-            if (attributes && valSpace) {
-                Value value = valSpace->validate(vStr);
+            if (pluginAttrs) {
+                Value value;
+                if (valSpace) {
+                    value = valSpace->validate(vStr);
+                }
+
                 if (value.isValid()) {
-                    attributes->replace(valSpace->id(), attrName, value);
+                    pluginAttrs->replace(valSpace->id(), attrName, value);
                 } else {
                     failedAttributes.append(attrName);
                 }
