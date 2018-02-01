@@ -21,6 +21,7 @@
 #include "settingspage.h"
 #include "welcomepage.h"
 
+#include "../config.h"
 #include "core/project.h"
 
 namespace evoplex {
@@ -163,8 +164,16 @@ MainGUI::MainGUI(MainApp* mainApp, QWidget* parent)
     QMenu* menuSettings = new QMenu("Settings", this);
         // generate template
     this->menuBar()->addMenu(menuSettings);
-    QMenu* menuAbout = new QMenu("About", this);
-    this->menuBar()->addMenu(menuAbout);
+    QAction* menuAbout = new QAction("About", this);
+    this->menuBar()->addAction(menuAbout);
+    connect(menuAbout, &QAction::triggered, [this](){
+        QString version = "Evoplex " EVOPLEX_VERSION;
+        QString txt = "Evoplex is a multi-agent system for networks (graphs).\n\n"
+                      "Built on " EVOPLEX_BUILDDATE "\n\n"
+                      "From revision " EVOPLEX_GIT_COMMIT_HASH " (" EVOPLEX_GIT_BRANCH ")\n\n"
+                      "Copyright 2016-2018 Marcos Cardinot et al.";
+        QMessageBox::about(this, version, txt);
+    });
 
     QSettings s;
     restoreGeometry(s.value("gui/geometry").toByteArray());
