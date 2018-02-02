@@ -88,7 +88,7 @@ void PluginsPage::importPlugin()
     }
 
     QString error;
-    const AbstractPlugin* plugin = m_mainApp->loadPlugin(fileName, error);
+    const AbstractPlugin* plugin = m_mainApp->importPlugin(fileName, error);
     if (plugin) {
         insertRow(plugin);
     } else {

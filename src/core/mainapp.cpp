@@ -43,7 +43,7 @@ MainApp::MainApp()
     addAttrSpace(id, OUTPUT_HEADER, "string");
     addAttrSpace(id, OUTPUT_AVGTRIALS, "bool");
 
-    // load plugins
+    // load built-in plugins
     QDir pluginsDir = QDir(qApp->applicationDirPath());
     pluginsDir.cdUp();
     if (pluginsDir.cd("lib/evoplex/plugins")) {
@@ -51,6 +51,13 @@ MainApp::MainApp()
             QString error;
             loadPlugin(pluginsDir.absoluteFilePath(fileName), error);
         }
+    }
+    // load user imported plugins
+    QSettings s;
+    QStringList plugins = s.value("plugins").toStringList();
+    for (QString path : plugins) {
+        QString error;
+        loadPlugin(pluginsDir.absoluteFilePath(path), error);
     }
 }
 
@@ -61,6 +68,18 @@ MainApp::~MainApp()
     qDeleteAll(m_graphs);
     delete m_experimentsMgr;
     m_experimentsMgr = nullptr;
+}
+
+const AbstractPlugin* MainApp::importPlugin(const QString& path, QString& error)
+{
+    const AbstractPlugin* plugin = loadPlugin(path, error);
+    if (plugin) {
+        QSettings s;
+        QStringList paths = s.value("plugins").toStringList();
+        paths.append(path);
+        s.setValue("plugins", paths);
+    }
+    return plugin;
 }
 
 const AbstractPlugin* MainApp::loadPlugin(const QString& path, QString& error)
