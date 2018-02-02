@@ -142,7 +142,7 @@ void GraphWidget::slotRestarted(Experiment* exp)
     }
     m_model = nullptr;
     m_ui->currStep->setText("--");
-    updateCache();
+    updateCache(true);
 }
 
 void GraphWidget::slotStatusChanged(Experiment *exp)
