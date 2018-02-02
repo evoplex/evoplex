@@ -12,11 +12,14 @@
 
 namespace evoplex {
 
-ExperimentsMgr::ExperimentsMgr(int threads)
-    : m_threads(threads)
-    , m_timer(new QTimer(this))
+ExperimentsMgr::ExperimentsMgr()
+    : m_timer(new QTimer(this))
 {
     connect(m_timer, SIGNAL(timeout()), this, SLOT(updateProgressValues()));
+
+    QSettings s;
+    m_threads = s.value("settings/threads", QThread::idealThreadCount()).toInt();
+    m_threads = m_threads > QThread::idealThreadCount() ? QThread::idealThreadCount() : m_threads;
 }
 
 ExperimentsMgr::~ExperimentsMgr()

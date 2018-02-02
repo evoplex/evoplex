@@ -7,6 +7,7 @@
 #include <QElapsedTimer>
 #include <QFile>
 #include <QFileInfo>
+#include <QThread>
 
 #include "agent.h"
 #include "agentsgenerator.h"
@@ -76,6 +77,7 @@ bool Experiment::init(ExperimentInputs* inputs)
     m_graphPlugin = m_mainApp->graph(m_generalAttrs->value(GENERAL_ATTRIBUTE_GRAPHID).toQString());
     m_modelPlugin = m_mainApp->model(m_generalAttrs->value(GENERAL_ATTRIBUTE_MODELID).toQString());
 
+    m_delay = m_mainApp->defaultDelay();
     m_pauseAt = m_stopAt;
     m_progress = 0;
     m_trials.reserve(m_numTrials);
@@ -204,6 +206,9 @@ void Experiment::processTrial(const int& trialId)
 
         // TODO: write only after X steps
         writeStep(trialId);
+
+        if (m_delay > 0)
+            QThread::msleep(m_delay);
 
         algorithmConverged = trial->algorithmStep();
         ++trial->m_currStep;

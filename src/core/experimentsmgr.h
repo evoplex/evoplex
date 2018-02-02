@@ -19,7 +19,7 @@ class ExperimentsMgr: public QObject
     Q_OBJECT
 
 public:
-    explicit ExperimentsMgr(int threads);
+    explicit ExperimentsMgr();
     ~ExperimentsMgr();
 
     void play(Experiment* exp);

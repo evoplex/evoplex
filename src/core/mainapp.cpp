@@ -22,7 +22,7 @@
 namespace evoplex {
 
 MainApp::MainApp()
-    : m_experimentsMgr(new ExperimentsMgr(QThread::idealThreadCount()))
+    : m_experimentsMgr(new ExperimentsMgr())
     , m_lastProjectId(-1)
 {
     int id = 0;
@@ -43,6 +43,9 @@ MainApp::MainApp()
     addAttrSpace(id, OUTPUT_HEADER, "string");
     addAttrSpace(id, OUTPUT_AVGTRIALS, "bool");
 
+    QSettings s;
+    m_defaultDelay = s.value("settings/delay", 0).toInt();
+
     // load built-in plugins
     QDir pluginsDir = QDir(qApp->applicationDirPath());
     pluginsDir.cdUp();
@@ -53,7 +56,6 @@ MainApp::MainApp()
         }
     }
     // load user imported plugins
-    QSettings s;
     QStringList plugins = s.value("plugins").toStringList();
     for (QString path : plugins) {
         QString error;

@@ -53,6 +53,7 @@ private:
     QAction* m_aGraph;
     QAction* m_aGrid;
     QAction* m_aLineChart;
+    QSlider* m_delay;
 };
 }
 

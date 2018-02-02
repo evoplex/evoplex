@@ -39,6 +39,9 @@ public:
 
     void closeProject(int projId);
 
+    inline quint16 defaultDelay() const { return m_defaultDelay; }
+    inline void setDefaultDelay(quint16 msec) { m_defaultDelay = msec; }
+
     inline ExperimentsMgr* expMgr() const { return m_experimentsMgr; }
     inline const QHash<QString, GraphPlugin*>& graphs() const { return m_graphs; }
     inline const QHash<QString, ModelPlugin*>& models() const { return m_models; }
@@ -55,6 +58,7 @@ signals:
 
 private:
     ExperimentsMgr* m_experimentsMgr;
+    quint16 m_defaultDelay; // msec
 
     int m_lastProjectId;
     QHash<int, Project*> m_projects; // opened projects.

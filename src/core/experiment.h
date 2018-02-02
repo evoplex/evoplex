@@ -87,6 +87,9 @@ public:
     // stop all trials asap
     inline void stop() { pause(); m_stopAt = 0; play(); }
 
+    inline quint16 delay() const { return m_delay; }
+    inline void setDelay(quint16 delay) { m_delay = delay; }
+
     inline const Status expStatus() const { return m_expStatus; }
     inline void setExpStatus(Status s) { m_mutex.lock(); m_expStatus = s; m_mutex.unlock(); }
 
@@ -133,6 +136,7 @@ private:
     int m_pauseAt;
     Status m_expStatus;
     quint16 m_progress; // current progress value [0, 360]
+    quint16 m_delay;
 
     // A trial is part of an experiment which might have several other trials.
     // All trials of an experiment are meant to use exactly the same parameters

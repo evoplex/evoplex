@@ -51,12 +51,26 @@ ExperimentWidget::ExperimentWidget(MainGUI* mainGUI, Experiment* exp, ProjectsPa
     m_aStop = tb->addAction(m_kIcon_stop, "Stop");
     m_aReset = tb->addAction(m_kIcon_reset, "Reset");
     tb->addSeparator();
-    m_aGraph = tb->addAction("graph");
-    m_aGrid = tb->addAction("grid");
-    m_aLineChart = tb->addAction("line");
+    m_aGraph = tb->addAction(QIcon(":/icons/graph.svg"), "Graph");
+    m_aGrid = tb->addAction(QIcon(":/icons/grid.svg"), "Grid");
+    m_aLineChart = tb->addAction(QIcon(":/icons/line-chart.svg"), "Line chart");
+
+    QWidget* spacer = new QWidget(this);
+    spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    tb->addWidget(spacer);
+
+    m_delay = new QSlider(Qt::Horizontal, this);
+    m_delay->setSingleStep(10);
+    m_delay->setPageStep(100);
+    m_delay->setMaximum(500);
+    m_delay->setMinimumWidth(100);
+    m_delay->setMaximumWidth(100);
+    m_delay->setValue(m_exp->delay());
+    tb->addWidget(m_delay);
+
     tb->setMovable(false);
     tb->setFloatable(false);
-    tb->setIconSize(QSize(16,16));
+    tb->setIconSize(QSize(20,20));
     tb->setStyleSheet("background: rgb(53,53,53);");
 
     ExperimentsMgr* expMgr = mainGUI->mainApp()->expMgr();
@@ -66,6 +80,7 @@ ExperimentWidget::ExperimentWidget(MainGUI* mainGUI, Experiment* exp, ProjectsPa
     connect(m_aStop, &QAction::triggered, [this]() { m_exp->stop(); });
     connect(m_aReset, &QAction::triggered, [this]() { m_exp->reset(); });
     slotStatusChanged(exp); // just to init the controls
+    connect(m_delay, &QSlider::valueChanged, [this](int v) { m_exp->setDelay(v); });
 
     QVBoxLayout* layout = new QVBoxLayout(new QWidget(this));
     layout->addWidget(m_innerWindow);
