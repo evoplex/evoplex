@@ -17,6 +17,9 @@
         <file>next.svg</file>
         <file>plugins2.svg</file>
         <file>reset.svg</file>
+        <file>grid.svg</file>
+        <file>graph.svg</file>
+        <file>line-chart.svg</file>
     </qresource>
     <qresource prefix="/colormaps">
         <file>colormaps.json</file>
