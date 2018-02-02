@@ -35,7 +35,7 @@ public:
     // Create a new project
     Project* newProject(const QString& name="", const QString& dest="");
 
-    Project* openProject(const QString& filepath);
+    Project* openProject(const QString& filepath, QString& error);
 
     void closeProject(int projId);
 

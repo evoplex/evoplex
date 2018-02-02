@@ -186,17 +186,20 @@ void MainApp::closeProject(int projId)
     delete m_projects.take(projId);
 }
 
-Project* MainApp::openProject(const QString& filepath)
+Project* MainApp::openProject(const QString& filepath, QString& error)
 {
     QFileInfo fi(filepath);
     if (!fi.isReadable() || fi.suffix() != "csv") {
-        qWarning() << "[Project] : failed to open a project!" << filepath;
+        error = "Failed to open the project!\n"
+                "Please, make sure it's a readable csv file!\n" + filepath;
+        qWarning() << "[Project] :" << error;
         return nullptr;
     }
 
     Project* project = newProject(fi.baseName(), fi.absolutePath());
     if (project->importExperiments(filepath) == -1) {
-        qWarning() << "[Project] : failed to open a project!" << filepath;
+        error = "Failed to open the project!\n" + filepath;
+        qWarning() << "[Project] :" << error;
         closeProject(project->id());
         return nullptr;
     }

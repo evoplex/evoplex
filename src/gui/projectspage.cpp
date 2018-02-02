@@ -6,6 +6,7 @@
 #include <QApplication>
 #include <QDebug>
 #include <QFileDialog>
+#include <QMessageBox>
 
 #include "experimentwidget.h"
 #include "projectwidget.h"
@@ -77,8 +78,10 @@ bool ProjectsPage::slotOpenProject(QString path)
         }
     }
 
-    Project* project = m_mainApp->openProject(path);
+    QString error;
+    Project* project = m_mainApp->openProject(path, error);
     if (!project) {
+        QMessageBox::warning(this, "Evoplex", error);
         return false;
     }
     addProjectWidget(project);
