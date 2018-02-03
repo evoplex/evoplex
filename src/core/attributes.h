@@ -32,6 +32,9 @@ public:
         return idx == m_names.size() ? -1 : idx;
     }
 
+    inline bool contains(const char* name) const { return indexOf(name) > -1; }
+    inline bool contains(const QString& name) const { return indexOf(name) > -1; }
+
     inline void replace(int id, QString newName, Value newValue) { m_names[id] = newName; m_values[id] = newValue; }
     inline void push_back(QString name, Value value) { m_names.emplace_back(name); m_values.emplace_back(value); }
 

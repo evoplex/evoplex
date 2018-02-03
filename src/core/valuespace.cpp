@@ -48,7 +48,6 @@ ValueSpace* ValueSpace::parse(int id, const QString& attrName, QString space)
         qWarning() << "[ValueSpace::parse]: unable to parse " << space;
         return new DefaultSpace();
     }
-    Q_ASSERT(space == vs->space());
     return vs;
 }
 
