@@ -54,12 +54,12 @@ AgentsGeneratorDlg::AgentsGeneratorDlg(const AttributesSpace& agentAttrsSpace, A
     m_ui->func->insertItem(2, AgentsGenerator::enumToString(AgentsGenerator::F_Rand), AgentsGenerator::F_Rand);
     m_ui->func->setCurrentIndex(0);
 
+    m_ui->table->setRowCount(m_agentAttrsSpace.size());
     for (const ValueSpace* vs : m_agentAttrsSpace) {
         const int row = vs->id();
-        m_ui->table->insertRow(row);
         m_ui->table->setItem(row, 0, new QTableWidgetItem(vs->attrName()));
 
-        QComboBox* cb = new QComboBox();
+        QComboBox* cb = new QComboBox(m_ui->table);
         cb->insertItem(0, AgentsGenerator::enumToString(AgentsGenerator::F_Min), AgentsGenerator::F_Min);
         cb->insertItem(1, AgentsGenerator::enumToString(AgentsGenerator::F_Max), AgentsGenerator::F_Max);
         cb->insertItem(2, AgentsGenerator::enumToString(AgentsGenerator::F_Rand), AgentsGenerator::F_Rand);
@@ -68,21 +68,24 @@ AgentsGeneratorDlg::AgentsGeneratorDlg(const AttributesSpace& agentAttrsSpace, A
 
         QLineEdit* le = new QLineEdit();
         connect(cb, &QComboBox::currentTextChanged, [cb, le, vs](){
-            if (cb->currentIndex() == AgentsGenerator::F_Min
-                    || cb->currentIndex() == AgentsGenerator::F_Max) {
+            if (cb->currentData() == AgentsGenerator::F_Min
+                    || cb->currentData() == AgentsGenerator::F_Max) {
                 le->setHidden(true);
                 return;
-            } else if (cb->currentIndex() == AgentsGenerator::F_Rand) {
+            } else if (cb->currentData() == AgentsGenerator::F_Rand) {
                 le->setToolTip("Type the PRG seed (integer).");
-            } else if (cb->currentIndex() == AgentsGenerator::F_Value) {
+                le->setFocus();
+            } else if (cb->currentData() == AgentsGenerator::F_Value) {
                 le->setToolTip("Type a valid value for this attribute.\n"
                                "Expected: " + vs->space());
+                le->setFocus();
             } else {
                 Q_ASSERT(false);
             }
             le->setHidden(false);
         });
         m_ui->table->setCellWidget(row, 2, le);
+        le->setHidden(true);
     }
 
     resize(width(), 250);

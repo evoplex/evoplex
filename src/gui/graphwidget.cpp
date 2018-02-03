@@ -58,6 +58,7 @@ GraphWidget::GraphWidget(MainGUI* mainGUI, Experiment* exp, QWidget* parent)
     connect(m_ui->bZoomOut, SIGNAL(clicked(bool)), SLOT(zoomOut()));
     connect(m_ui->bReset, SIGNAL(clicked(bool)), SLOT(resetView()));
 
+    m_attrs.resize(exp->modelPlugin()->agentAttrSpace().size());
     for (const ValueSpace* valSpace : exp->modelPlugin()->agentAttrSpace()) {
         QLineEdit* le = new QLineEdit();
         le->setToolTip(valSpace->space());
@@ -84,7 +85,7 @@ GraphWidget::GraphWidget(MainGUI* mainGUI, Experiment* exp, QWidget* parent)
             QMessageBox::warning(this, "Graph", err);
             le->setText(agent->attr(valSpace->id()).toQString());
         });
-        m_attrs.emplace_back(le);
+        m_attrs[valSpace->id()] = le;
         m_ui->inspectorLayout->addRow(valSpace->attrName(), le);
     }
     m_ui->inspector->hide();
