@@ -4,7 +4,6 @@
  */
 
 #include <QDebug>
-#include <QElapsedTimer>
 #include <QFile>
 #include <QFileInfo>
 #include <QThread>
@@ -519,6 +518,18 @@ Experiment::ExperimentInputs* Experiment::readInputs(const MainApp* mainApp,
         }
     }
 
+    // make sure all attributes exist
+    auto checkAll = [&failedAttributes](const Attributes* attrs, const AttributesSpace& attrSpace) {
+        for (const ValueSpace* valSpace : attrSpace) {
+            if (!attrs->contains(valSpace->attrName())) {
+                failedAttributes.append(valSpace->attrName());
+            }
+        }
+    };
+    checkAll(generalAttrs, mainApp->generalAttrSpace());
+    checkAll(modelAttrs, mPlugin->pluginAttrSpace());
+    checkAll(graphAttrs, gPlugin->pluginAttrSpace());
+
     if (!failedAttributes.isEmpty()) {
         errorMsg += QString("The following attributes are missing/invalid: %1").arg(failedAttributes.join(","));
         delete generalAttrs;
@@ -527,11 +538,6 @@ Experiment::ExperimentInputs* Experiment::readInputs(const MainApp* mainApp,
         qDeleteAll(outputs);
         return nullptr;
     }
-
-    // make sure all attributes exist
-    Q_ASSERT(generalAttrs->indexOf("") == -1);
-    Q_ASSERT(modelAttrs->indexOf("") == -1);
-    Q_ASSERT(graphAttrs->indexOf("") == -1);
 
     // that's great! everything seems to be valid
     ExperimentInputs* inputs = new ExperimentInputs;
