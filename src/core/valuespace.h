@@ -33,15 +33,27 @@ public:
         FilePath
     };
 
-    static ValueSpace* parse(int id, const QString& attrName, QString space);
+    // space can be:
+    //   - "bool"               // a boolean
+    //   - "string"             // a string
+    //   - "dirpath"            // a string containing a valid dirpath
+    //   - "filepath"           // a string containing a valid filepath
+    //   - "int[min,max]"       // integers from min to max (including min and max)
+    //   - "int{1,2,3}"         // set of integers
+    //   - "double[min,max]     // doubles from min to max (including min and max)
+    //   - "double{1.1,1.2}     // set of doubles
+    //   * you can use 'max' to take the maximum value for the type
+    static ValueSpace* parse(int id, const QString& attrName, const QString& space);
 
     virtual const Value& min() const = 0;
     virtual const Value& max() const = 0;
     virtual Value rand(PRG* prg) const = 0;
 
+    // Check if the valueStr belongs to the parameter space.
+    // If true, return a valid Value with the correct type
     Value validate(const QString& valueStr) const;
-    inline bool isValid() const { return m_type != Invalid; }
 
+    inline bool isValid() const { return m_type != Invalid; }
     inline int id() const { return m_id; }
     inline const QString& attrName() const { return m_attrName; }
     inline const QString& space() const { return m_space; }
@@ -54,6 +66,14 @@ protected:
     QString m_space;
 
     explicit ValueSpace(int id, const QString& attrName, SpaceType type);
+
+private:
+    // assume that space is equal to 'int{ }' or 'double{ }'
+    // return a vector with all elements with the proper type
+    static ValueSpace* setSpace(QString space, const int id, const QString& attrName);
+
+    // assume that space is equal to 'int[min,max]' or 'double[min,max]'
+    static ValueSpace* rangeSpace(QString space, const int id, const QString& attrName);
 };
 
 class DefaultSpace : public ValueSpace

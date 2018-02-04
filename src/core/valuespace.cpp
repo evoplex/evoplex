@@ -9,7 +9,7 @@
 namespace evoplex
 {
 
-ValueSpace* ValueSpace::parse(int id, const QString& attrName, QString space)
+ValueSpace* ValueSpace::parse(int id, const QString& attrName, const QString& space)
 {
     ValueSpace* vs;
     if (space == "bool") {
@@ -21,27 +21,9 @@ ValueSpace* ValueSpace::parse(int id, const QString& attrName, QString space)
     } else if (space == "filepath") {
         vs = new DefaultSpace(id, attrName, FilePath, Value(QString()));
     } else if (space.contains('{') && space.endsWith('}')) {
-        Values values;
-        if (!Utils::paramSet(space, values)) {
-            vs = new DefaultSpace();
-        } else if (space.startsWith("int")) {
-            space.replace("max", QString::number(INT32_MAX));
-            vs = new SetSpace(id, attrName, Int_Set, values);
-        } else if (space.startsWith("double")) {
-            space.replace("max", QString::number(DBL_MAX));
-            vs = new SetSpace(id, attrName, Double_Set, values);
-        }
+        vs = setSpace(space, id, attrName);
     } else if (space.contains('[') && space.endsWith(']')) {
-        Value min, max;
-        if (!Utils::paramInterval(space, min, max)) {
-            vs = new DefaultSpace();
-        } else if (space.startsWith("int")) {
-            space.replace("max", QString::number(INT32_MAX));
-            vs = new RangeSpace(id, attrName, Int_Range, min, max);
-        } else if (space.startsWith("double")) {
-            space.replace("max", QString::number(DBL_MAX));
-            vs = new RangeSpace(id, attrName, Double_Range, min, max);
-        }
+        vs = rangeSpace(space, id, attrName);
     }
 
     if (!vs) {
@@ -49,6 +31,75 @@ ValueSpace* ValueSpace::parse(int id, const QString& attrName, QString space)
         return new DefaultSpace();
     }
     return vs;
+}
+
+ValueSpace* ValueSpace::setSpace(QString space, const int id, const QString& attrName)
+{
+    QStringList valuesStr = space.remove("{").remove("}").split(",");
+    ValueSpace::SpaceType type;
+    Values values;
+    bool ok = false;
+    if (space.startsWith("int")) {
+        type = ValueSpace::Int_Set;
+        valuesStr[0] = valuesStr[0].remove("int");
+        foreach (QString vStr, valuesStr) {
+            values.push_back(vStr.toInt(&ok));
+            if (!ok) break;
+        }
+    } else if (space.startsWith("double")) {
+        type = ValueSpace::Double_Set;
+        valuesStr[0] = valuesStr[0].remove("double");
+        foreach (QString vStr, valuesStr) {
+            values.push_back(vStr.toDouble(&ok));
+            if (!ok) break;
+        }
+    }
+
+    if (!ok) {
+        return new DefaultSpace();
+    }
+    return new SetSpace(id, attrName, type, values);
+}
+
+ValueSpace* ValueSpace::rangeSpace(QString space, const int id, const QString& attrName)
+{
+    QStringList values = space.remove("[").remove("]").split(",");
+    if (values.size() != 2) {
+        return new DefaultSpace();
+    }
+
+    ValueSpace::SpaceType type;
+    Value min;
+    Value max;
+    bool ok1 = false;
+    bool ok2 = false;
+
+    if (space.startsWith("int")) {
+        type = ValueSpace::Int_Range;
+        values[0] = values[0].remove("int");
+        min = Value(values.at(0).toInt(&ok1));
+        if (values.at(1) == "max") {
+            max = Value(INT32_MAX);
+            ok2 = true;
+        } else {
+            max = Value(values.at(1).toInt(&ok2));
+        }
+    } else if (space.startsWith("double")) {
+        type = ValueSpace::Double_Range;
+        values[0] = values[0].remove("double");
+        min = Value(values.at(0).toDouble(&ok1));
+        if (values.at(1) == "max") {
+            max = Value(DBL_MAX);
+            ok2 = true;
+        } else {
+            max = Value(values.at(1).toDouble(&ok2));
+        }
+    }
+
+    if (!ok1 || !ok2) {
+        return new DefaultSpace();
+    }
+    return new RangeSpace(id, attrName, type, min, max);
 }
 
 Value ValueSpace::validate(const QString& valueStr) const
@@ -84,21 +135,43 @@ Value ValueSpace::validate(const QString& valueStr) const
         }
         break;
     }
-    case Int_Range:
-    case Double_Range: {
-        const RangeSpace* ispace = dynamic_cast<const RangeSpace*>(this);
-        Value valSrc = Utils::valueFromString(ispace->min().type(), valueStr);
-        if (valSrc.isValid() && valSrc >= ispace->min() && valSrc <= ispace->max()) {
-            return valSrc;
+    case Int_Range: {
+        const RangeSpace* space = dynamic_cast<const RangeSpace*>(this);
+        bool ok = false;
+        Value value(valueStr.toInt(&ok));
+        if (ok && value.isValid() && value >= space->min() && value <= space->max()) {
+            return value;
         }
         break;
     }
-    case Int_Set:
+    case Double_Range: {
+        const RangeSpace* space = dynamic_cast<const RangeSpace*>(this);
+        bool ok = false;
+        Value value(valueStr.toDouble(&ok));
+        if (ok && value.isValid() && value >= space->min() && value <= space->max()) {
+            return value;
+        }
+        break;
+    }
+    case Int_Set: {
+        const SetSpace* sspace = dynamic_cast<const SetSpace*>(this);
+        bool ok = false;
+        Value value(valueStr.toInt(&ok));
+        foreach (Value validValue, sspace->values()) {
+            if (value == validValue) {
+                return value;
+            }
+        }
+        break;
+    }
     case Double_Set: {
         const SetSpace* sspace = dynamic_cast<const SetSpace*>(this);
-        Value valSrc = Utils::valueFromString(sspace->values().front().type(), valueStr);
-        foreach (Value val, sspace->values()) {
-            if (val == valSrc) return val;
+        bool ok = false;
+        Value value(valueStr.toDouble(&ok));
+        foreach (Value validValue, sspace->values()) {
+            if (value == validValue) {
+                return value;
+            }
         }
         break;
     }
