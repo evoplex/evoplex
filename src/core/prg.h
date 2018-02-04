@@ -8,6 +8,8 @@
 
 #include <random>
 
+namespace evoplex
+{
 class PRG
 {
 public:
@@ -24,17 +26,17 @@ public:
     // Generate a random double [0, max)
     double randD(double max) { return randD(0.0, max); }
 
-    // Generate a random int [min, max)
+    // Generate a random int [min, max]
     int randI(int min, int max) {
-        std::uniform_int_distribution<int> dis(min, max-1);
+        std::uniform_int_distribution<int> dis(min, max);
         return dis(m_mteng);
     }
-    // Generate a random int [0, max)
+    // Generate a random int [0, max]
     int randI(int max) { return randI(0, max); }
 
 private:
     std::mt19937 m_mteng; //  Mersenne Twister engine
     std::uniform_real_distribution<double> m_zeroOne;
 };
-
+} // evoplex
 #endif // PRG_H

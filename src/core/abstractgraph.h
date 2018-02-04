@@ -38,7 +38,7 @@ public:
     inline Edges edges() const { return m_edges; }
     inline Agents agents() const { return m_agents; }
     inline Agent* agent(int id) const { return m_agents.at(id); }
-    inline Agent* randAgent() const { return m_agents.at(m_prg->randI(m_agents.size())); }
+    inline Agent* randAgent() const { return m_agents.at(m_prg->randI(m_agents.size()-1)); }
 
 protected:
     Agents m_agents;

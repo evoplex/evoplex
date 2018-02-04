@@ -115,7 +115,7 @@ public:
 
     virtual const Value& min() const { return m_values.front(); }
     virtual const Value& max() const { return m_values.back(); }
-    virtual Value rand(PRG* prg) const { return m_values.at(prg->randI(m_values.size())); }
+    virtual Value rand(PRG* prg) const { return m_values.at(prg->randI(m_values.size()-1)); }
 
     inline const Values& values() const { return m_values; }
 

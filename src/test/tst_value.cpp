@@ -13,19 +13,11 @@ class TestValue: public QObject
     Q_OBJECT
 
 private slots:
-    void initTestCase();
-    void cleanupTestCase();
+    void initTestCase() {}
+    void cleanupTestCase() {}
     void tst_build();
     void tst_compare();
 };
-
-void TestValue::initTestCase()
-{
-}
-
-void TestValue::cleanupTestCase()
-{
-}
 
 void TestValue::tst_build()
 {

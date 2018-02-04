@@ -44,7 +44,7 @@ public:
     inline const Edges edges() const { return m_edges; }
     inline Agent* neighbour(int localId) const { return m_edges.at(localId)->neighbour(); }
     inline Agent* randNeighbour(PRG* prg) const {
-        return m_edges.at(prg->randI(m_edges.size()))->neighbour();
+        return m_edges.at(prg->randI(m_edges.size()-1))->neighbour();
     }
 
 private:
