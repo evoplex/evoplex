@@ -56,15 +56,14 @@ AgentsGeneratorDlg::AgentsGeneratorDlg(const AttributesSpace& agentAttrsSpace, A
 
     m_ui->table->setRowCount(m_agentAttrsSpace.size());
     for (const ValueSpace* vs : m_agentAttrsSpace) {
-        const int row = vs->id();
-        m_ui->table->setItem(row, 0, new QTableWidgetItem(vs->attrName()));
+        m_ui->table->setItem(vs->id(), 0, new QTableWidgetItem(vs->attrName()));
 
         QComboBox* cb = new QComboBox(m_ui->table);
         cb->insertItem(0, AgentsGenerator::enumToString(AgentsGenerator::F_Min), AgentsGenerator::F_Min);
         cb->insertItem(1, AgentsGenerator::enumToString(AgentsGenerator::F_Max), AgentsGenerator::F_Max);
         cb->insertItem(2, AgentsGenerator::enumToString(AgentsGenerator::F_Rand), AgentsGenerator::F_Rand);
         cb->insertItem(3, AgentsGenerator::enumToString(AgentsGenerator::F_Value), AgentsGenerator::F_Value);
-        m_ui->table->setCellWidget(row, 1, cb);
+        m_ui->table->setCellWidget(vs->id(), 1, cb);
 
         QLineEdit* le = new QLineEdit();
         connect(cb, &QComboBox::currentTextChanged, [cb, le, vs](){
@@ -84,7 +83,7 @@ AgentsGeneratorDlg::AgentsGeneratorDlg(const AttributesSpace& agentAttrsSpace, A
             }
             le->setHidden(false);
         });
-        m_ui->table->setCellWidget(row, 2, le);
+        m_ui->table->setCellWidget(vs->id(), 2, le);
         le->setHidden(true);
     }
 
@@ -162,12 +161,14 @@ void AgentsGeneratorDlg::fill(AgentsGenerator* ag)
 
     AGFromFile* agff = dynamic_cast<AGFromFile*>(ag);
     if (agff) {
+        m_ui->bFromFile->setChecked(true);
         m_ui->filepath->setText(agff->filePath());
         return;
     }
 
     AGSameFuncForAll* agsame = dynamic_cast<AGSameFuncForAll*>(ag);
     if (agsame) {
+        m_ui->bSameData->setChecked(true);
         m_ui->numAgents1->setValue(agsame->numAgents());
         m_ui->func->setCurrentIndex(m_ui->func->findData(agsame->function()));
         Value v = agsame->functionInput();
@@ -177,16 +178,15 @@ void AgentsGeneratorDlg::fill(AgentsGenerator* ag)
 
     AGDiffFunctions* agdiff = dynamic_cast<AGDiffFunctions*>(ag);
     if (agdiff) {
+        m_ui->bDiffData->setChecked(true);
         m_ui->numAgents2->setValue(agdiff->numAgents());
-        int row = 0;
         for (const AGDiffFunctions::AttrCmd ac : agdiff->attrCmds()) {
-            Q_ASSERT(m_ui->table->item(row, 0)->text() == ac.attrName);
-            QComboBox* cb = dynamic_cast<QComboBox*>(m_ui->table->cellWidget(row, 1));
+            Q_ASSERT(m_ui->table->item(ac.attrId, 0)->text() == ac.attrName);
+            QComboBox* cb = dynamic_cast<QComboBox*>(m_ui->table->cellWidget(ac.attrId, 1));
             cb->setCurrentIndex(cb->findData(ac.func));
             if (ac.func == AgentsGenerator::F_Rand || ac.func == AgentsGenerator::F_Value) {
-                dynamic_cast<QLineEdit*>(m_ui->table->cellWidget(row, 2))->setText(ac.funcInput.toQString());
+                dynamic_cast<QLineEdit*>(m_ui->table->cellWidget(ac.attrId, 2))->setText(ac.funcInput.toQString());
             }
-            ++row;
         }
     }
 }
@@ -208,13 +208,12 @@ QString AgentsGeneratorDlg::readCommand()
         }
     } else if (m_ui->bDiffData->isChecked()) {
         command = QString("#%1").arg(m_ui->numAgents2->text());
-        int row = 0;
         for (const ValueSpace* vs : m_agentAttrsSpace) {
-            Q_ASSERT(m_ui->table->item(row, 0)->text() == vs->attrName());
-            QComboBox* cb = dynamic_cast<QComboBox*>(m_ui->table->cellWidget(row, 1));
+            Q_ASSERT(m_ui->table->item(vs->id(), 0)->text() == vs->attrName());
+            QComboBox* cb = dynamic_cast<QComboBox*>(m_ui->table->cellWidget(vs->id(), 1));
             command += QString(";%1_%2").arg(vs->attrName()).arg(cb->currentText());
 
-            QString valStr = dynamic_cast<QLineEdit*>(m_ui->table->cellWidget(row, 2))->text();
+            QString valStr = dynamic_cast<QLineEdit*>(m_ui->table->cellWidget(vs->id(), 2))->text();
             if (cb->currentData() == AgentsGenerator::F_Rand) {
                 bool isInt = false;
                 valStr.toInt(&isInt);
@@ -233,7 +232,6 @@ QString AgentsGeneratorDlg::readCommand()
                 }
                 command += "_" + valStr;
             }
-            ++row;
         }
     } else {
         qFatal("[AgentsGeneratorDlg::slotOk()]");

@@ -92,9 +92,10 @@ class AGDiffFunctions : public AgentsGenerator
 {
 public:
     struct AttrCmd {
-      QString attrName;
-      Function func;
-      Value funcInput;
+        int attrId;
+        QString attrName;
+        Function func;
+        Value funcInput;
     };
 
     explicit AGDiffFunctions(const AttributesSpace& attrsSpace, const int numAgents,

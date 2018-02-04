@@ -181,6 +181,7 @@ void ProjectWidget::onItemDoubleClicked(QTableWidgetItem* item)
 
 void ProjectWidget::slotHasUnsavedChanges(bool b)
 {
+    setObjectName(m_project->name());
     setWindowTitle(objectName() + (b ? "*" : ""));
     emit (hasUnsavedChanges(this));
 }

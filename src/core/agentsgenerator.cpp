@@ -354,7 +354,10 @@ AgentsGenerator* AgentsGenerator::parse(const AttributesSpace& agentAttrsSpace,
                 QStringList attrCmdStr = cmd.split("_");
 
                 attrCmd.attrName = attrCmdStr.at(0);
-                if (!agentAttrsSpace.contains(attrCmd.attrName)) {
+                const ValueSpace* valSpace = agentAttrsSpace.value(attrCmd.attrName, nullptr);
+                if (valSpace) {
+                    attrCmd.attrId = valSpace->id();
+                } else {
                     errMsg = QString("Unable to parse '%1'."
                             "The attribute '%2' does not belong to the current model.")
                             .arg(command).arg(attrCmd.attrName);
