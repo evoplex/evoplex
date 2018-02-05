@@ -358,7 +358,7 @@ Experiment::ExperimentInputs* AttributesWidget::readInputs()
         }
         QDoubleSpinBox* dsp = qobject_cast<QDoubleSpinBox*>(widget);
         if (dsp) {
-            values << QString::number(dsp->value(), 'f', 2);
+            values << QString::number(dsp->value(), 'g', 8);
             continue;
         }
         QComboBox* cb = qobject_cast<QComboBox*>(widget);
@@ -557,6 +557,7 @@ QDoubleSpinBox* AttributesWidget::newDoubleSpinBox(const double min, const doubl
     QDoubleSpinBox* sp = new QDoubleSpinBox(m_ui->treeWidget);
     sp->setMaximum(max);
     sp->setMinimum(min);
+    sp->setDecimals(8);
     sp->setButtonSymbols(QDoubleSpinBox::NoButtons);
     return sp;
 }

@@ -118,6 +118,10 @@ void ExperimentWidget::closeEvent(QCloseEvent* event)
 
 void ExperimentWidget::slotStatusChanged(Experiment* exp)
 {
+    if (m_exp != exp) {
+        return;
+    }
+
     Experiment::Status status = exp->expStatus();
     if (status == Experiment::READY) {
         m_aPlayPause->setIcon(m_kIcon_play);

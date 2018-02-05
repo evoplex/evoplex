@@ -141,6 +141,8 @@ void GraphWidget::slotRestarted(Experiment* exp)
     if (exp != m_exp) {
         return;
     }
+    m_selectedAgent = -1;
+    m_ui->inspector->hide();
     m_model = nullptr;
     m_ui->currStep->setText("--");
     updateCache(true);

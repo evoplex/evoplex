@@ -40,7 +40,7 @@ LineChart::LineChart(ExperimentsMgr* expMgr, Experiment* exp, QWidget* parent)
     dlg->hide();
 
     m_chart->legend()->hide();
-    m_chart->setAnimationOptions(QtCharts::QChart::GridAxisAnimations);
+    m_chart->setAnimationOptions(QtCharts::QChart::NoAnimation);
     m_chart->setTheme(QtCharts::QChart::ChartThemeLight);
     m_chart->setBackgroundVisible(false);
 

@@ -187,7 +187,14 @@ AGDiffFunctions::AGDiffFunctions(const AttributesSpace &attrsSpace, const int nu
     , m_numAgents(numAgents)
     , m_attrCmds(attrCmds)
 {
-
+    Q_ASSERT(m_numAgents > 0);
+    m_command = QString("#%1").arg(m_numAgents);
+    for (const AttrCmd& cmd : m_attrCmds) {
+        m_command += QString(";%1_%2").arg(cmd.attrName).arg(enumToString(cmd.func));
+        if (cmd.funcInput.isValid()) {
+            m_command += "_" + cmd.funcInput.toQString();
+        }
+    }
 }
 
 Agents AGDiffFunctions::create(std::function<void(int)> progress)
@@ -226,6 +233,7 @@ Agents AGDiffFunctions::create(std::function<void(int)> progress)
         for (Attributes& attrs : agentsAttrs) {
             attrs.replace(valSpace->id(), valSpace->attrName(), value());
         }
+        delete prg;
     }
 
     Agents agents;
