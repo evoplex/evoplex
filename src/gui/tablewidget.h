@@ -30,7 +30,6 @@ public:
         H_EXPID,
         H_SEED,
         H_STOPAT,
-        H_AGENTS,
         H_MODEL,
         H_GRAPH,
         H_TRIALS

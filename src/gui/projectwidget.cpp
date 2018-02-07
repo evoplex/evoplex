@@ -48,7 +48,6 @@ ProjectWidget::ProjectWidget(MainGUI* mainGUI, Project* project, ProjectsPage* p
     m_headerIdx.insert(TableWidget::H_EXPID, col++);
     m_headerIdx.insert(TableWidget::H_SEED, col++);
     m_headerIdx.insert(TableWidget::H_STOPAT, col++);
-    m_headerIdx.insert(TableWidget::H_AGENTS, col++);
     m_headerIdx.insert(TableWidget::H_MODEL, col++);
     m_headerIdx.insert(TableWidget::H_GRAPH, col++);
     m_headerIdx.insert(TableWidget::H_TRIALS, col++);
@@ -103,28 +102,20 @@ void ProjectWidget::fillRow(int row, Experiment* exp)
     insertItem(row, TableWidget::H_SEED, gep->value(GENERAL_ATTRIBUTE_SEED).toQString());
     insertItem(row, TableWidget::H_STOPAT, gep->value(GENERAL_ATTRIBUTE_STOPAT).toQString());
     insertItem(row, TableWidget::H_TRIALS, gep->value(GENERAL_ATTRIBUTE_TRIALS).toQString());
-    bool isRandom;
-    gep->value(GENERAL_ATTRIBUTE_AGENTS).toQString().toInt(&isRandom);
-    if (isRandom)
-        insertItem(row, TableWidget::H_AGENTS, "R", "Agents with random attributes.");
-    else
-        insertItem(row, TableWidget::H_AGENTS, "F", "Agents from file.");
 
     // lambda function to add the attributes of a plugin (ie, model or graph)
     auto pluginAtbs = [this, row](TableWidget::Header header, QString pluginId, const Attributes* attrs)
     {
-        QString pluginAttrs = "id:" + pluginId;
-        pluginId += "_";
-        for (int i = 0; i < attrs->size(); ++i) {
-            pluginAttrs += QString(" | %1:%2")
-                    .arg(QString(attrs->name(i)).remove(pluginId))
-                    .arg(attrs->value(i).toQString());
+        QString pluginAttrs = pluginId;
+        for (const Value& v : attrs->values()) {
+            pluginAttrs += QString(" | %1").arg(v.toQString());
         }
         QTableWidgetItem* item = new QTableWidgetItem(pluginAttrs);
         item->setTextAlignment(Qt::AlignCenter);
-        QFont font = item->font();
-        font.setItalic(true);
-        item->setFont(font);
+        item->setToolTip(pluginAttrs);
+        //QFont font = item->font();
+        //font.setItalic(true);
+        //item->setFont(font);
         m_ui->table->setItem(row, m_headerIdx.value(header), item);
     };
 

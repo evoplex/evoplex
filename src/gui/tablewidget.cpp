@@ -45,13 +45,11 @@ TableWidget::TableWidget(QWidget *parent)
     m_headerLabel.insert(H_EXPID, "#");
     m_headerLabel.insert(H_SEED, "Seed");
     m_headerLabel.insert(H_STOPAT, "Stop at");
-    m_headerLabel.insert(H_AGENTS, "Agents");
     m_headerLabel.insert(H_MODEL, "Model");
     m_headerLabel.insert(H_GRAPH, "Graph");
     m_headerLabel.insert(H_TRIALS, "Trials");
 
     horizontalHeader()->setHighlightSections(false);
-    horizontalHeader()->setDefaultSectionSize(70);
     horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 
     verticalHeader()->setVisible(false);
@@ -99,8 +97,9 @@ int TableWidget::insertRow(Experiment* exp)
     QTableWidgetItem* item = new QTableWidgetItem("");
     item->setData(Qt::UserRole, QVariant::fromValue(exp));
     setItem(row, 0, item); // always in the first column
-    horizontalHeader()->setSectionResizeMode(0, QHeaderView::Fixed);
+
     horizontalHeader()->setDefaultSectionSize(60);
+    horizontalHeader()->setSectionResizeMode(H_BUTTON, QHeaderView::Fixed);
 
     setItemDelegateForRow(row, new RowsDelegate(exp, this));
 
