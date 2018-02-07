@@ -15,6 +15,7 @@
 
 #include "mainapp.h"
 #include "experimentsmgr.h"
+#include "logger.h"
 #include "project.h"
 #include "constants.h"
 #include "utils.h"

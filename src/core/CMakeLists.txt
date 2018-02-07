@@ -21,6 +21,7 @@ set(EVOPLEX_CORE_H
   experiment.h
   experimentsmgr.h
   project.h
+  logger.h
   mainapp.h
 )
 set(EVOPLEX_CORE_CXX
@@ -35,6 +36,7 @@ set(EVOPLEX_CORE_CXX
   output.cpp
   project.cpp
   valuespace.cpp
+  logger.cpp
   mainapp.cpp
 )
 

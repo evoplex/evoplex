@@ -6,10 +6,12 @@
 #include <QApplication>
 #include <QCoreApplication>
 #include <QDebug>
+#include <QDir>
 #include <QScopedPointer>
 #include <QStyleFactory>
 
 #include "config.h"
+#include "core/logger.h"
 #include "core/mainapp.h"
 #include "gui/maingui.h"
 
@@ -32,10 +34,19 @@ int main(int argc, char* argv[])
     QCoreApplication::setApplicationName("Evoplex");
     QCoreApplication::setApplicationVersion(EVOPLEX_VERSION);
 
-    qDebug() <<" *************************************************\n"
-             << "* Copyright (C) 2016-2018 - Evoplex" << EVOPLEX_VERSION << "      *\n"
-             << "* @author Marcos Cardinot <mcardinot@gmail.com> *\n"
-             << "*************************************************\n";
+    evoplex::Logger::init();
+
+    QString copyrightLine = "Copyright (C) 2016-2018 Marcos Cardinot et al.";
+    QString versionLine = QString("This is %1 %2 - %3").arg(QCoreApplication::applicationName())
+                                                       .arg(QCoreApplication::applicationVersion())
+                                                       .arg(QCoreApplication::organizationDomain());
+
+    int maxLength = qMax(versionLine.size(), copyrightLine.size());
+    qDebug() << qPrintable(QString(" %1").arg(QString().fill('-', maxLength+2)));
+    qDebug() << qPrintable(QString("[ %1 ]").arg(versionLine.leftJustified(maxLength, ' ')));
+    qDebug() << qPrintable(QString("[ %1 ]").arg(copyrightLine.leftJustified(maxLength, ' ')));
+    qDebug() << qPrintable(QString(" %1").arg(QString().fill('-', maxLength+2)));
+    qDebug() << "Writing log file to:" << QDir::toNativeSeparators(evoplex::Logger::getLogFileName());
 
     // init application
     evoplex::MainApp mainApp;
@@ -69,6 +80,8 @@ int main(int argc, char* argv[])
         // start console application
         // TODO: handle args
     }
+
+    evoplex::Logger::deinit();
 
     return result;
 }

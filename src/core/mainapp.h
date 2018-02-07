@@ -18,7 +18,6 @@
 namespace evoplex {
 
 class ExperimentsMgr;
-class FileMgr;
 class Project;
 
 class MainApp : public QObject
