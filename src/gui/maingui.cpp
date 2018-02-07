@@ -4,9 +4,12 @@
  */
 
 #include <QDebug>
+#include <QLabel>
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QMouseEvent>
+#include <QPlainTextEdit>
+#include <QPushButton>
 #include <QSettings>
 #include <QToolBar>
 #include <QToolButton>
@@ -22,6 +25,7 @@
 #include "welcomepage.h"
 
 #include "../config.h"
+#include "core/logger.h"
 #include "core/project.h"
 
 namespace evoplex {
@@ -45,6 +49,7 @@ MainGUI::MainGUI(MainApp* mainApp, QWidget* parent)
     this->setGeometry(100,100,800,500);
     this->setTabPosition(Qt::AllDockWidgetAreas, QTabWidget::South);
     this->setDockNestingEnabled(true);
+    this->setContextMenuPolicy(Qt::NoContextMenu);
 
     //
     // central widget
@@ -164,9 +169,13 @@ MainGUI::MainGUI(MainApp* mainApp, QWidget* parent)
     QMenu* menuSettings = new QMenu("Settings", this);
         // generate template
     this->menuBar()->addMenu(menuSettings);
-    QAction* menuAbout = new QAction("About", this);
-    this->menuBar()->addAction(menuAbout);
-    connect(menuAbout, &QAction::triggered, [this](){
+
+    QMenu* menuHelp = new QMenu("Help", this);
+    QAction* acLog = new QAction("Log", this);
+    connect(acLog, SIGNAL(triggered(bool)), SLOT(slotShowLog()));
+    menuHelp->addAction(acLog);
+    QAction* acAbout = new QAction("About", this);
+    connect(acAbout, &QAction::triggered, [this]() {
         QString version = "Evoplex " EVOPLEX_VERSION;
         QString txt = "Evoplex is a multi-agent system for networks (graphs).\n\n"
                       "Built on " EVOPLEX_BUILDDATE "\n\n"
@@ -174,6 +183,8 @@ MainGUI::MainGUI(MainApp* mainApp, QWidget* parent)
                       "Copyright 2016-2018 Marcos Cardinot et al.";
         QMessageBox::about(this, version, txt);
     });
+    menuHelp->addAction(acAbout);
+    this->menuBar()->addMenu(menuHelp);
 
     QSettings s;
     restoreGeometry(s.value("gui/geometry").toByteArray());
@@ -280,4 +291,31 @@ void MainGUI::slotSaveAll()
     }
 }
 
+void MainGUI::slotShowLog()
+{
+    QDialog* d = new QDialog(this);
+    QVBoxLayout* l = new QVBoxLayout(d);
+    l->addWidget(new QLabel("Use the following to provide more detailed information about your system to bug reports:"));
+
+    QPlainTextEdit* text = new QPlainTextEdit(Logger::log(), d);
+    text->setReadOnly(true);
+    l->addWidget(text);
+
+    l->addWidget(new QLabel("Writing log file to: " + Logger::logFileName()));
+
+    QHBoxLayout* bts = new QHBoxLayout(d);
+    bts->addSpacerItem(new QSpacerItem(5,5,QSizePolicy::MinimumExpanding,QSizePolicy::MinimumExpanding));
+    QPushButton* copy = new QPushButton("Copy to Clipboard");
+    connect(copy, &QPushButton::pressed, [text](){ text->selectAll(); text->copy(); });
+    bts->addWidget(copy);
+    QPushButton* close = new QPushButton("Close");
+    connect(close, &QPushButton::pressed, [d](){ d->close(); });
+    bts->addWidget(close);
+    l->addLayout(bts);
+
+    d->setModal(true);
+    d->setLayout(l);
+    d->show();
 }
+
+} // evoplex
