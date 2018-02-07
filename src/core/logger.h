@@ -28,14 +28,14 @@ public:
     // not on the console like with qDebug().
     static void writeLog(QString msg);
 
-    static const QString& log() { return log; }
+    static const QString& log() { return m_log; }
 
-    static QString logFileName() { return logFile.fileName(); }
+    static QString logFileName() { return m_logFile.fileName(); }
 
 private:
-    static QFile logFile;
-    static QString log;
-    static QMutex fileMutex;
+    static QFile m_logFile;
+    static QString m_log;
+    static QMutex m_fileMutex;
 
     static QString getMsvcVersionString(int ver);
 };

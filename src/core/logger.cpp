@@ -17,17 +17,17 @@
 namespace evoplex
 {
 
-QFile Logger::logFile;
-QString Logger::log;
-QMutex Logger::fileMutex;
+QFile Logger::m_logFile;
+QString Logger::m_log;
+QMutex Logger::m_fileMutex;
 
 void Logger::init()
 {
-    logFile.setFileName(QString("%1/%2/log.txt")
+    m_logFile.setFileName(QString("%1/%2/log.txt")
                         .arg(QStandardPaths::writableLocation(QStandardPaths::ConfigLocation))
                         .arg(QCoreApplication::applicationName()));
 
-    if (logFile.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text | QIODevice::Unbuffered)) {
+    if (m_logFile.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text | QIODevice::Unbuffered)) {
         qInstallMessageHandler(Logger::debugLogHandler);
     }
 
@@ -241,7 +241,7 @@ void Logger::init()
 void Logger::deinit()
 {
     qInstallMessageHandler(0);
-    logFile.close();
+    m_logFile.close();
 }
 
 void Logger::debugLogHandler(QtMsgType type, const QMessageLogContext& ctx, const QString& msg)
@@ -273,10 +273,10 @@ void Logger::writeLog(QString msg)
     if (!msg.endsWith('\n'))
         msg.append(QLatin1Char('\n'));
 
-    fileMutex.lock();
-    logFile.write(qPrintable(msg), msg.size());
-    log += msg;
-    fileMutex.unlock();
+    m_fileMutex.lock();
+    m_logFile.write(qPrintable(msg), msg.size());
+    m_log += msg;
+    m_fileMutex.unlock();
 }
 
 QString Logger::getMsvcVersionString(int ver)

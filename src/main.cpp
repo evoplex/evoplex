@@ -46,7 +46,7 @@ int main(int argc, char* argv[])
     qDebug() << qPrintable(QString("[ %1 ]").arg(versionLine.leftJustified(maxLength, ' ')));
     qDebug() << qPrintable(QString("[ %1 ]").arg(copyrightLine.leftJustified(maxLength, ' ')));
     qDebug() << qPrintable(QString(" %1").arg(QString().fill('-', maxLength+2)));
-    qDebug() << "Writing log file to:" << QDir::toNativeSeparators(evoplex::Logger::getLogFileName());
+    qDebug() << "Writing log file to:" << QDir::toNativeSeparators(evoplex::Logger::logFileName());
 
     // init application
     evoplex::MainApp mainApp;
