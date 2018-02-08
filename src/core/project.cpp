@@ -50,7 +50,7 @@ Experiment* Project::newExperiment(Experiment::ExperimentInputs* inputs)
     }
 
     ++m_lastExpId;
-    Experiment* exp = new Experiment(m_mainApp, m_lastExpId, m_id, inputs);
+    Experiment* exp = new Experiment(m_mainApp, m_lastExpId, inputs, this);
     m_experiments.insert(m_lastExpId, exp);
 
     m_hasUnsavedChanges = true;

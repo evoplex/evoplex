@@ -15,6 +15,8 @@
 
 #include "attributeswidget.h"
 #include "agentsgeneratordlg.h"
+#include "experimentwidget.h"
+#include "projectwidget.h"
 #include "outputwidget.h"
 #include "ui_attributeswidget.h"
 
@@ -24,21 +26,23 @@
 
 namespace evoplex {
 
-AttributesWidget::AttributesWidget(MainApp* mainApp, Project* project, QWidget *parent)
+AttributesWidget::AttributesWidget(MainApp* mainApp, QWidget *parent)
     : QDockWidget(parent)
     , m_mainApp(mainApp)
-    , m_project(project)
+    , m_project(nullptr)
     , m_exp(nullptr)
     , m_selectedGraphId(STRING_NULL_PLUGINID)
     , m_selectedModelId(STRING_NULL_PLUGINID)
     , m_ui(new Ui_AttributesWidget)
 {
+    setObjectName("AttributesWidget");
     m_ui->setupUi(this);
 
     m_ui->treeWidget->setFocusPolicy(Qt::NoFocus);
     m_ui->bEdit->hide();
     connect(m_ui->bSubmit, SIGNAL(clicked(bool)), SLOT(slotCreateExperiment()));
     connect(m_ui->bEdit, SIGNAL(clicked(bool)), SLOT(slotEditExperiment()));
+    connect(m_ui->cbWidgets, SIGNAL(currentIndexChanged(int)), SLOT(slotSetActiveWidget(int)));
 
     // setup the tree widget: model
     m_treeItemModels = new QTreeWidgetItem(m_ui->treeWidget);
@@ -54,7 +58,7 @@ AttributesWidget::AttributesWidget(MainApp* mainApp, Project* project, QWidget *
     m_treeItemGraphs->setText(0, "Graph");
     m_treeItemGraphs->setExpanded(false);
     // -- add custom widget -- agents creator
-    QLineEdit* agentsCmd = new QLineEdit(m_project->dest());
+    QLineEdit* agentsCmd = new QLineEdit();
     QPushButton* btAgentW = new QPushButton("...");
     btAgentW->setMaximumWidth(20);
     connect(btAgentW, SIGNAL(clicked(bool)), SLOT(slotAgentsWidget()));
@@ -102,7 +106,7 @@ AttributesWidget::AttributesWidget(MainApp* mainApp, Project* project, QWidget *
     itemEnabled->setText(0, "enable");
     m_ui->treeWidget->setItemWidget(itemEnabled, 1, m_enableOutputs);
     // -- add custom widget: output directory
-    QLineEdit* outDir = new QLineEdit(m_project->dest());
+    QLineEdit* outDir = new QLineEdit();
     QPushButton* outBrowseDir = new QPushButton("...");
     outBrowseDir->setMaximumWidth(20);
     connect(outBrowseDir, SIGNAL(clicked(bool)), SLOT(slotOutputDir()));
@@ -168,6 +172,43 @@ AttributesWidget::AttributesWidget(MainApp* mainApp, Project* project, QWidget *
 AttributesWidget::~AttributesWidget()
 {
     delete m_ui;
+}
+
+void AttributesWidget::addWidgetToList(QDockWidget* dw)
+{
+    m_ui->cbWidgets->addItem(dw->objectName(), QVariant::fromValue(dw));
+}
+
+void AttributesWidget::removeWidgetFromList(QDockWidget* dw)
+{
+    int id = m_ui->cbWidgets->findData(QVariant::fromValue(dw));
+    if (id != -1) {
+        m_ui->cbWidgets->blockSignals(true);
+        m_ui->cbWidgets->removeItem(id);
+        m_ui->cbWidgets->blockSignals(false);
+    }
+}
+
+void AttributesWidget::setActiveWidget(QDockWidget* dw, Project* project)
+{
+    int id = m_ui->cbWidgets->findData(QVariant::fromValue(dw));
+    if (id == -1 || !project) {
+        qFatal("[AttributesWidget]: project is null or qdockwidget is not in the list!");
+    }
+    m_ui->cbWidgets->setCurrentIndex(id);
+    m_project = project;
+    ExperimentWidget* ew = qobject_cast<ExperimentWidget*>(dw);
+    setExperiment(ew ? ew->experiment() : nullptr);
+}
+
+void AttributesWidget::slotSetActiveWidget(int idx)
+{
+    QVariant v = m_ui->cbWidgets->itemData(idx);
+    if (v.isValid()) {
+        QDockWidget* dw = v.value<QDockWidget*>();
+        dw->show();
+        dw->raise();
+    }
 }
 
 void AttributesWidget::setExperiment(Experiment* exp)
@@ -239,7 +280,7 @@ void AttributesWidget::slotAgentsWidget()
     }
 
     AgentsGenerator* ag = nullptr;
-    const ModelPlugin* model = m_project->models().value(m_selectedModelId);
+    const ModelPlugin* model = m_mainApp->models().value(m_selectedModelId);
     QString cmd = m_widgetFields.value(GENERAL_ATTRIBUTE_AGENTS).value<QLineEdit*>()->text();
     if (!cmd.isEmpty()) {
         QString errorMsg;
@@ -280,7 +321,7 @@ void AttributesWidget::slotOutputWidget()
     }
 
     std::vector<Output*> currentOutputs;
-    const ModelPlugin* model = m_project->models().value(m_selectedModelId);
+    const ModelPlugin* model = m_mainApp->models().value(m_selectedModelId);
     QString currentHeader = m_widgetFields.value(OUTPUT_HEADER).value<QLineEdit*>()->text();
     if (!currentHeader.isEmpty()) {
         QString errorMsg;
@@ -451,11 +492,11 @@ void AttributesWidget::slotPluginsUpdated(AbstractPlugin::PluginType type)
     if (type == AbstractPlugin::GraphPlugin) {
         tree = m_treeItemGraphs;
         treeId = GENERAL_ATTRIBUTE_GRAPHID;
-        keys = m_project->graphs().keys();
+        keys = m_mainApp->graphs().keys();
     } else if (type == AbstractPlugin::ModelPlugin) {
         tree = m_treeItemModels;
         treeId = GENERAL_ATTRIBUTE_MODELID;
-        keys = m_project->models().keys();
+        keys = m_mainApp->models().keys();
     } else {
         qFatal("[AttributesWidget]: invalid plugin type!");
     }
@@ -485,12 +526,12 @@ void AttributesWidget::slotPluginsUpdated(AbstractPlugin::PluginType type)
     };
 
     if (type == AbstractPlugin::GraphPlugin) {
-        foreach (AbstractPlugin* plugin, m_project->graphs()) {
+        foreach (AbstractPlugin* plugin, m_mainApp->graphs()) {
             addAttrs(plugin);
         }
         slotGraphSelected(cb->currentText());
     } else {
-        foreach (AbstractPlugin* plugin, m_project->models()) {
+        foreach (AbstractPlugin* plugin, m_mainApp->models()) {
             addAttrs(plugin);
         }
         slotModelSelected(cb->currentText());

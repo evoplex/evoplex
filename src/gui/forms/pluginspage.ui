@@ -131,7 +131,11 @@ QPushButton::hover {
       </widget>
      </item>
      <item>
-      <widget class="QTextBrowser" name="browser"/>
+      <widget class="QTextBrowser" name="browser">
+       <property name="styleSheet">
+        <string notr="true">background-color: rgb(25, 25, 25);</string>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>

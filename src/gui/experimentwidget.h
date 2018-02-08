@@ -22,8 +22,7 @@ public:
     explicit ExperimentWidget(MainGUI* mainGUI, Experiment* exp, ProjectsPage* ppage);
     ~ExperimentWidget();
 
-    inline int expId() const { return m_exp->id(); }
-    inline int projId() const { return m_exp->projId(); }
+    inline Experiment* experiment() const { return m_exp; }
 
 signals:
     void closed();
@@ -43,7 +42,6 @@ private:
 
     Experiment* m_exp;
     QMainWindow* m_innerWindow;
-    AttributesWidget* m_attrWidget;
     QTimer* m_timer;
 
     QAction* m_aPlayPause;

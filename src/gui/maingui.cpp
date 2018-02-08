@@ -107,17 +107,15 @@ MainGUI::MainGUI(MainApp* mainApp, QWidget* parent)
         btn->installEventFilter(this);
 
     connect(actionGroup, SIGNAL(triggered(QAction*)), this, SLOT(slotPage(QAction*)));
-    connect(m_projectsPage, &ProjectsPage::isEmpty,
-        [this, acWelcome, acProjects](bool b) {
-            acProjects->setDisabled(b);
-            if (b && m_curPage == PAGE_PROJECTS)
-                acWelcome->trigger();
+    connect(m_projectsPage, &ProjectsPage::isEmpty, [this, acWelcome, acProjects](bool b) {
+        acProjects->setDisabled(b);
+        if (b && m_curPage == PAGE_PROJECTS)
+            acWelcome->trigger();
     });
-    connect(m_queue, &QueuePage::isEmpty,
-        [this, acWelcome, acQueue](bool b) {
-            acQueue->setDisabled(b);
-            if (b && m_curPage == PAGE_QUEUE)
-                acWelcome->trigger();
+    connect(m_queue, &QueuePage::isEmpty, [this, acWelcome, acQueue](bool b) {
+        acQueue->setDisabled(b);
+        if (b && m_curPage == PAGE_QUEUE)
+            acWelcome->trigger();
     });
 
     acProjects->setDisabled(true);
@@ -130,8 +128,10 @@ MainGUI::MainGUI(MainApp* mainApp, QWidget* parent)
     //
     m_actNewProject = new QAction("New Project", this);
     connect(this, SIGNAL(newProject()), m_actNewProject, SIGNAL(triggered()));
-    connect(m_actNewProject, &QAction::triggered,
-            [this, acProjects](){ m_projectsPage->slotNewProject(); slotPage(acProjects); });
+    connect(m_actNewProject, &QAction::triggered, [this, acProjects]() {
+        m_projectsPage->slotNewProject();
+        slotPage(acProjects);
+    });
     m_actOpenProject = new QAction("Open Project", this);
 
     connect(m_actOpenProject, &QAction::triggered, [this]() { emit(openProject("")); });
@@ -147,8 +147,8 @@ MainGUI::MainGUI(MainApp* mainApp, QWidget* parent)
     m_actSaveAs = new QAction("Save as", this);
     m_actSaveAs->setEnabled(false);
     connect(m_actSaveAs, SIGNAL(triggered(bool)), this, SLOT(slotSaveAs()));
-    connect(m_projectsPage, SIGNAL(selectionChanged(ProjectWidget*)), SLOT(updateSaveButtons(ProjectWidget*)));
-    connect(m_projectsPage, SIGNAL(hasUnsavedChanges(ProjectWidget*)), SLOT(updateSaveButtons(ProjectWidget*)));
+    connect(m_projectsPage, SIGNAL(activeProjectChanged(Project*)), SLOT(updateSaveButtons(Project*)));
+    connect(m_projectsPage, SIGNAL(hasUnsavedChanges(Project*)), SLOT(updateSaveButtons(Project*)));
 
     QAction* actQuit = new QAction("Quit", this);
     connect(actQuit, SIGNAL(triggered(bool)), this, SLOT(close()));
@@ -254,14 +254,13 @@ void MainGUI::setPageVisible(Page page, bool visible)
     }
 }
 
-void MainGUI::updateSaveButtons(ProjectWidget* pw)
+void MainGUI::updateSaveButtons(Project* proj)
 {
-    if (pw && pw == m_projectsPage->currentProject() && pw->project()) {
-        Project* project = pw->project();
-        m_actSave->setEnabled(project->hasUnsavedChanges());
+    if (proj) {
+        m_actSave->setEnabled(proj->hasUnsavedChanges());
         m_actSaveAs->setEnabled(true);
-        m_actSave->setText(QString("Save \"%1\"").arg(pw->objectName()));
-        m_actSaveAs->setText(QString("Save \"%1\" As").arg(pw->objectName()));
+        m_actSave->setText(QString("Save \"%1\"").arg(proj->name()));
+        m_actSaveAs->setText(QString("Save \"%1\" As").arg(proj->name()));
     } else {
         m_actSave->setEnabled(false);
         m_actSaveAs->setEnabled(false);
@@ -272,15 +271,15 @@ void MainGUI::updateSaveButtons(ProjectWidget* pw)
 
 void MainGUI::slotSaveAs()
 {
-    if (m_projectsPage->currentProject()) {
-        m_saveDialog->saveAs(m_projectsPage->currentProject()->project());
+    if (m_projectsPage->activeProject()) {
+        m_saveDialog->saveAs(m_projectsPage->activeProject());
     }
 }
 
 void MainGUI::slotSave()
 {
-    if (m_projectsPage->currentProject()) {
-        m_saveDialog->save(m_projectsPage->currentProject()->project());
+    if (m_projectsPage->activeProject()) {
+        m_saveDialog->save(m_projectsPage->activeProject());
     }
 }
 

@@ -7,6 +7,7 @@
 #include <QDebug>
 #include <QFileDialog>
 #include <QMessageBox>
+#include <QSettings>
 
 #include "experimentwidget.h"
 #include "projectwidget.h"
@@ -18,28 +19,59 @@ ProjectsPage::ProjectsPage(MainGUI* mainGUI)
     : QMainWindow(mainGUI)
     , m_mainGUI(mainGUI)
     , m_mainApp(mainGUI->mainApp())
-    , m_currProjectWidget(nullptr)
+    , m_attrWidget(new AttributesWidget(mainGUI->mainApp(), this))
+    , m_activeProject(nullptr)
 {
     setTabPosition(Qt::AllDockWidgetAreas, QTabWidget::South);
     connect(this, SIGNAL(tabifiedDockWidgetActivated(QDockWidget*)),
             SLOT(slotFocusChanged(QDockWidget*)));
+
+    addDockWidget(Qt::RightDockWidgetArea, m_attrWidget);
+}
+
+void ProjectsPage::showEvent(QShowEvent* e)
+{
+    QSettings s;
+    restoreState(s.value("gui/projectsPage").toByteArray());
+    QWidget::showEvent(e);
+}
+
+void ProjectsPage::hideEvent(QHideEvent* e)
+{
+    if (!m_projects.isEmpty()) { // otherwise we'd always save the attrsWidget in fullscreen
+        QSettings s;
+        s.setValue("gui/projectsPage", saveState());
+    }
+    QMainWindow::hideEvent(e);
 }
 
 void ProjectsPage::slotFocusChanged(QDockWidget* currTab)
 {
+    m_activeProject = nullptr;
     ProjectWidget* pw = qobject_cast<ProjectWidget*>(currTab);
-    m_currProjectWidget = pw ? pw : nullptr;
-    emit (selectionChanged(pw));
+    if (pw) {
+        pw->clearSelection();
+        m_activeProject = pw->project();
+    } else {
+        ExperimentWidget* ew = qobject_cast<ExperimentWidget*>(currTab);
+        m_activeProject = ew ? ew->experiment()->project() : nullptr;
+    }
+
+    if (m_activeProject) {
+        m_attrWidget->setActiveWidget(currTab, m_activeProject);
+        emit (activeProjectChanged(m_activeProject));
+    }
 }
 
 void ProjectsPage::addProjectWidget(Project* project)
 {
     ProjectWidget* pw = new ProjectWidget(m_mainGUI, project, this);
     if (m_projects.isEmpty()) {
-        this->addDockWidget(Qt::TopDockWidgetArea, pw);
+        addDockWidget(Qt::LeftDockWidgetArea, pw);
     } else {
-        this->tabifyDockWidget(m_projects.last(), pw);
+        tabifyDockWidget(m_projects.last(), pw);
     }
+    m_attrWidget->addWidgetToList(pw);
     pw->show();
     pw->raise();
     m_projects.push_back(pw);
@@ -47,15 +79,24 @@ void ProjectsPage::addProjectWidget(Project* project)
     emit (isEmpty(false));
 
     //connect(m_contextMenu, SIGNAL(openView(int)), wp, SLOT(slotOpenView(int)));
-    connect(pw, SIGNAL(openExperiment(int,int)), this, SLOT(slotOpenExperiment(int,int)));
-    connect(pw, SIGNAL(hasUnsavedChanges(ProjectWidget*)), SIGNAL(hasUnsavedChanges(ProjectWidget*)));
-    connect(pw, &ProjectWidget::destroyed, [this, pw, project]() {
+    connect(pw, &ProjectWidget::expSelectionChanged, [this](Experiment* exp) { m_attrWidget->setExperiment(exp); });
+    connect(pw, SIGNAL(openExperiment(Experiment*)), this, SLOT(slotOpenExperiment(Experiment*)));
+    connect(pw, SIGNAL(hasUnsavedChanges(Project*)), SIGNAL(hasUnsavedChanges(Project*)));
+    connect(pw, &ProjectWidget::closed, [this, pw, project]() {
+        m_attrWidget->removeWidgetFromList(pw);
         for (ExperimentWidget* expW : m_experiments) {
             expW->close();
         }
         m_projects.removeOne(pw);
-        emit (isEmpty(m_projects.isEmpty()));
+        if (m_projects.isEmpty()) {
+            QSettings s;
+            s.setValue("gui/projectsPage", saveState());
+            emit (isEmpty(true));
+        } else {
+            emit (isEmpty(false));
+        }
         m_mainApp->closeProject(project->id());
+        pw->deleteLater();
     });
 
     QHash<int, Experiment*>::const_iterator it = project->experiments().cbegin();
@@ -88,18 +129,21 @@ bool ProjectsPage::slotOpenProject(QString path)
     return true;
 }
 
-void ProjectsPage::slotOpenExperiment(int projId, int expId)
+void ProjectsPage::slotOpenExperiment(Experiment* exp)
 {
+    if (!exp) {
+        return;
+    }
+
     ExperimentWidget* ew = nullptr;
     foreach (ExperimentWidget* e, m_experiments) {
-        if (e->expId() == expId && e->projId() == projId) {
+        if (exp == e->experiment()) {
             ew = e;
             break;
         }
     }
 
     if (!ew) {
-        Experiment* exp = m_mainApp->project(projId)->experiment(expId);
         ew = new ExperimentWidget(m_mainGUI, exp, this);
         connect(ew, &ExperimentWidget::closed, [this, ew]() {
             m_projects.last()->raise();
@@ -114,6 +158,8 @@ void ProjectsPage::slotOpenExperiment(int projId, int expId)
         }
         m_experiments.append(ew);
     }
+
+    m_attrWidget->addWidgetToList(ew);
     ew->show();
     ew->raise();
 }

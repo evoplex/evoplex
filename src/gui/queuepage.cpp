@@ -8,6 +8,8 @@
 
 #include "queuepage.h"
 #include "ui_queuepage.h"
+#include "core/experiment.h"
+#include "core/project.h"
 #include "core/mainapp.h"
 
 namespace evoplex {
@@ -54,7 +56,7 @@ QueuePage::QueuePage(MainGUI* mainGUI)
 
 void QueuePage::slotRemoveRow(Experiment *exp)
 {
-    Row row = m_rows.take(std::make_pair(exp->projId(), exp->id()));
+    Row row = m_rows.take(std::make_pair(exp->project()->id(), exp->id()));
     if (!row.table) {
         return;
     }
@@ -65,7 +67,7 @@ void QueuePage::slotRemoveRow(Experiment *exp)
 
 void QueuePage::slotStatusChanged(Experiment* exp)
 {
-    const rowKey key = std::make_pair(exp->projId(), exp->id());
+    const rowKey key = std::make_pair(exp->project()->id(), exp->id());
     Row prev = m_rows.value(key, Row());
     Row next = prev;
 
@@ -111,7 +113,7 @@ QTableWidgetItem* QueuePage::insertRow(TableWidget* table, Experiment* exp)
 
     add(TableWidget::H_STOPAT, exp->stopAt());
     add(TableWidget::H_TRIALS, exp->numTrials());
-    add(TableWidget::H_PROJID, exp->projId());
+    add(TableWidget::H_PROJID, exp->project()->id());
     return add(TableWidget::H_EXPID, exp->id());
 }
 

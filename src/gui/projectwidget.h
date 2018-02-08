@@ -30,12 +30,18 @@ public:
 
     inline Project* project() const { return m_project; }
 
+    void clearSelection();
+
+signals:
+    void closed();
+
 protected:
     void closeEvent(QCloseEvent* event);
 
 signals:
-    void openExperiment(int projId, int expId);
-    void hasUnsavedChanges(ProjectWidget*);
+    void expSelectionChanged(Experiment* exp);
+    void openExperiment(Experiment* exp);
+    void hasUnsavedChanges(Project* project);
 
 public slots:
     void slotInsertRow(int expId);
@@ -43,14 +49,12 @@ public slots:
     void slotHasUnsavedChanges(bool b);
 
 private slots:
-    void onItemClicked(QTableWidgetItem* item);
+    void slotSelectionChanged();
     void onItemDoubleClicked(QTableWidgetItem* item);
 
 private:
     Ui_ProjectWidget* m_ui;
     MainGUI* m_mainGUI;
-    QMainWindow* m_innerWindow;
-    AttributesWidget* m_attrWidget;
     Project* m_project;
 
     QMap<TableWidget::Header, int> m_headerIdx; // map Header to column index

@@ -23,8 +23,12 @@ class AttributesWidget : public QDockWidget
     Q_OBJECT
 
 public:
-    explicit AttributesWidget(MainApp* mainApp, Project *project, QWidget *parent = 0);
+    explicit AttributesWidget(MainApp* mainApp, QWidget* parent = 0);
     ~AttributesWidget();
+
+    void addWidgetToList(QDockWidget* dw);
+    void removeWidgetFromList(QDockWidget* dw);
+    void setActiveWidget(QDockWidget* dw, Project* project);
 
     void setExperiment(Experiment* exp);
 
@@ -37,6 +41,7 @@ private slots:
     void slotModelSelected(const QString& modelId);
     void slotGraphSelected(const QString& graphId);
     void slotPluginsUpdated(AbstractPlugin::PluginType type);
+    void slotSetActiveWidget(int idx);
 
 private:
     MainApp* m_mainApp;

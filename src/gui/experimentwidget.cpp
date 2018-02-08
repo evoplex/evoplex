@@ -25,10 +25,9 @@ ExperimentWidget::ExperimentWidget(MainGUI* mainGUI, Experiment* exp, ProjectsPa
     , m_kIcon_stop(QIcon(":/icons/stop.svg"))
     , m_exp(exp)
     , m_innerWindow(new QMainWindow(this))
-    //, m_attrWidget(new AttributesWidget(project, this))
     , m_timer(new QTimer)
 {
-    setObjectName(QString("P%1.E%2").arg(m_exp->projId()).arg(m_exp->id()));
+    setObjectName(QString("P%1.E%2").arg(m_exp->project()->id()).arg(m_exp->id()));
     setWindowTitle(objectName());
 
     // setup the inner qmainwindow

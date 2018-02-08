@@ -20,26 +20,13 @@ ProjectWidget::ProjectWidget(MainGUI* mainGUI, Project* project, ProjectsPage* p
     : QDockWidget(ppage)
     , m_ui(new Ui_ProjectWidget)
     , m_mainGUI(mainGUI)
-    , m_innerWindow(new QMainWindow(this, Qt::FramelessWindowHint))
-    , m_attrWidget(new AttributesWidget(mainGUI->mainApp(), project, m_innerWindow))
     , m_project(project)
 {
+    m_ui->setupUi(this);
+
     setObjectName(m_project->name());
     setWindowTitle(objectName());
-    setAttribute(Qt::WA_DeleteOnClose, true);
 
-    QHBoxLayout* lh = new QHBoxLayout(new QWidget(this));
-    lh->addWidget(m_innerWindow);
-    this->setWidget(lh->parentWidget());
-
-    QWidget* projectWidget = new QWidget(m_innerWindow);
-    m_ui->setupUi(projectWidget);
-    m_innerWindow->setCentralWidget(projectWidget);
-    m_innerWindow->setStyleSheet("QMainWindow { background-color: rgb(24,24,24); }");
-
-    m_innerWindow->addDockWidget(Qt::RightDockWidgetArea, m_attrWidget);
-    m_attrWidget->setTitleBarWidget(new QWidget());
-    m_attrWidget->setFeatures(QDockWidget::NoDockWidgetFeatures);
     connect(m_project, SIGNAL(expAdded(int)), SLOT(slotInsertRow(int)));
     connect(m_project, SIGNAL(expEdited(int)), SLOT(slotUpdateRow(int)));
 
@@ -55,10 +42,9 @@ ProjectWidget::ProjectWidget(MainGUI* mainGUI, Project* project, ProjectsPage* p
 
     connect(m_ui->playAll, &QPushButton::pressed, [this]() { m_project->playAll(); });
 
+    connect(m_ui->table, SIGNAL(itemSelectionChanged()), SLOT(slotSelectionChanged()));
     connect(m_ui->table, SIGNAL(itemDoubleClicked(QTableWidgetItem*)),
             SLOT(onItemDoubleClicked(QTableWidgetItem*)));
-    connect(m_ui->table, SIGNAL(itemClicked(QTableWidgetItem*)),
-            SLOT(onItemClicked(QTableWidgetItem*)));
 
     connect(m_mainGUI->mainApp()->expMgr(), SIGNAL(statusChanged(Experiment*)),
             m_ui->table->viewport(), SLOT(update()));
@@ -72,7 +58,6 @@ ProjectWidget::ProjectWidget(MainGUI* mainGUI, Project* project, ProjectsPage* p
 ProjectWidget::~ProjectWidget()
 {
     delete m_ui;
-    delete m_innerWindow;
 }
 
 void ProjectWidget::closeEvent(QCloseEvent* event)
@@ -88,6 +73,7 @@ void ProjectWidget::closeEvent(QCloseEvent* event)
             return;
         }
     }
+    emit (closed());
     event->accept();
     QDockWidget::closeEvent(event);
 }
@@ -152,28 +138,33 @@ void ProjectWidget::insertItem(int row, TableWidget::Header header, QString labe
     m_ui->table->setItem(row, m_headerIdx.value(header), item);
 }
 
-void ProjectWidget::onItemClicked(QTableWidgetItem* item)
+void ProjectWidget::slotSelectionChanged()
 {
-    if (m_ui->table->selectedItems().isEmpty()) {
-        m_attrWidget->setExperiment(nullptr);
-        return;
+    Experiment* exp = nullptr;
+    if (!m_ui->table->selectedItems().isEmpty()) {
+        int row = m_ui->table->selectedItems().first()->row();
+        int expId = m_ui->table->item(row, m_headerIdx.value(TableWidget::H_EXPID))->text().toInt();
+        exp = m_project->experiment(expId);
     }
-
-    int expId = m_ui->table->item(item->row(), m_headerIdx.value(TableWidget::H_EXPID))->text().toInt();
-    Experiment* exp = m_project->experiment(expId);
-    m_attrWidget->setExperiment(exp);
+    emit (expSelectionChanged(exp));
 }
 
 void ProjectWidget::onItemDoubleClicked(QTableWidgetItem* item)
 {
     int expId = m_ui->table->item(item->row(), m_headerIdx.value(TableWidget::H_EXPID))->text().toInt();
-    emit (openExperiment(m_project->id(), expId));
+    emit (openExperiment(m_project->experiment(expId)));
 }
 
 void ProjectWidget::slotHasUnsavedChanges(bool b)
 {
     setObjectName(m_project->name());
     setWindowTitle(objectName() + (b ? "*" : ""));
-    emit (hasUnsavedChanges(this));
+    emit (hasUnsavedChanges(m_project));
 }
+
+void ProjectWidget::clearSelection()
+{
+    m_ui->table->clearSelection();
 }
+
+} // evoplex

@@ -60,8 +60,8 @@ int main(int argc, char* argv[])
         QPalette darkPalette;
         darkPalette.setColor(QPalette::Window, QColor(51,51,51));
         darkPalette.setColor(QPalette::WindowText, Qt::white);
-        darkPalette.setColor(QPalette::Base, QColor(25,25,25));
-        darkPalette.setColor(QPalette::AlternateBase, QColor(51,51,51));
+        darkPalette.setColor(QPalette::Base, QColor(51,51,51));
+        darkPalette.setColor(QPalette::AlternateBase, QColor(25,25,25));
         darkPalette.setColor(QPalette::ToolTipBase, QColor(255,255,220));
         darkPalette.setColor(QPalette::ToolTipText, Qt::black);
         darkPalette.setColor(QPalette::Text, Qt::white);

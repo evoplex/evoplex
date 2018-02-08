@@ -17,10 +17,10 @@
 namespace evoplex
 {
 
-Experiment::Experiment(MainApp* mainApp, int id, int projId, ExperimentInputs* inputs)
+Experiment::Experiment(MainApp* mainApp, int id, ExperimentInputs* inputs, Project* project)
     : m_mainApp(mainApp)
     , m_id(id)
-    , m_projId(projId)
+    , m_project(project)
     , m_expStatus(INVALID)
 {
     init(inputs);
@@ -231,7 +231,7 @@ AbstractModel* Experiment::createTrial(const int trialId)
         return nullptr;
     } if (m_trials.size() == m_numTrials) {
         qWarning() << "[Experiment]: all the trials for this experiment have already been created."
-                   << "Project:" << m_projId << "Experiment:" << m_id << "Trial:" << trialId
+                   << "Project:" << m_project->name() << "Experiment:" << m_id << "Trial:" << trialId
                    << " (" << m_trials.size() << "/" << numTrials() << ")";
         return nullptr;
     }
@@ -251,7 +251,7 @@ AbstractModel* Experiment::createTrial(const int trialId)
     if (!graphObj || !graphObj->setup(prg, agents, m_graphAttrs, gType) || !graphObj->init()) {
         qWarning() << "[Experiment]: unable to create the trials."
                    << "The graph could not be initialized."
-                   << "Project:" << m_projId << "Experiment:" << m_id;
+                   << "Project:" << m_project->name() << "Experiment:" << m_id;
         delete graphObj;
         graphObj = nullptr;
         delete prg;
@@ -264,7 +264,7 @@ AbstractModel* Experiment::createTrial(const int trialId)
     if (!modelObj || !modelObj->setup(prg, graphObj, m_modelAttrs) || !modelObj->init()) {
         qWarning() << "[Experiment]: unable to create the trials."
                    << "The model could not be initialized."
-                   << "Project:" << m_projId << "Experiment:" << m_id;
+                   << "Project:" << m_project->name() << "Experiment:" << m_id;
         delete modelObj;
         return nullptr;
     }
@@ -272,7 +272,7 @@ AbstractModel* Experiment::createTrial(const int trialId)
     if (!m_fileOutputs.empty()) {
         const QString fpath = QString("%1/%2_e%3_t%4.csv")
                 .arg(m_generalAttrs->value(OUTPUT_DIR).toQString())
-                .arg(m_mainApp->project(m_projId)->name())
+                .arg(m_project->name())
                 .arg(m_id)
                 .arg(trialId);
 
@@ -321,7 +321,7 @@ Agents Experiment::createAgents()
         errMsg = QString("[Experiment]: unable to create the trials."
                          "The set of agents could not be created (%1)."
                          "Project: %2 Experiment: %3")
-                         .arg(errMsg).arg(m_projId).arg(m_id);
+                         .arg(errMsg).arg(m_project->name()).arg(m_id);
         qWarning() << errMsg;
     } else if (m_numTrials > 1) {
         m_clonableAgents = cloneAgents(agents);

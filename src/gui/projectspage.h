@@ -9,10 +9,12 @@
 #include <QMainWindow>
 
 #include "maingui.h"
+#include "core/experiment.h"
 #include "core/mainapp.h"
 
 namespace evoplex {
 
+class AttributesWidget;
 class ExperimentWidget;
 class ProjectWidget;
 
@@ -22,26 +24,31 @@ class ProjectsPage : public QMainWindow
 public:
     explicit ProjectsPage(MainGUI* mainGUI);
 
-    inline const ProjectWidget* currentProject() const { return m_currProjectWidget; }
+    inline Project* activeProject() const { return m_activeProject; }
     inline const QVector<ProjectWidget*> projects() const { return m_projects; }
 
 signals:
-    void selectionChanged(ProjectWidget*);
+    void activeProjectChanged(Project*);
     void isEmpty(bool empty);
-    void hasUnsavedChanges(ProjectWidget*);
+    void hasUnsavedChanges(Project*);
 
 public slots:
     void slotNewProject();
     bool slotOpenProject(QString path);
-    void slotOpenExperiment(int projId, int expId);
+    void slotOpenExperiment(Experiment* exp);
 
 private slots:
     void slotFocusChanged(QDockWidget* currTab);
 
+protected:
+    virtual void showEvent(QShowEvent* e);
+    virtual void hideEvent(QHideEvent* e);
+
 private:
     MainGUI* m_mainGUI;
     MainApp* m_mainApp;
-    ProjectWidget* m_currProjectWidget;
+    AttributesWidget* m_attrWidget;
+    Project* m_activeProject;
     QVector<ProjectWidget*> m_projects; // opened projects
     QVector<ExperimentWidget*> m_experiments; // opened experiments
 
