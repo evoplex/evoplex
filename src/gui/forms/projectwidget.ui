@@ -13,9 +13,11 @@
   <property name="windowTitle">
    <string>DockWidget</string>
   </property>
-  <widget class="QWidget" name="dockWidgetContents">
+  <widget class="QWidget" name="contents">
    <property name="styleSheet">
-    <string notr="true">background-color: rgb(24, 24, 24);</string>
+    <string notr="true">QWidget#contents {
+background-color: rgb(24, 24, 24);
+}</string>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>

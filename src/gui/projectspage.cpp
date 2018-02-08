@@ -23,6 +23,11 @@ ProjectsPage::ProjectsPage(MainGUI* mainGUI)
     , m_activeProject(nullptr)
 {
     setTabPosition(Qt::AllDockWidgetAreas, QTabWidget::South);
+    setDockOptions(QMainWindow::AllowTabbedDocks | QMainWindow::GroupedDragging);
+    setDockNestingEnabled(true);
+    setAnimated(true);
+    setCentralWidget(0);
+
     connect(this, SIGNAL(tabifiedDockWidgetActivated(QDockWidget*)),
             SLOT(slotFocusChanged(QDockWidget*)));
 
@@ -152,7 +157,7 @@ void ProjectsPage::slotOpenExperiment(Experiment* exp)
         });
 
         if (m_projects.isEmpty() && m_experiments.isEmpty()) {
-            addDockWidget(Qt::TopDockWidgetArea, ew);
+            addDockWidget(Qt::LeftDockWidgetArea, ew);
         } else {
             tabifyDockWidget(m_projects.last(), ew);
         }
