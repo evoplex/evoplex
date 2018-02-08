@@ -13,12 +13,12 @@
 #include <QVariant>
 #include <QRadioButton>
 
-#include "attributeswidget.h"
+#include "experimentdesigner.h"
 #include "agentsgeneratordlg.h"
 #include "experimentwidget.h"
 #include "projectwidget.h"
 #include "outputwidget.h"
-#include "ui_attributeswidget.h"
+#include "ui_experimentdesigner.h"
 
 #include "core/agentsgenerator.h"
 
@@ -26,16 +26,16 @@
 
 namespace evoplex {
 
-AttributesWidget::AttributesWidget(MainApp* mainApp, QWidget *parent)
+ExperimentDesigner::ExperimentDesigner(MainApp* mainApp, QWidget *parent)
     : QDockWidget(parent)
     , m_mainApp(mainApp)
     , m_project(nullptr)
     , m_exp(nullptr)
     , m_selectedGraphId(STRING_NULL_PLUGINID)
     , m_selectedModelId(STRING_NULL_PLUGINID)
-    , m_ui(new Ui_AttributesWidget)
+    , m_ui(new Ui_ExperimentDesigner)
 {
-    setObjectName("AttributesWidget");
+    setObjectName("ExperimentDesigner");
     m_ui->setupUi(this);
 
     m_ui->treeWidget->setFocusPolicy(Qt::NoFocus);
@@ -169,17 +169,17 @@ AttributesWidget::AttributesWidget(MainApp* mainApp, QWidget *parent)
     slotPluginsUpdated(AbstractPlugin::ModelPlugin);
 }
 
-AttributesWidget::~AttributesWidget()
+ExperimentDesigner::~ExperimentDesigner()
 {
     delete m_ui;
 }
 
-void AttributesWidget::addWidgetToList(QDockWidget* dw)
+void ExperimentDesigner::addWidgetToList(QDockWidget* dw)
 {
     m_ui->cbWidgets->addItem(dw->objectName(), QVariant::fromValue(dw));
 }
 
-void AttributesWidget::removeWidgetFromList(QDockWidget* dw)
+void ExperimentDesigner::removeWidgetFromList(QDockWidget* dw)
 {
     int id = m_ui->cbWidgets->findData(QVariant::fromValue(dw));
     if (id != -1) {
@@ -189,11 +189,11 @@ void AttributesWidget::removeWidgetFromList(QDockWidget* dw)
     }
 }
 
-void AttributesWidget::setActiveWidget(QDockWidget* dw, Project* project)
+void ExperimentDesigner::setActiveWidget(QDockWidget* dw, Project* project)
 {
     int id = m_ui->cbWidgets->findData(QVariant::fromValue(dw));
     if (id == -1 || !project) {
-        qFatal("[AttributesWidget]: project is null or qdockwidget is not in the list!");
+        qFatal("[ExperimentDesigner]: project is null or qdockwidget is not in the list!");
     }
     m_ui->cbWidgets->setCurrentIndex(id);
     m_project = project;
@@ -201,7 +201,7 @@ void AttributesWidget::setActiveWidget(QDockWidget* dw, Project* project)
     setExperiment(ew ? ew->experiment() : nullptr);
 }
 
-void AttributesWidget::slotSetActiveWidget(int idx)
+void ExperimentDesigner::slotSetActiveWidget(int idx)
 {
     QVariant v = m_ui->cbWidgets->itemData(idx);
     if (v.isValid()) {
@@ -211,7 +211,7 @@ void AttributesWidget::slotSetActiveWidget(int idx)
     }
 }
 
-void AttributesWidget::setExperiment(Experiment* exp)
+void ExperimentDesigner::setExperiment(Experiment* exp)
 {
     if (!exp) {
         m_exp = nullptr;
@@ -268,11 +268,11 @@ void AttributesWidget::setExperiment(Experiment* exp)
             le->setText(values.at(i).toQString());
             continue;
         }
-        qFatal("[AttributesWidget]: unable to know the widget type.");
+        qFatal("[ExperimentDesigner]: unable to know the widget type.");
     }
 }
 
-void AttributesWidget::slotAgentsWidget()
+void ExperimentDesigner::slotAgentsWidget()
 {
     if (m_selectedModelId == STRING_NULL_PLUGINID) {
         QMessageBox::warning(this, "Experiment", "Please, select a valid 'modelId' first.");
@@ -297,7 +297,7 @@ void AttributesWidget::slotAgentsWidget()
     adlg->deleteLater();
 }
 
-void AttributesWidget::slotOutputDir()
+void ExperimentDesigner::slotOutputDir()
 {
     QLineEdit* lineedit = m_widgetFields.value(OUTPUT_DIR).value<QLineEdit*>();
     QString path = QFileDialog::getExistingDirectory(this, "Output Directory", lineedit->text());
@@ -306,7 +306,7 @@ void AttributesWidget::slotOutputDir()
     }
 }
 
-void AttributesWidget::slotOutputWidget()
+void ExperimentDesigner::slotOutputWidget()
 {
     if (m_selectedModelId == STRING_NULL_PLUGINID) {
         QMessageBox::warning(this, "Experiment", "Please, select a valid 'modelId' first.");
@@ -365,7 +365,7 @@ void AttributesWidget::slotOutputWidget()
     });
 }
 
-Experiment::ExperimentInputs* AttributesWidget::readInputs()
+Experiment::ExperimentInputs* ExperimentDesigner::readInputs()
 {
     if (m_selectedModelId == STRING_NULL_PLUGINID) {
         QMessageBox::warning(this, "Experiment", "Please, select a valid 'modelId'.");
@@ -418,7 +418,7 @@ Experiment::ExperimentInputs* AttributesWidget::readInputs()
             continue;
         }
 
-        qFatal("[AttributesWidget]: unable to know the widget type.");
+        qFatal("[ExperimentDesigner]: unable to know the widget type.");
     }
 
     if (!m_enableOutputs->isChecked()) {
@@ -435,12 +435,12 @@ Experiment::ExperimentInputs* AttributesWidget::readInputs()
     return inputs;
 }
 
-void AttributesWidget::slotCreateExperiment()
+void ExperimentDesigner::slotCreateExperiment()
 {
     m_exp = m_project->newExperiment(readInputs());
 }
 
-void AttributesWidget::slotEditExperiment()
+void ExperimentDesigner::slotEditExperiment()
 {
     Q_ASSERT(m_exp);
     if (!m_project->editExperiment(m_exp->id(), readInputs())) {
@@ -450,7 +450,7 @@ void AttributesWidget::slotEditExperiment()
     }
 }
 
-void AttributesWidget::slotGraphSelected(const QString& graphId)
+void ExperimentDesigner::slotGraphSelected(const QString& graphId)
 {
     m_selectedGraphId = graphId;
     pluginSelected(m_treeItemGraphs, graphId);
@@ -461,7 +461,7 @@ void AttributesWidget::slotGraphSelected(const QString& graphId)
     m_treeItemOutputs->setExpanded(validGraph);
 }
 
-void AttributesWidget::slotModelSelected(const QString& modelId)
+void ExperimentDesigner::slotModelSelected(const QString& modelId)
 {
     m_selectedModelId = modelId;
     pluginSelected(m_treeItemModels, modelId);
@@ -473,7 +473,7 @@ void AttributesWidget::slotModelSelected(const QString& modelId)
     m_treeItemGraphs->setExpanded(!nullModel);
 }
 
-void AttributesWidget::pluginSelected(QTreeWidgetItem* itemRoot, const QString& pluginId)
+void ExperimentDesigner::pluginSelected(QTreeWidgetItem* itemRoot, const QString& pluginId)
 {
     for (int i = 0; i < itemRoot->childCount(); ++i) {
         QTreeWidgetItem* row = itemRoot->child(i);
@@ -484,7 +484,7 @@ void AttributesWidget::pluginSelected(QTreeWidgetItem* itemRoot, const QString& 
     }
 }
 
-void AttributesWidget::slotPluginsUpdated(AbstractPlugin::PluginType type)
+void ExperimentDesigner::slotPluginsUpdated(AbstractPlugin::PluginType type)
 {
     QTreeWidgetItem* tree;
     QString treeId;
@@ -498,7 +498,7 @@ void AttributesWidget::slotPluginsUpdated(AbstractPlugin::PluginType type)
         treeId = GENERAL_ATTRIBUTE_MODELID;
         keys = m_mainApp->models().keys();
     } else {
-        qFatal("[AttributesWidget]: invalid plugin type!");
+        qFatal("[ExperimentDesigner]: invalid plugin type!");
     }
 
     QComboBox* cb = m_widgetFields.value(treeId).value<QComboBox*>();
@@ -538,7 +538,7 @@ void AttributesWidget::slotPluginsUpdated(AbstractPlugin::PluginType type)
     }
 }
 
-void AttributesWidget::insertPluginAttributes(QTreeWidgetItem* itemRoot,
+void ExperimentDesigner::insertPluginAttributes(QTreeWidgetItem* itemRoot,
                                               const QString& uid,
                                               const AttributesSpace& attrsSpace)
 {
@@ -584,7 +584,7 @@ void AttributesWidget::insertPluginAttributes(QTreeWidgetItem* itemRoot,
     }
 }
 
-QSpinBox* AttributesWidget::newSpinBox(const int min, const int max)
+QSpinBox* ExperimentDesigner::newSpinBox(const int min, const int max)
 {
     QSpinBox* sp = new QSpinBox(m_ui->treeWidget);
     sp->setMaximum(max);
@@ -593,7 +593,7 @@ QSpinBox* AttributesWidget::newSpinBox(const int min, const int max)
     return sp;
 }
 
-QDoubleSpinBox* AttributesWidget::newDoubleSpinBox(const double min, const double max)
+QDoubleSpinBox* ExperimentDesigner::newDoubleSpinBox(const double min, const double max)
 {
     QDoubleSpinBox* sp = new QDoubleSpinBox(m_ui->treeWidget);
     sp->setMaximum(max);
@@ -603,7 +603,7 @@ QDoubleSpinBox* AttributesWidget::newDoubleSpinBox(const double min, const doubl
     return sp;
 }
 
-void AttributesWidget::addTreeWidget(QTreeWidgetItem* itemRoot, const QString& label, const QVariant& widget)
+void ExperimentDesigner::addTreeWidget(QTreeWidgetItem* itemRoot, const QString& label, const QVariant& widget)
 {
     QTreeWidgetItem* item = new QTreeWidgetItem(itemRoot);
     m_widgetFields.insert(label, widget);

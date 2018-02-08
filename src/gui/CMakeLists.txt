@@ -1,9 +1,9 @@
 set(EVOPLEX_GUI_H
   maingui.h
   agentsgeneratordlg.h
-  attributes.h
   colormap.h
   #contextmenutable.h
+  experimentdesigner.h
   experimentwidget.h
   linechart.h
   outputwidget.h
@@ -26,7 +26,7 @@ set(EVOPLEX_GUI_H
 set(EVOPLEX_GUI_CXX
   maingui.cpp
   agentsgeneratordlg.cpp
-  attributeswidget.cpp
+  experimentdesigner.cpp
   colormap.cpp
   #contextmenutable.cpp
   experimentwidget.cpp
@@ -50,7 +50,7 @@ set(EVOPLEX_GUI_CXX
 
 qt5_wrap_ui(EVOPLEX_GUI_UI
   forms/agentsgeneratordlg.ui
-  forms/attributeswidget.ui
+  forms/experimentdesigner.ui
   forms/graphwidget.ui
   forms/graphsettings.ui
   forms/linechartsettings.ui

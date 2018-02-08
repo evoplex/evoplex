@@ -9,7 +9,7 @@
 #include <QDockWidget>
 #include <QMainWindow>
 
-#include "attributeswidget.h"
+#include "experimentdesigner.h"
 #include "projectspage.h"
 #include "core/project.h"
 

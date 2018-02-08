@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>AttributesWidget</class>
- <widget class="QDockWidget" name="AttributesWidget">
+ <class>ExperimentDesigner</class>
+ <widget class="QDockWidget" name="ExperimentDesigner">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -9,6 +9,9 @@
     <width>400</width>
     <height>300</height>
    </rect>
+  </property>
+  <property name="features">
+   <set>QDockWidget::DockWidgetFloatable|QDockWidget::DockWidgetMovable|QDockWidget::DockWidgetVerticalTitleBar</set>
   </property>
   <property name="windowTitle">
    <string>Experiment Designer</string>

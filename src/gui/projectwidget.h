@@ -11,7 +11,7 @@
 #include <QMap>
 #include <QMainWindow>
 
-#include "attributeswidget.h"
+#include "experimentdesigner.h"
 #include "projectspage.h"
 #include "tablewidget.h"
 #include "core/project.h"

@@ -19,7 +19,7 @@ ProjectsPage::ProjectsPage(MainGUI* mainGUI)
     : QMainWindow(mainGUI)
     , m_mainGUI(mainGUI)
     , m_mainApp(mainGUI->mainApp())
-    , m_attrWidget(new AttributesWidget(mainGUI->mainApp(), this))
+    , m_expDesigner(new ExperimentDesigner(mainGUI->mainApp(), this))
     , m_activeProject(nullptr)
 {
     setTabPosition(Qt::AllDockWidgetAreas, QTabWidget::South);
@@ -31,7 +31,7 @@ ProjectsPage::ProjectsPage(MainGUI* mainGUI)
     connect(this, SIGNAL(tabifiedDockWidgetActivated(QDockWidget*)),
             SLOT(slotFocusChanged(QDockWidget*)));
 
-    addDockWidget(Qt::RightDockWidgetArea, m_attrWidget);
+    addDockWidget(Qt::RightDockWidgetArea, m_expDesigner);
 }
 
 void ProjectsPage::showEvent(QShowEvent* e)
@@ -63,7 +63,7 @@ void ProjectsPage::slotFocusChanged(QDockWidget* currTab)
     }
 
     if (m_activeProject) {
-        m_attrWidget->setActiveWidget(currTab, m_activeProject);
+        m_expDesigner->setActiveWidget(currTab, m_activeProject);
         emit (activeProjectChanged(m_activeProject));
     }
 }
@@ -76,7 +76,7 @@ void ProjectsPage::addProjectWidget(Project* project)
     } else {
         tabifyDockWidget(m_projects.last(), pw);
     }
-    m_attrWidget->addWidgetToList(pw);
+    m_expDesigner->addWidgetToList(pw);
     pw->show();
     pw->raise();
     m_projects.push_back(pw);
@@ -84,11 +84,11 @@ void ProjectsPage::addProjectWidget(Project* project)
     emit (isEmpty(false));
 
     //connect(m_contextMenu, SIGNAL(openView(int)), wp, SLOT(slotOpenView(int)));
-    connect(pw, &ProjectWidget::expSelectionChanged, [this](Experiment* exp) { m_attrWidget->setExperiment(exp); });
+    connect(pw, &ProjectWidget::expSelectionChanged, [this](Experiment* exp) { m_expDesigner->setExperiment(exp); });
     connect(pw, SIGNAL(openExperiment(Experiment*)), this, SLOT(slotOpenExperiment(Experiment*)));
     connect(pw, SIGNAL(hasUnsavedChanges(Project*)), SIGNAL(hasUnsavedChanges(Project*)));
     connect(pw, &ProjectWidget::closed, [this, pw, project]() {
-        m_attrWidget->removeWidgetFromList(pw);
+        m_expDesigner->removeWidgetFromList(pw);
         for (ExperimentWidget* expW : m_experiments) {
             expW->close();
         }
@@ -164,7 +164,7 @@ void ProjectsPage::slotOpenExperiment(Experiment* exp)
         m_experiments.append(ew);
     }
 
-    m_attrWidget->addWidgetToList(ew);
+    m_expDesigner->addWidgetToList(ew);
     ew->show();
     ew->raise();
 }

@@ -3,8 +3,8 @@
  * @author Marcos Cardinot <mcardinot@gmail.com>
  */
 
-#ifndef ATTRIBUTESWIDGET_H
-#define ATTRIBUTESWIDGET_H
+#ifndef EXPERIMENT_DESIGNER_H
+#define EXPERIMENT_DESIGNER_H
 
 #include <QCheckBox>
 #include <QDockWidget>
@@ -14,17 +14,17 @@
 
 #include "core/project.h"
 
-class Ui_AttributesWidget;
+class Ui_ExperimentDesigner;
 
 namespace evoplex {
 
-class AttributesWidget : public QDockWidget
+class ExperimentDesigner : public QDockWidget
 {
     Q_OBJECT
 
 public:
-    explicit AttributesWidget(MainApp* mainApp, QWidget* parent = 0);
-    ~AttributesWidget();
+    explicit ExperimentDesigner(MainApp* mainApp, QWidget* parent = 0);
+    ~ExperimentDesigner();
 
     void addWidgetToList(QDockWidget* dw);
     void removeWidgetFromList(QDockWidget* dw);
@@ -50,7 +50,7 @@ private:
     QString m_selectedGraphId;
     QString m_selectedModelId;
 
-    Ui_AttributesWidget* m_ui;
+    Ui_ExperimentDesigner* m_ui;
     QTreeWidgetItem* m_treeItemGeneral;
     QTreeWidgetItem* m_treeItemOutputs;
     QTreeWidgetItem* m_treeItemModels;
@@ -72,4 +72,4 @@ private:
 };
 }
 
-#endif // ATTRIBUTESWIDGET_H
+#endif // EXPERIMENT_DESIGNER_H

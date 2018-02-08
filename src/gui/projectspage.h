@@ -14,7 +14,7 @@
 
 namespace evoplex {
 
-class AttributesWidget;
+class ExperimentDesigner;
 class ExperimentWidget;
 class ProjectWidget;
 
@@ -47,7 +47,7 @@ protected:
 private:
     MainGUI* m_mainGUI;
     MainApp* m_mainApp;
-    AttributesWidget* m_attrWidget;
+    ExperimentDesigner* m_expDesigner;
     Project* m_activeProject;
     QVector<ProjectWidget*> m_projects; // opened projects
     QVector<ExperimentWidget*> m_experiments; // opened experiments
