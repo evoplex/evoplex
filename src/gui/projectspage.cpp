@@ -59,7 +59,7 @@ void ProjectsPage::slotFocusChanged(QDockWidget* currTab)
         m_activeProject = pw->project();
     } else {
         ExperimentWidget* ew = qobject_cast<ExperimentWidget*>(currTab);
-        m_activeProject = ew ? ew->experiment()->project() : nullptr;
+        m_activeProject = ew ? ew->exp()->project() : nullptr;
     }
 
     if (m_activeProject) {
@@ -88,10 +88,12 @@ void ProjectsPage::addProjectWidget(Project* project)
     connect(pw, SIGNAL(openExperiment(Experiment*)), this, SLOT(slotOpenExperiment(Experiment*)));
     connect(pw, SIGNAL(hasUnsavedChanges(Project*)), SIGNAL(hasUnsavedChanges(Project*)));
     connect(pw, &ProjectWidget::closed, [this, pw, project]() {
-        m_expDesigner->removeWidgetFromList(pw);
         for (ExperimentWidget* expW : m_experiments) {
-            expW->close();
+            if (expW->exp()->project() == project) {
+                expW->close();
+            }
         }
+        m_expDesigner->removeWidgetFromList(pw);
         m_projects.removeOne(pw);
         if (m_projects.isEmpty()) {
             QSettings s;
@@ -142,7 +144,7 @@ void ProjectsPage::slotOpenExperiment(Experiment* exp)
 
     ExperimentWidget* ew = nullptr;
     foreach (ExperimentWidget* e, m_experiments) {
-        if (exp == e->experiment()) {
+        if (exp == e->exp()) {
             ew = e;
             break;
         }
@@ -152,6 +154,7 @@ void ProjectsPage::slotOpenExperiment(Experiment* exp)
         ew = new ExperimentWidget(m_mainGUI, exp, this);
         connect(ew, &ExperimentWidget::closed, [this, ew]() {
             m_projects.last()->raise();
+            m_expDesigner->removeWidgetFromList(ew);
             m_experiments.removeOne(ew);
             ew->deleteLater();
         });

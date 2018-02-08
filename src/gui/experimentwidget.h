@@ -22,7 +22,7 @@ public:
     explicit ExperimentWidget(MainGUI* mainGUI, Experiment* exp, ProjectsPage* ppage);
     ~ExperimentWidget();
 
-    inline Experiment* experiment() const { return m_exp; }
+    inline Experiment* exp() const { return m_exp; }
 
 signals:
     void closed();

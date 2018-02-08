@@ -198,7 +198,7 @@ void ExperimentDesigner::setActiveWidget(QDockWidget* dw, Project* project)
     m_ui->cbWidgets->setCurrentIndex(id);
     m_project = project;
     ExperimentWidget* ew = qobject_cast<ExperimentWidget*>(dw);
-    setExperiment(ew ? ew->experiment() : nullptr);
+    setExperiment(ew ? ew->exp() : nullptr);
 }
 
 void ExperimentDesigner::slotSetActiveWidget(int idx)
