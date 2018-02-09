@@ -46,6 +46,7 @@ private slots:
     void slotSaveAs();
     void slotSaveAll();
     void slotShowLog();
+    void slotShowAbout();
 
 protected:
     void closeEvent(QCloseEvent* event);

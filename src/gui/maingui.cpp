@@ -175,14 +175,7 @@ MainGUI::MainGUI(MainApp* mainApp, QWidget* parent)
     connect(acLog, SIGNAL(triggered(bool)), SLOT(slotShowLog()));
     menuHelp->addAction(acLog);
     QAction* acAbout = new QAction("About", this);
-    connect(acAbout, &QAction::triggered, [this]() {
-        QString version = "Evoplex " EVOPLEX_VERSION;
-        QString txt = "Evoplex is a multi-agent system for networks (graphs).\n\n"
-                      "Built on " EVOPLEX_BUILDDATE "\n\n"
-                      "From revision " EVOPLEX_GIT_COMMIT_HASH " (" EVOPLEX_GIT_BRANCH ")\n\n"
-                      "Copyright 2016-2018 Marcos Cardinot et al.";
-        QMessageBox::about(this, version, txt);
-    });
+    connect(acAbout, SIGNAL(triggered(bool)), SLOT(slotShowAbout()));
     menuHelp->addAction(acAbout);
     this->menuBar()->addMenu(menuHelp);
 
@@ -298,12 +291,16 @@ void MainGUI::slotShowLog()
 
     QPlainTextEdit* text = new QPlainTextEdit(Logger::log(), d);
     text->setReadOnly(true);
+    text->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     l->addWidget(text);
 
     l->addWidget(new QLabel("Writing log file to: " + Logger::logFileName()));
 
-    QHBoxLayout* bts = new QHBoxLayout(d);
-    bts->addSpacerItem(new QSpacerItem(5,5,QSizePolicy::MinimumExpanding,QSizePolicy::MinimumExpanding));
+    QHBoxLayout* bts = new QHBoxLayout();
+    bts->addSpacerItem(new QSpacerItem(5, 5, QSizePolicy::MinimumExpanding, QSizePolicy::Minimum));
+    QPushButton* refresh = new QPushButton("Refresh");
+    connect(refresh, &QPushButton::pressed, [text](){ text->setPlainText(Logger::log()); });
+    bts->addWidget(refresh);
     QPushButton* copy = new QPushButton("Copy to Clipboard");
     connect(copy, &QPushButton::pressed, [text](){ text->selectAll(); text->copy(); });
     bts->addWidget(copy);
@@ -311,10 +308,21 @@ void MainGUI::slotShowLog()
     connect(close, &QPushButton::pressed, [d](){ d->close(); });
     bts->addWidget(close);
     l->addLayout(bts);
+    close->setFocus();
 
     d->setModal(true);
     d->setLayout(l);
     d->show();
+}
+
+void MainGUI::slotShowAbout()
+{
+    QString version = "Evoplex " EVOPLEX_VERSION;
+    QString txt = "Evoplex is a multi-agent system for networks (graphs).\n\n"
+                  "Built on " EVOPLEX_BUILDDATE "\n\n"
+                  "From revision " EVOPLEX_GIT_COMMIT_HASH " (" EVOPLEX_GIT_BRANCH ")\n\n"
+                  "Copyright 2016-2018 Marcos Cardinot et al.";
+    QMessageBox::about(this, version, txt);
 }
 
 } // evoplex
