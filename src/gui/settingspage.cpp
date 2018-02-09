@@ -31,7 +31,7 @@ SettingsPage::SettingsPage(MainGUI* mainGUI)
     setDfCMapSize(QString::number(mainGUI->colorMapMgr()->defaultColorMap().second));
     connect(m_ui->colormaps, SIGNAL(currentIndexChanged(QString)), SLOT(setDfCMapName(QString)));
     connect(m_ui->colormapsize, SIGNAL(currentTextChanged(QString)), SLOT(setDfCMapSize(QString)));
-    connect(m_ui->delay, &QSlider::valueChanged, [this](int v) { m_mainGUI->mainApp()->setDefaultDelay(v); });
+    connect(m_ui->delay, &QSlider::valueChanged, [this](int v) { m_mainGUI->mainApp()->setDefaultStepDelay(v); });
 
     QSettings s;
     s.beginGroup("settings");
@@ -49,7 +49,7 @@ SettingsPage::~SettingsPage()
     s.setValue("threads", m_ui->threads->value());
     s.setValue("colormap", m_ui->colormaps->currentText());
     s.setValue("colormapSize", m_ui->colormapsize->currentText());
-    s.setValue("delay", m_ui->delay->value());
+    s.setValue("stepDelay", m_ui->delay->value());
     s.endGroup();
 
     delete m_ui;

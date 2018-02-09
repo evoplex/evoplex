@@ -24,6 +24,9 @@ ExperimentsMgr::ExperimentsMgr()
 
 ExperimentsMgr::~ExperimentsMgr()
 {
+    QSettings s;
+    s.setValue("settings/threads", m_threads);
+
     delete m_timer;
 }
 

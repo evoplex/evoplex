@@ -8,7 +8,7 @@
 
 #include <QObject>
 #include <QTimer>
-#include <QVector>
+#include <list>
 
 namespace evoplex {
 

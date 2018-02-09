@@ -38,8 +38,8 @@ public:
 
     void closeProject(int projId);
 
-    inline quint16 defaultDelay() const { return m_defaultDelay; }
-    inline void setDefaultDelay(quint16 msec) { m_defaultDelay = msec; }
+    inline quint16 defaultStepDelay() const { return m_defaultStepDelay; }
+    inline void setDefaultStepDelay(quint16 msec) { m_defaultStepDelay = msec; }
 
     inline ExperimentsMgr* expMgr() const { return m_experimentsMgr; }
     inline const QHash<QString, GraphPlugin*>& graphs() const { return m_graphs; }
@@ -57,7 +57,7 @@ signals:
 
 private:
     ExperimentsMgr* m_experimentsMgr;
-    quint16 m_defaultDelay; // msec
+    quint16 m_defaultStepDelay; // msec
 
     int m_lastProjectId;
     QHash<int, Project*> m_projects; // opened projects.

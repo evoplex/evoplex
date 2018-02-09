@@ -45,7 +45,7 @@ MainApp::MainApp()
     addAttrSpace(id, OUTPUT_AVGTRIALS, "bool");
 
     QSettings s;
-    m_defaultDelay = s.value("settings/delay", 0).toInt();
+    m_defaultStepDelay = s.value("settings/stepDelay", 0).toInt();
 
     // load built-in plugins
     QDir pluginsDir = QDir(qApp->applicationDirPath());
@@ -66,6 +66,9 @@ MainApp::MainApp()
 
 MainApp::~MainApp()
 {
+    QSettings s;
+    s.setValue("settings/stepDelay", m_defaultStepDelay);
+
     qDeleteAll(m_projects);
     qDeleteAll(m_models);
     qDeleteAll(m_graphs);
