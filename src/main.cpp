@@ -8,6 +8,7 @@
 #include <QDebug>
 #include <QDir>
 #include <QScopedPointer>
+#include <QSplashScreen>
 #include <QStyleFactory>
 
 #include "config.h"
@@ -36,10 +37,12 @@ int main(int argc, char* argv[])
 
     evoplex::Logger::init();
 
-    QString copyrightLine = "Copyright (C) 2016-2018 Marcos Cardinot et al.";
-    QString versionLine = QString("This is %1 %2 - %3").arg(QCoreApplication::applicationName())
-                                                       .arg(QCoreApplication::applicationVersion())
-                                                       .arg(QCoreApplication::organizationDomain());
+    const QString copyright = "Copyright (C) 2016-2018";
+    const QString authors = "Marcos Cardinot et al.";
+    const QString copyrightLine = copyright + " - " + authors;
+    const QString versionLine = QString("%1 %2 - %3").arg(QCoreApplication::applicationName())
+                                                     .arg(QCoreApplication::applicationVersion())
+                                                     .arg(QCoreApplication::organizationDomain());
 
     int maxLength = qMax(versionLine.size(), copyrightLine.size());
     qDebug() << qPrintable(QString(" %1").arg(QString().fill('-', maxLength+2)));
@@ -54,6 +57,18 @@ int main(int argc, char* argv[])
     int result = -1;
     QApplication* app = qobject_cast<QApplication*>(coreApp.data());
     if (app) {
+        QPixmap pixmap(":icons/splash.svg");
+        QSplashScreen* splash = new QSplashScreen(pixmap, Qt::WindowStaysOnTopHint);
+        QFont splashFont = qApp->font();
+        splashFont.setPixelSize(12);
+        splash->setFont(splashFont);
+
+        splash->show();
+        app->processEvents();
+
+        splash->showMessage(QString("%1\n%2").arg(copyrightLine).arg(authors),
+                            Qt::AlignHCenter | Qt::AlignBottom, QColor(66,133,244));
+
         // start GUI application
         app->setStyle(QStyleFactory::create("Fusion"));
 
@@ -74,6 +89,7 @@ int main(int argc, char* argv[])
         app->setPalette(darkPalette);
 
         evoplex::MainGUI gui(&mainApp);
+        splash->finish(&gui);
         gui.show();
         result = app->exec();
     } else {
