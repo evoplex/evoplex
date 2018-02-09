@@ -66,7 +66,6 @@ bool Project::editExperiment(int expId, Experiment::ExperimentInputs* newInputs)
     if (!exp->init(newInputs)) {
         return false;
     }
-    exp->reset();
     emit (expEdited(expId));
     return true;
 }
