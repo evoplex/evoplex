@@ -16,9 +16,6 @@
     <verstretch>0</verstretch>
    </sizepolicy>
   </property>
-  <property name="windowTitle">
-   <string>Form</string>
-  </property>
   <layout class="QGridLayout" name="gridLayout_2">
    <property name="topMargin">
     <number>20</number>
@@ -35,7 +32,9 @@
       </sizepolicy>
      </property>
      <property name="styleSheet">
-      <string notr="true">background-color: rgb(46, 52, 54);</string>
+      <string notr="true">QWidget#inspector {
+	background-color: rgb(46, 52, 54);
+}</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout">
       <item>

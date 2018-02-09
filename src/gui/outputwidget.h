@@ -6,7 +6,7 @@
 #ifndef OUTPUTWIDGET_H
 #define OUTPUTWIDGET_H
 
-#include <QWidget>
+#include <QDialog>
 
 #include "core/output.h"
 #include "core/mainapp.h"
@@ -14,7 +14,7 @@
 
 namespace evoplex {
 
-class OutputWidget : public QWidget
+class OutputWidget : public QDialog
 {
     Q_OBJECT
 

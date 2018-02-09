@@ -20,6 +20,7 @@
         <file>grid.svg</file>
         <file>graph.svg</file>
         <file>line-chart.svg</file>
+        <file>splash.svg</file>
     </qresource>
     <qresource prefix="/colormaps">
         <file>colormaps.json</file>

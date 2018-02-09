@@ -11,7 +11,7 @@
 namespace evoplex {
 
 OutputWidget::OutputWidget(const ModelPlugin* modelPlugin, QWidget *parent)
-    : QWidget(parent)
+    : QDialog(parent)
     , m_ui(new Ui_OutputWidget)
     , m_modelPlugin(modelPlugin)
 {
@@ -26,7 +26,9 @@ OutputWidget::OutputWidget(const ModelPlugin* modelPlugin, QWidget *parent)
     connect(m_ui->add, SIGNAL(clicked(bool)), SLOT(slotAdd()));
     connect(m_ui->func, SIGNAL(currentIndexChanged(int)), SLOT(slotFuncChanged(int)));
     connect(m_ui->entityAgent, SIGNAL(toggled(bool)), SLOT(slotEntityChanged(bool)));
+
     m_ui->entityAgent->setChecked(true);
+    m_ui->entityEdge->setDisabled(modelPlugin->edgeAttrNames().empty());
 }
 
 OutputWidget::~OutputWidget()

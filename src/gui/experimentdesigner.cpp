@@ -198,6 +198,7 @@ void ExperimentDesigner::setActiveWidget(QDockWidget* dw, Project* project)
     m_ui->cbWidgets->setCurrentIndex(id);
     m_project = project;
     ExperimentWidget* ew = qobject_cast<ExperimentWidget*>(dw);
+    m_ui->bSubmit->setVisible(!ew);
     setExperiment(ew ? ew->exp() : nullptr);
 }
 
@@ -333,7 +334,7 @@ void ExperimentDesigner::slotOutputWidget()
         }
     }
 
-    OutputWidget* ow = new OutputWidget(model);
+    OutputWidget* ow = new OutputWidget(model, this);
     ow->setAttribute(Qt::WA_DeleteOnClose, true);
     ow->setWindowModality(Qt::ApplicationModal);
     ow->setTrialIds(trialIds);

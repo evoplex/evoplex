@@ -57,6 +57,7 @@ TableWidget::TableWidget(QWidget *parent)
     verticalHeader()->setDefaultSectionSize(40);
 
     setShowGrid(false);
+    setSortingEnabled(true);
     setEditTriggers(QAbstractItemView::NoEditTriggers);
     setSelectionBehavior(QAbstractItemView::SelectRows);
     setSelectionMode(QAbstractItemView::SingleSelection);

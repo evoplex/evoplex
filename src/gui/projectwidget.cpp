@@ -82,6 +82,8 @@ void ProjectWidget::fillRow(int row, Experiment* exp)
 {
     Q_ASSERT(exp);
 
+    m_ui->table->setSortingEnabled(false);
+
     // general stuff
     const Attributes* gep = exp->generalAttrs();
     insertItem(row, TableWidget::H_EXPID, QString::number(exp->id()));
@@ -110,6 +112,8 @@ void ProjectWidget::fillRow(int row, Experiment* exp)
 
     // graph stuff
     pluginAtbs(TableWidget::H_GRAPH, exp->graphId(), exp->graphAttrs());
+
+    m_ui->table->setSortingEnabled(true);
 }
 
 void ProjectWidget::slotInsertRow(int expId)
