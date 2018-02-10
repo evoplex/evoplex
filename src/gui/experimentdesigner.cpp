@@ -224,15 +224,16 @@ void ExperimentDesigner::setExperiment(Experiment* exp)
     m_ui->bEdit->show();
     m_enableOutputs->setChecked(exp->hasOutputs());
 
-    std::vector<QString> header = exp->generalAttrs()->names();
-    foreach (QString attrName, exp->graphAttrs()->names())
+    const Experiment::ExperimentInputs* inputs = exp->inputs();
+    std::vector<QString> header = inputs->generalAttrs->names();
+    foreach (QString attrName, inputs->graphAttrs->names())
         header.emplace_back(exp->graphId() + "_" + attrName);
-    foreach (QString attrName, exp->modelAttrs()->names())
+    foreach (QString attrName, inputs->modelAttrs->names())
         header.emplace_back(exp->modelId() + "_" + attrName);
 
-    std::vector<Value> values = exp->generalAttrs()->values();
-    values.insert(values.end(), exp->graphAttrs()->values().begin(), exp->graphAttrs()->values().end());
-    values.insert(values.end(), exp->modelAttrs()->values().begin(), exp->modelAttrs()->values().end());
+    std::vector<Value> values = inputs->generalAttrs->values();
+    values.insert(values.end(), inputs->graphAttrs->values().begin(), inputs->graphAttrs->values().end());
+    values.insert(values.end(), inputs->modelAttrs->values().begin(), inputs->modelAttrs->values().end());
 
     // ensure graphId will be filled at the end
     header.emplace_back(GENERAL_ATTRIBUTE_GRAPHID);
@@ -445,10 +446,14 @@ void ExperimentDesigner::slotCreateExperiment()
 void ExperimentDesigner::slotEditExperiment()
 {
     Q_ASSERT(m_exp);
-    if (!m_project->editExperiment(m_exp->id(), readInputs())) {
+    Experiment::ExperimentInputs* inputs = readInputs();
+    if (!inputs) {
+        return;
+    } else if (!m_project->editExperiment(m_exp->id(), inputs)) {
         QMessageBox::warning(this, "Experiment",
                 "Unable to edit the experiment.\n"
                 "If it is running, you should pause it first.");
+        delete inputs;
     }
 }
 

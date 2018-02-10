@@ -206,8 +206,9 @@ Project* MainApp::openProject(const QString& filepath, QString& error)
     }
 
     Project* project = newProject(fi.baseName(), fi.absolutePath());
-    if (project->importExperiments(filepath) == -1) {
-        error = "Failed to open the project!\n" + filepath;
+    if (project->importExperiments(filepath, error) < 1) {
+        error = "Failed to open the project!\n" + filepath
+              + "Error: " + error;
         qWarning() << "[Project] :" << error;
         closeProject(project->id());
         return nullptr;

@@ -30,10 +30,9 @@ public:
     // Edit an experiment of this project.
     bool editExperiment(int expId, Experiment::ExperimentInputs* newInputs);
 
-    // Import a set of experiments from a csv file
-    // return the number of failures or -1 if everything went wrong.
-    // Experiments belong to a project, that is why we need a valid projectId.
-    const int importExperiments(const QString& filePath);
+    // Import a set of experiments from a csv file. It stops if an experiment fails.
+    // return the number of experiments imported.
+    const int importExperiments(const QString& filePath, QString& errorMsg);
 
     // Save project into the dest directory.
     // A project is composed of plain csv files

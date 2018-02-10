@@ -41,12 +41,12 @@ protected:
 private:
     AbstractGraph* m_graph;
     PRG* m_prg;
-    Attributes* m_attributes;
+    const Attributes* m_attributes;
     int m_currStep;
     int m_status;
 
     // takes the ownership of the graph and the PRG
-    inline bool setup(PRG* prg, AbstractGraph* graphObj, Attributes* attrs) {
+    inline bool setup(PRG* prg, AbstractGraph* graphObj, const Attributes* attrs) {
         Q_ASSERT(!m_prg && !m_graph); // make sure it'll be called only once
         m_prg = prg;
         m_graph = graphObj;

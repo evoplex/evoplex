@@ -47,7 +47,7 @@ protected:
 private:
     const QString m_name;
     GraphType m_type;
-    Attributes* m_attrs;
+    const Attributes* m_attrs;
     PRG* m_prg;
 
     explicit AbstractBaseGraph(const QString& name)
@@ -64,7 +64,7 @@ private:
     }
 
     // takes the ownership of the agents
-    inline bool setup(PRG* prg, Agents& agents, Attributes* attrs, const QString& graphType) {
+    inline bool setup(PRG* prg, Agents& agents, const Attributes* attrs, const QString& graphType) {
         // make sure it'll be called only once
         Q_ASSERT(!m_prg && m_agents.empty());
         m_prg = prg;

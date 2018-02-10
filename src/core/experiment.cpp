@@ -29,39 +29,24 @@ Experiment::Experiment(MainApp* mainApp, int id, ExperimentInputs* inputs, Proje
 Experiment::~Experiment()
 {
     deleteTrials();
-    qDeleteAll(m_fileOutputs);
-    delete m_generalAttrs;
-    m_generalAttrs = nullptr;
-    delete m_modelAttrs;
-    m_modelAttrs = nullptr;
-    delete m_graphAttrs;
-    m_graphAttrs = nullptr;
+    Utils::deleteAndShrink(m_extraOutputs);
+    delete m_inputs;
 }
 
 bool Experiment::init(ExperimentInputs* inputs)
 {
     if (m_expStatus == RUNNING) {
         qWarning() << "[Experiment]: tried to init() a running experiment.";
-        delete inputs;
         return false;
-    } else if (m_expStatus != INVALID) {
-        m_expStatus = INVALID;
-        deleteTrials();
-        qDeleteAll(m_fileOutputs);
-        delete m_generalAttrs;
-        delete m_modelAttrs;
-        delete m_graphAttrs;
     }
 
-    m_generalAttrs = inputs->generalAttrs;
-    m_modelAttrs = inputs->modelAttrs;
-    m_graphAttrs = inputs->graphAttrs;
-    m_fileOutputs = inputs->fileOutputs;
-    delete inputs;
+    Utils::deleteAndShrink(m_extraOutputs);
+    delete m_inputs;
+    m_inputs = inputs;
 
     m_fileHeader = "";
-    if (!m_fileOutputs.empty()) {
-        for (Output* output : m_fileOutputs) {
+    if (!m_inputs->fileOutputs.empty()) {
+        for (Output* output : m_inputs->fileOutputs) {
             Q_ASSERT(output->allInputs().size() > 0);
             m_fileHeader += output->printableHeader(',') + ",";
         }
@@ -69,18 +54,13 @@ bool Experiment::init(ExperimentInputs* inputs)
         m_fileHeader += "\n";
     }
 
-    m_numTrials = m_generalAttrs->value(GENERAL_ATTRIBUTE_TRIALS).toInt();
-    m_autoDelete = m_generalAttrs->value(GENERAL_ATTRIBUTE_AUTODELETE).toBool();
-    m_stopAt = m_generalAttrs->value(GENERAL_ATTRIBUTE_STOPAT).toInt();
+    m_numTrials = m_inputs->generalAttrs->value(GENERAL_ATTRIBUTE_TRIALS).toInt();
+    m_autoDelete = m_inputs->generalAttrs->value(GENERAL_ATTRIBUTE_AUTODELETE).toBool();
 
-    m_graphPlugin = m_mainApp->graph(m_generalAttrs->value(GENERAL_ATTRIBUTE_GRAPHID).toQString());
-    m_modelPlugin = m_mainApp->model(m_generalAttrs->value(GENERAL_ATTRIBUTE_MODELID).toQString());
+    m_graphPlugin = m_mainApp->graph(m_inputs->generalAttrs->value(GENERAL_ATTRIBUTE_GRAPHID).toQString());
+    m_modelPlugin = m_mainApp->model(m_inputs->generalAttrs->value(GENERAL_ATTRIBUTE_MODELID).toQString());
 
-    m_delay = m_mainApp->defaultStepDelay();
-    m_pauseAt = m_stopAt;
-    m_progress = 0;
-    m_trials.reserve(m_numTrials);
-    m_expStatus = READY;
+    reset();
 
     return true;
 }
@@ -91,13 +71,15 @@ void Experiment::reset()
         qWarning() << "[Experiment]: tried to reset a running experiment. You should pause it first.";
         return;
     }
+
     deleteTrials();
     m_trials.reserve(m_numTrials);
-    m_expStatus = READY;
 
-    m_stopAt = m_generalAttrs->value(GENERAL_ATTRIBUTE_STOPAT).toInt();
+    m_delay = m_mainApp->defaultStepDelay();
+    m_stopAt = m_inputs->generalAttrs->value(GENERAL_ATTRIBUTE_STOPAT).toInt();
     m_pauseAt = m_stopAt;
     m_progress = 0;
+    m_expStatus = READY;
 
     emit (m_mainApp->expMgr()->statusChanged(this));
     emit (m_mainApp->expMgr()->restarted(this));
@@ -200,8 +182,8 @@ void Experiment::processTrial(const int& trialId)
         algorithmConverged = trial->algorithmStep();
         ++trial->m_currStep;
 
-        if (m_fileOutputs.size()) {
-            for (Output* output : m_fileOutputs)
+        if (m_inputs->fileOutputs.size()) {
+            for (Output* output : m_inputs->fileOutputs)
                 output->doOperation(trialId, trial);
 
             if (trial->m_currStep % m_mainApp->stepsToFlush() == 0)
@@ -241,12 +223,12 @@ AbstractModel* Experiment::createTrial(const int trialId)
         return nullptr;
     }
 
-    const int seed = m_generalAttrs->value(GENERAL_ATTRIBUTE_SEED).toInt();
+    const int seed = m_inputs->generalAttrs->value(GENERAL_ATTRIBUTE_SEED).toInt();
     PRG* prg = new PRG(seed + trialId);
 
     AbstractGraph* graphObj = m_graphPlugin->create();
-    QString gType = m_generalAttrs->value(GENERAL_ATTRIBUTE_GRAPHTYPE).toString();
-    if (!graphObj || !graphObj->setup(prg, agents, m_graphAttrs, gType) || !graphObj->init()) {
+    QString gType = m_inputs->generalAttrs->value(GENERAL_ATTRIBUTE_GRAPHTYPE).toString();
+    if (!graphObj || !graphObj->setup(prg, agents, m_inputs->graphAttrs, gType) || !graphObj->init()) {
         qWarning() << "[Experiment]: unable to create the trials."
                    << "The graph could not be initialized."
                    << "Project:" << m_project->name() << "Experiment:" << m_id;
@@ -259,7 +241,7 @@ AbstractModel* Experiment::createTrial(const int trialId)
     graphObj->reset();
 
     AbstractModel* modelObj = m_modelPlugin->create();
-    if (!modelObj || !modelObj->setup(prg, graphObj, m_modelAttrs) || !modelObj->init()) {
+    if (!modelObj || !modelObj->setup(prg, graphObj, m_inputs->modelAttrs) || !modelObj->init()) {
         qWarning() << "[Experiment]: unable to create the trials."
                    << "The model could not be initialized."
                    << "Project:" << m_project->name() << "Experiment:" << m_id;
@@ -267,9 +249,9 @@ AbstractModel* Experiment::createTrial(const int trialId)
         return nullptr;
     }
 
-    if (!m_fileOutputs.empty()) {
+    if (!m_inputs->fileOutputs.empty()) {
         const QString fpath = QString("%1/%2_e%3_t%4.csv")
-                .arg(m_generalAttrs->value(OUTPUT_DIR).toQString())
+                .arg(m_inputs->generalAttrs->value(OUTPUT_DIR).toQString())
                 .arg(m_project->name())
                 .arg(m_id)
                 .arg(trialId);
@@ -287,7 +269,7 @@ AbstractModel* Experiment::createTrial(const int trialId)
         m_fileStreams.insert({trialId, stream});
 
         // write this initial step to file
-        for (Output* output : m_fileOutputs) {
+        for (Output* output : m_inputs->fileOutputs) {
             output->doOperation(trialId, modelObj);
         }
         writeCachedSteps(trialId);
@@ -315,7 +297,7 @@ Agents Experiment::createAgents()
     Agents agents;
     QString errMsg;
     AgentsGenerator* ag = AgentsGenerator::parse(m_modelPlugin->agentAttrSpace(),
-                m_generalAttrs->value(GENERAL_ATTRIBUTE_AGENTS).toQString(), errMsg);
+                m_inputs->generalAttrs->value(GENERAL_ATTRIBUTE_AGENTS).toQString(), errMsg);
     if (ag) {
         agents = ag->create();
         delete ag;
@@ -356,13 +338,13 @@ void Experiment::writeCachedSteps(const int trialId)
 {
     // the cacheId for fileOutputs is always 0
     const int cacheId = 0;
-    if (m_fileOutputs.empty() || m_fileOutputs.front()->isEmpty(cacheId, trialId)) {
+    if (m_inputs->fileOutputs.empty() || m_inputs->fileOutputs.front()->isEmpty(cacheId, trialId)) {
         return;
     }
 
     QString rows;
-    while (!m_fileOutputs.front()->isEmpty(cacheId, trialId)) {
-        for (Output* output : m_fileOutputs) {
+    while (!m_inputs->fileOutputs.front()->isEmpty(cacheId, trialId)) {
+        for (Output* output : m_inputs->fileOutputs) {
             Values vals = output->readFrontRow(cacheId, trialId).second;
             output->flushFrontRow(cacheId, trialId);
             for (Value val : vals) {
@@ -405,7 +387,7 @@ bool Experiment::removeOutput(Output* output)
 
 Output* Experiment::searchOutput(const Output* find)
 {
-    for (Output* output : m_fileOutputs) {
+    for (Output* output : m_inputs->fileOutputs) {
         if (output->operator ==(find)) {
             return output;
         }
@@ -545,13 +527,7 @@ Experiment::ExperimentInputs* Experiment::readInputs(const MainApp* mainApp,
     }
 
     // that's great! everything seems to be valid
-    ExperimentInputs* inputs = new ExperimentInputs;
-    inputs->generalAttrs = generalAttrs;
-    inputs->modelAttrs = modelAttrs;
-    inputs->graphAttrs = graphAttrs;
-    inputs->fileOutputs = outputs;
-
-    return inputs;
+    return new ExperimentInputs(generalAttrs, modelAttrs, graphAttrs, outputs);
 }
 
 } // evoplex

@@ -37,10 +37,21 @@ public:
     };
 
     struct ExperimentInputs {
-        Attributes* generalAttrs = nullptr;
-        Attributes* modelAttrs = nullptr;
-        Attributes* graphAttrs = nullptr;
-        std::vector<Output*> fileOutputs;
+        const Attributes* generalAttrs;
+        const Attributes* modelAttrs;
+        const Attributes* graphAttrs;
+        const std::vector<Output*> fileOutputs;
+
+        ExperimentInputs(const Attributes* general, const Attributes* model,
+                         const Attributes* graph, const std::vector<Output*> outputs)
+            : generalAttrs(general), modelAttrs(model), graphAttrs(graph), fileOutputs(outputs) {}
+
+        ~ExperimentInputs() {
+            delete generalAttrs;
+            delete modelAttrs;
+            delete graphAttrs;
+            qDeleteAll(fileOutputs);
+        }
     };
 
     // Read and validates the experiment inputs.
@@ -97,7 +108,7 @@ public:
     inline bool autoDelete() const { return m_autoDelete; }
     inline void setAutoDelete(bool b) { m_autoDelete = b; }
 
-    inline bool hasOutputs() const { return !m_fileOutputs.empty() || !m_extraOutputs.empty(); }
+    inline bool hasOutputs() const { return !m_inputs->fileOutputs.empty() || !m_extraOutputs.empty(); }
     inline void addOutput(Output* output) { m_extraOutputs.emplace_back(output); }
     bool removeOutput(Output* output);
     Output* searchOutput(const Output* find);
@@ -108,9 +119,7 @@ public:
     inline int id() const { return m_id; }
     inline Project* project() const { return m_project; }
     inline int numTrials() const { return m_numTrials; }
-    inline const Attributes* generalAttrs() const { return m_generalAttrs; }
-    inline const Attributes* modelAttrs() const { return m_modelAttrs; }
-    inline const Attributes* graphAttrs() const { return m_graphAttrs; }
+    inline const ExperimentInputs* inputs() const { return m_inputs; }
     inline const QString& modelId() const { return m_modelPlugin->id(); }
     inline const QString& graphId() const { return m_graphPlugin->id(); }
     inline const ModelPlugin* modelPlugin() const { return m_modelPlugin; }
@@ -121,9 +130,7 @@ private:
     const int m_id;
     Project* m_project;
 
-    Attributes* m_generalAttrs;
-    Attributes* m_modelAttrs;
-    Attributes* m_graphAttrs;
+    const ExperimentInputs* m_inputs;
     const GraphPlugin* m_graphPlugin;
     const ModelPlugin* m_modelPlugin;
     int m_numTrials;
@@ -131,7 +138,6 @@ private:
     int m_stopAt;
 
     QString m_fileHeader;   // file header is the same for all trials; let's save it then
-    std::vector<Output*> m_fileOutputs;
     std::vector<Output*> m_extraOutputs;
     std::unordered_map<int, QTextStream*> m_fileStreams; // <trialId, stream>
 

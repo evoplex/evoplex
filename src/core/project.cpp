@@ -70,12 +70,14 @@ bool Project::editExperiment(int expId, Experiment::ExperimentInputs* newInputs)
     return true;
 }
 
-const int Project::importExperiments(const QString& filePath)
+const int Project::importExperiments(const QString& filePath, QString& errorMsg)
 {
     QFile file(filePath);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        qWarning() << "[FileMgr]: unable to read csv file with the experiments." << filePath;
-        return -1;
+        errorMsg = "Couldn't read the experiments from:\n`" + filePath + "`";
+                 + "Please, make sure it is a readable csv file.";
+        qWarning() << "[Project]: " << errorMsg;
+        return 0;
     }
 
     QTextStream in(&file);
@@ -83,27 +85,31 @@ const int Project::importExperiments(const QString& filePath)
     // read header
     const QStringList header = in.readLine().split(",");
     if (header.isEmpty()) {
-        qWarning() << "[FileMgr]: unable to read the experiments from" << filePath
-                   << "The header must have:" << m_mainApp->generalAttrSpace();
-        return -1;
+        errorMsg = "Couldn't read the experiments from:\n`" + filePath + "`"
+                 + "\nThe header must have: " + m_mainApp->generalAttrSpace().keys().join(", ");
+        qWarning() << "[Project]: " << errorMsg;
+        return 0;
     }
 
     // import experiments
-    int failures = 0;
     int row = 1;
     while (!in.atEnd()) {
         const QStringList values = in.readLine().split(",");
-        QString errorMsg;
-        Experiment::ExperimentInputs* inputs = Experiment::readInputs(m_mainApp, header, values, errorMsg);
+        QString expErrorMsg;
+        Experiment::ExperimentInputs* inputs = Experiment::readInputs(m_mainApp, header, values, expErrorMsg);
         if (!inputs || !newExperiment(inputs)) {
-            qWarning() << "[FileMgr]: unable to read the experiment at" << row << filePath
-                       << "\nError: \"" << errorMsg;
-            ++failures;
+            errorMsg = QString("Couldn't read the experiment at line %1 from:\n`%2`\n"
+                               "Error: %3").arg(row).arg(filePath).arg(expErrorMsg);
+            qWarning() << "[Project]: " << errorMsg;
+            delete inputs;
+            file.close();
+            return row - 1;
         }
         ++row;
     }
     file.close();
-    return failures == row - 1 ? -1 : failures;
+
+    return row - 1;
 }
 
 bool Project::saveProject(QString& errMsg, std::function<void(int)>& progress)
@@ -137,14 +143,15 @@ bool Project::saveProject(QString& errMsg, std::function<void(int)>& progress)
     progress(10);
     std::vector<QString> header;
     for (Experiment* exp : m_experiments) {
-        std::vector<QString> general = exp->generalAttrs()->names();
+        const Experiment::ExperimentInputs* inputs = exp->inputs();
+        std::vector<QString> general = inputs->generalAttrs->names();
         header.insert(header.end(), general.begin(), general.end());
         // prefix all model attributes with the modelId
-        foreach (const QString& attrName, exp->modelAttrs()->names()) {
+        foreach (const QString& attrName, inputs->modelAttrs->names()) {
             header.emplace_back(exp->modelId() + "_" + attrName);
         }
         // prefix all graph attributes with the graphId
-        foreach (const QString& attrName, exp->graphAttrs()->names()) {
+        foreach (const QString& attrName, inputs->graphAttrs->names()) {
             header.emplace_back(exp->graphId() + "_" + attrName);
         }
     }
@@ -162,23 +169,21 @@ bool Project::saveProject(QString& errMsg, std::function<void(int)>& progress)
 
     progress(35);
     for (Experiment* exp : m_experiments) {
-        const Attributes* generalAttrs = exp->generalAttrs();
-        const Attributes* modelAttrs = exp->modelAttrs();
-        const Attributes* graphAttrs = exp->graphAttrs();
+        const Experiment::ExperimentInputs* inputs = exp->inputs();
         const QString modelId_ = exp->modelId() + "_";
         const QString graphId_ = exp->graphId() + "_";
 
         QStringList values;
         foreach (QString attrName, header) {
-            int idx = generalAttrs->indexOf(attrName);
+            int idx = inputs->generalAttrs->indexOf(attrName);
             if (idx != -1) {
-                values.append(generalAttrs->value(idx).toQString());
+                values.append(inputs->generalAttrs->value(idx).toQString());
             } else if (attrName.startsWith(modelId_)) {
-                idx = modelAttrs->indexOf(attrName.remove(modelId_));
-                if (idx != -1) values.append(modelAttrs->value(idx).toQString());
+                idx = inputs->modelAttrs->indexOf(attrName.remove(modelId_));
+                if (idx != -1) values.append(inputs->modelAttrs->value(idx).toQString());
             } else if (attrName.startsWith(graphId_)) {
-                idx = graphAttrs->indexOf(attrName.remove(graphId_));
-                if (idx != -1) values.append(graphAttrs->value(idx).toQString());
+                idx = inputs->graphAttrs->indexOf(attrName.remove(graphId_));
+                if (idx != -1) values.append(inputs->graphAttrs->value(idx).toQString());
             } else {
                 values.append(""); // not found; leave empty
             }

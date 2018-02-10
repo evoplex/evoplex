@@ -17,11 +17,17 @@
 #include "prg.h"
 #include "valuespace.h"
 
-namespace evoplex {
-
-class Utils
+namespace evoplex
 {
-public:
+namespace Utils
+{
+    template <class T>
+    void deleteAndShrink(std::vector<T*> v) {
+        qDeleteAll(v);
+        v.clear();
+        std::vector<T*> ve;
+        ve.swap(v);
+    }
 
     // convert a linear index to row and column
     static void ind2sub(const int ind, const int cols, int &row, int &col) {
@@ -37,6 +43,7 @@ public:
     static int linearIdx(QPair<int,int> rowCol, const int cols) {
         return linearIdx(rowCol.first, rowCol.second, cols);
     }
-};
-}
+
+} // utils
+} // evoplex
 #endif // UTILS_H
