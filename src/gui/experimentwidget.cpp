@@ -28,7 +28,7 @@ ExperimentWidget::ExperimentWidget(MainGUI* mainGUI, Experiment* exp, ProjectsPa
     , m_innerWindow(new QMainWindow(this))
     , m_timer(new QTimer)
 {
-    setObjectName(QString("P%1.E%2").arg(m_exp->project()->id()).arg(m_exp->id()));
+    setObjectName(QString("%1(%2)").arg(m_exp->project()->name()).arg(m_exp->id()));
     setWindowTitle(objectName());
 
     // setup the inner qmainwindow
