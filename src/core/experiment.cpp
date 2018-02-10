@@ -76,7 +76,7 @@ bool Experiment::init(ExperimentInputs* inputs)
     m_graphPlugin = m_mainApp->graph(m_generalAttrs->value(GENERAL_ATTRIBUTE_GRAPHID).toQString());
     m_modelPlugin = m_mainApp->model(m_generalAttrs->value(GENERAL_ATTRIBUTE_MODELID).toQString());
 
-    m_delay = m_mainApp->defaultDelay();
+    m_delay = m_mainApp->defaultStepDelay();
     m_pauseAt = m_stopAt;
     m_progress = 0;
     m_trials.reserve(m_numTrials);
@@ -101,16 +101,15 @@ void Experiment::reset()
 
     emit (m_mainApp->expMgr()->statusChanged(this));
     emit (m_mainApp->expMgr()->restarted(this));
-
 }
 
 void Experiment::deleteTrials()
 {
-    QHash<int,QTextStream*>::iterator it;
-    for (it = m_fileStreams.begin(); it != m_fileStreams.end(); ++it) {
-        it.value()->flush();
-        delete it.value();
+    for (auto& stream : m_fileStreams) {
+        stream.second->flush();
+        delete stream.second;
     }
+    m_fileStreams.clear();
 
     for (auto& trial : m_trials) {
         delete trial.second;
@@ -198,27 +197,26 @@ void Experiment::processTrial(const int& trialId)
 
     bool algorithmConverged = false;
     while (trial->m_currStep < m_pauseAt && !algorithmConverged) {
-        for (Output* output : m_fileOutputs)
-            output->doOperation(trialId, trial);
+        algorithmConverged = trial->algorithmStep();
+        ++trial->m_currStep;
+
+        if (m_fileOutputs.size()) {
+            for (Output* output : m_fileOutputs)
+                output->doOperation(trialId, trial);
+
+            if (trial->m_currStep % m_mainApp->stepsToFlush() == 0)
+                writeCachedSteps(trialId);
+        }
+
         for (Output* output : m_extraOutputs)
             output->doOperation(trialId, trial);
 
-        // TODO: write only after X steps
-        writeStep(trialId);
-
         if (m_delay > 0)
             QThread::msleep(m_delay);
-
-        algorithmConverged = trial->algorithmStep();
-        ++trial->m_currStep;
     }
 
     if (trial->m_currStep >= m_stopAt || algorithmConverged) {
-        if (!m_fileStreams.empty()) {
-            for (QTextStream* stream : m_fileStreams) {
-                stream->flush();
-            }
-        }
+        writeCachedSteps(trialId);
         trial->m_status = FINISHED;
     } else {
         trial->m_status = READY;
@@ -286,7 +284,13 @@ AbstractModel* Experiment::createTrial(const int trialId)
 
         QTextStream* stream = new QTextStream(file);
         stream->operator <<(m_fileHeader);
-        m_fileStreams.insert(trialId, stream);
+        m_fileStreams.insert({trialId, stream});
+
+        // write this initial step to file
+        for (Output* output : m_fileOutputs) {
+            output->doOperation(trialId, modelObj);
+        }
+        writeCachedSteps(trialId);
     }
 
     modelObj->m_status = READY;
@@ -348,7 +352,7 @@ AbstractModel* Experiment::trial(int trialId) const
     return it->second;
 }
 
-void Experiment::writeStep(const int trialId)
+void Experiment::writeCachedSteps(const int trialId)
 {
     // the cacheId for fileOutputs is always 0
     const int cacheId = 0;
@@ -369,7 +373,8 @@ void Experiment::writeStep(const int trialId)
         rows += "\n";
     }
 
-    m_fileStreams.value(trialId)->operator <<(rows);
+    m_fileStreams.at(trialId)->operator <<(rows);
+    m_fileStreams.at(trialId)->flush();
 }
 
 bool Experiment::removeOutput(Output* output)

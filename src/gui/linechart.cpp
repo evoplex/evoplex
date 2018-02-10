@@ -134,7 +134,7 @@ void LineChart::slotAddSeries(std::vector<Output*> newOutputs)
 
 void LineChart::updateSeries()
 {
-    if (m_series.empty() || m_finished || !this->isVisible()) {
+    if (!isVisible() || m_series.empty() || m_finished) {
         return;
     }
 

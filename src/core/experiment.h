@@ -11,6 +11,7 @@
 #include <QString>
 #include <QTextStream>
 #include <unordered_map>
+#include <vector>
 
 #include "experimentsmgr.h"
 #include "mainapp.h"
@@ -96,6 +97,7 @@ public:
     inline bool autoDelete() const { return m_autoDelete; }
     inline void setAutoDelete(bool b) { m_autoDelete = b; }
 
+    inline bool hasOutputs() const { return !m_fileOutputs.empty() || !m_extraOutputs.empty(); }
     inline void addOutput(Output* output) { m_extraOutputs.emplace_back(output); }
     bool removeOutput(Output* output);
     Output* searchOutput(const Output* find);
@@ -131,7 +133,7 @@ private:
     QString m_fileHeader;   // file header is the same for all trials; let's save it then
     std::vector<Output*> m_fileOutputs;
     std::vector<Output*> m_extraOutputs;
-    QHash<int, QTextStream*> m_fileStreams; // <trialId, stream>
+    std::unordered_map<int, QTextStream*> m_fileStreams; // <trialId, stream>
 
     int m_pauseAt;
     Status m_expStatus;
@@ -168,7 +170,7 @@ private:
 
     void deleteTrials();
 
-    void writeStep(const int trialId);
+    void writeCachedSteps(const int trialId);
 };
 }
 

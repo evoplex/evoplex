@@ -42,7 +42,7 @@ void DefaultOutput::doOperation(const int trialId, const AbstractModel* model)
     updateCaches(trialId, model->currStep(), allValues);
 }
 
-QString DefaultOutput::printableHeader(const char sep)
+QString DefaultOutput::printableHeader(const char sep) const
 {
     QString prefix = QString("%1_%2_%3_")
             .arg(stringFromFunc(m_func))
@@ -57,7 +57,7 @@ QString DefaultOutput::printableHeader(const char sep)
     return ret;
 }
 
-bool DefaultOutput::operator==(const Output* output)
+bool DefaultOutput::operator==(const Output* output) const
 {
     const DefaultOutput* other = dynamic_cast<const DefaultOutput*>(output);
     if (!other) return false;
@@ -83,7 +83,7 @@ void CustomOutput::doOperation(const int trialId, const AbstractModel* model)
     updateCaches(trialId, model->currStep(), model->customOutputs(m_allInputs));
 }
 
-QString CustomOutput::printableHeader(const char sep)
+QString CustomOutput::printableHeader(const char sep) const
 {
     QString ret;
     for (Value h : m_allInputs) {
@@ -93,7 +93,7 @@ QString CustomOutput::printableHeader(const char sep)
     return ret;
 }
 
-bool CustomOutput::operator==(const Output* output)
+bool CustomOutput::operator==(const Output* output) const
 {
     const CustomOutput* other = dynamic_cast<const CustomOutput*>(output);
     if (!other) return false;

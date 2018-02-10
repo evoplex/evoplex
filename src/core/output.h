@@ -28,9 +28,9 @@ public:
     virtual void doOperation(const int trialId, const AbstractModel* model) = 0;
 
     // Printable header with all columns of this operation separated by commas.
-    virtual QString printableHeader(const char sep) = 0;
+    virtual QString printableHeader(const char sep) const = 0;
 
-    virtual bool operator==(const Output* output) = 0;
+    virtual bool operator==(const Output* output) const = 0;
 
     static std::vector<Output*> parseHeader(const QStringList& header,
         const std::vector<int> trialIds, const ModelPlugin* model, QString& errorMsg);
@@ -96,9 +96,9 @@ public:
 
     // Printable header with all columns of this operation separated by commas.
     // Format: "custom_nameDefinedInTheModel"
-    virtual QString printableHeader(const char sep);
+    virtual QString printableHeader(const char sep) const;
 
-    virtual bool operator==(const Output* output);
+    virtual bool operator==(const Output* output) const;
 };
 
 
@@ -133,9 +133,9 @@ public:
 
     // Printable header with all columns of this operation separated by commas.
     // Format: "function_entity_attrName_value"
-    virtual QString printableHeader(const char sep);
+    virtual QString printableHeader(const char sep) const;
 
-    virtual bool operator==(const Output* output);
+    virtual bool operator==(const Output* output) const;
 
     inline Function function() const { return m_func; }
     inline QString functionStr()  const { return DefaultOutput::stringFromFunc(m_func); }
@@ -146,7 +146,6 @@ private:
     const Function m_func;
     const Entity m_entity;
     const ValueSpace* m_valueSpace;
-    const QString m_attrName;
 };
 
 }

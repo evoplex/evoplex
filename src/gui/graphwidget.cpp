@@ -252,7 +252,7 @@ void GraphWidget::updateInspector(const Agent* agent)
 
 void GraphWidget::updateView()
 {
-    if (!m_model || m_model->currStep() == m_currStep) {
+    if (!isVisible() || !m_model || m_model->currStep() == m_currStep) {
         return;
     }
     m_currStep = m_model->currStep();
