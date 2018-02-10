@@ -3,11 +3,12 @@
  * @author Marcos Cardinot <mcardinot@gmail.com>
  */
 
-#include <QToolBar>
-#include <QHBoxLayout>
-#include <QSpacerItem>
 #include <QDebug>
+#include <QHBoxLayout>
 #include <QLabel>
+#include <QMessageBox>
+#include <QSpacerItem>
+#include <QToolBar>
 
 #include "experimentwidget.h"
 #include "linechart.h"
@@ -36,13 +37,6 @@ ExperimentWidget::ExperimentWidget(MainGUI* mainGUI, Experiment* exp, ProjectsPa
     m_innerWindow->setAnimated(true);
     m_innerWindow->setStyleSheet("QMainWindow { background-color: rgb(24,24,24); }");
     m_innerWindow->setCentralWidget(0);
-
-    /*
-    // setup the AttributesWidget
-    m_innerWindow->addDockWidget(Qt::RightDockWidgetArea, m_attrWidget);
-    m_attrWidget->setTitleBarWidget(new QWidget());
-    m_attrWidget->setFeatures(QDockWidget::NoDockWidgetFeatures);
-    */
 
     QToolBar* tb = new QToolBar("Controls");
     m_aPlayPause = tb->addAction(m_kIcon_play, "Play/Pause");
@@ -140,6 +134,10 @@ void ExperimentWidget::slotStatusChanged(Experiment* exp)
         m_aNext->setEnabled(false);
         m_aStop->setEnabled(false);
         m_aReset->setEnabled(true);
+    }
+
+    if (status == Experiment::INVALID) {
+        QMessageBox::warning(this, "Experiment", "Something went wrong with your settings!");
     }
 }
 }

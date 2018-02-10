@@ -155,8 +155,6 @@ void GraphWidget::slotStatusChanged(Experiment *exp)
     } else if (exp->expStatus() == Experiment::FINISHED) {
         m_currStep = -1;
         updateView();
-    } else if (exp->expStatus() == Experiment::INVALID) {
-        QMessageBox::warning(this, "Graph", "Something went wrong with your settings!");
     }
 }
 
