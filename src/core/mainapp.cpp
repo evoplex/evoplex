@@ -9,7 +9,6 @@
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QPluginLoader>
-#include <QSettings>
 #include <QThread>
 #include <QtDebug>
 
@@ -24,6 +23,8 @@ namespace evoplex {
 
 MainApp::MainApp()
     : m_experimentsMgr(new ExperimentsMgr())
+    , m_defaultStepDelay(m_userPrefs.value("settings/stepDelay", 0).toInt())
+    , m_stepsToFlush(m_userPrefs.value("settings/stepsToFlush", 10000).toInt())
     , m_lastProjectId(-1)
 {
     int id = 0;
@@ -44,9 +45,6 @@ MainApp::MainApp()
     addAttrSpace(id, OUTPUT_HEADER, "string");
     addAttrSpace(id, OUTPUT_AVGTRIALS, "bool");
 
-    QSettings s;
-    m_defaultStepDelay = s.value("settings/stepDelay", 0).toInt();
-
     // load built-in plugins
     QDir pluginsDir = QDir(qApp->applicationDirPath());
     pluginsDir.cdUp();
@@ -57,7 +55,7 @@ MainApp::MainApp()
         }
     }
     // load user imported plugins
-    QStringList plugins = s.value("plugins").toStringList();
+    QStringList plugins = m_userPrefs.value("plugins").toStringList();
     for (QString path : plugins) {
         QString error;
         loadPlugin(pluginsDir.absoluteFilePath(path), error);
@@ -66,9 +64,6 @@ MainApp::MainApp()
 
 MainApp::~MainApp()
 {
-    QSettings s;
-    s.setValue("settings/stepDelay", m_defaultStepDelay);
-
     qDeleteAll(m_projects);
     qDeleteAll(m_models);
     qDeleteAll(m_graphs);
@@ -76,14 +71,25 @@ MainApp::~MainApp()
     m_experimentsMgr = nullptr;
 }
 
+void MainApp::setDefaultStepDelay(quint16 msec)
+{
+    m_defaultStepDelay = msec;
+    m_userPrefs.setValue("settings/stepDelay", m_defaultStepDelay);
+}
+
+void MainApp::setStepsToFlush(int steps)
+{
+    m_stepsToFlush = steps;
+    m_userPrefs.setValue("settings/stepsToFlush", m_stepsToFlush);
+}
+
 const AbstractPlugin* MainApp::importPlugin(const QString& path, QString& error)
 {
     const AbstractPlugin* plugin = loadPlugin(path, error);
     if (plugin) {
-        QSettings s;
-        QStringList paths = s.value("plugins").toStringList();
+        QStringList paths = m_userPrefs.value("plugins").toStringList();
         paths.append(path);
-        s.setValue("plugins", paths);
+        m_userPrefs.setValue("plugins", paths);
     }
     return plugin;
 }
@@ -171,15 +177,14 @@ Project* MainApp::newProject(const QString& name, const QString& dest)
     m_projects.insert(m_lastProjectId, project);
 
     if (!dest.isEmpty() && !name.isEmpty()) {
-        QSettings s;
-        QVariantList recentProjects = s.value("recentProjects").toList();
+        QVariantList recentProjects = m_userPrefs.value("recentProjects").toList();
         QString path = QString("%1/%2.csv").arg(dest).arg(name);
         recentProjects.removeOne(path);
         recentProjects.push_front(path);
         if (recentProjects.size() > 20) {
             recentProjects.removeLast();
         }
-        s.setValue("recentProjects", recentProjects);
+        m_userPrefs.setValue("recentProjects", recentProjects);
     }
     emit (projectCreated(project));
     return project;

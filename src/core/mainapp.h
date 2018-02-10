@@ -8,6 +8,7 @@
 
 #include <QHash>
 #include <QObject>
+#include <QSettings>
 #include <QVector>
 
 #include "plugininterfaces.h"
@@ -39,7 +40,10 @@ public:
     void closeProject(int projId);
 
     inline quint16 defaultStepDelay() const { return m_defaultStepDelay; }
-    inline void setDefaultStepDelay(quint16 msec) { m_defaultStepDelay = msec; }
+    void setDefaultStepDelay(quint16 msec);
+
+    inline int stepsToFlush() const { return m_stepsToFlush; }
+    void setStepsToFlush(int steps);
 
     inline ExperimentsMgr* expMgr() const { return m_experimentsMgr; }
     inline const QHash<QString, GraphPlugin*>& graphs() const { return m_graphs; }
@@ -57,7 +61,10 @@ signals:
 
 private:
     ExperimentsMgr* m_experimentsMgr;
+
+    QSettings m_userPrefs;
     quint16 m_defaultStepDelay; // msec
+    int m_stepsToFlush;
 
     int m_lastProjectId;
     QHash<int, Project*> m_projects; // opened projects.

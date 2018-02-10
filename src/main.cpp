@@ -66,7 +66,7 @@ int main(int argc, char* argv[])
         splash->show();
         app->processEvents();
 
-        splash->showMessage(QString("%1\n%2").arg(copyrightLine).arg(authors),
+        splash->showMessage(QString("%1\n%2").arg(copyright).arg(authors),
                             Qt::AlignHCenter | Qt::AlignBottom, QColor(66,133,244));
 
         // start GUI application

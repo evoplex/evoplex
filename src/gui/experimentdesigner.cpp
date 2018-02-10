@@ -222,6 +222,7 @@ void ExperimentDesigner::setExperiment(Experiment* exp)
 
     m_exp = exp;
     m_ui->bEdit->show();
+    m_enableOutputs->setChecked(exp->hasOutputs());
 
     std::vector<QString> header = exp->generalAttrs()->names();
     foreach (QString attrName, exp->graphAttrs()->names())

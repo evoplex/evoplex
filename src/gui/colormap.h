@@ -7,6 +7,7 @@
 #define COLORMAP_H
 
 #include <QColor>
+#include <QSettings>
 #include <unordered_map>
 #include <vector>
 
@@ -28,11 +29,13 @@ public:
     const Colors colors(const QString& name, int size) const;
     inline QStringList names() const { return m_names; }
     inline QStringList sizes(const QString& name) const { return m_sizesAvailable.value(name); }
+
     inline const CMapKey& defaultColorMap() const { return m_dfCMap; }
-    inline void setDefaultColorMap(const CMapKey& key) { m_dfCMap = key; }
-    inline void setDefaultColorMap(const QString& name, int size) { m_dfCMap = CMapKey(name, size); }
+    inline void setDefaultColorMap(const CMapKey& key) { setDefaultColorMap(key.first, key.second); }
+    void setDefaultColorMap(const QString& name, const int size);
 
 private:
+    QSettings m_userPrefs;
     CMapKey m_dfCMap;
     QHash<CMapKey, Colors> m_colormaps;
     QStringList m_names;

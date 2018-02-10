@@ -3,8 +3,6 @@
  * @author Marcos Cardinot <mcardinot@gmail.com>
  */
 
-#include <QSettings>
-
 #include "maingui.h"
 #include "welcomepage.h"
 #include "ui_welcomepage.h"
@@ -36,8 +34,7 @@ WelcomePage::~WelcomePage()
 void WelcomePage::refreshList()
 {
     m_ui->recent->clear();
-    QSettings s;
-    QVariantList recentProjects = s.value("recentProjects").toList();
+    QVariantList recentProjects = m_userPrefs.value("recentProjects").toList();
     for (const QVariant& path : recentProjects) {
         m_ui->recent->addItem(path.toString());
     }

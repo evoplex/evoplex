@@ -8,6 +8,7 @@
 
 #include <QObject>
 #include <QTimer>
+#include <QSettings>
 #include <list>
 
 namespace evoplex {
@@ -43,7 +44,9 @@ private slots:
     void updateProgressValues();
 
 private:
+    QSettings m_userPrefs;
     int m_threads;
+
     QTimer* m_timer; // timer to update the progress value of all running experiments
     std::list<Experiment*> m_running;
     std::list<Experiment*> m_queued;

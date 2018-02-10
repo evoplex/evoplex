@@ -52,6 +52,11 @@ ColorMapMgr::ColorMapMgr()
         m_sizesAvailable.insert(name, sizes);
     }
     m_names.sort();
+
+    CMapKey userDfCMap;
+    userDfCMap.first = m_userPrefs.value("settings/colormap", m_dfCMap.first).toString();
+    userDfCMap.second = m_userPrefs.value("settings/colormapSize", m_dfCMap.second).toInt();
+    m_dfCMap = m_colormaps.contains(userDfCMap) ? userDfCMap : m_dfCMap;
 }
 
 const Colors ColorMapMgr::colors(const CMapKey& key) const
@@ -66,6 +71,13 @@ const Colors ColorMapMgr::colors(const CMapKey& key) const
 const Colors ColorMapMgr::colors(const QString& name, int size) const
 {
     return colors(CMapKey(name, size));
+}
+
+void ColorMapMgr::setDefaultColorMap(const QString& name, const int size)
+{
+    m_dfCMap = CMapKey(name, size);
+    m_userPrefs.setValue("settings/colormap", name);
+    m_userPrefs.setValue("settings/colormapSize", size);
 }
 
 /************************************************************************/

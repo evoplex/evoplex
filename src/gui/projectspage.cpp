@@ -36,16 +36,14 @@ ProjectsPage::ProjectsPage(MainGUI* mainGUI)
 
 void ProjectsPage::showEvent(QShowEvent* e)
 {
-    QSettings s;
-    restoreState(s.value("gui/projectsPage").toByteArray());
+    restoreState(m_userPrefs.value("gui/projectsPage").toByteArray());
     QWidget::showEvent(e);
 }
 
 void ProjectsPage::hideEvent(QHideEvent* e)
 {
     if (!m_projects.isEmpty()) { // otherwise we'd always save the attrsWidget in fullscreen
-        QSettings s;
-        s.setValue("gui/projectsPage", saveState());
+        m_userPrefs.setValue("gui/projectsPage", saveState());
     }
     QMainWindow::hideEvent(e);
 }
@@ -96,8 +94,7 @@ void ProjectsPage::addProjectWidget(Project* project)
         m_expDesigner->removeWidgetFromList(pw);
         m_projects.removeOne(pw);
         if (m_projects.isEmpty()) {
-            QSettings s;
-            s.setValue("gui/projectsPage", saveState());
+            m_userPrefs.setValue("gui/projectsPage", saveState());
             emit (isEmpty(true));
         } else {
             emit (isEmpty(false));

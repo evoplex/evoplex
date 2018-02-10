@@ -45,6 +45,7 @@ protected:
     virtual void hideEvent(QHideEvent* e);
 
 private:
+    QSettings m_userPrefs;
     MainGUI* m_mainGUI;
     MainApp* m_mainApp;
     ExperimentDesigner* m_expDesigner;

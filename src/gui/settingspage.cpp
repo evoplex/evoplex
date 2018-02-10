@@ -3,7 +3,6 @@
  * @author Marcos Cardinot <mcardinot@gmail.com>
  */
 
-#include <QSettings>
 #include <QStringList>
 #include <QThread>
 
@@ -21,37 +20,33 @@ SettingsPage::SettingsPage(MainGUI* mainGUI)
 {
     m_ui->setupUi(this);
 
+    m_ui->threads->setMinimum(1);
     m_ui->threads->setMaximum(QThread::idealThreadCount());
+    m_ui->threads->setValue(mainGUI->mainApp()->expMgr()->maxThreadsCount());
     connect(m_ui->threads, static_cast<void(QSpinBox::*)(int)>(&QSpinBox::valueChanged),
             [mainGUI](int newValue) { mainGUI->mainApp()->expMgr()->setMaxThreadCount(newValue); });
 
+    const CMapKey cmap = mainGUI->colorMapMgr()->defaultColorMap();
     m_ui->colormaps->insertItems(0, mainGUI->colorMapMgr()->names());
-    m_ui->colormaps->setCurrentText(mainGUI->colorMapMgr()->defaultColorMap().first);
-    setDfCMapName(m_ui->colormaps->currentText()); // fill sizes
-    setDfCMapSize(QString::number(mainGUI->colorMapMgr()->defaultColorMap().second));
+    m_ui->colormaps->setCurrentText(cmap.first);
+    setDfCMapName(m_ui->colormaps->currentText()); // make sure we fill the cbox of sizes
     connect(m_ui->colormaps, SIGNAL(currentIndexChanged(QString)), SLOT(setDfCMapName(QString)));
-    connect(m_ui->colormapsize, SIGNAL(currentTextChanged(QString)), SLOT(setDfCMapSize(QString)));
-    connect(m_ui->delay, &QSlider::valueChanged, [this](int v) { m_mainGUI->mainApp()->setDefaultStepDelay(v); });
 
-    QSettings s;
-    s.beginGroup("settings");
-    m_ui->threads->setValue(s.value("threads", mainGUI->mainApp()->expMgr()->maxThreadsCount()).toInt());
-    m_ui->colormaps->setCurrentText(s.value("colormap", m_ui->colormaps->currentText()).toString());
-    m_ui->colormapsize->setCurrentText(s.value("colormapSize", m_ui->colormapsize->currentText()).toString());
-    m_ui->delay->setValue(s.value("delay", 0).toInt());
-    s.endGroup();
+    m_ui->colormapsize->setCurrentText(QString::number(cmap.second));
+    connect(m_ui->colormapsize, SIGNAL(currentTextChanged(QString)), SLOT(setDfCMapSize(QString)));
+
+    m_ui->delay->setValue(mainGUI->mainApp()->defaultStepDelay());
+    connect(m_ui->delay, &QSlider::valueChanged, [mainGUI](int v) { mainGUI->mainApp()->setDefaultStepDelay(v); });
+
+    m_ui->stepsToFlush->setMinimum(1);
+    m_ui->stepsToFlush->setMaximum(EVOPLEX_MAX_STEPS);
+    m_ui->stepsToFlush->setValue(mainGUI->mainApp()->stepsToFlush());
+    connect(m_ui->stepsToFlush, static_cast<void(QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+            [mainGUI](int newValue) { mainGUI->mainApp()->setStepsToFlush(newValue); });
 }
 
 SettingsPage::~SettingsPage()
 {
-    QSettings s;
-    s.beginGroup("settings");
-    s.setValue("threads", m_ui->threads->value());
-    s.setValue("colormap", m_ui->colormaps->currentText());
-    s.setValue("colormapSize", m_ui->colormapsize->currentText());
-    s.setValue("stepDelay", m_ui->delay->value());
-    s.endGroup();
-
     delete m_ui;
 }
 

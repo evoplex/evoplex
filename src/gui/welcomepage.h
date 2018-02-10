@@ -6,6 +6,7 @@
 #ifndef WELCOMEPAGE_H
 #define WELCOMEPAGE_H
 
+#include <QSettings>
 #include <QWidget>
 
 class Ui_WelcomePage;
@@ -26,6 +27,7 @@ private slots:
     void refreshList();
 
 private:
+    QSettings m_userPrefs;
     Ui_WelcomePage* m_ui;
     MainGUI* m_maingui;
 };

@@ -17,16 +17,12 @@ ExperimentsMgr::ExperimentsMgr()
 {
     connect(m_timer, SIGNAL(timeout()), this, SLOT(updateProgressValues()));
 
-    QSettings s;
-    m_threads = s.value("settings/threads", QThread::idealThreadCount()).toInt();
+    m_threads = m_userPrefs.value("settings/threads", QThread::idealThreadCount()).toInt();
     m_threads = m_threads > QThread::idealThreadCount() ? QThread::idealThreadCount() : m_threads;
 }
 
 ExperimentsMgr::~ExperimentsMgr()
 {
-    QSettings s;
-    s.setValue("settings/threads", m_threads);
-
     delete m_timer;
 }
 
@@ -164,6 +160,7 @@ void ExperimentsMgr::setMaxThreadCount(const int newValue)
         }
     }
 
+    m_userPrefs.setValue("settings/threads", m_threads);
     QThreadPool::globalInstance()->setMaxThreadCount(m_threads);
     qDebug() << "[ExperimentsMgr] setting the max number of thread from"
              << previous << "to" << newValue;
