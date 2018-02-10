@@ -32,9 +32,7 @@ bool SquareGrid::init()
 
 void SquareGrid::reset()
 {
-    qDeleteAll(m_edges);
-    m_edges.clear();
-    Edges().swap(m_edges);
+    Utils::deleteAndShrink(m_edges);
 
     for (int id = 0; id < m_agents.size(); ++id) {
         int x, y;

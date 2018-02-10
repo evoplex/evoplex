@@ -11,6 +11,7 @@
 
 #include "agentsgenerator.h"
 #include "modelplugin.h"
+#include "utils.h"
 
 namespace evoplex
 {
@@ -118,11 +119,11 @@ Agents AGFromFile::create(std::function<void(int)> progress)
     }
     file.close();
 
-    if (!isValid) {
-        qDeleteAll(agents);
-        agents.clear();
+    if (isValid) {
+        agents.shrink_to_fit();
+    } else {
+        Utils::deleteAndShrink(agents);
     }
-    agents.shrink_to_fit();
 
     return agents;
 }

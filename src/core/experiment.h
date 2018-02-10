@@ -19,6 +19,7 @@
 #include "output.h"
 #include "graphplugin.h"
 #include "modelplugin.h"
+#include "utils.h"
 
 namespace evoplex
 {

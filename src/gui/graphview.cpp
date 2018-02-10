@@ -40,8 +40,7 @@ int GraphView::refreshCache()
     if (paintingActive()) {
         return Scheduled;
     }
-    m_cache.clear();
-    m_cache.shrink_to_fit();
+    Utils::deleteAndShrink(m_cache);
     if (!m_model) {
         return Ready;
     }

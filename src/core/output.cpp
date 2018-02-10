@@ -188,8 +188,7 @@ std::vector<Output*> Output::parseHeader(const QStringList& header, const std::v
             if (h.isEmpty()) {
                 errorMsg = "[OutputHeader] invalid header! Custom function cannot be empty.\n";
                 qWarning() << errorMsg;
-                qDeleteAll(outputs);
-                outputs.clear();
+                Utils::deleteAndShrink(outputs);
                 return outputs;
             }
             customHeader.emplace_back(h);
@@ -203,8 +202,7 @@ std::vector<Output*> Output::parseHeader(const QStringList& header, const std::v
         } else {
             errorMsg = QString("[OutputHeader] invalid header! Function does not exist. (%1)\n").arg(h);
             qWarning() << errorMsg;
-            qDeleteAll(outputs);
-            outputs.clear();
+            Utils::deleteAndShrink(outputs);
             return outputs;
         }
 
@@ -221,8 +219,7 @@ std::vector<Output*> Output::parseHeader(const QStringList& header, const std::v
         } else {
             errorMsg = QString("[OutputHeader] invalid header! Entity does not exist. (%1)\n").arg(h);
             qWarning() << errorMsg;
-            qDeleteAll(outputs);
-            outputs.clear();
+            Utils::deleteAndShrink(outputs);
             return outputs;
         }
 
@@ -231,8 +228,7 @@ std::vector<Output*> Output::parseHeader(const QStringList& header, const std::v
         if (!valSpace->isValid()) {
             errorMsg = QString("[OutputHeader] invalid header! Attribute does not exist. (%1)\n").arg(h);
             qWarning() << errorMsg;
-            qDeleteAll(outputs);
-            outputs.clear();
+            Utils::deleteAndShrink(outputs);
             return outputs;
         }
 
@@ -243,8 +239,7 @@ std::vector<Output*> Output::parseHeader(const QStringList& header, const std::v
             if (!val.isValid()) {
                 errorMsg = QString("[OutputHeader] invalid header! Value of attribute is invalid. (%1)\n").arg(valStr);
                 qWarning() << errorMsg;
-                qDeleteAll(outputs);
-                outputs.clear();
+                Utils::deleteAndShrink(outputs);
                 return outputs;
             }
             attrHeader.emplace_back(val);
@@ -253,8 +248,7 @@ std::vector<Output*> Output::parseHeader(const QStringList& header, const std::v
         if (attrHeader.empty()) {
             errorMsg = "[OutputHeader] invalid header! Function cannot be empty.\n";
             qWarning() << errorMsg;
-            qDeleteAll(outputs);
-            outputs.clear();
+            Utils::deleteAndShrink(outputs);
             return outputs;
         }
 

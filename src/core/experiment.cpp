@@ -12,7 +12,6 @@
 #include "agentsgenerator.h"
 #include "experiment.h"
 #include "project.h"
-#include "utils.h"
 
 namespace evoplex
 {
@@ -21,6 +20,7 @@ Experiment::Experiment(MainApp* mainApp, int id, ExperimentInputs* inputs, Proje
     : m_mainApp(mainApp)
     , m_id(id)
     , m_project(project)
+    , m_inputs(nullptr)
     , m_expStatus(INVALID)
 {
     init(inputs);
@@ -98,9 +98,7 @@ void Experiment::deleteTrials()
     }
     m_trials.clear();
 
-    qDeleteAll(m_clonableAgents);
-    m_clonableAgents.clear();
-    Agents().swap(m_clonableAgents);
+    Utils::deleteAndShrink(m_clonableAgents);
 
     // if the experiment has finished or became invalid,
     // it's more interesing to do NOT change the status
@@ -522,7 +520,7 @@ Experiment::ExperimentInputs* Experiment::readInputs(const MainApp* mainApp,
         delete generalAttrs;
         delete graphAttrs;
         delete modelAttrs;
-        qDeleteAll(outputs);
+        Utils::deleteAndShrink(outputs);
         return nullptr;
     }
 

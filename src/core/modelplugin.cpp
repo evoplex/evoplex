@@ -51,8 +51,8 @@ ModelPlugin::ModelPlugin(const QObject* instance, const QJsonObject* metaData)
 
 ModelPlugin::~ModelPlugin()
 {
-    qDeleteAll(m_agentAttrSpace);
-    qDeleteAll(m_edgeAttrSpace);
+    Utils::deleteAndShrink(m_agentAttrSpace);
+    Utils::deleteAndShrink(m_edgeAttrSpace);
 }
 
 } // evoplex

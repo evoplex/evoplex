@@ -10,6 +10,7 @@
 #include "constants.h"
 #include "edge.h"
 #include "prg.h"
+#include "utils.h"
 
 namespace evoplex {
 
@@ -54,13 +55,8 @@ private:
         : m_name(name), m_type(Invalid_Type), m_attrs(nullptr), m_prg(nullptr) {}
 
     virtual ~AbstractBaseGraph() {
-        qDeleteAll(m_agents);
-        m_agents.clear();
-        Agents().swap(m_agents);
-
-        qDeleteAll(m_edges);
-        m_edges.clear();
-        Edges().swap(m_edges);
+        Utils::deleteAndShrink(m_agents);
+        Utils::deleteAndShrink(m_edges);
     }
 
     // takes the ownership of the agents

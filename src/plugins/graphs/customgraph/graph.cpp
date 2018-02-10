@@ -28,9 +28,7 @@ bool CustomGraph::init()
 
 void CustomGraph::reset()
 {
-    qDeleteAll(m_edges);
-    m_edges.clear();
-    Edges().swap(m_edges);
+    Utils::deleteAndShrink(m_edges);
 
     QFile file(m_filePath);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
@@ -91,9 +89,7 @@ void CustomGraph::reset()
     file.close();
 
     if (!isValid) {
-        qDeleteAll(m_edges);
-        m_edges.clear();
-        Edges().swap(m_edges);
+        Utils::deleteAndShrink(m_edges);
     }
 }
 

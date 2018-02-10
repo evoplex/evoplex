@@ -131,9 +131,8 @@ void OutputWidget::slotAdd()
 void OutputWidget::fill(std::vector<Output*> outputs)
 {
     m_ui->table->clearContents();
-    qDeleteAll(m_allOutputs);
-    m_allOutputs.clear();
-    m_newOutputs.clear();
+    Utils::deleteAndShrink(m_allOutputs);
+    Utils::deleteAndShrink(m_newOutputs);
 
     for (Output* output : outputs) {
         int row = m_ui->table->rowCount();

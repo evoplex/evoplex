@@ -10,6 +10,7 @@
 
 #include "agentsgeneratordlg.h"
 #include "core/agent.h"
+#include "core/utils.h"
 
 namespace evoplex
 {
@@ -138,9 +139,7 @@ void AgentsGeneratorDlg::slotSaveAs()
         pValue = numAgents;
         saved = AgentsGenerator::saveToFile(path, agents, progress);
 
-        qDeleteAll(agents);
-        agents.clear();
-        Agents().swap(agents);
+        Utils::deleteAndShrink(agents);
     }
 
     if (saved) {

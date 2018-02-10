@@ -33,7 +33,7 @@ Project::Project(MainApp* mainApp, int id, const QString& name, const QString& d
 
 Project::~Project()
 {
-    qDeleteAll(m_experiments);
+    Utils::deleteAndShrink(m_experiments);
 }
 
 void Project::playAll()

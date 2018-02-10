@@ -22,11 +22,25 @@ namespace evoplex
 namespace Utils
 {
     template <class T>
-    void deleteAndShrink(std::vector<T*> v) {
+    void deleteAndShrink(std::vector<T*>& v) {
         qDeleteAll(v);
         v.clear();
         std::vector<T*> ve;
         ve.swap(v);
+    }
+
+    template <class T>
+    void deleteAndShrink(std::vector<T>& v) {
+        v.clear();
+        std::vector<T> ve;
+        ve.swap(v);
+    }
+
+    template <typename T, class C>
+    void deleteAndShrink(QHash<T, C*>& h) {
+        qDeleteAll(h);
+        h.clear();
+        h.squeeze();
     }
 
     // convert a linear index to row and column

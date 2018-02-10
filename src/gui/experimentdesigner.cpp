@@ -331,8 +331,7 @@ void ExperimentDesigner::slotOutputWidget()
         currentOutputs = Output::parseHeader(currentHeader.split(";"), trialIds, model, errorMsg);
         if (!errorMsg.isEmpty()) {
             QMessageBox::warning(this, "Output Creator", errorMsg);
-            qDeleteAll(currentOutputs);
-            currentOutputs.clear();
+            Utils::deleteAndShrink(currentOutputs);
         }
     }
 

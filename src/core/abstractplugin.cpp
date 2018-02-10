@@ -9,6 +9,7 @@
 
 #include "abstractplugin.h"
 #include "constants.h"
+#include "utils.h"
 
 namespace evoplex {
 
@@ -41,7 +42,7 @@ AbstractPlugin::AbstractPlugin(const QJsonObject* metaData)
 
 AbstractPlugin::~AbstractPlugin()
 {
-    qDeleteAll(m_pluginAttrSpace);
+    Utils::deleteAndShrink(m_pluginAttrSpace);
 }
 
 bool AbstractPlugin::attrsSpace(const QJsonObject* metaData, const QString& name,
@@ -54,10 +55,8 @@ bool AbstractPlugin::attrsSpace(const QJsonObject* metaData, const QString& name
             ValueSpace* valSpace = ValueSpace::parse(id, attrs.firstKey(), attrs.first().toString());
             if (!valSpace->isValid()) {
                 delete valSpace;
-                qDeleteAll(space);
-                space.clear();
-                keys.clear();
-                keys.shrink_to_fit();
+                Utils::deleteAndShrink(space);
+                Utils::deleteAndShrink(keys);
                 return false;
             }
             space.insert(valSpace->attrName(), valSpace);

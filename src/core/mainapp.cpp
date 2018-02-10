@@ -64,9 +64,9 @@ MainApp::MainApp()
 
 MainApp::~MainApp()
 {
-    qDeleteAll(m_projects);
-    qDeleteAll(m_models);
-    qDeleteAll(m_graphs);
+    Utils::deleteAndShrink(m_projects);
+    Utils::deleteAndShrink(m_models);
+    Utils::deleteAndShrink(m_graphs);
     delete m_experimentsMgr;
     m_experimentsMgr = nullptr;
 }
