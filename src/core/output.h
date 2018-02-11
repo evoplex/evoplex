@@ -40,8 +40,7 @@ public:
     inline bool isEmpty() const
     { return m_caches.empty(); }
 
-    inline bool isEmpty(const int cacheId, const int trialId) const
-    { return m_caches.at(cacheId).trials.at(trialId).rows.empty(); }
+    bool isEmpty(const int cacheId, const int trialId) const;
 
     inline const Row& readFrontRow(const int cacheId, const int trialId) const
     { return m_caches.at(cacheId).trials.at(trialId).rows.front(); }

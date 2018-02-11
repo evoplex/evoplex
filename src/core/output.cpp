@@ -114,6 +114,15 @@ Output::Output(Values inputs, const std::vector<int> trialIds)
     addCache(inputs, trialIds);
 }
 
+bool Output::isEmpty(const int cacheId, const int trialId) const
+{
+    try {
+        return  m_caches.at(cacheId).trials.at(trialId).rows.empty();
+    } catch (...) {
+        return false;
+    }
+}
+
 const int Output::addCache(Values inputs, const std::vector<int> trialIds)
 {
     Cache cache;
