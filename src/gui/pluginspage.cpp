@@ -104,10 +104,7 @@ void PluginsPage::importPlugin()
     }
 
     QString error;
-    const AbstractPlugin* plugin = m_mainApp->loadPlugin(fileName, error, true);
-    if (plugin) {
-        insertRow(plugin);
-    } else {
+    if (!m_mainApp->loadPlugin(fileName, error, true)) {
         QMessageBox::warning(this, "Error", error);
     }
 }
