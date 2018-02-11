@@ -3,8 +3,10 @@
  * @author Marcos Cardinot <mcardinot@gmail.com>
  */
 
+#include <QDockWidget>
 #include <QFileDialog>
 #include <QMessageBox>
+#include <QSettings>
 
 #include "ui_pluginspage.h"
 #include "pluginspage.h"
@@ -15,31 +17,43 @@ PluginsPage::PluginsPage(MainGUI* mainGUI)
     : QWidget(mainGUI)
     , m_ui(new Ui_PluginsPage)
     , m_mainApp(mainGUI->mainApp())
+    , m_innerWindow(new QMainWindow())
 {
     m_ui->setupUi(this);
 
-    m_ui->table->horizontalHeader()->setSectionResizeMode(UID, QHeaderView::ResizeToContents);
-    m_ui->table->horizontalHeader()->setSectionResizeMode(TYPE, QHeaderView::ResizeToContents);
+    m_innerWindow->setStyleSheet("QMainWindow { background-color: rgb(24,24,24); }");
+    m_innerWindow->setCentralWidget(m_ui->table);
+    m_ui->dockBrowser->setTitleBarWidget(0);
+    m_innerWindow->addDockWidget(Qt::RightDockWidgetArea, m_ui->dockBrowser);
+    m_ui->iwLayout->addWidget(m_innerWindow);
 
     connect(m_ui->bImport, SIGNAL(pressed()), SLOT(importPlugin()));
     connect(m_ui->table, SIGNAL(itemSelectionChanged()), SLOT(rowSelectionChanged()));
 
-    for (GraphPlugin* g : m_mainApp->graphs()) {
-        insertRow(g);
-    }
-    for (ModelPlugin* m : m_mainApp->models()) {
-        insertRow(m);
-    }
+    for (GraphPlugin* g : m_mainApp->graphs()) { insertRow(g); }
+    for (ModelPlugin* m : m_mainApp->models()) { insertRow(m); }
+    connect(m_mainApp, SIGNAL(pluginAdded(const AbstractPlugin*)),
+            SLOT(insertRow(const AbstractPlugin*)));
+
+    QSettings s;
+    m_innerWindow->restoreGeometry(s.value("gui/pluginsPageGeometry").toByteArray());
+    m_innerWindow->restoreState(s.value("gui/pluginsPageState").toByteArray());
 }
 
 PluginsPage::~PluginsPage()
 {
-    delete m_ui;
+    QSettings s;
+    s.setValue("gui/pluginsPageGeometry", m_innerWindow->saveGeometry());
+    s.setValue("gui/pluginsPageState", m_innerWindow->saveState());
 }
 
 void PluginsPage::rowSelectionChanged()
 {
     int row = m_ui->table->currentRow();
+    if (row < 0) {
+        return;
+    }
+
     int type = m_ui->table->item(row, TYPE)->data(Qt::UserRole).toInt();
     if (type == AbstractPlugin::GraphPlugin) {
         loadHtml(m_mainApp->graph(m_ui->table->item(row, UID)->text()));
@@ -53,7 +67,8 @@ void PluginsPage::rowSelectionChanged()
 void PluginsPage::loadHtml(const GraphPlugin* plugin)
 {
     if (!plugin) {
-        qFatal("[PluginsPage]: invalid plugin object! It should never happen.");
+        m_ui->browser->clear();
+        return;
     }
 
     QString html = "<h2>" + plugin->name() + "</h2><br>"
@@ -67,7 +82,8 @@ void PluginsPage::loadHtml(const GraphPlugin* plugin)
 void PluginsPage::loadHtml(const ModelPlugin* plugin)
 {
     if (!plugin) {
-        qFatal("[PluginsPage]: invalid plugin object! It should never happen.");
+        m_ui->browser->clear();
+        return;
     }
 
     QString html = "<h2>" + plugin->name() + "</h2><br>"
@@ -88,7 +104,7 @@ void PluginsPage::importPlugin()
     }
 
     QString error;
-    const AbstractPlugin* plugin = m_mainApp->importPlugin(fileName, error);
+    const AbstractPlugin* plugin = m_mainApp->loadPlugin(fileName, error, true);
     if (plugin) {
         insertRow(plugin);
     } else {
@@ -98,6 +114,10 @@ void PluginsPage::importPlugin()
 
 void PluginsPage::insertRow(const AbstractPlugin* plugin)
 {
+    if (!plugin) {
+        return;
+    }
+
     QTableWidgetItem* typeItem;
     if (plugin->type() == AbstractPlugin::ModelPlugin) {
         typeItem = new QTableWidgetItem("model");
@@ -108,11 +128,54 @@ void PluginsPage::insertRow(const AbstractPlugin* plugin)
     }
     typeItem->setData(Qt::UserRole, plugin->type());
 
+    QPushButton* bUnload = new QPushButton();
+    bUnload->setFlat(true);
+    bUnload->installEventFilter(new ButtonHoverWatcher(this));
+
+    m_ui->table->setSortingEnabled(false);
     int row = m_ui->table->rowCount();
     m_ui->table->insertRow(row);
     m_ui->table->setItem(row, UID, new QTableWidgetItem(plugin->id()));
     m_ui->table->setItem(row, NAME, new QTableWidgetItem(plugin->name()));
     m_ui->table->setItem(row, TYPE, typeItem);
+    m_ui->table->setCellWidget(row, UNLOAD, bUnload);
+    m_ui->table->setSortingEnabled(true);
+
+    m_ui->table->horizontalHeader()->setSectionResizeMode(UID, QHeaderView::ResizeToContents);
+    m_ui->table->horizontalHeader()->setSectionResizeMode(TYPE, QHeaderView::ResizeToContents);
+    m_ui->table->horizontalHeader()->setSectionResizeMode(NAME, QHeaderView::ResizeToContents);
+    m_ui->table->horizontalHeader()->setSectionResizeMode(UNLOAD, QHeaderView::ResizeToContents);
+
+    connect(bUnload, &QPushButton::pressed, [this, typeItem, plugin]() {
+        int res = QMessageBox::question(this, "Unloading Plugin",
+                        QString("Are you sure you want to unload the plugin '%1'?").arg(plugin->name()));
+        if (res == QMessageBox::No) {
+            return;
+        }
+
+        QString error;
+        if (m_mainApp->unloadPlugin(plugin, error)) {
+            m_ui->table->clearSelection();
+            m_ui->table->removeRow(typeItem->row());
+        } else {
+            QMessageBox::warning(this, "Unloading Plugin", error);
+        }
+    });
+}
+
+bool ButtonHoverWatcher::eventFilter(QObject* watched, QEvent* event)
+{
+    QPushButton * button = qobject_cast<QPushButton*>(watched);
+    if (!button) {
+        return false;
+    } else if (event->type() == QEvent::Enter) { // hovered
+        button->setIcon(QIcon(":/icons/x.png"));
+        return true;
+    } else if (event->type() == QEvent::Leave){
+        button->setIcon(QIcon());
+        return true;
+    }
+    return false;
 }
 
 }

@@ -40,7 +40,8 @@ private slots:
     void slotEditExperiment();
     void slotModelSelected(const QString& modelId);
     void slotGraphSelected(const QString& graphId);
-    void slotPluginsUpdated(AbstractPlugin::PluginType type);
+    void slotPluginAdded(const AbstractPlugin* plugin);
+    void slotPluginRemoved(const QString& id, AbstractPlugin::PluginType type);
     void slotSetActiveWidget(int idx);
 
 private:
@@ -59,8 +60,7 @@ private:
     QCheckBox* m_enableOutputs;
     int m_customGraphIdx; // position of combobox in the graph tree
 
-    void insertPluginAttributes(QTreeWidgetItem* itemRoot, const QString &uid,
-                                const AttributesSpace& attrsSpace);
+    void addPluginAttrs(QTreeWidgetItem* tree, const AbstractPlugin* plugin);
 
     QSpinBox* newSpinBox(const int min, const int max);
     QDoubleSpinBox* newDoubleSpinBox(const double min, const double max);

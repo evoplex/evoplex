@@ -50,6 +50,7 @@ ExperimentDesigner::ExperimentDesigner(MainApp* mainApp, QWidget *parent)
     m_treeItemModels->setExpanded(true);
     // --  models available
     QComboBox* cb = new QComboBox(m_ui->treeWidget);
+    cb->insertItem(0, STRING_NULL_PLUGINID);
     connect(cb, SIGNAL(currentIndexChanged(QString)), SLOT(slotModelSelected(QString)));
     addTreeWidget(m_treeItemModels, GENERAL_ATTRIBUTE_MODELID, QVariant::fromValue(cb));
 
@@ -72,6 +73,7 @@ ExperimentDesigner::ExperimentDesigner(MainApp* mainApp, QWidget *parent)
     m_ui->treeWidget->setItemWidget(item, 1, agentsLayout->parentWidget());
     // --  graphs available
     cb = new QComboBox(m_ui->treeWidget);
+    cb->insertItem(0, STRING_NULL_PLUGINID);
     connect(cb, SIGNAL(currentIndexChanged(QString)), SLOT(slotGraphSelected(QString)));
     addTreeWidget(m_treeItemGraphs, GENERAL_ATTRIBUTE_GRAPHID, QVariant::fromValue(cb));
     // --  graph type
@@ -165,8 +167,11 @@ ExperimentDesigner::ExperimentDesigner(MainApp* mainApp, QWidget *parent)
     m_enableOutputs->setChecked(true);
     m_enableOutputs->setChecked(false);
 
-    slotPluginsUpdated(AbstractPlugin::GraphPlugin);
-    slotPluginsUpdated(AbstractPlugin::ModelPlugin);
+    for (const GraphPlugin* g : m_mainApp->graphs()) { slotPluginAdded(g); }
+    for (const ModelPlugin* m : m_mainApp->models()) { slotPluginAdded(m); }
+    connect(m_mainApp, SIGNAL(pluginAdded(const AbstractPlugin*)), SLOT(slotPluginAdded(const AbstractPlugin*)));
+    connect(m_mainApp, SIGNAL(pluginRemoved(QString,AbstractPlugin::PluginType)),
+            SLOT(slotPluginRemoved(QString,AbstractPlugin::PluginType)));
 }
 
 ExperimentDesigner::~ExperimentDesigner()
@@ -490,69 +495,81 @@ void ExperimentDesigner::pluginSelected(QTreeWidgetItem* itemRoot, const QString
     }
 }
 
-void ExperimentDesigner::slotPluginsUpdated(AbstractPlugin::PluginType type)
+void ExperimentDesigner::slotPluginAdded(const AbstractPlugin* plugin)
 {
-    QTreeWidgetItem* tree;
-    QString treeId;
-    QStringList keys;
-    if (type == AbstractPlugin::GraphPlugin) {
-        tree = m_treeItemGraphs;
-        treeId = GENERAL_ATTRIBUTE_GRAPHID;
-        keys = m_mainApp->graphs().keys();
-    } else if (type == AbstractPlugin::ModelPlugin) {
-        tree = m_treeItemModels;
-        treeId = GENERAL_ATTRIBUTE_MODELID;
-        keys = m_mainApp->models().keys();
+    QComboBox* cb;
+    if (plugin->type() == AbstractPlugin::GraphPlugin) {
+        addPluginAttrs(m_treeItemGraphs, plugin);
+        slotGraphSelected(STRING_NULL_PLUGINID); // to hide all fields
+        cb = m_widgetFields.value(GENERAL_ATTRIBUTE_GRAPHID).value<QComboBox*>();
+    } else if (plugin->type() == AbstractPlugin::ModelPlugin) {
+        addPluginAttrs(m_treeItemModels, plugin);
+        slotModelSelected(STRING_NULL_PLUGINID); // to hide all fields
+        cb = m_widgetFields.value(GENERAL_ATTRIBUTE_MODELID).value<QComboBox*>();
     } else {
         qFatal("[ExperimentDesigner]: invalid plugin type!");
     }
 
-    QComboBox* cb = m_widgetFields.value(treeId).value<QComboBox*>();
     cb->blockSignals(true);
-    cb->clear();
-    cb->insertItem(0, STRING_NULL_PLUGINID);
-    cb->insertItems(1, keys);
+    cb->insertItem(cb->count(), plugin->id());
+    cb->setCurrentIndex(0); // moves to --
+    cb->blockSignals(false);
+}
+
+void ExperimentDesigner::slotPluginRemoved(const QString& id, AbstractPlugin::PluginType type)
+{
+    QTreeWidgetItem* tree;
+    QComboBox* cb;
+    if (type == AbstractPlugin::GraphPlugin) {
+        tree = m_treeItemGraphs;
+        cb = m_widgetFields.value(GENERAL_ATTRIBUTE_GRAPHID).value<QComboBox*>();
+    } else if (type == AbstractPlugin::ModelPlugin) {
+        tree = m_treeItemModels;
+        cb = m_widgetFields.value(GENERAL_ATTRIBUTE_MODELID).value<QComboBox*>();
+    } else {
+        qFatal("[ExperimentDesigner]: invalid plugin type!");
+    }
+
+    cb->blockSignals(true);
+    cb->removeItem(cb->findText(id));
     cb->blockSignals(false);
 
-    auto addAttrs = [this, tree](AbstractPlugin* plugin) {
-        if (plugin->pluginAttrNames().size() <= 0) {
-            return; // nothing to add
-        }
-
-        QTreeWidgetItemIterator it(m_ui->treeWidget);
-        while (*it) {
-            if ((*it)->parent() == tree
-                    && (*it)->data(0, Qt::UserRole).toString() == plugin->id()) {
-                return; // plugins already exists
+    // remove all fields which belog to this plugin
+    QTreeWidgetItemIterator it(m_ui->treeWidget);
+    while (*it) {
+        if ((*it)->parent() == tree && (*it)->data(0, Qt::UserRole).toString() == id) {
+            QVariantHash::iterator i = m_widgetFields.begin();
+            while (i != m_widgetFields.end()) {
+                if (i.key().startsWith(id+"_"))
+                    i = m_widgetFields.erase(i);
+                else
+                    ++i;
             }
-            ++it;
+            tree->removeChild(*it);
         }
-
-        insertPluginAttributes(tree, plugin->id(), plugin->pluginAttrSpace());
-    };
-
-    if (type == AbstractPlugin::GraphPlugin) {
-        foreach (AbstractPlugin* plugin, m_mainApp->graphs()) {
-            addAttrs(plugin);
-        }
-        slotGraphSelected(cb->currentText());
-    } else {
-        foreach (AbstractPlugin* plugin, m_mainApp->models()) {
-            addAttrs(plugin);
-        }
-        slotModelSelected(cb->currentText());
+        ++it;
     }
 }
 
-void ExperimentDesigner::insertPluginAttributes(QTreeWidgetItem* itemRoot,
-                                              const QString& uid,
-                                              const AttributesSpace& attrsSpace)
+void ExperimentDesigner::addPluginAttrs(QTreeWidgetItem* tree, const AbstractPlugin* plugin)
 {
-    const QString& uid_ = uid + "_";
-    foreach (const ValueSpace* valSpace, attrsSpace) {
-        QTreeWidgetItem* item = new QTreeWidgetItem(itemRoot);
+    if (plugin->pluginAttrNames().size() <= 0) {
+        return; // nothing to add
+    }
+
+    QTreeWidgetItemIterator it(m_ui->treeWidget);
+    while (*it) {
+        if ((*it)->parent() == tree && (*it)->data(0, Qt::UserRole).toString() == plugin->id()) {
+            return; // plugins already exists
+        }
+        ++it;
+    }
+
+    const QString& uid_ = plugin->id() + "_";
+    foreach (const ValueSpace* valSpace, plugin->pluginAttrSpace()) {
+        QTreeWidgetItem* item = new QTreeWidgetItem(tree);
         item->setText(0, valSpace->attrName());
-        item->setData(0, Qt::UserRole, uid);
+        item->setData(0, Qt::UserRole, plugin->id());
 
         QWidget* widget = nullptr;
         switch (valSpace->type()) {
@@ -584,6 +601,8 @@ void ExperimentDesigner::insertPluginAttributes(QTreeWidgetItem* itemRoot,
             widget = le;
         }
 
+        widget->setAutoFillBackground(true); // important! seed qt docs
+        item->setHidden(true);
         m_ui->treeWidget->setItemWidget(item, 1, widget);
         // add the uid as prefix to avoid clashes.
         m_widgetFields.insert(uid_ + valSpace->attrName(), QVariant::fromValue(widget));

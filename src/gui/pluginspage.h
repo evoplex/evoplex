@@ -25,21 +25,31 @@ public:
 private slots:
     void importPlugin();
     void rowSelectionChanged();
+    void insertRow(const AbstractPlugin *plugin);
 
 private:
     enum TableCols {
         TYPE = 0,
         UID = 1,
-        NAME = 2
+        NAME = 2,
+        UNLOAD = 3
     };
 
     Ui_PluginsPage* m_ui;
     MainApp* m_mainApp;
-
-    void insertRow(const AbstractPlugin *plugin);
+    QMainWindow* m_innerWindow;
 
     void loadHtml(const GraphPlugin* plugin);
     void loadHtml(const ModelPlugin* plugin);
 };
+
+class ButtonHoverWatcher : public QObject
+{
+    Q_OBJECT
+public:
+    explicit ButtonHoverWatcher(QObject* parent) : QObject(parent) {}
+    virtual bool eventFilter(QObject* watched, QEvent* event) Q_DECL_OVERRIDE;
+};
+
 }
 #endif // PLUGINSPAGE_H

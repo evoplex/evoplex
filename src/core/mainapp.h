@@ -29,8 +29,11 @@ public:
     explicit MainApp();
     ~MainApp();
 
-    // loads plugin from a .so file; return true nullptr if unsuccessful
-    const AbstractPlugin* importPlugin(const QString& path, QString& error);
+    // load plugin from a .so file; return nullptr if unsuccessful
+    const AbstractPlugin* loadPlugin(const QString& path, QString& error, const bool addToUserPrefs);
+
+    // unload an existing plugin; return true if successful
+    bool unloadPlugin(const AbstractPlugin* plugin, QString& error);
 
     // Create a new project
     Project* newProject(const QString& name="", const QString& dest="");
@@ -58,6 +61,8 @@ public:
 
 signals:
     void projectCreated(const Project* p);
+    void pluginAdded(const AbstractPlugin* plugin);
+    void pluginRemoved(const QString& id, AbstractPlugin::PluginType t);
 
 private:
     ExperimentsMgr* m_experimentsMgr;
@@ -75,9 +80,6 @@ private:
     // lets build a hash with the name and space of the essential parameters
     // it is important to validate the contents of csv files
     AttributesSpace m_generalAttrSpace;
-
-    // load plugin from a .so file; return nullptr if unsuccessful
-    const AbstractPlugin* loadPlugin(const QString& path, QString& error);
 };
 }
 

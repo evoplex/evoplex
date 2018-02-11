@@ -51,14 +51,14 @@ MainApp::MainApp()
     if (pluginsDir.cd("lib/evoplex/plugins")) {
         foreach (QString fileName, pluginsDir.entryList(QStringList("*.so"), QDir::Files)) {
             QString error;
-            loadPlugin(pluginsDir.absoluteFilePath(fileName), error);
+            loadPlugin(pluginsDir.absoluteFilePath(fileName), error, false);
         }
     }
     // load user imported plugins
     QStringList plugins = m_userPrefs.value("plugins").toStringList();
     for (QString path : plugins) {
         QString error;
-        loadPlugin(pluginsDir.absoluteFilePath(path), error);
+        loadPlugin(pluginsDir.absoluteFilePath(path), error, false);
     }
 }
 
@@ -83,18 +83,7 @@ void MainApp::setStepsToFlush(int steps)
     m_userPrefs.setValue("settings/stepsToFlush", m_stepsToFlush);
 }
 
-const AbstractPlugin* MainApp::importPlugin(const QString& path, QString& error)
-{
-    const AbstractPlugin* plugin = loadPlugin(path, error);
-    if (plugin) {
-        QStringList paths = m_userPrefs.value("plugins").toStringList();
-        paths.append(path);
-        m_userPrefs.setValue("plugins", paths);
-    }
-    return plugin;
-}
-
-const AbstractPlugin* MainApp::loadPlugin(const QString& path, QString& error)
+const AbstractPlugin* MainApp::loadPlugin(const QString& path, QString& error, const bool addToUserPrefs)
 {
     if (!QFile(path).exists()) {
         error = "Unable to find the .so file. " + path;
@@ -108,14 +97,13 @@ const AbstractPlugin* MainApp::loadPlugin(const QString& path, QString& error)
         error = "Unable to load the plugin.\nWe couldn't find the meta data for this plugin.\n" + path;
         qWarning() << "[MainApp] " << error;
         return nullptr;
-    } else if (!metaData.contains(PLUGIN_ATTRIBUTE_UID)) {
-        error = QString("Unable to load the plugin.\n'%1' cannot be empty. %2")
-                .arg(PLUGIN_ATTRIBUTE_UID).arg(path);
-        qWarning() << "[MainApp] " << error;
-        return nullptr;
-    } else if (!metaData.contains(PLUGIN_ATTRIBUTE_TYPE)) {
-        error = QString("Unable to load the plugin.\n'%1' cannot be empty. %2")
-                .arg(PLUGIN_ATTRIBUTE_TYPE).arg(path);
+    } else if (!metaData.contains(PLUGIN_ATTRIBUTE_UID)
+               || !metaData.contains(PLUGIN_ATTRIBUTE_TYPE)
+               || !metaData.contains(PLUGIN_ATTRIBUTE_NAME)) {
+        error = QString("Unable to load the plugin at '%1'.\n"
+                "Plese, make sure the following fields are not empty:\n"
+                "%2, %3, %4").arg(path).arg(PLUGIN_ATTRIBUTE_UID)
+                .arg(PLUGIN_ATTRIBUTE_TYPE).arg(PLUGIN_ATTRIBUTE_NAME);
         qWarning() << "[MainApp] " << error;
         return nullptr;
     }
@@ -130,8 +118,9 @@ const AbstractPlugin* MainApp::loadPlugin(const QString& path, QString& error)
 
     QString uid = metaData[PLUGIN_ATTRIBUTE_UID].toString();
     if (m_models.contains(uid) || m_graphs.contains(uid)) {
-        error = QString("Unable to load the plugin.\n'%1' must be unique! %2")
-                .arg(PLUGIN_ATTRIBUTE_UID).arg(path);
+        error = QString("Unable to load the plugin.\n'%1' must be unique! %2\n"
+                "Please, choose another id or unload the plugin `%3` and try again.")
+                .arg(PLUGIN_ATTRIBUTE_UID).arg(path).arg(uid);
         qWarning() << "[MainApp] " << error;
         return nullptr;
     }
@@ -166,8 +155,40 @@ const AbstractPlugin* MainApp::loadPlugin(const QString& path, QString& error)
         return nullptr;
     }
 
+    if (addToUserPrefs) {
+        QStringList paths = m_userPrefs.value("plugins").toStringList();
+        paths.append(path);
+        m_userPrefs.setValue("plugins", paths);
+    }
+
+    emit (pluginAdded(plugin));
     qDebug() << "[MainApp] a plugin has been loaded." << path;
     return plugin;
+}
+
+bool MainApp::unloadPlugin(const AbstractPlugin* plugin, QString& error)
+{
+    if (!m_projects.isEmpty()) {
+        error = QString("Couldn't unload the plugin `%1`.\n"
+                "Please, close all projects and try again!")
+                .arg(plugin->name());
+        qWarning() << "[MainApp]: " << error;
+        return false;
+    }
+
+    QString id = plugin->id();
+    AbstractPlugin::PluginType type = plugin->type();
+    if (type == AbstractPlugin::GraphPlugin && m_graphs.contains(id)) {
+        delete m_graphs.take(id);
+    } else if (type == AbstractPlugin::ModelPlugin && m_models.contains(id)) {
+        delete m_models.take(id);
+    } else {
+        qFatal("[MainApp] Tried to unload a plugin (%s) which has not been loaded before.", id);
+    }
+
+    emit (pluginRemoved(id, type));
+    qDebug() << "[MainApp] a plugin has been unloaded." << id;
+    return true;
 }
 
 Project* MainApp::newProject(const QString& name, const QString& dest)
