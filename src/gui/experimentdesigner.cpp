@@ -296,11 +296,11 @@ void ExperimentDesigner::slotAgentsWidget()
         if (!errorMsg.isEmpty()) {
             QMessageBox::warning(this, "Agents Generator", errorMsg);
             delete ag;
-            return;
+            ag = nullptr;
         }
     }
 
-    AgentsGeneratorDlg* adlg = new AgentsGeneratorDlg(model->agentAttrSpace(), ag, this);
+    AgentsGeneratorDlg* adlg = new AgentsGeneratorDlg(model->agentAttrSpace(), this, ag);
     if (adlg->exec() == QDialog::Accepted) {
         m_widgetFields.value(GENERAL_ATTRIBUTE_AGENTS).value<QLineEdit*>()->setText(adlg->readCommand());
     }

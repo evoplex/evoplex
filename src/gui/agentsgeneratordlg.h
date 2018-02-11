@@ -20,7 +20,7 @@ class AgentsGeneratorDlg : public QDialog
     Q_OBJECT
 
 public:
-    explicit AgentsGeneratorDlg(const AttributesSpace& agentAttrsSpace, AgentsGenerator* ag, QWidget *parent);
+    explicit AgentsGeneratorDlg(const AttributesSpace& agentAttrsSpace, QWidget *parent, AgentsGenerator* ag=nullptr);
     ~AgentsGeneratorDlg();
 
     QString readCommand();
