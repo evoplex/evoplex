@@ -11,8 +11,8 @@
 
 namespace evoplex {
 
-ModelPlugin::ModelPlugin(const QObject* instance, const QJsonObject* metaData)
-    : AbstractPlugin(metaData)
+ModelPlugin::ModelPlugin(const QObject* instance, const QJsonObject* metaData, const QString& libPath)
+    : AbstractPlugin(metaData, libPath)
 {
     if (!isValid()) {
         return;

@@ -14,7 +14,7 @@ namespace evoplex {
 class GraphPlugin : public AbstractPlugin
 {
 public:
-    GraphPlugin(const QObject* instance, const QJsonObject* metaData);
+    GraphPlugin(const QObject* instance, const QJsonObject* metaData, const QString& libPath);
     virtual ~GraphPlugin();
 
     inline AbstractGraph* create() const { return m_factory->create(); }

@@ -13,8 +13,9 @@
 
 namespace evoplex {
 
-AbstractPlugin::AbstractPlugin(const QJsonObject* metaData)
-    : m_isValid(false)
+AbstractPlugin::AbstractPlugin(const QJsonObject* metaData, const QString& libPath)
+    : m_libPath(libPath)
+    , m_isValid(false)
 {
     QString t = metaData->value(PLUGIN_ATTRIBUTE_TYPE).toString();
     if (t == "graph") {

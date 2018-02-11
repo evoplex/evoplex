@@ -135,13 +135,13 @@ const AbstractPlugin* MainApp::loadPlugin(const QString& path, QString& error, c
 
     AbstractPlugin* plugin = nullptr;
     if (type == "graph") {
-        GraphPlugin* graph = new GraphPlugin(instance, &metaData);
+        GraphPlugin* graph = new GraphPlugin(instance, &metaData, path);
         if (graph->isValid()) {
             m_graphs.insert(graph->id(), graph);
             plugin = graph;
         }
     } else {
-        ModelPlugin* model = new ModelPlugin(instance, &metaData);
+        ModelPlugin* model = new ModelPlugin(instance, &metaData, path);
         if (model->isValid()) {
             m_models.insert(model->id(), model);
             plugin = model;
@@ -175,6 +175,10 @@ bool MainApp::unloadPlugin(const AbstractPlugin* plugin, QString& error)
         qWarning() << "[MainApp]: " << error;
         return false;
     }
+
+    QStringList paths = m_userPrefs.value("plugins").toStringList();
+    paths.removeOne(plugin->path());
+    m_userPrefs.setValue("plugins", paths);
 
     QString id = plugin->id();
     AbstractPlugin::PluginType type = plugin->type();

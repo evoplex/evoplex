@@ -21,11 +21,12 @@ public:
         ModelPlugin
     };
 
-    AbstractPlugin(const QJsonObject* metaData);
+    explicit AbstractPlugin(const QJsonObject* metaData, const QString& libPath);
     virtual ~AbstractPlugin();
 
     inline const bool isValid() const { return m_isValid; }
 
+    inline const QString& path() const { return m_libPath; }
     inline const PluginType type() const { return m_type; }
     inline const QString& id() const { return m_id; }
     inline const QString& author() const { return m_author; }
@@ -41,6 +42,7 @@ protected:
                     AttributesSpace &space, std::vector<QString>& keys) const;
 
 private:
+    const QString m_libPath;
     PluginType m_type;
     QString m_id;
     QString m_author;

@@ -11,8 +11,8 @@
 
 namespace evoplex {
 
-GraphPlugin::GraphPlugin(const QObject* instance, const QJsonObject* metaData)
-    : AbstractPlugin(metaData)
+GraphPlugin::GraphPlugin(const QObject* instance, const QJsonObject* metaData, const QString& libPath)
+    : AbstractPlugin(metaData, libPath)
 {
     if (!isValid()) {
         return;

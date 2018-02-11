@@ -16,7 +16,7 @@ namespace evoplex {
 class ModelPlugin : public AbstractPlugin
 {
 public:
-    ModelPlugin(const QObject* instance, const QJsonObject* metaData);
+    ModelPlugin(const QObject* instance, const QJsonObject* metaData, const QString& libPath);
     virtual ~ModelPlugin();
 
     AbstractModel* create() const { return m_factory->create(); }
