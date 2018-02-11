@@ -148,10 +148,11 @@ const AbstractPlugin* MainApp::loadPlugin(const QString& path, QString& error, c
         }
     }
 
-    if (!plugin->isValid()) {
+    if (!plugin || !plugin->isValid()) {
         error = QString("Unable to load the plugin.\nPlease, check the metaData.json file.\n %1").arg(path);
         loader.unload();
         qWarning() << "[MainApp] " << error;
+        delete plugin;
         return nullptr;
     }
 
@@ -187,7 +188,7 @@ bool MainApp::unloadPlugin(const AbstractPlugin* plugin, QString& error)
     } else if (type == AbstractPlugin::ModelPlugin && m_models.contains(id)) {
         delete m_models.take(id);
     } else {
-        qFatal("[MainApp] Tried to unload a plugin (%s) which has not been loaded before.", id);
+        qFatal(qPrintable("[MainApp] Tried to unload a plugin (" + id + ") which has not been loaded before."));
     }
 
     emit (pluginRemoved(id, type));

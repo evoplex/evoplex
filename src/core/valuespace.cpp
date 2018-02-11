@@ -11,7 +11,7 @@ namespace evoplex
 
 ValueSpace* ValueSpace::parse(int id, const QString& attrName, const QString& space)
 {
-    ValueSpace* vs;
+    ValueSpace* vs = nullptr;
     if (space == "bool") {
         vs = new DefaultSpace(id, attrName, Bool, Value(false));
     } else if (space == "string") {
