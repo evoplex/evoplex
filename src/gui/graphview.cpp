@@ -12,7 +12,7 @@
 namespace evoplex
 {
 
-GraphView::GraphView(MainGUI* mainGUI, Experiment* exp, QWidget* parent)
+GraphView::GraphView(MainGUI* mainGUI, Experiment* exp, ExperimentWidget* parent)
     : GraphWidget(mainGUI, exp, parent)
     , m_edgeSizeRate(25.f)
 {

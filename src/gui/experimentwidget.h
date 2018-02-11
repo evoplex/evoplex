@@ -26,6 +26,7 @@ public:
 
 signals:
     void closed();
+    void updateWidgets(bool forceUpdate);
 
 protected:
     void closeEvent(QCloseEvent *event);

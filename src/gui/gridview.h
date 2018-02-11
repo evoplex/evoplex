@@ -16,7 +16,7 @@ class GridView : public GraphWidget
     Q_OBJECT
 
 public:
-    explicit GridView(MainGUI* mainGUI, Experiment* exp, QWidget* parent);
+    explicit GridView(MainGUI* mainGUI, Experiment* exp, ExperimentWidget* parent);
 
 protected:
     void paintEvent(QPaintEvent*) override;

@@ -15,8 +15,9 @@
 namespace evoplex
 {
 
-GraphWidget::GraphWidget(MainGUI* mainGUI, Experiment* exp, QWidget* parent)
+GraphWidget::GraphWidget(MainGUI* mainGUI, Experiment* exp, ExperimentWidget* parent)
     : QDockWidget(parent)
+    , m_expWidget(parent)
     , m_ui(new Ui_GraphWidget)
     , m_settingsDlg(new GraphSettings(mainGUI, exp, this))
     , m_exp(exp)
@@ -75,7 +76,8 @@ GraphWidget::GraphWidget(MainGUI* mainGUI, Experiment* exp, QWidget* parent)
                 Value v = valSpace->validate(le->text());
                 if (v.isValid()) {
                     agent->setAttr(valSpace->id(), v);
-                    update();
+                    // let the other widgets aware that they all need to be updated
+                    emit (m_expWidget->updateWidgets(true));
                     return;
                 } else {
                     err = "The input for '" + valSpace->attrName() + "' is invalid.\n"
@@ -153,8 +155,7 @@ void GraphWidget::slotStatusChanged(Experiment *exp)
     if (exp != m_exp) {
         return;
     } else if (exp->expStatus() == Experiment::FINISHED) {
-        m_currStep = -1;
-        updateView();
+        updateView(true);
     }
 }
 
@@ -248,9 +249,9 @@ void GraphWidget::updateInspector(const Agent* agent)
     }
 }
 
-void GraphWidget::updateView()
+void GraphWidget::updateView(bool forceUpdate)
 {
-    if (!isVisible() || !m_model || m_model->currStep() == m_currStep) {
+    if (!m_model || (!forceUpdate && m_model->currStep() == m_currStep)) {
         return;
     }
     m_currStep = m_model->currStep();

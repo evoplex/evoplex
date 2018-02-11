@@ -14,7 +14,7 @@ namespace evoplex
 class GraphView : public GraphWidget
 {
 public:
-    explicit GraphView(MainGUI* mainGUI, Experiment* exp, QWidget* parent);
+    explicit GraphView(MainGUI* mainGUI, Experiment* exp, ExperimentWidget* parent);
 
 protected:
     void paintEvent(QPaintEvent*) override;

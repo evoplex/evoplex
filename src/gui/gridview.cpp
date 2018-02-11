@@ -12,7 +12,7 @@
 namespace evoplex
 {
 
-GridView::GridView(MainGUI* mainGUI, Experiment* exp, QWidget* parent)
+GridView::GridView(MainGUI* mainGUI, Experiment* exp, ExperimentWidget* parent)
     : GraphWidget(mainGUI, exp, parent)
 {
     setWindowTitle("Grid");

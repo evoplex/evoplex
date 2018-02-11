@@ -82,19 +82,20 @@ ExperimentWidget::ExperimentWidget(MainGUI* mainGUI, Experiment* exp, ProjectsPa
     connect(m_aGraph, &QAction::triggered, [this, mainGUI]() {
         GraphView* graph = new GraphView(mainGUI, m_exp, this);
         m_innerWindow->addDockWidget(Qt::TopDockWidgetArea, graph);
-        connect(m_timer, SIGNAL(timeout()), graph, SLOT(updateView()));
+        connect(this, SIGNAL(updateWidgets(bool)), graph, SLOT(updateView(bool)));
     });
     connect(m_aGrid, &QAction::triggered, [this, mainGUI]() {
         GridView* grid = new GridView(mainGUI, m_exp, this);
         m_innerWindow->addDockWidget(Qt::TopDockWidgetArea, grid);
-        connect(m_timer, SIGNAL(timeout()), grid, SLOT(updateView()));
+        connect(this, SIGNAL(updateWidgets(bool)), grid, SLOT(updateView(bool)));
     });
     connect(m_aLineChart, &QAction::triggered, [this, expMgr]() {
         LineChart* lineChart = new LineChart(expMgr, m_exp, this);
         m_innerWindow->addDockWidget(Qt::TopDockWidgetArea, lineChart);
-        connect(m_timer, SIGNAL(timeout()), lineChart, SLOT(updateSeries()));
+        connect(this, SIGNAL(updateWidgets(bool)), lineChart, SLOT(updateSeries()));
     });
 
+    connect(m_timer, &QTimer::timeout, [this]() { emit(updateWidgets(false)); });
     m_timer->start(100);
 }
 

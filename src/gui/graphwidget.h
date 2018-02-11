@@ -13,6 +13,7 @@
 #include <vector>
 
 #include "colormap.h"
+#include "experimentwidget.h"
 #include "graphsettings.h"
 #include "maingui.h"
 #include "core/experiment.h"
@@ -26,7 +27,7 @@ class GraphWidget : public QDockWidget
     Q_OBJECT
 
 public:
-    explicit GraphWidget(MainGUI* mainGUI, Experiment* exp, QWidget* parent);
+    explicit GraphWidget(MainGUI* mainGUI, Experiment* exp, ExperimentWidget* parent);
     ~GraphWidget();
 
 protected:
@@ -60,7 +61,7 @@ protected:
     virtual const Agent* selectAgent(const QPoint& pos) const = 0;
 
 public slots:
-    void updateView();
+    void updateView(bool forceUpdate);
     void setTrial(int trialId);
 
 private slots:
@@ -72,6 +73,7 @@ private slots:
     void setAgentCMap(ColorMap* cmap);
 
 private:
+    ExperimentWidget* m_expWidget; // parent
     QTimer m_updateCacheTimer;
     QPoint m_posEntered;
     int m_currTrialId;
