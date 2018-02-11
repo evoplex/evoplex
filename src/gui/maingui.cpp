@@ -129,8 +129,7 @@ MainGUI::MainGUI(MainApp* mainApp, QWidget* parent)
     m_actNewProject = new QAction("New Project", this);
     connect(this, SIGNAL(newProject()), m_actNewProject, SIGNAL(triggered()));
     connect(m_actNewProject, &QAction::triggered, [this, acProjects]() {
-        m_projectsPage->slotNewProject();
-        slotPage(acProjects);
+        if (m_projectsPage->slotNewProject()) slotPage(acProjects);
     });
     m_actOpenProject = new QAction("Open Project", this);
 

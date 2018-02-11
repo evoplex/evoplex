@@ -109,9 +109,17 @@ void ProjectsPage::addProjectWidget(Project* project)
     }
 }
 
-void ProjectsPage::slotNewProject()
+bool ProjectsPage::slotNewProject()
 {
-    addProjectWidget(m_mainApp->newProject());
+    QString error;
+    Project* p = m_mainApp->newProject(error);
+    if (p) {
+        addProjectWidget(p);
+    } else {
+        QMessageBox::warning(this, "Evoplex", error);
+        return false;
+    }
+    return true;
 }
 
 bool ProjectsPage::slotOpenProject(QString path)

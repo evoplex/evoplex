@@ -33,7 +33,7 @@ signals:
     void hasUnsavedChanges(Project*);
 
 public slots:
-    void slotNewProject();
+    bool slotNewProject();
     bool slotOpenProject(QString path);
     void slotOpenExperiment(Experiment* exp);
 

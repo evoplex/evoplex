@@ -191,8 +191,20 @@ bool MainApp::unloadPlugin(const AbstractPlugin* plugin, QString& error)
     return true;
 }
 
-Project* MainApp::newProject(const QString& name, const QString& dest)
+Project* MainApp::newProject(QString& error, const QString& name, const QString& dest)
 {
+    if (m_models.isEmpty()) {
+        error = "There are no models available in the software.\n"
+                "Please, make sure you import the plugins you need first!";
+        qWarning() << "[MainApp] :" << error;
+        return nullptr;
+    } else if (m_graphs.isEmpty()) {
+        error = "There are no graphs available in the software.\n"
+                "Please, make sure you import the plugins you need first!";
+        qWarning() << "[MainApp] :" << error;
+        return nullptr;
+    }
+
     ++m_lastProjectId;
     Project* project = new Project(this, m_lastProjectId, name, dest);
     m_projects.insert(m_lastProjectId, project);
@@ -222,15 +234,17 @@ Project* MainApp::openProject(const QString& filepath, QString& error)
     if (!fi.isReadable() || fi.suffix() != "csv") {
         error = "Failed to open the project!\n"
                 "Please, make sure it's a readable csv file!\n" + filepath;
-        qWarning() << "[Project] :" << error;
+        qWarning() << "[MainApp] :" << error;
         return nullptr;
     }
 
-    Project* project = newProject(fi.baseName(), fi.absolutePath());
-    if (project->importExperiments(filepath, error) < 1) {
+    Project* project = newProject(error, fi.baseName(), fi.absolutePath());
+    if (!project) {
+        return nullptr;
+    } else  if (project->importExperiments(filepath, error) < 1) {
         error = "Failed to open the project!\n" + filepath
               + "Error: " + error;
-        qWarning() << "[Project] :" << error;
+        qWarning() << "[MainApp] :" << error;
         closeProject(project->id());
         return nullptr;
     }

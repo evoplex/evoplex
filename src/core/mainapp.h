@@ -36,7 +36,7 @@ public:
     bool unloadPlugin(const AbstractPlugin* plugin, QString& error);
 
     // Create a new project
-    Project* newProject(const QString& name="", const QString& dest="");
+    Project* newProject(QString &error, const QString& name="", const QString& dest="");
 
     Project* openProject(const QString& filepath, QString& error);
 
