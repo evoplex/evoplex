@@ -54,8 +54,8 @@ ColorMapMgr::ColorMapMgr()
     m_names.sort();
 
     CMapKey userDfCMap;
-    userDfCMap.first = m_userPrefs.value("settings/colormap", m_dfCMap.first).toString();
-    userDfCMap.second = m_userPrefs.value("settings/colormapSize", m_dfCMap.second).toInt();
+    userDfCMap.first = m_userPrefs.value("settings/colormap", "Evoplex").toString();
+    userDfCMap.second = m_userPrefs.value("settings/colormapSize", 5).toInt();
     m_dfCMap = m_colormaps.contains(userDfCMap) ? userDfCMap : m_dfCMap;
 }
 
@@ -78,6 +78,17 @@ void ColorMapMgr::setDefaultColorMap(const QString& name, const int size)
     m_dfCMap = CMapKey(name, size);
     m_userPrefs.setValue("settings/colormap", name);
     m_userPrefs.setValue("settings/colormapSize", size);
+}
+
+void ColorMapMgr::resetSettingsToDefault()
+{
+    m_dfCMap = qMakePair(QString("Evoplex"), 5);
+    if (!m_colormaps.contains(m_dfCMap)) {
+        m_dfCMap = qMakePair(QString("Black"), 1);
+        if (!m_colormaps.contains(m_dfCMap)) {
+            qFatal("[ColorMapMgr]: unable to reset default settings!");
+        }
+    }
 }
 
 /************************************************************************/

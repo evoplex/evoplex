@@ -29,6 +29,8 @@ public:
     explicit MainApp();
     ~MainApp();
 
+    void resetSettingsToDefault();
+
     // load plugin from a .so file; return nullptr if unsuccessful
     const AbstractPlugin* loadPlugin(const QString& path, QString& error, const bool addToUserPrefs);
 

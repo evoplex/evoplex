@@ -23,9 +23,12 @@ public:
     explicit SettingsPage(MainGUI* mainGUI);
     ~SettingsPage();
 
+    void refreshFields();
+
 private slots:
     void setDfCMapName(const QString& name);
     void setDfCMapSize(const QString& sz);
+    void resetDefaults();
 
 private:
     Ui_SettingsPage* m_ui;

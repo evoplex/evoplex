@@ -23,6 +23,8 @@ public:
     explicit ExperimentsMgr();
     ~ExperimentsMgr();
 
+    void resetSettingsToDefault();
+
     void play(Experiment* exp);
 
     inline const int maxThreadsCount() const { return m_threads; }

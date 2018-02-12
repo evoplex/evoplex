@@ -23,10 +23,12 @@ namespace evoplex {
 
 MainApp::MainApp()
     : m_experimentsMgr(new ExperimentsMgr())
-    , m_defaultStepDelay(m_userPrefs.value("settings/stepDelay", 0).toInt())
-    , m_stepsToFlush(m_userPrefs.value("settings/stepsToFlush", 10000).toInt())
     , m_lastProjectId(-1)
 {
+    resetSettingsToDefault();
+    m_defaultStepDelay = m_userPrefs.value("settings/stepDelay", m_defaultStepDelay).toInt();
+    m_stepsToFlush = m_userPrefs.value("settings/stepsToFlush", m_stepsToFlush).toInt();
+
     int id = 0;
     auto addAttrSpace = [this](int& id, const QString& name, const QString& space) {
         m_generalAttrSpace.insert(name, ValueSpace::parse(id++, name, space));
@@ -69,6 +71,12 @@ MainApp::~MainApp()
     Utils::deleteAndShrink(m_graphs);
     delete m_experimentsMgr;
     m_experimentsMgr = nullptr;
+}
+
+void MainApp::resetSettingsToDefault()
+{
+    m_defaultStepDelay = 0;
+    m_stepsToFlush = 10000;
 }
 
 void MainApp::setDefaultStepDelay(quint16 msec)

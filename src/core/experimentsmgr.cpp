@@ -15,15 +15,21 @@ namespace evoplex {
 ExperimentsMgr::ExperimentsMgr()
     : m_timer(new QTimer(this))
 {
-    connect(m_timer, SIGNAL(timeout()), this, SLOT(updateProgressValues()));
+    resetSettingsToDefault();
+    m_threads = m_userPrefs.value("settings/threads", m_threads).toInt();
+    setMaxThreadCount(m_threads); // init
 
-    m_threads = m_userPrefs.value("settings/threads", QThread::idealThreadCount()).toInt();
-    m_threads = m_threads > QThread::idealThreadCount() ? QThread::idealThreadCount() : m_threads;
+    connect(m_timer, SIGNAL(timeout()), this, SLOT(updateProgressValues()));
 }
 
 ExperimentsMgr::~ExperimentsMgr()
 {
     delete m_timer;
+}
+
+void ExperimentsMgr::resetSettingsToDefault()
+{
+    m_threads = QThread::idealThreadCount();
 }
 
 void ExperimentsMgr::updateProgressValues()
@@ -145,7 +151,7 @@ void ExperimentsMgr::setMaxThreadCount(const int newValue)
     }
 
     const int previous = m_threads;
-    m_threads = newValue;
+    m_threads = newValue > QThread::idealThreadCount() ? QThread::idealThreadCount() : newValue;
 
     if (newValue > previous) {
         for (Experiment* exp : m_queued) {

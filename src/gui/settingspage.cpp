@@ -20,34 +20,51 @@ SettingsPage::SettingsPage(MainGUI* mainGUI)
 {
     m_ui->setupUi(this);
 
+    connect(m_ui->reset, SIGNAL(pressed()), SLOT(resetDefaults()));
+
     m_ui->threads->setMinimum(1);
     m_ui->threads->setMaximum(QThread::idealThreadCount());
-    m_ui->threads->setValue(mainGUI->mainApp()->expMgr()->maxThreadsCount());
     connect(m_ui->threads, static_cast<void(QSpinBox::*)(int)>(&QSpinBox::valueChanged),
             [mainGUI](int newValue) { mainGUI->mainApp()->expMgr()->setMaxThreadCount(newValue); });
 
-    const CMapKey cmap = mainGUI->colorMapMgr()->defaultColorMap();
-    m_ui->colormaps->insertItems(0, mainGUI->colorMapMgr()->names());
-    m_ui->colormaps->setCurrentText(cmap.first);
-    setDfCMapName(m_ui->colormaps->currentText()); // make sure we fill the cbox of sizes
+    m_ui->colormaps->insertItems(0, m_mainGUI->colorMapMgr()->names());
     connect(m_ui->colormaps, SIGNAL(currentIndexChanged(QString)), SLOT(setDfCMapName(QString)));
-
-    m_ui->colormapsize->setCurrentText(QString::number(cmap.second));
     connect(m_ui->colormapsize, SIGNAL(currentTextChanged(QString)), SLOT(setDfCMapSize(QString)));
 
-    m_ui->delay->setValue(mainGUI->mainApp()->defaultStepDelay());
     connect(m_ui->delay, &QSlider::valueChanged, [mainGUI](int v) { mainGUI->mainApp()->setDefaultStepDelay(v); });
 
     m_ui->stepsToFlush->setMinimum(1);
     m_ui->stepsToFlush->setMaximum(EVOPLEX_MAX_STEPS);
-    m_ui->stepsToFlush->setValue(mainGUI->mainApp()->stepsToFlush());
     connect(m_ui->stepsToFlush, static_cast<void(QSpinBox::*)(int)>(&QSpinBox::valueChanged),
             [mainGUI](int newValue) { mainGUI->mainApp()->setStepsToFlush(newValue); });
+
+    refreshFields();
 }
 
 SettingsPage::~SettingsPage()
 {
     delete m_ui;
+}
+
+void SettingsPage::refreshFields()
+{
+    m_ui->threads->setValue(m_mainGUI->mainApp()->expMgr()->maxThreadsCount());
+
+    const CMapKey cmap = m_mainGUI->colorMapMgr()->defaultColorMap();
+    m_ui->colormaps->setCurrentText(cmap.first);
+    m_ui->colormapsize->setCurrentText(QString::number(cmap.second));
+
+    m_ui->delay->setValue(m_mainGUI->mainApp()->defaultStepDelay());
+
+    m_ui->stepsToFlush->setValue(m_mainGUI->mainApp()->stepsToFlush());
+}
+
+void SettingsPage::resetDefaults()
+{
+    m_mainGUI->mainApp()->expMgr()->resetSettingsToDefault();
+    m_mainGUI->colorMapMgr()->resetSettingsToDefault();
+    m_mainGUI->mainApp()->resetSettingsToDefault();
+    refreshFields();
 }
 
 void SettingsPage::setDfCMapName(const QString& name)

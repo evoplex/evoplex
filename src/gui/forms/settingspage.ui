@@ -45,6 +45,41 @@
        </property>
       </widget>
      </item>
+     <item>
+      <widget class="QPushButton" name="reset">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>130</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>130</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton  {
+	border: 1px solid white;
+    border-radius: 8px;
+    background-color: transparent;
+}
+QPushButton::hover {
+	background-color: #4285f4;
+}</string>
+       </property>
+       <property name="text">
+        <string>Reset Defaults</string>
+       </property>
+      </widget>
+     </item>
     </layout>
    </item>
    <item row="3" column="0">

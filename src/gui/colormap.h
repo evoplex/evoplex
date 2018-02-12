@@ -25,6 +25,8 @@ class ColorMapMgr
 public:
     explicit ColorMapMgr();
 
+    void resetSettingsToDefault();
+
     const Colors colors(const CMapKey& key) const;
     const Colors colors(const QString& name, int size) const;
     inline QStringList names() const { return m_names; }
