@@ -12,6 +12,7 @@
 #include <QVariantHash>
 #include <QSpinBox>
 
+#include "projectspage.h"
 #include "core/project.h"
 
 class Ui_ExperimentDesigner;
@@ -26,9 +27,9 @@ public:
     explicit ExperimentDesigner(MainApp* mainApp, QWidget* parent = 0);
     ~ExperimentDesigner();
 
-    void addWidgetToList(QDockWidget* dw);
-    void removeWidgetFromList(QDockWidget* dw);
-    void setActiveWidget(QDockWidget* dw, Project* project);
+    void addWidgetToList(PPageDockWidget* dw);
+    void removeWidgetFromList(PPageDockWidget* dw);
+    void setActiveWidget(PPageDockWidget* dw, Project* project);
 
     void setExperiment(Experiment* exp);
 

@@ -16,8 +16,8 @@
 
 namespace evoplex {
 
-ProjectWidget::ProjectWidget(MainGUI* mainGUI, Project* project, ProjectsPage* ppage)
-    : QDockWidget(ppage)
+ProjectWidget::ProjectWidget(Project* project, MainGUI* mainGUI, ProjectsPage* ppage)
+    : PPageDockWidget(ppage)
     , m_ui(new Ui_ProjectWidget)
     , m_mainGUI(mainGUI)
     , m_project(project)
@@ -26,6 +26,7 @@ ProjectWidget::ProjectWidget(MainGUI* mainGUI, Project* project, ProjectsPage* p
 
     setObjectName(m_project->name());
     setWindowTitle(objectName());
+    setFocusPolicy(Qt::StrongFocus);
 
     connect(m_project, SIGNAL(expAdded(int)), SLOT(slotInsertRow(int)));
     connect(m_project, SIGNAL(expEdited(int)), SLOT(slotUpdateRow(int)));

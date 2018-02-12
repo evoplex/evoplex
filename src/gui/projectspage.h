@@ -38,7 +38,8 @@ public slots:
     void slotOpenExperiment(Experiment* exp);
 
 private slots:
-    void slotFocusChanged(QDockWidget* currTab);
+    void slotFocusChanged(QWidget*, QWidget* now);
+    void slotFocusChanged(QDockWidget* dw);
 
 protected:
     virtual void showEvent(QShowEvent* e);
@@ -55,6 +56,15 @@ private:
 
     void addProjectWidget(Project* project);
 };
+
+class PPageDockWidget : public QDockWidget
+{
+    Q_OBJECT
+public:
+    explicit PPageDockWidget(ProjectsPage* parent) : QDockWidget(parent) {}
+    virtual ~PPageDockWidget() {}
+};
+
 }
 
 #endif // PROJECTSPAGE_H

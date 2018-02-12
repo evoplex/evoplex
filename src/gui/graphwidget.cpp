@@ -32,12 +32,14 @@ GraphWidget::GraphWidget(MainGUI* mainGUI, Experiment* exp, ExperimentWidget* pa
     , m_cacheStatus(Ready)
 {
     setAttribute(Qt::WA_DeleteOnClose, true);
+    setFocusPolicy(Qt::StrongFocus);
 
     connect(mainGUI->mainApp()->expMgr(), SIGNAL(restarted(Experiment*)), SLOT(slotRestarted(Experiment*)));
     connect(mainGUI->mainApp()->expMgr(), SIGNAL(statusChanged(Experiment*)), SLOT(slotStatusChanged(Experiment*)));
 
-    QWidget* front = new QWidget;
+    QWidget* front = new QWidget(this);
     m_ui->setupUi(front);
+    front->setFocusPolicy(Qt::StrongFocus);
     setWidget(front);
 
     TitleBar* titleBar = new TitleBar(exp, this);

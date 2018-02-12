@@ -30,6 +30,8 @@ ProjectsPage::ProjectsPage(MainGUI* mainGUI)
 
     connect(this, SIGNAL(tabifiedDockWidgetActivated(QDockWidget*)),
             SLOT(slotFocusChanged(QDockWidget*)));
+    connect(qApp, SIGNAL(focusChanged(QWidget*,QWidget*)),
+            SLOT(slotFocusChanged(QWidget*,QWidget*)));
 
     addDockWidget(Qt::RightDockWidgetArea, m_expDesigner);
 }
@@ -48,27 +50,42 @@ void ProjectsPage::hideEvent(QHideEvent* e)
     QMainWindow::hideEvent(e);
 }
 
-void ProjectsPage::slotFocusChanged(QDockWidget* currTab)
+void ProjectsPage::slotFocusChanged(QDockWidget* dw)
 {
-    m_activeProject = nullptr;
-    ProjectWidget* pw = qobject_cast<ProjectWidget*>(currTab);
+    ProjectWidget* pw = qobject_cast<ProjectWidget*>(dw);
     if (pw) {
         pw->clearSelection();
         m_activeProject = pw->project();
+        m_expDesigner->setActiveWidget(pw, m_activeProject);
     } else {
-        ExperimentWidget* ew = qobject_cast<ExperimentWidget*>(currTab);
-        m_activeProject = ew ? ew->exp()->project() : nullptr;
+        ExperimentWidget* ew = qobject_cast<ExperimentWidget*>(dw);
+        if (!ew) return;
+        m_activeProject = ew->exp()->project();
+        m_expDesigner->setActiveWidget(ew, m_activeProject);
+    }
+    emit (activeProjectChanged(m_activeProject));
+}
+
+void ProjectsPage::slotFocusChanged(QWidget*, QWidget* now)
+{
+    if (!isVisible()) {
+        return;
     }
 
-    if (m_activeProject) {
-        m_expDesigner->setActiveWidget(currTab, m_activeProject);
-        emit (activeProjectChanged(m_activeProject));
+    QWidget* widget = now;
+    PPageDockWidget* dockWidget = nullptr;
+    while (widget && widget != this && !dockWidget) {
+        dockWidget = qobject_cast<PPageDockWidget*>(widget);
+        if (dockWidget) {
+            slotFocusChanged(qobject_cast<QDockWidget*>(dockWidget));
+        }
+        widget = widget->parentWidget();
     }
 }
 
 void ProjectsPage::addProjectWidget(Project* project)
 {
-    ProjectWidget* pw = new ProjectWidget(m_mainGUI, project, this);
+    ProjectWidget* pw = new ProjectWidget(project, m_mainGUI, this);
     if (m_projects.isEmpty()) {
         addDockWidget(Qt::LeftDockWidgetArea, pw);
     } else {
@@ -94,6 +111,7 @@ void ProjectsPage::addProjectWidget(Project* project)
         m_expDesigner->removeWidgetFromList(pw);
         m_projects.removeOne(pw);
         if (m_projects.isEmpty()) {
+            pw->show(); // make sure the widget is visible (to allow saving the current state)
             m_userPrefs.setValue("gui/projectsPage", saveState());
             emit (isEmpty(true));
         } else {
@@ -156,7 +174,7 @@ void ProjectsPage::slotOpenExperiment(Experiment* exp)
     }
 
     if (!ew) {
-        ew = new ExperimentWidget(m_mainGUI, exp, this);
+        ew = new ExperimentWidget(exp, m_mainGUI, this);
         connect(ew, &ExperimentWidget::closed, [this, ew]() {
             m_projects.last()->raise();
             m_expDesigner->removeWidgetFromList(ew);

@@ -17,8 +17,8 @@
 
 namespace evoplex {
 
-ExperimentWidget::ExperimentWidget(MainGUI* mainGUI, Experiment* exp, ProjectsPage* ppage)
-    : QDockWidget(ppage)
+ExperimentWidget::ExperimentWidget(Experiment* exp, MainGUI* mainGUI, ProjectsPage* ppage)
+    : PPageDockWidget(ppage)
     , m_kIcon_play(QIcon(":/icons/play.svg"))
     , m_kIcon_pause(QIcon(":/icons/pause.svg"))
     , m_kIcon_next(QIcon(":/icons/next.svg"))
@@ -30,6 +30,7 @@ ExperimentWidget::ExperimentWidget(MainGUI* mainGUI, Experiment* exp, ProjectsPa
 {
     setObjectName(QString("%1(%2)").arg(m_exp->project()->name()).arg(m_exp->id()));
     setWindowTitle(objectName());
+    setFocusPolicy(Qt::StrongFocus);
 
     // setup the inner qmainwindow
     m_innerWindow->setDockOptions(QMainWindow::AllowTabbedDocks | QMainWindow::GroupedDragging);
@@ -38,7 +39,7 @@ ExperimentWidget::ExperimentWidget(MainGUI* mainGUI, Experiment* exp, ProjectsPa
     m_innerWindow->setStyleSheet("QMainWindow { background-color: rgb(24,24,24); }");
     m_innerWindow->setCentralWidget(0);
 
-    QToolBar* tb = new QToolBar("Controls");
+    QToolBar* tb = new QToolBar("Controls", this);
     m_aPlayPause = tb->addAction(m_kIcon_play, "Play/Pause");
     m_aNext = tb->addAction(m_kIcon_next, "Next step");
     m_aStop = tb->addAction(m_kIcon_stop, "Stop");
@@ -65,6 +66,7 @@ ExperimentWidget::ExperimentWidget(MainGUI* mainGUI, Experiment* exp, ProjectsPa
     tb->setFloatable(false);
     tb->setIconSize(QSize(20,20));
     tb->setStyleSheet("background: rgb(53,53,53);");
+    tb->setFocusPolicy(Qt::StrongFocus);
 
     ExperimentsMgr* expMgr = mainGUI->mainApp()->expMgr();
     connect(expMgr, SIGNAL(statusChanged(Experiment*)), SLOT(slotStatusChanged(Experiment*)));

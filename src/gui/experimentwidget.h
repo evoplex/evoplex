@@ -13,13 +13,14 @@
 #include "projectspage.h"
 #include "core/project.h"
 
-namespace evoplex {
-
-class ExperimentWidget : public QDockWidget
+namespace evoplex
+{
+class ExperimentWidget : public PPageDockWidget
 {
     Q_OBJECT
+
 public:
-    explicit ExperimentWidget(MainGUI* mainGUI, Experiment* exp, ProjectsPage* ppage);
+    explicit ExperimentWidget(Experiment* exp, MainGUI* mainGUI, ProjectsPage* ppage);
     ~ExperimentWidget();
 
     inline Experiment* exp() const { return m_exp; }

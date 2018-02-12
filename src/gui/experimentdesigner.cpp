@@ -179,12 +179,12 @@ ExperimentDesigner::~ExperimentDesigner()
     delete m_ui;
 }
 
-void ExperimentDesigner::addWidgetToList(QDockWidget* dw)
+void ExperimentDesigner::addWidgetToList(PPageDockWidget* dw)
 {
     m_ui->cbWidgets->addItem(dw->objectName(), QVariant::fromValue(dw));
 }
 
-void ExperimentDesigner::removeWidgetFromList(QDockWidget* dw)
+void ExperimentDesigner::removeWidgetFromList(PPageDockWidget *dw)
 {
     int id = m_ui->cbWidgets->findData(QVariant::fromValue(dw));
     if (id != -1) {
@@ -194,7 +194,7 @@ void ExperimentDesigner::removeWidgetFromList(QDockWidget* dw)
     }
 }
 
-void ExperimentDesigner::setActiveWidget(QDockWidget* dw, Project* project)
+void ExperimentDesigner::setActiveWidget(PPageDockWidget* dw, Project* project)
 {
     int id = m_ui->cbWidgets->findData(QVariant::fromValue(dw));
     if (id == -1 || !project) {
@@ -211,7 +211,7 @@ void ExperimentDesigner::slotSetActiveWidget(int idx)
 {
     QVariant v = m_ui->cbWidgets->itemData(idx);
     if (v.isValid()) {
-        QDockWidget* dw = v.value<QDockWidget*>();
+        PPageDockWidget* dw = v.value<PPageDockWidget*>();
         dw->show();
         dw->raise();
     }

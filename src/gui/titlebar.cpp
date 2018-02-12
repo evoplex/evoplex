@@ -17,6 +17,7 @@ TitleBar::TitleBar(Experiment* exp, QDockWidget* parent)
     , m_exp(exp)
 {
     m_ui->setupUi(this);
+    setFocusPolicy(Qt::StrongFocus);
 
     setStyleSheet("background-color:rgb(40,40,40);");
 

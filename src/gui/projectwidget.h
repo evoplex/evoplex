@@ -20,12 +20,12 @@ class Ui_ProjectWidget;
 
 namespace evoplex {
 
-class ProjectWidget : public QDockWidget
+class ProjectWidget : public PPageDockWidget
 {
     Q_OBJECT
 
 public:
-    explicit ProjectWidget(MainGUI* mainGUI, Project* project, ProjectsPage* ppage);
+    explicit ProjectWidget(Project* project, MainGUI* mainGUI, ProjectsPage* ppage);
     ~ProjectWidget();
 
     inline Project* project() const { return m_project; }
