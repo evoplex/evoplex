@@ -133,7 +133,7 @@ bool Project::saveProject(QString& errMsg, std::function<void(int)>& progress)
 {
     progress(0);
     if (m_experiments.empty()) {
-        errMsg = QString("Unable to save %1.\n"
+        errMsg = QString("Unable to save the project '%1'.\n"
                 "This project is empty. There is nothing to save.").arg(name());
         qWarning() << "[Project]" << errMsg;
         return false;
@@ -142,11 +142,10 @@ bool Project::saveProject(QString& errMsg, std::function<void(int)>& progress)
     progress(5);
     QFile file(m_filepath);
     QFileInfo fi(file);
-    if (!fi.isFile() || fi.suffix() != "csv" ||
-            !file.open(QFile::WriteOnly | QFile::Truncate)) {
-        errMsg = QString("Unable to save %1.\n"
+    if (fi.suffix() != "csv" || !file.open(QFile::WriteOnly | QFile::Truncate)) {
+        errMsg = QString("Unable to save the project '%1'.\n"
                 "Please, make sure the path below corresponds to a writable csv file!\n%2")
-                .arg(m_filepath);
+                .arg(name()).arg(m_filepath);
         qWarning() << "[Project]" << errMsg;
         return false;
     }
