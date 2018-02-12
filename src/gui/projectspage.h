@@ -23,6 +23,7 @@ class ProjectsPage : public QMainWindow
     Q_OBJECT
 public:
     explicit ProjectsPage(MainGUI* mainGUI);
+    ~ProjectsPage();
 
     inline Project* activeProject() const { return m_activeProject; }
     inline const QVector<ProjectWidget*> projects() const { return m_projects; }
@@ -40,10 +41,6 @@ public slots:
 private slots:
     void slotFocusChanged(QWidget*, QWidget* now);
     void slotFocusChanged(QDockWidget* dw);
-
-protected:
-    virtual void showEvent(QShowEvent* e);
-    virtual void hideEvent(QHideEvent* e);
 
 private:
     QSettings m_userPrefs;

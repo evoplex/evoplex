@@ -34,20 +34,15 @@ ProjectsPage::ProjectsPage(MainGUI* mainGUI)
             SLOT(slotFocusChanged(QWidget*,QWidget*)));
 
     addDockWidget(Qt::RightDockWidgetArea, m_expDesigner);
+
+    restoreGeometry(m_userPrefs.value("gui/projectsPageGeometry").toByteArray());
+    restoreState(m_userPrefs.value("gui/projectsPageState").toByteArray());
 }
 
-void ProjectsPage::showEvent(QShowEvent* e)
+ProjectsPage::~ProjectsPage()
 {
-    restoreState(m_userPrefs.value("gui/projectsPage").toByteArray());
-    QWidget::showEvent(e);
-}
-
-void ProjectsPage::hideEvent(QHideEvent* e)
-{
-    if (!m_projects.isEmpty()) { // otherwise we'd always save the attrsWidget in fullscreen
-        m_userPrefs.setValue("gui/projectsPage", saveState());
-    }
-    QMainWindow::hideEvent(e);
+    m_userPrefs.setValue("gui/projectsPageGeometry", saveGeometry());
+    m_userPrefs.setValue("gui/projectsPageState", saveState());
 }
 
 void ProjectsPage::slotFocusChanged(QDockWidget* dw)
@@ -110,13 +105,7 @@ void ProjectsPage::addProjectWidget(Project* project)
         }
         m_expDesigner->removeWidgetFromList(pw);
         m_projects.removeOne(pw);
-        if (m_projects.isEmpty()) {
-            pw->show(); // make sure the widget is visible (to allow saving the current state)
-            m_userPrefs.setValue("gui/projectsPage", saveState());
-            emit (isEmpty(true));
-        } else {
-            emit (isEmpty(false));
-        }
+        emit (isEmpty(m_projects.isEmpty()));
         m_mainApp->closeProject(project->id());
         pw->deleteLater();
     });
