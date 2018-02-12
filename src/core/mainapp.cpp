@@ -212,7 +212,7 @@ bool MainApp::unloadPlugin(const AbstractPlugin* plugin, QString& error)
     return true;
 }
 
-Project* MainApp::newProject(QString& error, const QString& name, const QString& dest)
+Project* MainApp::newProject(QString& error, const QString& filepath)
 {
     if (m_models.isEmpty()) {
         error = "There are no models available in the software.\n"
@@ -226,20 +226,33 @@ Project* MainApp::newProject(QString& error, const QString& name, const QString&
         return nullptr;
     }
 
-    ++m_lastProjectId;
-    Project* project = new Project(this, m_lastProjectId, name, dest);
-    m_projects.insert(m_lastProjectId, project);
-
-    if (!dest.isEmpty() && !name.isEmpty()) {
-        QVariantList recentProjects = m_userPrefs.value("recentProjects").toList();
-        QString path = QString("%1/%2.csv").arg(dest).arg(name);
-        recentProjects.removeOne(path);
-        recentProjects.push_front(path);
-        if (recentProjects.size() > 20) {
-            recentProjects.removeLast();
+    if (!filepath.isEmpty()) {
+        QFileInfo fi(filepath);
+        if (!fi.isReadable() || fi.suffix() != "csv") {
+            error = "Failed to open the project!\n"
+                    "Please, make sure it's a readable csv file!\n" + filepath;
+            qWarning() << "[MainApp] :" << error;
+            return nullptr;
+        } else {
+            QVariantList recentProjects = m_userPrefs.value("recentProjects").toList();
+            recentProjects.removeOne(filepath);
+            recentProjects.push_front(filepath);
+            if (recentProjects.size() > 20) {
+                recentProjects.removeLast();
+            }
+            m_userPrefs.setValue("recentProjects", recentProjects);
         }
-        m_userPrefs.setValue("recentProjects", recentProjects);
     }
+
+    ++m_lastProjectId;
+    Project* project = new Project(this, m_lastProjectId, error, filepath);
+    if (!error.isEmpty()) {
+        delete project;
+        --m_lastProjectId;
+        return nullptr;
+    }
+
+    m_projects.insert(m_lastProjectId, project);
     emit (projectCreated(project));
     return project;
 }
@@ -247,29 +260,6 @@ Project* MainApp::newProject(QString& error, const QString& name, const QString&
 void MainApp::closeProject(int projId)
 {
     delete m_projects.take(projId);
-}
-
-Project* MainApp::openProject(const QString& filepath, QString& error)
-{
-    QFileInfo fi(filepath);
-    if (!fi.isReadable() || fi.suffix() != "csv") {
-        error = "Failed to open the project!\n"
-                "Please, make sure it's a readable csv file!\n" + filepath;
-        qWarning() << "[MainApp] :" << error;
-        return nullptr;
-    }
-
-    Project* project = newProject(error, fi.baseName(), fi.absolutePath());
-    if (!project) {
-        return nullptr;
-    } else  if (project->importExperiments(filepath, error) < 1) {
-        error = "Failed to open the project!\n" + filepath
-              + "Error: " + error;
-        qWarning() << "[MainApp] :" << error;
-        closeProject(project->id());
-        return nullptr;
-    }
-    return project;
 }
 
 } // evoplex

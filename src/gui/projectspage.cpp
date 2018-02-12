@@ -139,7 +139,7 @@ bool ProjectsPage::slotOpenProject(QString path)
     }
 
     QString error;
-    Project* project = m_mainApp->openProject(path, error);
+    Project* project = m_mainApp->newProject(error, path);
     if (!project) {
         QMessageBox::warning(this, "Evoplex", error);
         return false;

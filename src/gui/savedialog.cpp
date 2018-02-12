@@ -24,8 +24,8 @@ SaveDialog::SaveDialog(QWidget *parent)
     connect(m_ui->browse, SIGNAL(clicked(bool)), SLOT(browseDir()));
     connect(m_ui->btn, SIGNAL(rejected()), SLOT(hide()));
     connect(m_ui->btn, &QDialogButtonBox::accepted, [this]() {
-        m_currProject->setName(m_ui->pname->text());
-        m_currProject->setDest(m_ui->dest->text());
+        m_currProject->setFilePath(QString("%1/%2.csv")
+                .arg(m_ui->dest->text()).arg(m_ui->pname->text()));
         save(m_currProject);
     });
 }
@@ -39,7 +39,7 @@ bool SaveDialog::save(Project* project)
 {
     if (!project) {
         return false;
-    } else if (project->dest().isEmpty()) {
+    } else if (project->filepath().isEmpty()) {
         return saveAs(project);
     }
 
@@ -65,7 +65,7 @@ bool SaveDialog::saveAs(Project* project)
         return false;
     }
     m_ui->pname->setText(project->name());
-    m_ui->dest->setText(project->dest().isEmpty() ? QDir::homePath() : project->dest());
+    m_ui->dest->setText(project->filepath().isEmpty() ? QDir::homePath() : QFileInfo(project->filepath()).absolutePath());
     m_currProject = project;
     return exec() == QDialog::Accepted;
 }

@@ -18,22 +18,31 @@
 namespace evoplex
 {
 
-Project::Project(MainApp* mainApp, int id, const QString& name, const QString& dest)
+Project::Project(MainApp* mainApp, int id, QString& error, const QString& filepath)
     : m_mainApp(mainApp)
     , m_id(id)
-    , m_name(name)
-    , m_dest(dest)
-    , m_hasUnsavedChanges(false)
+    , m_filepath(filepath)
     , m_lastExpId(-1)
 {
-    if (m_name.isEmpty()) {
-        m_name = QString("Project%1").arg(id);
+    setFilePath(filepath);
+    if (!filepath.isEmpty()) {
+        this->blockSignals(true);
+        importExperiments(filepath, error);
+        this->blockSignals(false);
     }
+    m_hasUnsavedChanges = false;
 }
 
 Project::~Project()
 {
     Utils::deleteAndShrink(m_experiments);
+}
+
+void Project::setFilePath(const QString& path)
+{
+    m_filepath = path;
+    m_name = path.isEmpty() ? QString("Project%1").arg(m_id)
+                            : QFileInfo(path).baseName();
 }
 
 void Project::playAll()
@@ -66,6 +75,8 @@ bool Project::editExperiment(int expId, Experiment::ExperimentInputs* newInputs)
     if (!exp->init(newInputs)) {
         return false;
     }
+    m_hasUnsavedChanges = true;
+    emit (hasUnsavedChanges(m_hasUnsavedChanges));
     emit (expEdited(expId));
     return true;
 }
@@ -109,6 +120,12 @@ const int Project::importExperiments(const QString& filePath, QString& errorMsg)
     }
     file.close();
 
+    if (row == 1) {
+        errorMsg = QString("This file is empty.\nThere were no experiments to be read.\n%1").arg(filePath);
+        qWarning() << "[Project]: " << errorMsg;
+        return 0;
+    }
+
     return row - 1;
 }
 
@@ -117,25 +134,19 @@ bool Project::saveProject(QString& errMsg, std::function<void(int)>& progress)
     progress(0);
     if (m_experiments.empty()) {
         errMsg = QString("Unable to save %1.\n"
-                "This project is empty. There is nothing to save.").arg(m_name);
-        qWarning() << "[Project]" << errMsg;
-        return false;
-    }
-
-    QDir dir(m_dest);
-    if (m_dest.isEmpty() || m_name.isEmpty() || !dir.mkpath(m_dest)) {
-        errMsg = QString("Unable to save %1.\n"
-                "The destination is invalid!\n%2").arg(m_name).arg(m_dest);
+                "This project is empty. There is nothing to save.").arg(name());
         qWarning() << "[Project]" << errMsg;
         return false;
     }
 
     progress(5);
-    QFile experimentsFile(dir.absoluteFilePath(m_name + ".csv"));
-    if (!experimentsFile.open(QFile::WriteOnly | QFile::Truncate)) {
+    QFile file(m_filepath);
+    QFileInfo fi(file);
+    if (!fi.isFile() || fi.suffix() != "csv" ||
+            !file.open(QFile::WriteOnly | QFile::Truncate)) {
         errMsg = QString("Unable to save %1.\n"
-                "Make sure the destination directory is writtable.\n%2")
-                .arg(m_name).arg(dir.absolutePath());
+                "Please, make sure the path below corresponds to a writable csv file!\n%2")
+                .arg(m_filepath);
         qWarning() << "[Project]" << errMsg;
         return false;
     }
@@ -161,7 +172,7 @@ bool Project::saveProject(QString& errMsg, std::function<void(int)>& progress)
     header.assign(s.begin(), s.end());
 
     progress(30);
-    QTextStream out(&experimentsFile);
+    QTextStream out(&file);
     for (int i = 0; i < header.size()-1; ++i) {
         out << header.at(i) << ",";
     }
@@ -190,11 +201,11 @@ bool Project::saveProject(QString& errMsg, std::function<void(int)>& progress)
         }
         out << values.join(",") << "\n";
     }
-    experimentsFile.close();
+    file.close();
     m_hasUnsavedChanges = false;
     emit (hasUnsavedChanges(false));
     progress((100));
-    qWarning() << "[Project]: project has been saved!" << m_name;
+    qWarning() << "[Project]: project has been saved!" << name();
     return true;
 }
 

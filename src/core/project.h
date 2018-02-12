@@ -20,7 +20,7 @@ class Project : public QObject
     Q_OBJECT
 
 public:
-    Project(MainApp* mainApp, int id, const QString& name="", const QString& dest="");
+    Project(MainApp* mainApp, int id, QString& error, const QString& filepath="");
     virtual ~Project();
 
     // Add a new experiment to this project.
@@ -42,10 +42,8 @@ public:
     void playAll();
 
     inline const QString& name() const { return m_name; }
-    inline void setName(const QString& name) { m_name = name; }
-
-    inline const QString& dest() const { return m_dest; }
-    inline void setDest(const QString& dest) { m_dest = dest; }
+    inline const QString& filepath() const { return m_filepath; }
+    void setFilePath(const QString& path);
 
     inline Experiment* experiment(int expId) const { return m_experiments.value(expId); }
     inline const QHash<int, Experiment*> experiments() const { return m_experiments; }
@@ -61,8 +59,8 @@ signals:
 private:
     MainApp* m_mainApp;
     const int m_id;
+    QString m_filepath;
     QString m_name;
-    QString m_dest;
     bool m_hasUnsavedChanges;
 
     int m_lastExpId;
