@@ -60,6 +60,8 @@ class PPageDockWidget : public QDockWidget
 public:
     explicit PPageDockWidget(ProjectsPage* parent) : QDockWidget(parent) {}
     virtual ~PPageDockWidget() {}
+    virtual Project* project() const = 0;
+    virtual void clearSelection() = 0;
 };
 
 }

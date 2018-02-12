@@ -85,11 +85,13 @@ ExperimentWidget::ExperimentWidget(Experiment* exp, MainGUI* mainGUI, ProjectsPa
         GraphView* graph = new GraphView(mainGUI, m_exp, this);
         m_innerWindow->addDockWidget(Qt::TopDockWidgetArea, graph);
         connect(this, SIGNAL(updateWidgets(bool)), graph, SLOT(updateView(bool)));
+        connect(this, SIGNAL(clearSelections()), graph, SLOT(clearSelection()));
     });
     connect(m_aGrid, &QAction::triggered, [this, mainGUI]() {
         GridView* grid = new GridView(mainGUI, m_exp, this);
         m_innerWindow->addDockWidget(Qt::TopDockWidgetArea, grid);
         connect(this, SIGNAL(updateWidgets(bool)), grid, SLOT(updateView(bool)));
+        connect(this, SIGNAL(clearSelections()), grid, SLOT(clearSelection()));
     });
     connect(m_aLineChart, &QAction::triggered, [this, expMgr]() {
         LineChart* lineChart = new LineChart(expMgr, m_exp, this);

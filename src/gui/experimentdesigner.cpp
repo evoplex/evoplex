@@ -188,20 +188,18 @@ void ExperimentDesigner::removeWidgetFromList(PPageDockWidget *dw)
 {
     int id = m_ui->cbWidgets->findData(QVariant::fromValue(dw));
     if (id != -1) {
-        m_ui->cbWidgets->blockSignals(true);
         m_ui->cbWidgets->removeItem(id);
-        m_ui->cbWidgets->blockSignals(false);
     }
 }
 
-void ExperimentDesigner::setActiveWidget(PPageDockWidget* dw, Project* project)
+void ExperimentDesigner::setActiveWidget(PPageDockWidget* dw)
 {
     int id = m_ui->cbWidgets->findData(QVariant::fromValue(dw));
-    if (id == -1 || !project) {
+    if (id == -1 || !dw->project()) {
         qFatal("[ExperimentDesigner]: project is null or qdockwidget is not in the list!");
     }
     m_ui->cbWidgets->setCurrentIndex(id);
-    m_project = project;
+    m_project = dw->project();
     ExperimentWidget* ew = qobject_cast<ExperimentWidget*>(dw);
     m_ui->bSubmit->setVisible(!ew);
     setExperiment(ew ? ew->exp() : nullptr);

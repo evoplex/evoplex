@@ -28,7 +28,7 @@ public:
     explicit ProjectWidget(Project* project, MainGUI* mainGUI, ProjectsPage* ppage);
     ~ProjectWidget();
 
-    inline Project* project() const { return m_project; }
+    virtual Project* project() const { return m_project; }
 
     void clearSelection();
 

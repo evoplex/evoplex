@@ -23,10 +23,13 @@ public:
     explicit ExperimentWidget(Experiment* exp, MainGUI* mainGUI, ProjectsPage* ppage);
     ~ExperimentWidget();
 
+    virtual void clearSelection() { emit (clearSelections()); }
+    virtual Project* project() const { return m_exp->project(); }
     inline Experiment* exp() const { return m_exp; }
 
 signals:
     void closed();
+    void clearSelections();
     void updateWidgets(bool forceUpdate);
 
 protected:

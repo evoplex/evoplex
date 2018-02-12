@@ -29,7 +29,7 @@ public:
 
     void addWidgetToList(PPageDockWidget* dw);
     void removeWidgetFromList(PPageDockWidget* dw);
-    void setActiveWidget(PPageDockWidget* dw, Project* project);
+    void setActiveWidget(PPageDockWidget* dw);
 
     void setExperiment(Experiment* exp);
 

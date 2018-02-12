@@ -63,6 +63,7 @@ protected:
 public slots:
     void updateView(bool forceUpdate);
     void setTrial(int trialId);
+    void clearSelection();
 
 private slots:
     void slotRestarted(Experiment* exp);

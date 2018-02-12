@@ -261,4 +261,11 @@ void GraphWidget::updateView(bool forceUpdate)
     update();
 }
 
+void GraphWidget::clearSelection()
+{
+    m_selectedAgent = -1;
+    m_ui->inspector->hide();
+    update();
+}
+
 } // evoplex

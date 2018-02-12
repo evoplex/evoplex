@@ -62,7 +62,7 @@ void QueuePage::slotRemoveRow(Experiment *exp)
     }
     row.table->removeRow(row.item->row());
     row.section->setVisible(row.table->rowCount() > 0);
-    emit (isEmpty(!m_ui->idle->isVisible() && !m_ui->running->isVisible() && !m_ui->queue->isVisible()));
+    emit (isEmpty(!m_ui->tableIdle->rowCount() && !m_ui->tableRunning->rowCount() && !m_ui->tableQueue->rowCount()));
 }
 
 void QueuePage::slotStatusChanged(Experiment* exp)

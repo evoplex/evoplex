@@ -47,18 +47,13 @@ ProjectsPage::~ProjectsPage()
 
 void ProjectsPage::slotFocusChanged(QDockWidget* dw)
 {
-    ProjectWidget* pw = qobject_cast<ProjectWidget*>(dw);
-    if (pw) {
-        pw->clearSelection();
-        m_activeProject = pw->project();
-        m_expDesigner->setActiveWidget(pw, m_activeProject);
-    } else {
-        ExperimentWidget* ew = qobject_cast<ExperimentWidget*>(dw);
-        if (!ew) return;
-        m_activeProject = ew->exp()->project();
-        m_expDesigner->setActiveWidget(ew, m_activeProject);
+    PPageDockWidget* pdw = qobject_cast<PPageDockWidget*>(dw);
+    if (pdw) {
+        pdw->clearSelection();
+        m_activeProject = pdw->project();
+        m_expDesigner->setActiveWidget(pdw);
+        emit (activeProjectChanged(m_activeProject));
     }
-    emit (activeProjectChanged(m_activeProject));
 }
 
 void ProjectsPage::slotFocusChanged(QWidget*, QWidget* now)
