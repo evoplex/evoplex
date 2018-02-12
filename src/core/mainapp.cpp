@@ -117,10 +117,18 @@ const AbstractPlugin* MainApp::loadPlugin(const QString& path, QString& error, c
     }
 
     QString uid = metaData[PLUGIN_ATTRIBUTE_UID].toString();
-    if (m_models.contains(uid) || m_graphs.contains(uid)) {
-        error = QString("Unable to load the plugin.\n'%1' must be unique! %2\n"
-                "Please, choose another id or unload the plugin `%3` and try again.")
-                .arg(PLUGIN_ATTRIBUTE_UID).arg(path).arg(uid);
+    if (uid.contains("_")) {
+        error = QString("Unable to load the plugin (%1).\n"
+                        "The '%2:%3' should not have the underscore symbol.\n"
+                        "Please, fix this id and try again.")
+                        .arg(path).arg(PLUGIN_ATTRIBUTE_UID).arg(uid);
+        qWarning() << "[MainApp] " << error;
+        return nullptr;
+    } else if (m_models.contains(uid) || m_graphs.contains(uid)) {
+        error = QString("Unable to load the plugin (%1).\n"
+                        "The %2 '%3' is already being used by another plugin.\n"
+                        "Please, unload the plugin '%4' (or choose another id) and try again.")
+                        .arg(path).arg(PLUGIN_ATTRIBUTE_UID).arg(uid).arg(uid);
         qWarning() << "[MainApp] " << error;
         return nullptr;
     }
