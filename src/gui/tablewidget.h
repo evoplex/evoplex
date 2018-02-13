@@ -37,7 +37,7 @@ public:
 
     explicit TableWidget(QWidget* parent = 0);
 
-    int insertRow(Experiment* exp);
+    int insertRow(const Experiment* exp);
     void insertColumns(const QList<Header> headers);
 
 private slots:
@@ -63,7 +63,7 @@ class RowsDelegate : public QStyledItemDelegate
     Q_OBJECT
 
 public:
-    explicit RowsDelegate(Experiment* exp, TableWidget* table);
+    explicit RowsDelegate(const Experiment* exp, TableWidget* table);
     ~RowsDelegate() {}
 
     void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
@@ -72,8 +72,8 @@ public slots:
     void onItemEntered(int row, int col);
 
 private:
+    const Experiment* m_exp;
     TableWidget* m_table;
-    Experiment* m_exp;
     int m_hoveredRow;
     int m_hoveredCol;
 };

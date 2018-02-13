@@ -43,6 +43,14 @@ namespace Utils
         h.squeeze();
     }
 
+    template <typename T, class C>
+    void deleteAndShrink(std::map<T, C*>& m) {
+        for (auto& i : m) {
+            delete i.second;
+        }
+        m.clear();
+    }
+
     // convert a linear index to row and column
     static void ind2sub(const int ind, const int cols, int &row, int &col) {
         row = ind / cols;

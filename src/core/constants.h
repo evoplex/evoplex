@@ -12,6 +12,7 @@
 #define EVOPLEX_MAX_TRIALS 1000         // maximum number of times an experiment can be repeated (10^3)
 
 // These constants hold the name of the properties common to any experiment.
+#define GENERAL_ATTRIBUTE_EXPID "id"                    // the experiment id
 #define GENERAL_ATTRIBUTE_AGENTS "agents"               // a path to a csv file OR an integer with the number of agents
 #define GENERAL_ATTRIBUTE_GRAPHID "graphId"             // uid of the graph used
 #define GENERAL_ATTRIBUTE_MODELID "modelId"             // uid of the model used

@@ -16,9 +16,9 @@
 namespace evoplex
 {
 
-Experiment::Experiment(MainApp* mainApp, int id, ExperimentInputs* inputs, Project* project)
+Experiment::Experiment(MainApp* mainApp, ExperimentInputs* inputs, Project* project)
     : m_mainApp(mainApp)
-    , m_id(id)
+    , m_id(inputs->generalAttrs->value(GENERAL_ATTRIBUTE_EXPID).toInt())
     , m_project(project)
     , m_inputs(nullptr)
     , m_expStatus(INVALID)

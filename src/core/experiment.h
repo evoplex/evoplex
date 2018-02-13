@@ -62,7 +62,7 @@ public:
     static ExperimentInputs* readInputs(const MainApp* mainApp,
             const QStringList& header, const QStringList& values, QString& errorMsg);
 
-    explicit Experiment(MainApp* mainApp, int id, ExperimentInputs* inputs, Project* project);
+    explicit Experiment(MainApp* mainApp, ExperimentInputs* inputs, Project* project);
 
     ~Experiment();
 
@@ -184,5 +184,6 @@ private:
 // Lets make the Experiment pointer known to QMetaType
 // It enable us to convert an Experiment* to a QVariant for example
 Q_DECLARE_METATYPE(evoplex::Experiment*)
+Q_DECLARE_METATYPE(const evoplex::Experiment*)
 
 #endif // EXPERIMENT_H

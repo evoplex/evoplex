@@ -28,8 +28,8 @@ ProjectWidget::ProjectWidget(Project* project, MainGUI* mainGUI, ProjectsPage* p
     setWindowTitle(objectName());
     setFocusPolicy(Qt::StrongFocus);
 
-    connect(m_project, SIGNAL(expAdded(int)), SLOT(slotInsertRow(int)));
-    connect(m_project, SIGNAL(expEdited(int)), SLOT(slotUpdateRow(int)));
+    connect(m_project, SIGNAL(expAdded(const Experiment*)), SLOT(slotInsertRow(const Experiment*)));
+    connect(m_project, SIGNAL(expEdited(const Experiment*)), SLOT(slotUpdateRow(const Experiment*)));
 
     int col = 0;
     m_headerIdx.insert(TableWidget::H_BUTTON, col++);
@@ -79,7 +79,7 @@ void ProjectWidget::closeEvent(QCloseEvent* event)
     QDockWidget::closeEvent(event);
 }
 
-void ProjectWidget::fillRow(int row, Experiment* exp)
+void ProjectWidget::fillRow(int row, const Experiment* exp)
 {
     Q_ASSERT(exp);
 
@@ -117,18 +117,17 @@ void ProjectWidget::fillRow(int row, Experiment* exp)
     m_ui->table->setSortingEnabled(true);
 }
 
-void ProjectWidget::slotInsertRow(int expId)
+void ProjectWidget::slotInsertRow(const Experiment* exp)
 {
-    Experiment* exp = m_project->experiment(expId);
     fillRow(m_ui->table->insertRow(exp), exp);
 }
 
-void ProjectWidget::slotUpdateRow(int expId)
+void ProjectWidget::slotUpdateRow(const Experiment* exp)
 {
     const int expIdCol = m_headerIdx.value(TableWidget::H_EXPID);
     for (int row = 0; row < m_ui->table->rowCount(); ++row) {
-        if (expId == m_ui->table->item(row, expIdCol)->text().toInt()) {
-            fillRow(row, m_project->experiment(expId));
+        if (exp->id() == m_ui->table->item(row, expIdCol)->text().toInt()) {
+            fillRow(row, exp);
             return;
         }
     }

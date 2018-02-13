@@ -105,9 +105,8 @@ void ProjectsPage::addProjectWidget(Project* project)
         pw->deleteLater();
     });
 
-    QHash<int, Experiment*>::const_iterator it = project->experiments().cbegin();
-    for (it; it != project->experiments().cend(); ++it) {
-        pw->slotInsertRow(it.key());
+    for (auto& i : project->experiments()) {
+        pw->slotInsertRow(i.second);
     }
 }
 

@@ -44,8 +44,8 @@ signals:
     void hasUnsavedChanges(Project* project);
 
 public slots:
-    void slotInsertRow(int expId);
-    void slotUpdateRow(int expId);
+    void slotInsertRow(const Experiment* exp);
+    void slotUpdateRow(const Experiment* exp);
     void slotHasUnsavedChanges(bool b);
 
 private slots:
@@ -59,7 +59,7 @@ private:
 
     QMap<TableWidget::Header, int> m_headerIdx; // map Header to column index
 
-    void fillRow(int row, Experiment* exp);
+    void fillRow(int row, const Experiment* exp);
 
     void insertItem(int row, TableWidget::Header header, QString label, QString tooltip="");
 };

@@ -25,7 +25,7 @@ public:
 
     // Add a new experiment to this project.
     // @return nullptr if unsuccessful
-    Experiment* newExperiment(Experiment::ExperimentInputs* inputs);
+    Experiment* newExperiment(Experiment::ExperimentInputs* inputs, QString& error);
 
     // Edit an experiment of this project.
     bool editExperiment(int expId, Experiment::ExperimentInputs* newInputs);
@@ -45,15 +45,18 @@ public:
     inline const QString& filepath() const { return m_filepath; }
     void setFilePath(const QString& path);
 
-    inline Experiment* experiment(int expId) const { return m_experiments.value(expId); }
-    inline const QHash<int, Experiment*> experiments() const { return m_experiments; }
+    inline Experiment* experiment(int expId) const { return m_experiments.at(expId); }
+    inline const std::map<int, Experiment*>& experiments() const { return m_experiments; }
 
     inline int id() const { return m_id; }
     inline bool hasUnsavedChanges() const { return m_hasUnsavedChanges; }
 
+    // generate a valid experiment id
+    int generateExpId() const;
+
 signals:
-    void expAdded(int expId);
-    void expEdited(int expId);
+    void expAdded(const Experiment* exp);
+    void expEdited(const Experiment* exp);
     void hasUnsavedChanges(bool);
 
 private:
@@ -62,9 +65,7 @@ private:
     QString m_filepath;
     QString m_name;
     bool m_hasUnsavedChanges;
-
-    int m_lastExpId;
-    QHash<int, Experiment*> m_experiments;
+    std::map<int, Experiment*> m_experiments;
 };
 }
 

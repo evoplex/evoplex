@@ -246,6 +246,11 @@ void ExperimentDesigner::setExperiment(Experiment* exp)
     values.shrink_to_fit();
 
     for (int i = 0; i < header.size(); ++i) {
+        // we don't have a field for the expId
+        if (header.at(i) == GENERAL_ATTRIBUTE_EXPID) {
+            continue;
+        }
+
         QWidget* widget = m_widgetFields.value(header.at(i)).value<QWidget*>();
         Q_ASSERT(widget);
 
@@ -389,6 +394,11 @@ Experiment::ExperimentInputs* ExperimentDesigner::readInputs()
 
     QStringList header;
     QStringList values;
+
+    // the experiment id is auto incremented by the Project
+    header << GENERAL_ATTRIBUTE_EXPID;
+    values << QString::number(m_project->generateExpId());
+
     QVariantHash::iterator it;
     for (it = m_widgetFields.begin(); it != m_widgetFields.end(); ++it) {
         QWidget* widget = it.value().value<QWidget*>();
@@ -444,7 +454,15 @@ Experiment::ExperimentInputs* ExperimentDesigner::readInputs()
 
 void ExperimentDesigner::slotCreateExperiment()
 {
-    m_exp = m_project->newExperiment(readInputs());
+    Experiment::ExperimentInputs* inputs = readInputs();
+    if (inputs) {
+        QString error;
+        m_exp = m_project->newExperiment(inputs, error);
+        if (!m_exp) {
+            QMessageBox::warning(this, "Experiment", error);
+            setExperiment(m_exp);
+        }
+    }
 }
 
 void ExperimentDesigner::slotEditExperiment()

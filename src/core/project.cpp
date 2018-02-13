@@ -22,7 +22,6 @@ Project::Project(MainApp* mainApp, int id, QString& error, const QString& filepa
     : m_mainApp(mainApp)
     , m_id(id)
     , m_filepath(filepath)
-    , m_lastExpId(-1)
 {
     setFilePath(filepath);
     if (!filepath.isEmpty()) {
@@ -47,37 +46,47 @@ void Project::setFilePath(const QString& path)
 
 void Project::playAll()
 {
-    QHash<int, Experiment*>::iterator it;
-    for (it = m_experiments.begin(); it != m_experiments.end(); ++it)
-        it.value()->play();
+    for (auto& i : m_experiments)
+        i.second->play();
 }
 
-Experiment* Project::newExperiment(Experiment::ExperimentInputs* inputs)
+int Project::generateExpId() const
+{
+    return m_experiments.empty() ? 0 : (--m_experiments.end())->first + 1;
+}
+
+Experiment* Project::newExperiment(Experiment::ExperimentInputs* inputs, QString& error)
 {
     if (!inputs) {
+        error = "Null inputs!";
         return nullptr;
     }
 
-    ++m_lastExpId;
-    Experiment* exp = new Experiment(m_mainApp, m_lastExpId, inputs, this);
-    m_experiments.insert(m_lastExpId, exp);
+    int expId = inputs->generalAttrs->value(GENERAL_ATTRIBUTE_EXPID).toInt();
+    if (m_experiments.count(expId)) {
+        error = "The Experiment Id must be unique!";
+        return nullptr;
+    }
+
+    Experiment* exp = new Experiment(m_mainApp, inputs, this);
+    m_experiments.insert({expId, exp});
 
     m_hasUnsavedChanges = true;
     emit (hasUnsavedChanges(m_hasUnsavedChanges));
-    emit (expAdded(m_lastExpId));
+    emit (expAdded(exp));
     return exp;
 }
 
 bool Project::editExperiment(int expId, Experiment::ExperimentInputs* newInputs)
 {
-    Experiment* exp = m_experiments.value(expId);
+    Experiment* exp = m_experiments.at(expId);
     Q_ASSERT(exp);
     if (!exp->init(newInputs)) {
         return false;
     }
     m_hasUnsavedChanges = true;
     emit (hasUnsavedChanges(m_hasUnsavedChanges));
-    emit (expEdited(expId));
+    emit (expEdited(exp));
     return true;
 }
 
@@ -108,7 +117,7 @@ const int Project::importExperiments(const QString& filePath, QString& errorMsg)
         const QStringList values = in.readLine().split(",");
         QString expErrorMsg;
         Experiment::ExperimentInputs* inputs = Experiment::readInputs(m_mainApp, header, values, expErrorMsg);
-        if (!inputs || !newExperiment(inputs)) {
+        if (!inputs || !newExperiment(inputs, expErrorMsg)) {
             errorMsg = QString("Couldn't read the experiment at line %1 from:\n`%2`\n"
                                "Error: %3").arg(row).arg(filePath).arg(expErrorMsg);
             qWarning() << "[Project]: " << errorMsg;
@@ -152,7 +161,8 @@ bool Project::saveProject(QString& errMsg, std::function<void(int)>& progress)
 
     progress(10);
     std::vector<QString> header;
-    for (Experiment* exp : m_experiments) {
+    for (auto const& i : m_experiments) {
+        const Experiment* exp = i.second;
         const Experiment::ExperimentInputs* inputs = exp->inputs();
         std::vector<QString> general = inputs->generalAttrs->names();
         header.insert(header.end(), general.begin(), general.end());
@@ -178,7 +188,8 @@ bool Project::saveProject(QString& errMsg, std::function<void(int)>& progress)
     out << header.at(header.size()-1) << "\n";
 
     progress(35);
-    for (Experiment* exp : m_experiments) {
+    for (auto const& i : m_experiments) {
+        const Experiment* exp = i.second;
         const Experiment::ExperimentInputs* inputs = exp->inputs();
         const QString modelId_ = exp->modelId() + "_";
         const QString graphId_ = exp->graphId() + "_";

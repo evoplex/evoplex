@@ -88,7 +88,7 @@ void TableWidget::insertColumns(const QList<Header> headers)
     setHorizontalHeaderLabels(labels);
 }
 
-int TableWidget::insertRow(Experiment* exp)
+int TableWidget::insertRow(const Experiment* exp)
 {
     int row = rowCount();
     QTableWidget::insertRow(row);
@@ -120,7 +120,7 @@ void TableWidget::onItemClicked(QTableWidgetItem* item)
 /*********************************************************/
 /*********************************************************/
 
-RowsDelegate::RowsDelegate(Experiment* exp, TableWidget* table)
+RowsDelegate::RowsDelegate(const Experiment* exp, TableWidget* table)
     : QStyledItemDelegate(table)
     , m_table(table)
     , m_exp(exp)
