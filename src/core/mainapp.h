@@ -59,10 +59,12 @@ public:
 
     inline const AttributesSpace& generalAttrSpace() const { return m_generalAttrSpace; }
 
+    void addPathToRecentProjects(const QString& projectFilePath);
+
 signals:
-    void projectCreated(const Project* p);
     void pluginAdded(const AbstractPlugin* plugin);
     void pluginRemoved(const QString& id, AbstractPlugin::PluginType t);
+    void listOfRecentProjectsUpdated();
 
 private:
     ExperimentsMgr* m_experimentsMgr;

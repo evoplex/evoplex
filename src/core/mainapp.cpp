@@ -235,13 +235,7 @@ Project* MainApp::newProject(QString& error, const QString& filepath)
             qWarning() << "[MainApp] :" << error;
             return nullptr;
         } else {
-            QVariantList recentProjects = m_userPrefs.value("recentProjects").toList();
-            recentProjects.removeOne(filepath);
-            recentProjects.push_front(filepath);
-            if (recentProjects.size() > 20) {
-                recentProjects.removeLast();
-            }
-            m_userPrefs.setValue("recentProjects", recentProjects);
+            addPathToRecentProjects(filepath);
         }
     }
 
@@ -254,13 +248,24 @@ Project* MainApp::newProject(QString& error, const QString& filepath)
     }
 
     m_projects.insert(m_lastProjectId, project);
-    emit (projectCreated(project));
     return project;
 }
 
 void MainApp::closeProject(int projId)
 {
     delete m_projects.take(projId);
+}
+
+void MainApp::addPathToRecentProjects(const QString& projectFilePath)
+{
+    QVariantList recentProjects = m_userPrefs.value("recentProjects").toList();
+    recentProjects.removeOne(projectFilePath);
+    recentProjects.push_front(projectFilePath);
+    if (recentProjects.size() > 20) {
+        recentProjects.removeLast();
+    }
+    m_userPrefs.setValue("recentProjects", recentProjects);
+    emit (listOfRecentProjectsUpdated());
 }
 
 } // evoplex

@@ -20,7 +20,7 @@ WelcomePage::WelcomePage(MainGUI* maingui)
     connect(m_ui->bOpenProject, &QPushButton::pressed, [this]() { m_maingui->openProject(""); });
 
     refreshList();
-    connect(maingui->mainApp(), SIGNAL(projectCreated(const Project*)), SLOT(refreshList()));
+    connect(maingui->mainApp(), SIGNAL(listOfRecentProjectsUpdated()), SLOT(refreshList()));
     connect(m_ui->recent, &QListWidget::doubleClicked, [this](const QModelIndex& index) {
         emit (m_maingui->openProject(index.data().toString()));
     });

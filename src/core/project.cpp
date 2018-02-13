@@ -212,6 +212,9 @@ bool Project::saveProject(QString& errMsg, std::function<void(int)>& progress)
         out << values.join(",") << "\n";
     }
     file.close();
+
+    m_mainApp->addPathToRecentProjects(m_filepath);
+
     m_hasUnsavedChanges = false;
     emit (hasUnsavedChanges(false));
     progress((100));
