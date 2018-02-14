@@ -28,6 +28,7 @@ set(EVOPLEX_CORE_CXX
   abstractplugin.cpp
   graphplugin.cpp
   modelplugin.cpp
+  prg.cpp
 
   agentsgenerator.cpp
   edge.cpp
