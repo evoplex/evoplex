@@ -6,7 +6,7 @@
 #ifndef SQUARE_GRID_H
 #define SQUARE_GRID_H
 
-#include <QPair>
+#include <functional>
 #include <vector>
 
 #include "core/plugininterfaces.h"
@@ -21,13 +21,21 @@ public:
 
 private:
     // graph parameters
-    enum GraphAttr { Height, Width };
+    enum GraphAttr { Neighbours, Height, Width };
+    int m_numNeighbours;
     int m_width;
     int m_height;
 
-    void createEdges(const int id);
-    std::vector<QPair<int,int>> directedEdges(const int id);
-    std::vector<QPair<int,int>> undirectedEdges(const int id);
+    typedef std::pair<int,int> rowCol;
+    typedef std::vector<rowCol> edges2d;
+    typedef std::function<edges2d(const int, const int)> edgesFunc;
+    void createEdges(const int id, edgesFunc func, bool isDirected);
+
+    static edges2d directed4Edges(const int id, const int width);
+    static edges2d directed8Edges(const int id, const int width);
+
+    static edges2d undirected4Edges(const int id, const int width);
+    static edges2d undirected8Edges(const int id, const int width);
 };
 }
 

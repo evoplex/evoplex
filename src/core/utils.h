@@ -62,7 +62,7 @@ namespace Utils
         return row * cols + col;
     }
 
-    static int linearIdx(QPair<int,int> rowCol, const int cols) {
+    static int linearIdx(std::pair<int,int> rowCol, const int cols) {
         return linearIdx(rowCol.first, rowCol.second, cols);
     }
 
