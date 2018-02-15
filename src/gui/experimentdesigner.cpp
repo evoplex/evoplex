@@ -553,19 +553,19 @@ void ExperimentDesigner::slotPluginRemoved(const QString& id, AbstractPlugin::Pl
     cb->blockSignals(false);
 
     // remove all fields which belog to this plugin
-    QTreeWidgetItemIterator it(m_ui->treeWidget);
-    while (*it) {
-        if ((*it)->parent() == tree && (*it)->data(0, Qt::UserRole).toString() == id) {
-            QVariantHash::iterator i = m_widgetFields.begin();
-            while (i != m_widgetFields.end()) {
-                if (i.key().startsWith(id+"_"))
-                    i = m_widgetFields.erase(i);
-                else
-                    ++i;
-            }
-            tree->removeChild(*it);
+    QVariantHash::iterator i = m_widgetFields.begin();
+    while (i != m_widgetFields.end()) {
+        if (i.key().startsWith(id + "_")) {
+            i = m_widgetFields.erase(i);
+        } else {
+            ++i;
         }
-        ++it;
+    }
+    for (int i = 0; i < tree->childCount(); ++i) {
+        if (tree->child(i)->data(0, Qt::UserRole).toString() == id) {
+            delete tree->takeChild(i);
+            --i;
+        }
     }
 }
 
@@ -583,7 +583,7 @@ void ExperimentDesigner::addPluginAttrs(QTreeWidgetItem* tree, const AbstractPlu
         ++it;
     }
 
-    const QString& uid_ = plugin->id() + "_";
+    const QString uid_ = plugin->id() + "_";
     foreach (const ValueSpace* valSpace, plugin->pluginAttrSpace()) {
         QTreeWidgetItem* item = new QTreeWidgetItem(tree);
         item->setText(0, valSpace->attrName());
@@ -629,7 +629,7 @@ void ExperimentDesigner::addPluginAttrs(QTreeWidgetItem* tree, const AbstractPlu
 
 QSpinBox* ExperimentDesigner::newSpinBox(const int min, const int max)
 {
-    QSpinBox* sp = new QSpinBox(m_ui->treeWidget);
+    QSpinBox* sp = new QSpinBox();
     sp->setMaximum(max);
     sp->setMinimum(min);
     sp->setButtonSymbols(QSpinBox::NoButtons);
@@ -638,7 +638,7 @@ QSpinBox* ExperimentDesigner::newSpinBox(const int min, const int max)
 
 QDoubleSpinBox* ExperimentDesigner::newDoubleSpinBox(const double min, const double max)
 {
-    QDoubleSpinBox* sp = new QDoubleSpinBox(m_ui->treeWidget);
+    QDoubleSpinBox* sp = new QDoubleSpinBox();
     sp->setMaximum(max);
     sp->setMinimum(min);
     sp->setDecimals(8);
