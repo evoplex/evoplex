@@ -6,6 +6,7 @@
 #ifndef EXPERIMENTMGR_H
 #define EXPERIMENTMGR_H
 
+#include <QMutex>
 #include <QObject>
 #include <QTimer>
 #include <QSettings>
@@ -46,6 +47,7 @@ private slots:
     void updateProgressValues();
 
 private:
+    QMutex m_mutex;
     QSettings m_userPrefs;
     int m_threads;
 

@@ -16,8 +16,11 @@ ExperimentsMgr::ExperimentsMgr()
     : m_timer(new QTimer(this))
 {
     resetSettingsToDefault();
+
     m_threads = m_userPrefs.value("settings/threads", m_threads).toInt();
-    setMaxThreadCount(m_threads); // init
+    m_threads = m_threads > QThread::idealThreadCount() ? QThread::idealThreadCount() : m_threads;
+    QThreadPool::globalInstance()->setMaxThreadCount(m_threads);
+    qDebug() << "[ExperimentsMgr]: setting the max number of threads to" << m_threads;
 
     connect(m_timer, SIGNAL(timeout()), this, SLOT(updateProgressValues()));
 }
@@ -44,6 +47,8 @@ void ExperimentsMgr::updateProgressValues()
 
 void ExperimentsMgr::play(Experiment* exp)
 {
+    QMutexLocker locker(&m_mutex);
+
     if (exp->expStatus() != Experiment::READY
             && exp->expStatus() != Experiment::QUEUED) {
         return;
@@ -87,6 +92,8 @@ void ExperimentsMgr::play(Experiment* exp)
 
 void ExperimentsMgr::finished(Experiment* exp)
 {
+    QMutexLocker locker(&m_mutex);
+
     m_running.remove(exp);
     if (m_running.empty()) {
         m_timer->stop();
@@ -119,6 +126,8 @@ void ExperimentsMgr::finished(Experiment* exp)
 
 void ExperimentsMgr::removeFromQueue(Experiment* exp)
 {
+    QMutexLocker locker(&m_mutex);
+
     if (exp->expStatus() == Experiment::QUEUED) {
         m_queued.remove(exp);
         exp->setExpStatus(Experiment::READY);
@@ -128,6 +137,8 @@ void ExperimentsMgr::removeFromQueue(Experiment* exp)
 
 void ExperimentsMgr::clearQueue()
 {
+    QMutexLocker locker(&m_mutex);
+
     for (Experiment* exp : m_queued) {
         exp->pause();
         exp->setExpStatus(Experiment::READY);
@@ -138,6 +149,8 @@ void ExperimentsMgr::clearQueue()
 
 void ExperimentsMgr::clearIdle()
 {
+    QMutexLocker locker(&m_mutex);
+
     for (Experiment* exp : m_idle) {
         exp->deleteTrials();
     }
@@ -146,23 +159,30 @@ void ExperimentsMgr::clearIdle()
 
 void ExperimentsMgr::setMaxThreadCount(const int newValue)
 {
-    if (m_threads == newValue || newValue < 1) {
+    if (m_threads == newValue) {
+        return;
+    } else if (newValue < 1 || newValue > QThread::idealThreadCount()) {
+        QString err = QString("[ExperimentMgr]: invalid number of threads!"
+                    "It should be an integer greater than 0 and less than %1.\n"
+                    "Current: %2; Tried: %3").arg(QThread::idealThreadCount())
+                    .arg(m_threads).arg(newValue);
+        qWarning() << err;
         return;
     }
 
+    QMutexLocker locker(&m_mutex);
+
     const int previous = m_threads;
-    m_threads = newValue > QThread::idealThreadCount() ? QThread::idealThreadCount() : newValue;
+    const int diff = qAbs(newValue - previous);
+    m_threads = newValue;
 
     if (newValue > previous) {
-        for (Experiment* exp : m_queued) {
-            play(exp);
+        for (int n = 0; n < diff && !m_queued.empty(); ++n) {
+            play(m_queued.front());
         }
     } else if (newValue < previous) {
-        const int diff = previous - newValue;
-        int n = 0;
-        for (Experiment* exp : m_running) {
-            if (n < diff) break;
-            exp->pause();
+        for (int n = 0; n < diff && !m_running.empty(); ++n) {
+            m_running.back()->pause();
         }
     }
 
