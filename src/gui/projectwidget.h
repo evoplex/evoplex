@@ -44,7 +44,7 @@ signals:
     void hasUnsavedChanges(Project* project);
 
 public slots:
-    void slotInsertRow(const Experiment* exp);
+    void slotInsertRow(Experiment* exp);
     void slotUpdateRow(const Experiment* exp);
     void slotHasUnsavedChanges(bool b);
 

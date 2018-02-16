@@ -377,30 +377,29 @@ void ExperimentDesigner::slotOutputWidget()
     });
 }
 
-Experiment::ExperimentInputs* ExperimentDesigner::readInputs()
+Experiment::ExperimentInputs* ExperimentDesigner::readInputs(const int expId, QString& error) const
 {
     if (m_selectedModelId == STRING_NULL_PLUGINID) {
-        QMessageBox::warning(this, "Experiment", "Please, select a valid 'modelId'.");
+        error = "Please, select a valid 'modelId'.";
         return nullptr;
     } else if (m_selectedGraphId == STRING_NULL_PLUGINID) {
-        QMessageBox::warning(this, "Experiment", "Please, select a valid 'graphId'.");
+        error = "Please, select a valid 'graphId'.";
         return nullptr;
     } else if (m_enableOutputs->isChecked()
                && (m_widgetFields.value(OUTPUT_DIR).value<QLineEdit*>()->text().isEmpty()
                    || m_widgetFields.value(OUTPUT_HEADER).value<QLineEdit*>()->text().isEmpty())) {
-        QMessageBox::warning(this, "Experiment", "Please, insert a valid output directory and a output header.");
+        error = "Please, insert a valid output directory and a output header.";
         return nullptr;
     }
 
     QStringList header;
     QStringList values;
 
-    // the experiment id is auto incremented by the Project
     header << GENERAL_ATTRIBUTE_EXPID;
-    values << QString::number(m_project->generateExpId());
+    values << QString::number(expId);
 
-    QVariantHash::iterator it;
-    for (it = m_widgetFields.begin(); it != m_widgetFields.end(); ++it) {
+    QVariantHash::const_iterator it;
+    for (it = m_widgetFields.constBegin(); it != m_widgetFields.constEnd(); ++it) {
         QWidget* widget = it.value().value<QWidget*>();
         Q_ASSERT(widget);
         if (!widget->isEnabled()) {
@@ -446,35 +445,32 @@ Experiment::ExperimentInputs* ExperimentDesigner::readInputs()
     QString errorMsg;
     Experiment::ExperimentInputs* inputs = Experiment::readInputs(m_mainApp, header, values, errorMsg);
     if (!inputs) {
-        QMessageBox::warning(this, "Experiment",
-                "Unable to create the experiment.\nError: \"" + errorMsg + "\"");
+        error = "Unable to create the experiment.\nError: \"" + errorMsg + "\"";
     }
     return inputs;
 }
 
 void ExperimentDesigner::slotCreateExperiment()
 {
-    Experiment::ExperimentInputs* inputs = readInputs();
+    QString error;
+    Experiment::ExperimentInputs* inputs = readInputs(m_project->generateExpId(), error);
     if (inputs) {
-        QString error;
-        m_exp = m_project->newExperiment(inputs, error);
-        if (!m_exp) {
-            QMessageBox::warning(this, "Experiment", error);
-            setExperiment(m_exp);
-        }
+        setExperiment(m_project->newExperiment(inputs, error));
+    }
+
+    if (!error.isEmpty()) {
+        QMessageBox::warning(this, "Experiment", error);
+        delete inputs;
     }
 }
 
 void ExperimentDesigner::slotEditExperiment()
 {
     Q_ASSERT(m_exp);
-    Experiment::ExperimentInputs* inputs = readInputs();
-    if (!inputs) {
-        return;
-    } else if (!m_project->editExperiment(m_exp->id(), inputs)) {
-        QMessageBox::warning(this, "Experiment",
-                "Unable to edit the experiment.\n"
-                "If it is running, you should pause it first.");
+    QString error;
+    Experiment::ExperimentInputs* inputs = readInputs(m_exp->id(), error);
+    if (!inputs || !m_project->editExperiment(m_exp->id(), inputs, error)) {
+        QMessageBox::warning(this, "Experiment", error);
         delete inputs;
     }
 }

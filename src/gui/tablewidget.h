@@ -37,7 +37,7 @@ public:
 
     explicit TableWidget(QWidget* parent = 0);
 
-    int insertRow(const Experiment* exp);
+    int insertRow(Experiment* exp);
     void insertColumns(const QList<Header> headers);
 
 private slots:

@@ -88,7 +88,7 @@ void TableWidget::insertColumns(const QList<Header> headers)
     setHorizontalHeaderLabels(labels);
 }
 
-int TableWidget::insertRow(const Experiment* exp)
+int TableWidget::insertRow(Experiment* exp)
 {
     int row = rowCount();
     QTableWidget::insertRow(row);

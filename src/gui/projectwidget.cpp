@@ -28,7 +28,7 @@ ProjectWidget::ProjectWidget(Project* project, MainGUI* mainGUI, ProjectsPage* p
     setWindowTitle(objectName());
     setFocusPolicy(Qt::StrongFocus);
 
-    connect(m_project, SIGNAL(expAdded(const Experiment*)), SLOT(slotInsertRow(const Experiment*)));
+    connect(m_project, SIGNAL(expAdded(Experiment*)), SLOT(slotInsertRow(Experiment*)));
     connect(m_project, SIGNAL(expEdited(const Experiment*)), SLOT(slotUpdateRow(const Experiment*)));
 
     int col = 0;
@@ -117,7 +117,7 @@ void ProjectWidget::fillRow(int row, const Experiment* exp)
     m_ui->table->setSortingEnabled(true);
 }
 
-void ProjectWidget::slotInsertRow(const Experiment* exp)
+void ProjectWidget::slotInsertRow(Experiment* exp)
 {
     fillRow(m_ui->table->insertRow(exp), exp);
 }
