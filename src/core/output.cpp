@@ -116,11 +116,14 @@ Output::Output(Values inputs, const std::vector<int> trialIds)
 
 bool Output::isEmpty(const int cacheId, const int trialId) const
 {
-    try {
-        return  m_caches.at(cacheId).trials.at(trialId).rows.empty();
-    } catch (...) {
-        return false;
+    std::unordered_map<int, Cache>::const_iterator cache = m_caches.find(cacheId);
+    if (cache != m_caches.end()) {
+        std::unordered_map<int, Data>::const_iterator trial = cache->second.trials.find(trialId);
+        if (trial != cache->second.trials.end()) {
+            return trial->second.rows.empty();
+        }
     }
+    return false;
 }
 
 const int Output::addCache(Values inputs, const std::vector<int> trialIds)
