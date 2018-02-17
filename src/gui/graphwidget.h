@@ -66,8 +66,7 @@ public slots:
     void clearSelection();
 
 private slots:
-    void slotRestarted(Experiment* exp);
-    void slotStatusChanged(Experiment* exp);
+    void slotRestarted();
     void zoomIn();
     void zoomOut();
     void resetView();

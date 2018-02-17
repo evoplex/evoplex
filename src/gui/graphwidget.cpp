@@ -34,8 +34,8 @@ GraphWidget::GraphWidget(MainGUI* mainGUI, Experiment* exp, ExperimentWidget* pa
     setAttribute(Qt::WA_DeleteOnClose, true);
     setFocusPolicy(Qt::StrongFocus);
 
-    connect(mainGUI->mainApp()->expMgr(), SIGNAL(restarted(Experiment*)), SLOT(slotRestarted(Experiment*)));
-    connect(mainGUI->mainApp()->expMgr(), SIGNAL(statusChanged(Experiment*)), SLOT(slotStatusChanged(Experiment*)));
+    Q_ASSERT(!m_exp->autoDeleteTrials());
+    connect(m_exp, SIGNAL(restarted()), SLOT(slotRestarted()));
 
     QWidget* front = new QWidget(this);
     m_ui->setupUi(front);
@@ -46,11 +46,12 @@ GraphWidget::GraphWidget(MainGUI* mainGUI, Experiment* exp, ExperimentWidget* pa
     setTitleBarWidget(titleBar);
     connect(titleBar, SIGNAL(openSettingsDlg()), m_settingsDlg, SLOT(show()));
     connect(titleBar, SIGNAL(trialSelected(int)), SLOT(setTrial(int)));
-    connect(mainGUI->mainApp()->expMgr(), &ExperimentsMgr::trialCreated, this,
-        [this](Experiment* exp, int trialId) {
-            if (exp == m_exp && trialId == m_currTrialId)
-                setTrial(m_currTrialId);
-    }, Qt::QueuedConnection);
+
+    // setTrial() triggers a timer that needs to be exec in the main thread
+    // thus, we need to use queuedconnection here
+    connect(exp, &Experiment::trialCreated, this,
+            [this](int trialId) { if (trialId == m_currTrialId) setTrial(m_currTrialId); },
+            Qt::QueuedConnection);
 
     connect(m_settingsDlg, &GraphSettings::agentAttrUpdated, [this](int idx) { m_agentAttr = idx; });
     connect(m_settingsDlg, SIGNAL(agentCMapUpdated(ColorMap*)), SLOT(setAgentCMap(ColorMap*)));
@@ -140,9 +141,10 @@ void GraphWidget::updateCache(bool force)
     mutex.unlock();
 }
 
-void GraphWidget::slotRestarted(Experiment* exp)
+void GraphWidget::slotRestarted()
 {
-    if (exp != m_exp) {
+    if (m_exp->autoDeleteTrials()) {
+        close();
         return;
     }
     m_selectedAgent = -1;
@@ -150,15 +152,6 @@ void GraphWidget::slotRestarted(Experiment* exp)
     m_model = nullptr;
     m_ui->currStep->setText("--");
     updateCache(true);
-}
-
-void GraphWidget::slotStatusChanged(Experiment *exp)
-{
-    if (exp != m_exp) {
-        return;
-    } else if (exp->expStatus() == Experiment::FINISHED) {
-        updateView(true);
-    }
 }
 
 void GraphWidget::setAgentCMap(ColorMap* cmap)

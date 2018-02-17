@@ -25,6 +25,9 @@ LineChart::LineChart(ExperimentsMgr* expMgr, Experiment* exp, QWidget* parent)
     setWindowTitle("Line Chart");
     setAttribute(Qt::WA_DeleteOnClose, true);
 
+    Q_ASSERT(!m_exp->autoDeleteTrials());
+    connect(m_exp, SIGNAL(restarted()), SLOT(slotRestarted()));
+
     TitleBar* titleBar = new TitleBar(exp, this);
     setTitleBarWidget(titleBar);
     connect(titleBar, SIGNAL(trialSelected(int)), this, SLOT(setSelectedTrial(int)));
@@ -48,8 +51,6 @@ LineChart::LineChart(ExperimentsMgr* expMgr, Experiment* exp, QWidget* parent)
     chartView->setRenderHint(QPainter::Antialiasing);
     chartView->setBackgroundBrush(QColor(239,235,231));
     setWidget(chartView);
-
-    connect(expMgr, SIGNAL(restarted(Experiment*)), SLOT(slotRestarted(Experiment*)));
 }
 
 LineChart::~LineChart()
@@ -58,9 +59,10 @@ LineChart::~LineChart()
     delete m_chart;
 }
 
-void LineChart::slotRestarted(Experiment* exp)
+void LineChart::slotRestarted()
 {
-    if (exp != m_exp) {
+    if (m_exp->autoDeleteTrials()) {
+        close();
         return;
     }
 

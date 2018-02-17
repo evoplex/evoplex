@@ -25,7 +25,7 @@ public:
     ~LineChart();
 
 private slots:
-    void slotRestarted(Experiment* exp);
+    void slotRestarted();
     void setSelectedTrial(int trialId);
     void slotAddSeries(std::vector<Output*> newOutputs);
     void updateSeries();

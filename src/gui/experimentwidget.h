@@ -57,7 +57,8 @@ private:
     QAction* m_aGrid;
     QAction* m_aLineChart;
     QSlider* m_delay;
-};
-}
 
+    bool isAutoDeleteOff();
+};
+} // evoplex
 #endif // EXPERIMENTWIDGET_H

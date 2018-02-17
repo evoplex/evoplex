@@ -70,6 +70,7 @@ ExperimentWidget::ExperimentWidget(Experiment* exp, MainGUI* mainGUI, ProjectsPa
 
     ExperimentsMgr* expMgr = mainGUI->mainApp()->expMgr();
     connect(expMgr, SIGNAL(statusChanged(Experiment*)), SLOT(slotStatusChanged(Experiment*)));
+
     connect(m_aPlayPause, &QAction::triggered, [this]() { m_exp->toggle(); });
     connect(m_aNext, &QAction::triggered, [this]() { m_exp->playNext(); });
     connect(m_aStop, &QAction::triggered, [this]() { m_exp->stop(); });
@@ -82,19 +83,25 @@ ExperimentWidget::ExperimentWidget(Experiment* exp, MainGUI* mainGUI, ProjectsPa
     layout->addWidget(tb);
     setWidget(layout->parentWidget());
     connect(m_aGraph, &QAction::triggered, [this, mainGUI]() {
-        GraphView* graph = new GraphView(mainGUI, m_exp, this);
-        m_innerWindow->addDockWidget(Qt::TopDockWidgetArea, graph);
-        connect(this, SIGNAL(updateWidgets(bool)), graph, SLOT(updateView(bool)));
+        if (isAutoDeleteOff()) {
+            GraphView* graph = new GraphView(mainGUI, m_exp, this);
+            m_innerWindow->addDockWidget(Qt::TopDockWidgetArea, graph);
+            connect(this, SIGNAL(updateWidgets(bool)), graph, SLOT(updateView(bool)));
+        }
     });
     connect(m_aGrid, &QAction::triggered, [this, mainGUI]() {
-        GridView* grid = new GridView(mainGUI, m_exp, this);
-        m_innerWindow->addDockWidget(Qt::TopDockWidgetArea, grid);
-        connect(this, SIGNAL(updateWidgets(bool)), grid, SLOT(updateView(bool)));
+        if (isAutoDeleteOff()) {
+            GridView* grid = new GridView(mainGUI, m_exp, this);
+            m_innerWindow->addDockWidget(Qt::TopDockWidgetArea, grid);
+            connect(this, SIGNAL(updateWidgets(bool)), grid, SLOT(updateView(bool)));
+        }
     });
     connect(m_aLineChart, &QAction::triggered, [this, expMgr]() {
-        LineChart* lineChart = new LineChart(expMgr, m_exp, this);
-        m_innerWindow->addDockWidget(Qt::TopDockWidgetArea, lineChart);
-        connect(this, SIGNAL(updateWidgets(bool)), lineChart, SLOT(updateSeries()));
+        if (isAutoDeleteOff()) {
+            LineChart* lineChart = new LineChart(expMgr, m_exp, this);
+            m_innerWindow->addDockWidget(Qt::TopDockWidgetArea, lineChart);
+            connect(this, SIGNAL(updateWidgets(bool)), lineChart, SLOT(updateSeries()));
+        }
     });
 
     connect(m_timer, &QTimer::timeout, [this]() { emit(updateWidgets(false)); });
@@ -143,4 +150,20 @@ void ExperimentWidget::slotStatusChanged(Experiment* exp)
         QMessageBox::warning(this, "Experiment", "Something went wrong with your settings!");
     }
 }
+
+bool ExperimentWidget::isAutoDeleteOff()
+{
+    if (m_exp->autoDeleteTrials()) {
+        int r = QMessageBox::warning(this, "Experiment",
+                    "We cannot open widgets if 'autoDelete' is enabled.\n"
+                    "Would you like to disable it for this experiment?",
+                    QMessageBox::Yes, QMessageBox::No);
+        if (r == QMessageBox::No) {
+            return false;
+        }
+        m_exp->setAutoDeleteTrials(false);
+    }
+    return true;
 }
+
+} // evoplex
