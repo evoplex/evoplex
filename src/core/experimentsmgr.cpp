@@ -13,7 +13,8 @@
 namespace evoplex {
 
 ExperimentsMgr::ExperimentsMgr()
-    : m_timer(new QTimer(this))
+    : m_timerProgress(new QTimer(this))
+    , m_timerDestroy(new QTimer(this))
 {
     resetSettingsToDefault();
 
@@ -22,12 +23,15 @@ ExperimentsMgr::ExperimentsMgr()
     QThreadPool::globalInstance()->setMaxThreadCount(m_threads);
     qDebug() << "[ExperimentsMgr]: setting the max number of threads to" << m_threads;
 
-    connect(m_timer, SIGNAL(timeout()), this, SLOT(updateProgressValues()));
+    m_timerDestroy->setSingleShot(true);
+    connect(m_timerDestroy, SIGNAL(timeout()), this, SLOT(destroyExperiments()));
+    connect(m_timerProgress, SIGNAL(timeout()), this, SLOT(updateProgressValues()));
 }
 
 ExperimentsMgr::~ExperimentsMgr()
 {
-    delete m_timer;
+    delete m_timerProgress;
+    delete m_timerDestroy;
 }
 
 void ExperimentsMgr::resetSettingsToDefault()
@@ -45,6 +49,36 @@ void ExperimentsMgr::updateProgressValues()
     }
 }
 
+void ExperimentsMgr::destroyExperiments()
+{
+    std::list<Experiment*>::iterator it = m_toDestroy.begin();
+    while (it != m_toDestroy.end()) {
+        Experiment* exp = (*it);
+        if (exp->expStatus() == Experiment::RUNNING) {
+            exp->pause();
+        } else if (exp->expStatus() == Experiment::QUEUED) {
+            m_queued.remove(exp);
+            exp->setExpStatus(Experiment::INVALID);
+            emit (statusChanged(exp));
+        } else {
+            exp->deleteLater();
+            it = m_toDestroy.erase(it);
+            continue;
+        }
+        ++it;
+    }
+
+    if (!m_toDestroy.empty()) {
+        m_timerDestroy->start(500);
+    }
+}
+
+void ExperimentsMgr::destroy(Experiment* exp)
+{
+    m_toDestroy.emplace_back(exp);
+    m_timerDestroy->start(500);
+}
+
 void ExperimentsMgr::play(Experiment* exp)
 {
     QMutexLocker locker(&m_mutex);
@@ -60,8 +94,8 @@ void ExperimentsMgr::play(Experiment* exp)
         m_queued.remove(exp);
 
         m_running.emplace_back(exp);
-        if (!m_timer->isActive())
-            m_timer->start(500); // every half a second, check progress
+        if (!m_timerProgress->isActive())
+            m_timerProgress->start(500); // every half a second, check progress
 
         // both the QVector and the QFutureWatcher must live longer
         // so, they must be pointers.
@@ -96,27 +130,32 @@ void ExperimentsMgr::finished(Experiment* exp)
 
     m_running.remove(exp);
     if (m_running.empty()) {
-        m_timer->stop();
+        m_timerProgress->stop();
     }
 
-    exp->setPauseAt(EVOPLEX_MAX_STEPS); // reset the pauseAt flag to maximum
-
-    if(exp->expStatus() != Experiment::INVALID) {
-        exp->setExpStatus(Experiment::FINISHED);
+    if (std::find(m_toDestroy.begin(), m_toDestroy.end(), exp) != m_toDestroy.end()) {
+        exp->setExpStatus(Experiment::INVALID);
+    } else if(exp->expStatus() != Experiment::INVALID) {
         for (auto& trial : exp->trials()) {
             if (trial.second->status() != Experiment::FINISHED) {
                 exp->setExpStatus(Experiment::READY);
+                exp->setPauseAt(EVOPLEX_MAX_STEPS); // reset the pauseAt flag to maximum
+                m_idle.emplace_back(exp);
                 break;
             }
         }
-    }
-    emit (statusChanged(exp));
 
-    if (exp->expStatus() == Experiment::FINISHED && exp->autoDelete()) {
-        exp->deleteTrials();
-    } else {
-        m_idle.emplace_back(exp);
+        if (exp->expStatus() != Experiment::READY) {
+            exp->setExpStatus(Experiment::FINISHED);
+            if (exp->autoDeleteTrials()) {
+                exp->deleteTrials();
+            } else {
+                m_idle.emplace_back(exp);
+            }
+        }
     }
+
+    emit (statusChanged(exp));
 
     // call next process in the queue
     if (!m_queued.empty()) {

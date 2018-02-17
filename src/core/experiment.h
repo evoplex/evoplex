@@ -24,8 +24,10 @@
 namespace evoplex
 {
 // Evoplex assumes that any experiment belong to a project.
-class Experiment
+class Experiment : public QObject
 {
+    Q_OBJECT
+
     friend class ExperimentsMgr;
 
 public:
@@ -66,7 +68,7 @@ public:
 
     ~Experiment();
 
-    bool init(ExperimentInputs* inputs);
+    bool init(ExperimentInputs* inputs, QString& error);
 
     void reset();
 
@@ -74,11 +76,6 @@ public:
     // This method might be expensive!
     void updateProgressValue();
     inline quint16 progress() const { return m_progress; }
-
-    // Here is where the actual simulation is performed.
-    // This method will run in a worker thread until it reaches the max
-    // number of steps or the pause criteria defined by the user.
-    void processTrial(const int& trialId);
 
     void toggle();
 
@@ -106,8 +103,8 @@ public:
     inline const Status expStatus() const { return m_expStatus; }
     inline void setExpStatus(Status s) { m_mutex.lock(); m_expStatus = s; m_mutex.unlock(); }
 
-    inline bool autoDelete() const { return m_autoDelete; }
-    inline void setAutoDelete(bool b) { m_autoDelete = b; }
+    inline bool autoDeleteTrials() const { return m_autoDeleteTrials; }
+    inline void setAutoDeleteTrials(bool b) { m_autoDeleteTrials = b; }
 
     inline bool hasOutputs() const { return !m_inputs->fileOutputs.empty() || !m_extraOutputs.empty(); }
     inline void addOutput(Output* output) { m_extraOutputs.emplace_back(output); }
@@ -125,6 +122,10 @@ public:
     inline const QString& graphId() const { return m_graphPlugin->id(); }
     inline const ModelPlugin* modelPlugin() const { return m_modelPlugin; }
 
+signals:
+    void trialCreated(int trialId);
+    void restarted();
+
 private:
     QMutex m_mutex;
     MainApp* m_mainApp;
@@ -135,7 +136,7 @@ private:
     const GraphPlugin* m_graphPlugin;
     const ModelPlugin* m_modelPlugin;
     int m_numTrials;
-    bool m_autoDelete;
+    bool m_autoDeleteTrials;
     int m_stopAt;
 
     QString m_fileHeader;   // file header is the same for all trials; let's save it then
@@ -158,6 +159,11 @@ private:
     // If this experiment has only one trial, then it won't be used anyway.
     // If the experiment has 2 or more trials, it'll be used in the last trial.
     Agents m_clonableAgents;
+
+    // Here is where the actual simulation is performed.
+    // This method will run in a worker thread until it reaches the max
+    // number of steps or the pause criteria defined by the user.
+    void processTrial(const int& trialId);
 
     // We can safely consider that all parameters are valid at this point.
     // However, some things might fail (eg, missing agents, broken graph etc),

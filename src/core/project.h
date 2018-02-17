@@ -28,7 +28,7 @@ public:
     Experiment* newExperiment(Experiment::ExperimentInputs* inputs, QString& error);
 
     // Edit an experiment of this project.
-    bool editExperiment(int expId, Experiment::ExperimentInputs* newInputs);
+    bool editExperiment(int expId, Experiment::ExperimentInputs* newInputs, QString& error);
 
     // Import a set of experiments from a csv file. It stops if an experiment fails.
     // return the number of experiments imported.
@@ -55,7 +55,7 @@ public:
     int generateExpId() const;
 
 signals:
-    void expAdded(const Experiment* exp);
+    void expAdded(Experiment* exp);
     void expEdited(const Experiment* exp);
     void hasUnsavedChanges(bool);
 

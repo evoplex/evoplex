@@ -34,7 +34,10 @@ Project::Project(MainApp* mainApp, int id, QString& error, const QString& filepa
 
 Project::~Project()
 {
-    Utils::deleteAndShrink(m_experiments);
+    for (auto& it : m_experiments) {
+        m_mainApp->expMgr()->destroy(it.second);
+    }
+    m_experiments.clear();
 }
 
 void Project::setFilePath(const QString& path)
@@ -77,11 +80,11 @@ Experiment* Project::newExperiment(Experiment::ExperimentInputs* inputs, QString
     return exp;
 }
 
-bool Project::editExperiment(int expId, Experiment::ExperimentInputs* newInputs)
+bool Project::editExperiment(int expId, Experiment::ExperimentInputs* newInputs, QString& error)
 {
     Experiment* exp = m_experiments.at(expId);
     Q_ASSERT(exp);
-    if (!exp->init(newInputs)) {
+    if (!exp->init(newInputs, error)) {
         return false;
     }
     m_hasUnsavedChanges = true;

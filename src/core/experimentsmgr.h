@@ -34,27 +34,29 @@ public:
 signals:
     void statusChanged(Experiment* exp);
     void progressUpdated(Experiment* exp);
-    void restarted(Experiment* exp);
-    void trialCreated(Experiment* exp, int trialId);
-    void trialsDeleted(Experiment* exp);
 
 public slots:
     void clearQueue();
     void clearIdle();
     void removeFromQueue(Experiment* exp);
+    void destroy(Experiment* exp);
 
 private slots:
     void updateProgressValues();
+    void destroyExperiments();
 
 private:
     QMutex m_mutex;
     QSettings m_userPrefs;
     int m_threads;
 
-    QTimer* m_timer; // timer to update the progress value of all running experiments
+    QTimer* m_timerProgress; // update the progress value of all running experiments
+    QTimer* m_timerDestroy;
+
     std::list<Experiment*> m_running;
     std::list<Experiment*> m_queued;
     std::list<Experiment*> m_idle;
+    std::list<Experiment*> m_toDestroy;
 
     // trigged when an experiment ends (futurewatcher)
     void finished(Experiment* exp);

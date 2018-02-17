@@ -23,20 +23,24 @@ Experiment::Experiment(MainApp* mainApp, ExperimentInputs* inputs, Project* proj
     , m_inputs(nullptr)
     , m_expStatus(INVALID)
 {
-    init(inputs);
+    QString error;
+    init(inputs, error);
 }
 
 Experiment::~Experiment()
 {
+    Q_ASSERT(m_expStatus != RUNNING && m_expStatus != QUEUED);
     deleteTrials();
     Utils::deleteAndShrink(m_extraOutputs);
     delete m_inputs;
 }
 
-bool Experiment::init(ExperimentInputs* inputs)
+bool Experiment::init(ExperimentInputs* inputs, QString& error)
 {
-    if (m_expStatus == RUNNING) {
-        qWarning() << "[Experiment]: tried to init() a running experiment.";
+    if (m_expStatus == RUNNING || m_expStatus == QUEUED) {
+        error = "Tried to initialize a running experiment.\n"
+                "Please, pause it and try again.";
+        qWarning() << "[Experiment]:" << error;
         return false;
     }
 
@@ -55,7 +59,7 @@ bool Experiment::init(ExperimentInputs* inputs)
     }
 
     m_numTrials = m_inputs->generalAttrs->value(GENERAL_ATTRIBUTE_TRIALS).toInt();
-    m_autoDelete = m_inputs->generalAttrs->value(GENERAL_ATTRIBUTE_AUTODELETE).toBool();
+    m_autoDeleteTrials = m_inputs->generalAttrs->value(GENERAL_ATTRIBUTE_AUTODELETE).toBool();
 
     m_graphPlugin = m_mainApp->graph(m_inputs->generalAttrs->value(GENERAL_ATTRIBUTE_GRAPHID).toQString());
     m_modelPlugin = m_mainApp->model(m_inputs->generalAttrs->value(GENERAL_ATTRIBUTE_MODELID).toQString());
@@ -67,14 +71,16 @@ bool Experiment::init(ExperimentInputs* inputs)
 
 void Experiment::reset()
 {
-    if (m_expStatus == RUNNING) {
+    if (m_expStatus == RUNNING || m_expStatus == QUEUED) {
         qWarning() << "[Experiment]: tried to reset a running experiment. You should pause it first.";
         return;
     }
 
     deleteTrials();
-    m_trials.reserve(m_numTrials);
 
+    QMutexLocker locker(&m_mutex);
+
+    m_trials.reserve(m_numTrials);
     m_delay = m_mainApp->defaultStepDelay();
     m_stopAt = m_inputs->generalAttrs->value(GENERAL_ATTRIBUTE_STOPAT).toInt();
     m_pauseAt = m_stopAt;
@@ -82,11 +88,13 @@ void Experiment::reset()
     m_expStatus = READY;
 
     emit (m_mainApp->expMgr()->statusChanged(this));
-    emit (m_mainApp->expMgr()->restarted(this));
+    emit (restarted());
 }
 
 void Experiment::deleteTrials()
 {
+    QMutexLocker locker(&m_mutex);
+
     for (auto& stream : m_fileStreams) {
         stream.second->flush();
         delete stream.second;
@@ -103,11 +111,9 @@ void Experiment::deleteTrials()
     // if the experiment has finished or became invalid,
     // it's more interesing to do NOT change the status
     if (m_expStatus != FINISHED && m_expStatus != INVALID) {
-        setExpStatus(READY);
+        m_expStatus = READY;
         emit (m_mainApp->expMgr()->statusChanged(this));
     }
-
-    emit (m_mainApp->expMgr()->trialsDeleted(this));
 }
 
 void Experiment::updateProgressValue()
@@ -165,7 +171,7 @@ void Experiment::processTrial(const int& trialId)
             return;
         }
         m_trials.insert({trialId, trial});
-        emit (m_mainApp->expMgr()->trialCreated(this, trialId));
+        emit (trialCreated(trialId));
     }
 
     AbstractModel* trial = m_trials.at(trialId);
@@ -340,8 +346,10 @@ void Experiment::writeCachedSteps(const int trialId)
         return;
     }
 
+    // we synchronously flush all the io stuff. So, it's safe to say
+    // that if the front Output is empty, then all others are also empty.
     QString rows;
-    while (!m_inputs->fileOutputs.front()->isEmpty(cacheId, trialId)) {
+    do {
         for (Output* output : m_inputs->fileOutputs) {
             Values vals = output->readFrontRow(cacheId, trialId).second;
             output->flushFrontRow(cacheId, trialId);
@@ -351,7 +359,7 @@ void Experiment::writeCachedSteps(const int trialId)
         }
         rows.chop(1);
         rows += "\n";
-    }
+    } while (!m_inputs->fileOutputs.front()->isEmpty(cacheId, trialId));
 
     m_fileStreams.at(trialId)->operator <<(rows);
     m_fileStreams.at(trialId)->flush();
