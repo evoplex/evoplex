@@ -29,7 +29,6 @@ signals:
 
 private slots:
     void slotRestarted();
-    void slotTrialChanged(int trialId);
 
 protected:
     virtual void paintEvent(QPaintEvent* pe);

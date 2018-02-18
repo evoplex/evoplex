@@ -30,7 +30,7 @@ TitleBar::TitleBar(Experiment* exp, QDockWidget* parent)
     connect(m_ui->bFloat, &QPushButton::clicked,
             [parent]() { parent->setFloating(!parent->isFloating()); });
 
-    connect(m_ui->cbTrial, SIGNAL(currentIndexChanged(int)), SLOT(slotTrialChanged(int)));
+    connect(m_ui->cbTrial, SIGNAL(currentIndexChanged(int)), SIGNAL(trialSelected(int)));
     connect(m_ui->bSettings, SIGNAL(clicked(bool)), SIGNAL(openSettingsDlg()));
 }
 
@@ -50,15 +50,13 @@ void TitleBar::paintEvent(QPaintEvent* pe)
 
 void TitleBar::slotRestarted()
 {
+    m_ui->cbTrial->blockSignals(true);
     m_ui->cbTrial->clear();
     for (int trialId = 0; trialId < m_exp->numTrials(); ++trialId) {
         m_ui->cbTrial->insertItem(trialId, QString::number(trialId));
     }
-}
-
-void TitleBar::slotTrialChanged(int trialId)
-{
-    emit (trialSelected(trialId));
+    m_ui->cbTrial->blockSignals(false);
+    emit (trialSelected(m_ui->cbTrial->currentText().toInt()));
 }
 
 } // evoplex

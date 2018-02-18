@@ -11,6 +11,7 @@
 #include <QVector>
 #include <QtDebug>
 #include <float.h>
+#include <unordered_set>
 
 #include "agent.h"
 #include "attributes.h"
@@ -47,8 +48,18 @@ namespace Utils
     void deleteAndShrink(std::map<T, C*>& m) {
         for (auto& i : m) {
             delete i.second;
+            i.second = nullptr;
         }
         m.clear();
+    }
+
+    template <class C>
+    void deleteAndShrink(std::unordered_set<C*>& s) {
+        for (C* c : s) {
+            delete c;
+            c = nullptr;
+        }
+        s.clear();
     }
 
     // convert a linear index to row and column
