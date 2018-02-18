@@ -23,13 +23,12 @@ public:
     explicit TitleBar(Experiment* exp, QDockWidget* parent);
     ~TitleBar();
 
-    void changeCurrentTrial(int trialId);
-
 signals:
     void trialSelected(int);
     void openSettingsDlg();
 
 private slots:
+    void slotRestarted();
     void slotTrialChanged(int trialId);
 
 protected:
@@ -38,8 +37,6 @@ protected:
 private:
     Ui_TitleBar* m_ui;
     Experiment* m_exp;
-
-    bool isFreeToUse();
 };
 }
 
