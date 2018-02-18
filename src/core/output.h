@@ -27,8 +27,10 @@ public:
 
     virtual void doOperation(const int trialId, const AbstractModel* model) = 0;
 
-    // Printable header with all columns of this operation separated by commas.
-    virtual QString printableHeader(const char sep) const = 0;
+    // Printable header with all columns of this operation separated by 'sep'.
+    // If joinInputs is enabled: eg: func_attr_input1[sep]input2
+    // If joinInputs is disabled: eg: func_attr_input1[sep]func_attr_input2
+    virtual QString printableHeader(const char sep, const bool joinInputs) const = 0;
 
     virtual bool operator==(const Output* output) const = 0;
 
@@ -55,7 +57,7 @@ public:
     inline const Values& allInputs() const
     { return m_allInputs; }
 
-    inline const Values& inputs(const int cacheId, const int trialId) const
+    inline const Values& inputs(const int cacheId) const
     { return m_caches.at(cacheId).inputs; }
 
     inline const std::set<int>& trialIds() const
@@ -93,9 +95,9 @@ public:
 
     virtual void doOperation(const int trialId, const AbstractModel* model);
 
-    // Printable header with all columns of this operation separated by commas.
+    // Printable header with all columns of this operation separated by 'sep'.
     // Format: "custom_nameDefinedInTheModel"
-    virtual QString printableHeader(const char sep) const;
+    virtual QString printableHeader(const char sep, const bool joinInputs) const;
 
     virtual bool operator==(const Output* output) const;
 };
@@ -130,9 +132,9 @@ public:
 
     virtual void doOperation(const int trialId, const AbstractModel* model);
 
-    // Printable header with all columns of this operation separated by commas.
+    // Printable header with all columns of this operation separated by 'sep'.
     // Format: "function_entity_attrName_value"
-    virtual QString printableHeader(const char sep) const;
+    virtual QString printableHeader(const char sep, const bool joinInputs) const;
 
     virtual bool operator==(const Output* output) const;
 

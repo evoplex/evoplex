@@ -52,7 +52,7 @@ bool Experiment::init(ExperimentInputs* inputs, QString& error)
     if (!m_inputs->fileOutputs.empty()) {
         for (Output* output : m_inputs->fileOutputs) {
             Q_ASSERT(output->allInputs().size() > 0);
-            m_fileHeader += output->printableHeader(',') + ",";
+            m_fileHeader += output->printableHeader(',', false) + ",";
         }
         m_fileHeader.chop(1);
         m_fileHeader += "\n";
@@ -499,7 +499,7 @@ Experiment::ExperimentInputs* Experiment::readInputs(const MainApp* mainApp,
             trialIds.emplace_back(i);
         }
 
-        outputs = Output::parseHeader(outHeader.split(";"), trialIds, mPlugin, errorMsg);
+        outputs = Output::parseHeader(outHeader.split(";", QString::SkipEmptyParts), trialIds, mPlugin, errorMsg);
         if (outputs.empty()) {
             failedAttributes.append(OUTPUT_HEADER);
         }

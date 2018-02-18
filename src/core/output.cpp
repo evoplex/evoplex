@@ -42,7 +42,7 @@ void DefaultOutput::doOperation(const int trialId, const AbstractModel* model)
     updateCaches(trialId, model->currStep(), allValues);
 }
 
-QString DefaultOutput::printableHeader(const char sep) const
+QString DefaultOutput::printableHeader(const char sep, const bool joinInputs) const
 {
     QString prefix = QString("%1_%2_%3_")
             .arg(stringFromFunc(m_func))
@@ -50,8 +50,15 @@ QString DefaultOutput::printableHeader(const char sep) const
             .arg(m_valueSpace->attrName());
 
     QString ret;
-    for (Value val : m_allInputs) {
-        ret += prefix + val.toQString() + sep;
+    if (joinInputs) {
+        ret = prefix;
+        for (Value val : m_allInputs) {
+            ret += val.toQString() + sep;
+        }
+    } else {
+        for (Value val : m_allInputs) {
+            ret += prefix + val.toQString() + sep;
+        }
     }
     ret.chop(1);
     return ret;
@@ -83,11 +90,19 @@ void CustomOutput::doOperation(const int trialId, const AbstractModel* model)
     updateCaches(trialId, model->currStep(), model->customOutputs(m_allInputs));
 }
 
-QString CustomOutput::printableHeader(const char sep) const
+QString CustomOutput::printableHeader(const char sep, const bool joinInputs) const
 {
+    const QString prefix = "custom_";
     QString ret;
-    for (Value h : m_allInputs) {
-        ret += "custom_" + h.toQString() + sep;
+    if (joinInputs) {
+        ret = prefix;
+        for (Value h : m_allInputs) {
+            ret += h.toQString() + sep;
+        }
+    } else {
+        for (Value h : m_allInputs) {
+            ret += prefix + h.toQString() + sep;
+        }
     }
     ret.chop(1);
     return ret;
