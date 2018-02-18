@@ -98,7 +98,7 @@ ExperimentWidget::ExperimentWidget(Experiment* exp, MainGUI* mainGUI, ProjectsPa
     });
     connect(m_aLineChart, &QAction::triggered, [this, expMgr]() {
         if (isAutoDeleteOff()) {
-            LineChart* lineChart = new LineChart(expMgr, m_exp, this);
+            LineChart* lineChart = new LineChart(m_exp, this);
             m_innerWindow->addDockWidget(Qt::TopDockWidgetArea, lineChart);
             connect(this, SIGNAL(updateWidgets(bool)), lineChart, SLOT(updateSeries()));
         }

@@ -21,7 +21,7 @@ class LineChart : public QDockWidget
     Q_OBJECT
 
 public:
-    explicit LineChart(ExperimentsMgr* expMgr, Experiment* exp, QWidget* parent);
+    explicit LineChart(Experiment* exp, QWidget* parent);
     ~LineChart();
 
 private slots:

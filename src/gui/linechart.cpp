@@ -12,7 +12,7 @@
 
 namespace evoplex {
 
-LineChart::LineChart(ExperimentsMgr* expMgr, Experiment* exp, QWidget* parent)
+LineChart::LineChart(Experiment* exp, QWidget* parent)
     : QDockWidget(parent)
     , m_settingsDlg(new Ui_LineChartSettings)
     , m_exp(exp)
