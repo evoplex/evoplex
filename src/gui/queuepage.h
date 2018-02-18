@@ -26,7 +26,6 @@ signals:
     void isEmpty(bool empty);
 
 private slots:
-    void slotRemoveRow(Experiment* exp);
     void slotStatusChanged(Experiment* exp);
 
 private:
@@ -45,6 +44,7 @@ private:
 
     QTableWidgetItem* insertRow(TableWidget* table, Experiment* exp);
     void moveRow(TableWidget* prevTable, int preRow, TableWidget* nextTable, Experiment* exp);
+    void removeRow(const Row& key);
 };
 }
 #endif // QUEUEPAGE_H

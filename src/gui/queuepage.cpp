@@ -36,16 +36,12 @@ QueuePage::QueuePage(MainGUI* mainGUI)
     m_ui->idle->hide();
 
     ExperimentsMgr* expMgr = mainGUI->mainApp()->expMgr();
-    connect(expMgr, SIGNAL(trialsDeleted(Experiment*)),
-            this, SLOT(slotRemoveRow(Experiment*)));
-    connect(expMgr, SIGNAL(statusChanged(Experiment*)),
-            this, SLOT(slotStatusChanged(Experiment*)));
-    connect(expMgr, SIGNAL(progressUpdated(Experiment*)),
-            m_ui->tableRunning->viewport(), SLOT(update()));
-    connect(m_ui->bClearQueue, SIGNAL(clicked(bool)),
-            expMgr, SLOT(clearQueue()));
-    connect(m_ui->bClearIdle, SIGNAL(clicked(bool)),
-            expMgr, SLOT(clearIdle()));
+    connect(expMgr, SIGNAL(statusChanged(Experiment*)), SLOT(slotStatusChanged(Experiment*)));
+    connect(expMgr, SIGNAL(progressUpdated(Experiment*)), m_ui->tableRunning->viewport(), SLOT(update()));
+
+    connect(m_ui->bClearQueue, SIGNAL(clicked(bool)), expMgr, SLOT(clearQueue()));
+    connect(m_ui->bClearIdle, SIGNAL(clicked(bool)), expMgr, SLOT(clearIdle()));
+
     connect(m_ui->tableIdle, &QTableWidget::cellClicked, [this]() {
             m_ui->tableQueue->clearSelection(); m_ui->tableRunning->clearSelection();});
     connect(m_ui->tableQueue, &QTableWidget::cellClicked, [this]() {
@@ -54,42 +50,33 @@ QueuePage::QueuePage(MainGUI* mainGUI)
             m_ui->tableIdle->clearSelection(); m_ui->tableQueue->clearSelection();});
 }
 
-void QueuePage::slotRemoveRow(Experiment *exp)
-{
-    Row row = m_rows.take(std::make_pair(exp->project()->id(), exp->id()));
-    if (!row.table) {
-        return;
-    }
-    row.table->removeRow(row.item->row());
-    row.section->setVisible(row.table->rowCount() > 0);
-    emit (isEmpty(!m_ui->tableIdle->rowCount() && !m_ui->tableRunning->rowCount() && !m_ui->tableQueue->rowCount()));
-}
-
 void QueuePage::slotStatusChanged(Experiment* exp)
 {
     const rowKey key = std::make_pair(exp->project()->id(), exp->id());
     Row prev = m_rows.value(key, Row());
-    Row next = prev;
+    Row next;
 
-    switch (exp->expStatus()) {
-        case Experiment::RUNNING:
-            next.table = m_ui->tableRunning;
-            next.section = m_ui->running;
-            break;
-        case Experiment::QUEUED:
-            next.table = m_ui->tableQueue;
-            next.section = m_ui->queue;
-            break;
-        default:
-            next.table = m_ui->tableIdle;
-            next.section = m_ui->idle;
+    const Experiment::Status s = exp->expStatus();
+    if (s == Experiment::RUNNING) {
+        next.table = m_ui->tableRunning;
+        next.section = m_ui->running;
+    } else if (s == Experiment::QUEUED) {
+        next.table = m_ui->tableQueue;
+        next.section = m_ui->queue;
+    } else if (exp->trials().empty()) {
+        removeRow(prev);
+        m_rows.remove(key);
+        return;
+    } else {
+        next.table = m_ui->tableIdle;
+        next.section = m_ui->idle;
     }
 
     next.section->show();
-
     if (prev.table == next.table) {
         return;
     } else if (prev.table) {
+        next.item = prev.item;
         moveRow(prev.table, prev.item->row(), next.table, exp);
         prev.section->setVisible(prev.table->rowCount() > 0);
     } else {
@@ -126,5 +113,18 @@ void QueuePage::moveRow(TableWidget* prevTable, int preRow, TableWidget* nextTab
         nextTable->setItem(nextRow, col, item);
     }
     prevTable->removeRow(preRow);
+}
+
+void QueuePage::removeRow(const Row& r)
+{
+    if (!r.table || !r.item) {
+        return;
+    }
+
+    r.table->removeRow(r.item->row());
+    r.section->setVisible(r.table->rowCount() > 0);
+    emit (isEmpty(!m_ui->tableIdle->rowCount()
+                  && !m_ui->tableRunning->rowCount()
+                  && !m_ui->tableQueue->rowCount()));
 }
 }
