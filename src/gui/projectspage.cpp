@@ -146,6 +146,12 @@ void ProjectsPage::slotOpenExperiment(Experiment* exp)
 {
     if (!exp) {
         return;
+    } else if (exp->expStatus() == Experiment::INVALID) {
+        QMessageBox::warning(this, "Experiment",
+                "This experiment is invalid.\n"
+                "It seems that something went wrong with its settings.\n"
+                "Please, use the Experiment Designer tool to check your settings and try again.");
+        return;
     }
 
     ExperimentWidget* ew = nullptr;
