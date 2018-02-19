@@ -157,9 +157,11 @@ Value ValueSpace::validate(const QString& valueStr) const
         const SetSpace* sspace = dynamic_cast<const SetSpace*>(this);
         bool ok = false;
         Value value(valueStr.toInt(&ok));
-        foreach (Value validValue, sspace->values()) {
-            if (value == validValue) {
-                return value;
+        if (ok && value.isValid()) {
+            for (Value validValue : sspace->values()) {
+                if (value == validValue) {
+                    return value;
+                }
             }
         }
         break;
@@ -168,9 +170,11 @@ Value ValueSpace::validate(const QString& valueStr) const
         const SetSpace* sspace = dynamic_cast<const SetSpace*>(this);
         bool ok = false;
         Value value(valueStr.toDouble(&ok));
-        foreach (Value validValue, sspace->values()) {
-            if (value == validValue) {
-                return value;
+        if (ok && value.isValid()) {
+            for (Value validValue : sspace->values()) {
+                if (value == validValue) {
+                    return value;
+                }
             }
         }
         break;
