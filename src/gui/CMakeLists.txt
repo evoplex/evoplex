@@ -48,21 +48,25 @@ set(EVOPLEX_GUI_CXX
   welcomepage.cpp
 )
 
-qt5_wrap_ui(EVOPLEX_GUI_UI
-  forms/agentsgeneratordlg.ui
-  forms/experimentdesigner.ui
-  forms/graphwidget.ui
-  forms/graphsettings.ui
-  forms/linechartsettings.ui
-  forms/outputwidget.ui
-  forms/pluginspage.ui
-  forms/projectwidget.ui
-  forms/queuepage.ui
-  forms/savedialog.ui
-  forms/settingspage.ui
-  forms/titlebar.ui
-  forms/welcomepage.ui
+set(EVOPLEX_GUI_UIFORM
+  agentsgeneratordlg
+  experimentdesigner
+  graphwidget
+  graphsettings
+  linechartsettings
+  outputwidget
+  pluginspage
+  projectwidget
+  queuepage
+  savedialog
+  settingspage
+  titlebar
+  welcomepage
 )
+foreach(uiform ${EVOPLEX_GUI_UIFORM})
+  set(EVOPLEX_GUI_UI ${EVOPLEX_GUI_UI} forms/${uiform}.ui)
+endforeach(uiform)
+qt5_wrap_ui(EVOPLEX_GUI_UI ${EVOPLEX_GUI_UI})
 
 add_library(EvoplexGUI SHARED ${EVOPLEX_GUI_CXX} ${EVOPLEX_GUI_UI})
 target_link_libraries(EvoplexGUI EvoplexCore Qt5::Core Qt5::Concurrent Qt5::Widgets Qt5::Charts)
