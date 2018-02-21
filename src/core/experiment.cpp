@@ -31,7 +31,7 @@ Experiment::~Experiment()
 {
     Q_ASSERT(m_expStatus != RUNNING && m_expStatus != QUEUED);
     deleteTrials();
-    Utils::deleteAndShrink(m_extraOutputs);
+    m_outputs.clear();
     delete m_inputs;
 }
 
@@ -44,15 +44,16 @@ bool Experiment::init(ExperimentInputs* inputs, QString& error)
         return false;
     }
 
-    Utils::deleteAndShrink(m_extraOutputs);
+    m_outputs.clear();
     delete m_inputs;
     m_inputs = inputs;
 
     m_fileHeader = "";
-    if (!m_inputs->fileOutputs.empty()) {
-        for (Output* output : m_inputs->fileOutputs) {
-            Q_ASSERT(output->allInputs().size() > 0);
-            m_fileHeader += output->printableHeader(',', false) + ",";
+    if (!m_inputs->fileCaches.empty()) {
+        for (Cache* cache : m_inputs->fileCaches) {
+            Q_ASSERT(cache->inputs().size() > 0);
+            m_fileHeader += cache->printableHeader(',', false) + ",";
+            m_outputs.insert(cache->output());
         }
         m_fileHeader.chop(1);
         m_fileHeader += "\n";
@@ -79,6 +80,10 @@ void Experiment::reset()
     deleteTrials();
 
     QMutexLocker locker(&m_mutex);
+
+    for (OutputSP o : m_outputs) {
+        o->flushAll();
+    }
 
     m_trials.reserve(m_numTrials);
     m_delay = m_mainApp->defaultStepDelay();
@@ -186,16 +191,11 @@ void Experiment::processTrial(const int& trialId)
         algorithmConverged = trial->algorithmStep();
         ++trial->m_currStep;
 
-        if (m_inputs->fileOutputs.size()) {
-            for (Output* output : m_inputs->fileOutputs)
-                output->doOperation(trialId, trial);
-
-            if (trial->m_currStep % m_mainApp->stepsToFlush() == 0)
-                writeCachedSteps(trialId);
-        }
-
-        for (Output* output : m_extraOutputs)
+        for (OutputSP output : m_outputs)
             output->doOperation(trialId, trial);
+
+        if (m_inputs->fileCaches.size() && trial->m_currStep % m_mainApp->stepsToFlush() == 0)
+            writeCachedSteps(trialId);
 
         if (m_delay > 0)
             QThread::msleep(m_delay);
@@ -253,7 +253,7 @@ AbstractModel* Experiment::createTrial(const int trialId)
         return nullptr;
     }
 
-    if (!m_inputs->fileOutputs.empty()) {
+    if (!m_inputs->fileCaches.empty()) {
         const QString fpath = QString("%1/%2_e%3_t%4.csv")
                 .arg(m_inputs->generalAttrs->value(OUTPUT_DIR).toQString())
                 .arg(m_project->name())
@@ -273,7 +273,7 @@ AbstractModel* Experiment::createTrial(const int trialId)
         m_fileStreams.insert({trialId, stream});
 
         // write this initial step to file
-        for (Output* output : m_inputs->fileOutputs) {
+        for (OutputSP output : m_outputs) {
             output->doOperation(trialId, modelObj);
         }
         writeCachedSteps(trialId);
@@ -340,66 +340,56 @@ AbstractModel* Experiment::trial(int trialId) const
 
 void Experiment::writeCachedSteps(const int trialId)
 {
-    // the cacheId for fileOutputs is always 0
-    const int cacheId = 0;
-    if (m_inputs->fileOutputs.empty() || m_inputs->fileOutputs.front()->isEmpty(cacheId, trialId)) {
+    if (m_inputs->fileCaches.empty() || m_inputs->fileCaches.front()->isEmpty(trialId)) {
         return;
     }
 
-    // we synchronously flush all the io stuff. So, it's safe to say
-    // that if the front Output is empty, then all others are also empty.
     QString rows;
     do {
-        for (Output* output : m_inputs->fileOutputs) {
-            Values vals = output->readFrontRow(cacheId, trialId).second;
-            output->flushFrontRow(cacheId, trialId);
+        for (Cache* cache : m_inputs->fileCaches) {
+            Values vals = cache->readFrontRow(trialId).second;
+            cache->flushFrontRow(trialId);
             for (Value val : vals) {
                 rows += val.toQString() + ",";
             }
         }
         rows.chop(1);
         rows += "\n";
-    } while (!m_inputs->fileOutputs.front()->isEmpty(cacheId, trialId));
+
+    // we synchronously flush all the io stuff. So, it's safe to say
+    // that if the front Output is empty, then all others are also empty.
+    } while (!m_inputs->fileCaches.front()->isEmpty(trialId));
 
     m_fileStreams.at(trialId)->operator <<(rows);
     m_fileStreams.at(trialId)->flush();
 }
 
-bool Experiment::removeOutput(Output* output)
+bool Experiment::removeOutput(OutputSP output)
 {
     if (m_expStatus != Experiment::READY) {
         qWarning() << "[Experiment] : tried to remove an 'Output' from a running experiment. You should pause it first.";
         return false;
     }
 
-    std::vector<Output*>::iterator it;
-    it = std::find(m_extraOutputs.begin(), m_extraOutputs.end(), output);
-    if (it == m_extraOutputs.end()) {
-        qWarning() << "[Experiment] : tried to remove a non-existent 'Output'.";
-        return false;
-    }
-
-    if (!(*it)->isEmpty()) {
+    if (!output->isEmpty()) {
         qWarning() << "[Experiment] : tried to remove an 'Output' that seems to be used somewhere. It should be cleaned first.";
         return false;
     }
 
-    m_extraOutputs.erase(it);
-    delete *it;
-    *it = nullptr;
+    std::unordered_set<OutputSP>::iterator it = m_outputs.find(output);
+    if (it == m_outputs.end()) {
+        qWarning() << "[Experiment] : tried to remove a non-existent 'Output'.";
+        return false;
+    }
 
+    m_outputs.erase(it);
     return true;
 }
 
-Output* Experiment::searchOutput(const Output* find)
+OutputSP Experiment::searchOutput(const OutputSP find)
 {
-    for (Output* output : m_inputs->fileOutputs) {
-        if (output->operator ==(find)) {
-            return output;
-        }
-    }
-    for (Output* output : m_extraOutputs) {
-        if (output->operator ==(find)) {
+    for (OutputSP output : m_outputs) {
+        if (output->operator==(find)) {
             return output;
         }
     }
@@ -490,7 +480,7 @@ Experiment::ExperimentInputs* Experiment::readInputs(const MainApp* mainApp,
     }
 
     QString outHeader = generalAttrs->value(OUTPUT_HEADER).toQString();
-    std::vector<Output*> outputs;
+    std::vector<Cache*> fileCaches;
     if (!outHeader.isEmpty()) {
         const int numTrials = generalAttrs->value(GENERAL_ATTRIBUTE_TRIALS).toInt();
         Q_ASSERT(numTrials > 0);
@@ -499,8 +489,8 @@ Experiment::ExperimentInputs* Experiment::readInputs(const MainApp* mainApp,
             trialIds.emplace_back(i);
         }
 
-        outputs = Output::parseHeader(outHeader.split(";", QString::SkipEmptyParts), trialIds, mPlugin, errorMsg);
-        if (outputs.empty()) {
+        fileCaches = Output::parseHeader(outHeader.split(";", QString::SkipEmptyParts), trialIds, mPlugin, errorMsg);
+        if (fileCaches.empty()) {
             failedAttributes.append(OUTPUT_HEADER);
         }
 
@@ -523,17 +513,16 @@ Experiment::ExperimentInputs* Experiment::readInputs(const MainApp* mainApp,
     checkAll(modelAttrs, mPlugin->pluginAttrSpace());
     checkAll(graphAttrs, gPlugin->pluginAttrSpace());
 
+    ExperimentInputs* ei = new ExperimentInputs(generalAttrs, modelAttrs, graphAttrs, fileCaches);
+
     if (!failedAttributes.isEmpty()) {
         errorMsg += QString("The following attributes are missing/invalid: %1").arg(failedAttributes.join(","));
-        delete generalAttrs;
-        delete graphAttrs;
-        delete modelAttrs;
-        Utils::deleteAndShrink(outputs);
+        delete ei;
         return nullptr;
     }
 
     // that's great! everything seems to be valid
-    return new ExperimentInputs(generalAttrs, modelAttrs, graphAttrs, outputs);
+    return ei;
 }
 
 } // evoplex

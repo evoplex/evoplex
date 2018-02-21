@@ -9,20 +9,63 @@
 #include "output.h"
 #include "utils.h"
 
-namespace evoplex {
+namespace evoplex
+{
 
-DefaultOutput::DefaultOutput(const Function f, const Entity e, const ValueSpace *valSpace,
-                             Values inputs, const std::vector<int> trialIds)
-    : Output(inputs, trialIds)
+Cache::Cache(Values inputs, std::vector<int> trialIds, OutputSP parent)
+    : m_parent(parent)
+    , m_inputs(inputs)
+{
+    for (int trialId : trialIds) {
+        m_trials.insert({trialId, Data()});
+    }
+}
+
+void Cache::deleteCache()
+{
+    m_parent->deleteCache(this);
+}
+
+bool Cache::isEmpty(const int trialId) const
+{
+    std::unordered_map<int, Data>::const_iterator trial = m_trials.find(trialId);
+    if (trial != m_trials.end()) {
+        return trial->second.rows.empty();
+    }
+    return false;
+}
+
+QString Cache::printableHeader(const char sep, const bool joinInputs) const
+{
+    return Output::printableHeader(m_parent->printableHeaderPrefix(),
+                                   m_inputs, sep, joinInputs);
+}
+
+void Cache::flushAll()
+{
+    for (auto& it : m_trials) {
+        it.second.rows.clear();
+    }
+}
+
+/*******************************************************/
+/*******************************************************/
+
+DefaultOutput::DefaultOutput(const Function f, const Entity e, const ValueSpace* valSpace)
+    : Output()
     , m_func(f)
     , m_entity(e)
     , m_valueSpace(valSpace)
 {
+    m_headerPrefix = QString("%1_%2_%3_")
+            .arg(stringFromFunc(m_func))
+            .arg((m_entity == E_Agents ? "agents" : "edges"))
+            .arg(m_valueSpace->attrName());
 }
 
 void DefaultOutput::doOperation(const int trialId, const AbstractModel* model)
 {
-    if (m_trialIds.find(trialId) == m_trialIds.end()) {
+    if (m_allTrialIds.find(trialId) == m_allTrialIds.end()) {
         return;
     }
 
@@ -42,31 +85,9 @@ void DefaultOutput::doOperation(const int trialId, const AbstractModel* model)
     updateCaches(trialId, model->currStep(), allValues);
 }
 
-QString DefaultOutput::printableHeader(const char sep, const bool joinInputs) const
+bool DefaultOutput::operator==(const OutputSP output) const
 {
-    QString prefix = QString("%1_%2_%3_")
-            .arg(stringFromFunc(m_func))
-            .arg((m_entity == E_Agents ? "agents" : "edges"))
-            .arg(m_valueSpace->attrName());
-
-    QString ret;
-    if (joinInputs) {
-        ret = prefix;
-        for (Value val : m_allInputs) {
-            ret += val.toQString() + sep;
-        }
-    } else {
-        for (Value val : m_allInputs) {
-            ret += prefix + val.toQString() + sep;
-        }
-    }
-    ret.chop(1);
-    return ret;
-}
-
-bool DefaultOutput::operator==(const Output* output) const
-{
-    const DefaultOutput* other = dynamic_cast<const DefaultOutput*>(output);
+    auto other = std::dynamic_pointer_cast<const DefaultOutput>(output);
     if (!other) return false;
     if (m_func != other->function()) return false;
     if (m_entity != other->entity()) return false;
@@ -77,40 +98,22 @@ bool DefaultOutput::operator==(const Output* output) const
 /*******************************************************/
 /*******************************************************/
 
-CustomOutput::CustomOutput(Values inputs, const std::vector<int> trialIds)
-        : Output(inputs, trialIds)
+CustomOutput::CustomOutput() : Output()
 {
+    m_headerPrefix = "custom_";
 }
 
 void CustomOutput::doOperation(const int trialId, const AbstractModel* model)
 {
-    if (m_trialIds.find(trialId) == m_trialIds.end()) {
+    if (m_allTrialIds.find(trialId) == m_allTrialIds.end()) {
         return;
     }
     updateCaches(trialId, model->currStep(), model->customOutputs(m_allInputs));
 }
 
-QString CustomOutput::printableHeader(const char sep, const bool joinInputs) const
+bool CustomOutput::operator==(const OutputSP output) const
 {
-    const QString prefix = "custom_";
-    QString ret;
-    if (joinInputs) {
-        ret = prefix;
-        for (Value h : m_allInputs) {
-            ret += h.toQString() + sep;
-        }
-    } else {
-        for (Value h : m_allInputs) {
-            ret += prefix + h.toQString() + sep;
-        }
-    }
-    ret.chop(1);
-    return ret;
-}
-
-bool CustomOutput::operator==(const Output* output) const
-{
-    const CustomOutput* other = dynamic_cast<const CustomOutput*>(output);
+    auto other = std::dynamic_pointer_cast<const CustomOutput>(output);
     if (!other) return false;
     if (m_allInputs.size() != other->allInputs().size()) return false;
     for (int i = 0; i < m_allInputs.size(); ++i) {
@@ -123,53 +126,52 @@ bool CustomOutput::operator==(const Output* output) const
 /*******************************************************/
 /*******************************************************/
 
-Output::Output(Values inputs, const std::vector<int> trialIds)
-    : m_lastCacheId(-1)
+Output::~Output()
 {
-    addCache(inputs, trialIds);
-}
-
-bool Output::isEmpty(const int cacheId, const int trialId) const
-{
-    std::unordered_map<int, Cache>::const_iterator cache = m_caches.find(cacheId);
-    if (cache != m_caches.end()) {
-        std::unordered_map<int, Data>::const_iterator trial = cache->second.trials.find(trialId);
-        if (trial != cache->second.trials.end()) {
-            return trial->second.rows.empty();
-        }
+    for (Cache* c :  m_caches) {
+        delete c;
     }
-    return false;
 }
 
-const int Output::addCache(Values inputs, const std::vector<int> trialIds)
+void Output::flushAll()
 {
-    Cache cache;
-    cache.inputs = inputs;
+    for (Cache* c : m_caches) {
+        c->flushAll();
+    }
+}
+
+Cache* Output::addCache(Values inputs, const std::vector<int> trialIds)
+{
+    Cache* cache = new Cache(inputs, trialIds, shared_from_this());
     for (int trialId : trialIds) {
-        cache.trials.insert({trialId, Data()});
-        m_trialIds.insert(trialId);
+        m_allTrialIds.insert(trialId);
     }
-    m_caches.insert({++m_lastCacheId, cache});
+    m_caches.emplace_back(cache);
     updateListOfInputs();
-    return m_lastCacheId;
+    return cache;
 }
 
-void Output::removeCache(const int cacheId, const int trialId)
+void Output::deleteCache(Cache* cache)
 {
-    m_trialIds.erase(trialId);
-    m_caches.at(cacheId).trials.erase(trialId);
-    if (m_caches.at(cacheId).trials.empty()) {
-        m_caches.erase(cacheId);
-        updateListOfInputs();
+    std::vector<Cache*>::iterator it = std::find(m_caches.begin(), m_caches.end(), cache);
+    if (it == m_caches.end()) {
+        qFatal("[Output]: tried to remove a non-existent cache.");
     }
+    m_caches.erase(it);
+    updateListOfInputs();
+    delete cache;
+    cache = nullptr;
 }
 
 void Output::updateListOfInputs()
 {
+    m_allTrialIds.clear();
     m_allInputs.clear();
-    for (auto& itCache : m_caches) {
-        const Values& inputs = itCache.second.inputs;
-        m_allInputs.insert(m_allInputs.end(), inputs.begin(), inputs.end());
+    for (Cache* cache : m_caches) {
+        m_allInputs.insert(m_allInputs.end(), cache->m_inputs.cbegin(), cache->m_inputs.cend());
+        for (const auto& it : cache->m_trials) {
+            m_allTrialIds.insert(it.first);
+        }
     }
     // remove duplicates
     std::sort(m_allInputs.begin(), m_allInputs.end());
@@ -182,21 +184,19 @@ void Output::updateCaches(const int trialId, const int currStep, const Values& a
         return;
     }
 
-    for (auto& itCache : m_caches) {
-        Cache& cache = itCache.second;
-        std::unordered_map<int,Data>::iterator itData = cache.trials.find(trialId);
-        if (itData == cache.trials.end()) {
+    for (Cache* cache : m_caches) {
+        std::unordered_map<int, Cache::Data>::iterator itData = cache->m_trials.find(trialId);
+        if (itData == cache->m_trials.end()) {
             continue;
         }
 
-        Data& data = itData->second;
-        Row newRow;
+        Cache::Data& data = itData->second;
+        Cache::Row newRow;
         newRow.first = currStep;
-        newRow.second.reserve(cache.inputs.size());
+        newRow.second.reserve(cache->m_inputs.size());
 
-        for (Value input : cache.inputs) {
+        for (Value input : cache->m_inputs) {
             int col = std::find(m_allInputs.begin(), m_allInputs.end(), input) - m_allInputs.begin();
-            Q_ASSERT(col != m_allInputs.size()); // input must exist
             newRow.second.emplace_back(allValues.at(col));
         }
         if (data.rows.empty()) data.last = data.rows.before_begin();
@@ -204,10 +204,33 @@ void Output::updateCaches(const int trialId, const int currStep, const Values& a
     }
 }
 
-std::vector<Output*> Output::parseHeader(const QStringList& header, const std::vector<int> trialIds,
-                                         const ModelPlugin* model, QString& errorMsg)
+QString Output::printableHeader(const char sep, const bool joinInputs) const
 {
-    std::vector<Output*> outputs;
+    return printableHeader(m_headerPrefix, m_allInputs, sep, joinInputs);
+}
+
+QString Output::printableHeader(const QString& prefix, const Values& inputs,
+                                const char sep, const bool joinInputs)
+{
+    QString ret;
+    if (joinInputs) {
+        ret = prefix;
+        for (Value val : inputs) {
+            ret += val.toQString() + sep;
+        }
+    } else {
+        for (Value val : inputs) {
+            ret += prefix + val.toQString() + sep;
+        }
+    }
+    ret.chop(1);
+    return ret;
+}
+
+std::vector<Cache*> Output::parseHeader(const QStringList& header, const std::vector<int> trialIds,
+                                        const ModelPlugin* model, QString& errorMsg)
+{
+    std::vector<Cache*> caches;
     std::vector<Value> customHeader;
     for (QString h : header) {
         if (h.startsWith("custom_")) {
@@ -215,8 +238,8 @@ std::vector<Output*> Output::parseHeader(const QStringList& header, const std::v
             if (h.isEmpty()) {
                 errorMsg = "[OutputHeader] invalid header! Custom function cannot be empty.\n";
                 qWarning() << errorMsg;
-                Utils::deleteAndShrink(outputs);
-                return outputs;
+                Utils::deleteAndShrink(caches);
+                return caches;
             }
             customHeader.emplace_back(h);
             continue;
@@ -229,8 +252,8 @@ std::vector<Output*> Output::parseHeader(const QStringList& header, const std::v
         } else {
             errorMsg = QString("[OutputHeader] invalid header! Function does not exist. (%1)\n").arg(h);
             qWarning() << errorMsg;
-            Utils::deleteAndShrink(outputs);
-            return outputs;
+            Utils::deleteAndShrink(caches);
+            return caches;
         }
 
         AttributesSpace entityAttrSpace;
@@ -246,8 +269,8 @@ std::vector<Output*> Output::parseHeader(const QStringList& header, const std::v
         } else {
             errorMsg = QString("[OutputHeader] invalid header! Entity does not exist. (%1)\n").arg(h);
             qWarning() << errorMsg;
-            Utils::deleteAndShrink(outputs);
-            return outputs;
+            Utils::deleteAndShrink(caches);
+            return caches;
         }
 
         QStringList attrHeaderStr = h.split("_");
@@ -255,8 +278,8 @@ std::vector<Output*> Output::parseHeader(const QStringList& header, const std::v
         if (!valSpace->isValid()) {
             errorMsg = QString("[OutputHeader] invalid header! Attribute does not exist. (%1)\n").arg(h);
             qWarning() << errorMsg;
-            Utils::deleteAndShrink(outputs);
-            return outputs;
+            Utils::deleteAndShrink(caches);
+            return caches;
         }
 
         std::vector<Value> attrHeader; //inputs
@@ -266,8 +289,8 @@ std::vector<Output*> Output::parseHeader(const QStringList& header, const std::v
             if (!val.isValid()) {
                 errorMsg = QString("[OutputHeader] invalid header! Value of attribute is invalid. (%1)\n").arg(valStr);
                 qWarning() << errorMsg;
-                Utils::deleteAndShrink(outputs);
-                return outputs;
+                Utils::deleteAndShrink(caches);
+                return caches;
             }
             attrHeader.emplace_back(val);
         }
@@ -275,17 +298,19 @@ std::vector<Output*> Output::parseHeader(const QStringList& header, const std::v
         if (attrHeader.empty()) {
             errorMsg = "[OutputHeader] invalid header! Function cannot be empty.\n";
             qWarning() << errorMsg;
-            Utils::deleteAndShrink(outputs);
-            return outputs;
+            Utils::deleteAndShrink(caches);
+            return caches;
         }
 
-        outputs.emplace_back(new DefaultOutput(func, entity, valSpace, attrHeader, trialIds));
+        OutputSP output (new DefaultOutput(func, entity, valSpace));
+        caches.emplace_back(output->addCache(attrHeader, trialIds));
     }
 
     if (!customHeader.empty()) {
-        outputs.emplace_back(new CustomOutput(customHeader, trialIds));
+        OutputSP output (new CustomOutput());
+        caches.emplace_back(output->addCache(customHeader, trialIds));
     }
 
-    return outputs;
+    return caches;
 }
 }

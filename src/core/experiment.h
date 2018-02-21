@@ -11,6 +11,7 @@
 #include <QString>
 #include <QTextStream>
 #include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
 #include "experimentsmgr.h"
@@ -43,17 +44,18 @@ public:
         const Attributes* generalAttrs;
         const Attributes* modelAttrs;
         const Attributes* graphAttrs;
-        const std::vector<Output*> fileOutputs;
+        const std::vector<Cache*> fileCaches;
 
         ExperimentInputs(const Attributes* general, const Attributes* model,
-                         const Attributes* graph, const std::vector<Output*> outputs)
-            : generalAttrs(general), modelAttrs(model), graphAttrs(graph), fileOutputs(outputs) {}
+                         const Attributes* graph, const std::vector<Cache*> caches)
+            : generalAttrs(general), modelAttrs(model), graphAttrs(graph), fileCaches(caches) {}
 
         ~ExperimentInputs() {
             delete generalAttrs;
             delete modelAttrs;
             delete graphAttrs;
-            qDeleteAll(fileOutputs);
+            for (Cache* c : fileCaches)
+                c->deleteCache();
         }
     };
 
@@ -106,10 +108,10 @@ public:
     inline bool autoDeleteTrials() const { return m_autoDeleteTrials; }
     inline void setAutoDeleteTrials(bool b) { m_autoDeleteTrials = b; }
 
-    inline bool hasOutputs() const { return !m_inputs->fileOutputs.empty() || !m_extraOutputs.empty(); }
-    inline void addOutput(Output* output) { m_extraOutputs.emplace_back(output); }
-    bool removeOutput(Output* output);
-    Output* searchOutput(const Output* find);
+    inline bool hasOutputs() const { return !m_outputs.empty(); }
+    inline void addOutput(OutputSP output) { m_outputs.insert(output); }
+    bool removeOutput(OutputSP output);
+    OutputSP searchOutput(const OutputSP find);
 
     AbstractModel* trial(int trialId) const;
     inline const std::unordered_map<int, AbstractModel*>& trials() const { return m_trials; }
@@ -140,7 +142,7 @@ private:
     int m_stopAt;
 
     QString m_fileHeader;   // file header is the same for all trials; let's save it then
-    std::vector<Output*> m_extraOutputs;
+    std::unordered_set<OutputSP> m_outputs;
     std::unordered_map<int, QTextStream*> m_fileStreams; // <trialId, stream>
 
     int m_pauseAt;

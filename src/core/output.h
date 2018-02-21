@@ -7,6 +7,7 @@
 #define OUTPUT_H
 
 #include <forward_list>
+#include <memory>
 #include <set>
 #include <unordered_map>
 #include <vector>
@@ -16,67 +17,91 @@
 #include "modelplugin.h"
 #include "stats.h"
 
-namespace evoplex {
-
-class Output
+namespace evoplex
 {
+
+class Output;
+class CustomOutput;
+class DefaultOutput;
+
+typedef std::shared_ptr<Output> OutputSP;
+typedef std::shared_ptr<CustomOutput> CustomOutputSP;
+typedef std::shared_ptr<DefaultOutput> DefaultOutputSP;
+
+class Cache
+{
+    friend class Output;
 public:
     typedef std::pair<int, Values> Row; // <rowNumber, values>
 
-    explicit Output(Values inputs, const std::vector<int> trialIds);
+    bool isEmpty(const int trialId) const;
+
+    void deleteCache();
+
+    QString printableHeader(const char sep, const bool joinInputs) const;
+
+    inline OutputSP output() const { return m_parent; }
+    inline const Values& inputs() const { return m_inputs; }
+    inline const Row& readFrontRow(const int trialId) const { return m_trials.at(trialId).rows.front(); }
+    inline void flushFrontRow(const int trialId) { m_trials.at(trialId).rows.pop_front(); }
+    void flushAll();
+
+private:
+    struct Data {
+        std::forward_list<Row> rows;
+        std::forward_list<Row>::const_iterator last;
+    };
+
+    OutputSP m_parent;
+    Values m_inputs; // columns
+    std::unordered_map<int, Data> m_trials;
+
+    // let's keep it private to ensure that only Output can create a Cache
+    explicit Cache(Values inputs, std::vector<int> trialIds, OutputSP parent);
+};
+
+class Output : public std::enable_shared_from_this<Output>
+{
+public:
+    static std::vector<Cache*> parseHeader(const QStringList& header,
+        const std::vector<int> trialIds, const ModelPlugin* model, QString& errorMsg);
+
+    static QString printableHeader(const QString& prefix, const Values& inputs,
+                                   const char sep, const bool joinInputs);
+
+    virtual ~Output();
 
     virtual void doOperation(const int trialId, const AbstractModel* model) = 0;
 
     // Printable header with all columns of this operation separated by 'sep'.
     // If joinInputs is enabled: eg: func_attr_input1[sep]input2
     // If joinInputs is disabled: eg: func_attr_input1[sep]func_attr_input2
-    virtual QString printableHeader(const char sep, const bool joinInputs) const = 0;
+    QString printableHeader(const char sep, const bool joinInputs) const;
 
-    virtual bool operator==(const Output* output) const = 0;
+    // Format for CustomOutput: "custom_nameDefinedInTheModel"
+    // Format for DefaultOutput: "function_entity_attrName_value"
+    const QString& printableHeaderPrefix() const { return m_headerPrefix; }
 
-    static std::vector<Output*> parseHeader(const QStringList& header,
-        const std::vector<int> trialIds, const ModelPlugin* model, QString& errorMsg);
+    virtual bool operator==(const OutputSP output) const = 0;
 
-    const int addCache(Values inputs, const std::vector<int> trialIds);
-
-    inline bool isEmpty() const
-    { return m_caches.empty(); }
-
-    bool isEmpty(const int cacheId, const int trialId) const;
-
-    inline const Row& readFrontRow(const int cacheId, const int trialId) const
-    { return m_caches.at(cacheId).trials.at(trialId).rows.front(); }
-
-    inline void flushFrontRow(const int cacheId, const int trialId)
-    { m_caches.at(cacheId).trials.at(trialId).rows.pop_front(); }
+    Cache* addCache(Values inputs, const std::vector<int> trialIds);
 
     // CAUTION! We trust it will NEVER be called in a running experiment.
     // Make sure it is paused first.
-    void removeCache(const int cacheId, const int trialId);
+    void deleteCache(Cache* cache);
 
-    inline const Values& allInputs() const
-    { return m_allInputs; }
+    // flushes all its child caches
+    void flushAll();
 
-    inline const Values& inputs(const int cacheId) const
-    { return m_caches.at(cacheId).inputs; }
-
-    inline const std::set<int>& trialIds() const
-    { return m_trialIds; }
+    inline const std::vector<Cache*>& caches() const { return m_caches; }
+    inline bool isEmpty() const { return m_caches.empty(); }
+    inline const Values& allInputs() const { return m_allInputs; }
+    inline const std::set<int>& trialIds() const { return m_allTrialIds; }
 
 protected:
-    struct Data {
-        std::forward_list<Row> rows;
-        std::forward_list<Row>::const_iterator last;
-    };
-
-    struct Cache {
-        Values inputs; // columns
-        std::unordered_map<int, Data> trials;
-    };
-
-    int m_lastCacheId;
-    std::unordered_map<int, Cache> m_caches;
-    std::set<int> m_trialIds;   // convenient to handle 'doOperation' requests
+    QString m_headerPrefix;
+    std::vector<Cache*> m_caches; // child caches
+    std::set<int> m_allTrialIds;  // convenient to handle 'doOperation' requests
     Values m_allInputs;
 
     // auxiliar method for 'doOperation()'
@@ -91,15 +116,11 @@ private:
 class CustomOutput: public Output
 {
 public:
-    explicit CustomOutput(Values inputs, const std::vector<int> trialIds);
+    explicit CustomOutput();
 
     virtual void doOperation(const int trialId, const AbstractModel* model);
 
-    // Printable header with all columns of this operation separated by 'sep'.
-    // Format: "custom_nameDefinedInTheModel"
-    virtual QString printableHeader(const char sep, const bool joinInputs) const;
-
-    virtual bool operator==(const Output* output) const;
+    virtual bool operator==(const OutputSP output) const;
 };
 
 
@@ -127,16 +148,11 @@ public:
         return "invalid";
     }
 
-    explicit DefaultOutput(const Function f, const Entity e, const ValueSpace* valSpace,
-                           Values inputs, const std::vector<int> trialIds);
+    explicit DefaultOutput(const Function f, const Entity e, const ValueSpace* valSpace);
 
     virtual void doOperation(const int trialId, const AbstractModel* model);
 
-    // Printable header with all columns of this operation separated by 'sep'.
-    // Format: "function_entity_attrName_value"
-    virtual QString printableHeader(const char sep, const bool joinInputs) const;
-
-    virtual bool operator==(const Output* output) const;
+    virtual bool operator==(const OutputSP output) const;
 
     inline Function function() const { return m_func; }
     inline QString functionStr()  const { return DefaultOutput::stringFromFunc(m_func); }
