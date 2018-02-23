@@ -50,13 +50,18 @@ void TitleBar::paintEvent(QPaintEvent* pe)
 
 void TitleBar::slotRestarted()
 {
+    int currTrial = m_ui->cbTrial->currentText().toInt();
     m_ui->cbTrial->blockSignals(true);
     m_ui->cbTrial->clear();
     for (int trialId = 0; trialId < m_exp->numTrials(); ++trialId) {
         m_ui->cbTrial->insertItem(trialId, QString::number(trialId));
     }
+    m_ui->cbTrial->setCurrentText(QString::number(currTrial)); // try to keep the same id
     m_ui->cbTrial->blockSignals(false);
-    emit (trialSelected(m_ui->cbTrial->currentText().toInt()));
+
+    if (currTrial != m_ui->cbTrial->currentText().toInt()) {
+        emit (trialSelected(m_ui->cbTrial->currentText().toInt()));
+    }
 }
 
 } // evoplex

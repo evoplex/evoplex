@@ -333,48 +333,31 @@ void ExperimentDesigner::slotOutputWidget()
         trialIds.emplace_back(id);
     }
 
-    std::vector<Output*> currentOutputs;
+    std::vector<Cache*> currFileCaches;
     const ModelPlugin* model = m_mainApp->models().value(m_selectedModelId);
     QString currentHeader = m_widgetFields.value(OUTPUT_HEADER).value<QLineEdit*>()->text();
     if (!currentHeader.isEmpty()) {
         QString errorMsg;
-        currentOutputs = Output::parseHeader(currentHeader.split(";"), trialIds, model, errorMsg);
+        currFileCaches = Output::parseHeader(currentHeader.split(";", QString::SkipEmptyParts), trialIds, model, errorMsg);
         if (!errorMsg.isEmpty()) {
             QMessageBox::warning(this, "Output Creator", errorMsg);
-            Utils::deleteAndShrink(currentOutputs);
+            for (Cache* c : currFileCaches) c->deleteCache();
         }
     }
 
-    OutputWidget* ow = new OutputWidget(model, this);
-    ow->setAttribute(Qt::WA_DeleteOnClose, true);
-    ow->setWindowModality(Qt::ApplicationModal);
-    ow->setTrialIds(trialIds);
-    ow->fill(currentOutputs);
-    ow->show();
+    OutputWidget* ow = new OutputWidget(model, trialIds, this, currFileCaches);
+    if (ow->exec() == QDialog::Accepted) {
+        std::unordered_set<OutputSP> outputs;
+        for (auto& it : ow->caches()) outputs.insert(it.second->output());
 
-    connect(ow, &OutputWidget::closed,
-    [this, ow](std::vector<Output*> outputs) {
-        // join all Output objects which have the same function, entity and attribute
-        QStringList uniqueOutputs;
-        for (int o1 = 0; o1 < outputs.size(); ++o1) {
-            if (!outputs.at(o1)) {
-                continue;
-            }
-            QString outputStr = outputs.at(o1)->printableHeader(';');
-            for (int o2 = 0; o2 < outputs.size(); ++o2) {
-                if (o1 == o2 || !outputs.at(o2) || !outputs.at(o1)->operator ==(outputs.at(o2))) {
-                    continue;
-                }
-                outputStr += "_" + outputs.at(o2)->allInputs().front().toQString();
-                delete outputs.at(o2);
-                outputs.at(o2) = nullptr;
-            }
-            uniqueOutputs.push_back(outputStr);
-        }
+        QString outputStr;
+        for (OutputSP o : outputs) outputStr += o->printableHeader('_', true) + ";";
+        outputStr.chop(1);
 
-        m_widgetFields.value(OUTPUT_HEADER).value<QLineEdit*>()->setText(uniqueOutputs.join(';'));
-        ow->deleteLater();
-    });
+        m_widgetFields.value(OUTPUT_HEADER).value<QLineEdit*>()->setText(outputStr);
+    }
+    ow->deleteLater();
+    for (Cache* c : currFileCaches) c->deleteCache();
 }
 
 Experiment::ExperimentInputs* ExperimentDesigner::readInputs(const int expId, QString& error) const

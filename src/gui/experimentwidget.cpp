@@ -104,7 +104,10 @@ ExperimentWidget::ExperimentWidget(Experiment* exp, MainGUI* mainGUI, ProjectsPa
         }
     });
 
-    connect(m_timer, &QTimer::timeout, [this]() { emit(updateWidgets(false)); });
+    connect(m_timer, &QTimer::timeout, [this]() {
+        if (m_exp->expStatus() != Experiment::INVALID)
+            emit(updateWidgets(false));
+    });
     m_timer->start(100);
 }
 
