@@ -12,7 +12,9 @@ set(EVOPLEX_VERSION 0.0.0)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 # Instruct CMake to run moc automatically when needed.
-cmake_policy(SET CMP0071 NEW) # process generated files
+if(POLICY CMP0071)
+  cmake_policy(SET CMP0071 NEW) # process generated files
+endif()
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
