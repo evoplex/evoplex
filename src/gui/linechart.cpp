@@ -9,6 +9,7 @@
 
 #include "linechart.h"
 #include "titlebar.h"
+#include "ui_linechartsettings.h"
 
 namespace evoplex {
 
@@ -19,8 +20,9 @@ LineChart::LineChart(Experiment* exp, QWidget* parent)
     , m_chart(new QtCharts::QChart())
     , m_maxY(0)
     , m_finished(false)
-    , m_currentTrialId(0)
-    , m_lastSeriesId(-1)
+    , m_currTrialId(0)
+    , m_model(nullptr)
+    , m_currStep(0)
 {
     setWindowTitle("Line Chart");
     setAttribute(Qt::WA_DeleteOnClose, true);
@@ -28,19 +30,22 @@ LineChart::LineChart(Experiment* exp, QWidget* parent)
     Q_ASSERT(!m_exp->autoDeleteTrials());
     connect(m_exp, SIGNAL(restarted()), SLOT(slotRestarted()));
 
-    TitleBar* titleBar = new TitleBar(exp, this);
-    setTitleBarWidget(titleBar);
-    connect(titleBar, SIGNAL(trialSelected(int)), this, SLOT(setSelectedTrial(int)));
-    setSelectedTrial(0);
-
     QDialog* dlg = new QDialog(this);
     m_settingsDlg->setupUi(dlg);
-    OutputWidget* outputWidget = new OutputWidget(m_exp->modelPlugin(), this);
-    m_settingsDlg->seriesLayout->addWidget(outputWidget);
-    connect(outputWidget, SIGNAL(closed(std::vector<Output*>)), SLOT(slotAddSeries(std::vector<Output*>)));
-    connect(titleBar, &TitleBar::openSettingsDlg,
-            [this, outputWidget, dlg]() { outputWidget->setTrialIds({m_currentTrialId}); dlg->show(); });
-    dlg->hide();
+    connect(m_settingsDlg->bEditSeries, SIGNAL(clicked(bool)), SLOT(slotOutputWidget()));
+
+    TitleBar* titleBar = new TitleBar(exp, this);
+    setTitleBarWidget(titleBar);
+    setTrial(0); // init
+    connect(titleBar, SIGNAL(trialSelected(int)), SLOT(setTrial(int)));
+    connect(titleBar, SIGNAL(openSettingsDlg()), dlg, SLOT(show()));
+
+    connect(exp, &Experiment::trialCreated, [this](int trialId) {
+        if (trialId == m_currTrialId) {
+            m_model = m_exp->trial(trialId);
+            m_currStep = 0;
+        }
+    });
 
     m_chart->legend()->hide();
     m_chart->setAnimationOptions(QtCharts::QChart::NoAnimation);
@@ -55,8 +60,54 @@ LineChart::LineChart(Experiment* exp, QWidget* parent)
 
 LineChart::~LineChart()
 {
+    removeAllSeries();
     delete m_settingsDlg;
     delete m_chart;
+}
+
+void LineChart::slotOutputWidget()
+{
+    if (m_exp->expStatus() == Experiment::RUNNING
+            || m_exp->expStatus() == Experiment::QUEUED) {
+        QMessageBox::warning(this, "Line Chart",
+                    "You cannot edit the series of a running experiment.\n"
+                    "Please, pause it and try again.");
+        return;
+    }
+
+    std::vector<Cache*> caches;
+    if (!m_series.empty()) {
+        caches.reserve(m_series.size());
+        for (Series& s : m_series) {
+            caches.emplace_back(s.cache);
+        }
+    }
+
+    OutputWidget* ow = new OutputWidget(m_exp->modelPlugin(), {m_currTrialId}, this, caches);
+    if (ow->exec() == QDialog::Rejected) {
+        return; // nothing to do
+    }
+
+    removeAllSeries();
+
+    for (auto& it : ow->caches()) {
+        Cache* cache = it.second;
+        Series s;
+        s.series = new QtCharts::QLineSeries();
+        //s.series->setUseOpenGL(true); TODO: make sure we can call it
+        OutputSP existingOutput = m_exp->searchOutput(cache->output());
+        if (existingOutput && existingOutput != cache->output()) {
+            s.cache = existingOutput->addCache(cache->inputs(), {m_currTrialId});
+            cache->deleteCache();
+        } else {
+            s.cache = cache;
+            m_exp->addOutput(cache->output());
+        }
+        m_series.emplace_back(s);
+        m_chart->addSeries(s.series);
+    }
+
+    ow->deleteLater();
 }
 
 void LineChart::slotRestarted()
@@ -66,84 +117,69 @@ void LineChart::slotRestarted()
         return;
     }
 
-    for (auto& i : m_series) {
-        Series& s = i.second;
+    for (Series& s : m_series) {
         s.series->clear(); // remove all points
+        m_exp->addOutput(s.cache->output()); // make sure we reinsert everything
     }
     m_finished = false;
 }
 
-void LineChart::setSelectedTrial(int trialId)
+void LineChart::setTrial(int trialId)
 {
-    if (m_series.empty()) {
-        m_currentTrialId = trialId;
+    if (m_exp->expStatus() == Experiment::RUNNING
+               || m_exp->expStatus() == Experiment::QUEUED) {
+        QMessageBox::warning(this, "Line Chart",
+                "Tried to change the trial in a running experiment.\n"
+                "Please, pause it and try again.");
         return;
     }
 
-    int res = QMessageBox::warning(this, "Line Chart",
-                         "Are you sure you want to change the trial?\n"
-                         "It'll delete the current chart.",
-                         QMessageBox::Yes, QMessageBox::Cancel);
-    if (res == QMessageBox::Cancel) {
-        return;
-    }
-
-    for (auto& i : m_series) {
-        Series& s = i.second;
-        s.series->clear(); // remove all points
-        Values inputs = s.output->inputs(s.cacheIdx, m_currentTrialId); // keep the same inputs
-        s.output->removeCache(s.cacheIdx, m_currentTrialId);
-        s.cacheIdx = s.output->addCache(inputs, {trialId});
-    }
-
-    m_currentTrialId = trialId;
-}
-
-void LineChart::removeSeries(int seriesId)
-{
-    Series& s = m_series.at(seriesId);
-    m_chart->removeSeries(s.series);
-    s.output->removeCache(s.cacheIdx, m_currentTrialId);
-    if (s.output->isEmpty()) {
-        m_exp->removeOutput(s.output);
-    }
-    m_series.erase(seriesId);
-}
-
-void LineChart::slotAddSeries(std::vector<Output*> newOutputs)
-{
-    for (Output* output : newOutputs) {
-        Series s;
-        s.series = new QtCharts::QLineSeries();
-        //s.series->setUseOpenGL(true); TODO: make sure we can call it
-        Output* existingOutput = m_exp->searchOutput(output);
-        if (existingOutput) {
-            s.cacheIdx = existingOutput->addCache({output->allInputs()}, {m_currentTrialId});
-            s.output = existingOutput;
-            if (existingOutput != output) {
-                delete output;
-                output = nullptr;
-            }
-        } else {
-            s.cacheIdx = 0;
-            s.output = output;
-            m_exp->addOutput(output);
+    if (!m_series.empty()) {
+        int res = QMessageBox::warning(this, "Line Chart",
+                    "Are you sure you want to change the trial?\n"
+                    "It'll delete the current chart.\n"
+                    "If you don't want to delete it now, you could just open another line chart.",
+                    QMessageBox::Yes, QMessageBox::Cancel);
+        if (res == QMessageBox::Cancel) {
+            return;
         }
-        m_series.insert({++m_lastSeriesId, s});
-        m_chart->addSeries(s.series);
     }
+
+    m_currTrialId = trialId;
+    m_model = m_exp->trial(trialId);
+
+    for (Series& s : m_series) {
+        s.series->clear(); // remove all points
+        Values inputs = s.cache->inputs(); // keep the same inputs
+        OutputSP parent = s.cache->output(); // keep the same parent
+        s.cache->deleteCache();
+        s.cache = parent->addCache(inputs, {trialId});
+    }
+}
+
+void LineChart::removeAllSeries()
+{
+    for (Series& s : m_series) {
+        OutputSP parent = s.cache->output();
+        s.cache->deleteCache();
+        if (parent->isEmpty()) {
+            m_exp->removeOutput(parent);
+        }
+    }
+    m_chart->removeAllSeries();
+    m_series.clear();
 }
 
 void LineChart::updateSeries()
 {
-    if (!isVisible() || m_series.empty() || m_finished) {
+    if (!m_model || !m_chart->isVisible() || m_series.empty() || m_model->currStep() == m_currStep) {
         return;
     }
 
+    float minX = EVOPLEX_MAX_STEPS;
     float maxY = m_maxY;
-    for (auto& it : m_series) {
-        Series& s = it.second;
-        if (s.output->isEmpty(s.cacheIdx, m_currentTrialId)) {
+    for (Series& s : m_series) {
+        if (s.cache->isEmpty(m_currTrialId)) {
             continue;
         }
 
@@ -155,7 +191,7 @@ void LineChart::updateSeries()
         int i = 0;
         bool lastWasDuplicated = false;
         do {
-            const Output::Row& row = s.output->readFrontRow(s.cacheIdx, m_currentTrialId);
+            const Cache::Row& row = s.cache->readFrontRow(m_currTrialId);
             Q_ASSERT(row.second.size() == 1);
 
             x = row.first;
@@ -166,7 +202,7 @@ void LineChart::updateSeries()
             } else {
                 qFatal("[LineChart] : the type is invalid!");
             }
-            s.output->flushFrontRow(s.cacheIdx, m_currentTrialId);
+            s.cache->flushFrontRow(m_currTrialId);
 
             // we skip the duplicated rows to reduce the amount of unnecessary points
             if (!points.isEmpty()) {
@@ -180,17 +216,20 @@ void LineChart::updateSeries()
             }
 
             points.push_back(QPointF(x, y));
-            if (y > maxY) {
-                maxY = y;
-            }
+            if (x < minX) minX = x;
+            if (y > maxY) maxY = y;
             ++i;
-        } while (i < 10000 && !s.output->isEmpty(s.cacheIdx, m_currentTrialId));
+        } while (i < 10000 && !s.cache->isEmpty(m_currTrialId));
 
         if (lastWasDuplicated) {
             points.push_back(QPointF(x, y));
         }
 
         s.series->replace(points);
+    }
+
+    if (minX < EVOPLEX_MAX_STEPS) {
+        m_currStep = minX;
     }
 
     if (maxY != m_maxY) {
@@ -202,9 +241,8 @@ void LineChart::updateSeries()
         m_chart->axisY()->setGridLineVisible(false);
     }
 
-    const Series& s = m_series.cbegin()->second;
-    m_finished = s.output->isEmpty(s.cacheIdx, m_currentTrialId)
-                    && m_exp->expStatus() == Experiment::FINISHED;
+    m_finished = m_series.front().cache->isEmpty(m_currTrialId)
+            && m_exp->expStatus() == Experiment::FINISHED;
 }
 
-}
+} // evoplex

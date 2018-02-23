@@ -11,8 +11,9 @@
 #include <QtCharts/QLineSeries>
 
 #include "outputwidget.h"
-#include "ui_linechartsettings.h"
 #include "core/experiment.h"
+
+class Ui_LineChartSettings;
 
 namespace evoplex {
 
@@ -24,28 +25,32 @@ public:
     explicit LineChart(Experiment* exp, QWidget* parent);
     ~LineChart();
 
-private slots:
-    void slotRestarted();
-    void setSelectedTrial(int trialId);
-    void slotAddSeries(std::vector<Output*> newOutputs);
+public slots:
     void updateSeries();
-    void removeSeries(int seriesId);
+
+private slots:
+    void slotOutputWidget();
+    void slotRestarted();
+    void setTrial(int trialId);
 
 private:
     struct Series {
         QtCharts::QLineSeries* series;
-        Output* output;
-        int cacheIdx = 0;
+        Cache* cache;
     };
 
     Ui_LineChartSettings* m_settingsDlg;
     Experiment* m_exp;
     QtCharts::QChart* m_chart;
-    std::unordered_map<int, Series> m_series;
+    std::vector<Series> m_series;
     float m_maxY;
     bool m_finished;
-    int m_currentTrialId;
-    int m_lastSeriesId;
+    int m_currTrialId;
+
+    AbstractModel* m_model;
+    int m_currStep;
+
+    void removeAllSeries();
 };
 }
 
