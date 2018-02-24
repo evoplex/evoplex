@@ -9,7 +9,7 @@
 #include <functional>
 #include <vector>
 
-#include "core/plugininterfaces.h"
+#include <evoplex/plugininterfaces.h>
 
 namespace evoplex {
 class SquareGrid: public AbstractGraph

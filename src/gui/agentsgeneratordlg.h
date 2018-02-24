@@ -8,9 +8,10 @@
 
 #include <QDialog>
 
-#include "ui_agentsgeneratordlg.h"
+#include "valuespace.h"
 #include "core/agentsgenerator.h"
-#include "core/valuespace.h"
+
+class Ui_AgentsGeneratorDlg;
 
 namespace evoplex
 {

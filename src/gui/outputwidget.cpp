@@ -7,7 +7,7 @@
 #include <QMessageBox>
 
 #include "outputwidget.h"
-#include "core/utils.h"
+#include "ui_outputwidget.h"
 
 namespace evoplex {
 

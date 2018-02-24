@@ -7,7 +7,6 @@
 #include <QtMath>
 
 #include "graph.h"
-#include "core/utils.h"
 
 namespace evoplex {
 

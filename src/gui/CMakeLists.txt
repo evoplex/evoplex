@@ -70,16 +70,4 @@ qt5_wrap_ui(EVOPLEX_GUI_UI ${EVOPLEX_GUI_UI})
 
 add_library(EvoplexGUI SHARED ${EVOPLEX_GUI_CXX} ${EVOPLEX_GUI_UI})
 target_link_libraries(EvoplexGUI EvoplexCore Qt5::Core Qt5::Concurrent Qt5::Widgets Qt5::Charts)
-set_target_properties(EvoplexGUI PROPERTIES
-  LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib/evoplex)
-
-install(TARGETS EvoplexGUI
-  LIBRARY DESTINATION lib/evoplex
-  ARCHIVE DESTINATION lib/evoplex
-  INCLUDES DESTINATION include/evoplex/gui
-)
-
-target_include_directories(EvoplexGUI PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src>
-  $<INSTALL_INTERFACE:include/evoplex>
-)
+target_include_directories(EvoplexGUI PRIVATE ${CMAKE_SOURCE_DIR}/src)

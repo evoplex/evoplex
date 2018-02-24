@@ -1,22 +1,24 @@
-set(EVOPLEX_CORE_H
-  constants.h
-  output.h
-  plugininterfaces.h
-  prg.h
-  stats.h
-  utils.h
+set(EVOPLEX_CORE_INCLUDE
+  include/plugininterfaces.h
+  include/abstractgraph.h
+  include/abstractmodel.h
 
-  abstractgraph.h
-  abstractmodel.h
+  include/attributes.h
+  include/agent.h
+  include/edge.h
+  include/constants.h
+  include/prg.h
+  include/utils.h
+  include/value.h
+  include/valuespace.h
+)
+set(EVOPLEX_CORE_H
   abstractplugin.h
   graphplugin.h
   modelplugin.h
-  attributes.h
-  agent.h
   agentsgenerator.h
-  edge.h
-  value.h
-  valuespace.h
+  output.h
+  stats.h
 
   experiment.h
   experimentsmgr.h
@@ -45,20 +47,27 @@ add_library(EvoplexCore SHARED ${EVOPLEX_CORE_CXX})
 target_link_libraries(EvoplexCore Qt5::Core Qt5::Concurrent)
 set_target_properties(EvoplexCore PROPERTIES
   LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib/evoplex)
+target_include_directories(EvoplexCore
+  PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src/core/include>
+    $<INSTALL_INTERFACE:include/evoplex>
+  PRIVATE
+    $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src/core>
+)
 
 install(
   TARGETS EvoplexCore
   EXPORT EvoplexCoreTargets
   LIBRARY DESTINATION lib/evoplex
   ARCHIVE DESTINATION lib/evoplex
-  INCLUDES DESTINATION include/evoplex/core
+  INCLUDES DESTINATION include/evoplex
 )
 
 install(
   FILES
-    ${EVOPLEX_CORE_H}
+    ${EVOPLEX_CORE_INCLUDE}
     "${CMAKE_CURRENT_BINARY_DIR}/evoplexcore_export.h"
-  DESTINATION include/evoplex/core
+  DESTINATION include/evoplex
   COMPONENT Devel
 )
 

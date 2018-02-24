@@ -9,8 +9,8 @@
 #include <functional>
 
 #include "agentsgeneratordlg.h"
-#include "core/agent.h"
-#include "core/utils.h"
+#include "ui_agentsgeneratordlg.h"
+#include "agent.h"
 
 namespace evoplex
 {

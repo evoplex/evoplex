@@ -4,7 +4,7 @@
  */
 
 #include <QtTest>
-#include "core/prg.h"
+#include <evoplex/prg.h>
 
 using namespace evoplex;
 

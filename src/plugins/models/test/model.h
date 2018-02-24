@@ -6,7 +6,7 @@
 #ifndef TEST_H
 #define TEST_H
 
-#include "core/plugininterfaces.h"
+#include <evoplex/plugininterfaces.h>
 
 namespace evoplex {
 class ModelTest: public AbstractModel

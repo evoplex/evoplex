@@ -4,7 +4,7 @@
  */
 
 #include <QtTest>
-#include "core/value.h"
+#include <value.h>
 
 using namespace evoplex;
 

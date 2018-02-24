@@ -10,7 +10,8 @@
 
 #include "core/output.h"
 #include "core/mainapp.h"
-#include "ui_outputwidget.h"
+
+class Ui_OutputWidget;
 
 namespace evoplex {
 

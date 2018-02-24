@@ -9,8 +9,7 @@
 #include <QPair>
 #include <vector>
 
-#include "core/agent.h"
-#include "core/plugininterfaces.h"
+#include <evoplex/plugininterfaces.h>
 
 namespace evoplex {
 class CustomGraph: public AbstractGraph

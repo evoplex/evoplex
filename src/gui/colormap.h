@@ -11,8 +11,8 @@
 #include <unordered_map>
 #include <vector>
 
-#include "core/attributes.h"
-#include "core/valuespace.h"
+#include "attributes.h"
+#include "valuespace.h"
 
 namespace evoplex
 {
