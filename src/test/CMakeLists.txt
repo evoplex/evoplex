@@ -1,6 +1,9 @@
 enable_testing()
 
-set (TESTS tst_prg tst_value)
+set(TESTS
+  tst_prg
+  tst_value
+)
 
 foreach(TEST ${TESTS})
   add_executable(${TEST} ${TEST}.cpp)
