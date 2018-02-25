@@ -6,17 +6,10 @@
 #ifndef UTILS_H
 #define UTILS_H
 
-#include <QFileInfo>
-#include <QVariant>
-#include <QVector>
-#include <QtDebug>
-#include <float.h>
+#include <QHash>
+#include <map>
+#include <vector>
 #include <unordered_set>
-
-#include "agent.h"
-#include "attributes.h"
-#include "prg.h"
-#include "valuespace.h"
 
 namespace evoplex
 {

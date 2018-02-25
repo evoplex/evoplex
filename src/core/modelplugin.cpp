@@ -3,6 +3,7 @@
  * @author Marcos Cardinot <mcardinot@gmail.com>
  */
 
+#include <QDebug>
 #include <QJsonArray>
 
 #include "modelplugin.h"

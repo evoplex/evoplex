@@ -3,11 +3,11 @@
  * @author Marcos Cardinot <mcardinot@gmail.com>
  */
 
+#include <QDebug>
 #include <QJsonArray>
 
 #include "graphplugin.h"
 #include "abstractplugin.h"
-#include "utils.h"
 
 namespace evoplex {
 

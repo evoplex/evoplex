@@ -3,8 +3,11 @@
  * @author Marcos Cardinot <mcardinot@gmail.com>
  */
 
+#include <QDebug>
+#include <QFileInfo>
+#include <float.h>
+
 #include "valuespace.h"
-#include "utils.h"
 
 namespace evoplex
 {

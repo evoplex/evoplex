@@ -6,6 +6,8 @@
 #ifndef AGENTGENERATOR_H
 #define AGENTGENERATOR_H
 
+#include <functional>
+
 #include "agent.h"
 #include "modelplugin.h"
 
