@@ -59,6 +59,7 @@ private:
     std::list<Experiment*> m_toDestroy;
 
     // trigged when an experiment ends (futurewatcher)
+    // also runs in a work thread
     void finished(Experiment* exp);
 };
 }

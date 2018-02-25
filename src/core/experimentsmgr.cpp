@@ -126,8 +126,6 @@ void ExperimentsMgr::play(Experiment* exp)
 
 void ExperimentsMgr::finished(Experiment* exp)
 {
-    QMutexLocker locker(&m_mutex);
-
     m_running.remove(exp);
     if (m_running.empty()) {
         m_timerProgress->stop();
