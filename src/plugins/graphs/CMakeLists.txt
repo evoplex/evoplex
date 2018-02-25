@@ -1,2 +1,0 @@
-ADD_SUBDIRECTORY(customgraph)
-ADD_SUBDIRECTORY(squaregrid)

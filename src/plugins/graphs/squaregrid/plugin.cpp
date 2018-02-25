@@ -6,7 +6,7 @@
 #include <QtDebug>
 #include <QtMath>
 
-#include "graph.h"
+#include "plugin.h"
 
 namespace evoplex {
 
@@ -146,4 +146,4 @@ SquareGrid::edges2d SquareGrid::undirected8Edges(const int id, const int width)
 
 } // evoplex
 REGISTER_GRAPH(SquareGrid)
-#include "graph.moc"
+#include "plugin.moc"

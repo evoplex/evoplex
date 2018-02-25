@@ -6,7 +6,7 @@
 #include <QtDebug>
 #include <QFile>
 
-#include "graph.h"
+#include "plugin.h"
 
 namespace evoplex {
 
@@ -95,4 +95,4 @@ void CustomGraph::reset()
 
 } // evoplex
 REGISTER_GRAPH(CustomGraph)
-#include "graph.moc"
+#include "plugin.moc"

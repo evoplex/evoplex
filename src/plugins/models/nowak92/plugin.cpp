@@ -3,7 +3,7 @@
  * @author Marcos Cardinot <mcardinot@gmail.com>
  */
 
-#include "model.h"
+#include "plugin.h"
 
 namespace evoplex {
 
@@ -75,4 +75,4 @@ const int ModelNowak::binarize(const int strategy) const
 } // evoplex
 
 REGISTER_MODEL(ModelNowak)
-#include "model.moc"
+#include "plugin.moc"

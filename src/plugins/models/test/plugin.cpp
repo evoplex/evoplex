@@ -1,4 +1,4 @@
-#include "model.h"
+#include "plugin.h"
 
 namespace evoplex {
 
@@ -15,4 +15,4 @@ bool ModelTest::algorithmStep()
 }
 
 REGISTER_MODEL(ModelTest)
-#include "model.moc"
+#include "plugin.moc"

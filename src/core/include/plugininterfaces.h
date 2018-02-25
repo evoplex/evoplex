@@ -41,7 +41,7 @@ Q_DECLARE_INTERFACE(evoplex::IPluginModel, "org.evoplex.IPluginModel")
     {                                                                       \
     Q_OBJECT                                                                \
     Q_PLUGIN_METADATA(IID "org.evoplex.IPluginModel"                        \
-                      FILE "modelMetaData.json")                            \
+                      FILE "metadata.json")                                 \
     Q_INTERFACES(evoplex::IPluginModel)                                     \
     public:                                                                 \
         AbstractModel* create() {                                           \
@@ -55,7 +55,7 @@ Q_DECLARE_INTERFACE(evoplex::IPluginModel, "org.evoplex.IPluginModel")
     {                                                                       \
     Q_OBJECT                                                                \
     Q_PLUGIN_METADATA(IID "org.evoplex.IPluginGraph"                        \
-                      FILE "graphMetaData.json")                            \
+                      FILE "metadata.json")                                 \
     Q_INTERFACES(evoplex::IPluginGraph)                                     \
     public:                                                                 \
         AbstractGraph* create() {                                           \
