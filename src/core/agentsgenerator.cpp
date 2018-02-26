@@ -169,6 +169,7 @@ AGSameFuncForAll::~AGSameFuncForAll()
 Agents AGSameFuncForAll::create(std::function<void(int)> progress)
 {
     Agents agents;
+    agents.reserve(m_numAgents);
     for (int agentId = 0; agentId < m_numAgents; ++agentId) {
         Attributes attrs(m_attrsSpace.size());
         for (ValueSpace* valSpace : m_attrsSpace) {
