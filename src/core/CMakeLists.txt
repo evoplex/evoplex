@@ -11,6 +11,7 @@ set(EVOPLEX_CORE_INCLUDE
   include/utils.h
   include/value.h
   include/valuespace.h
+  include/stats.h
 )
 set(EVOPLEX_CORE_H
   abstractplugin.h
@@ -18,7 +19,6 @@ set(EVOPLEX_CORE_H
   modelplugin.h
   agentsgenerator.h
   output.h
-  stats.h
 
   experiment.h
   experimentsmgr.h
