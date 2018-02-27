@@ -4,6 +4,7 @@
  */
 
 #include <QDebug>
+#include <QElapsedTimer>
 #include <QFile>
 #include <QFileInfo>
 #include <QThread>
@@ -186,6 +187,9 @@ void Experiment::processTrial(const int& trialId)
 
     trial->m_status = RUNNING;
 
+    QElapsedTimer t;
+    t.start();
+
     bool algorithmConverged = false;
     while (trial->m_currStep < m_pauseAt && !algorithmConverged) {
         algorithmConverged = trial->algorithmStep();
@@ -200,6 +204,8 @@ void Experiment::processTrial(const int& trialId)
         if (m_delay > 0)
             QThread::msleep(m_delay);
     }
+
+    qDebug() << QString("Exp: %1 - %2s").arg(m_id).arg(t.elapsed());
 
     if (trial->m_currStep >= m_stopAt || algorithmConverged) {
         writeCachedSteps(trialId);
