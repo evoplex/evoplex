@@ -13,7 +13,7 @@ namespace evoplex
 class PRG
 {
 public:
-    explicit PRG(int seed);
+    explicit PRG(unsigned int seed);
 
     // Generate a random double [0, 1)
     inline double randD() { return m_doubleZeroOne(m_mteng); }

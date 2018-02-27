@@ -8,7 +8,7 @@
 namespace evoplex
 {
 
-PRG::PRG(int seed)
+PRG::PRG(unsigned int seed)
     : m_mteng(seed)
     , m_doubleZeroOne(0.,1.)
     , m_floatZeroOne(0.f,1.f)
