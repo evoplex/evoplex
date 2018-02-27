@@ -66,21 +66,39 @@ Agents AGFromFile::create(std::function<void(int)> progress)
     QTextStream in(&file);
 
     // read and validate header
+    bool hasCoords = false;
     QStringList header;
     if (!in.atEnd()) {
+        bool hasCoordX = false;
+        bool hasCoordY = false;
         header = in.readLine().split(",");
-        foreach (QString attrName, header) {
-            if (attrName != "x" && attrName != "y" && !m_attrsSpace.contains(attrName)) {
-                header.clear();
-                break;
+        for (int i = 0; i < header.size(); ++i) {
+            QString attrName = header.at(i);
+            for (int j = i+1; j < header.size(); ++j) {
+                if (attrName == header.at(j)) {
+                    qWarning() << "[Agent::readFromFile]: unable to read the set of agents from" << m_filePath
+                               << QString("The headers should be unique! '%1' is duplicated.").arg(attrName);
+                    return Agents();
+                }
+            }
+
+            if (attrName == "x") {
+                hasCoordX = true;
+            } else if (attrName == "y") {
+                hasCoordY = true;
+            } else if (!m_attrsSpace.contains(attrName)) {
+                qWarning() << "[Agent::readFromFile]: unable to read the set of agents from" << m_filePath
+                           << "Expected properties:" << m_attrsSpace.keys();
+                return Agents();
             }
         }
-    }
 
-    if (header.isEmpty()) {
-        qWarning() << "[Agent::readFromFile]: unable to read the set of agents from" << m_filePath
-                   << "Expected properties:" << m_attrsSpace.keys();
-        return Agents();
+        hasCoords = hasCoordX;
+        if (hasCoordX != hasCoordY) {
+            qWarning() << "[Agent::readFromFile]: unable to read the set of agents from" << m_filePath
+                       << "One of the 2d coordinates are missing. Make sure you have both 'x' and 'y' columns.";
+            return Agents();
+        }
     }
 
     // create agents
@@ -97,7 +115,7 @@ Agents AGFromFile::create(std::function<void(int)> progress)
 
         int coordX = 0;
         int coordY = id;
-        Attributes attributes(values.size());
+        Attributes attributes(hasCoords ? values.size()-2 : values.size());
         for (int i = 0; i < values.size(); ++i) {
             if (header.at(i) == "x") {
                 coordX = values.at(i).toInt(&isValid);
