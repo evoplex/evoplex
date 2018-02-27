@@ -8,8 +8,11 @@
 
 #include <QHash>
 #include <map>
+#include <math.h>
 #include <vector>
 #include <unordered_set>
+
+#include "prg.h"
 
 namespace evoplex
 {
@@ -53,6 +56,23 @@ namespace Utils
             c = nullptr;
         }
         s.clear();
+    }
+
+    // Fisher–Yates shuffle algorithm
+    // https://bost.ocks.org/mike/shuffle
+    // http://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle
+    template <typename T>
+    void shuffle(std::vector<T>& vector, PRG* prg) {
+        size_t n = vector.size();
+        // While there remain elements to shuffle…
+        while (n) {
+            // Pick a remaining element…
+            const size_t i = std::floor(prg->randD() * n--);
+            // And swap it with the current element.
+            const T t = vector[n];
+            vector[n] = vector[i];
+            vector[i] = t;
+        }
     }
 
     // convert a linear index to row and column
