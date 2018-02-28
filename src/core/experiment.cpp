@@ -172,7 +172,6 @@ void Experiment::processTrial(const int& trialId)
     } else if (m_trials.find(trialId) == m_trials.end()) {
         AbstractModel* trial = createTrial(trialId);
         if (!trial) {
-            setExpStatus(INVALID);
             pause();
             return;
         }
@@ -228,19 +227,24 @@ void Experiment::processTrial(const int& trialId)
 
 AbstractModel* Experiment::createTrial(const int trialId)
 {
-    if (m_expStatus == INVALID) {
+    // Make it thread-safe to make sure that we create one trial at a time.
+    // Thus, if one trial fail, then the other will be aborted earlier.
+    QMutexLocker locker(&m_mutex);
+
+    if (m_expStatus == INVALID || m_pauseAt == 0) {
         return nullptr;
     } if (m_trials.size() == m_numTrials) {
-        qWarning() << "[Experiment]: all the trials for this experiment have already been created."
-                   << "Project:" << m_project->name() << "Experiment:" << m_id << "Trial:" << trialId
-                   << " (" << m_trials.size() << "/" << numTrials() << ")";
+        m_expStatus = INVALID;
+        QString e = QString("[Experiment]: FATAL! all the trials for this experiment have already been created."
+                            "It should never happen!\n Project: %1; Exp: %2; Trial: %3 (max=%4)\n")
+                            .arg(m_project->name()).arg(m_id).arg(trialId).arg(m_numTrials);
+        qFatal(qUtf8Printable(e));
         return nullptr;
     }
 
-    m_mutex.lock(); // make it thread-safe
     Agents agents = createAgents();
-    m_mutex.unlock();
     if (agents.empty()) {
+        m_expStatus = INVALID;
         return nullptr;
     }
 
@@ -253,10 +257,9 @@ AbstractModel* Experiment::createTrial(const int trialId)
         qWarning() << "[Experiment]: unable to create the trials."
                    << "The graph could not be initialized."
                    << "Project:" << m_project->name() << "Experiment:" << m_id;
+        m_expStatus = INVALID;
         delete graphObj;
-        graphObj = nullptr;
         delete prg;
-        prg = nullptr;
         return nullptr;
     }
     graphObj->reset();
@@ -266,6 +269,7 @@ AbstractModel* Experiment::createTrial(const int trialId)
         qWarning() << "[Experiment]: unable to create the trials."
                    << "The model could not be initialized."
                    << "Project:" << m_project->name() << "Experiment:" << m_id;
+        m_expStatus = INVALID;
         delete modelObj;
         return nullptr;
     }
@@ -280,6 +284,7 @@ AbstractModel* Experiment::createTrial(const int trialId)
         } else {
             qWarning() << "[Experiment] unable to create the trials."
                        << "Could not write in " << fpath;
+            m_expStatus = INVALID;
             delete modelObj;
             return nullptr;
         }
