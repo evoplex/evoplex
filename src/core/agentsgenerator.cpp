@@ -127,12 +127,14 @@ Agents AGFromFile::create(std::function<void(int)> progress)
                 coordY = values.at(i).toInt(&isValid);
             } else {
                 ValueSpace* valSpace = m_attrsSpace.value(header.at(i));
-                Value value = valSpace->validate(values.at(i));
-                if (!value.isValid()) {
-                    isValid = false;
-                    break;
+                if (valSpace) { // is null if the column is not required
+                    Value value = valSpace->validate(values.at(i));
+                    if (!value.isValid()) {
+                        isValid = false;
+                        break;
+                    }
+                    attributes.replace(valSpace->id(), header.at(i), value);
                 }
-                attributes.replace(valSpace->id(), header.at(i), value);
             }
         }
         agents.emplace_back(new Agent(id, attributes, coordX, coordY));
