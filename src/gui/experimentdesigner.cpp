@@ -92,7 +92,7 @@ ExperimentDesigner::ExperimentDesigner(MainApp* mainApp, QWidget *parent)
     // --  stop at
     addTreeWidget(m_treeItemGeneral, GENERAL_ATTRIBUTE_STOPAT, QVariant::fromValue(newSpinBox(1, EVOPLEX_MAX_STEPS)));
     // --  trials
-    addTreeWidget(m_treeItemGeneral, GENERAL_ATTRIBUTE_TRIALS, QVariant::fromValue(newSpinBox(1, EVOPLEX_MAX_STEPS)));
+    addTreeWidget(m_treeItemGeneral, GENERAL_ATTRIBUTE_TRIALS, QVariant::fromValue(newSpinBox(1, EVOPLEX_MAX_TRIALS)));
     // --  auto delete
     QCheckBox* chb = new QCheckBox(m_ui->treeWidget);
     chb->setChecked(false);
