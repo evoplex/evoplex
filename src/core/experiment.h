@@ -142,8 +142,8 @@ private:
     int m_stopAt;
 
     QString m_fileHeader;   // file header is the same for all trials; let's save it then
+    QString m_filePathPrefix;
     std::unordered_set<OutputSP> m_outputs;
-    std::unordered_map<int, QTextStream*> m_fileStreams; // <trialId, stream>
 
     int m_pauseAt;
     Status m_expStatus;
@@ -185,7 +185,7 @@ private:
 
     void deleteTrials();
 
-    void writeCachedSteps(const int trialId);
+    bool writeCachedSteps(const int trialId);
 };
 }
 

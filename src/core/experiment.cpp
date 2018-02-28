@@ -49,8 +49,14 @@ bool Experiment::init(ExperimentInputs* inputs, QString& error)
     delete m_inputs;
     m_inputs = inputs;
 
-    m_fileHeader = "";
+    m_filePathPrefix.clear();
+    m_fileHeader.clear();
     if (!m_inputs->fileCaches.empty()) {
+        m_filePathPrefix = QString("%1/%2_e%3_t")
+                .arg(m_inputs->generalAttrs->value(OUTPUT_DIR).toQString())
+                .arg(m_project->name())
+                .arg(m_id);
+
         for (Cache* cache : m_inputs->fileCaches) {
             Q_ASSERT(cache->inputs().size() > 0);
             m_fileHeader += cache->printableHeader(',', false) + ",";
@@ -100,12 +106,6 @@ void Experiment::reset()
 void Experiment::deleteTrials()
 {
     QMutexLocker locker(&m_mutex);
-
-    for (auto& stream : m_fileStreams) {
-        stream.second->flush();
-        delete stream.second;
-    }
-    m_fileStreams.clear();
 
     for (auto& trial : m_trials) {
         delete trial.second;
@@ -198,18 +198,29 @@ void Experiment::processTrial(const int& trialId)
         for (OutputSP output : m_outputs)
             output->doOperation(trialId, trial);
 
-        if (m_inputs->fileCaches.size() && trial->m_currStep % m_mainApp->stepsToFlush() == 0)
-            writeCachedSteps(trialId);
+        if (m_inputs->fileCaches.size()
+                && trial->m_currStep % m_mainApp->stepsToFlush() == 0
+                && !writeCachedSteps(trialId)) {
+            trial->m_status = INVALID;
+            setExpStatus(INVALID);
+            pause();
+            return;
+        }
 
         if (m_delay > 0)
             QThread::msleep(m_delay);
     }
 
-    qDebug() << QString("Exp: %1 - %2s").arg(m_id).arg(t.elapsed());
+    qDebug() << QString("%1 (%2) - %3s").arg(m_project->name()).arg(m_id).arg(t.elapsed());
 
     if (trial->m_currStep >= m_stopAt || algorithmConverged) {
-        writeCachedSteps(trialId);
-        trial->m_status = FINISHED;
+        if (writeCachedSteps(trialId)) {
+            trial->m_status = FINISHED;
+        } else {
+            trial->m_status = INVALID;
+            setExpStatus(INVALID);
+            pause();
+        }
     } else {
         trial->m_status = READY;
     }
@@ -260,23 +271,18 @@ AbstractModel* Experiment::createTrial(const int trialId)
     }
 
     if (!m_inputs->fileCaches.empty()) {
-        const QString fpath = QString("%1/%2_e%3_t%4.csv")
-                .arg(m_inputs->generalAttrs->value(OUTPUT_DIR).toQString())
-                .arg(m_project->name())
-                .arg(m_id)
-                .arg(trialId);
-
-        QFile* file = new QFile(fpath);
-        if (!file->open(QFile::WriteOnly | QFile::Truncate)) {
+        const QString fpath = m_filePathPrefix + QString("%4.csv").arg(trialId);
+        QFile file(fpath);
+        if (file.open(QFile::WriteOnly | QFile::Truncate)) {
+            QTextStream stream(&file);
+            stream << m_fileHeader;
+            file.close();
+        } else {
             qWarning() << "[Experiment] unable to create the trials."
                        << "Could not write in " << fpath;
             delete modelObj;
             return nullptr;
         }
-
-        QTextStream* stream = new QTextStream(file);
-        stream->operator <<(m_fileHeader);
-        m_fileStreams.insert({trialId, stream});
 
         // write this initial step to file
         for (OutputSP output : m_outputs) {
@@ -344,30 +350,39 @@ AbstractModel* Experiment::trial(int trialId) const
     return it->second;
 }
 
-void Experiment::writeCachedSteps(const int trialId)
+bool Experiment::writeCachedSteps(const int trialId)
 {
     if (m_inputs->fileCaches.empty() || m_inputs->fileCaches.front()->isEmpty(trialId)) {
-        return;
+        return true;
     }
 
-    QString rows;
+    const QString fpath = m_filePathPrefix + QString("%1.csv").arg(trialId);
+    QFile file(fpath);
+    if (!file.open(QFile::WriteOnly | QFile::Append)) {
+        qWarning() << "[Experiment] unable to create the trials."
+                   << "Could not write in " << fpath;
+        return false;
+    }
+
+    QTextStream stream(&file);
     do {
+        QString row;
         for (Cache* cache : m_inputs->fileCaches) {
             Values vals = cache->readFrontRow(trialId).second;
             cache->flushFrontRow(trialId);
             for (Value val : vals) {
-                rows += val.toQString() + ",";
+                row += val.toQString() + ",";
             }
         }
-        rows.chop(1);
-        rows += "\n";
+        row.chop(1);
+        stream << row << "\n";
 
     // we synchronously flush all the io stuff. So, it's safe to say
     // that if the front Output is empty, then all others are also empty.
     } while (!m_inputs->fileCaches.front()->isEmpty(trialId));
 
-    m_fileStreams.at(trialId)->operator <<(rows);
-    m_fileStreams.at(trialId)->flush();
+    file.close();
+    return true;
 }
 
 bool Experiment::removeOutput(OutputSP output)
@@ -485,9 +500,9 @@ Experiment::ExperimentInputs* Experiment::readInputs(const MainApp* mainApp,
         }
     }
 
-    QString outHeader = generalAttrs->value(OUTPUT_HEADER).toQString();
     std::vector<Cache*> fileCaches;
-    if (!outHeader.isEmpty()) {
+    if (failedAttributes.isEmpty() && generalAttrs->contains(OUTPUT_HEADER)) {
+        QString outHeader = generalAttrs->value(OUTPUT_HEADER).toQString();
         const int numTrials = generalAttrs->value(GENERAL_ATTRIBUTE_TRIALS).toInt();
         Q_ASSERT(numTrials > 0);
         std::vector<int> trialIds;
