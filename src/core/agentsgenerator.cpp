@@ -86,10 +86,6 @@ Agents AGFromFile::create(std::function<void(int)> progress)
                 hasCoordX = true;
             } else if (attrName == "y") {
                 hasCoordY = true;
-            } else if (!m_attrsSpace.contains(attrName)) {
-                qWarning() << "[Agent::readFromFile]: unable to read the set of agents from" << m_filePath
-                           << "Expected properties:" << m_attrsSpace.keys();
-                return Agents();
             }
         }
 
@@ -97,6 +93,14 @@ Agents AGFromFile::create(std::function<void(int)> progress)
         if (hasCoordX != hasCoordY) {
             qWarning() << "[Agent::readFromFile]: unable to read the set of agents from" << m_filePath
                        << "One of the 2d coordinates are missing. Make sure you have both 'x' and 'y' columns.";
+            return Agents();
+        }
+    }
+
+    for (const auto* vs : m_attrsSpace) {
+        if (!header.contains(vs->attrName())) {
+            qWarning() << "[Agent::readFromFile]: the agents from '" << m_filePath << "' are incompatible with the model."
+                       << "Expected attributes:" << m_attrsSpace.keys();
             return Agents();
         }
     }

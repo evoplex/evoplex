@@ -10,6 +10,7 @@
 
 #include "agent.h"
 #include "modelplugin.h"
+#include "valuespace.h"
 
 namespace evoplex
 {
