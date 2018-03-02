@@ -210,7 +210,8 @@ void Experiment::processTrial(const int& trialId)
             QThread::msleep(m_delay);
     }
 
-    qDebug() << QString("%1 (%2) - %3s").arg(m_project->name()).arg(m_id).arg(t.elapsed());
+    qDebug() << QString("%1 (E%2:T%3) - %3s")
+                .arg(m_project->name()).arg(m_id).arg(trialId).arg(t.elapsed());
 
     if (trial->m_currStep >= m_stopAt || algorithmConverged) {
         if (writeCachedSteps(trialId)) {
@@ -506,8 +507,8 @@ Experiment::ExperimentInputs* Experiment::readInputs(const MainApp* mainApp,
     }
 
     std::vector<Cache*> fileCaches;
-    if (failedAttributes.isEmpty() && generalAttrs->contains(OUTPUT_HEADER)) {
-        QString outHeader = generalAttrs->value(OUTPUT_HEADER).toQString();
+    QString outHeader = generalAttrs->value(OUTPUT_HEADER, Value("")).toQString();
+    if (failedAttributes.isEmpty() && !outHeader.isEmpty()) {
         const int numTrials = generalAttrs->value(GENERAL_ATTRIBUTE_TRIALS).toInt();
         Q_ASSERT(numTrials > 0);
         std::vector<int> trialIds;
@@ -520,7 +521,7 @@ Experiment::ExperimentInputs* Experiment::readInputs(const MainApp* mainApp,
             failedAttributes.append(OUTPUT_HEADER);
         }
 
-        QFileInfo outDir(generalAttrs->value(OUTPUT_DIR).toQString());
+        QFileInfo outDir(generalAttrs->value(OUTPUT_DIR, Value("")).toQString());
         if (!outDir.isDir() || !outDir.isWritable()) {
             errorMsg += "The output directory must be valid and writable!\n";
             failedAttributes.append(OUTPUT_DIR);

@@ -63,6 +63,15 @@ public:
         }
     }
 
+    inline const Value& value(const char* name, const Value& defaultValue) const {
+        const int idx = indexOf(name);
+        return idx < 0 ? defaultValue : value(idx);
+    }
+    inline const Value& value(const QString& name, const Value& defaultValue) const {
+        const int idx = indexOf(name);
+        return idx < 0 ? defaultValue : value(idx);
+    }
+
     inline const Value& value(const char* name) const { return value(indexOf(name)); }
     inline const Value& value(const QString& name) const { return value(indexOf(name)); }
     inline const std::vector<Value>& values() const { return m_values; }
