@@ -25,6 +25,7 @@ public:
 
     inline int size() const { return m_values.size(); }
     inline void resize(int size) { m_names.resize(size); m_values.resize(size); }
+    inline void reserve(int size) { m_names.reserve(size); m_values.reserve(size); }
 
     inline int indexOf(const char* name) const { return indexOf(QString::fromLocal8Bit(name)); }
     inline int indexOf(const QString& name) const {

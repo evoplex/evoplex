@@ -210,7 +210,7 @@ void Experiment::processTrial(const int& trialId)
             QThread::msleep(m_delay);
     }
 
-    qDebug() << QString("%1 (E%2:T%3) - %3s")
+    qDebug() << QString("%1 (E%2:T%3) - %4s")
                 .arg(m_project->name()).arg(m_id).arg(trialId).arg(t.elapsed());
 
     if (trial->m_currStep >= m_stopAt || algorithmConverged) {

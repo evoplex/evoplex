@@ -66,7 +66,6 @@ Agents AGFromFile::create(std::function<void(int)> progress)
     QTextStream in(&file);
 
     // read and validate header
-    bool hasCoords = false;
     QStringList header;
     if (!in.atEnd()) {
         bool hasCoordX = false;
@@ -89,7 +88,6 @@ Agents AGFromFile::create(std::function<void(int)> progress)
             }
         }
 
-        hasCoords = hasCoordX;
         if (hasCoordX != hasCoordY) {
             qWarning() << "[Agent::readFromFile]: unable to read the set of agents from" << m_filePath
                        << "One of the 2d coordinates are missing. Make sure you have both 'x' and 'y' columns.";
@@ -119,7 +117,7 @@ Agents AGFromFile::create(std::function<void(int)> progress)
 
         int coordX = 0;
         int coordY = id;
-        Attributes attributes(hasCoords ? values.size()-2 : values.size());
+        Attributes attributes(m_attrsSpace.size());
         for (int i = 0; i < values.size(); ++i) {
             if (header.at(i) == "x") {
                 coordX = values.at(i).toInt(&isValid);
