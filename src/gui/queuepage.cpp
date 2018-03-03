@@ -34,7 +34,7 @@ QueuePage::QueuePage(MainGUI* mainGUI)
     m_ui->running->hide();
     m_ui->queue->hide();
     m_ui->idle->hide();
-
+/* FIXME
     ExperimentsMgr* expMgr = mainGUI->mainApp()->expMgr();
     connect(expMgr, SIGNAL(statusChanged(Experiment*)), SLOT(slotStatusChanged(Experiment*)));
     connect(expMgr, SIGNAL(progressUpdated(Experiment*)), m_ui->tableRunning->viewport(), SLOT(update()));
@@ -48,6 +48,7 @@ QueuePage::QueuePage(MainGUI* mainGUI)
             m_ui->tableIdle->clearSelection(); m_ui->tableRunning->clearSelection();});
     connect(m_ui->tableRunning, &QTableWidget::cellClicked, [this]() {
             m_ui->tableIdle->clearSelection(); m_ui->tableQueue->clearSelection();});
+*/
 }
 
 void QueuePage::slotStatusChanged(Experiment* exp)
