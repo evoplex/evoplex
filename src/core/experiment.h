@@ -66,7 +66,7 @@ public:
     static ExperimentInputs* readInputs(const MainApp* mainApp,
             const QStringList& header, const QStringList& values, QString& errorMsg);
 
-    explicit Experiment(MainApp* mainApp, ExperimentInputs* inputs, Project* project);
+    explicit Experiment(MainApp* mainApp, ExperimentInputs* inputs, ProjectSP project);
 
     ~Experiment();
 
@@ -117,7 +117,7 @@ public:
     inline const std::unordered_map<int, AbstractModel*>& trials() const { return m_trials; }
 
     inline int id() const { return m_id; }
-    inline Project* project() const { return m_project; }
+    inline ProjectSP project() const { return m_project; }
     inline int numTrials() const { return m_numTrials; }
     inline const ExperimentInputs* inputs() const { return m_inputs; }
     inline const QString& modelId() const { return m_modelPlugin->id(); }
@@ -132,7 +132,7 @@ private:
     QMutex m_mutex;
     MainApp* m_mainApp;
     const int m_id;
-    Project* m_project;
+    ProjectSP m_project;
 
     const ExperimentInputs* m_inputs;
     const GraphPlugin* m_graphPlugin;

@@ -66,7 +66,11 @@ MainApp::MainApp()
 
 MainApp::~MainApp()
 {
-    Utils::deleteAndShrink(m_projects);
+    for (auto& p : m_projects) {
+        for (auto& e : p.second->experiments()) {
+            e.second->deleteLater();
+        }
+    }
     Utils::deleteAndShrink(m_models);
     Utils::deleteAndShrink(m_graphs);
     delete m_experimentsMgr;
@@ -212,7 +216,7 @@ bool MainApp::unloadPlugin(const AbstractPlugin* plugin, QString& error)
     return true;
 }
 
-Project* MainApp::newProject(QString& error, const QString& filepath)
+ProjectSP MainApp::newProject(QString& error, const QString& filepath)
 {
     if (m_models.isEmpty()) {
         error = "There are no models available in the software.\n"
@@ -239,9 +243,8 @@ Project* MainApp::newProject(QString& error, const QString& filepath)
     }
 
     const int projectId = m_projects.size();
-    Project* project = new Project(this, projectId, error, filepath);
+    ProjectSP project (new Project(this, projectId, error, filepath));
     if (!error.isEmpty()) {
-        delete project;
         return nullptr;
     }
 
@@ -251,9 +254,10 @@ Project* MainApp::newProject(QString& error, const QString& filepath)
 
 void MainApp::closeProject(int projId)
 {
-    std::map<int, Project*>::iterator it = m_projects.find(projId);
+    std::map<int, ProjectSP>::iterator it = m_projects.find(projId);
     if (it != m_projects.end()) {
         (*it).second->destroyExperiments();
+        (*it).second.clear();
         m_projects.erase(it);
     }
 }

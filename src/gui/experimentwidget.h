@@ -24,7 +24,7 @@ public:
     ~ExperimentWidget();
 
     virtual void clearSelection() { emit (clearSelections()); }
-    virtual Project* project() const { return m_exp->project(); }
+    virtual ProjectSP project() const { return m_exp->project(); }
     inline Experiment* exp() const { return m_exp; }
 
 signals:

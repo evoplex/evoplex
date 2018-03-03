@@ -9,6 +9,7 @@
 #include <QHash>
 #include <QObject>
 #include <QSettings>
+#include <memory>
 #include <QVector>
 
 #include "plugininterfaces.h"
@@ -20,6 +21,8 @@ namespace evoplex {
 
 class ExperimentsMgr;
 class Project;
+
+typedef QSharedPointer<Project> ProjectSP;
 
 class MainApp : public QObject
 {
@@ -38,7 +41,7 @@ public:
     bool unloadPlugin(const AbstractPlugin* plugin, QString& error);
 
     // Create a new project
-    Project* newProject(QString &error, const QString& filepath="");
+    ProjectSP newProject(QString &error, const QString& filepath="");
 
     void closeProject(int projId);
 
@@ -51,11 +54,11 @@ public:
     inline ExperimentsMgr* expMgr() const { return m_experimentsMgr; }
     inline const QHash<QString, GraphPlugin*>& graphs() const { return m_graphs; }
     inline const QHash<QString, ModelPlugin*>& models() const { return m_models; }
-    inline const std::map<int, Project*>& projects() const { return m_projects; }
+    inline const std::map<int, ProjectSP>& projects() const { return m_projects; }
 
     inline const GraphPlugin* graph(const QString& graphId) const { return m_graphs.value(graphId, nullptr); }
     inline const ModelPlugin* model(const QString& modelId) const { return m_models.value(modelId, nullptr); }
-    inline Project* project(int projId) const { return m_projects.at(projId); }
+    inline ProjectSP project(int projId) const { return m_projects.at(projId); }
 
     inline const AttributesSpace& generalAttrSpace() const { return m_generalAttrSpace; }
 
@@ -73,8 +76,7 @@ private:
     quint16 m_defaultStepDelay; // msec
     int m_stepsToFlush;
 
-    int m_lastProjectId;
-    std::map<int, Project*> m_projects; // opened projects.
+    std::map<int, ProjectSP> m_projects; // opened projects.
 
     QHash<QString, GraphPlugin*> m_graphs;  // loaded graphs
     QHash<QString, ModelPlugin*> m_models;  // loaded models

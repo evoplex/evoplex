@@ -9,15 +9,15 @@
 #include <QFileInfo>
 #include <QThread>
 
+#include "experiment.h"
 #include "agent.h"
 #include "agentsgenerator.h"
-#include "experiment.h"
 #include "project.h"
 
 namespace evoplex
 {
 
-Experiment::Experiment(MainApp* mainApp, ExperimentInputs* inputs, Project* project)
+Experiment::Experiment(MainApp* mainApp, ExperimentInputs* inputs, ProjectSP project)
     : m_mainApp(mainApp)
     , m_id(inputs->generalAttrs->value(GENERAL_ATTRIBUTE_EXPID).toInt())
     , m_project(project)
@@ -113,13 +113,6 @@ void Experiment::deleteTrials()
     m_trials.clear();
 
     Utils::deleteAndShrink(m_clonableAgents);
-
-    // if the experiment has finished or became invalid,
-    // it's more interesing to do NOT change the status
-    if (m_expStatus != FINISHED && m_expStatus != INVALID) {
-        m_expStatus = READY;
-        emit (m_mainApp->expMgr()->statusChanged(this));
-    }
 }
 
 void Experiment::updateProgressValue()

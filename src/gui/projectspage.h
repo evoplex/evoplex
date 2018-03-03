@@ -25,13 +25,13 @@ public:
     explicit ProjectsPage(MainGUI* mainGUI);
     ~ProjectsPage();
 
-    inline Project* activeProject() const { return m_activeProject; }
+    inline ProjectSP activeProject() const { return m_activeProject; }
     inline const QVector<ProjectWidget*> projects() const { return m_projects; }
 
 signals:
-    void activeProjectChanged(Project*);
+    void activeProjectChanged(ProjectSP);
     void isEmpty(bool empty);
-    void hasUnsavedChanges(Project*);
+    void hasUnsavedChanges(ProjectSP);
 
 public slots:
     bool slotNewProject();
@@ -47,11 +47,11 @@ private:
     MainGUI* m_mainGUI;
     MainApp* m_mainApp;
     ExperimentDesigner* m_expDesigner;
-    Project* m_activeProject;
+    ProjectSP m_activeProject;
     QVector<ProjectWidget*> m_projects; // opened projects
     QVector<ExperimentWidget*> m_experiments; // opened experiments
 
-    void addProjectWidget(Project* project);
+    void addProjectWidget(ProjectSP project);
 };
 
 class PPageDockWidget : public QDockWidget
@@ -60,7 +60,7 @@ class PPageDockWidget : public QDockWidget
 public:
     explicit PPageDockWidget(ProjectsPage* parent) : QDockWidget(parent) {}
     virtual ~PPageDockWidget() {}
-    virtual Project* project() const = 0;
+    virtual ProjectSP project() const = 0;
     virtual void clearSelection() = 0;
 };
 

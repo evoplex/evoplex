@@ -71,7 +71,7 @@ Experiment* Project::newExperiment(Experiment::ExperimentInputs* inputs, QString
         return nullptr;
     }
 
-    Experiment* exp = new Experiment(m_mainApp, inputs, this);
+    Experiment* exp = new Experiment(m_mainApp, inputs, sharedFromThis());
     m_experiments.insert({expId, exp});
 
     m_hasUnsavedChanges = true;

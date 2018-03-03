@@ -63,7 +63,7 @@ void QueuePage::slotStatusChanged(Experiment* exp)
     } else if (s == Experiment::QUEUED) {
         next.table = m_ui->tableQueue;
         next.section = m_ui->queue;
-    } else if (exp->trials().empty()) {
+    } else if (s == Experiment::INVALID || exp->autoDeleteTrials() || exp->trials().empty()) {
         removeRow(prev);
         m_rows.remove(key);
         return;

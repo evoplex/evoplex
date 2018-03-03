@@ -47,7 +47,7 @@ private slots:
 
 private:
     MainApp* m_mainApp;
-    Project* m_project;
+    ProjectSP m_project;
     Experiment* m_exp;
     QString m_selectedGraphId;
     QString m_selectedModelId;

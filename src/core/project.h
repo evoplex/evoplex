@@ -6,16 +6,17 @@
 #ifndef PROJECT_H
 #define PROJECT_H
 
-#include <QHash>
 #include <QObject>
+#include <QEnableSharedFromThis>
 
 #include "abstractmodel.h"
-#include "mainapp.h"
 #include "experiment.h"
+#include "mainapp.h"
 
 namespace evoplex
 {
-class Project : public QObject
+
+class Project : public QObject, public QEnableSharedFromThis<Project>
 {
     Q_OBJECT
 

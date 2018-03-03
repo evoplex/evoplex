@@ -35,7 +35,7 @@ SaveDialog::~SaveDialog()
     delete m_ui;
 }
 
-bool SaveDialog::save(Project* project)
+bool SaveDialog::save(ProjectSP project)
 {
     if (!project) {
         return false;
@@ -59,7 +59,7 @@ bool SaveDialog::save(Project* project)
     return true;
 }
 
-bool SaveDialog::saveAs(Project* project)
+bool SaveDialog::saveAs(ProjectSP project)
 {
     if (!project) {
         return false;

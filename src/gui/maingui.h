@@ -40,7 +40,7 @@ signals:
     void openProject(QString path);
 
 private slots:
-    void updateSaveButtons(Project* proj);
+    void updateSaveButtons(ProjectSP proj);
     void slotPage(QAction* action);
     void slotSave();
     void slotSaveAs();

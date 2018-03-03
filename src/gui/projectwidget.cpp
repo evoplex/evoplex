@@ -16,7 +16,7 @@
 
 namespace evoplex {
 
-ProjectWidget::ProjectWidget(Project* project, MainGUI* mainGUI, ProjectsPage* ppage)
+ProjectWidget::ProjectWidget(ProjectSP project, MainGUI* mainGUI, ProjectsPage* ppage)
     : PPageDockWidget(ppage)
     , m_ui(new Ui_ProjectWidget)
     , m_mainGUI(mainGUI)
@@ -28,8 +28,8 @@ ProjectWidget::ProjectWidget(Project* project, MainGUI* mainGUI, ProjectsPage* p
     setWindowTitle(objectName());
     setFocusPolicy(Qt::StrongFocus);
 
-    connect(m_project, SIGNAL(expAdded(Experiment*)), SLOT(slotInsertRow(Experiment*)));
-    connect(m_project, SIGNAL(expEdited(const Experiment*)), SLOT(slotUpdateRow(const Experiment*)));
+    connect(m_project.data(), SIGNAL(expAdded(Experiment*)), SLOT(slotInsertRow(Experiment*)));
+    connect(m_project.data(), SIGNAL(expEdited(const Experiment*)), SLOT(slotUpdateRow(const Experiment*)));
 
     int col = 0;
     m_headerIdx.insert(TableWidget::H_BUTTON, col++);
@@ -52,7 +52,7 @@ ProjectWidget::ProjectWidget(Project* project, MainGUI* mainGUI, ProjectsPage* p
     connect(m_mainGUI->mainApp()->expMgr(), SIGNAL(progressUpdated(Experiment*)),
             m_ui->table->viewport(), SLOT(update()));
 
-    connect(project, SIGNAL(hasUnsavedChanges(bool)),
+    connect(project.data(), SIGNAL(hasUnsavedChanges(bool)),
             SLOT(slotHasUnsavedChanges(bool)));
 }
 
