@@ -32,7 +32,7 @@ Project::Project(MainApp* mainApp, int id, QString& error, const QString& filepa
     m_hasUnsavedChanges = false;
 }
 
-Project::~Project()
+void Project::destroyExperiments()
 {
     for (auto& it : m_experiments) {
         m_mainApp->expMgr()->destroy(it.second);

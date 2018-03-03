@@ -277,8 +277,8 @@ void MainGUI::slotSave()
 
 void MainGUI::slotSaveAll()
 {
-    for (Project* p : m_mainApp->projects()) {
-        m_saveDialog->save(p);
+    for (auto& p : m_mainApp->projects()) {
+        m_saveDialog->save(p.second);
     }
 }
 

@@ -23,7 +23,6 @@ namespace evoplex {
 
 MainApp::MainApp()
     : m_experimentsMgr(new ExperimentsMgr())
-    , m_lastProjectId(-1)
 {
     resetSettingsToDefault();
     m_defaultStepDelay = m_userPrefs.value("settings/stepDelay", m_defaultStepDelay).toInt();
@@ -186,7 +185,7 @@ const AbstractPlugin* MainApp::loadPlugin(const QString& path, QString& error, c
 
 bool MainApp::unloadPlugin(const AbstractPlugin* plugin, QString& error)
 {
-    if (!m_projects.isEmpty()) {
+    if (!m_projects.empty()) {
         error = QString("Couldn't unload the plugin `%1`.\n"
                 "Please, close all projects and try again!")
                 .arg(plugin->name());
@@ -239,21 +238,24 @@ Project* MainApp::newProject(QString& error, const QString& filepath)
         }
     }
 
-    ++m_lastProjectId;
-    Project* project = new Project(this, m_lastProjectId, error, filepath);
+    const int projectId = m_projects.size();
+    Project* project = new Project(this, projectId, error, filepath);
     if (!error.isEmpty()) {
         delete project;
-        --m_lastProjectId;
         return nullptr;
     }
 
-    m_projects.insert(m_lastProjectId, project);
+    m_projects.insert({projectId, project});
     return project;
 }
 
 void MainApp::closeProject(int projId)
 {
-    delete m_projects.take(projId);
+    std::map<int, Project*>::iterator it = m_projects.find(projId);
+    if (it != m_projects.end()) {
+        (*it).second->destroyExperiments();
+        m_projects.erase(it);
+    }
 }
 
 void MainApp::addPathToRecentProjects(const QString& projectFilePath)

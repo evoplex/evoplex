@@ -51,11 +51,11 @@ public:
     inline ExperimentsMgr* expMgr() const { return m_experimentsMgr; }
     inline const QHash<QString, GraphPlugin*>& graphs() const { return m_graphs; }
     inline const QHash<QString, ModelPlugin*>& models() const { return m_models; }
-    inline const QHash<int, Project*>& projects() const { return m_projects; }
+    inline const std::map<int, Project*>& projects() const { return m_projects; }
 
     inline const GraphPlugin* graph(const QString& graphId) const { return m_graphs.value(graphId, nullptr); }
     inline const ModelPlugin* model(const QString& modelId) const { return m_models.value(modelId, nullptr); }
-    inline Project* project(int projId) const { return m_projects.value(projId); }
+    inline Project* project(int projId) const { return m_projects.at(projId); }
 
     inline const AttributesSpace& generalAttrSpace() const { return m_generalAttrSpace; }
 
@@ -74,7 +74,7 @@ private:
     int m_stepsToFlush;
 
     int m_lastProjectId;
-    QHash<int, Project*> m_projects; // opened projects.
+    std::map<int, Project*> m_projects; // opened projects.
 
     QHash<QString, GraphPlugin*> m_graphs;  // loaded graphs
     QHash<QString, ModelPlugin*> m_models;  // loaded models

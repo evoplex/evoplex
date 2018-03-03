@@ -21,7 +21,9 @@ class Project : public QObject
 
 public:
     Project(MainApp* mainApp, int id, QString& error, const QString& filepath="");
-    virtual ~Project();
+    ~Project() {}
+
+    void destroyExperiments();
 
     // Add a new experiment to this project.
     // @return nullptr if unsuccessful
