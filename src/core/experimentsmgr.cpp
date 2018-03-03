@@ -54,16 +54,16 @@ void ExperimentsMgr::destroyExperiments()
     std::list<Experiment*>::iterator it = m_toDestroy.begin();
     while (it != m_toDestroy.end()) {
         Experiment* exp = (*it);
-        if (exp->expStatus() == Experiment::RUNNING) {
-            exp->pause();
-        } else if (exp->expStatus() == Experiment::QUEUED) {
-            m_queued.remove(exp);
-            exp->setExpStatus(Experiment::INVALID);
-            emit (statusChanged(exp));
-        } else {
+        if (exp->expStatus() == Experiment::INVALID) {
             exp->deleteLater();
             it = m_toDestroy.erase(it);
             continue;
+        } else if (exp->expStatus() == Experiment::RUNNING) {
+            exp->pause();
+        } else {
+            m_queued.remove(exp);
+            exp->setExpStatus(Experiment::INVALID);
+            emit (statusChanged(exp));
         }
         ++it;
     }
