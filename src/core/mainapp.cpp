@@ -243,8 +243,8 @@ ProjectSP MainApp::newProject(QString& error, const QString& filepath)
     }
 
     const int projectId = m_projects.size();
-    ProjectSP project (new Project(this, projectId, error, filepath));
-    if (!error.isEmpty()) {
+    ProjectSP project = ProjectSP::create(this, projectId);
+    if (!project->init(error, filepath)) {
         return nullptr;
     }
 

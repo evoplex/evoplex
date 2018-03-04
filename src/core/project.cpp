@@ -18,10 +18,13 @@
 namespace evoplex
 {
 
-Project::Project(MainApp* mainApp, int id, QString& error, const QString& filepath)
+Project::Project(MainApp* mainApp, int id)
     : m_mainApp(mainApp)
     , m_id(id)
-    , m_filepath(filepath)
+{
+}
+
+bool Project::init(QString& error, const QString& filepath)
 {
     setFilePath(filepath);
     if (!filepath.isEmpty()) {
@@ -30,6 +33,7 @@ Project::Project(MainApp* mainApp, int id, QString& error, const QString& filepa
         this->blockSignals(false);
     }
     m_hasUnsavedChanges = false;
+    return error.isEmpty();
 }
 
 void Project::destroyExperiments()

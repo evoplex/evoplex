@@ -21,8 +21,10 @@ class Project : public QObject, public QEnableSharedFromThis<Project>
     Q_OBJECT
 
 public:
-    Project(MainApp* mainApp, int id, QString& error, const QString& filepath="");
+    Project(MainApp* mainApp, int id);
     ~Project() {}
+
+    bool init(QString& error, const QString& filepath="");
 
     void destroyExperiments();
 

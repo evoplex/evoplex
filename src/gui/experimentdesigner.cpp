@@ -212,6 +212,8 @@ void ExperimentDesigner::slotSetActiveWidget(int idx)
         PPageDockWidget* dw = v.value<PPageDockWidget*>();
         dw->show();
         dw->raise();
+    } else {
+        m_project.clear();
     }
 }
 

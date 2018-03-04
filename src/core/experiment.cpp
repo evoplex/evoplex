@@ -26,6 +26,7 @@ Experiment::Experiment(MainApp* mainApp, ExperimentInputs* inputs, ProjectSP pro
 {
     QString error;
     init(inputs, error);
+    Q_ASSERT(m_project);
 }
 
 Experiment::~Experiment()
@@ -34,6 +35,7 @@ Experiment::~Experiment()
     deleteTrials();
     m_outputs.clear();
     delete m_inputs;
+    m_project.clear();
 }
 
 bool Experiment::init(ExperimentInputs* inputs, QString& error)

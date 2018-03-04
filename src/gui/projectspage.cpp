@@ -47,13 +47,14 @@ ProjectsPage::~ProjectsPage()
 
 void ProjectsPage::slotFocusChanged(QDockWidget* dw)
 {
+    m_activeProject.clear();
     PPageDockWidget* pdw = qobject_cast<PPageDockWidget*>(dw);
     if (pdw) {
         pdw->clearSelection();
         m_activeProject = pdw->project();
         m_expDesigner->setActiveWidget(pdw);
-        emit (activeProjectChanged(m_activeProject));
     }
+    emit (activeProjectChanged(m_activeProject));
 }
 
 void ProjectsPage::slotFocusChanged(QWidget*, QWidget* now)
@@ -103,6 +104,10 @@ void ProjectsPage::addProjectWidget(ProjectSP project)
         emit (isEmpty(m_projects.isEmpty()));
         m_mainApp->closeProject(project->id());
         pw->deleteLater();
+        if (m_projects.isEmpty()) {
+            m_activeProject.clear();
+            emit (activeProjectChanged(m_activeProject));
+        }
     });
 
     for (auto& i : project->experiments()) {
