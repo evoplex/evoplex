@@ -206,7 +206,8 @@ void Experiment::processTrial(const int& trialId)
     }
 
     qDebug() << QString("%1 (E%2:T%3) - %4s")
-                .arg(m_project->name()).arg(m_id).arg(trialId).arg(t.elapsed());
+                .arg(m_project->name()).arg(m_id).arg(trialId)
+                .arg(t.elapsed() / 1000);
 
     if (trial->m_currStep >= m_stopAt || algorithmConverged) {
         if (writeCachedSteps(trialId)) {
