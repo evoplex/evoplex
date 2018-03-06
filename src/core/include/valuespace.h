@@ -26,6 +26,7 @@ public:
 
         Double_Set,
         Int_Set,
+        String_Set,
 
         Bool,
         String,
@@ -35,9 +36,10 @@ public:
 
     // space can be:
     //   - "bool"               // a boolean
-    //   - "string"             // a string
     //   - "dirpath"            // a string containing a valid dirpath
     //   - "filepath"           // a string containing a valid filepath
+    //   - "string"             // a string
+    //   - "string{aaa,bbb}"    // set of strings
     //   - "int[min,max]"       // integers from min to max (including min and max)
     //   - "int{1,2,3}"         // set of integers
     //   - "double[min,max]     // doubles from min to max (including min and max)

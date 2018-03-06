@@ -29,7 +29,7 @@ ValueSpace* ValueSpace::parse(int id, const QString& attrName, const QString& sp
         vs = rangeSpace(space, id, attrName);
     }
 
-    if (!vs) {
+    if (!vs || !vs->isValid()) {
         qWarning() << "[ValueSpace::parse]: unable to parse " << space;
         return new DefaultSpace();
     }
@@ -55,6 +55,13 @@ ValueSpace* ValueSpace::setSpace(QString space, const int id, const QString& att
         foreach (QString vStr, valuesStr) {
             values.push_back(vStr.toDouble(&ok));
             if (!ok) break;
+        }
+    } else if (space.startsWith("string")) {
+        type = ValueSpace::String_Set;
+        valuesStr[0] = valuesStr[0].remove("string");
+        ok = true;
+        foreach (QString vStr, valuesStr) {
+            values.push_back(vStr);
         }
     }
 
@@ -182,6 +189,18 @@ Value ValueSpace::validate(const QString& valueStr) const
         }
         break;
     }
+    case String_Set: {
+        const SetSpace* sspace = dynamic_cast<const SetSpace*>(this);
+        Value value(valueStr);
+        if (value.isValid() && valueStr == value.toQString()) {
+            for (Value validValue : sspace->values()) {
+                if (value == validValue) {
+                    return value;
+                }
+            }
+        }
+        break;
+    }
     default:
         break;
     }
@@ -256,6 +275,9 @@ SetSpace::SetSpace(int id, const QString& attrName, SpaceType type, Values value
         break;
     case Int_Set:
         m_space = "int{";
+        break;
+    case String_Set:
+        m_space = "string{";
         break;
     default:
         m_space.clear();

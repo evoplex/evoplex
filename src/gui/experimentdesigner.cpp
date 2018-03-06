@@ -581,7 +581,8 @@ void ExperimentDesigner::addPluginAttrs(QTreeWidgetItem* tree, const AbstractPlu
             break;
         }
         case ValueSpace::Double_Set:
-        case ValueSpace::Int_Set: {
+        case ValueSpace::Int_Set:
+        case ValueSpace::String_Set: {
             const SetSpace* sSpace = dynamic_cast<const SetSpace*>(valSpace);
             QComboBox* cb = new QComboBox();
             for (Value v : sSpace->values()) {
