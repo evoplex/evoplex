@@ -116,12 +116,6 @@
        </property>
        <item>
         <widget class="QPushButton" name="bNewProject">
-         <property name="maximumSize">
-          <size>
-           <width>120</width>
-           <height>16777215</height>
-          </size>
-         </property>
          <property name="text">
           <string>New Project</string>
          </property>
@@ -129,12 +123,6 @@
        </item>
        <item>
         <widget class="QPushButton" name="bOpenProject">
-         <property name="maximumSize">
-          <size>
-           <width>120</width>
-           <height>16777215</height>
-          </size>
-         </property>
          <property name="text">
           <string>Open Project</string>
          </property>

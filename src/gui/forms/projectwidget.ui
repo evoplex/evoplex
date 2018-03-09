@@ -49,32 +49,30 @@ background-color: rgb(24, 24, 24);
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="playAll">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
+       <spacer name="horizontalSpacer_2">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
         </property>
-        <property name="minimumSize">
+        <property name="sizeHint" stdset="0">
          <size>
-          <width>80</width>
-          <height>0</height>
+          <width>40</width>
+          <height>20</height>
          </size>
         </property>
-        <property name="font">
-         <font>
-          <pointsize>10</pointsize>
-         </font>
-        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="playAll">
         <property name="styleSheet">
          <string notr="true">QPushButton  {
-	border: 1px solid white;
-    border-radius: 8px;
-    background-color: transparent;
+  border: 1px solid white;
+  border-radius: 8px;
+  background-color: transparent;
+  padding-left: 10px;
+  padding-right: 10px;
 }
 QPushButton::hover {
-	background-color: #4285f4;
+  background-color: #4285f4;
 }</string>
         </property>
         <property name="text">
