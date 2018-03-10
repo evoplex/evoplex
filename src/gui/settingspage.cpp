@@ -22,6 +22,8 @@ SettingsPage::SettingsPage(MainGUI* mainGUI)
 
     connect(m_ui->reset, SIGNAL(pressed()), SLOT(resetDefaults()));
 
+    connect(m_ui->fontSize, SIGNAL(valueChanged(int)), mainGUI, SLOT(setFontSize(int)));
+
     m_ui->threads->setMinimum(1);
     m_ui->threads->setMaximum(QThread::idealThreadCount());
     connect(m_ui->threads, static_cast<void(QSpinBox::*)(int)>(&QSpinBox::valueChanged),
@@ -48,6 +50,8 @@ SettingsPage::~SettingsPage()
 
 void SettingsPage::refreshFields()
 {
+    m_ui->fontSize->setValue(m_mainGUI->fontSize());
+
     m_ui->threads->setValue(m_mainGUI->mainApp()->expMgr()->maxThreadsCount());
 
     const CMapKey cmap = m_mainGUI->colorMapMgr()->defaultColorMap();
@@ -64,6 +68,7 @@ void SettingsPage::resetDefaults()
     m_mainGUI->mainApp()->expMgr()->resetSettingsToDefault();
     m_mainGUI->colorMapMgr()->resetSettingsToDefault();
     m_mainGUI->mainApp()->resetSettingsToDefault();
+    m_mainGUI->resetSettingsToDefault();
     refreshFields();
 }
 

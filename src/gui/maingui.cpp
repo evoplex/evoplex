@@ -178,14 +178,19 @@ MainGUI::MainGUI(MainApp* mainApp, QWidget* parent)
     menuHelp->addAction(acAbout);
     this->menuBar()->addMenu(menuHelp);
 
-    QSettings s;
-    restoreGeometry(s.value("gui/geometry").toByteArray());
-    restoreState(s.value("gui/windowState").toByteArray());
+    restoreGeometry(m_userPrefs.value("gui/geometry").toByteArray());
+    restoreState(m_userPrefs.value("gui/windowState").toByteArray());
+    setFontSize(m_userPrefs.value("gui/fontSize", font().pointSize()).toInt());
 }
 
 MainGUI::~MainGUI()
 {
     delete m_colorMapMgr;
+}
+
+void MainGUI::resetSettingsToDefault()
+{
+    setFontSize(11);
 }
 
 bool MainGUI::eventFilter(QObject* o, QEvent* e)
@@ -205,13 +210,26 @@ void MainGUI::closeEvent(QCloseEvent* event)
         }
     }
 
-    QSettings s;
-    s.setValue("gui/geometry", saveGeometry());
-    s.setValue("gui/windowState", saveState());
-    qDebug() << "[MainGUI]: user settings stored at " << s.fileName();
+    m_userPrefs.setValue("gui/geometry", saveGeometry());
+    m_userPrefs.setValue("gui/windowState", saveState());
+    qDebug() << "[MainGUI]: user settings stored at " << m_userPrefs.fileName();
 
     event->accept();
     QMainWindow::closeEvent(event);
+}
+
+void MainGUI::setFontSize(int size)
+{
+    QFont f = font();
+    f.setPointSize(size);
+    setFont(f);
+    setStyleSheet(QString("%1 font:%2pt;").arg(styleSheet()).arg(size));
+    m_userPrefs.setValue("gui/fontSize", size);
+}
+
+int MainGUI::fontSize()
+{
+    return m_userPrefs.value("gui/fontSize", font().pointSize()).toInt();
 }
 
 void MainGUI::slotPage(QAction* action)
