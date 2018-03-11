@@ -33,10 +33,10 @@ ProjectsPage::ProjectsPage(MainGUI* mainGUI)
     connect(qApp, SIGNAL(focusChanged(QWidget*,QWidget*)),
             SLOT(slotFocusChanged(QWidget*,QWidget*)));
 
-    addDockWidget(Qt::RightDockWidgetArea, m_expDesigner);
-
     restoreGeometry(m_userPrefs.value("gui/projectsPageGeometry").toByteArray());
     restoreState(m_userPrefs.value("gui/projectsPageState").toByteArray());
+
+    addDockWidget(Qt::RightDockWidgetArea, m_expDesigner);
 }
 
 ProjectsPage::~ProjectsPage()

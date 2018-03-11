@@ -24,7 +24,7 @@ class ExperimentDesigner : public QDockWidget
     Q_OBJECT
 
 public:
-    explicit ExperimentDesigner(MainApp* mainApp, QWidget* parent = 0);
+    explicit ExperimentDesigner(MainApp* mainApp, QWidget* parent);
     ~ExperimentDesigner();
 
     void addWidgetToList(PPageDockWidget* dw);
