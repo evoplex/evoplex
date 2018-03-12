@@ -207,8 +207,6 @@ void ExperimentsMgr::setMaxThreadCount(const int newValue)
         return;
     }
 
-    QMutexLocker locker(&m_mutex);
-
     const int previous = m_threads;
     const int diff = qAbs(newValue - previous);
     m_threads = newValue;
