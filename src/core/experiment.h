@@ -30,6 +30,7 @@ class Experiment : public QObject
     Q_OBJECT
 
     friend class ExperimentsMgr;
+    friend class TrialRunnable;
 
 public:
     enum Status {
@@ -74,9 +75,6 @@ public:
 
     void reset();
 
-    // Updates the progress value.
-    // This method might be expensive!
-    void updateProgressValue();
     inline quint16 progress() const { return m_progress; }
 
     void toggle();
@@ -127,6 +125,12 @@ public:
 signals:
     void trialCreated(int trialId);
     void restarted();
+    void progressUpdated();
+
+private slots:
+    // Updates the progress value.
+    // This method might be expensive!
+    void updateProgressValue();
 
 private:
     QMutex m_mutex;

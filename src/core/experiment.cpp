@@ -119,6 +119,7 @@ void Experiment::deleteTrials()
 
 void Experiment::updateProgressValue()
 {
+    quint16 lastProgress = m_progress;
     if (m_expStatus == FINISHED) {
         m_progress = 360;
     } else if (m_expStatus == INVALID) {
@@ -129,6 +130,10 @@ void Experiment::updateProgressValue()
             p += ((float) trial.second->m_currStep / m_pauseAt);
         }
         m_progress = ceil(p * 360.f / m_numTrials);
+    }
+
+    if (lastProgress != m_progress) {
+        emit (progressUpdated());
     }
 }
 

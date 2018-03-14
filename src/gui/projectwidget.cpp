@@ -49,8 +49,6 @@ ProjectWidget::ProjectWidget(ProjectSP project, MainGUI* mainGUI, ProjectsPage* 
 
     connect(m_mainGUI->mainApp()->expMgr(), SIGNAL(statusChanged(Experiment*)),
             m_ui->table->viewport(), SLOT(update()));
-    connect(m_mainGUI->mainApp()->expMgr(), SIGNAL(progressUpdated(Experiment*)),
-            m_ui->table->viewport(), SLOT(update()));
 
     connect(project.data(), SIGNAL(hasUnsavedChanges(bool)),
             SLOT(slotHasUnsavedChanges(bool)));

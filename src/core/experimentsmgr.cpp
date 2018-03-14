@@ -20,16 +20,24 @@ ExperimentsMgr::ExperimentsMgr()
 
     m_threads = m_userPrefs.value("settings/threads", m_threads).toInt();
     m_threads = m_threads > QThread::idealThreadCount() ? QThread::idealThreadCount() : m_threads;
-    QThreadPool::globalInstance()->setMaxThreadCount(m_threads);
+    m_threadPool.setMaxThreadCount(m_threads);
     qDebug() << "[ExperimentsMgr]: setting the max number of threads to" << m_threads;
 
     m_timerDestroy->setSingleShot(true);
-    connect(m_timerDestroy, SIGNAL(timeout()), this, SLOT(destroyExperiments()));
-    connect(m_timerProgress, SIGNAL(timeout()), this, SLOT(updateProgressValues()));
+    m_timerProgress->setSingleShot(true);
+    connect(m_timerDestroy, SIGNAL(timeout()), SLOT(destroyExperiments()));
+    connect(m_timerProgress, SIGNAL(timeout()), SLOT(updateProgressValues()));
+
+    // call next process in the queue
+    connect(this, &ExperimentsMgr::expFinished, this,
+            [this]() { if (!m_queued.empty()) { play(m_queued.front()); } },
+            Qt::QueuedConnection);
 }
 
 ExperimentsMgr::~ExperimentsMgr()
 {
+    m_threadPool.clear();
+    m_threadPool.waitForDone();
     delete m_timerProgress;
     delete m_timerDestroy;
 }
@@ -41,11 +49,11 @@ void ExperimentsMgr::resetSettingsToDefault()
 
 void ExperimentsMgr::updateProgressValues()
 {
-    for (Experiment* exp : m_running) {
-        quint16 p = exp->progress();
-        exp->updateProgressValue();
-        if (p != exp->progress())
-            emit (progressUpdated(exp));
+    if (m_running.size()) {
+        for (Experiment* exp : m_running) {
+            if (exp) exp->updateProgressValue();
+        }
+        m_timerProgress->start(500);
     }
 }
 
@@ -76,7 +84,7 @@ void ExperimentsMgr::destroyExperiments()
 void ExperimentsMgr::destroy(Experiment* exp)
 {
     m_toDestroy.emplace_back(exp);
-    m_timerDestroy->start(500);
+    destroyExperiments();
 }
 
 void ExperimentsMgr::play(Experiment* exp)
@@ -88,35 +96,19 @@ void ExperimentsMgr::play(Experiment* exp)
         return;
     }
 
-    if (m_running.size() < m_threads) {
+    if (m_threadPool.activeThreadCount() < m_threads) {
         exp->setExpStatus(Experiment::RUNNING);
         emit (statusChanged(exp));
         m_queued.remove(exp);
 
         m_running.emplace_back(exp);
-        if (!m_timerProgress->isActive())
-            m_timerProgress->start(500); // every half a second, check progress
+        m_timerProgress->start(500); // every half a second, check progress
 
-        // both the QVector and the QFutureWatcher must live longer
-        // so, they must be pointers.
-        QVector<int>* trialIds = new QVector<int>;
-        trialIds->reserve(exp->numTrials());
-        for (int id = 0; id < exp->numTrials(); ++id)
-            trialIds->push_back(id);
-
-        QFutureWatcher<void>* fw = new QFutureWatcher<void>(this);
-        connect(fw, &QFutureWatcher<void>::finished,
-                [this, fw, trialIds, exp]() {
-                    finished(exp);
-                    fw->deleteLater();
-                    trialIds->clear();
-                    trialIds->squeeze();
-                    delete trialIds;
-                }
-        );
-
-        fw->setFuture(QtConcurrent::map(trialIds->begin(), trialIds->end(),
-                [this, exp](int& trialId) { exp->processTrial(trialId); }));
+        for (int trialId = 0; trialId < exp->numTrials(); ++trialId) {
+            m_runningTrials.emplace_back(std::make_pair(exp->id(), trialId));
+            m_threadPool.start(new TrialRunnable(this, exp, trialId),
+                               -1 * m_runningTrials.size()); // play in the same order of insertion
+        }
     } else if (exp->expStatus() != Experiment::QUEUED) {
         exp->setExpStatus(Experiment::QUEUED);
         emit (statusChanged(exp));
@@ -124,12 +116,18 @@ void ExperimentsMgr::play(Experiment* exp)
     }
 }
 
-void ExperimentsMgr::finished(Experiment* exp)
+void ExperimentsMgr::finished(Experiment* exp, const int trialId)
 {
-    m_running.remove(exp);
-    if (m_running.empty()) {
-        m_timerProgress->stop();
+    QMutexLocker locker(&m_mutex);
+
+    m_runningTrials.remove(std::make_pair(exp->id(), trialId));
+    for (auto& expTrial : m_runningTrials) {
+        if (expTrial.first == exp->id()) {
+            return;
+        }
     }
+
+    m_running.remove(exp);
 
     if (std::find(m_toDestroy.begin(), m_toDestroy.end(), exp) != m_toDestroy.end()) {
         exp->setExpStatus(Experiment::INVALID);
@@ -154,11 +152,7 @@ void ExperimentsMgr::finished(Experiment* exp)
     }
 
     emit (statusChanged(exp));
-
-    // call next process in the queue
-    if (!m_queued.empty()) {
-        play(m_queued.front());
-    }
+    emit (expFinished());
 }
 
 void ExperimentsMgr::removeFromQueue(Experiment* exp)
@@ -222,9 +216,24 @@ void ExperimentsMgr::setMaxThreadCount(const int newValue)
     }
 
     m_userPrefs.setValue("settings/threads", m_threads);
-    QThreadPool::globalInstance()->setMaxThreadCount(m_threads);
+    m_threadPool.setMaxThreadCount(m_threads);
     qDebug() << "[ExperimentsMgr] setting the max number of thread from"
              << previous << "to" << newValue;
+}
+
+/********************************/
+
+TrialRunnable::TrialRunnable(ExperimentsMgr* expMgr, Experiment* exp, int trialId)
+    : expMgr(expMgr)
+    , m_exp(exp)
+    , m_trialId(trialId)
+{
+}
+
+void TrialRunnable::run()
+{
+    m_exp->processTrial(m_trialId);
+    expMgr->finished(m_exp, m_trialId);
 }
 
 }

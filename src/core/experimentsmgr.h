@@ -10,6 +10,7 @@
 #include <QObject>
 #include <QTimer>
 #include <QSettings>
+#include <QThreadPool>
 #include <list>
 
 namespace evoplex {
@@ -19,6 +20,8 @@ class Experiment;
 class ExperimentsMgr: public QObject
 {
     Q_OBJECT
+
+    friend class TrialRunnable;
 
 public:
     explicit ExperimentsMgr();
@@ -33,7 +36,7 @@ public:
 
 signals:
     void statusChanged(Experiment* exp);
-    void progressUpdated(Experiment* exp);
+    void expFinished();
 
 public slots:
     void clearQueue();
@@ -46,6 +49,7 @@ private slots:
     void destroyExperiments();
 
 private:
+    QThreadPool m_threadPool;
     QMutex m_mutex;
     QSettings m_userPrefs;
     int m_threads;
@@ -53,15 +57,31 @@ private:
     QTimer* m_timerProgress; // update the progress value of all running experiments
     QTimer* m_timerDestroy;
 
+    std::list<std::pair<int,int>> m_runningTrials;
     std::list<Experiment*> m_running;
     std::list<Experiment*> m_queued;
     std::list<Experiment*> m_idle;
     std::list<Experiment*> m_toDestroy;
 
-    // trigged when an experiment ends (futurewatcher)
+    // trigged when an experiment ends (TrialRunnable)
     // also runs in a work thread
-    void finished(Experiment* exp);
+    void finished(Experiment* exp, const int trialId);
 };
+
+/********************************/
+
+class TrialRunnable: public QRunnable
+{
+public:
+    TrialRunnable(ExperimentsMgr* expMgr, Experiment* exp, int trialId);
+    void run();
+
+private:
+    ExperimentsMgr* expMgr;
+    Experiment* m_exp;
+    const int m_trialId;
+};
+
 }
 
 #endif // EXPERIMENTMGR_H

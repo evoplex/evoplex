@@ -67,9 +67,7 @@ MainApp::MainApp()
 MainApp::~MainApp()
 {
     for (auto& p : m_projects) {
-        for (auto& e : p.second->experiments()) {
-            e.second->deleteLater();
-        }
+        p.second->destroyExperiments();
     }
     Utils::deleteAndShrink(m_models);
     Utils::deleteAndShrink(m_graphs);

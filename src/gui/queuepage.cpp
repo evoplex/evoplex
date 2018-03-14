@@ -37,7 +37,6 @@ QueuePage::QueuePage(MainGUI* mainGUI)
 /* FIXME
     ExperimentsMgr* expMgr = mainGUI->mainApp()->expMgr();
     connect(expMgr, SIGNAL(statusChanged(Experiment*)), SLOT(slotStatusChanged(Experiment*)));
-    connect(expMgr, SIGNAL(progressUpdated(Experiment*)), m_ui->tableRunning->viewport(), SLOT(update()));
 
     connect(m_ui->bClearQueue, SIGNAL(clicked(bool)), expMgr, SLOT(clearQueue()));
     connect(m_ui->bClearIdle, SIGNAL(clicked(bool)), expMgr, SLOT(clearIdle()));
