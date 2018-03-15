@@ -104,8 +104,10 @@ int TableWidget::insertRow(Experiment* exp)
 
     setItemDelegateForRow(row, new RowsDelegate(exp, this));
     connect(exp, &Experiment::progressUpdated, [this, row]() {
-        const QModelIndex& idx = model()->index(row, 0);
-        emit (model()->dataChanged(idx, idx));
+        if (model()) { // model might be null, eg., tab was closed with running experiments
+            const QModelIndex& idx = model()->index(row, 0);
+            emit (model()->dataChanged(idx, idx));
+        }
     });
 
     return row;
