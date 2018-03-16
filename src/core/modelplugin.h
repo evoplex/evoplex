@@ -27,9 +27,11 @@ public:
 
     inline const std::vector<QString>& agentAttrNames() const { return m_agentAttrNames; }
     inline const AttributesSpace& agentAttrSpace() const { return m_agentAttrSpace; }
+    inline const ValueSpace* agentAttrSpace(const QString& attr) const { return m_agentAttrSpace.value(attr); }
 
     inline const std::vector<QString>& edgeAttrNames() const { return m_edgeAttrNames; }
     inline const AttributesSpace& edgeAttrSpace() const { return m_edgeAttrSpace; }
+    inline const ValueSpace* edgeAttrSpace(const QString& attr) const { return m_edgeAttrSpace.value(attr); }
 
 private:
     IPluginModel* m_factory;

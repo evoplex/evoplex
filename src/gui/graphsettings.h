@@ -36,6 +36,8 @@ signals:
     void edgeCMapUpdated(ColorMap* cmap);
 
 private slots:
+    void init();
+
     void updateAgentCMap();
     void slotAgentCMapName(const QString& name);
     void setAgentAttr(int attrIdx);
@@ -46,9 +48,9 @@ private slots:
 
 private:
     Ui_GraphSettings* m_ui;
+    const Experiment* m_exp;
+    const ModelPlugin* m_modelPlugin;
     const ColorMapMgr* m_cmMgr;
-    const AttributesSpace m_agentAttrSpace;
-    const AttributesSpace m_edgeAttrSpace;
     ColorMap* m_agentCMap;
     ColorMap* m_edgeCMap;
 };

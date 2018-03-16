@@ -113,9 +113,9 @@ void OutputWidget::slotClose(bool canceled)
 
         const ValueSpace* entityValSpace;
         if (entity == DefaultOutput::E_Agents) {
-            entityValSpace = m_modelPlugin->agentAttrSpace().value(attr);
+            entityValSpace = m_modelPlugin->agentAttrSpace(attr);
         } else {
-            entityValSpace = m_modelPlugin->edgeAttrSpace().value(attr);
+            entityValSpace = m_modelPlugin->edgeAttrSpace(attr);
         }
 
         if (rinfo.equalToId == -1) {
