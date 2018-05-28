@@ -43,7 +43,7 @@ AgentsGenerator::Function AgentsGenerator::enumFromString(const QString& funcStr
     else if (funcStr == "max") return F_Max;
     else if (funcStr == "rand") return F_Rand;
     else if (funcStr == "value") return F_Value;
-    else if (funcStr == "invalid") return F_Invalid;
+    return F_Invalid;
 }
 
 /*********************/
