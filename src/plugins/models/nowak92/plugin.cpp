@@ -15,9 +15,20 @@ bool ModelNowak::init()
 
 bool ModelNowak::algorithmStep()
 {
+    // 1. each agent accumulates the payoff obtained by playing the game with all its neighbours and itself
+    for (Agent* agent : graph()->agents()) {
+        const int sX = agent->attr(Strategy).toInt();
+        double score = playGame(sX, sX);
+        for (const Edge* edge : agent->edges()) {
+            score += playGame(sX, edge->neighbour()->attr(Strategy).toInt());
+        }
+        agent->setAttr(Score, score);
+    }
+
     std::vector<char> bestStrategies;
     bestStrategies.reserve(graph()->agents().size());
 
+    // 2. the best agent in the neighbourhood is selected to reproduce
     for (Agent* agent : graph()->agents()) {
         int bestStrategy = agent->attr(Strategy).toInt();
         double highestScore = agent->attr(Score).toDouble();
@@ -31,21 +42,13 @@ bool ModelNowak::algorithmStep()
         bestStrategies.emplace_back(binarize(bestStrategy));
     }
 
+    // 3. prepare the next generation
     int i = 0;
     for (Agent* agent : graph()->agents()) {
         int s = binarize(agent->attr(Strategy).toInt());
         s = (s == bestStrategies.at(i)) ? s : bestStrategies.at(i) + 2;
         agent->setAttr(Strategy, s);
         ++i;
-    }
-
-    for (Agent* agent : graph()->agents()) {
-        const int sX = agent->attr(Strategy).toInt();
-        double score = 0.0;
-        for (const Edge* edge : agent->edges()) {
-            score += playGame(sX, edge->neighbour()->attr(Strategy).toInt());
-        }
-        agent->setAttr(Score, score);
     }
 
     return false;

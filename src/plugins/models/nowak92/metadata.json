@@ -3,7 +3,7 @@
   "uid": "nowak92",
   "name": "Evolutionary games and spatial chaos",
   "author": "Marcos Cardinot",
-  "description": "Nowak 1992",
+  "description": "Martin A. Nowak & Robert M. May, 1992",
   "supportedGraphs": ["mooreGrid","squareGrid","customGraph"],
   "pluginAttributesSpace": [
     {"temptation": "double[1,2]"}
