@@ -195,18 +195,18 @@ color: rgb(255, 255, 255);</string>
        </property>
        <property name="sizeHint" stdset="0">
         <size>
-         <width>40</width>
-         <height>20</height>
+         <width>0</width>
+         <height>0</height>
         </size>
        </property>
       </spacer>
      </item>
      <item>
       <widget class="QPushButton" name="bShowAgents">
-       <property name="maximumSize">
+       <property name="minimumSize">
         <size>
-         <width>45</width>
-         <height>16777215</height>
+         <width>5</width>
+         <height>5</height>
         </size>
        </property>
        <property name="font">
@@ -227,10 +227,10 @@ color: rgb(255, 255, 255);</string>
      </item>
      <item>
       <widget class="QPushButton" name="bShowEdges">
-       <property name="maximumSize">
+       <property name="minimumSize">
         <size>
-         <width>45</width>
-         <height>16777215</height>
+         <width>5</width>
+         <height>5</height>
         </size>
        </property>
        <property name="font">
@@ -256,8 +256,8 @@ color: rgb(255, 255, 255);</string>
        </property>
        <property name="sizeHint" stdset="0">
         <size>
-         <width>50</width>
-         <height>20</height>
+         <width>0</width>
+         <height>0</height>
         </size>
        </property>
       </spacer>
