@@ -565,11 +565,12 @@ void ExperimentDesigner::addPluginAttrs(QTreeWidgetItem* tree, const AbstractPlu
     }
 
     const QString uid_ = plugin->id() + "_";
-    foreach (const ValueSpace* valSpace, plugin->pluginAttrSpace()) {
+    foreach (const QString& attrName, plugin->pluginAttrNames()) {
         QTreeWidgetItem* item = new QTreeWidgetItem(tree);
-        item->setText(0, valSpace->attrName());
+        item->setText(0, attrName);
         item->setData(0, Qt::UserRole, plugin->id());
 
+        const ValueSpace* valSpace = plugin->pluginAttrSpace().value(attrName);
         QWidget* widget = nullptr;
         switch (valSpace->type()) {
         case ValueSpace::Double_Range: {
