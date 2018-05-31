@@ -47,9 +47,6 @@ ProjectWidget::ProjectWidget(ProjectSP project, MainGUI* mainGUI, ProjectsPage* 
     connect(m_ui->table, SIGNAL(itemDoubleClicked(QTableWidgetItem*)),
             SLOT(onItemDoubleClicked(QTableWidgetItem*)));
 
-    connect(m_mainGUI->mainApp()->expMgr(), SIGNAL(statusChanged(Experiment*)),
-            m_ui->table->viewport(), SLOT(update()));
-
     connect(project.data(), SIGNAL(hasUnsavedChanges(bool)),
             SLOT(slotHasUnsavedChanges(bool)));
 }

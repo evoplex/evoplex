@@ -7,6 +7,7 @@
 #include <QPainter>
 #include <QPaintEvent>
 #include <QPixmap>
+#include <QDebug>
 
 #include "tablewidget.h"
 
@@ -103,6 +104,7 @@ int TableWidget::insertRow(Experiment* exp)
     horizontalHeader()->setSectionResizeMode(H_BUTTON, QHeaderView::Fixed);
 
     setItemDelegateForRow(row, new RowsDelegate(exp, this));
+    connect(exp, &Experiment::statusChanged, [this]() { viewport()->update(); });
     connect(exp, &Experiment::progressUpdated, [this, row]() {
         if (model()) { // model might be null, eg., tab was closed with running experiments
             const QModelIndex& idx = model()->index(row, 0);

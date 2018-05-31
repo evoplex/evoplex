@@ -99,9 +99,10 @@ void Experiment::reset()
     m_stopAt = m_inputs->generalAttrs->value(GENERAL_ATTRIBUTE_STOPAT).toInt();
     m_pauseAt = m_stopAt;
     m_progress = 0;
-    m_expStatus = READY;
 
-    emit (m_mainApp->expMgr()->statusChanged(this));
+    m_expStatus = READY;
+    emit (statusChanged(m_expStatus));
+
     emit (restarted());
 }
 
@@ -172,6 +173,7 @@ void Experiment::processTrial(const int& trialId)
     } else if (m_trials.find(trialId) == m_trials.end()) {
         AbstractModel* trial = createTrial(trialId);
         if (!trial) {
+            setExpStatus(INVALID);
             pause();
             return;
         }
@@ -236,7 +238,6 @@ AbstractModel* Experiment::createTrial(const int trialId)
     if (m_expStatus == INVALID || m_pauseAt == 0) {
         return nullptr;
     } if (m_trials.size() == m_numTrials) {
-        m_expStatus = INVALID;
         QString e = QString("[Experiment]: FATAL! all the trials for this experiment have already been created."
                             "It should never happen!\n Project: %1; Exp: %2; Trial: %3 (max=%4)\n")
                             .arg(m_project->name()).arg(m_id).arg(trialId).arg(m_numTrials);
@@ -246,7 +247,6 @@ AbstractModel* Experiment::createTrial(const int trialId)
 
     Agents agents = createAgents();
     if (agents.empty()) {
-        m_expStatus = INVALID;
         return nullptr;
     }
 
@@ -259,7 +259,6 @@ AbstractModel* Experiment::createTrial(const int trialId)
         qWarning() << "[Experiment]: unable to create the trials."
                    << "The graph could not be initialized."
                    << "Project:" << m_project->name() << "Experiment:" << m_id;
-        m_expStatus = INVALID;
         delete graphObj;
         delete prg;
         return nullptr;
@@ -271,7 +270,6 @@ AbstractModel* Experiment::createTrial(const int trialId)
         qWarning() << "[Experiment]: unable to create the trials."
                    << "The model could not be initialized."
                    << "Project:" << m_project->name() << "Experiment:" << m_id;
-        m_expStatus = INVALID;
         delete modelObj;
         return nullptr;
     }
@@ -286,7 +284,6 @@ AbstractModel* Experiment::createTrial(const int trialId)
         } else {
             qWarning() << "[Experiment] unable to create the trials."
                        << "Could not write in " << fpath;
-            m_expStatus = INVALID;
             delete modelObj;
             return nullptr;
         }
@@ -551,6 +548,13 @@ Experiment::ExperimentInputs* Experiment::readInputs(const MainApp* mainApp,
 
     // that's great! everything seems to be valid
     return ei;
+}
+
+void Experiment::setExpStatus(Status s)
+{
+    QMutexLocker locker(&m_mutex);
+    m_expStatus = s;
+    emit (statusChanged(m_expStatus));
 }
 
 } // evoplex

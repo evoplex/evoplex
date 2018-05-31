@@ -71,7 +71,6 @@ void ExperimentsMgr::destroyExperiments()
         } else {
             m_queued.remove(exp);
             exp->setExpStatus(Experiment::INVALID);
-            emit (statusChanged(exp));
         }
         ++it;
     }
@@ -98,7 +97,6 @@ void ExperimentsMgr::play(Experiment* exp)
 
     if (m_threadPool.activeThreadCount() < m_threads) {
         exp->setExpStatus(Experiment::RUNNING);
-        emit (statusChanged(exp));
         m_queued.remove(exp);
 
         m_running.emplace_back(exp);
@@ -111,7 +109,6 @@ void ExperimentsMgr::play(Experiment* exp)
         }
     } else if (exp->expStatus() != Experiment::QUEUED) {
         exp->setExpStatus(Experiment::QUEUED);
-        emit (statusChanged(exp));
         m_queued.emplace_back(exp);
     }
 }
@@ -151,7 +148,6 @@ void ExperimentsMgr::finished(Experiment* exp, const int trialId)
         }
     }
 
-    emit (statusChanged(exp));
     emit (expFinished());
 }
 
@@ -162,7 +158,6 @@ void ExperimentsMgr::removeFromQueue(Experiment* exp)
     if (exp->expStatus() == Experiment::QUEUED) {
         m_queued.remove(exp);
         exp->setExpStatus(Experiment::READY);
-        emit (statusChanged(exp));
     }
 }
 
@@ -173,7 +168,6 @@ void ExperimentsMgr::clearQueue()
     for (Experiment* exp : m_queued) {
         exp->pause();
         exp->setExpStatus(Experiment::READY);
-        emit (statusChanged(exp));
     }
     m_queued.clear();
 }

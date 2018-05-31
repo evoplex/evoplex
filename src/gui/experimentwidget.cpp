@@ -68,15 +68,16 @@ ExperimentWidget::ExperimentWidget(Experiment* exp, MainGUI* mainGUI, ProjectsPa
     tb->setStyleSheet("background: rgb(53,53,53);");
     tb->setFocusPolicy(Qt::StrongFocus);
 
-    ExperimentsMgr* expMgr = mainGUI->mainApp()->expMgr();
-    connect(expMgr, SIGNAL(statusChanged(Experiment*)), SLOT(slotStatusChanged(Experiment*)));
-
     connect(m_aPlayPause, &QAction::triggered, [this]() { m_exp->toggle(); });
     connect(m_aNext, &QAction::triggered, [this]() { m_exp->playNext(); });
     connect(m_aStop, &QAction::triggered, [this]() { m_exp->stop(); });
     connect(m_aReset, &QAction::triggered, [this]() { m_exp->reset(); });
-    slotStatusChanged(exp); // just to init the controls
     connect(m_delay, &QSlider::valueChanged, [this](int v) { m_exp->setDelay(v); });
+
+    qRegisterMetaType<Experiment::Status>("Experiment::Status");
+    connect(m_exp, SIGNAL(statusChanged(Experiment::Status)),
+            SLOT(slotStatusChanged(Experiment::Status)));
+    slotStatusChanged(exp->expStatus()); // just to init the controls
 
     QVBoxLayout* layout = new QVBoxLayout(new QWidget(this));
     layout->addWidget(m_innerWindow);
@@ -96,7 +97,7 @@ ExperimentWidget::ExperimentWidget(Experiment* exp, MainGUI* mainGUI, ProjectsPa
             connect(this, SIGNAL(updateWidgets(bool)), grid, SLOT(updateView(bool)));
         }
     });
-    connect(m_aLineChart, &QAction::triggered, [this, expMgr]() {
+    connect(m_aLineChart, &QAction::triggered, [this]() {
         if (isAutoDeleteOff()) {
             LineChart* lineChart = new LineChart(m_exp, this);
             m_innerWindow->addDockWidget(Qt::TopDockWidgetArea, lineChart);
@@ -122,13 +123,8 @@ void ExperimentWidget::closeEvent(QCloseEvent* event)
     QDockWidget::closeEvent(event);
 }
 
-void ExperimentWidget::slotStatusChanged(Experiment* exp)
+void ExperimentWidget::slotStatusChanged(Experiment::Status status)
 {
-    if (m_exp != exp) {
-        return;
-    }
-
-    Experiment::Status status = exp->expStatus();
     if (status == Experiment::READY) {
         m_aPlayPause->setIcon(m_kIcon_play);
         m_aPlayPause->setEnabled(true);

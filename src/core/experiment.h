@@ -40,6 +40,7 @@ public:
         RUNNING,  // running in a work thread
         FINISHED, // all is done
     };
+    Q_ENUM(Status)
 
     struct ExperimentInputs {
         const Attributes* generalAttrs;
@@ -101,7 +102,7 @@ public:
     inline void setDelay(quint16 delay) { m_delay = delay; }
 
     inline const Status expStatus() const { return m_expStatus; }
-    inline void setExpStatus(Status s) { m_mutex.lock(); m_expStatus = s; m_mutex.unlock(); }
+    void setExpStatus(Status s);
 
     inline bool autoDeleteTrials() const { return m_autoDeleteTrials; }
     inline void setAutoDeleteTrials(bool b) { m_autoDeleteTrials = b; }
@@ -126,6 +127,7 @@ signals:
     void trialCreated(int trialId);
     void restarted();
     void progressUpdated();
+    void statusChanged(Experiment::Status);
 
 private slots:
     // Updates the progress value.

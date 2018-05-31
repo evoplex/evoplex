@@ -35,7 +35,6 @@ public:
     void setMaxThreadCount(const int newValue);
 
 signals:
-    void statusChanged(Experiment* exp);
     void expFinished();
 
 public slots:
