@@ -119,6 +119,7 @@ ExperimentWidget::~ExperimentWidget()
 
 void ExperimentWidget::closeEvent(QCloseEvent* event)
 {
+    m_exp->disconnect(this); // important to avoid triggering slotStatusChanged()
     emit (closed());
     QDockWidget::closeEvent(event);
 }
