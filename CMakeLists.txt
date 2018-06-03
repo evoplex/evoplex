@@ -5,8 +5,9 @@
 
 cmake_minimum_required(VERSION 3.1.0 FATAL_ERROR)
 
-project(evoplex)
+set(EVOPLEX_RELEASE "alpha")
 set(EVOPLEX_VERSION 0.0.0)
+project(evoplex VERSION ${EVOPLEX_VERSION})
 
 # Find includes in corresponding build directories
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -74,3 +75,33 @@ find_package(Qt5Test 5.8.0 REQUIRED)
 
 # Compile source
 add_subdirectory(src)
+
+# CPack: general configuration
+set(CPACK_GENERATOR "RPM;DEB")
+set(CPACK_PACKAGE_NAME ${PROJECT_NAME})
+set(CPACK_PACKAGE_VERSION ${PROJECT_VERSION})
+set(CPACK_PACKAGE_VENDOR "Marcos Cardinot <marcos@cardinot.net>")
+set(CPACK_PACKAGE_DESCRIPTION "Evoplex is a multi-agent system for networks.")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY ${CPACK_PACKAGE_DESCRIPTION})
+set(CPACK_PACKAGE_HOMEPAGE_URL "https://evoplex.github.io")
+set(CPACK_PACKAGE_ICON "${CMAKE_SOURCE_DIR}/data/icon.bmp")
+set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/LICENSE.txt")
+set(CPACK_RESOURCE_FILE_README "${CMAKE_SOURCE_DIR}/README.md")
+set(CPACK_PACKAGING_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX})
+set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}-${EVOPLEX_RELEASE}.${CMAKE_SYSTEM_PROCESSOR}")
+set(CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION / /usr/local /usr/local/bin /usr/local/include /usr/local/lib)
+# CPack: Debian package generator
+set(CPACK_DEBIAN_PACKAGE_DEPENDS "cmake (>= 3.1), qt5-default (>= 5.8), libqt5charts5 (>=5.8)")
+set(CPACK_DEBIAN_PACKAGE_DESCRIPTION ${CPACK_PACKAGE_DESCRIPTION})
+set(CPACK_DEBIAN_PACKAGE_MAINTAINER ${CPACK_PACKAGE_VENDOR})
+set(CPACK_DEBIAN_PACKAGE_SECTION "contrib/science")
+# CPack: RPM package generator
+set(CPACK_RPM_PACKAGE_REQUIRES "cmake >= 3.1, qt5-qtbase-devel >= 5.8, qt5-qtbase-devel-gui >= 5.8, qt5-qtcharts >= 5.8")
+set(CPACK_RPM_PACKAGE_DESCRIPTION ${CPACK_PACKAGE_DESCRIPTION})
+set(CPACK_RPM_PACKAGE_RELEASE ${EVOPLEX_RELEASE})
+set(CPACK_RPM_FILE_NAME "${CPACK_PACKAGE_FILE_NAME}.rpm")
+set(CPACK_RPM_CHANGELOG_FILE "${CMAKE_SOURCE_DIR}/CHANGELOG.md")
+set(CPACK_RPM_PACKAGE_GROUP "Development/Tools")
+set(CPACK_RPM_PACKAGE_LICENSE "GPLv3")
+# CPack call
+include(CPack)
