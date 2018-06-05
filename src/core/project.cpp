@@ -116,7 +116,7 @@ const int Project::importExperiments(const QString& filePath, QString& errorMsg)
 {
     QFile file(filePath);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        errorMsg = "Couldn't read the experiments from:\n`" + filePath + "`";
+        errorMsg = "Couldn't read the experiments from:\n`" + filePath + "`"
                  + "Please, make sure it is a readable csv file.";
         qWarning() << "[Project]: " << errorMsg;
         return 0;

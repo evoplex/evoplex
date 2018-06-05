@@ -38,7 +38,7 @@ public:
     Attributes(int size) { resize(size); }
     ~Attributes() {}
 
-    inline int size() const { return m_values.size(); }
+    inline size_t size() const { return m_values.size(); }
     inline void resize(int size) { m_names.resize(size); m_values.resize(size); }
     inline void reserve(int size) { m_names.reserve(size); m_values.reserve(size); }
 
@@ -69,6 +69,7 @@ public:
         } catch (const std::out_of_range&) {
             qFatal("[Attributes::value()]: Out of range error!");
         }
+        qFatal("[Attributes::value()]: Invalid value!");
     }
 
     inline void setValue(int id, Value value) {
