@@ -261,17 +261,6 @@ void Logger::deinit()
 
 void Logger::debugLogHandler(QtMsgType type, const QMessageLogContext& ctx, const QString& msg)
 {
-    // copied from qDefaultMessageHandler() at qlogging.cpp
-
-    bool handledStderr = false;
-#if defined(Q_OS_WIN)
-    handledStderr |= win_message_handler(type, context, message);
-#endif
-
-    if (handledStderr) {
-        return;
-    }
-
     QString formattedMessage = qFormatLogMessage(type, ctx, msg);
     if (formattedMessage.isNull()) {
         return;
