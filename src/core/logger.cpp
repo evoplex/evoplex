@@ -79,36 +79,32 @@ void Logger::init()
 
     // write memory and CPU info
 #ifdef Q_OS_LINUX
-
-#ifndef BUILD_FOR_MAEMO
     QFile infoFile("/proc/meminfo");
-    if(!infoFile.open(QIODevice::ReadOnly | QIODevice::Text))
-        writeLog("Could not get memory info.");
-    else
-    {
-        while(!infoFile.peek(1).isEmpty())
-        {
+    if (infoFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        while (!infoFile.peek(1).isEmpty()) {
             QString line = infoFile.readLine();
             line.chop(1);
-            if (line.startsWith("Mem") || line.startsWith("SwapTotal"))
+            if (line.startsWith("Mem") || line.startsWith("SwapTotal")) {
                 writeLog(line);
+            }
         }
         infoFile.close();
+    } else {
+        writeLog("Could not get memory info.");
     }
 
     infoFile.setFileName("/proc/cpuinfo");
-    if (!infoFile.open(QIODevice::ReadOnly | QIODevice::Text))
-        writeLog("Could not get CPU info.");
-    else
-    {
-        while(!infoFile.peek(1).isEmpty())
-        {
+    if (infoFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        while (!infoFile.peek(1).isEmpty()) {
             QString line = infoFile.readLine();
             line.chop(1);
-            if(line.startsWith("model name") || line.startsWith("cpu MHz"))
+            if (line.startsWith("model name") || line.startsWith("cpu MHz")) {
                 writeLog(line);
+            }
         }
         infoFile.close();
+    } else {
+        writeLog("Could not get CPU info.");
     }
 
     QProcess lspci;
@@ -116,30 +112,23 @@ void Logger::init()
     lspci.waitForFinished(300);
     const QString pciData(lspci.readAll());
     QStringList pciLines = pciData.split('\n', QString::SkipEmptyParts);
-    for (int i = 0; i<pciLines.size(); i++)
-    {
-        if(pciLines.at(i).contains("VGA compatible controller"))
-        {
+    for (int i = 0; i < pciLines.size(); ++i) {
+        if (pciLines.at(i).contains("VGA compatible controller")) {
             writeLog(pciLines.at(i));
             i++;
-            while(i < pciLines.size() && pciLines.at(i).startsWith('\t'))
-            {
-                if(pciLines.at(i).contains("Kernel driver in use"))
+            while(i < pciLines.size() && pciLines.at(i).startsWith('\t')) {
+                if (pciLines.at(i).contains("Kernel driver in use")) {
                     writeLog(pciLines.at(i).trimmed());
-                else if(pciLines.at(i).contains("Kernel modules"))
+                } else if(pciLines.at(i).contains("Kernel modules")) {
                     writeLog(pciLines.at(i).trimmed());
+                }
                 i++;
             }
         }
     }
-#endif
 
-// Aargh Windows API
 #elif defined Q_OS_WIN
-    // Hopefully doesn't throw a linker error on earlier systems. Not like
-    // I'm gonna test it or anything.
-    if (QSysInfo::WindowsVersion >= QSysInfo::WV_XP)
-    {
+    if (QSysInfo::WindowsVersion >= QSysInfo::WV_XP) {
         MEMORYSTATUSEX statex;
         statex.dwLength = sizeof (statex);
         GlobalMemoryStatusEx(&statex);
@@ -151,9 +140,9 @@ void Logger::init()
         writeLog(QString("Total virtual memory: %1 MB").arg(statex.ullTotalVirtual/(1024<<10)));
         writeLog(QString("Available virtual memory: %1 MB").arg(statex.ullAvailVirtual/(1024<<10)));
         #endif
-    }
-    else
+    } else {
         writeLog("Windows version too old to get memory info.");
+    }
 
     HKEY hKey = NULL;
     DWORD dwType = REG_DWORD;
@@ -164,18 +153,17 @@ void Logger::init()
     QString procKey = "Hardware\\Description\\System\\CentralProcessor";
     LONG lRet = ERROR_SUCCESS;
     int i;
-    for(i = 0; lRet == ERROR_SUCCESS; i++)
-    {
+    for(i = 0; lRet == ERROR_SUCCESS; ++i) {
         lRet = RegOpenKeyExA(HKEY_LOCAL_MACHINE,
                     qPrintable(QString("%1\\%2").arg(procKey).arg(i)),
                     0, KEY_QUERY_VALUE, &hKey);
 
-        if(lRet == ERROR_SUCCESS)
-        {
-            if(RegQueryValueExA(hKey, "~MHz", NULL, &dwType, (LPBYTE)&numVal, &dwSize) == ERROR_SUCCESS)
+        if(lRet == ERROR_SUCCESS) {
+            if(RegQueryValueExA(hKey, "~MHz", NULL, &dwType, (LPBYTE)&numVal, &dwSize) == ERROR_SUCCESS) {
                 writeLog(QString("Processor speed: %1 MHz").arg(numVal));
-            else
+            } else {
                 writeLog("Could not get processor speed.");
+            }
         }
 
         // can you believe this trash?
@@ -183,48 +171,40 @@ void Logger::init()
         char nameStr[512];
         DWORD nameSize = sizeof(nameStr);
 
-        if (lRet == ERROR_SUCCESS)
-        {
-            if (RegQueryValueExA(hKey, "ProcessorNameString", NULL, &dwType, (LPBYTE)&nameStr, &nameSize) == ERROR_SUCCESS)
+        if (lRet == ERROR_SUCCESS) {
+            if (RegQueryValueExA(hKey, "ProcessorNameString", NULL, &dwType, (LPBYTE)&nameStr, &nameSize) == ERROR_SUCCESS) {
                 writeLog(QString("Processor name: %1").arg(nameStr));
-            else
+            } else {
                 writeLog("Could not get processor name.");
+            }
         }
 
         RegCloseKey(hKey);
     }
-    if(i == 0)
+    if(i == 0) {
         writeLog("Could not get processor info.");
+    }
 
-#elif defined Q_OS_MAC
+#elif defined Q_OS_MACOS
     QProcess systemProfiler;
     systemProfiler.start("/usr/sbin/system_profiler -detailLevel mini SPHardwareDataType SPDisplaysDataType");
     systemProfiler.waitForStarted();
     systemProfiler.waitForFinished();
     const QString systemData(systemProfiler.readAllStandardOutput());
     QStringList systemLines = systemData.split('\n', QString::SkipEmptyParts);
-    for (int i = 0; i<systemLines.size(); i++)
-    {
-        if(systemLines.at(i).contains("Model"))
-        {
+    for (int i = 0; i<systemLines.size(); ++i) {
+        if(systemLines.at(i).contains("Model")) {
             writeLog(systemLines.at(i).trimmed());
         }
-
-        if(systemLines.at(i).contains("Processor"))
-        {
+        if(systemLines.at(i).contains("Processor")) {
             writeLog(systemLines.at(i).trimmed());
         }
-
-        if(systemLines.at(i).contains("Memory"))
-        {
+        if(systemLines.at(i).contains("Memory")) {
             writeLog(systemLines.at(i).trimmed());
         }
-
-        if(systemLines.at(i).contains("VRAM"))
-        {
+        if(systemLines.at(i).contains("VRAM")) {
             writeLog(systemLines.at(i).trimmed());
         }
-
     }
 
 #elif defined Q_OS_BSD4
@@ -234,18 +214,14 @@ void Logger::init()
     dmesg.waitForFinished();
     const QString dmesgData(dmesg.readAll());
     QStringList dmesgLines = dmesgData.split('\n', QString::SkipEmptyParts);
-    for (int i = 0; i<dmesgLines.size(); i++)
-    {
-        if (dmesgLines.at(i).contains("memory"))
-        {
+    for (int i = 0; i<dmesgLines.size(); ++i) {
+        if (dmesgLines.at(i).contains("memory")) {
             writeLog(dmesgLines.at(i).trimmed());
         }
-        if (dmesgLines.at(i).contains("CPU"))
-        {
+        if (dmesgLines.at(i).contains("CPU")) {
             writeLog(dmesgLines.at(i).trimmed());
         }
-        if (dmesgLines.at(i).contains("VGA"))
-        {
+        if (dmesgLines.at(i).contains("VGA")) {
             writeLog(dmesgLines.at(i).trimmed());
         }
     }
@@ -266,7 +242,7 @@ void Logger::debugLogHandler(QtMsgType type, const QMessageLogContext& ctx, cons
         return;
     }
 
-    fprintf(stderr, "%s\n", formattedMessage.toLocal8Bit().constData());
+    fprintf(stderr, "%s\n", qPrintable(formattedMessage));
     fflush(stderr);
 
     writeLog(formattedMessage);
@@ -274,8 +250,9 @@ void Logger::debugLogHandler(QtMsgType type, const QMessageLogContext& ctx, cons
 
 void Logger::writeLog(QString msg)
 {
-    if (!msg.endsWith('\n'))
+    if (!msg.endsWith('\n')) {
         msg.append(QLatin1Char('\n'));
+    }
 
     m_fileMutex.lock();
     m_logFile.write(qPrintable(msg), msg.size());

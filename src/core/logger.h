@@ -27,6 +27,8 @@
 
 namespace evoplex
 {
+// This class was mostly based on the StelLogger.hpp from Stellarium
+// https://github.com/Stellarium/stellarium/blob/master/src/StelLogger.hpp
 class Logger
 {
 public:
