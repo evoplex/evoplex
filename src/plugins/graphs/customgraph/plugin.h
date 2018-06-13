@@ -24,7 +24,7 @@
 #include <QPair>
 #include <vector>
 
-#include <evoplex/plugininterfaces.h>
+#include <plugininterfaces.h>
 
 namespace evoplex {
 class CustomGraph: public AbstractGraph

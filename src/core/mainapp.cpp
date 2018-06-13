@@ -36,6 +36,14 @@
 
 namespace evoplex {
 
+#if defined(Q_OS_WIN)
+const char* MainApp::kPluginExtension = ".dll";
+#elif defined(Q_OS_MACOS)
+const char* MainApp::kPluginExtension = ".dylib";
+#else
+const char* MainApp::kPluginExtension = ".so";
+#endif
+
 MainApp::MainApp()
     : m_experimentsMgr(new ExperimentsMgr())
 {
@@ -66,7 +74,9 @@ MainApp::MainApp()
     QDir pluginsDir = QDir(qApp->applicationDirPath());
     pluginsDir.cdUp();
     if (pluginsDir.cd("lib/evoplex/plugins")) {
-        foreach (QString fileName, pluginsDir.entryList(QStringList("*.so"), QDir::Files)) {
+        const QStringList nameFilter(QString("*%1").arg(kPluginExtension));
+        QStringList files = pluginsDir.entryList(nameFilter, QDir::Files);
+        for (const QString& fileName : files) {
             QString error;
             loadPlugin(pluginsDir.absoluteFilePath(fileName), error, false);
         }
@@ -111,7 +121,7 @@ void MainApp::setStepsToFlush(int steps)
 const AbstractPlugin* MainApp::loadPlugin(const QString& path, QString& error, const bool addToUserPrefs)
 {
     if (!QFile(path).exists()) {
-        error = "Unable to find the .so file. " + path;
+        error = "Unable to find the file. " + path;
         qWarning() << "[MainApp] " << error;
         return nullptr;
     }
@@ -160,7 +170,8 @@ const AbstractPlugin* MainApp::loadPlugin(const QString& path, QString& error, c
 
     QObject* instance = loader.instance(); // it'll load the plugin
     if (!instance) {
-        error = QString("Unable to load the plugin.\nIs it a valid .so file?\n %1").arg(path);
+        error = QString("Unable to load the plugin.\n"
+                        "Please, make sure it is a valid Evoplex plugin.\n %1").arg(path);
         loader.unload();
         qWarning() << "[MainApp] " << error;
         return nullptr;
@@ -182,7 +193,8 @@ const AbstractPlugin* MainApp::loadPlugin(const QString& path, QString& error, c
     }
 
     if (!plugin || !plugin->isValid()) {
-        error = QString("Unable to load the plugin.\nPlease, check the metaData.json file.\n %1").arg(path);
+        error = QString("Unable to load the plugin.\n"
+                        "Please, check the metaData.json file.\n %1").arg(path);
         loader.unload();
         qWarning() << "[MainApp] " << error;
         delete plugin;

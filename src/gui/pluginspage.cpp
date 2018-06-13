@@ -112,8 +112,8 @@ void PluginsPage::loadHtml(const ModelPlugin* plugin)
 void PluginsPage::importPlugin()
 {
     QString fileName = QFileDialog::getOpenFileName(this, tr("Import Plugin"),
-                                                    QDir::homePath(),
-                                                    tr("Plugin (*.so)"));
+            QDir::homePath(), tr("Evoplex Plugin (*%1)").arg(MainApp::kPluginExtension));
+
     if (fileName.isEmpty()) {
         return;
     }

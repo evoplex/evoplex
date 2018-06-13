@@ -44,6 +44,8 @@ class MainApp : public QObject
     Q_OBJECT
 
 public:
+    static const char* kPluginExtension;
+
     explicit MainApp();
     ~MainApp();
 

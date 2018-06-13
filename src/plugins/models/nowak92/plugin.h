@@ -21,7 +21,7 @@
 #ifndef NOWAK92_H
 #define NOWAK92_H
 
-#include <evoplex/plugininterfaces.h>
+#include <plugininterfaces.h>
 
 namespace evoplex {
 class ModelNowak: public AbstractModel
