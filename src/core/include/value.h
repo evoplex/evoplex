@@ -40,7 +40,7 @@ public:
     Value(const double value) : m_type(DOUBLE) { m_data.d = value; }
     Value(const int value) : m_type(INT) { m_data.i = value; }
     Value(const char* value) : m_type(STRING) { m_data.s = value; }
-    Value(const QString& value) : Value(strdup(value.toUtf8().constData())) {}
+    Value(const QString& value) : Value(value.toUtf8().constData()) {}
 
     inline bool isValid() const { return m_type != INVALID; }
     inline Type type() const { return m_type; }
