@@ -20,6 +20,8 @@
 
 #include <QCoreApplication>
 #include <QDateTime>
+#include <QDebug>
+#include <QDir>
 #include <QProcess>
 #include <QStandardPaths>
 #include <QSysInfo>
@@ -38,13 +40,18 @@ QMutex Logger::m_fileMutex;
 
 void Logger::init()
 {
-    m_logFile.setFileName(QString("%1/%2/log.txt")
-                        .arg(QStandardPaths::writableLocation(QStandardPaths::ConfigLocation))
-                        .arg(QCoreApplication::applicationName()));
-
-    if (m_logFile.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text | QIODevice::Unbuffered)) {
-        qInstallMessageHandler(Logger::debugLogHandler);
+    QDir dir(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation));
+    if (!dir.exists()) {
+        dir.mkpath(".");
     }
+
+    m_logFile.setFileName(dir.absoluteFilePath("log.txt"));
+    if (!m_logFile.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text | QIODevice::Unbuffered)) {
+        qWarning() << "[Logger] ERROR! Unable to write the log file.";
+        return;
+    }
+
+    qInstallMessageHandler(Logger::debugLogHandler);
 
     writeLog(QString("%1").arg(QDateTime::currentDateTime().toString(Qt::ISODate)));
 
