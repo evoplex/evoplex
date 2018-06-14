@@ -40,6 +40,11 @@ function(add_plugins ROOT_DIR PLUGINS)
         RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL ${DESTINATION}
         RUNTIME_OUTPUT_DIRECTORY_RELEASE ${DESTINATION}
         RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO ${DESTINATION})
+
+    # Qt Object macro is hidden in another macro; let's add them here
+    set_property(TARGET ${PLUGIN_NAME} APPEND PROPERTY
+        AUTOMOC_MACRO_NAMES "REGISTER_GRAPH;REGISTER_MODEL")
+
     install(TARGETS ${PLUGIN_NAME}
         ARCHIVE DESTINATION lib/evoplex/plugins
         LIBRARY DESTINATION lib/evoplex/plugins
