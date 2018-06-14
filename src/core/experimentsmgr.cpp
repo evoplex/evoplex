@@ -120,7 +120,7 @@ void ExperimentsMgr::play(Experiment* exp)
         for (int trialId = 0; trialId < exp->numTrials(); ++trialId) {
             m_runningTrials.emplace_back(std::make_pair(exp->id(), trialId));
             m_threadPool.start(new TrialRunnable(this, exp, trialId),
-                               -1 * m_runningTrials.size()); // play in the same order of insertion
+                               int(m_runningTrials.size()) * -1); // play in the same order of insertion
         }
     } else if (exp->expStatus() != Experiment::QUEUED) {
         exp->setExpStatus(Experiment::QUEUED);

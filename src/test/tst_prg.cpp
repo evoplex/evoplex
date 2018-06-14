@@ -19,7 +19,7 @@
  */
 
 #include <QtTest>
-#include <evoplex/prg.h>
+#include <prg.h>
 
 using namespace evoplex;
 
