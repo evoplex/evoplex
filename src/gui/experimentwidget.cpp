@@ -62,7 +62,10 @@ ExperimentWidget::ExperimentWidget(Experiment* exp, MainGUI* mainGUI, ProjectsPa
     tb->addSeparator();
     m_aGraph = tb->addAction(QIcon(":/icons/graph.svg"), "Graph");
     m_aGrid = tb->addAction(QIcon(":/icons/grid.svg"), "Grid");
-    // FIXME: m_aLineChart = tb->addAction(QIcon(":/icons/line-chart.svg"), "Line chart");
+    /* FIXME: Disabling LineChart button for now.
+     * This feature is in a very unstable state yet.
+    m_aLineChart = tb->addAction(QIcon(":/icons/line-chart.svg"), "Line chart");
+    */
 
     QWidget* spacer = new QWidget(this);
     spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -112,6 +115,9 @@ ExperimentWidget::ExperimentWidget(Experiment* exp, MainGUI* mainGUI, ProjectsPa
             connect(this, SIGNAL(updateWidgets(bool)), grid, SLOT(updateView(bool)));
         }
     });
+
+    /* FIXME: Disabling LineChart button for now.
+     * This feature is in a very unstable state yet.
     connect(m_aLineChart, &QAction::triggered, [this]() {
         if (isAutoDeleteOff()) {
             LineChart* lineChart = new LineChart(m_exp, this);
@@ -119,6 +125,7 @@ ExperimentWidget::ExperimentWidget(Experiment* exp, MainGUI* mainGUI, ProjectsPa
             connect(this, SIGNAL(updateWidgets(bool)), lineChart, SLOT(updateSeries()));
         }
     });
+    */
 
     connect(m_timer, &QTimer::timeout, [this]() {
         if (m_exp->expStatus() != Experiment::INVALID)
