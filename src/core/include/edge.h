@@ -40,12 +40,12 @@ public:
     explicit Edge(Agent* origin, Agent* neighbour, bool isDirected);
     ~Edge();
 
-    inline const Value& attr(const char* name) const { return m_attrs->value(name); }
-    inline const Value& attr(const int id) const { return m_attrs->value(id); }
-    inline void setAttr(const int id, const Value& value) { m_attrs->setValue(id, value); }
+    inline const Value& attr(const char* name) const;
+    inline const Value& attr(const int id) const;
+    inline void setAttr(const int id, const Value& value);
 
-    inline Agent* origin() const { return m_origin; }
-    inline Agent* neighbour() const { return m_neighbour; }
+    inline Agent* origin() const;
+    inline Agent* neighbour() const;
 
 private:
     Agent* m_origin;
@@ -59,5 +59,26 @@ private:
     // access the attrs of this connection.
     Edge* m_undirectedEdge;
 };
-}
+
+/************************************************************************
+   Edge: Inline member functions
+ ************************************************************************/
+
+inline const Value& Edge::attr(const char* name) const
+{ return m_attrs->value(name); }
+
+inline const Value& Edge::attr(const int id) const
+{ return m_attrs->value(id); }
+
+inline void Edge::setAttr(const int id, const Value& value)
+{ m_attrs->setValue(id, value); }
+
+inline Agent* Edge::origin() const
+{ return m_origin; }
+
+inline Agent* Edge::neighbour() const
+{ return m_neighbour; }
+
+
+} // evoplex
 #endif // EDGE_H

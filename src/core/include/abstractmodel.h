@@ -32,14 +32,14 @@ class AbstractBaseModel
     friend class Experiment;
 
 public:
-    inline AbstractGraph* graph() const { return m_graph; }
-    inline PRG* prg() const { return m_prg; }
-    inline const Attributes* attrs() const { return m_attributes; }
-    inline const Value& attr(const QString& name) const { return m_attributes->value(name); }
-    inline const Value& attr(int attrId) const { return m_attributes->value(attrId);  }
-    inline const QString& attrName(int attrId) const { return m_attributes->name(attrId); }
-    inline const int currStep() const { return m_currStep; }
-    inline const int status() const { return m_status; }
+    inline AbstractGraph* graph() const;
+    inline PRG* prg() const;
+    inline const Attributes* attrs() const;
+    inline const Value& attr(const QString& name) const;
+    inline const Value& attr(int attrId) const;
+    inline const QString& attrName(int attrId) const;
+    inline const int currStep() const;
+    inline const int status() const;
 
 protected:
     explicit AbstractBaseModel()
@@ -61,18 +61,7 @@ private:
     int m_status;
 
     // takes the ownership of the graph and the PRG
-    inline bool setup(PRG* prg, AbstractGraph* graphObj, const Attributes* attrs) {
-        Q_ASSERT(!m_prg && !m_graph); // make sure it'll be called only once
-        m_prg = prg;
-        m_graph = graphObj;
-        m_attributes = attrs;
-        m_currStep = 0;
-
-        if (!m_prg || !m_graph) {
-            return false;
-        }
-        return true;
-    }
+    inline bool setup(PRG* prg, AbstractGraph* graphObj, const Attributes* attrs);
 };
 
 class AbstractModel : public AbstractBaseModel
@@ -98,6 +87,47 @@ public:
         return std::vector<Value>();
     }
 };
-} // evoplex
 
+/************************************************************************
+   AbstractBaseModel: Inline member functions
+ ************************************************************************/
+
+inline AbstractGraph* AbstractBaseModel::graph() const
+{ return m_graph; }
+
+inline PRG* AbstractBaseModel::prg() const
+{ return m_prg; }
+
+inline const Attributes* AbstractBaseModel::attrs() const
+{ return m_attributes; }
+
+inline const Value& AbstractBaseModel::attr(const QString& name) const
+{ return m_attributes->value(name); }
+
+inline const Value& AbstractBaseModel::attr(int attrId) const
+{ return m_attributes->value(attrId);  }
+
+inline const QString& AbstractBaseModel::attrName(int attrId) const
+{ return m_attributes->name(attrId); }
+
+inline const int AbstractBaseModel::currStep() const
+{ return m_currStep; }
+
+inline const int AbstractBaseModel::status() const
+{ return m_status; }
+
+inline bool AbstractBaseModel::setup(PRG* prg, AbstractGraph* graphObj, const Attributes* attrs) {
+    assert(!m_prg && !m_graph); // make sure it'll be called only once
+    m_prg = prg;
+    m_graph = graphObj;
+    m_attributes = attrs;
+    m_currStep = 0;
+    if (!m_prg || !m_graph) {
+        return false;
+    }
+    return true;
+}
+
+
+} // evoplex
 #endif // ABSTRACT_MODEL_H

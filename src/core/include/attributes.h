@@ -38,45 +38,102 @@ public:
     Attributes(int size) { resize(size); }
     ~Attributes() {}
 
-    inline size_t size() const { return m_values.size(); }
-    inline void resize(int size) { m_names.resize(size); m_values.resize(size); }
-    inline void reserve(int size) { m_names.reserve(size); m_values.reserve(size); }
+    inline int size() const;
+    inline void resize(int size);
+    inline void reserve(int size);
 
-    inline int indexOf(const char* name) const { return indexOf(QString::fromLocal8Bit(name)); }
-    inline int indexOf(const QString& name) const {
-        int idx = std::find(m_names.begin(), m_names.end(), name) - m_names.begin();
-        return idx == m_names.size() ? -1 : idx;
-    }
+    inline int indexOf(const char* name) const;
+    inline int indexOf(const QString& name) const;
 
-    inline bool contains(const char* name) const { return indexOf(name) > -1; }
-    inline bool contains(const QString& name) const { return indexOf(name) > -1; }
+    inline bool contains(const char* name) const;
+    inline bool contains(const QString& name) const;
 
-    inline void replace(int id, QString newName, Value newValue) { m_names[id] = newName; m_values[id] = newValue; }
-    inline void push_back(QString name, Value value) { m_names.emplace_back(name); m_values.emplace_back(value); }
+    inline void replace(int id, QString newName, Value newValue);
+    inline void push_back(QString name, Value value);
 
-    inline const std::vector<QString>& names() const { return m_names; }
-    inline const QString& name(int id) const { return m_names.at(id); }
+    inline const std::vector<QString>& names() const;
+    inline const QString& name(int id) const;
 
-    inline const Value& value(int id) const { return m_values.at(id); }
-    inline void setValue(int id, Value value) { m_values.at(id) = value; }
+    inline const std::vector<Value>& values() const;
 
-    inline const Value& value(const char* name, const Value& defaultValue) const {
-        const int idx = indexOf(name);
-        return idx < 0 ? defaultValue : value(idx);
-    }
-    inline const Value& value(const QString& name, const Value& defaultValue) const {
-        const int idx = indexOf(name);
-        return idx < 0 ? defaultValue : value(idx);
-    }
+    inline void setValue(int id, Value value);
 
-    inline const Value& value(const char* name) const { return value(indexOf(name)); }
-    inline const Value& value(const QString& name) const { return value(indexOf(name)); }
-    inline const std::vector<Value>& values() const { return m_values; }
+    inline const Value& value(int id) const;
+    inline const Value& value(const char* name) const;
+    inline const Value& value(const QString& name) const;
+    inline const Value& value(const char* name, const Value& defaultValue) const;
+    inline const Value& value(const QString& name, const Value& defaultValue) const;
 
 private:
     std::vector<QString> m_names;
     std::vector<Value> m_values;
 };
 
+
+/************************************************************************
+   Attributes: Inline member functions
+ ************************************************************************/
+
+inline int Attributes::size() const
+{ return int(m_values.size()); }
+
+inline void Attributes::resize(int size)
+{ m_names.resize(size); m_values.resize(size); }
+
+inline void Attributes::reserve(int size)
+{ m_names.reserve(size); m_values.reserve(size); }
+
+inline int Attributes::indexOf(const char* name) const
+{ return indexOf(QString::fromLocal8Bit(name)); }
+
+inline int Attributes::indexOf(const QString& name) const {
+    int idx = std::find(m_names.begin(), m_names.end(), name) - m_names.begin();
+    return idx == m_names.size() ? -1 : idx;
 }
+
+inline bool Attributes::contains(const char* name) const
+{ return indexOf(name) > -1; }
+
+inline bool Attributes::contains(const QString& name) const
+{ return indexOf(name) > -1; }
+
+inline void Attributes::replace(int id, QString newName, Value newValue)
+{ m_names.at(id) = newName; m_values.at(id) = newValue; }
+
+inline void Attributes::push_back(QString name, Value value)
+{ m_names.emplace_back(name); m_values.emplace_back(value); }
+
+inline const std::vector<QString>& Attributes::names() const
+{ return m_names; }
+
+inline const QString& Attributes::name(int id) const
+{ return m_names.at(id); }
+
+inline const std::vector<Value>& Attributes::values() const
+{ return m_values; }
+
+inline void Attributes::setValue(int id, Value value)
+{ m_values.at(id) = value; }
+
+inline const Value& Attributes::value(int id) const
+{ return m_values.at(id); }
+
+inline const Value& Attributes::value(const char* name) const
+{ return value(indexOf(name)); }
+
+inline const Value& Attributes::value(const QString& name) const
+{ return value(indexOf(name)); }
+
+inline const Value& Attributes::value(const char* name, const Value& defaultValue) const {
+    const int idx = indexOf(name);
+    return idx < 0 ? defaultValue : value(idx);
+}
+
+inline const Value& Attributes::value(const QString& name, const Value& defaultValue) const {
+    const int idx = indexOf(name);
+    return idx < 0 ? defaultValue : value(idx);
+}
+
+
+} // evoplex
 #endif // ATTRIBUTES_H

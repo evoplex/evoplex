@@ -41,20 +41,19 @@ public:
         Directed = 2
     };
 
-    static GraphType enumFromString(const QString& str)
-    {
+    static GraphType enumFromString(const QString& str) {
         if (str == "undirected") return Undirected;
         if (str == "directed") return Directed;
         return Invalid_Type;
     }
 
-    inline const QString& name() const { return m_name; }
-    inline const GraphType& type() const { return m_type; }
-    inline const Attributes* attrs() const { return m_attrs; }
-    inline Edges edges() const { return m_edges; }
-    inline Agents agents() const { return m_agents; }
-    inline Agent* agent(int id) const { return m_agents.at(id); }
-    inline Agent* randAgent() const { return m_agents.at(m_prg->randI(m_agents.size()-1)); }
+    inline const QString& name() const;
+    inline const GraphType& type() const;
+    inline const Attributes* attrs() const;
+    inline Edges edges() const;
+    inline Agents agents() const;
+    inline Agent* agent(int id) const;
+    inline Agent* randAgent() const;
 
 protected:
     Agents m_agents;
@@ -75,19 +74,7 @@ private:
     }
 
     // takes the ownership of the agents
-    inline bool setup(PRG* prg, Agents& agents, const Attributes* attrs, const QString& graphType) {
-        // make sure it'll be called only once
-        Q_ASSERT(!m_prg && m_agents.empty());
-        m_prg = prg;
-        m_agents = agents;
-        m_attrs = attrs;
-        m_type = enumFromString(graphType);
-
-        if (!m_prg || m_agents.empty() || m_type == Invalid_Type) {
-            return false;
-        }
-        return true;
-    }
+    inline bool setup(PRG* prg, Agents& agents, const Attributes* attrs, const QString& graphType);
 };
 
 
@@ -110,6 +97,46 @@ public:
     // This method is triggered after a successful init()
     virtual void reset() = 0;
 };
-} // evoplex
 
+
+/************************************************************************
+   AbstractBaseGraph: Inline member functions
+ ************************************************************************/
+
+inline const QString& AbstractBaseGraph::name() const
+{ return m_name; }
+
+inline const AbstractBaseGraph::GraphType& AbstractBaseGraph::type() const
+{ return m_type; }
+
+inline const Attributes* AbstractBaseGraph::attrs() const
+{ return m_attrs; }
+
+inline Edges AbstractBaseGraph::edges() const
+{ return m_edges; }
+
+inline Agents AbstractBaseGraph::agents() const
+{ return m_agents; }
+
+inline Agent* AbstractBaseGraph::agent(int id) const
+{ return m_agents.at(id); }
+
+inline Agent* AbstractBaseGraph::randAgent() const
+{ return m_agents.at(m_prg->randI(m_agents.size()-1)); }
+
+inline bool AbstractBaseGraph::setup(PRG* prg, Agents& agents, const Attributes* attrs, const QString& graphType) {
+    // make sure it'll be called only once
+    assert(!m_prg && m_agents.empty());
+    m_prg = prg;
+    m_agents = agents;
+    m_attrs = attrs;
+    m_type = enumFromString(graphType);
+    if (!m_prg || m_agents.empty() || m_type == Invalid_Type) {
+        return false;
+    }
+    return true;
+}
+
+
+} // evoplex
 #endif // ABSTRACT_GRAPH_H

@@ -41,26 +41,24 @@ public:
     explicit Agent(int id, Attributes attr)
         : Agent(id, attr, 0, id) {}
 
-    inline Agent* clone() { return new Agent(m_id, m_attrs); }
+    inline Agent* clone();
 
-    inline const Attributes& attrs() const { return m_attrs; }
-    inline const Value& attr(const char* name) const { return m_attrs.value(name); }
-    inline const Value& attr(const int id) const { return m_attrs.value(id); }
-    inline void setAttr(const int id, const Value& value) { m_attrs.setValue(id, value); }
+    inline const Attributes& attrs() const;
+    inline const Value& attr(const char* name) const;
+    inline const Value& attr(const int id) const;
+    inline void setAttr(const int id, const Value& value);
 
-    inline const int id() const { return m_id; }
+    inline const int id() const;
 
-    inline const int x() const { return m_x; }
-    inline void setX(int x) { m_x = x; }
-    inline const int y() const { return m_y; }
-    inline void setY(int y) { m_y = y; }
-    inline void setCoords(int x, int y) { setX(x); setY(y); }
+    inline const int x() const;
+    inline void setX(int x);
+    inline const int y() const;
+    inline void setY(int y);
+    inline void setCoords(int x, int y);
 
-    inline const Edges edges() const { return m_edges; }
-    inline Agent* neighbour(int localId) const { return m_edges.at(localId)->neighbour(); }
-    inline Agent* randNeighbour(PRG* prg) const {
-        return m_edges.at(prg->randI(m_edges.size()-1))->neighbour();
-    }
+    inline const Edges edges() const;
+    inline Agent* neighbour(int localId) const;
+    inline Agent* randNeighbour(PRG* prg) const;
 
 private:
     const int m_id;
@@ -69,6 +67,53 @@ private:
     Attributes m_attrs;
     Edges m_edges;
 };
-}
 
+/************************************************************************
+   Agent: Inline member functions
+ ************************************************************************/
+
+inline Agent* Agent::clone()
+{ return new Agent(m_id, m_attrs); }
+
+inline const Attributes& Agent::attrs() const
+{ return m_attrs; }
+
+inline const Value& Agent::attr(const char* name) const
+{ return m_attrs.value(name); }
+
+inline const Value& Agent::attr(const int id) const
+{ return m_attrs.value(id); }
+
+inline void Agent::setAttr(const int id, const Value& value)
+{ m_attrs.setValue(id, value); }
+
+inline const int Agent::id() const
+{ return m_id; }
+
+inline const int Agent::x() const
+{ return m_x; }
+
+inline void Agent::setX(int x)
+{ m_x = x; }
+
+inline const int Agent::y() const
+{ return m_y; }
+
+inline void Agent::setY(int y)
+{ m_y = y; }
+
+inline void Agent::setCoords(int x, int y)
+{ setX(x); setY(y); }
+
+inline const Edges Agent::edges() const
+{ return m_edges; }
+
+inline Agent* Agent::neighbour(int localId) const
+{ return m_edges.at(localId)->neighbour(); }
+
+inline Agent* Agent::randNeighbour(PRG* prg) const
+{ return m_edges.at(prg->randI(m_edges.size()-1))->neighbour(); }
+
+
+} // evoplex
 #endif // ABSTRACT_AGENT_H

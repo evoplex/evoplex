@@ -58,6 +58,7 @@ set(EVOPLEX_CORE_CXX
   experimentsmgr.cpp
   output.cpp
   project.cpp
+  value.cpp
   valuespace.cpp
   logger.cpp
   mainapp.cpp
