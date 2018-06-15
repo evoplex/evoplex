@@ -83,7 +83,7 @@ MainGUI::MainGUI(MainApp* mainApp, QWidget* parent)
     m_settings->hide();
 
     //
-    // toolbar
+    // left toolbar
     //
     QToolBar* toolbar = new QToolBar(this);
     toolbar->setObjectName("toolbar");
@@ -176,13 +176,6 @@ MainGUI::MainGUI(MainApp* mainApp, QWidget* parent)
     menuFile->addSeparator();
     menuFile->addAction(actQuit);
     this->menuBar()->addMenu(menuFile);
-
-    QMenu* menuPlugins = new QMenu("Plugins", this);
-        // open dialog with plugin stuff (list of plugins, allow adding)
-    this->menuBar()->addMenu(menuPlugins);
-    QMenu* menuSettings = new QMenu("Settings", this);
-        // generate template
-    this->menuBar()->addMenu(menuSettings);
 
     QMenu* menuHelp = new QMenu("Help", this);
     QAction* acLog = new QAction("Log", this);
