@@ -62,7 +62,7 @@ ExperimentWidget::ExperimentWidget(Experiment* exp, MainGUI* mainGUI, ProjectsPa
     tb->addSeparator();
     m_aGraph = tb->addAction(QIcon(":/icons/graph.svg"), "Graph");
     m_aGrid = tb->addAction(QIcon(":/icons/grid.svg"), "Grid");
-    m_aLineChart = tb->addAction(QIcon(":/icons/line-chart.svg"), "Line chart");
+    // FIXME: m_aLineChart = tb->addAction(QIcon(":/icons/line-chart.svg"), "Line chart");
 
     QWidget* spacer = new QWidget(this);
     spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
