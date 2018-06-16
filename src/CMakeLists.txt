@@ -24,7 +24,7 @@ add_subdirectory(plugins) # built-in plugins (models and graph generators)
 add_subdirectory(test)
 
 #### EXECUTABLE ####
-add_executable(evoplex main.cpp gui/data/data.qrc)
+add_executable(evoplex main.cpp evoplex.rc gui/res/guiRes.qrc)
 target_link_libraries(evoplex PUBLIC EvoplexCore EvoplexGUI)
 set(RUNTIME_DEST "${CMAKE_BINARY_DIR}/bin")
 set_target_properties(evoplex PROPERTIES
