@@ -35,11 +35,11 @@ public:
 
 protected:
     void paintEvent(QPaintEvent*) override;
-    virtual const Agent* selectAgent(const QPoint& pos) const;
+    virtual const Node* selectNode(const QPoint& pos) const;
 
 private:
     struct Cache {
-        Agent* agent = nullptr;
+        Node* node = nullptr;
         QRectF rect;
     };
     std::vector<Cache> m_cache;

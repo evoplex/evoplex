@@ -18,19 +18,19 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef AGENTGENERATOR_H
-#define AGENTGENERATOR_H
+#ifndef NODESGENERATOR_H
+#define NODESGENERATOR_H
 
 #include <functional>
 
-#include "agent.h"
+#include "node.h"
 #include "modelplugin.h"
 #include "valuespace.h"
 
 namespace evoplex
 {
 
-class AgentsGenerator
+class NodesGenerator
 {
 public:
     enum Mode {
@@ -54,50 +54,50 @@ public:
     //   path to a csv file
     //     'filepath'
     //   same mode for all attributes
-    //     '*numAgents;[min|max|rand_seed]'
+    //     '*numNodes;[min|max|rand_seed]'
     //   specific mode for each attribute
-    //     '#numAgents;attrName_[min|max|rand_seed|value_val];...'
-    static AgentsGenerator* parse(const AttributesSpace& agentAttrsSpace,
+    //     '#numNodes;attrName_[min|max|rand_seed|value_val];...'
+    static NodesGenerator* parse(const AttributesSpace& nodeAttrsSpace,
                                   const QString& command, QString& errMsg);
 
-    // Export set of agents to a csv file
-    static bool saveToFile(QString& filepath, Agents agents, std::function<void(int)>& progress);
+    // Export set of nodes to a csv file
+    static bool saveToFile(QString& filepath, Nodes nodes, std::function<void(int)>& progress);
 
-    virtual Agents create(std::function<void(int)> progress = [](int){}) = 0;
+    virtual Nodes create(std::function<void(int)> progress = [](int){}) = 0;
 
     inline const QString& command() { return m_command; }
 
 protected:
-    explicit AgentsGenerator(const AttributesSpace& agentAttrsSpace);
+    explicit NodesGenerator(const AttributesSpace& nodeAttrsSpace);
 
     const AttributesSpace m_attrsSpace;
     QString m_command;
 };
 
-// Import a set of agents from a csv file
-class AGFromFile : public AgentsGenerator
+// Import a set of nodes from a csv file
+class AGFromFile : public NodesGenerator
 {
 public:
     explicit AGFromFile(const AttributesSpace& attrsSpace, const QString& filePath);
-    Agents create(std::function<void(int)> progress = [](int){});
+    Nodes create(std::function<void(int)> progress = [](int){});
     inline const QString& filePath() const { return m_filePath; }
 private:
     const QString m_filePath;
 };
 
-// using the same function for all agent attribute
-class AGSameFuncForAll : public AgentsGenerator
+// using the same function for all node attribute
+class AGSameFuncForAll : public NodesGenerator
 {
 public:
-    explicit AGSameFuncForAll(const AttributesSpace& attrsSpace, const int numAgents,
+    explicit AGSameFuncForAll(const AttributesSpace& attrsSpace, const int numNodes,
                               const Function& func, const Value& funcInput);
     ~AGSameFuncForAll();
-    Agents create(std::function<void(int)> progress = [](int){});
-    inline const int numAgents() const { return m_numAgents; }
+    Nodes create(std::function<void(int)> progress = [](int){});
+    inline const int numNodes() const { return m_numNodes; }
     inline const Function function() const { return m_function; }
     inline const Value& functionInput() const { return m_functionInput; }
 private:
-    const int m_numAgents;
+    const int m_numNodes;
     const Function m_function;
     const Value m_functionInput;
 
@@ -105,8 +105,8 @@ private:
     PRG* m_prg;
 };
 
-// using different functions for each agent attribute
-class AGDiffFunctions : public AgentsGenerator
+// using different functions for each node attribute
+class AGDiffFunctions : public NodesGenerator
 {
 public:
     struct AttrCmd {
@@ -116,15 +116,15 @@ public:
         Value funcInput;
     };
 
-    explicit AGDiffFunctions(const AttributesSpace& attrsSpace, const int numAgents,
+    explicit AGDiffFunctions(const AttributesSpace& attrsSpace, const int numNodes,
                              std::vector<AttrCmd> attrCmds);
-    Agents create(std::function<void(int)> progress = [](int){});
-    inline const int numAgents() const { return m_numAgents; }
+    Nodes create(std::function<void(int)> progress = [](int){});
+    inline const int numNodes() const { return m_numNodes; }
     inline const std::vector<AttrCmd> attrCmds() const { return m_attrCmds; }
 private:
-    const int m_numAgents;
+    const int m_numNodes;
     const std::vector<AttrCmd> m_attrCmds;
 };
 
 } // evoplex
-#endif // AGENTGENERATOR_H
+#endif // NODESGENERATOR_H

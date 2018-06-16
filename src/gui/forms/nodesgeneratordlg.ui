@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>AgentsGeneratorDlg</class>
- <widget class="QWidget" name="AgentsGeneratorDlg">
+ <class>NodesGeneratorDlg</class>
+ <widget class="QWidget" name="NodesGeneratorDlg">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -17,7 +17,7 @@
    </sizepolicy>
   </property>
   <property name="windowTitle">
-   <string>Agents Generator</string>
+   <string>Nodes Generator</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
@@ -134,12 +134,12 @@
          <item row="0" column="0">
           <widget class="QLabel" name="label_5">
            <property name="text">
-            <string>Number of agents:</string>
+            <string>Number of nodes:</string>
            </property>
           </widget>
          </item>
          <item row="0" column="1">
-          <widget class="QSpinBox" name="numAgents1">
+          <widget class="QSpinBox" name="numNodes1">
            <property name="minimum">
             <number>1</number>
            </property>
@@ -228,7 +228,7 @@
           </widget>
          </item>
          <item row="0" column="1">
-          <widget class="QSpinBox" name="numAgents2">
+          <widget class="QSpinBox" name="numNodes2">
            <property name="minimum">
             <number>1</number>
            </property>
@@ -253,7 +253,7 @@
          <item row="0" column="0">
           <widget class="QLabel" name="label_3">
            <property name="text">
-            <string>Number of agents:</string>
+            <string>Number of nodes:</string>
            </property>
           </widget>
          </item>

@@ -74,7 +74,7 @@ DefaultOutput::DefaultOutput(const Function f, const Entity e, const ValueSpace*
 {
     m_headerPrefix = QString("%1_%2_%3_")
             .arg(stringFromFunc(m_func))
-            .arg((m_entity == E_Agents ? "agents" : "edges"))
+            .arg((m_entity == E_Nodes ? "nodes" : "edges"))
             .arg(m_valueSpace->attrName());
 }
 
@@ -87,8 +87,8 @@ void DefaultOutput::doOperation(const int trialId, const AbstractModel* model)
     Values allValues;
     switch (m_func) {
     case F_Count:
-        if (m_entity == E_Agents) {
-            allValues = Stats::count(model->graph()->agents(), m_valueSpace->id(), m_allInputs);
+        if (m_entity == E_Nodes) {
+            allValues = Stats::count(model->graph()->nodes(), m_valueSpace->id(), m_allInputs);
         } else {
             allValues = Stats::count(model->graph()->edges(), m_valueSpace->id(), m_allInputs);
         }
@@ -273,14 +273,14 @@ std::vector<Cache*> Output::parseHeader(const QStringList& header, const std::ve
 
         AttributesSpace entityAttrSpace;
         DefaultOutput::Entity entity;
-        if (h.startsWith("agents_")) {
-            h.remove("agents_");
-            entity = DefaultOutput::E_Agents;
-            entityAttrSpace = model->agentAttrSpace();
+        if (h.startsWith("nodes_")) {
+            h.remove("nodes_");
+            entity = DefaultOutput::E_Nodes;
+            entityAttrSpace = model->nodeAttrSpace();
         } else if (h.startsWith("edges_")) {
             h.remove("edges_");
             entity = DefaultOutput::E_Edges;
-            entityAttrSpace = model->agentAttrSpace();
+            entityAttrSpace = model->nodeAttrSpace();
         } else {
             errorMsg = QString("[OutputHeader] invalid header! Entity does not exist. (%1)\n").arg(h);
             qWarning() << errorMsg;

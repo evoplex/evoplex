@@ -21,9 +21,9 @@
 #ifndef ABSTRACT_GRAPH_H
 #define ABSTRACT_GRAPH_H
 
-#include "agent.h"
 #include "constants.h"
 #include "edge.h"
+#include "node.h"
 #include "prg.h"
 #include "utils.h"
 
@@ -51,12 +51,12 @@ public:
     inline const GraphType& type() const;
     inline const Attributes* attrs() const;
     inline Edges edges() const;
-    inline Agents agents() const;
-    inline Agent* agent(int id) const;
-    inline Agent* randAgent() const;
+    inline Nodes nodes() const;
+    inline Node* node(int id) const;
+    inline Node* randNode() const;
 
 protected:
-    Agents m_agents;
+    Nodes m_nodes;
     Edges m_edges;
 
 private:
@@ -69,12 +69,12 @@ private:
         : m_name(name), m_type(Invalid_Type), m_attrs(nullptr), m_prg(nullptr) {}
 
     virtual ~AbstractBaseGraph() {
-        Utils::deleteAndShrink(m_agents);
+        Utils::deleteAndShrink(m_nodes);
         Utils::deleteAndShrink(m_edges);
     }
 
-    // takes the ownership of the agents
-    inline bool setup(PRG* prg, Agents& agents, const Attributes* attrs, const QString& graphType);
+    // takes the ownership of the nodes
+    inline bool setup(PRG* prg, Nodes& nodes, const Attributes* attrs, const QString& graphType);
 };
 
 
@@ -90,7 +90,7 @@ public:
 
     // Initializes the graph object.
     // This method is called once when a new graph object is being created.
-    // It is usually used to validate the graph attributes and the set of agents.
+    // It is usually used to validate the graph attributes and the set of nodes.
     virtual bool init() = 0;
 
     // Resets the graph object to the original state.
@@ -115,23 +115,23 @@ inline const Attributes* AbstractBaseGraph::attrs() const
 inline Edges AbstractBaseGraph::edges() const
 { return m_edges; }
 
-inline Agents AbstractBaseGraph::agents() const
-{ return m_agents; }
+inline Nodes AbstractBaseGraph::nodes() const
+{ return m_nodes; }
 
-inline Agent* AbstractBaseGraph::agent(int id) const
-{ return m_agents.at(id); }
+inline Node* AbstractBaseGraph::node(int id) const
+{ return m_nodes.at(id); }
 
-inline Agent* AbstractBaseGraph::randAgent() const
-{ return m_agents.at(m_prg->randI(m_agents.size()-1)); }
+inline Node* AbstractBaseGraph::randNode() const
+{ return m_nodes.at(m_prg->randI(m_nodes.size()-1)); }
 
-inline bool AbstractBaseGraph::setup(PRG* prg, Agents& agents, const Attributes* attrs, const QString& graphType) {
+inline bool AbstractBaseGraph::setup(PRG* prg, Nodes& nodes, const Attributes* attrs, const QString& graphType) {
     // make sure it'll be called only once
-    assert(!m_prg && m_agents.empty());
+    assert(!m_prg && m_nodes.empty());
     m_prg = prg;
-    m_agents = agents;
+    m_nodes = nodes;
     m_attrs = attrs;
     m_type = enumFromString(graphType);
-    if (!m_prg || m_agents.empty() || m_type == Invalid_Type) {
+    if (!m_prg || m_nodes.empty() || m_type == Invalid_Type) {
         return false;
     }
     return true;

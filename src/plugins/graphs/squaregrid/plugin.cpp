@@ -44,9 +44,8 @@ bool SquareGrid::init()
 
     m_height = attrs()->value(Height).toInt();
     m_width = attrs()->value(Width).toInt();
-    if (agents().size() != m_height * m_width) {
-        qWarning() << "[SquareGrid]: the agent set is not compatible with the required shape."
-                   << "The number of agents should be equal to 'height'*'width'.";
+    if (nodes().size() != m_height * m_width) {
+        qWarning() << "[SquareGrid]: Wrong shape! The number of nodes should be equal to 'height'*'width'.";
         return false;
     }
 
@@ -75,10 +74,10 @@ void SquareGrid::reset()
         }
     }
 
-    for (int id = 0; id < m_agents.size(); ++id) {
+    for (int id = 0; id < m_nodes.size(); ++id) {
         int x, y;
         Utils::ind2sub(id, m_width, y, x);
-        m_agents.at(id)->setCoords(x, y);
+        m_nodes.at(id)->setCoords(x, y);
         createEdges(id, func, isDirected);
     }
 }
@@ -100,8 +99,8 @@ void SquareGrid::createEdges(const int id, edgesFunc func, bool isDirected)
         }
 
         int nId = Utils::linearIdx(neighbor, m_width);
-        Q_ASSERT(nId < m_agents.size()); // neighbor must exist
-        m_edges.emplace_back(new Edge(agent(id), agent(nId), isDirected));
+        Q_ASSERT(nId < m_nodes.size()); // neighbor must exist
+        m_edges.emplace_back(new Edge(node(id), node(nId), isDirected));
     }
 }
 

@@ -139,9 +139,9 @@
    <item row="1" column="1">
     <layout class="QHBoxLayout" name="horizontalLayout_2">
      <item>
-      <widget class="QRadioButton" name="entityAgent">
+      <widget class="QRadioButton" name="entityNode">
        <property name="text">
-        <string>Agent</string>
+        <string>Node</string>
        </property>
       </widget>
      </item>

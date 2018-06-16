@@ -24,7 +24,7 @@ set(EVOPLEX_CORE_INCLUDE
   include/abstractmodel.h
 
   include/attributes.h
-  include/agent.h
+  include/node.h
   include/edge.h
   include/constants.h
   include/prg.h
@@ -37,7 +37,7 @@ set(EVOPLEX_CORE_H
   abstractplugin.h
   graphplugin.h
   modelplugin.h
-  agentsgenerator.h
+  nodesgenerator.h
   output.h
 
   experiment.h
@@ -52,7 +52,7 @@ set(EVOPLEX_CORE_CXX
   modelplugin.cpp
   prg.cpp
 
-  agentsgenerator.cpp
+  nodesgenerator.cpp
   edge.cpp
   experiment.cpp
   experimentsmgr.cpp

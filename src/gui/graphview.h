@@ -33,11 +33,11 @@ public:
 
 protected:
     void paintEvent(QPaintEvent*) override;
-    virtual const Agent* selectAgent(const QPoint& pos) const;
+    virtual const Node* selectNode(const QPoint& pos) const;
 
 private:
     struct Cache {
-        Agent* agent = nullptr;
+        Node* node = nullptr;
         QPointF xy;
         std::vector<QLineF> edges;
     };
@@ -47,7 +47,7 @@ private:
     ColorMap* m_edgeCMap;
     float m_edgeSizeRate;
 
-    bool m_showAgents;
+    bool m_showNodes;
     bool m_showEdges;
 
     virtual int refreshCache();

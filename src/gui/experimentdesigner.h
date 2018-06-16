@@ -49,7 +49,7 @@ public:
     void setExperiment(Experiment* exp);
 
 private slots:
-    void slotAgentsWidget();
+    void slotNodesWidget();
     void slotOutputDir();
     void slotOutputWidget();
     void slotCreateExperiment();

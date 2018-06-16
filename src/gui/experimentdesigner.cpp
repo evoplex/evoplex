@@ -29,13 +29,13 @@
 #include <QRadioButton>
 
 #include "experimentdesigner.h"
-#include "agentsgeneratordlg.h"
+#include "nodesgeneratordlg.h"
 #include "experimentwidget.h"
 #include "projectwidget.h"
 #include "outputwidget.h"
 #include "ui_experimentdesigner.h"
 
-#include "core/agentsgenerator.h"
+#include "core/nodesgenerator.h"
 
 #define STRING_NULL_PLUGINID "--"
 
@@ -73,19 +73,19 @@ ExperimentDesigner::ExperimentDesigner(MainApp* mainApp, QWidget *parent)
     m_treeItemGraphs = new QTreeWidgetItem(m_ui->treeWidget);
     m_treeItemGraphs->setText(0, "Graph");
     m_treeItemGraphs->setExpanded(false);
-    // -- add custom widget -- agents creator
-    QLineEdit* agentsCmd = new QLineEdit();
-    QPushButton* btAgentW = new QPushButton("...");
-    btAgentW->setMaximumWidth(20);
-    connect(btAgentW, SIGNAL(clicked(bool)), SLOT(slotAgentsWidget()));
-    QHBoxLayout* agentsLayout = new QHBoxLayout(new QWidget(m_ui->treeWidget));
-    agentsLayout->setMargin(0);
-    agentsLayout->insertWidget(0, agentsCmd);
-    agentsLayout->insertWidget(1, btAgentW);
-    m_widgetFields.insert(GENERAL_ATTRIBUTE_AGENTS, QVariant::fromValue(agentsCmd));
+    // -- add custom widget -- nodes creator
+    QLineEdit* nodesCmd = new QLineEdit();
+    QPushButton* btNodeW = new QPushButton("...");
+    btNodeW->setMaximumWidth(20);
+    connect(btNodeW, SIGNAL(clicked(bool)), SLOT(slotNodesWidget()));
+    QHBoxLayout* nodesLayout = new QHBoxLayout(new QWidget(m_ui->treeWidget));
+    nodesLayout->setMargin(0);
+    nodesLayout->insertWidget(0, nodesCmd);
+    nodesLayout->insertWidget(1, btNodeW);
+    m_widgetFields.insert(GENERAL_ATTRIBUTE_NODES, QVariant::fromValue(nodesCmd));
     QTreeWidgetItem* item = new QTreeWidgetItem(m_treeItemGraphs);
-    item->setText(0, GENERAL_ATTRIBUTE_AGENTS);
-    m_ui->treeWidget->setItemWidget(item, 1, agentsLayout->parentWidget());
+    item->setText(0, GENERAL_ATTRIBUTE_NODES);
+    m_ui->treeWidget->setItemWidget(item, 1, nodesLayout->parentWidget());
     // --  graphs available
     cb = new QComboBox(m_ui->treeWidget);
     cb->insertItem(0, STRING_NULL_PLUGINID);
@@ -300,29 +300,29 @@ void ExperimentDesigner::setExperiment(Experiment* exp)
     }
 }
 
-void ExperimentDesigner::slotAgentsWidget()
+void ExperimentDesigner::slotNodesWidget()
 {
     if (m_selectedModelId == STRING_NULL_PLUGINID) {
         QMessageBox::warning(this, "Experiment", "Please, select a valid 'modelId' first.");
         return;
     }
 
-    AgentsGenerator* ag = nullptr;
+    NodesGenerator* ag = nullptr;
     const ModelPlugin* model = m_mainApp->models().value(m_selectedModelId);
-    QString cmd = m_widgetFields.value(GENERAL_ATTRIBUTE_AGENTS).value<QLineEdit*>()->text();
+    QString cmd = m_widgetFields.value(GENERAL_ATTRIBUTE_NODES).value<QLineEdit*>()->text();
     if (!cmd.isEmpty()) {
         QString errorMsg;
-        ag = AgentsGenerator::parse(model->agentAttrSpace(), cmd, errorMsg);
+        ag = NodesGenerator::parse(model->nodeAttrSpace(), cmd, errorMsg);
         if (!errorMsg.isEmpty()) {
-            QMessageBox::warning(this, "Agents Generator", errorMsg);
+            QMessageBox::warning(this, "Nodes Generator", errorMsg);
             delete ag;
             ag = nullptr;
         }
     }
 
-    AgentsGeneratorDlg* adlg = new AgentsGeneratorDlg(model->agentAttrSpace(), this, ag);
+    NodesGeneratorDlg* adlg = new NodesGeneratorDlg(model->nodeAttrSpace(), this, ag);
     if (adlg->exec() == QDialog::Accepted) {
-        m_widgetFields.value(GENERAL_ATTRIBUTE_AGENTS).value<QLineEdit*>()->setText(adlg->readCommand());
+        m_widgetFields.value(GENERAL_ATTRIBUTE_NODES).value<QLineEdit*>()->setText(adlg->readCommand());
     }
     adlg->deleteLater();
 }

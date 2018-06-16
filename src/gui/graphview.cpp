@@ -42,9 +42,9 @@ GraphView::GraphView(MainGUI* mainGUI, Experiment* exp, ExperimentWidget* parent
         update();
     });
 
-    m_showAgents = m_ui->bShowAgents->isChecked();
+    m_showNodes = m_ui->bShowNodes->isChecked();
     m_showEdges = m_ui->bShowEdges->isChecked();
-    connect(m_ui->bShowAgents, &QPushButton::clicked, [this](bool b) { m_showAgents = b; update(); });
+    connect(m_ui->bShowNodes, &QPushButton::clicked, [this](bool b) { m_showNodes = b; update(); });
     connect(m_ui->bShowEdges, &QPushButton::clicked, [this](bool b) { m_showEdges = b; update(); });
 
     setTrial(0); // init at trial 0
@@ -60,23 +60,23 @@ int GraphView::refreshCache()
         return Ready;
     }
 
-    const Agents agents = m_model->graph()->agents();
+    const Nodes nodes = m_model->graph()->nodes();
     float edgeSizeRate = m_edgeSizeRate * std::pow(1.25f, m_zoomLevel);
-    m_cache.reserve(agents.size());
+    m_cache.reserve(nodes.size());
 
-    for (Agent* agent : agents) {
-        QPointF xy(m_origin.x() + edgeSizeRate * (1.0 + agent->x()),
-                   m_origin.y() + edgeSizeRate * (1.0 + agent->y()));
+    for (Node* node : nodes) {
+        QPointF xy(m_origin.x() + edgeSizeRate * (1.0 + node->x()),
+                   m_origin.y() + edgeSizeRate * (1.0 + node->y()));
 
         if (!rect().contains(xy.toPoint()))
             continue;
 
         Cache cache;
-        cache.agent = agent;
+        cache.node = node;
         cache.xy = xy;
-        cache.edges.reserve(agent->edges().size());
+        cache.edges.reserve(node->edges().size());
 
-        for (const Edge* edge : agent->edges()) {
+        for (const Edge* edge : node->edges()) {
             QPointF xy2(m_origin.x() + edgeSizeRate * (1.0 + edge->neighbour()->x()),
                         m_origin.y() + edgeSizeRate * (1.0 + edge->neighbour()->y()));
             cache.edges.emplace_back(QLineF(xy, xy2));
@@ -102,7 +102,7 @@ void GraphView::paintEvent(QPaintEvent*)
     if (m_showEdges) {
         Cache cacheSelected;
         for (const Cache& cache : m_cache) {
-            if (m_selectedAgent == cache.agent->id()) {
+            if (m_selectedNode == cache.node->id()) {
                 cacheSelected = cache;
             }
             for (const QLineF& edge : cache.edges) {
@@ -111,7 +111,7 @@ void GraphView::paintEvent(QPaintEvent*)
             }
         }
 
-        if (cacheSelected.agent) {
+        if (cacheSelected.node) {
             for (const QLineF& edge : cacheSelected.edges) {
                 painter.setPen(QPen(Qt::black, 3));
                 painter.drawLine(edge);
@@ -119,15 +119,15 @@ void GraphView::paintEvent(QPaintEvent*)
         }
     }
 
-    if (m_showAgents) {
+    if (m_showNodes) {
         for (const Cache& cache : m_cache) {
-            if (m_selectedAgent == cache.agent->id()) {
+            if (m_selectedNode == cache.node->id()) {
                 painter.setBrush(QColor(10,10,10,100));
                 painter.drawEllipse(cache.xy, m_nodeRadius*1.5f, m_nodeRadius*1.5f);
             }
 
-            const Value& value = cache.agent->attr(m_agentAttr);
-            painter.setBrush(m_agentCMap->colorFromValue(value));
+            const Value& value = cache.node->attr(m_nodeAttr);
+            painter.setBrush(m_nodeCMap->colorFromValue(value));
             painter.setPen(Qt::black);
             painter.drawEllipse(cache.xy, m_nodeRadius, m_nodeRadius);
         }
@@ -136,7 +136,7 @@ void GraphView::paintEvent(QPaintEvent*)
     painter.end();
 }
 
-const Agent* GraphView::selectAgent(const QPoint& pos) const
+const Node* GraphView::selectNode(const QPoint& pos) const
 {
     if (m_cacheStatus == Ready) {
         for (const Cache& cache : m_cache) {
@@ -144,7 +144,7 @@ const Agent* GraphView::selectAgent(const QPoint& pos) const
                     && pos.x() < cache.xy.x()+m_nodeRadius
                     && pos.y() > cache.xy.y()-m_nodeRadius
                     && pos.y() < cache.xy.y()+m_nodeRadius) {
-                return cache.agent;
+                return cache.node;
             }
         }
     }

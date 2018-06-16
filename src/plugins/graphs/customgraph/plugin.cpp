@@ -46,7 +46,7 @@ void CustomGraph::reset()
 
     QFile file(m_filePath);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        qWarning() << "[CustomGraph]: unable to read csv file with the set of agents." << m_filePath;
+        qWarning() << "[CustomGraph]: unable to read csv file with the set of nodes." << m_filePath;
         return;
     }
 
@@ -89,15 +89,15 @@ void CustomGraph::reset()
                        << m_filePath << "Row: " << row;
             isValid = false;
             break;
-        } else if (originId < 0 || originId >= m_agents.size() ||
-                   targetId < 0 || targetId >= m_agents.size()) {
-            qWarning() << "[CustomGraph]: invalid values. 'origin' or 'target' are not in the set of agents."
+        } else if (originId < 0 || originId >= m_nodes.size() ||
+                   targetId < 0 || targetId >= m_nodes.size()) {
+            qWarning() << "[CustomGraph]: invalid values. 'origin' or 'target' are not in the set of nodes."
                           << m_filePath << "Row: " << row;
             isValid = false;
             break;
         }
 
-        m_edges.emplace_back(new Edge(m_agents.at(originId), m_agents.at(targetId), type() ==  Directed));
+        m_edges.emplace_back(new Edge(m_nodes.at(originId), m_nodes.at(targetId), type() ==  Directed));
         ++row;
     }
     file.close();

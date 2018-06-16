@@ -20,7 +20,7 @@
 
 #include <memory>
 
-#include "agent.h"
+#include "node.h"
 #include "attributes.h"
 #include "edge.h"
 
@@ -34,12 +34,12 @@ Edge::Edge()
 {
 }
 
-Edge::Edge(Agent* origin, Agent* neighbour, bool isDirected)
+Edge::Edge(Node* origin, Node* neighbour, bool isDirected)
     : Edge(origin, neighbour, new Attributes(), isDirected)
 {
 }
 
-Edge::Edge(Agent* origin, Agent* neighbour, Attributes* attrs, bool isDirected)
+Edge::Edge(Node* origin, Node* neighbour, Attributes* attrs, bool isDirected)
     : m_origin(origin)
     , m_neighbour(neighbour)
     , m_attrs(attrs)

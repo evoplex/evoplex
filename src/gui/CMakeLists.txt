@@ -20,7 +20,7 @@
 
 set(EVOPLEX_GUI_H
   maingui.h
-  agentsgeneratordlg.h
+  nodesgeneratordlg.h
   colormap.h
   #contextmenutable.h
   experimentdesigner.h
@@ -45,7 +45,7 @@ set(EVOPLEX_GUI_H
 
 set(EVOPLEX_GUI_CXX
   maingui.cpp
-  agentsgeneratordlg.cpp
+  nodesgeneratordlg.cpp
   experimentdesigner.cpp
   colormap.cpp
   #contextmenutable.cpp
@@ -69,7 +69,7 @@ set(EVOPLEX_GUI_CXX
 )
 
 set(EVOPLEX_GUI_UIFORM
-  agentsgeneratordlg
+  nodesgeneratordlg
   experimentdesigner
   graphwidget
   graphsettings

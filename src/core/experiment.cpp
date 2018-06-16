@@ -25,8 +25,8 @@
 #include <QThread>
 
 #include "experiment.h"
-#include "agent.h"
-#include "agentsgenerator.h"
+#include "node.h"
+#include "nodesgenerator.h"
 #include "project.h"
 
 namespace evoplex
@@ -130,7 +130,7 @@ void Experiment::deleteTrials()
     }
     m_trials.clear();
 
-    Utils::deleteAndShrink(m_clonableAgents);
+    Utils::deleteAndShrink(m_clonableNodes);
 }
 
 void Experiment::updateProgressValue()
@@ -260,8 +260,8 @@ AbstractModel* Experiment::createTrial(const int trialId)
         return nullptr;
     }
 
-    Agents agents = createAgents();
-    if (agents.empty()) {
+    Nodes nodes = createNodes();
+    if (nodes.empty()) {
         return nullptr;
     }
 
@@ -270,7 +270,7 @@ AbstractModel* Experiment::createTrial(const int trialId)
 
     AbstractGraph* graphObj = m_graphPlugin->create();
     QString gType = m_inputs->generalAttrs->value(GENERAL_ATTRIBUTE_GRAPHTYPE).toString();
-    if (!graphObj || !graphObj->setup(prg, agents, m_inputs->graphAttrs, gType) || !graphObj->init()) {
+    if (!graphObj || !graphObj->setup(prg, nodes, m_inputs->graphAttrs, gType) || !graphObj->init()) {
         qWarning() << "[Experiment]: unable to create the trials."
                    << "The graph could not be initialized."
                    << "Project:" << m_project->name() << "Experiment:" << m_id;
@@ -314,48 +314,48 @@ AbstractModel* Experiment::createTrial(const int trialId)
     return modelObj;
 }
 
-Agents Experiment::createAgents()
+Nodes Experiment::createNodes()
 {
     if (m_expStatus == INVALID) {
-        return Agents();
-    } else if (!m_clonableAgents.empty()) {
+        return Nodes();
+    } else if (!m_clonableNodes.empty()) {
         if (m_trials.size() == m_numTrials - 1) {
-            Agents agents = m_clonableAgents;
-            Agents().swap(m_clonableAgents);
-            return agents;
+            Nodes nodes = m_clonableNodes;
+            Nodes().swap(m_clonableNodes);
+            return nodes;
         }
-        return cloneAgents(m_clonableAgents);
+        return cloneNodes(m_clonableNodes);
     }
 
     Q_ASSERT(m_trials.empty());
 
-    Agents agents;
+    Nodes nodes;
     QString errMsg;
-    AgentsGenerator* ag = AgentsGenerator::parse(m_modelPlugin->agentAttrSpace(),
-                m_inputs->generalAttrs->value(GENERAL_ATTRIBUTE_AGENTS).toQString(), errMsg);
+    NodesGenerator* ag = NodesGenerator::parse(m_modelPlugin->nodeAttrSpace(),
+                m_inputs->generalAttrs->value(GENERAL_ATTRIBUTE_NODES).toQString(), errMsg);
     if (ag) {
-        agents = ag->create();
+        nodes = ag->create();
         delete ag;
     }
 
-    if (agents.empty()) {
+    if (nodes.empty()) {
         errMsg = QString("[Experiment]: unable to create the trials."
-                         "The set of agents could not be created (%1)."
+                         "The set of nodes could not be created (%1)."
                          "Project: %2 Experiment: %3")
                          .arg(errMsg).arg(m_project->name()).arg(m_id);
         qWarning() << errMsg;
     } else if (m_numTrials > 1) {
-        m_clonableAgents = cloneAgents(agents);
+        m_clonableNodes = cloneNodes(nodes);
     }
 
-    return agents;
+    return nodes;
 }
 
-Agents Experiment::cloneAgents(const Agents& agents) const
+Nodes Experiment::cloneNodes(const Nodes& nodes) const
 {
-    Agents cloned;
-    cloned.reserve(agents.size());
-    for (Agents::const_iterator it = agents.begin(); it != agents.end(); ++it) {
+    Nodes cloned;
+    cloned.reserve(nodes.size());
+    for (Nodes::const_iterator it = nodes.begin(); it != nodes.end(); ++it) {
         cloned.emplace_back((*it)->clone());
     }
     return cloned;

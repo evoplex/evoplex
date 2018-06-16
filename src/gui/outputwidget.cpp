@@ -47,13 +47,13 @@ OutputWidget::OutputWidget(const ModelPlugin* modelPlugin, const std::vector<int
         m_ui->func->addItem(funcName, CustomFunc);
     }
 
-    m_ui->entityAgent->setChecked(true);
+    m_ui->entityNode->setChecked(true);
     slotEntityChanged(true); // init
     m_ui->entityEdge->setDisabled(modelPlugin->edgeAttrNames().empty());
 
     connect(m_ui->add, SIGNAL(clicked(bool)), SLOT(slotAdd()));
     connect(m_ui->func, SIGNAL(currentIndexChanged(int)), SLOT(slotFuncChanged(int)));
-    connect(m_ui->entityAgent, SIGNAL(toggled(bool)), SLOT(slotEntityChanged(bool)));
+    connect(m_ui->entityNode, SIGNAL(toggled(bool)), SLOT(slotEntityChanged(bool)));
 
     m_ui->table->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
     m_ui->table->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);
@@ -66,8 +66,8 @@ OutputWidget::OutputWidget(const ModelPlugin* modelPlugin, const std::vector<int
         const int rootId = m_ui->table->rowCount();
         DefaultOutputSP df = std::dynamic_pointer_cast<DefaultOutput>(cache->output());
         if (df) {
-            const QString entityStr = df->entity() == DefaultOutput::E_Agents
-                                    ? m_ui->entityAgent->text() : m_ui->entityEdge->text();
+            const QString entityStr = df->entity() == DefaultOutput::E_Nodes
+                                    ? m_ui->entityNode->text() : m_ui->entityEdge->text();
 
             for (Value input : cache->inputs()) {
                 RowInfo rowInfo;
@@ -127,8 +127,8 @@ void OutputWidget::slotClose(bool canceled)
         RowInfo rinfo = m_ui->table->item(row, 4)->data(Qt::UserRole).value<RowInfo>();
 
         const ValueSpace* entityValSpace;
-        if (entity == DefaultOutput::E_Agents) {
-            entityValSpace = m_modelPlugin->agentAttrSpace(attr);
+        if (entity == DefaultOutput::E_Nodes) {
+            entityValSpace = m_modelPlugin->nodeAttrSpace(attr);
         } else {
             entityValSpace = m_modelPlugin->edgeAttrSpace(attr);
         }
@@ -173,14 +173,14 @@ void OutputWidget::slotFuncChanged(int idx)
     m_ui->input->setEnabled(dfFunc);
 }
 
-void OutputWidget::slotEntityChanged(bool isAgent)
+void OutputWidget::slotEntityChanged(bool isNode)
 {
     m_ui->attr->clear();
     m_ui->input->clear();
-    if (isAgent) {
-        m_currEntity = DefaultOutput::E_Agents;
-        m_currEntityStr = m_ui->entityAgent->text();
-        for (QString n : m_modelPlugin->agentAttrNames()) {
+    if (isNode) {
+        m_currEntity = DefaultOutput::E_Nodes;
+        m_currEntityStr = m_ui->entityNode->text();
+        for (QString n : m_modelPlugin->nodeAttrNames()) {
             m_ui->attr->addItem(n);
         }
     } else {
@@ -213,8 +213,8 @@ void OutputWidget::slotAdd()
     }
 
     const ValueSpace* entityValSpace;
-    if (m_ui->entityAgent->isChecked()) {
-        entityValSpace = m_modelPlugin->agentAttrSpace().value(m_ui->attr->currentText());
+    if (m_ui->entityNode->isChecked()) {
+        entityValSpace = m_modelPlugin->nodeAttrSpace().value(m_ui->attr->currentText());
     } else {
         entityValSpace = m_modelPlugin->edgeAttrSpace().value(m_ui->attr->currentText());
     }

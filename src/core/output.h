@@ -143,7 +143,7 @@ class DefaultOutput : public Output
 {
 public:
     enum Entity {
-        E_Agents,
+        E_Nodes,
         E_Edges
     };
 

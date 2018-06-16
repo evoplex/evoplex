@@ -36,8 +36,8 @@ ModelPlugin::ModelPlugin(const QObject* instance, const QJsonObject* metaData, c
 
     m_factory = qobject_cast<IPluginModel*>(instance);
 
-    if (!attrsSpace(metaData, PLUGIN_ATTRIBUTE_AGENTSPACE, m_agentAttrSpace, m_agentAttrNames)) {
-        qWarning() << "[ModelPlugin]: failed to read the agent's attributes!";
+    if (!attrsSpace(metaData, PLUGIN_ATTRIBUTE_NODESPACE, m_nodeAttrSpace, m_nodeAttrNames)) {
+        qWarning() << "[ModelPlugin]: failed to read the node's attributes!";
         m_isValid = false;
         return;
     }
@@ -67,7 +67,7 @@ ModelPlugin::ModelPlugin(const QObject* instance, const QJsonObject* metaData, c
 
 ModelPlugin::~ModelPlugin()
 {
-    Utils::deleteAndShrink(m_agentAttrSpace);
+    Utils::deleteAndShrink(m_nodeAttrSpace);
     Utils::deleteAndShrink(m_edgeAttrSpace);
 }
 

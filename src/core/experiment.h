@@ -173,15 +173,15 @@ private:
 
     // A trial is part of an experiment which might have several other trials.
     // All trials of an experiment are meant to use exactly the same parameters
-    // and population of agents. Be aware that each trial will use the root
-    // seed incremented by 1. For exemple, if an experiment with 3 trials has
+    // and set of nodes. Be aware that each trial will use the root seed
+    // incremented by 1. For exemple, if an experiment with 3 trials has
     // the seed '111', the seeds of the trials will be '111', '112' and '113'.
     std::unordered_map<int, AbstractModel*> m_trials;
 
     // It holds the initial population for further use (internal only).
     // If this experiment has only one trial, then it won't be used anyway.
     // If the experiment has 2 or more trials, it'll be used in the last trial.
-    Agents m_clonableAgents;
+    Nodes m_clonableNodes;
 
     // Here is where the actual simulation is performed.
     // This method will run in a worker thread until it reaches the max
@@ -189,20 +189,20 @@ private:
     void processTrial(const int& trialId);
 
     // We can safely consider that all parameters are valid at this point.
-    // However, some things might fail (eg, missing agents, broken graph etc),
+    // However, some things might fail (eg, missing nodes, broken graph etc),
     // and, in that case, a null pointer is returned.
     AbstractModel* createTrial(const int trialId);
 
     // The trials are meant to have the same initial population.
     // So, considering that it might be a very expensive operation (eg, I/O),
     // this method will try to do the heavy stuff only once, storing the
-    // initial population in the 'm_clonableAgents' vector. Except when
+    // initial population in the 'm_clonableNodes' vector. Except when
     // the experiment has only one trial.
     // This method is NOT thread-safe.
-    Agents createAgents();
+    Nodes createNodes();
 
-    // clone a population of agents
-    Agents cloneAgents(const Agents& agents) const;
+    // clone a population of nodes
+    Nodes cloneNodes(const Nodes& nodes) const;
 
     void deleteTrials();
 

@@ -39,23 +39,23 @@ public:
     explicit GraphSettings(MainGUI* mainGUI, Experiment* exp, QWidget* parent);
     ~GraphSettings();
 
-    int agentAttr() const;
+    int nodeAttr() const;
     int edgeAttr() const;
-    inline ColorMap* agentCMap() const { return m_agentCMap; }
+    inline ColorMap* nodeCMap() const { return m_nodeCMap; }
     inline ColorMap* edgeCMap() const { return m_edgeCMap; }
 
 signals:
-    void agentAttrUpdated(int);
+    void nodeAttrUpdated(int);
     void edgeAttrUpdated(int);
-    void agentCMapUpdated(ColorMap* cmap);
+    void nodeCMapUpdated(ColorMap* cmap);
     void edgeCMapUpdated(ColorMap* cmap);
 
 private slots:
     void init();
 
-    void updateAgentCMap();
-    void slotAgentCMapName(const QString& name);
-    void setAgentAttr(int attrIdx);
+    void updateNodeCMap();
+    void slotNodeCMapName(const QString& name);
+    void setNodeAttr(int attrIdx);
 
     void updateEdgeCMap();
     void slotEdgeCMapName(const QString& name);
@@ -66,7 +66,7 @@ private:
     const Experiment* m_exp;
     const ModelPlugin* m_modelPlugin;
     const ColorMapMgr* m_cmMgr;
-    ColorMap* m_agentCMap;
+    ColorMap* m_nodeCMap;
     ColorMap* m_edgeCMap;
 };
 

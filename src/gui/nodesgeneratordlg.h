@@ -18,26 +18,26 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef AGENTSGENERATORDLG_H
-#define AGENTSGENERATORDLG_H
+#ifndef NODESGENERATORDLG_H
+#define NODESGENERATORDLG_H
 
 #include <QDialog>
 
 #include "valuespace.h"
-#include "core/agentsgenerator.h"
+#include "core/nodesgenerator.h"
 
-class Ui_AgentsGeneratorDlg;
+class Ui_NodesGeneratorDlg;
 
 namespace evoplex
 {
 
-class AgentsGeneratorDlg : public QDialog
+class NodesGeneratorDlg : public QDialog
 {
     Q_OBJECT
 
 public:
-    explicit AgentsGeneratorDlg(const AttributesSpace& agentAttrsSpace, QWidget *parent, AgentsGenerator* ag=nullptr);
-    ~AgentsGeneratorDlg();
+    explicit NodesGeneratorDlg(const AttributesSpace& nodeAttrsSpace, QWidget *parent, NodesGenerator* ag=nullptr);
+    ~NodesGeneratorDlg();
 
     QString readCommand();
 
@@ -45,11 +45,11 @@ private slots:
     void slotSaveAs();
 
 private:
-    Ui_AgentsGeneratorDlg* m_ui;
-    const AttributesSpace& m_agentAttrsSpace;
+    Ui_NodesGeneratorDlg* m_ui;
+    const AttributesSpace& m_nodeAttrsSpace;
 
-    void fill(AgentsGenerator* ag);
+    void fill(NodesGenerator* ag);
 };
 
 } // evoplex
-#endif // AGENTSGENERATORDLG_H
+#endif // NODESGENERATORDLG_H

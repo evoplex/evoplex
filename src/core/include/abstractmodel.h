@@ -22,7 +22,7 @@
 #define ABSTRACT_MODEL_H
 
 #include "abstractgraph.h"
-#include "agent.h"
+#include "node.h"
 #include "prg.h"
 
 namespace evoplex {

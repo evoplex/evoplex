@@ -53,7 +53,7 @@ protected:
     virtual void closeEvent(QCloseEvent*);
 
 private slots:
-    void slotEntityChanged(bool isAgent);
+    void slotEntityChanged(bool isNode);
     void slotFuncChanged(int idx);
     void slotAdd();
     void slotClose(bool canceled);
@@ -78,7 +78,7 @@ private:
     std::map<int, Cache*> m_allCaches;
 
     void insertRow(const RowInfo rowInfo, const QString& funcStr, const FuncType funcType,
-                   QString entityStr="", DefaultOutput::Entity entity=DefaultOutput::E_Agents,
+                   QString entityStr="", DefaultOutput::Entity entity=DefaultOutput::E_Nodes,
                    QString attr="", QString input="");
 };
 } // evoplex

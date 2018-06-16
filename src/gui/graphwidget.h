@@ -52,9 +52,9 @@ protected:
     AbstractModel* m_model;
 
     int m_currStep;
-    int m_selectedAgent;
-    int m_agentAttr;
-    ColorMap* m_agentCMap;
+    int m_selectedNode;
+    int m_nodeAttr;
+    ColorMap* m_nodeCMap;
 
     int m_zoomLevel;
     float m_nodeSizeRate;
@@ -73,7 +73,7 @@ protected:
     void resizeEvent(QResizeEvent* e);
 
     virtual void paintEvent(QPaintEvent*) = 0;
-    virtual const Agent* selectAgent(const QPoint& pos) const = 0;
+    virtual const Node* selectNode(const QPoint& pos) const = 0;
 
 public slots:
     void updateView(bool forceUpdate);
@@ -85,7 +85,7 @@ private slots:
     void zoomIn();
     void zoomOut();
     void resetView();
-    void setAgentCMap(ColorMap* cmap);
+    void setNodeCMap(ColorMap* cmap);
 
 private:
     ExperimentWidget* m_expWidget; // parent
@@ -95,7 +95,7 @@ private:
 
     std::vector<QLineEdit*> m_attrs;
 
-    void updateInspector(const Agent* agent);
+    void updateInspector(const Node* node);
 
     void updateCache(bool force=false);
     virtual int refreshCache() = 0;

@@ -27,7 +27,7 @@
 
 namespace evoplex {
 
-class Agent;
+class Node;
 class Edge;
 
 typedef std::vector<Edge*> Edges;
@@ -36,20 +36,20 @@ class Edge
 {
 public:
     explicit Edge();
-    explicit Edge(Agent* origin, Agent* neighbour, Attributes* attrs, bool isDirected);
-    explicit Edge(Agent* origin, Agent* neighbour, bool isDirected);
+    explicit Edge(Node *origin, Node *neighbour, Attributes* attrs, bool isDirected);
+    explicit Edge(Node* origin, Node* neighbour, bool isDirected);
     ~Edge();
 
     inline const Value& attr(const char* name) const;
     inline const Value& attr(const int id) const;
     inline void setAttr(const int id, const Value& value);
 
-    inline Agent* origin() const;
-    inline Agent* neighbour() const;
+    inline Node* origin() const;
+    inline Node* neighbour() const;
 
 private:
-    Agent* m_origin;
-    Agent* m_neighbour;
+    Node* m_origin;
+    Node* m_neighbour;
     Attributes* m_attrs;
 
     // If it's an undirected edge, it'll create a new edge in the
@@ -73,10 +73,10 @@ inline const Value& Edge::attr(const int id) const
 inline void Edge::setAttr(const int id, const Value& value)
 { m_attrs->setValue(id, value); }
 
-inline Agent* Edge::origin() const
+inline Node* Edge::origin() const
 { return m_origin; }
 
-inline Agent* Edge::neighbour() const
+inline Node* Edge::neighbour() const
 { return m_neighbour; }
 
 

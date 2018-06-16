@@ -33,9 +33,9 @@ GraphSettings::GraphSettings(MainGUI* mainGUI, Experiment* exp, QWidget *parent)
 {
     m_ui->setupUi(this);
 
-    connect(m_ui->agentAttr, SIGNAL(currentIndexChanged(int)), SLOT(setAgentAttr(int)));
-    connect(m_ui->agentCMapName, SIGNAL(currentIndexChanged(QString)), SLOT(slotAgentCMapName(QString)));
-    connect(m_ui->agentCMapSize, SIGNAL(currentIndexChanged(int)), SLOT(updateAgentCMap()));
+    connect(m_ui->nodeAttr, SIGNAL(currentIndexChanged(int)), SLOT(setNodeAttr(int)));
+    connect(m_ui->nodeCMapName, SIGNAL(currentIndexChanged(QString)), SLOT(slotNodeCMapName(QString)));
+    connect(m_ui->nodeCMapSize, SIGNAL(currentIndexChanged(int)), SLOT(updateNodeCMap()));
 
     connect(m_ui->edgeAttr, SIGNAL(currentIndexChanged(int)), SLOT(setEdgeAttr(int)));
     connect(m_ui->edgeCMapName, SIGNAL(currentIndexChanged(QString)), SLOT(slotEdgeCMapName(QString)));
@@ -59,17 +59,17 @@ void GraphSettings::init()
 
     m_modelPlugin = m_exp->modelPlugin();
 
-    // agent stuff
-    m_ui->agentAttr->clear();
-    m_ui->agentCMapName->clear();
-    for (QString attrName : m_modelPlugin->agentAttrNames()) {
-        m_ui->agentAttr->addItem(attrName);
+    // node stuff
+    m_ui->nodeAttr->clear();
+    m_ui->nodeCMapName->clear();
+    for (QString attrName : m_modelPlugin->nodeAttrNames()) {
+        m_ui->nodeAttr->addItem(attrName);
     }
-    m_ui->agentCMapName->insertItems(0, m_cmMgr->names());
-    m_ui->agentCMapName->setCurrentText(m_cmMgr->defaultColorMap().first);
-    slotAgentCMapName(m_cmMgr->defaultColorMap().first); // fill sizes
-    m_ui->agentCMapSize->setCurrentText(QString::number(m_cmMgr->defaultColorMap().second));
-    updateAgentCMap();
+    m_ui->nodeCMapName->insertItems(0, m_cmMgr->names());
+    m_ui->nodeCMapName->setCurrentText(m_cmMgr->defaultColorMap().first);
+    slotNodeCMapName(m_cmMgr->defaultColorMap().first); // fill sizes
+    m_ui->nodeCMapSize->setCurrentText(QString::number(m_cmMgr->defaultColorMap().second));
+    updateNodeCMap();
 
     // edge stuff
     m_ui->edgeAttr->clear();
@@ -84,34 +84,34 @@ void GraphSettings::init()
     updateEdgeCMap();
 }
 
-void GraphSettings::updateAgentCMap()
+void GraphSettings::updateNodeCMap()
 {
-    const ValueSpace* valSpace = m_modelPlugin->agentAttrSpace(m_ui->agentAttr->currentText());
+    const ValueSpace* valSpace = m_modelPlugin->nodeAttrSpace(m_ui->nodeAttr->currentText());
     ColorMap* cmap = ColorMap::create(valSpace,
-            m_cmMgr->colors(m_ui->agentCMapName->currentText(),
-                            m_ui->agentCMapSize->currentText().toInt()));
-    m_agentCMap = cmap;
-    emit (agentCMapUpdated(m_agentCMap));
+            m_cmMgr->colors(m_ui->nodeCMapName->currentText(),
+                            m_ui->nodeCMapSize->currentText().toInt()));
+    m_nodeCMap = cmap;
+    emit (nodeCMapUpdated(m_nodeCMap));
 }
 
-void GraphSettings::slotAgentCMapName(const QString &name)
+void GraphSettings::slotNodeCMapName(const QString &name)
 {
-    m_ui->agentCMapSize->blockSignals(true);
-    m_ui->agentCMapSize->clear();
-    m_ui->agentCMapSize->insertItems(0, m_cmMgr->sizes(name));
-    m_ui->agentCMapSize->blockSignals(false);
-    updateAgentCMap();
+    m_ui->nodeCMapSize->blockSignals(true);
+    m_ui->nodeCMapSize->clear();
+    m_ui->nodeCMapSize->insertItems(0, m_cmMgr->sizes(name));
+    m_ui->nodeCMapSize->blockSignals(false);
+    updateNodeCMap();
 }
 
-void GraphSettings::setAgentAttr(int attrIdx)
+void GraphSettings::setNodeAttr(int attrIdx)
 {
-    emit (agentAttrUpdated(attrIdx));
-    updateAgentCMap();
+    emit (nodeAttrUpdated(attrIdx));
+    updateNodeCMap();
 }
 
-int GraphSettings::agentAttr() const
+int GraphSettings::nodeAttr() const
 {
-    return m_ui->agentAttr->currentIndex();
+    return m_ui->nodeAttr->currentIndex();
 }
 
 /******/

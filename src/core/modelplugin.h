@@ -40,9 +40,9 @@ public:
     inline const QVector<QString>& supportedGraphs() const { return m_supportedGraphs; }
     inline bool graphIsSupported(const QString& graphId) const { return m_supportedGraphs.empty() || m_supportedGraphs.contains(graphId); }
 
-    inline const std::vector<QString>& agentAttrNames() const { return m_agentAttrNames; }
-    inline const AttributesSpace& agentAttrSpace() const { return m_agentAttrSpace; }
-    inline const ValueSpace* agentAttrSpace(const QString& attr) const { return m_agentAttrSpace.value(attr); }
+    inline const std::vector<QString>& nodeAttrNames() const { return m_nodeAttrNames; }
+    inline const AttributesSpace& nodeAttrSpace() const { return m_nodeAttrSpace; }
+    inline const ValueSpace* nodeAttrSpace(const QString& attr) const { return m_nodeAttrSpace.value(attr); }
 
     inline const std::vector<QString>& edgeAttrNames() const { return m_edgeAttrNames; }
     inline const AttributesSpace& edgeAttrSpace() const { return m_edgeAttrSpace; }
@@ -54,8 +54,8 @@ private:
     QVector<QString> m_supportedGraphs;
     QVector<QString> m_customOutputs;
 
-    AttributesSpace m_agentAttrSpace;
-    std::vector<QString> m_agentAttrNames;
+    AttributesSpace m_nodeAttrSpace;
+    std::vector<QString> m_nodeAttrNames;
 
     AttributesSpace m_edgeAttrSpace;
     std::vector<QString> m_edgeAttrNames;

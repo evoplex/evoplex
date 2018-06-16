@@ -13,7 +13,7 @@
     {"intSet": "int{1,4}"},
     {"bool": "bool"}
   ],
-  "agentAttributesSpace": [
+  "nodeAttributesSpace": [
     {"strategy": "int{0,1}"}
   ],
   "edgeAttributesSpace": [

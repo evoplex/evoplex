@@ -24,19 +24,19 @@
 #include <QtDebug>
 #include <functional>
 
-#include "agentsgenerator.h"
+#include "nodesgenerator.h"
 #include "modelplugin.h"
 #include "utils.h"
 
 namespace evoplex
 {
 
-AgentsGenerator::AgentsGenerator(const AttributesSpace& agentAttrsSpace)
-    : m_attrsSpace(agentAttrsSpace)
+NodesGenerator::NodesGenerator(const AttributesSpace& nodeAttrsSpace)
+    : m_attrsSpace(nodeAttrsSpace)
 {
 }
 
-QString AgentsGenerator::enumToString(Function func)
+QString NodesGenerator::enumToString(Function func)
 {
     switch (func) {
     case F_Min:
@@ -52,7 +52,7 @@ QString AgentsGenerator::enumToString(Function func)
     }
 }
 
-AgentsGenerator::Function AgentsGenerator::enumFromString(const QString& funcStr)
+NodesGenerator::Function NodesGenerator::enumFromString(const QString& funcStr)
 {
     if (funcStr == "min") return F_Min;
     else if (funcStr == "max") return F_Max;
@@ -64,18 +64,18 @@ AgentsGenerator::Function AgentsGenerator::enumFromString(const QString& funcStr
 /*********************/
 
 AGFromFile::AGFromFile(const AttributesSpace& attrsSpace, const QString& filePath)
-    : AgentsGenerator(attrsSpace)
+    : NodesGenerator(attrsSpace)
     , m_filePath(filePath)
 {
     m_command = filePath;
 }
 
-Agents AGFromFile::create(std::function<void(int)> progress)
+Nodes AGFromFile::create(std::function<void(int)> progress)
 {
     QFile file(m_filePath);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        qWarning() << "[Agent::readFromFile]: unable to read csv file with the set of agents." << m_filePath;
-        return Agents();
+        qWarning() << "[Node::readFromFile]: unable to read csv file with the set of nodes." << m_filePath;
+        return Nodes();
     }
 
     QTextStream in(&file);
@@ -90,9 +90,9 @@ Agents AGFromFile::create(std::function<void(int)> progress)
             QString attrName = header.at(i);
             for (int j = i+1; j < header.size(); ++j) {
                 if (attrName == header.at(j)) {
-                    qWarning() << "[Agent::readFromFile]: unable to read the set of agents from" << m_filePath
+                    qWarning() << "[Node::readFromFile]: unable to read the set of nodes from" << m_filePath
                                << QString("The headers should be unique! '%1' is duplicated.").arg(attrName);
-                    return Agents();
+                    return Nodes();
                 }
             }
 
@@ -104,28 +104,28 @@ Agents AGFromFile::create(std::function<void(int)> progress)
         }
 
         if (hasCoordX != hasCoordY) {
-            qWarning() << "[Agent::readFromFile]: unable to read the set of agents from" << m_filePath
+            qWarning() << "[Node::readFromFile]: unable to read the set of nodes from" << m_filePath
                        << "One of the 2d coordinates are missing. Make sure you have both 'x' and 'y' columns.";
-            return Agents();
+            return Nodes();
         }
     }
 
     for (const auto* vs : m_attrsSpace) {
         if (!header.contains(vs->attrName())) {
-            qWarning() << "[Agent::readFromFile]: the agents from '" << m_filePath << "' are incompatible with the model."
+            qWarning() << "[Node::readFromFile]: the nodes from '" << m_filePath << "' are incompatible with the model."
                        << "Expected attributes:" << m_attrsSpace.keys();
-            return Agents();
+            return Nodes();
         }
     }
 
-    // create agents
+    // create nodes
     int id = 0;
-    Agents agents;
+    Nodes nodes;
     bool isValid = true;
     while (!in.atEnd()) {
         QStringList values = in.readLine().split(",");
         if (values.size() != header.size()) {
-            qWarning() << "[Agent::readFromFile]: rows must have the same number of columns!";
+            qWarning() << "[Node::readFromFile]: rows must have the same number of columns!";
             isValid = false;
             break;
         }
@@ -150,45 +150,45 @@ Agents AGFromFile::create(std::function<void(int)> progress)
                 }
             }
         }
-        agents.emplace_back(new Agent(id, attributes, coordX, coordY));
+        nodes.emplace_back(new Node(id, attributes, coordX, coordY));
         progress(id);
         ++id;
     }
     file.close();
 
     if (isValid) {
-        agents.shrink_to_fit();
+        nodes.shrink_to_fit();
     } else {
-        Utils::deleteAndShrink(agents);
+        Utils::deleteAndShrink(nodes);
     }
 
-    return agents;
+    return nodes;
 }
 
 /*********************/
 
-AGSameFuncForAll::AGSameFuncForAll(const AttributesSpace& attrsSpace, const int numAgents,
+AGSameFuncForAll::AGSameFuncForAll(const AttributesSpace& attrsSpace, const int numNodes,
                                    const Function& func, const Value& funcInput)
-    : AgentsGenerator(attrsSpace)
-    , m_numAgents(numAgents)
+    : NodesGenerator(attrsSpace)
+    , m_numNodes(numNodes)
     , m_function(func)
     , m_functionInput(funcInput)
     , m_prg(nullptr)
 {
-    Q_ASSERT(m_numAgents > 0 && m_function != F_Invalid);
+    Q_ASSERT(m_numNodes > 0 && m_function != F_Invalid);
 
     switch (m_function) {
     case F_Min:
-        m_command = QString("*%1;min").arg(m_numAgents);
+        m_command = QString("*%1;min").arg(m_numNodes);
         f_value = [](const ValueSpace* valSpace) { return valSpace->min(); };
         break;
     case F_Max:
-        m_command = QString("*%1;max").arg(m_numAgents);
+        m_command = QString("*%1;max").arg(m_numNodes);
         f_value = [](const ValueSpace* valSpace) { return valSpace->max(); };
         break;
     case F_Rand:
         Q_ASSERT(funcInput.type() == Value::INT);
-        m_command = QString("*%1;rand_%2").arg(m_numAgents).arg(funcInput.toQString());
+        m_command = QString("*%1;rand_%2").arg(m_numNodes).arg(funcInput.toQString());
         m_prg = new PRG(funcInput.toInt());
         f_value = [this](const ValueSpace* valSpace) { return valSpace->rand(m_prg); };
         break;
@@ -203,31 +203,31 @@ AGSameFuncForAll::~AGSameFuncForAll()
     delete m_prg;
 }
 
-Agents AGSameFuncForAll::create(std::function<void(int)> progress)
+Nodes AGSameFuncForAll::create(std::function<void(int)> progress)
 {
-    Agents agents;
-    agents.reserve(m_numAgents);
-    for (int agentId = 0; agentId < m_numAgents; ++agentId) {
+    Nodes nodes;
+    nodes.reserve(m_numNodes);
+    for (int nodeId = 0; nodeId < m_numNodes; ++nodeId) {
         Attributes attrs(m_attrsSpace.size());
         for (ValueSpace* valSpace : m_attrsSpace) {
             attrs.replace(valSpace->id(), valSpace->attrName(), f_value(valSpace));
         }
-        agents.emplace_back(new Agent(agentId, attrs));
-        progress(agentId);
+        nodes.emplace_back(new Node(nodeId, attrs));
+        progress(nodeId);
     }
-    return agents;
+    return nodes;
 }
 
 /*********************/
 
-AGDiffFunctions::AGDiffFunctions(const AttributesSpace &attrsSpace, const int numAgents,
+AGDiffFunctions::AGDiffFunctions(const AttributesSpace &attrsSpace, const int numNodes,
                                  std::vector<AttrCmd> attrCmds)
-    : AgentsGenerator(attrsSpace)
-    , m_numAgents(numAgents)
+    : NodesGenerator(attrsSpace)
+    , m_numNodes(numNodes)
     , m_attrCmds(attrCmds)
 {
-    Q_ASSERT(m_numAgents > 0);
-    m_command = QString("#%1").arg(m_numAgents);
+    Q_ASSERT(m_numNodes > 0);
+    m_command = QString("#%1").arg(m_numNodes);
     for (const AttrCmd& cmd : m_attrCmds) {
         m_command += QString(";%1_%2").arg(cmd.attrName).arg(enumToString(cmd.func));
         if (cmd.funcInput.isValid()) {
@@ -236,13 +236,13 @@ AGDiffFunctions::AGDiffFunctions(const AttributesSpace &attrsSpace, const int nu
     }
 }
 
-Agents AGDiffFunctions::create(std::function<void(int)> progress)
+Nodes AGDiffFunctions::create(std::function<void(int)> progress)
 {
-    std::vector<Attributes> agentsAttrs;
-    agentsAttrs.reserve(m_numAgents);
-    for (int i = 0; i < m_numAgents; ++i) {
+    std::vector<Attributes> nodesAttrs;
+    nodesAttrs.reserve(m_numNodes);
+    for (int i = 0; i < m_numNodes; ++i) {
         Attributes attrs(m_attrsSpace.size());
-        agentsAttrs.emplace_back(attrs);
+        nodesAttrs.emplace_back(attrs);
     }
 
     std::function<Value()> value;
@@ -269,27 +269,27 @@ Agents AGDiffFunctions::create(std::function<void(int)> progress)
             qFatal("[AGDiffFunctions]: invalid function!");
         }
 
-        for (Attributes& attrs : agentsAttrs) {
+        for (Attributes& attrs : nodesAttrs) {
             attrs.replace(valSpace->id(), valSpace->attrName(), value());
         }
         delete prg;
     }
 
-    Agents agents;
-    agents.reserve(m_numAgents);
-    for (int agentId = 0; agentId < m_numAgents; ++agentId) {
-        agents.emplace_back(new Agent(agentId, agentsAttrs.at(agentId)));
-        progress(agentId);
+    Nodes nodes;
+    nodes.reserve(m_numNodes);
+    for (int nodeId = 0; nodeId < m_numNodes; ++nodeId) {
+        nodes.emplace_back(new Node(nodeId, nodesAttrs.at(nodeId)));
+        progress(nodeId);
     }
-    return agents;
+    return nodes;
 }
 
 /*********************/
 
-bool AgentsGenerator::saveToFile(QString& filePath, Agents agents, std::function<void(int)>& progress)
+bool NodesGenerator::saveToFile(QString& filePath, Nodes nodes, std::function<void(int)>& progress)
 {
-    if (agents.empty()) {
-        qWarning() << "[AgentsGenerator]: Tried to save an empty set of agents.";
+    if (nodes.empty()) {
+        qWarning() << "[NodesGenerator]: Tried to save an empty set of nodes.";
         return false;
     }
 
@@ -299,64 +299,64 @@ bool AgentsGenerator::saveToFile(QString& filePath, Agents agents, std::function
 
     QFile file(filePath);
     if (!file.open(QFile::WriteOnly | QFile::Truncate)) {
-        qWarning() << "[AgentsGenerator]: Failed to save the set of agents to file." << filePath;
+        qWarning() << "[NodesGenerator]: Failed to save the set of nodes to file." << filePath;
         return false;
     }
 
     QTextStream out(&file);
-    const std::vector<QString>& header = agents.front()->attrs().names();
+    const std::vector<QString>& header = nodes.front()->attrs().names();
     for (const QString& col : header) {
         out << col << ",";
     }
     out << "x,y\n";
 
-    for (Agent* agent : agents) {
-        for (const Value& value : agent->attrs().values()) {
+    for (Node* node : nodes) {
+        for (const Value& value : node->attrs().values()) {
             out << value.toQString() << ",";
         }
-        out << agent->x() << ",";
-        out << agent->y() << "\n";
+        out << node->x() << ",";
+        out << node->y() << "\n";
 
         out.flush();
-        progress(agent->id());
+        progress(node->id());
     }
 
     file.close();
     return true;
 }
 
-AgentsGenerator* AgentsGenerator::parse(const AttributesSpace& agentAttrsSpace,
+NodesGenerator* NodesGenerator::parse(const AttributesSpace& nodeAttrsSpace,
                                         const QString& command, QString& errMsg)
 {
-    AgentsGenerator* ag = nullptr;
+    NodesGenerator* ag = nullptr;
 
     if (QFileInfo::exists(command)) {
-        ag = new AGFromFile(agentAttrsSpace, command);
+        ag = new AGFromFile(nodeAttrsSpace, command);
     } else {
         QStringList cmds = command.split(";");
         if (cmds.size() < 2) {
             errMsg = QString("The command %1 is invalid!").arg(command);
-            qWarning() << "[Agent::createAgents()]:" << errMsg;
+            qWarning() << "[Node::createNodes()]:" << errMsg;
             return nullptr;
         }
 
         bool ok;
-        QString numAgentsStr = cmds.at(0);
-        const int numAgents = numAgentsStr.remove(0,1).toInt(&ok);
+        QString numNodesStr = cmds.at(0);
+        const int numNodes = numNodesStr.remove(0,1).toInt(&ok);
         if (!ok) {
             errMsg = QString("Unable to parse '%1'."
-                    "\n'%2' should be an integer representing the number of agents.")
-                    .arg(command).arg(numAgentsStr);
-            qWarning() << "[Agent::createAgents()]:" << errMsg;
+                    "\n'%2' should be an integer representing the number of nodes.")
+                    .arg(command).arg(numNodesStr);
+            qWarning() << "[Node::createNodes()]:" << errMsg;
             return nullptr;
         }
 
         if (command.startsWith("*")) {
             if (cmds.size() != 2) {
                 errMsg = QString("Unable to parse '%1'."
-                        "It should look like: '*numAgents;[min|max|rand_seed]'")
-                        .arg(command).arg(numAgentsStr);
-                qWarning() << "[Agent::createAgents()]:" << errMsg;
+                        "It should look like: '*numNodes;[min|max|rand_seed]'")
+                        .arg(command).arg(numNodesStr);
+                qWarning() << "[Node::createNodes()]:" << errMsg;
                 return nullptr;
             }
 
@@ -369,27 +369,27 @@ AgentsGenerator* AgentsGenerator::parse(const AttributesSpace& agentAttrsSpace,
                 value = Value(seedStr.remove("rand_").toInt(&ok)); // seed
                 if (!ok) {
                     errMsg = QString("Unable to parse '%1'."
-                            "It should look like: '*numAgents;rand_seed'")
+                            "It should look like: '*numNodes;rand_seed'")
                             .arg(command);
-                    qWarning() << "[Agent::createAgents()]:" << errMsg;
+                    qWarning() << "[Node::createNodes()]:" << errMsg;
                     return nullptr;
                 }
             } else if (func == F_Invalid) {
                 errMsg = QString("Unable to parse '%1'."
-                        "It should look like: '*numAgents;[min|max|rand_seed]'")
+                        "It should look like: '*numNodes;[min|max|rand_seed]'")
                         .arg(command);
-                qWarning() << "[Agent::createAgents()]:" << errMsg;
+                qWarning() << "[Node::createNodes()]:" << errMsg;
                 return nullptr;
             }
-            ag = new AGSameFuncForAll(agentAttrsSpace, numAgents, func, value);
+            ag = new AGSameFuncForAll(nodeAttrsSpace, numNodes, func, value);
         } else if (command.startsWith("#")) {
             cmds.removeFirst();
-            if (cmds.size() != agentAttrsSpace.size()) {
+            if (cmds.size() != nodeAttrsSpace.size()) {
                 errMsg = QString("Unable to parse '%1'."
-                        "It should look like: '#numAgents;attrName_[min|max|rand_seed|value_value]'"
+                        "It should look like: '#numNodes;attrName_[min|max|rand_seed|value_value]'"
                         "and must contain all attributes of the current model (i.e., '%2')")
-                        .arg(command).arg(agentAttrsSpace.keys().join(", "));
-                qWarning() << "[Agent::createAgents()]:" << errMsg;
+                        .arg(command).arg(nodeAttrsSpace.keys().join(", "));
+                qWarning() << "[Node::createNodes()]:" << errMsg;
                 return nullptr;
             }
 
@@ -401,14 +401,14 @@ AgentsGenerator* AgentsGenerator::parse(const AttributesSpace& agentAttrsSpace,
                 QStringList attrCmdStr = cmd.split("_");
 
                 attrCmd.attrName = attrCmdStr.at(0);
-                const ValueSpace* valSpace = agentAttrsSpace.value(attrCmd.attrName, nullptr);
+                const ValueSpace* valSpace = nodeAttrsSpace.value(attrCmd.attrName, nullptr);
                 if (valSpace) {
                     attrCmd.attrId = valSpace->id();
                 } else {
                     errMsg = QString("Unable to parse '%1'."
                             "The attribute '%2' does not belong to the current model.")
                             .arg(command).arg(attrCmd.attrName);
-                    qWarning() << "[Agent::createAgents()]:" << errMsg;
+                    qWarning() << "[Node::createNodes()]:" << errMsg;
                     return nullptr;
                 }
 
@@ -417,20 +417,20 @@ AgentsGenerator* AgentsGenerator::parse(const AttributesSpace& agentAttrsSpace,
                     errMsg = QString("Unable to parse '%1'."
                                 "The function '%2' is invalid.")
                                 .arg(command).arg(attrCmdStr.at(1));
-                    qWarning() << "[Agent::createAgents()]:" << errMsg;
+                    qWarning() << "[Node::createNodes()]:" << errMsg;
                     return nullptr;
                 } else if (attrCmd.func == F_Rand) {
                     attrCmd.funcInput = Value(attrCmdStr.at(2).toInt(&ok)); // seed
                     if (!ok) {
                         errMsg = QString("Unable to parse '%1'. The PRG seed should be an integer!").arg(command);
-                        qWarning() << "[Agent::createAgents()]:" << errMsg;
+                        qWarning() << "[Node::createNodes()]:" << errMsg;
                         return nullptr;
                     }
                 } else if (attrCmd.func == F_Value){
-                    attrCmd.funcInput = agentAttrsSpace.value(attrCmd.attrName)->validate(attrCmdStr.at(2));
+                    attrCmd.funcInput = nodeAttrsSpace.value(attrCmd.attrName)->validate(attrCmdStr.at(2));
                     if (!attrCmd.funcInput.isValid()) {
                         errMsg = QString("Unable to parse '%1'. The value is invalid!").arg(command);
-                        qWarning() << "[Agent::createAgents()]:" << errMsg;
+                        qWarning() << "[Node::createNodes()]:" << errMsg;
                         return nullptr;
                     }
                 }
@@ -438,13 +438,13 @@ AgentsGenerator* AgentsGenerator::parse(const AttributesSpace& agentAttrsSpace,
                 attrCmds.emplace_back(attrCmd);
             }
 
-            ag = new AGDiffFunctions(agentAttrsSpace, numAgents, attrCmds);
+            ag = new AGDiffFunctions(nodeAttrsSpace, numNodes, attrCmds);
         }
     }
 
     if (!ag) {
         errMsg = QString("the command '%1'. is invalid!").arg(command);
-        qWarning() << "[Agent::createAgents()]:" << errMsg;
+        qWarning() << "[Node::createNodes()]:" << errMsg;
         return nullptr;
     }
 

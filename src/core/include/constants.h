@@ -22,13 +22,13 @@
 #define CONSTANTS_H
 
 // Impose limits for sanity
-#define EVOPLEX_MAX_AGENTS 100000000    // maximum number of agents (10^8)
+#define EVOPLEX_MAX_NODES 100000000    // maximum number of nodes (10^8)
 #define EVOPLEX_MAX_STEPS 100000000     // maximum number of steps (10^8)
 #define EVOPLEX_MAX_TRIALS 1000         // maximum number of times an experiment can be repeated (10^3)
 
 // These constants hold the name of the properties common to any experiment.
 #define GENERAL_ATTRIBUTE_EXPID "id"                    // the experiment id
-#define GENERAL_ATTRIBUTE_AGENTS "agents"               // a path to a csv file OR an integer with the number of agents
+#define GENERAL_ATTRIBUTE_NODES "nodes"                 // a path to a csv file OR an integer with the number of nodes
 #define GENERAL_ATTRIBUTE_GRAPHID "graphId"             // uid of the graph used
 #define GENERAL_ATTRIBUTE_MODELID "modelId"             // uid of the model used
 #define GENERAL_ATTRIBUTE_SEED "seed"                   // seed of the PRG
@@ -50,7 +50,7 @@
 #define PLUGIN_ATTRIBUTE_DESCRIPTION "description"      // plugin's description
 #define PLUGIN_ATTRIBUTE_SPACE "pluginAttributesSpace"  // domain of the plugin's attributes
 // model (only)
-#define PLUGIN_ATTRIBUTE_AGENTSPACE "agentAttributesSpace"  // domain of the agent's attributes
+#define PLUGIN_ATTRIBUTE_NODESPACE "nodeAttributesSpace"    // domain of the node's attributes
 #define PLUGIN_ATTRIBUTE_EDGESPACE "edgeAttributesSpace"    // domain of the edge's attributes
 #define PLUGIN_ATTRIBUTE_CUSTOMOUTPUTS "customOutputs"      // custom outputs defined in the model
 #define PLUGIN_ATTRIBUTE_SUPPORTEDGRAPHS "supportedGraphs"  // graphIds allowed in the model

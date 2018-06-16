@@ -17,7 +17,7 @@
    <item>
     <widget class="QGroupBox" name="agents">
      <property name="title">
-      <string>Agents</string>
+      <string>Nodes</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_3">
       <item row="1" column="0">
@@ -31,7 +31,7 @@
        </widget>
       </item>
       <item row="1" column="3">
-       <widget class="QComboBox" name="agentCMapSize"/>
+       <widget class="QComboBox" name="nodeCMapSize"/>
       </item>
       <item row="0" column="0">
        <widget class="QLabel" name="label">
@@ -44,10 +44,10 @@
        </widget>
       </item>
       <item row="0" column="1">
-       <widget class="QComboBox" name="agentAttr"/>
+       <widget class="QComboBox" name="nodeAttr"/>
       </item>
       <item row="1" column="1">
-       <widget class="QComboBox" name="agentCMapName"/>
+       <widget class="QComboBox" name="nodeCMapName"/>
       </item>
       <item row="1" column="2">
        <widget class="QLabel" name="label_6">

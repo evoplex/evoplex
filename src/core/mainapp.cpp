@@ -57,7 +57,7 @@ MainApp::MainApp()
     };
 
     addAttrSpace(id, GENERAL_ATTRIBUTE_EXPID, QString("int[0,%1]").arg(INT32_MAX));
-    addAttrSpace(id, GENERAL_ATTRIBUTE_AGENTS, "string");
+    addAttrSpace(id, GENERAL_ATTRIBUTE_NODES, "string");
     addAttrSpace(id, GENERAL_ATTRIBUTE_GRAPHID, "string");
     addAttrSpace(id, GENERAL_ATTRIBUTE_MODELID, "string");
     addAttrSpace(id, GENERAL_ATTRIBUTE_SEED, QString("int[0,%1]").arg(INT32_MAX));

@@ -31,7 +31,7 @@ public:
     virtual bool algorithmStep();
 
 private:
-    enum AgentAttr { Strategy, Score };
+    enum NodeAttr { Strategy, Score };
 
     double m_temptation;
 

@@ -38,7 +38,7 @@ GraphWidget::GraphWidget(MainGUI* mainGUI, Experiment* exp, ExperimentWidget* pa
     , m_exp(exp)
     , m_model(nullptr)
     , m_currStep(-1)
-    , m_selectedAgent(-1)
+    , m_selectedNode(-1)
     , m_zoomLevel(0)
     , m_nodeSizeRate(10.f)
     , m_nodeRadius(m_nodeSizeRate)
@@ -68,32 +68,32 @@ GraphWidget::GraphWidget(MainGUI* mainGUI, Experiment* exp, ExperimentWidget* pa
             [this](int trialId) { if (trialId == m_currTrialId) setTrial(m_currTrialId); },
             Qt::QueuedConnection);
 
-    connect(m_settingsDlg, &GraphSettings::agentAttrUpdated, [this](int idx) { m_agentAttr = idx; });
-    connect(m_settingsDlg, SIGNAL(agentCMapUpdated(ColorMap*)), SLOT(setAgentCMap(ColorMap*)));
-    m_agentAttr = m_settingsDlg->agentAttr();
-    m_agentCMap = m_settingsDlg->agentCMap();
+    connect(m_settingsDlg, &GraphSettings::nodeAttrUpdated, [this](int idx) { m_nodeAttr = idx; });
+    connect(m_settingsDlg, SIGNAL(nodeCMapUpdated(ColorMap*)), SLOT(setNodeCMap(ColorMap*)));
+    m_nodeAttr = m_settingsDlg->nodeAttr();
+    m_nodeCMap = m_settingsDlg->nodeCMap();
 
     connect(m_ui->bZoomIn, SIGNAL(clicked(bool)), SLOT(zoomIn()));
     connect(m_ui->bZoomOut, SIGNAL(clicked(bool)), SLOT(zoomOut()));
     connect(m_ui->bReset, SIGNAL(clicked(bool)), SLOT(resetView()));
 
-    m_attrs.resize(exp->modelPlugin()->agentAttrSpace().size());
-    for (const ValueSpace* valSpace : exp->modelPlugin()->agentAttrSpace()) {
+    m_attrs.resize(exp->modelPlugin()->nodeAttrSpace().size());
+    for (const ValueSpace* valSpace : exp->modelPlugin()->nodeAttrSpace()) {
         QLineEdit* le = new QLineEdit();
         le->setToolTip(valSpace->space());
         connect(le, &QLineEdit::editingFinished, [this, valSpace, le]() {
-            if (!m_model || !m_model->graph() || m_ui->agentId->value() < 0) {
+            if (!m_model || !m_model->graph() || m_ui->nodeId->value() < 0) {
                 return;
             }
             QString err;
-            Agent* agent = m_model->graph()->agent(m_ui->agentId->value());
+            Node* node = m_model->graph()->node(m_ui->nodeId->value());
             if (m_model->status() == Experiment::RUNNING) {
                 err = "You cannot change things in a running experiment.\n"
                       "Please, pause it and try again.";
             } else {
                 Value v = valSpace->validate(le->text());
                 if (v.isValid()) {
-                    agent->setAttr(valSpace->id(), v);
+                    node->setAttr(valSpace->id(), v);
                     // let the other widgets aware that they all need to be updated
                     emit (m_expWidget->updateWidgets(true));
                     return;
@@ -103,7 +103,7 @@ GraphWidget::GraphWidget(MainGUI* mainGUI, Experiment* exp, ExperimentWidget* pa
                 }
             }
             QMessageBox::warning(this, "Graph", err);
-            le->setText(agent->attr(valSpace->id()).toQString());
+            le->setText(node->attr(valSpace->id()).toQString());
         });
         m_attrs[valSpace->id()] = le;
         m_ui->inspectorLayout->addRow(valSpace->attrName(), le);
@@ -125,7 +125,7 @@ GraphWidget::~GraphWidget()
     m_model = nullptr;
     m_exp = nullptr;
     delete m_ui;
-    delete m_agentCMap;
+    delete m_nodeCMap;
 }
 
 void GraphWidget::updateCache(bool force)
@@ -162,17 +162,17 @@ void GraphWidget::slotRestarted()
         close();
         return;
     }
-    m_selectedAgent = -1;
+    m_selectedNode = -1;
     m_ui->inspector->hide();
     m_model = nullptr;
     m_ui->currStep->setText("--");
     updateCache(true);
 }
 
-void GraphWidget::setAgentCMap(ColorMap* cmap)
+void GraphWidget::setNodeCMap(ColorMap* cmap)
 {
-    delete m_agentCMap;
-    m_agentCMap = cmap;
+    delete m_nodeCMap;
+    m_nodeCMap = cmap;
     update();
 }
 
@@ -207,7 +207,7 @@ void GraphWidget::resetView()
     m_origin = QPoint(5,25);
     m_zoomLevel = 0;
     m_nodeRadius = m_nodeSizeRate;
-    m_selectedAgent = -1;
+    m_selectedNode = -1;
     m_ui->inspector->hide();
     updateCache();
 }
@@ -226,12 +226,12 @@ void GraphWidget::mouseReleaseEvent(QMouseEvent *e)
         return;
     }
 
-    m_selectedAgent = -1;
+    m_selectedNode = -1;
     if (e->pos() == m_posEntered) {
-        const Agent* agent = selectAgent(e->pos());
-        if (agent) {
-            m_selectedAgent = agent->id();
-            updateInspector(agent);
+        const Node* node = selectNode(e->pos());
+        if (node) {
+            m_selectedNode = node->id();
+            updateInspector(node);
             m_ui->inspector->show();
         } else {
             m_ui->inspector->hide();
@@ -250,12 +250,12 @@ void GraphWidget::resizeEvent(QResizeEvent* e)
     QWidget::resizeEvent(e);
 }
 
-void GraphWidget::updateInspector(const Agent* agent)
+void GraphWidget::updateInspector(const Node* node)
 {
-    m_ui->agentId->setValue(agent->id());
-    m_ui->neighbors->setText(QString::number(agent->edges().size()));
-    for (int id = 0; id < agent->attrs().size(); ++id) {
-        m_attrs.at(id)->setText(agent->attr(id).toQString());
+    m_ui->nodeId->setValue(node->id());
+    m_ui->neighbors->setText(QString::number(node->edges().size()));
+    for (int id = 0; id < node->attrs().size(); ++id) {
+        m_attrs.at(id)->setText(node->attr(id).toQString());
     }
 }
 
@@ -271,7 +271,7 @@ void GraphWidget::updateView(bool forceUpdate)
 
 void GraphWidget::clearSelection()
 {
-    m_selectedAgent = -1;
+    m_selectedNode = -1;
     m_ui->inspector->hide();
     update();
 }
