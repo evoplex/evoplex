@@ -48,10 +48,10 @@
 #define PLUGIN_ATTRIBUTE_AUTHOR "author"                // authors' name
 #define PLUGIN_ATTRIBUTE_NAME "name"                    // plugin's name
 #define PLUGIN_ATTRIBUTE_DESCRIPTION "description"      // plugin's description
-#define PLUGIN_ATTRIBUTE_SPACE "pluginAttributesSpace"  // domain of the plugin's attributes
+#define PLUGIN_ATTRIBUTES_SCOPE "pluginAttributesScope" // domain of the plugin's attributes
 // model (only)
-#define PLUGIN_ATTRIBUTE_NODESPACE "nodeAttributesSpace"    // domain of the node's attributes
-#define PLUGIN_ATTRIBUTE_EDGESPACE "edgeAttributesSpace"    // domain of the edge's attributes
+#define PLUGIN_ATTRIBUTE_NODESCOPE "nodeAttributesScope"    // domain of the node's attributes
+#define PLUGIN_ATTRIBUTE_EDGESCOPE "edgeAttributesScope"    // domain of the edge's attributes
 #define PLUGIN_ATTRIBUTE_CUSTOMOUTPUTS "customOutputs"      // custom outputs defined in the model
 #define PLUGIN_ATTRIBUTE_SUPPORTEDGRAPHS "supportedGraphs"  // graphIds allowed in the model
 // graph (only)

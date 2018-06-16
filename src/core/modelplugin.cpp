@@ -36,13 +36,13 @@ ModelPlugin::ModelPlugin(const QObject* instance, const QJsonObject* metaData, c
 
     m_factory = qobject_cast<IPluginModel*>(instance);
 
-    if (!attrsSpace(metaData, PLUGIN_ATTRIBUTE_NODESPACE, m_nodeAttrSpace, m_nodeAttrNames)) {
+    if (!attrsScope(metaData, PLUGIN_ATTRIBUTE_NODESCOPE, m_nodeAttrsScope, m_nodeAttrNames)) {
         qWarning() << "[ModelPlugin]: failed to read the node's attributes!";
         m_isValid = false;
         return;
     }
 
-    if (!attrsSpace(metaData, PLUGIN_ATTRIBUTE_EDGESPACE, m_edgeAttrSpace, m_edgeAttrNames)) {
+    if (!attrsScope(metaData, PLUGIN_ATTRIBUTE_EDGESCOPE, m_edgeAttrsScope, m_edgeAttrNames)) {
         qWarning() << "[ModelPlugin]: failed to read the edge's attributes!";
         m_isValid = false;
         return;
@@ -67,8 +67,8 @@ ModelPlugin::ModelPlugin(const QObject* instance, const QJsonObject* metaData, c
 
 ModelPlugin::~ModelPlugin()
 {
-    Utils::deleteAndShrink(m_nodeAttrSpace);
-    Utils::deleteAndShrink(m_edgeAttrSpace);
+    Utils::deleteAndShrink(m_nodeAttrsScope);
+    Utils::deleteAndShrink(m_edgeAttrsScope);
 }
 
 } // evoplex

@@ -23,9 +23,9 @@
 
 #include <functional>
 
+#include "attributerange.h"
 #include "node.h"
 #include "modelplugin.h"
-#include "valuespace.h"
 
 namespace evoplex
 {
@@ -57,7 +57,7 @@ public:
     //     '*numNodes;[min|max|rand_seed]'
     //   specific mode for each attribute
     //     '#numNodes;attrName_[min|max|rand_seed|value_val];...'
-    static NodesGenerator* parse(const AttributesSpace& nodeAttrsSpace,
+    static NodesGenerator* parse(const AttributesScope& nodeAttrsScope,
                                   const QString& command, QString& errMsg);
 
     // Export set of nodes to a csv file
@@ -68,9 +68,9 @@ public:
     inline const QString& command() { return m_command; }
 
 protected:
-    explicit NodesGenerator(const AttributesSpace& nodeAttrsSpace);
+    explicit NodesGenerator(const AttributesScope &nodeAttrsScope);
 
-    const AttributesSpace m_attrsSpace;
+    const AttributesScope m_attrsScope;
     QString m_command;
 };
 
@@ -78,7 +78,7 @@ protected:
 class AGFromFile : public NodesGenerator
 {
 public:
-    explicit AGFromFile(const AttributesSpace& attrsSpace, const QString& filePath);
+    explicit AGFromFile(const AttributesScope& attrsScope, const QString& filePath);
     Nodes create(std::function<void(int)> progress = [](int){});
     inline const QString& filePath() const { return m_filePath; }
 private:
@@ -89,7 +89,7 @@ private:
 class AGSameFuncForAll : public NodesGenerator
 {
 public:
-    explicit AGSameFuncForAll(const AttributesSpace& attrsSpace, const int numNodes,
+    explicit AGSameFuncForAll(const AttributesScope& attrsScope, const int numNodes,
                               const Function& func, const Value& funcInput);
     ~AGSameFuncForAll();
     Nodes create(std::function<void(int)> progress = [](int){});
@@ -101,7 +101,7 @@ private:
     const Function m_function;
     const Value m_functionInput;
 
-    std::function<Value(const ValueSpace*)> f_value;
+    std::function<Value(const AttributeRange*)> f_value;
     PRG* m_prg;
 };
 
@@ -116,7 +116,7 @@ public:
         Value funcInput;
     };
 
-    explicit AGDiffFunctions(const AttributesSpace& attrsSpace, const int numNodes,
+    explicit AGDiffFunctions(const AttributesScope& attrsScope, const int numNodes,
                              std::vector<AttrCmd> attrCmds);
     Nodes create(std::function<void(int)> progress = [](int){});
     inline const int numNodes() const { return m_numNodes; }

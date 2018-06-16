@@ -108,16 +108,16 @@ void ColorMapMgr::resetSettingsToDefault()
 
 /************************************************************************/
 
-ColorMap* ColorMap::create(const ValueSpace* valSpace, const Colors& colors)
+ColorMap* ColorMap::create(const AttributeRange* attrRange, const Colors& colors)
 {
-    const SetSpace* set = dynamic_cast<const SetSpace*>(valSpace);
+    const SetOfValues* set = dynamic_cast<const SetOfValues*>(attrRange);
     if (set) {
         return new ColorMapSet(colors, set);
     }
 
-    const RangeSpace* range = dynamic_cast<const RangeSpace*>(valSpace);
-    if (range) {
-        return new ColorMapRange(colors, range);
+    const IntervalOfValues* interval = dynamic_cast<const IntervalOfValues*>(attrRange);
+    if (interval) {
+        return new ColorMapRange(colors, interval);
     }
 
     return new SingleColor(colors.front());
@@ -143,17 +143,17 @@ const QColor SingleColor::colorFromValue(const Value &val) const
 
 /************************************************************************/
 
-ColorMapRange::ColorMapRange(const Colors& colors, const RangeSpace* valSpace)
+ColorMapRange::ColorMapRange(const Colors& colors, const IntervalOfValues* attrRange)
     : ColorMap(colors)
 {
-    if (valSpace->type() == ValueSpace::Int_Range) {
-        m_max = valSpace->max().toInt();
-        m_min = valSpace->min().toInt();
-    } else if (valSpace->type() == ValueSpace::Double_Range) {
-        m_max = valSpace->max().toDouble();
-        m_min = valSpace->min().toDouble();
+    if (attrRange->type() == AttributeRange::Int_Range) {
+        m_max = attrRange->max().toInt();
+        m_min = attrRange->min().toInt();
+    } else if (attrRange->type() == AttributeRange::Double_Range) {
+        m_max = attrRange->max().toDouble();
+        m_min = attrRange->min().toDouble();
     } else {
-        qFatal("[ColorMapRange] : invalid attribute space!");
+        qFatal("[ColorMapRange] : invalid attribute range!");
     }
 }
 
@@ -165,18 +165,18 @@ const QColor ColorMapRange::colorFromValue(const Value& val) const
     } else if (val.type() == Value::DOUBLE) {
         value = val.toDouble();
     } else {
-        qFatal("[ColorMapRange]: invalid attribute space!");
+        qFatal("[ColorMapRange]: invalid attribute range!");
     }
     return m_colors.at(std::round((value * (m_colors.size()-1)) / m_max + m_min));
 }
 
 /************************************************************************/
 
-ColorMapSet::ColorMapSet(const Colors& colors, const SetSpace* valSpace)
+ColorMapSet::ColorMapSet(const Colors& colors, const SetOfValues* attrRange)
     : ColorMap(colors)
 {
     int c = 0;
-    for (const Value value : valSpace->values()) {
+    for (const Value value : attrRange->values()) {
         m_cmap.insert({value, m_colors.at(c++)});
         c = (c == m_colors.size()) ? 0 : c;
     }

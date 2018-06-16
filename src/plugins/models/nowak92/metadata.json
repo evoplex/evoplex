@@ -5,10 +5,10 @@
   "author": "Marcos Cardinot",
   "description": "Martin A. Nowak & Robert M. May, 1992",
   "supportedGraphs": ["mooreGrid","squareGrid","customGraph"],
-  "pluginAttributesSpace": [
+  "pluginAttributesScope": [
     {"temptation": "double[1,2]"}
   ],
-  "nodeAttributesSpace": [
+  "nodeAttributesScope": [
     {"strategy": "int{0,1,2,3}"},
     {"score": "double[0,16]"}
   ]

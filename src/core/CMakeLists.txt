@@ -24,13 +24,13 @@ set(EVOPLEX_CORE_INCLUDE
   include/abstractmodel.h
 
   include/attributes.h
+  include/attributerange.h
   include/node.h
   include/edge.h
   include/constants.h
   include/prg.h
   include/utils.h
   include/value.h
-  include/valuespace.h
   include/stats.h
 )
 set(EVOPLEX_CORE_H
@@ -52,6 +52,7 @@ set(EVOPLEX_CORE_CXX
   modelplugin.cpp
   prg.cpp
 
+  attributerange.cpp
   nodesgenerator.cpp
   edge.cpp
   experiment.cpp
@@ -59,7 +60,6 @@ set(EVOPLEX_CORE_CXX
   output.cpp
   project.cpp
   value.cpp
-  valuespace.cpp
   logger.cpp
   mainapp.cpp
 )

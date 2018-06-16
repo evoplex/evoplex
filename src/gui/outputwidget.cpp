@@ -74,7 +74,7 @@ OutputWidget::OutputWidget(const ModelPlugin* modelPlugin, const std::vector<int
                 rowInfo.id = m_ui->table->rowCount();
                 rowInfo.equalToId = rowInfo.id == rootId ? -1 : rootId;
                 insertRow(rowInfo, df->functionStr(), DefaultFunc, entityStr, df->entity(),
-                          df->valueSpace()->attrName(), input.toQString());
+                          df->attrRange()->attrName(), input.toQString());
             }
         } else if (std::dynamic_pointer_cast<CustomOutput>(cache->output())) {
             for (Value func : cache->inputs()) {
@@ -126,20 +126,20 @@ void OutputWidget::slotClose(bool canceled)
         QString inputStr = m_ui->table->item(row, 4)->text();
         RowInfo rinfo = m_ui->table->item(row, 4)->data(Qt::UserRole).value<RowInfo>();
 
-        const ValueSpace* entityValSpace;
+        const AttributeRange* entityAttrRange;
         if (entity == DefaultOutput::E_Nodes) {
-            entityValSpace = m_modelPlugin->nodeAttrSpace(attr);
+            entityAttrRange = m_modelPlugin->nodeAttrRange(attr);
         } else {
-            entityValSpace = m_modelPlugin->edgeAttrSpace(attr);
+            entityAttrRange = m_modelPlugin->edgeAttrRange(attr);
         }
 
         if (rinfo.equalToId == -1) {
             Cache* cache = nullptr;
             if (funcType == DefaultFunc) {
-                Value input = entityValSpace->validate(inputStr);
+                Value input = entityAttrRange->validate(inputStr);
                 DefaultOutput::Function func = DefaultOutput::funcFromString(funcStr);
                 Q_ASSERT(func != DefaultOutput::F_Invalid && input.isValid());
-                OutputSP newOutput (new DefaultOutput(func, entity, entityValSpace));
+                OutputSP newOutput (new DefaultOutput(func, entity, entityAttrRange));
                 cache = newOutput->addCache({input}, m_trialIds);
             } else {
                 OutputSP newOutput (new CustomOutput());
@@ -150,7 +150,7 @@ void OutputWidget::slotClose(bool canceled)
             OutputSP existingOutput = m_allCaches.at(rinfo.equalToId)->output();
             Value input;
             if (funcType == DefaultFunc) {
-                input = entityValSpace->validate(inputStr);
+                input = entityAttrRange->validate(inputStr);
             } else {
                 input = Value(funcStr);
             }
@@ -212,18 +212,18 @@ void OutputWidget::slotAdd()
         }
     }
 
-    const ValueSpace* entityValSpace;
+    const AttributeRange* entityAttrRange;
     if (m_ui->entityNode->isChecked()) {
-        entityValSpace = m_modelPlugin->nodeAttrSpace().value(m_ui->attr->currentText());
+        entityAttrRange = m_modelPlugin->nodeAttrRange(m_ui->attr->currentText());
     } else {
-        entityValSpace = m_modelPlugin->edgeAttrSpace().value(m_ui->attr->currentText());
+        entityAttrRange = m_modelPlugin->edgeAttrRange(m_ui->attr->currentText());
     }
 
     if (m_ui->func->currentData().toInt() == DefaultFunc) {
-        if (!entityValSpace->validate(m_ui->input->text()).isValid()) {
+        if (!entityAttrRange->validate(m_ui->input->text()).isValid()) {
             QMessageBox::warning(this, "Evoplex",
                                  "The 'input' is not valid for the current 'attribute'.\n"
-                                 "Expected: " + entityValSpace->space());
+                                 "Expected: " + entityAttrRange->attrRangeStr());
             return;
         }
     }

@@ -6,17 +6,17 @@
   "description": "just another model",
   "supportedGraphs": [""],
   "customOutputs": [""],
-  "pluginAttributesSpace": [
+  "pluginAttributesScope": [
     {"doubleInterval": "double[1,2]"},
     {"intInterval": "int[0,4]"},
     {"doubleSet": "double{1.2,4.4}"},
     {"intSet": "int{1,4}"},
     {"bool": "bool"}
   ],
-  "nodeAttributesSpace": [
+  "nodeAttributesScope": [
     {"strategy": "int{0,1}"}
   ],
-  "edgeAttributesSpace": [
+  "edgeAttributesScope": [
     {"weight": "double[0,1]"}
   ]
 }

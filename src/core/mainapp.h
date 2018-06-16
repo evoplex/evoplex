@@ -77,7 +77,7 @@ public:
     inline const ModelPlugin* model(const QString& modelId) const { return m_models.value(modelId, nullptr); }
     inline ProjectSP project(int projId) const { return m_projects.at(projId); }
 
-    inline const AttributesSpace& generalAttrSpace() const { return m_generalAttrSpace; }
+    inline const AttributesScope& generalAttrsScope() const { return m_generalAttrsScope; }
 
     void addPathToRecentProjects(const QString& projectFilePath);
 
@@ -98,9 +98,9 @@ private:
     QHash<QString, GraphPlugin*> m_graphs;  // loaded graphs
     QHash<QString, ModelPlugin*> m_models;  // loaded models
 
-    // lets build a hash with the name and space of the essential parameters
+    // let's build a hash with the name and attrRange of the essential attributes
     // it is important to validate the contents of csv files
-    AttributesSpace m_generalAttrSpace;
+    AttributesScope m_generalAttrsScope;
 };
 }
 

@@ -18,8 +18,8 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef VALUESPACE_H
-#define VALUESPACE_H
+#ifndef ATTRIBUTE_RANGE_H
+#define ATTRIBUTE_RANGE_H
 
 #include <QHash>
 #include <vector>
@@ -30,10 +30,10 @@
 namespace evoplex
 {
 
-class ValueSpace
+class AttributeRange
 {
 public:
-    enum SpaceType {
+    enum Type {
         Invalid,
 
         Double_Range,
@@ -49,7 +49,7 @@ public:
         FilePath
     };
 
-    // space can be:
+    // an attrRangeStr can be:
     //   - "bool"               // a boolean
     //   - "dirpath"            // a string containing a valid dirpath
     //   - "filepath"           // a string containing a valid filepath
@@ -60,44 +60,43 @@ public:
     //   - "double[min,max]     // doubles from min to max (including min and max)
     //   - "double{1.1,1.2}     // set of doubles
     //   * you can use 'max' to take the maximum value for the type
-    static ValueSpace* parse(int id, const QString& attrName, const QString& space);
+    static AttributeRange* parse(int id, const QString& attrName, const QString& attrRangeStr);
 
     virtual const Value& min() const = 0;
     virtual const Value& max() const = 0;
     virtual Value rand(PRG* prg) const = 0;
 
-    // Check if the valueStr belongs to the parameter space.
+    // Check if the valueStr belongs to this attribute range.
     // If true, return a valid Value with the correct type
     Value validate(const QString& valueStr) const;
 
     inline bool isValid() const { return m_type != Invalid; }
     inline int id() const { return m_id; }
     inline const QString& attrName() const { return m_attrName; }
-    inline const QString& space() const { return m_space; }
-    inline SpaceType type() const { return m_type; }
+    inline const QString& attrRangeStr() const { return m_attrRangeStr; }
+    inline Type type() const { return m_type; }
 
 protected:
     const int m_id;
     const QString m_attrName;
-    const SpaceType m_type;
-    QString m_space;
+    const Type m_type;
+    QString m_attrRangeStr;
 
-    explicit ValueSpace(int id, const QString& attrName, SpaceType type);
+    explicit AttributeRange(int id, const QString& attrName, Type type);
 
 private:
-    // assume that space is equal to 'int{ }' or 'double{ }'
-    // return a vector with all elements with the proper type
-    static ValueSpace* setSpace(QString space, const int id, const QString& attrName);
+    // assume that attrRangeStr is equal to 'int{ }' or 'double{ }'
+    static AttributeRange* setOfValues(QString attrRangeStr, const int id, const QString& attrName);
 
-    // assume that space is equal to 'int[min,max]' or 'double[min,max]'
-    static ValueSpace* rangeSpace(QString space, const int id, const QString& attrName);
+    // assume that attrRangeStr is equal to 'int[min,max]' or 'double[min,max]'
+    static AttributeRange* intervalOfValues(QString attrRangeStr, const int id, const QString& attrName);
 };
 
-class DefaultSpace : public ValueSpace
+class SingleValue : public AttributeRange
 {
 public:
-    explicit DefaultSpace();
-    explicit DefaultSpace(int id, const QString& attrName, SpaceType type, Value validValue);
+    explicit SingleValue();
+    explicit SingleValue(int id, const QString& attrName, Type type, Value validValue);
 
     virtual const Value& min() const { return m_validValue; }
     virtual const Value& max() const { return m_validValue; }
@@ -107,10 +106,10 @@ private:
     Value m_validValue;
 };
 
-class RangeSpace : public DefaultSpace
+class IntervalOfValues : public AttributeRange
 {
 public:
-    RangeSpace(int id, const QString& attrName, SpaceType type, Value min, Value max);
+    IntervalOfValues(int id, const QString& attrName, Type type, Value min, Value max);
 
     virtual const Value& min() const { return m_min; }
     virtual const Value& max() const { return m_max; }
@@ -120,15 +119,15 @@ private:
     Value m_min;
     Value m_max;
 
-    Value (evoplex::RangeSpace::*f_rand)(PRG*) const;
+    Value (evoplex::IntervalOfValues::*f_rand)(PRG*) const;
     inline Value randD(PRG* prg) const { return prg->randD(m_min.toDouble(), m_max.toDouble()); }
     inline Value randI(PRG* prg) const { return prg->randI(m_min.toInt(), m_max.toInt()); }
 };
 
-class SetSpace : public DefaultSpace
+class SetOfValues : public AttributeRange
 {
 public:
-    SetSpace(int id, const QString& attrName, SpaceType type, Values values);
+    SetOfValues(int id, const QString& attrName, Type type, Values values);
 
     virtual const Value& min() const { return m_values.front(); }
     virtual const Value& max() const { return m_values.back(); }
@@ -140,7 +139,7 @@ private:
     Values m_values;
 };
 
-typedef QHash<QString, ValueSpace*> AttributesSpace;
+typedef QHash<QString, AttributeRange*> AttributesScope;
 
 } // evoplex
-#endif // VALUESPACE_H
+#endif // ATTRIBUTE_RANGE_H

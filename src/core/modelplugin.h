@@ -41,12 +41,12 @@ public:
     inline bool graphIsSupported(const QString& graphId) const { return m_supportedGraphs.empty() || m_supportedGraphs.contains(graphId); }
 
     inline const std::vector<QString>& nodeAttrNames() const { return m_nodeAttrNames; }
-    inline const AttributesSpace& nodeAttrSpace() const { return m_nodeAttrSpace; }
-    inline const ValueSpace* nodeAttrSpace(const QString& attr) const { return m_nodeAttrSpace.value(attr); }
+    inline const AttributesScope& nodeAttrsScope() const { return m_nodeAttrsScope; }
+    inline const AttributeRange* nodeAttrRange(const QString& attr) const { return m_nodeAttrsScope.value(attr); }
 
     inline const std::vector<QString>& edgeAttrNames() const { return m_edgeAttrNames; }
-    inline const AttributesSpace& edgeAttrSpace() const { return m_edgeAttrSpace; }
-    inline const ValueSpace* edgeAttrSpace(const QString& attr) const { return m_edgeAttrSpace.value(attr); }
+    inline const AttributesScope& edgeAttrsScope() const { return m_edgeAttrsScope; }
+    inline const AttributeRange* edgeAttrRange(const QString& attr) const { return m_edgeAttrsScope.value(attr); }
 
 private:
     IPluginModel* m_factory;
@@ -54,10 +54,10 @@ private:
     QVector<QString> m_supportedGraphs;
     QVector<QString> m_customOutputs;
 
-    AttributesSpace m_nodeAttrSpace;
+    AttributesScope m_nodeAttrsScope;
     std::vector<QString> m_nodeAttrNames;
 
-    AttributesSpace m_edgeAttrSpace;
+    AttributesScope m_edgeAttrsScope;
     std::vector<QString> m_edgeAttrNames;
 };
 }

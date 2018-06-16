@@ -331,7 +331,7 @@ Nodes Experiment::createNodes()
 
     Nodes nodes;
     QString errMsg;
-    NodesGenerator* ag = NodesGenerator::parse(m_modelPlugin->nodeAttrSpace(),
+    NodesGenerator* ag = NodesGenerator::parse(m_modelPlugin->nodeAttrsScope(),
                 m_inputs->generalAttrs->value(GENERAL_ATTRIBUTE_NODES).toQString(), errMsg);
     if (ag) {
         nodes = ag->create();
@@ -476,15 +476,15 @@ Experiment::ExperimentInputs* Experiment::readInputs(const MainApp* mainApp,
 
     // get the value of each attribute and make sure they are valid
     QStringList failedAttributes;
-    Attributes* generalAttrs = new Attributes(mainApp->generalAttrSpace().size());
-    Attributes* modelAttrs = new Attributes(mPlugin->pluginAttrSpace().size());
-    Attributes* graphAttrs = new Attributes(gPlugin->pluginAttrSpace().size());
+    Attributes* generalAttrs = new Attributes(mainApp->generalAttrsScope().size());
+    Attributes* modelAttrs = new Attributes(mPlugin->pluginAttrsScope().size());
+    Attributes* graphAttrs = new Attributes(gPlugin->pluginAttrsScope().size());
     for (int i = 0; i < values.size(); ++i) {
         const QString& vStr = values.at(i);
         QString attrName = header.at(i);
 
-        AttributesSpace::const_iterator gps = mainApp->generalAttrSpace().find(attrName);
-        if (gps != mainApp->generalAttrSpace().end()) {
+        AttributesScope::const_iterator gps = mainApp->generalAttrsScope().find(attrName);
+        if (gps != mainApp->generalAttrsScope().end()) {
             Value value = gps.value()->validate(vStr);
             if (value.isValid()) {
                 generalAttrs->replace(gps.value()->id(), attrName, value);
@@ -492,26 +492,26 @@ Experiment::ExperimentInputs* Experiment::readInputs(const MainApp* mainApp,
                 failedAttributes.append(attrName);
             }
         } else {
-            ValueSpace* valSpace = nullptr;
+            const AttributeRange* attrRange = nullptr;
             Attributes* pluginAttrs = nullptr;
             if (attrName.startsWith(modelId_)) {
                 attrName = attrName.remove(modelId_);
-                valSpace = mPlugin->pluginAttrSpace().value(attrName);
+                attrRange = mPlugin->pluginAttrRange(attrName);
                 pluginAttrs = modelAttrs;
             } else if (attrName.startsWith(graphId_)) {
                 attrName = attrName.remove(graphId_);
-                valSpace = gPlugin->pluginAttrSpace().value(attrName);
+                attrRange = gPlugin->pluginAttrRange(attrName);
                 pluginAttrs = graphAttrs;
             }
 
             if (pluginAttrs) {
                 Value value;
-                if (valSpace) {
-                    value = valSpace->validate(vStr);
+                if (attrRange) {
+                    value = attrRange->validate(vStr);
                 }
 
                 if (value.isValid()) {
-                    pluginAttrs->replace(valSpace->id(), attrName, value);
+                    pluginAttrs->replace(attrRange->id(), attrName, value);
                 } else {
                     failedAttributes.append(attrName);
                 }
@@ -542,16 +542,16 @@ Experiment::ExperimentInputs* Experiment::readInputs(const MainApp* mainApp,
     }
 
     // make sure all attributes exist
-    auto checkAll = [&failedAttributes](const Attributes* attrs, const AttributesSpace& attrSpace) {
-        for (const ValueSpace* valSpace : attrSpace) {
-            if (!attrs->contains(valSpace->attrName())) {
-                failedAttributes.append(valSpace->attrName());
+    auto checkAll = [&failedAttributes](const Attributes* attrs, const AttributesScope& attrsScope) {
+        for (const AttributeRange* attrRange : attrsScope) {
+            if (!attrs->contains(attrRange->attrName())) {
+                failedAttributes.append(attrRange->attrName());
             }
         }
     };
-    checkAll(generalAttrs, mainApp->generalAttrSpace());
-    checkAll(modelAttrs, mPlugin->pluginAttrSpace());
-    checkAll(graphAttrs, gPlugin->pluginAttrSpace());
+    checkAll(generalAttrs, mainApp->generalAttrsScope());
+    checkAll(modelAttrs, mPlugin->pluginAttrsScope());
+    checkAll(graphAttrs, gPlugin->pluginAttrsScope());
 
     ExperimentInputs* ei = new ExperimentInputs(generalAttrs, modelAttrs, graphAttrs, fileCaches);
 

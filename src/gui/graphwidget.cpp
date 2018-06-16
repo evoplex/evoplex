@@ -77,11 +77,11 @@ GraphWidget::GraphWidget(MainGUI* mainGUI, Experiment* exp, ExperimentWidget* pa
     connect(m_ui->bZoomOut, SIGNAL(clicked(bool)), SLOT(zoomOut()));
     connect(m_ui->bReset, SIGNAL(clicked(bool)), SLOT(resetView()));
 
-    m_attrs.resize(exp->modelPlugin()->nodeAttrSpace().size());
-    for (const ValueSpace* valSpace : exp->modelPlugin()->nodeAttrSpace()) {
+    m_attrs.resize(exp->modelPlugin()->nodeAttrsScope().size());
+    for (const AttributeRange* attrRange : exp->modelPlugin()->nodeAttrsScope()) {
         QLineEdit* le = new QLineEdit();
-        le->setToolTip(valSpace->space());
-        connect(le, &QLineEdit::editingFinished, [this, valSpace, le]() {
+        le->setToolTip(attrRange->attrRangeStr());
+        connect(le, &QLineEdit::editingFinished, [this, attrRange, le]() {
             if (!m_model || !m_model->graph() || m_ui->nodeId->value() < 0) {
                 return;
             }
@@ -91,22 +91,22 @@ GraphWidget::GraphWidget(MainGUI* mainGUI, Experiment* exp, ExperimentWidget* pa
                 err = "You cannot change things in a running experiment.\n"
                       "Please, pause it and try again.";
             } else {
-                Value v = valSpace->validate(le->text());
+                Value v = attrRange->validate(le->text());
                 if (v.isValid()) {
-                    node->setAttr(valSpace->id(), v);
+                    node->setAttr(attrRange->id(), v);
                     // let the other widgets aware that they all need to be updated
                     emit (m_expWidget->updateWidgets(true));
                     return;
                 } else {
-                    err = "The input for '" + valSpace->attrName() + "' is invalid.\n"
-                          "Expected: " + valSpace->space();
+                    err = "The input for '" + attrRange->attrName() + "' is invalid.\n"
+                          "Expected: " + attrRange->attrRangeStr();
                 }
             }
             QMessageBox::warning(this, "Graph", err);
-            le->setText(node->attr(valSpace->id()).toQString());
+            le->setText(node->attr(attrRange->id()).toQString());
         });
-        m_attrs[valSpace->id()] = le;
-        m_ui->inspectorLayout->addRow(valSpace->attrName(), le);
+        m_attrs[attrRange->id()] = le;
+        m_ui->inspectorLayout->addRow(attrRange->attrName(), le);
     }
     m_ui->inspector->hide();
     connect(m_ui->bCloseInspector, SIGNAL(clicked(bool)), m_ui->inspector, SLOT(hide()));

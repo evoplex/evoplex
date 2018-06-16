@@ -27,7 +27,7 @@
 #include <vector>
 
 #include "attributes.h"
-#include "valuespace.h"
+#include "attributerange.h"
 
 namespace evoplex
 {
@@ -64,7 +64,7 @@ private:
 class ColorMap
 {
 public:
-    static ColorMap* create(const ValueSpace* valSpace, const Colors& colors);
+    static ColorMap* create(const AttributeRange* attrRange, const Colors& colors);
 
     virtual const QColor colorFromValue(const Value& val) const = 0;
 
@@ -87,7 +87,7 @@ public:
 class ColorMapRange : public ColorMap
 {
 public:
-    explicit ColorMapRange(const Colors& colors, const RangeSpace* valSpace);
+    explicit ColorMapRange(const Colors& colors, const IntervalOfValues* attrRange);
     virtual const QColor colorFromValue(const Value& val) const;
 private:
     float m_max;
@@ -99,7 +99,7 @@ private:
 class ColorMapSet : public ColorMap
 {
 public:
-    explicit ColorMapSet(const Colors& colors, const SetSpace* valSpace);
+    explicit ColorMapSet(const Colors& colors, const SetOfValues* attrRange);
     virtual const QColor colorFromValue(const Value& val) const;
 private:
     std::unordered_map<Value, QColor> m_cmap;

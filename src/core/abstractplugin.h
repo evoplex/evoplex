@@ -25,7 +25,7 @@
 #include <QString>
 
 #include "attributes.h"
-#include "valuespace.h"
+#include "attributerange.h"
 
 namespace evoplex {
 class AbstractPlugin
@@ -48,13 +48,14 @@ public:
     inline const QString& name() const { return m_name; }
     inline const QString& description() const { return m_descr; }
 
-    inline const std::vector<QString>& pluginAttrNames() const { return m_pluginAttrNames; }
-    inline const AttributesSpace& pluginAttrSpace() const { return m_pluginAttrSpace; }
+    inline const std::vector<QString>& pluginAttrsNames() const { return m_pluginAttrsNames; }
+    inline const AttributesScope& pluginAttrsScope() const { return m_pluginAttrsScope; }
+    inline const AttributeRange* pluginAttrRange(const QString& attr) const { return m_pluginAttrsScope.value(attr); }
 
 protected:
     bool m_isValid;
-    bool attrsSpace(const QJsonObject* metaData, const QString& name,
-                    AttributesSpace &space, std::vector<QString>& keys) const;
+    bool attrsScope(const QJsonObject* metaData, const QString& name,
+                    AttributesScope& attrsScope, std::vector<QString>& keys) const;
 
 private:
     const QString m_libPath;
@@ -63,8 +64,8 @@ private:
     QString m_author;
     QString m_name;
     QString m_descr;
-    AttributesSpace m_pluginAttrSpace;
-    std::vector<QString> m_pluginAttrNames;
+    AttributesScope m_pluginAttrsScope;
+    std::vector<QString> m_pluginAttrsNames;
 };
 }
 #endif // ABSTRACTPLUGIN_H

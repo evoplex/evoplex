@@ -47,7 +47,7 @@ AbstractPlugin::AbstractPlugin(const QJsonObject* metaData, const QString& libPa
     m_descr = metaData->value(PLUGIN_ATTRIBUTE_DESCRIPTION).toString();
 
     if (m_id.isEmpty() || m_author.isEmpty() || m_name.isEmpty() || m_descr.isEmpty()
-            || !attrsSpace(metaData, PLUGIN_ATTRIBUTE_SPACE, m_pluginAttrSpace, m_pluginAttrNames)) {
+            || !attrsScope(metaData, PLUGIN_ATTRIBUTES_SCOPE, m_pluginAttrsScope, m_pluginAttrsNames)) {
         qWarning() << "[AbstractPlugin]: failed to read the plugins's attributes!";
         m_isValid = false;
         return;
@@ -58,25 +58,25 @@ AbstractPlugin::AbstractPlugin(const QJsonObject* metaData, const QString& libPa
 
 AbstractPlugin::~AbstractPlugin()
 {
-    Utils::deleteAndShrink(m_pluginAttrSpace);
+    Utils::deleteAndShrink(m_pluginAttrsScope);
 }
 
-bool AbstractPlugin::attrsSpace(const QJsonObject* metaData, const QString& name,
-                                AttributesSpace& space, std::vector<QString>& keys) const
+bool AbstractPlugin::attrsScope(const QJsonObject* metaData, const QString& name,
+                                AttributesScope& attrsScope, std::vector<QString>& keys) const
 {
     if (metaData->contains(name)) {
         QJsonArray json = metaData->value(name).toArray();
         for (int id = 0; id < json.size(); ++id) {
             QVariantMap attrs = json.at(id).toObject().toVariantMap();
-            ValueSpace* valSpace = ValueSpace::parse(id, attrs.firstKey(), attrs.first().toString());
-            if (!valSpace->isValid()) {
-                delete valSpace;
-                Utils::deleteAndShrink(space);
+            AttributeRange* attrRange = AttributeRange::parse(id, attrs.firstKey(), attrs.first().toString());
+            if (!attrRange->isValid()) {
+                delete attrRange;
+                Utils::deleteAndShrink(attrsScope);
                 Utils::deleteAndShrink(keys);
                 return false;
             }
-            space.insert(valSpace->attrName(), valSpace);
-            keys.push_back(valSpace->attrName());
+            attrsScope.insert(attrRange->attrName(), attrRange);
+            keys.push_back(attrRange->attrName());
         }
     }
     return true;

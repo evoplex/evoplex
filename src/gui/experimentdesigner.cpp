@@ -312,7 +312,7 @@ void ExperimentDesigner::slotNodesWidget()
     QString cmd = m_widgetFields.value(GENERAL_ATTRIBUTE_NODES).value<QLineEdit*>()->text();
     if (!cmd.isEmpty()) {
         QString errorMsg;
-        ag = NodesGenerator::parse(model->nodeAttrSpace(), cmd, errorMsg);
+        ag = NodesGenerator::parse(model->nodeAttrsScope(), cmd, errorMsg);
         if (!errorMsg.isEmpty()) {
             QMessageBox::warning(this, "Nodes Generator", errorMsg);
             delete ag;
@@ -320,7 +320,7 @@ void ExperimentDesigner::slotNodesWidget()
         }
     }
 
-    NodesGeneratorDlg* adlg = new NodesGeneratorDlg(model->nodeAttrSpace(), this, ag);
+    NodesGeneratorDlg* adlg = new NodesGeneratorDlg(model->nodeAttrsScope(), this, ag);
     if (adlg->exec() == QDialog::Accepted) {
         m_widgetFields.value(GENERAL_ATTRIBUTE_NODES).value<QLineEdit*>()->setText(adlg->readCommand());
     }
@@ -567,7 +567,7 @@ void ExperimentDesigner::slotPluginRemoved(const QString& id, AbstractPlugin::Pl
 
 void ExperimentDesigner::addPluginAttrs(QTreeWidgetItem* tree, const AbstractPlugin* plugin)
 {
-    if (plugin->pluginAttrNames().size() <= 0) {
+    if (plugin->pluginAttrsNames().size() <= 0) {
         return; // nothing to add
     }
 
@@ -580,40 +580,40 @@ void ExperimentDesigner::addPluginAttrs(QTreeWidgetItem* tree, const AbstractPlu
     }
 
     const QString uid_ = plugin->id() + "_";
-    foreach (const QString& attrName, plugin->pluginAttrNames()) {
+    for (const QString& attrName : plugin->pluginAttrsNames()) {
         QTreeWidgetItem* item = new QTreeWidgetItem(tree);
         item->setText(0, attrName);
         item->setData(0, Qt::UserRole, plugin->id());
 
-        const ValueSpace* valSpace = plugin->pluginAttrSpace().value(attrName);
+        const AttributeRange* attrRange = plugin->pluginAttrRange(attrName);
         QWidget* widget = nullptr;
-        switch (valSpace->type()) {
-        case ValueSpace::Double_Range: {
-            widget = newDoubleSpinBox(valSpace->min().toDouble(), valSpace->max().toDouble());
+        switch (attrRange->type()) {
+        case AttributeRange::Double_Range: {
+            widget = newDoubleSpinBox(attrRange->min().toDouble(), attrRange->max().toDouble());
             break;
         }
-        case ValueSpace::Int_Range: {
-            widget = newSpinBox(valSpace->min().toInt(), valSpace->max().toInt());
+        case AttributeRange::Int_Range: {
+            widget = newSpinBox(attrRange->min().toInt(), attrRange->max().toInt());
             break;
         }
-        case ValueSpace::Double_Set:
-        case ValueSpace::Int_Set:
-        case ValueSpace::String_Set: {
-            const SetSpace* sSpace = dynamic_cast<const SetSpace*>(valSpace);
+        case AttributeRange::Double_Set:
+        case AttributeRange::Int_Set:
+        case AttributeRange::String_Set: {
+            const SetOfValues* sov = dynamic_cast<const SetOfValues*>(attrRange);
             QComboBox* cb = new QComboBox();
-            for (Value v : sSpace->values()) {
+            for (Value v : sov->values()) {
                 cb->addItem(v.toQString());
             }
             widget = cb;
             break;
         }
-        case ValueSpace::Bool: {
+        case AttributeRange::Bool: {
             widget = new QCheckBox();
             break;
         }
         default:
             QLineEdit* le = new QLineEdit();
-            le->setText(valSpace->min().toQString());
+            le->setText(attrRange->min().toQString());
             widget = le;
         }
 
@@ -621,7 +621,7 @@ void ExperimentDesigner::addPluginAttrs(QTreeWidgetItem* tree, const AbstractPlu
         item->setHidden(true);
         m_ui->treeWidget->setItemWidget(item, 1, widget);
         // add the uid as prefix to avoid clashes.
-        m_widgetFields.insert(uid_ + valSpace->attrName(), QVariant::fromValue(widget));
+        m_widgetFields.insert(uid_ + attrRange->attrName(), QVariant::fromValue(widget));
     }
 }
 

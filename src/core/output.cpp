@@ -66,16 +66,16 @@ void Cache::flushAll()
 /*******************************************************/
 /*******************************************************/
 
-DefaultOutput::DefaultOutput(const Function f, const Entity e, const ValueSpace* valSpace)
+DefaultOutput::DefaultOutput(const Function f, const Entity e, const AttributeRange* attrRange)
     : Output()
     , m_func(f)
     , m_entity(e)
-    , m_valueSpace(valSpace)
+    , m_attrRange(attrRange)
 {
     m_headerPrefix = QString("%1_%2_%3_")
             .arg(stringFromFunc(m_func))
             .arg((m_entity == E_Nodes ? "nodes" : "edges"))
-            .arg(m_valueSpace->attrName());
+            .arg(m_attrRange->attrName());
 }
 
 void DefaultOutput::doOperation(const int trialId, const AbstractModel* model)
@@ -88,9 +88,9 @@ void DefaultOutput::doOperation(const int trialId, const AbstractModel* model)
     switch (m_func) {
     case F_Count:
         if (m_entity == E_Nodes) {
-            allValues = Stats::count(model->graph()->nodes(), m_valueSpace->id(), m_allInputs);
+            allValues = Stats::count(model->graph()->nodes(), m_attrRange->id(), m_allInputs);
         } else {
-            allValues = Stats::count(model->graph()->edges(), m_valueSpace->id(), m_allInputs);
+            allValues = Stats::count(model->graph()->edges(), m_attrRange->id(), m_allInputs);
         }
         break;
     default:
@@ -106,7 +106,7 @@ bool DefaultOutput::operator==(const OutputSP output) const
     if (!other) return false;
     if (m_func != other->function()) return false;
     if (m_entity != other->entity()) return false;
-    if (m_valueSpace->id() != other->valueSpace()->id()) return false;
+    if (m_attrRange->id() != other->attrRange()->id()) return false;
     return true;
 }
 
@@ -271,16 +271,16 @@ std::vector<Cache*> Output::parseHeader(const QStringList& header, const std::ve
             return caches;
         }
 
-        AttributesSpace entityAttrSpace;
+        AttributesScope entityAttrsScope;
         DefaultOutput::Entity entity;
         if (h.startsWith("nodes_")) {
             h.remove("nodes_");
             entity = DefaultOutput::E_Nodes;
-            entityAttrSpace = model->nodeAttrSpace();
+            entityAttrsScope = model->nodeAttrsScope();
         } else if (h.startsWith("edges_")) {
             h.remove("edges_");
             entity = DefaultOutput::E_Edges;
-            entityAttrSpace = model->nodeAttrSpace();
+            entityAttrsScope = model->edgeAttrsScope();
         } else {
             errorMsg = QString("[OutputHeader] invalid header! Entity does not exist. (%1)\n").arg(h);
             qWarning() << errorMsg;
@@ -289,8 +289,8 @@ std::vector<Cache*> Output::parseHeader(const QStringList& header, const std::ve
         }
 
         QStringList attrHeaderStr = h.split("_");
-        ValueSpace* valSpace = entityAttrSpace.value(attrHeaderStr.first());
-        if (!valSpace->isValid()) {
+        AttributeRange* attrRange = entityAttrsScope.value(attrHeaderStr.first());
+        if (!attrRange->isValid()) {
             errorMsg = QString("[OutputHeader] invalid header! Attribute does not exist. (%1)\n").arg(h);
             qWarning() << errorMsg;
             Utils::deleteAndShrink(caches);
@@ -300,7 +300,7 @@ std::vector<Cache*> Output::parseHeader(const QStringList& header, const std::ve
         std::vector<Value> attrHeader; //inputs
         attrHeaderStr.removeFirst();
         for (QString valStr : attrHeaderStr) {
-            Value val = valSpace->validate(valStr);
+            Value val = attrRange->validate(valStr);
             if (!val.isValid()) {
                 errorMsg = QString("[OutputHeader] invalid header! Value of attribute is invalid. (%1)\n").arg(valStr);
                 qWarning() << errorMsg;
@@ -317,7 +317,7 @@ std::vector<Cache*> Output::parseHeader(const QStringList& header, const std::ve
             return caches;
         }
 
-        OutputSP output (new DefaultOutput(func, entity, valSpace));
+        OutputSP output (new DefaultOutput(func, entity, attrRange));
         caches.emplace_back(output->addCache(attrHeader, trialIds));
     }
 

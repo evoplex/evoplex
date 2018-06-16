@@ -163,7 +163,7 @@ public:
         return "invalid";
     }
 
-    explicit DefaultOutput(const Function f, const Entity e, const ValueSpace* valSpace);
+    explicit DefaultOutput(const Function f, const Entity e, const AttributeRange* attrRange);
 
     virtual void doOperation(const int trialId, const AbstractModel* model);
 
@@ -172,12 +172,12 @@ public:
     inline Function function() const { return m_func; }
     inline QString functionStr()  const { return DefaultOutput::stringFromFunc(m_func); }
     inline Entity entity() const { return m_entity; }
-    inline const ValueSpace* valueSpace() const { return m_valueSpace; }
+    inline const AttributeRange* attrRange() const { return m_attrRange; }
 
 private:
     const Function m_func;
     const Entity m_entity;
-    const ValueSpace* m_valueSpace;
+    const AttributeRange* m_attrRange;
 };
 
 }

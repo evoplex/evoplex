@@ -31,8 +31,8 @@
 namespace evoplex
 {
 
-NodesGenerator::NodesGenerator(const AttributesSpace& nodeAttrsSpace)
-    : m_attrsSpace(nodeAttrsSpace)
+NodesGenerator::NodesGenerator(const AttributesScope& nodeAttrsScope)
+    : m_attrsScope(nodeAttrsScope)
 {
 }
 
@@ -63,8 +63,8 @@ NodesGenerator::Function NodesGenerator::enumFromString(const QString& funcStr)
 
 /*********************/
 
-AGFromFile::AGFromFile(const AttributesSpace& attrsSpace, const QString& filePath)
-    : NodesGenerator(attrsSpace)
+AGFromFile::AGFromFile(const AttributesScope& attrsScope, const QString& filePath)
+    : NodesGenerator(attrsScope)
     , m_filePath(filePath)
 {
     m_command = filePath;
@@ -110,10 +110,10 @@ Nodes AGFromFile::create(std::function<void(int)> progress)
         }
     }
 
-    for (const auto* vs : m_attrsSpace) {
+    for (const auto* vs : m_attrsScope) {
         if (!header.contains(vs->attrName())) {
             qWarning() << "[Node::readFromFile]: the nodes from '" << m_filePath << "' are incompatible with the model."
-                       << "Expected attributes:" << m_attrsSpace.keys();
+                       << "Expected attributes:" << m_attrsScope.keys();
             return Nodes();
         }
     }
@@ -132,21 +132,21 @@ Nodes AGFromFile::create(std::function<void(int)> progress)
 
         int coordX = 0;
         int coordY = id;
-        Attributes attributes(m_attrsSpace.size());
+        Attributes attributes(m_attrsScope.size());
         for (int i = 0; i < values.size(); ++i) {
             if (header.at(i) == "x") {
                 coordX = values.at(i).toInt(&isValid);
             } else if (header.at(i) == "y") {
                 coordY = values.at(i).toInt(&isValid);
             } else {
-                ValueSpace* valSpace = m_attrsSpace.value(header.at(i));
-                if (valSpace) { // is null if the column is not required
-                    Value value = valSpace->validate(values.at(i));
+                AttributeRange* attrRange = m_attrsScope.value(header.at(i));
+                if (attrRange) { // is null if the column is not required
+                    Value value = attrRange->validate(values.at(i));
                     if (!value.isValid()) {
                         isValid = false;
                         break;
                     }
-                    attributes.replace(valSpace->id(), header.at(i), value);
+                    attributes.replace(attrRange->id(), header.at(i), value);
                 }
             }
         }
@@ -167,9 +167,9 @@ Nodes AGFromFile::create(std::function<void(int)> progress)
 
 /*********************/
 
-AGSameFuncForAll::AGSameFuncForAll(const AttributesSpace& attrsSpace, const int numNodes,
+AGSameFuncForAll::AGSameFuncForAll(const AttributesScope& attrsScope, const int numNodes,
                                    const Function& func, const Value& funcInput)
-    : NodesGenerator(attrsSpace)
+    : NodesGenerator(attrsScope)
     , m_numNodes(numNodes)
     , m_function(func)
     , m_functionInput(funcInput)
@@ -180,17 +180,17 @@ AGSameFuncForAll::AGSameFuncForAll(const AttributesSpace& attrsSpace, const int 
     switch (m_function) {
     case F_Min:
         m_command = QString("*%1;min").arg(m_numNodes);
-        f_value = [](const ValueSpace* valSpace) { return valSpace->min(); };
+        f_value = [](const AttributeRange* attrRange) { return attrRange->min(); };
         break;
     case F_Max:
         m_command = QString("*%1;max").arg(m_numNodes);
-        f_value = [](const ValueSpace* valSpace) { return valSpace->max(); };
+        f_value = [](const AttributeRange* attrRange) { return attrRange->max(); };
         break;
     case F_Rand:
         Q_ASSERT(funcInput.type() == Value::INT);
         m_command = QString("*%1;rand_%2").arg(m_numNodes).arg(funcInput.toQString());
         m_prg = new PRG(funcInput.toInt());
-        f_value = [this](const ValueSpace* valSpace) { return valSpace->rand(m_prg); };
+        f_value = [this](const AttributeRange* attrRange) { return attrRange->rand(m_prg); };
         break;
     default:
         qFatal("[AGSameFuncForAll]: invalid function!");
@@ -208,9 +208,9 @@ Nodes AGSameFuncForAll::create(std::function<void(int)> progress)
     Nodes nodes;
     nodes.reserve(m_numNodes);
     for (int nodeId = 0; nodeId < m_numNodes; ++nodeId) {
-        Attributes attrs(m_attrsSpace.size());
-        for (ValueSpace* valSpace : m_attrsSpace) {
-            attrs.replace(valSpace->id(), valSpace->attrName(), f_value(valSpace));
+        Attributes attrs(m_attrsScope.size());
+        for (AttributeRange* attrRange : m_attrsScope) {
+            attrs.replace(attrRange->id(), attrRange->attrName(), f_value(attrRange));
         }
         nodes.emplace_back(new Node(nodeId, attrs));
         progress(nodeId);
@@ -220,9 +220,9 @@ Nodes AGSameFuncForAll::create(std::function<void(int)> progress)
 
 /*********************/
 
-AGDiffFunctions::AGDiffFunctions(const AttributesSpace &attrsSpace, const int numNodes,
+AGDiffFunctions::AGDiffFunctions(const AttributesScope& attrsScope, const int numNodes,
                                  std::vector<AttrCmd> attrCmds)
-    : NodesGenerator(attrsSpace)
+    : NodesGenerator(attrsScope)
     , m_numNodes(numNodes)
     , m_attrCmds(attrCmds)
 {
@@ -241,26 +241,26 @@ Nodes AGDiffFunctions::create(std::function<void(int)> progress)
     std::vector<Attributes> nodesAttrs;
     nodesAttrs.reserve(m_numNodes);
     for (int i = 0; i < m_numNodes; ++i) {
-        Attributes attrs(m_attrsSpace.size());
+        Attributes attrs(m_attrsScope.size());
         nodesAttrs.emplace_back(attrs);
     }
 
     std::function<Value()> value;
     for (const AttrCmd& cmd : m_attrCmds) {
-        const ValueSpace* valSpace = m_attrsSpace.value(cmd.attrName, nullptr);
-        Q_ASSERT(valSpace);
+        const AttributeRange* attrRange = m_attrsScope.value(cmd.attrName, nullptr);
+        assert(attrRange);
 
         PRG* prg = nullptr;
         switch (cmd.func) {
         case F_Min:
-            value = [valSpace]() { return valSpace->min(); };
+            value = [attrRange]() { return attrRange->min(); };
             break;
         case F_Max:
-            value = [valSpace]() { return valSpace->max(); };
+            value = [attrRange]() { return attrRange->max(); };
             break;
         case F_Rand:
             prg = new PRG(cmd.funcInput.toInt());
-            value = [valSpace, prg]() { return valSpace->rand(prg); };
+            value = [attrRange, prg]() { return attrRange->rand(prg); };
             break;
         case F_Value:
             value = [cmd]() { return cmd.funcInput; };
@@ -270,7 +270,7 @@ Nodes AGDiffFunctions::create(std::function<void(int)> progress)
         }
 
         for (Attributes& attrs : nodesAttrs) {
-            attrs.replace(valSpace->id(), valSpace->attrName(), value());
+            attrs.replace(attrRange->id(), attrRange->attrName(), value());
         }
         delete prg;
     }
@@ -325,13 +325,13 @@ bool NodesGenerator::saveToFile(QString& filePath, Nodes nodes, std::function<vo
     return true;
 }
 
-NodesGenerator* NodesGenerator::parse(const AttributesSpace& nodeAttrsSpace,
-                                        const QString& command, QString& errMsg)
+NodesGenerator* NodesGenerator::parse(const AttributesScope& nodeAttrsScope,
+                                      const QString& command, QString& errMsg)
 {
     NodesGenerator* ag = nullptr;
 
     if (QFileInfo::exists(command)) {
-        ag = new AGFromFile(nodeAttrsSpace, command);
+        ag = new AGFromFile(nodeAttrsScope, command);
     } else {
         QStringList cmds = command.split(";");
         if (cmds.size() < 2) {
@@ -381,14 +381,14 @@ NodesGenerator* NodesGenerator::parse(const AttributesSpace& nodeAttrsSpace,
                 qWarning() << "[Node::createNodes()]:" << errMsg;
                 return nullptr;
             }
-            ag = new AGSameFuncForAll(nodeAttrsSpace, numNodes, func, value);
+            ag = new AGSameFuncForAll(nodeAttrsScope, numNodes, func, value);
         } else if (command.startsWith("#")) {
             cmds.removeFirst();
-            if (cmds.size() != nodeAttrsSpace.size()) {
+            if (cmds.size() != nodeAttrsScope.size()) {
                 errMsg = QString("Unable to parse '%1'."
                         "It should look like: '#numNodes;attrName_[min|max|rand_seed|value_value]'"
                         "and must contain all attributes of the current model (i.e., '%2')")
-                        .arg(command).arg(nodeAttrsSpace.keys().join(", "));
+                        .arg(command).arg(nodeAttrsScope.keys().join(", "));
                 qWarning() << "[Node::createNodes()]:" << errMsg;
                 return nullptr;
             }
@@ -401,9 +401,9 @@ NodesGenerator* NodesGenerator::parse(const AttributesSpace& nodeAttrsSpace,
                 QStringList attrCmdStr = cmd.split("_");
 
                 attrCmd.attrName = attrCmdStr.at(0);
-                const ValueSpace* valSpace = nodeAttrsSpace.value(attrCmd.attrName, nullptr);
-                if (valSpace) {
-                    attrCmd.attrId = valSpace->id();
+                const AttributeRange* attrRange = nodeAttrsScope.value(attrCmd.attrName, nullptr);
+                if (attrRange) {
+                    attrCmd.attrId = attrRange->id();
                 } else {
                     errMsg = QString("Unable to parse '%1'."
                             "The attribute '%2' does not belong to the current model.")
@@ -427,7 +427,7 @@ NodesGenerator* NodesGenerator::parse(const AttributesSpace& nodeAttrsSpace,
                         return nullptr;
                     }
                 } else if (attrCmd.func == F_Value){
-                    attrCmd.funcInput = nodeAttrsSpace.value(attrCmd.attrName)->validate(attrCmdStr.at(2));
+                    attrCmd.funcInput = nodeAttrsScope.value(attrCmd.attrName)->validate(attrCmdStr.at(2));
                     if (!attrCmd.funcInput.isValid()) {
                         errMsg = QString("Unable to parse '%1'. The value is invalid!").arg(command);
                         qWarning() << "[Node::createNodes()]:" << errMsg;
@@ -438,7 +438,7 @@ NodesGenerator* NodesGenerator::parse(const AttributesSpace& nodeAttrsSpace,
                 attrCmds.emplace_back(attrCmd);
             }
 
-            ag = new AGDiffFunctions(nodeAttrsSpace, numNodes, attrCmds);
+            ag = new AGDiffFunctions(nodeAttrsScope, numNodes, attrCmds);
         }
     }
 

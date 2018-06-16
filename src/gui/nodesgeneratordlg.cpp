@@ -30,10 +30,10 @@
 namespace evoplex
 {
 
-NodesGeneratorDlg::NodesGeneratorDlg(const AttributesSpace& nodeAttrsSpace, QWidget* parent, NodesGenerator* ag)
+NodesGeneratorDlg::NodesGeneratorDlg(const AttributesScope& nodeAttrsScope, QWidget* parent, NodesGenerator* ag)
     : QDialog(parent)
     , m_ui(new Ui_NodesGeneratorDlg)
-    , m_nodeAttrsSpace(nodeAttrsSpace)
+    , m_nodeAttrsScope(nodeAttrsScope)
 {
     setWindowModality(Qt::ApplicationModal);
     m_ui->setupUi(this);
@@ -70,19 +70,19 @@ NodesGeneratorDlg::NodesGeneratorDlg(const AttributesSpace& nodeAttrsSpace, QWid
     m_ui->func->insertItem(2, NodesGenerator::enumToString(NodesGenerator::F_Rand), NodesGenerator::F_Rand);
     m_ui->func->setCurrentIndex(0);
 
-    m_ui->table->setRowCount(m_nodeAttrsSpace.size());
-    for (const ValueSpace* vs : m_nodeAttrsSpace) {
-        m_ui->table->setItem(vs->id(), 0, new QTableWidgetItem(vs->attrName()));
+    m_ui->table->setRowCount(m_nodeAttrsScope.size());
+    for (const AttributeRange* ar : m_nodeAttrsScope) {
+        m_ui->table->setItem(ar->id(), 0, new QTableWidgetItem(ar->attrName()));
 
         QComboBox* cb = new QComboBox(m_ui->table);
         cb->insertItem(0, NodesGenerator::enumToString(NodesGenerator::F_Min), NodesGenerator::F_Min);
         cb->insertItem(1, NodesGenerator::enumToString(NodesGenerator::F_Max), NodesGenerator::F_Max);
         cb->insertItem(2, NodesGenerator::enumToString(NodesGenerator::F_Rand), NodesGenerator::F_Rand);
         cb->insertItem(3, NodesGenerator::enumToString(NodesGenerator::F_Value), NodesGenerator::F_Value);
-        m_ui->table->setCellWidget(vs->id(), 1, cb);
+        m_ui->table->setCellWidget(ar->id(), 1, cb);
 
         QLineEdit* le = new QLineEdit();
-        connect(cb, &QComboBox::currentTextChanged, [cb, le, vs](){
+        connect(cb, &QComboBox::currentTextChanged, [cb, le, ar](){
             if (cb->currentData() == NodesGenerator::F_Min
                     || cb->currentData() == NodesGenerator::F_Max) {
                 le->setHidden(true);
@@ -92,14 +92,14 @@ NodesGeneratorDlg::NodesGeneratorDlg(const AttributesSpace& nodeAttrsSpace, QWid
                 le->setFocus();
             } else if (cb->currentData() == NodesGenerator::F_Value) {
                 le->setToolTip("Type a valid value for this attribute.\n"
-                               "Expected: " + vs->space());
+                               "Expected: " + ar->attrRangeStr());
                 le->setFocus();
             } else {
                 Q_ASSERT(false);
             }
             le->setHidden(false);
         });
-        m_ui->table->setCellWidget(vs->id(), 2, le);
+        m_ui->table->setCellWidget(ar->id(), 2, le);
         le->setHidden(true);
     }
 
@@ -143,7 +143,7 @@ void NodesGeneratorDlg::slotSaveAs()
         progressDlg.setValue(0);
 
         QString errMsg;
-        NodesGenerator* ag = NodesGenerator::parse(m_nodeAttrsSpace, cmd, errMsg);
+        NodesGenerator* ag = NodesGenerator::parse(m_nodeAttrsScope, cmd, errMsg);
         Q_ASSERT(errMsg.isEmpty());
 
         int pValue = 0;
@@ -222,26 +222,26 @@ QString NodesGeneratorDlg::readCommand()
         }
     } else if (m_ui->bDiffData->isChecked()) {
         command = QString("#%1").arg(m_ui->numNodes2->text());
-        for (const ValueSpace* vs : m_nodeAttrsSpace) {
-            Q_ASSERT(m_ui->table->item(vs->id(), 0)->text() == vs->attrName());
-            QComboBox* cb = dynamic_cast<QComboBox*>(m_ui->table->cellWidget(vs->id(), 1));
-            command += QString(";%1_%2").arg(vs->attrName()).arg(cb->currentText());
+        for (const AttributeRange* ar : m_nodeAttrsScope) {
+            Q_ASSERT(m_ui->table->item(ar->id(), 0)->text() == ar->attrName());
+            QComboBox* cb = dynamic_cast<QComboBox*>(m_ui->table->cellWidget(ar->id(), 1));
+            command += QString(";%1_%2").arg(ar->attrName()).arg(cb->currentText());
 
-            QString valStr = dynamic_cast<QLineEdit*>(m_ui->table->cellWidget(vs->id(), 2))->text();
+            QString valStr = dynamic_cast<QLineEdit*>(m_ui->table->cellWidget(ar->id(), 2))->text();
             if (cb->currentData() == NodesGenerator::F_Rand) {
                 bool isInt = false;
                 valStr.toInt(&isInt);
                 if (!isInt) {
                     QMessageBox::warning(this, "Nodes Generator",
-                        "The PRG seed for '" + vs->attrName() + "' should be an integer!\n");
+                        "The PRG seed for '" + ar->attrName() + "' should be an integer!\n");
                     return QString();
                 }
                 command += "_" + valStr;
             } else if (cb->currentData() == NodesGenerator::F_Value) {
-                if (!vs->validate(valStr).isValid()) {
+                if (!ar->validate(valStr).isValid()) {
                     QMessageBox::warning(this, "Nodes Generator",
-                        "The value of '" + vs->attrName() + "' is invalid!\n"
-                         "Expected: " + vs->space());
+                        "The value of '" + ar->attrName() + "' is invalid!\n"
+                         "Expected: " + ar->attrRangeStr());
                     return QString();
                 }
                 command += "_" + valStr;

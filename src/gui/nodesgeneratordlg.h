@@ -23,7 +23,7 @@
 
 #include <QDialog>
 
-#include "valuespace.h"
+#include "attributerange.h"
 #include "core/nodesgenerator.h"
 
 class Ui_NodesGeneratorDlg;
@@ -36,7 +36,7 @@ class NodesGeneratorDlg : public QDialog
     Q_OBJECT
 
 public:
-    explicit NodesGeneratorDlg(const AttributesSpace& nodeAttrsSpace, QWidget *parent, NodesGenerator* ag=nullptr);
+    explicit NodesGeneratorDlg(const AttributesScope& nodeAttrsScope, QWidget *parent, NodesGenerator* ag=nullptr);
     ~NodesGeneratorDlg();
 
     QString readCommand();
@@ -46,7 +46,7 @@ private slots:
 
 private:
     Ui_NodesGeneratorDlg* m_ui;
-    const AttributesSpace& m_nodeAttrsSpace;
+    const AttributesScope& m_nodeAttrsScope;
 
     void fill(NodesGenerator* ag);
 };

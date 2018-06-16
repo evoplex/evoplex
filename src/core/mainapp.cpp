@@ -52,23 +52,23 @@ MainApp::MainApp()
     m_stepsToFlush = m_userPrefs.value("settings/stepsToFlush", m_stepsToFlush).toInt();
 
     int id = 0;
-    auto addAttrSpace = [this](int& id, const QString& name, const QString& space) {
-        m_generalAttrSpace.insert(name, ValueSpace::parse(id++, name, space));
+    auto addAttrScope = [this](int& id, const QString& name, const QString& attrRangeStr) {
+        m_generalAttrsScope.insert(name, AttributeRange::parse(id++, name, attrRangeStr));
     };
 
-    addAttrSpace(id, GENERAL_ATTRIBUTE_EXPID, QString("int[0,%1]").arg(INT32_MAX));
-    addAttrSpace(id, GENERAL_ATTRIBUTE_NODES, "string");
-    addAttrSpace(id, GENERAL_ATTRIBUTE_GRAPHID, "string");
-    addAttrSpace(id, GENERAL_ATTRIBUTE_MODELID, "string");
-    addAttrSpace(id, GENERAL_ATTRIBUTE_SEED, QString("int[0,%1]").arg(INT32_MAX));
-    addAttrSpace(id, GENERAL_ATTRIBUTE_STOPAT, QString("int[1,%1]").arg(EVOPLEX_MAX_STEPS));
-    addAttrSpace(id, GENERAL_ATTRIBUTE_TRIALS, QString("int[1,%1]").arg(EVOPLEX_MAX_TRIALS));
-    addAttrSpace(id, GENERAL_ATTRIBUTE_AUTODELETE, "bool");
-    addAttrSpace(id, GENERAL_ATTRIBUTE_GRAPHTYPE, "string");
+    addAttrScope(id, GENERAL_ATTRIBUTE_EXPID, QString("int[0,%1]").arg(INT32_MAX));
+    addAttrScope(id, GENERAL_ATTRIBUTE_NODES, "string");
+    addAttrScope(id, GENERAL_ATTRIBUTE_GRAPHID, "string");
+    addAttrScope(id, GENERAL_ATTRIBUTE_MODELID, "string");
+    addAttrScope(id, GENERAL_ATTRIBUTE_SEED, QString("int[0,%1]").arg(INT32_MAX));
+    addAttrScope(id, GENERAL_ATTRIBUTE_STOPAT, QString("int[1,%1]").arg(EVOPLEX_MAX_STEPS));
+    addAttrScope(id, GENERAL_ATTRIBUTE_TRIALS, QString("int[1,%1]").arg(EVOPLEX_MAX_TRIALS));
+    addAttrScope(id, GENERAL_ATTRIBUTE_AUTODELETE, "bool");
+    addAttrScope(id, GENERAL_ATTRIBUTE_GRAPHTYPE, "string");
 
-    addAttrSpace(id, OUTPUT_DIR, "string");
-    addAttrSpace(id, OUTPUT_HEADER, "string");
-    addAttrSpace(id, OUTPUT_AVGTRIALS, "bool");
+    addAttrScope(id, OUTPUT_DIR, "string");
+    addAttrScope(id, OUTPUT_HEADER, "string");
+    addAttrScope(id, OUTPUT_AVGTRIALS, "bool");
 
     // load built-in plugins
     QDir pluginsDir = QDir(qApp->applicationDirPath());

@@ -128,7 +128,7 @@ const int Project::importExperiments(const QString& filePath, QString& errorMsg)
     const QStringList header = in.readLine().split(",");
     if (header.isEmpty()) {
         errorMsg = "Couldn't read the experiments from:\n`" + filePath + "`"
-                 + "\nThe header must have: " + m_mainApp->generalAttrSpace().keys().join(", ");
+                 + "\nThe header must have: " + m_mainApp->generalAttrsScope().keys().join(", ");
         qWarning() << "[Project]: " << errorMsg;
         return 0;
     }
