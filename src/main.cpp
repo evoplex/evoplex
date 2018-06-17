@@ -48,7 +48,7 @@ int main(int argc, char* argv[])
     QCoreApplication::setOrganizationName("Evoplex");
     QCoreApplication::setOrganizationDomain("evoplex.github.io");
     QCoreApplication::setApplicationName("Evoplex");
-    QCoreApplication::setApplicationVersion(EVOPLEX_VERSION);
+    QCoreApplication::setApplicationVersion(EVOPLEX_VERSION "-" EVOPLEX_RELEASE);
 
     evoplex::Logger::init();
 

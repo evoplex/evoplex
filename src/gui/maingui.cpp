@@ -18,6 +18,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <QCoreApplication>
 #include <QDebug>
 #include <QLabel>
 #include <QMenuBar>
@@ -342,8 +343,9 @@ void MainGUI::slotShowLog()
 
 void MainGUI::slotShowAbout()
 {
-    QString version = "Evoplex " EVOPLEX_VERSION;
+    QString version = "Evoplex " + qApp->applicationVersion();
     QString txt = "Evoplex is a multi-agent system for networks (graphs).\n\n"
+                  "Based on Qt " QT_VERSION_STR "\n\n"
                   "Built on " EVOPLEX_BUILDDATE "\n\n"
                   "From revision " EVOPLEX_GIT_COMMIT_HASH " (" EVOPLEX_GIT_BRANCH ")\n\n"
                   "Copyright 2016-2018 Marcos Cardinot et al.";

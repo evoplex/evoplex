@@ -71,9 +71,9 @@ MainApp::MainApp()
     addAttrScope(id, OUTPUT_AVGTRIALS, "bool");
 
     // load built-in plugins
-    QDir pluginsDir = QDir(qApp->applicationDirPath());
-    pluginsDir.cdUp();
-    if (pluginsDir.cd("lib/evoplex/plugins")) {
+    QDir pluginsDir = QDir(qApp->applicationDirPath() + "/../lib/evoplex/plugins");
+    qDebug() << "[MainApp]: searching for plugins at" << pluginsDir.absolutePath();
+    if (pluginsDir.exists()) {
         const QStringList nameFilter(QString("*%1").arg(kPluginExtension));
         QStringList files = pluginsDir.entryList(nameFilter, QDir::Files);
         for (const QString& fileName : files) {
