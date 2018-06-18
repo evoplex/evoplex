@@ -1,12 +1,12 @@
 #=============================================================================
 #  Evoplex
-#  Copyright (C) 2016-2017 by Marcos Cardinot <mcardinot@gmail.com>
+#  Copyright (C) 2016-2018 by Marcos Cardinot <mcardinot@gmail.com>
 #=============================================================================
 
 cmake_minimum_required(VERSION 3.1.0 FATAL_ERROR)
 
 set(EVOPLEX_RELEASE "alpha")
-set(EVOPLEX_VERSION 0.0.0)
+set(EVOPLEX_VERSION 0.0.1)
 project(evoplex VERSION ${EVOPLEX_VERSION})
 
 # Find includes in corresponding build directories
