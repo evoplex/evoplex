@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package>
+    <DisplayName>Evoplex</DisplayName>
+    <Description>Install the main application.</Description>
+    <Version></Version>
+    <ReleaseDate></ReleaseDate>
+    <Licenses>
+        <License name="GNU GENERAL PUBLIC LICENSE v3" file="LICENSE.txt" />
+    </Licenses>
+    <Default>true</Default>
+</Package>

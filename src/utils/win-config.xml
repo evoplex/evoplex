@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Installer>
+    <Name>Evoplex</Name>
+    <Version></Version>
+    <Title>Evoplex Installer</Title>
+    <Publisher>Evoplex</Publisher>
+    <StartMenuDir>Evoplex</StartMenuDir>
+    <TargetDir>@HomeDir@/evoplex</TargetDir>
+</Installer>

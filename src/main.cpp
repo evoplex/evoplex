@@ -45,7 +45,7 @@ QCoreApplication* createApp(int& argc, char* argv[])
 int main(int argc, char* argv[])
 {
     if (!qstrcmp(argv[1], "-version")) {
-        printf("%s-%s\n", EVOPLEX_VERSION, EVOPLEX_RELEASE);
+        printf("%s\n", EVOPLEX_VERSION);
         return 0;
     }
 
