@@ -5,8 +5,8 @@
 
 cmake_minimum_required(VERSION 3.1.0 FATAL_ERROR)
 
-set(EVOPLEX_RELEASE "alpha")
-set(EVOPLEX_VERSION 0.0.1)
+set(EVOPLEX_RELEASE "alpha0")
+set(EVOPLEX_VERSION 0.1.0)
 project(evoplex VERSION ${EVOPLEX_VERSION})
 
 # Find includes in corresponding build directories
