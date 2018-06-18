@@ -44,6 +44,11 @@ QCoreApplication* createApp(int& argc, char* argv[])
 
 int main(int argc, char* argv[])
 {
+    if (!qstrcmp(argv[1], "-version")) {
+        printf("%s-%s\n", EVOPLEX_VERSION, EVOPLEX_RELEASE);
+        return 0;
+    }
+
     QScopedPointer<QCoreApplication> coreApp(createApp(argc, argv));
 
     QCoreApplication::setOrganizationName("Evoplex");
