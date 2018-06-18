@@ -7,6 +7,7 @@ ROOTDIR="/c/evoplex"
 CONFIGXML="$ROOTDIR/evoplex/src/utils/win-config.xml"
 PACKAGEXML="$ROOTDIR/evoplex/src/utils/win-package.xml"
 LICENSE=$ROOTDIR/evoplex/LICENSE.txt
+LOGO=$ROOTDIR/evoplex/src/evoplex.png
 
 EVOPLEX_VERSION="$(build/bin/evoplex -version)"
 TODAY="$(date +'%Y-%m-%d')"
@@ -36,7 +37,7 @@ cd packages/com.evoplex.evoplex
 mkdir meta data
 
 cd meta
-cp $LICENSE .
+cp $LICENSE $LOGO .
 cp $PACKAGEXML package.xml
 setXML Package Version $EVOPLEX_VERSION package.xml
 setXML Package ReleaseDate $TODAY package.xml

@@ -4,6 +4,8 @@
     <Version></Version>
     <Title>Evoplex Installer</Title>
     <Publisher>Evoplex</Publisher>
+    <ProductUrl>https://evoplex.github.io</ProductUrl>
+    <Logo>evoplex.png</Logo>
     <StartMenuDir>Evoplex</StartMenuDir>
-    <TargetDir>@HomeDir@/evoplex</TargetDir>
+    <TargetDir>@ApplicationsDirX64@/evoplex</TargetDir>
 </Installer>
