@@ -20,6 +20,7 @@
 
 #include <QApplication>
 #include <QCoreApplication>
+#include <QDate>
 #include <QDebug>
 #include <QDir>
 #include <QScopedPointer>
@@ -46,13 +47,13 @@ int main(int argc, char* argv[])
     QScopedPointer<QCoreApplication> coreApp(createApp(argc, argv));
 
     QCoreApplication::setOrganizationName("Evoplex");
-    QCoreApplication::setOrganizationDomain("evoplex.github.io");
+    QCoreApplication::setOrganizationDomain("https://evoplex.github.io");
     QCoreApplication::setApplicationName("Evoplex");
     QCoreApplication::setApplicationVersion(EVOPLEX_VERSION "-" EVOPLEX_RELEASE);
 
     evoplex::Logger::init();
 
-    const QString copyright = "Copyright (C) 2016-2018";
+    const QString copyright = "Copyright (C) 2016-" + QDate::currentDate().toString("yyyy");
     const QString authors = "Marcos Cardinot et al.";
     const QString copyrightLine = copyright + " - " + authors;
     const QString versionLine = QString("%1 %2 - %3").arg(QCoreApplication::applicationName())

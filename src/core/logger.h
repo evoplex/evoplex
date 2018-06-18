@@ -53,8 +53,6 @@ private:
     static QFile m_logFile;
     static QString m_log;
     static QMutex m_fileMutex;
-
-    static QString getMsvcVersionString(int ver);
 };
 } // evoplex
 #endif // LOGGER_HPP

@@ -30,6 +30,7 @@
 #endif
 
 #include "logger.h"
+#include "constants.h"
 
 namespace evoplex
 {
@@ -54,35 +55,11 @@ void Logger::init()
     qInstallMessageHandler(Logger::debugLogHandler);
 
     writeLog(QString("%1").arg(QDateTime::currentDateTime().toString(Qt::ISODate)));
-
     writeLog(QString("Operating System: %1").arg(QSysInfo::prettyProductName()));
-
-    // write compiler version
-#if defined __GNUC__ && !defined __clang__
-    #ifdef __MINGW32__
-        #define COMPILER "MinGW GCC"
-    #else
-        #define COMPILER "GCC"
-    #endif
-    writeLog(QString("Compiled using %1 %2.%3.%4").arg(COMPILER).arg(__GNUC__).arg(__GNUC_MINOR__).arg(__GNUC_PATCHLEVEL__));
-#elif defined __clang__
-    writeLog(QString("Compiled using %1 %2.%3.%4").arg("Clang").arg(__clang_major__).arg(__clang_minor__).arg(__clang_patchlevel__));
-#elif defined _MSC_VER
-    writeLog(QString("Compiled using %1").arg(getMsvcVersionString(_MSC_VER)));
-#else
-    writeLog("Unknown compiler");
-#endif
-
-    // write Qt version
+    writeLog(QString("Built with %1").arg(COMPILER_VERSION));
     writeLog(QString("Qt runtime version: %1").arg(qVersion()));
     writeLog(QString("Qt compilation version: %1").arg(QT_VERSION_STR));
-
-    // write addressing mode
-#if defined(__LP64__) || defined(_WIN64)
-    writeLog(QString("Addressing mode: 64-bit"));
-#else
-    writeLog("Addressing mode: 32-bit");
-#endif
+    writeLog(QString("Architecture: %1").arg(COMPILER_ARCHITECTURE));
 
     // write memory and CPU info
 #ifdef Q_OS_LINUX
@@ -265,30 +242,6 @@ void Logger::writeLog(QString msg)
     m_logFile.write(qPrintable(msg), msg.size());
     m_log += msg;
     m_fileMutex.unlock();
-}
-
-QString Logger::getMsvcVersionString(int ver)
-{
-    switch(ver) {
-    case 1310:
-        return "MSVC++ 7.1 (Visual Studio 2003)";
-    case 1400:
-        return "MSVC++ 8.0 (Visual Studio 2005)";
-    case 1500:
-        return "MSVC++ 9.0 (Visual Studio 2008)";
-    case 1600:
-        return "MSVC++ 10.0 (Visual Studio 2010)";
-    case 1700:
-        return "MSVC++ 11.0 (Visual Studio 2012)";
-    case 1800:
-        return "MSVC++ 12.0 (Visual Studio 2013)";
-    case 1900:
-        return "MSVC++ 14.0 (Visual Studio 2015)";
-    case 1910:
-        return "MSVC++ 14.1 (Visual Studio 2017)";
-    default:
-        return "unknown MSVC++ version";
-    }
 }
 
 } // evoplex

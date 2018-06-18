@@ -19,6 +19,7 @@
  */
 
 #include <QCoreApplication>
+#include <QDate>
 #include <QDebug>
 #include <QLabel>
 #include <QMenuBar>
@@ -345,10 +346,10 @@ void MainGUI::slotShowAbout()
 {
     QString version = "Evoplex " + qApp->applicationVersion();
     QString txt = "Evoplex is a multi-agent system for networks (graphs).\n\n"
-                  "Based on Qt " QT_VERSION_STR "\n\n"
+                  "Based on Qt " QT_VERSION_STR " (" COMPILER_VERSION " " COMPILER_ARCHITECTURE ")\n\n"
                   "Built on " EVOPLEX_BUILDDATE "\n\n"
                   "From revision " EVOPLEX_GIT_COMMIT_HASH " (" EVOPLEX_GIT_BRANCH ")\n\n"
-                  "Copyright 2016-2018 Marcos Cardinot et al.";
+                  "Copyright 2016-" + QDate::currentDate().toString("yyyy") + " Marcos Cardinot et al.";
     QMessageBox::about(this, version, txt);
 }
 
