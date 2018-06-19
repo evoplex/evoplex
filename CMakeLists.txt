@@ -78,8 +78,8 @@ add_subdirectory(src)
 
 # copy text files
 foreach(TXTFILE LICENSE.txt README.md CHANGELOG.md)
-  configure_file(${TXTFILE} "${CMAKE_CURRENT_BINARY_DIR}/${TXTFILE}" COPYONLY)
-  install(FILES ${TXTFILE} DESTINATION ${CMAKE_BINARY_DIR})
+  configure_file(${TXTFILE} "${CMAKE_CURRENT_BINARY_DIR}/bin/${TXTFILE}" COPYONLY)
+  install(FILES ${TXTFILE} DESTINATION "${CMAKE_BINARY_DIR}/bin")
 endforeach(TXTFILE)
 
 # CPack: general configuration

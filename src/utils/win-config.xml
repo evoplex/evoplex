@@ -2,11 +2,10 @@
 <Installer>
     <Name>Evoplex</Name>
     <Version></Version>
-    <Title>Evoplex Installer</Title>
+    <Title></Title>
     <Publisher>Evoplex</Publisher>
     <ProductUrl>https://evoplex.github.io</ProductUrl>
     <Logo>evoplex.png</Logo>
     <StartMenuDir>Evoplex</StartMenuDir>
     <TargetDir>@ApplicationsDirX64@/evoplex</TargetDir>
-    <Script>win-installerscript.qs</Script>
 </Installer>

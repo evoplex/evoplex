@@ -6,8 +6,9 @@
 ROOTDIR="/c/evoplex"
 CONFIGXML="$ROOTDIR/evoplex/src/utils/win-config.xml"
 PACKAGEXML="$ROOTDIR/evoplex/src/utils/win-package.xml"
-LICENSE=$ROOTDIR/evoplex/LICENSE.txt
-LOGO=$ROOTDIR/evoplex/src/evoplex.png
+INSTALLERSCRIPT="$ROOTDIR/evoplex/src/utils/win-installerscript.qs"
+LICENSE="$ROOTDIR/evoplex/LICENSE.txt"
+LOGO="$ROOTDIR/evoplex/src/evoplex.png"
 TODAY="$(date +'%Y-%m-%d')"
 
 EVOPLEX_RELEASE="$(build/bin/evoplex -version)"
@@ -28,9 +29,11 @@ mkdir win-installer win-installer/config win-installer/packages
 cd win-installer
 
 cd config
+cp $LOGO .
 cp $CONFIGXML config.xml
 setVersion config.xml
 setXML Installer Version $EVOPLEX_VERSION config.xml
+setXML Installer Title "Evoplex $EVOPLEX_RELEASE" config.xml
 cd ..
 
 mkdir packages/com.evoplex.evoplex
@@ -38,10 +41,11 @@ cd packages/com.evoplex.evoplex
 mkdir meta data
 
 cd meta
-cp $LICENSE $LOGO .
+cp $INSTALLERSCRIPT $LICENSE .
 cp $PACKAGEXML package.xml
 setXML Package Version $EVOPLEX_VERSION package.xml
 setXML Package ReleaseDate $TODAY package.xml
+setXML Package DisplayName "Evoplex $EVOPLEX_RELEASE" package.xml
 cd ..
 
 cd data
