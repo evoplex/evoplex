@@ -8,4 +8,5 @@
     <Logo>evoplex.png</Logo>
     <StartMenuDir>Evoplex</StartMenuDir>
     <TargetDir>@ApplicationsDirX64@/evoplex</TargetDir>
+    <Script>win-installerscript.qs</Script>
 </Installer>

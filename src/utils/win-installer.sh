@@ -8,9 +8,10 @@ CONFIGXML="$ROOTDIR/evoplex/src/utils/win-config.xml"
 PACKAGEXML="$ROOTDIR/evoplex/src/utils/win-package.xml"
 LICENSE=$ROOTDIR/evoplex/LICENSE.txt
 LOGO=$ROOTDIR/evoplex/src/evoplex.png
-
-EVOPLEX_VERSION="$(build/bin/evoplex -version)"
 TODAY="$(date +'%Y-%m-%d')"
+
+EVOPLEX_RELEASE="$(build/bin/evoplex -version)"
+EVOPLEX_VERSION=$(echo $EVOPLEX_RELEASE | sed 's/-.*//')
 
 function setXML() {
 sed -i.bac "/<$1>/,/<\/$1>/ s/<$2><\/$2>/<$2>$3<\/$2>/g;" $4
@@ -52,4 +53,4 @@ cd ..
 
 
 cd $ROOTDIR/win-installer
-binarycreator.exe --offline-only -c config/config.xml -p packages evoplex_$EVOPLEX_VERSION.exe
+binarycreator.exe --offline-only -c config/config.xml -p packages evoplex_$EVOPLEX_RELEASE.exe
