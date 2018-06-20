@@ -25,8 +25,9 @@
     Impose limits for sanity
 ******************************************************************************/
 #define EVOPLEX_MAX_NODES 100000000    // maximum number of nodes (10^8)
-#define EVOPLEX_MAX_STEPS 100000000     // maximum number of steps (10^8)
-#define EVOPLEX_MAX_TRIALS 1000         // maximum number of times an experiment can be repeated (10^3)
+#define EVOPLEX_MAX_STEPS 100000000    // maximum number of steps (10^8)
+#define EVOPLEX_MAX_TRIALS 1000        // maximum number of times an experiment can be repeated (10^3)
+#define EVOPLEX_MAX_PROJECTS 100       // maximum number of opened projects at the same time (10^2)
 
 /******************************************************************************
     These constants hold the name of the properties common to any experiment.

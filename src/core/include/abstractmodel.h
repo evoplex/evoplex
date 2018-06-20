@@ -117,7 +117,7 @@ inline const int AbstractBaseModel::status() const
 { return m_status; }
 
 inline bool AbstractBaseModel::setup(PRG* prg, AbstractGraph* graphObj, const Attributes* attrs) {
-    assert(!m_prg && !m_graph); // make sure it'll be called only once
+    Q_ASSERT_X(!m_prg && !m_graph, "AbstractBaseModel::setup", "tried to setup a model twice! It should be done only once!");
     m_prg = prg;
     m_graph = graphObj;
     m_attributes = attrs;

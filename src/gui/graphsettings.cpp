@@ -52,7 +52,7 @@ GraphSettings::~GraphSettings()
 
 void GraphSettings::init()
 {
-    Q_ASSERT(m_exp->modelPlugin());
+    Q_ASSERT_X(m_exp->modelPlugin(), "GraphSettings", "tried to init the graph settings for a null model!");
     if (m_exp->modelPlugin() == m_modelPlugin) {
         return;
     }

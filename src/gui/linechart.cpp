@@ -42,7 +42,9 @@ LineChart::LineChart(Experiment* exp, QWidget* parent)
     setWindowTitle("Line Chart");
     setAttribute(Qt::WA_DeleteOnClose, true);
 
-    Q_ASSERT(!m_exp->autoDeleteTrials());
+    Q_ASSERT_X(!m_exp->autoDeleteTrials(), "LineChart",
+               "tried to build a LineChart for a experiment that will be auto-deleted!");
+
     connect(m_exp, SIGNAL(restarted()), SLOT(slotRestarted()));
 
     QDialog* dlg = new QDialog(this);
@@ -207,7 +209,7 @@ void LineChart::updateSeries()
         bool lastWasDuplicated = false;
         do {
             const Cache::Row& row = s.cache->readFrontRow(m_currTrialId);
-            Q_ASSERT(row.second.size() == 1);
+            Q_ASSERT_X(row.second.size() == 1, "LineChart", "it must have only one column");
 
             x = row.first;
             if (row.second.at(0).type() == Value::INT) {

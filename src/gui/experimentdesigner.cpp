@@ -269,7 +269,7 @@ void ExperimentDesigner::setExperiment(Experiment* exp)
         }
 
         QWidget* widget = m_widgetFields.value(header.at(i)).value<QWidget*>();
-        Q_ASSERT(widget);
+        Q_ASSERT_X(widget, "ExperimentDesigner", "unable to find the field. It should never happen!");
 
         QSpinBox* sp = qobject_cast<QSpinBox*>(widget);
         if (sp) {
@@ -401,7 +401,7 @@ Experiment::ExperimentInputs* ExperimentDesigner::readInputs(const int expId, QS
     QVariantHash::const_iterator it;
     for (it = m_widgetFields.constBegin(); it != m_widgetFields.constEnd(); ++it) {
         QWidget* widget = it.value().value<QWidget*>();
-        Q_ASSERT(widget);
+        Q_ASSERT_X(widget, "ExperimentDesigner", "unable to find the field. It should never happen!");
         if (!widget->isEnabled()) {
             continue;
         }
@@ -466,7 +466,7 @@ void ExperimentDesigner::slotCreateExperiment()
 
 void ExperimentDesigner::slotEditExperiment()
 {
-    Q_ASSERT(m_exp);
+    Q_ASSERT_X(m_exp, "ExperimentDesigner", "tried to edit a null experiment");
     QString error;
     Experiment::ExperimentInputs* inputs = readInputs(m_exp->id(), error);
     if (!inputs || !m_project->editExperiment(m_exp->id(), inputs, error)) {

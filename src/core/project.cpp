@@ -102,7 +102,7 @@ Experiment* Project::newExperiment(Experiment::ExperimentInputs* inputs, QString
 bool Project::editExperiment(int expId, Experiment::ExperimentInputs* newInputs, QString& error)
 {
     Experiment* exp = m_experiments.at(expId);
-    Q_ASSERT(exp);
+    Q_ASSERT_X(exp, "Experiment", "tried to edit a nonexistent experiment");
     if (!exp->init(newInputs, error)) {
         return false;
     }

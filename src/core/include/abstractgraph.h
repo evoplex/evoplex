@@ -125,8 +125,7 @@ inline Node* AbstractBaseGraph::randNode() const
 { return m_nodes.at(m_prg->randI(m_nodes.size()-1)); }
 
 inline bool AbstractBaseGraph::setup(PRG* prg, Nodes& nodes, const Attributes* attrs, const QString& graphType) {
-    // make sure it'll be called only once
-    assert(!m_prg && m_nodes.empty());
+    Q_ASSERT_X(!m_prg && m_nodes.empty(), "AbstractBaseGraph::setup", "tried to setup a graph twice! It should be done only once!");
     m_prg = prg;
     m_nodes = nodes;
     m_attrs = attrs;

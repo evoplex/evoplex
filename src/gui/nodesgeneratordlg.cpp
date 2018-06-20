@@ -95,7 +95,7 @@ NodesGeneratorDlg::NodesGeneratorDlg(const AttributesScope& nodeAttrsScope, QWid
                                "Expected: " + ar->attrRangeStr());
                 le->setFocus();
             } else {
-                Q_ASSERT(false);
+                qFatal("[NodesGeneratorDlg] invalid function!");
             }
             le->setHidden(false);
         });
@@ -144,12 +144,12 @@ void NodesGeneratorDlg::slotSaveAs()
 
         QString errMsg;
         NodesGenerator* ag = NodesGenerator::parse(m_nodeAttrsScope, cmd, errMsg);
-        Q_ASSERT(errMsg.isEmpty());
+        Q_ASSERT_X(errMsg.isEmpty(), "NodesGeneratorDlg::slotSaveAs", "the command should be free of erros here");
 
         int pValue = 0;
         std::function<void(int)> progress = [&progressDlg, &pValue](int p) { progressDlg.setValue(pValue + p); };
         Nodes nodes = ag->create(progress);
-        Q_ASSERT(nodes.size() > 0);
+        Q_ASSERT_X(nodes.size() > 0, "NodesGeneratorDlg::slotSaveAs", "nodes size must be >0");
 
         pValue = numNodes;
         saved = NodesGenerator::saveToFile(path, nodes, progress);
@@ -195,7 +195,8 @@ void NodesGeneratorDlg::fill(NodesGenerator* ag)
         m_ui->bDiffData->setChecked(true);
         m_ui->numNodes2->setValue(agdiff->numNodes());
         for (const AGDiffFunctions::AttrCmd ac : agdiff->attrCmds()) {
-            Q_ASSERT(m_ui->table->item(ac.attrId, 0)->text() == ac.attrName);
+            Q_ASSERT_X(m_ui->table->item(ac.attrId, 0)->text() == ac.attrName,
+                       "NodesGeneratorDlg::fill", "attribute name mismatch. It should never happen!");
             QComboBox* cb = dynamic_cast<QComboBox*>(m_ui->table->cellWidget(ac.attrId, 1));
             cb->setCurrentIndex(cb->findData(ac.func));
             if (ac.func == NodesGenerator::F_Rand || ac.func == NodesGenerator::F_Value) {
@@ -223,7 +224,9 @@ QString NodesGeneratorDlg::readCommand()
     } else if (m_ui->bDiffData->isChecked()) {
         command = QString("#%1").arg(m_ui->numNodes2->text());
         for (const AttributeRange* ar : m_nodeAttrsScope) {
-            Q_ASSERT(m_ui->table->item(ar->id(), 0)->text() == ar->attrName());
+            Q_ASSERT_X(m_ui->table->item(ar->id(), 0)->text() == ar->attrName(),
+                       "NodesGeneratorDlg::fill", "attribute name mismatch. It should never happen!");
+
             QComboBox* cb = dynamic_cast<QComboBox*>(m_ui->table->cellWidget(ar->id(), 1));
             command += QString(";%1_%2").arg(ar->attrName()).arg(cb->currentText());
 

@@ -91,13 +91,15 @@ TableWidget::TableWidget(QWidget *parent)
 
 void TableWidget::insertColumns(const QList<Header> headers)
 {
-    // make sure the toggle button is in the first column
-    Q_ASSERT(headers.at(0) == H_BUTTON);
+    Q_ASSERT_X(headers.at(0) == H_BUTTON, "TableWidget::insertColumns",
+             "the toggle button MUST be in the first column");
+
     QStringList labels;
     labels << m_headerLabel.value(H_BUTTON);
     for (int i = 1; i < headers.size(); ++i) {
         Header h = headers.at(i);
-        Q_ASSERT(h != H_BUTTON); // make sure we have only one toggle button
+        Q_ASSERT_X(h != H_BUTTON, "TableWidget::insertColumns",
+                   "we must have only one toggle button in a row");
         labels << m_headerLabel.value(h);
     }
     setColumnCount(labels.size());

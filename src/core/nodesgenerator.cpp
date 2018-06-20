@@ -175,7 +175,8 @@ AGSameFuncForAll::AGSameFuncForAll(const AttributesScope& attrsScope, const int 
     , m_functionInput(funcInput)
     , m_prg(nullptr)
 {
-    Q_ASSERT(m_numNodes > 0 && m_function != F_Invalid);
+    Q_ASSERT_X(m_numNodes > 0, "AGSameFuncForAll", "number of nodes must be >0");
+    Q_ASSERT_X(m_function != F_Invalid, "AGSameFuncForAll", "the function must be valid!");
 
     switch (m_function) {
     case F_Min:
@@ -187,7 +188,7 @@ AGSameFuncForAll::AGSameFuncForAll(const AttributesScope& attrsScope, const int 
         f_value = [](const AttributeRange* attrRange) { return attrRange->max(); };
         break;
     case F_Rand:
-        Q_ASSERT(funcInput.type() == Value::INT);
+        Q_ASSERT_X(funcInput.type() == Value::INT, "AGSameFuncForAll", "rand function expects an integer seed.");
         m_command = QString("*%1;rand_%2").arg(m_numNodes).arg(funcInput.toQString());
         m_prg = new PRG(funcInput.toInt());
         f_value = [this](const AttributeRange* attrRange) { return attrRange->rand(m_prg); };
@@ -226,7 +227,7 @@ AGDiffFunctions::AGDiffFunctions(const AttributesScope& attrsScope, const int nu
     , m_numNodes(numNodes)
     , m_attrCmds(attrCmds)
 {
-    Q_ASSERT(m_numNodes > 0);
+    Q_ASSERT_X(m_numNodes > 0, "AGDiffFunctions", "number of nodes must be >0");
     m_command = QString("#%1").arg(m_numNodes);
     for (const AttrCmd& cmd : m_attrCmds) {
         m_command += QString(";%1_%2").arg(cmd.attrName).arg(enumToString(cmd.func));
@@ -248,7 +249,7 @@ Nodes AGDiffFunctions::create(std::function<void(int)> progress)
     std::function<Value()> value;
     for (const AttrCmd& cmd : m_attrCmds) {
         const AttributeRange* attrRange = m_attrsScope.value(cmd.attrName, nullptr);
-        assert(attrRange);
+        Q_ASSERT_X(attrRange, "AGDiffFunctions", "unable to find the attribute range");
 
         PRG* prg = nullptr;
         switch (cmd.func) {
@@ -448,7 +449,7 @@ NodesGenerator* NodesGenerator::parse(const AttributesScope& nodeAttrsScope,
         return nullptr;
     }
 
-    Q_ASSERT(command == ag->command());
+    Q_ASSERT_X(command == ag->command(), "NodesGenerator", "something went extremely wrong with the command string!");
     return ag;
 }
 

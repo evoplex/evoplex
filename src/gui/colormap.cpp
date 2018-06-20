@@ -57,7 +57,7 @@ ColorMapMgr::ColorMapMgr()
                 QJsonArray rgb = rgb_.toArray();
                 colors.emplace_back(QColor(rgb.at(0).toInt(), rgb.at(1).toInt(), rgb.at(2).toInt()));
             }
-            assert(colors.size() > 0 && colors.size() < INT_MAX);
+            Q_ASSERT_X(colors.size() > 0 && colors.size() < INT_MAX, "ColorMapMgr", "the color size is invalid!");
             CMapKey key(name, int(colors.size()));
             m_colormaps.insert(key, colors);
             sizes.append(QString::number(key.second));
@@ -126,7 +126,7 @@ ColorMap* ColorMap::create(const AttributeRange* attrRange, const Colors& colors
 ColorMap::ColorMap(const Colors& colors)
     : m_colors(colors)
 {
-    Q_ASSERT(colors.size() > 0);
+    Q_ASSERT_X(colors.size() > 0, "ColorMap", "the color size is invalid!");
 }
 
 /************************************************************************/

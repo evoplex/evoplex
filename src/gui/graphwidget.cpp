@@ -49,7 +49,9 @@ GraphWidget::GraphWidget(MainGUI* mainGUI, Experiment* exp, ExperimentWidget* pa
     setAttribute(Qt::WA_DeleteOnClose, true);
     setFocusPolicy(Qt::StrongFocus);
 
-    Q_ASSERT(!m_exp->autoDeleteTrials());
+    Q_ASSERT_X(!m_exp->autoDeleteTrials(), "GraphWidget",
+               "tried to build a GraphWidget for a experiment that will be auto-deleted!");
+
     connect(m_exp, SIGNAL(restarted()), SLOT(slotRestarted()));
 
     QWidget* front = new QWidget(this);

@@ -41,12 +41,13 @@ Experiment::Experiment(MainApp* mainApp, ExperimentInputs* inputs, ProjectSP pro
 {
     QString error;
     init(inputs, error);
-    Q_ASSERT(m_project);
+    Q_ASSERT_X(m_project, "Experiment", "tried to create an experiment from a null project");
 }
 
 Experiment::~Experiment()
 {
-    Q_ASSERT(m_expStatus != RUNNING && m_expStatus != QUEUED);
+    Q_ASSERT_X(m_expStatus != RUNNING && m_expStatus != QUEUED,
+               "~Experiment", "tried to delete a running experiment");
     deleteTrials();
     m_outputs.clear();
     delete m_inputs;
@@ -75,7 +76,7 @@ bool Experiment::init(ExperimentInputs* inputs, QString& error)
                 .arg(m_id);
 
         for (Cache* cache : m_inputs->fileCaches) {
-            Q_ASSERT(cache->inputs().size() > 0);
+            Q_ASSERT_X(cache->inputs().size() > 0, "Experiment::init", "a file cache must have inputs");
             m_fileHeader += cache->printableHeader(',', false) + ",";
             m_outputs.insert(cache->output());
         }
@@ -327,7 +328,8 @@ Nodes Experiment::createNodes()
         return cloneNodes(m_clonableNodes);
     }
 
-    Q_ASSERT(m_trials.empty());
+    Q_ASSERT_X(m_trials.empty(), "Experiment::createNodes",
+               "if there is no trials to run, why is it trying to create nodes?");
 
     Nodes nodes;
     QString errMsg;
@@ -523,7 +525,7 @@ Experiment::ExperimentInputs* Experiment::readInputs(const MainApp* mainApp,
     QString outHeader = generalAttrs->value(OUTPUT_HEADER, Value("")).toQString();
     if (failedAttributes.isEmpty() && !outHeader.isEmpty()) {
         const int numTrials = generalAttrs->value(GENERAL_ATTRIBUTE_TRIALS).toInt();
-        Q_ASSERT(numTrials > 0);
+        Q_ASSERT_X(numTrials > 0, "Experiment::readInputs", "what? an experiment without trials?");
         std::vector<int> trialIds;
         for (int i = 0; i < numTrials; ++i) {
             trialIds.emplace_back(i);
