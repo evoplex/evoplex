@@ -83,10 +83,17 @@ MainApp::MainApp()
     }
     // load user imported plugins
     QStringList plugins = m_userPrefs.value("plugins").toStringList();
-    for (QString path : plugins) {
+    QStringList::iterator it = plugins.begin();
+    while (it != plugins.end()) {
         QString error;
-        loadPlugin(pluginsDir.absoluteFilePath(path), error, false);
+        loadPlugin(pluginsDir.absoluteFilePath(*it), error, false);
+        if (error.isEmpty()) {
+            ++it;
+        } else {
+            it = plugins.erase(it);
+        }
     }
+    m_userPrefs.setValue("plugins", plugins);
 }
 
 MainApp::~MainApp()
