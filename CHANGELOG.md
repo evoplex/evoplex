@@ -1,8 +1,3 @@
-Evoplex: CHANGELOG
-==================
-
-Evoplex 0.0.0-alpha 2018-06-X
------------------------------
-
-First public release
+* Thu Jun 21 2018 Marcos Cardinot <marcos@cardinot.net> - 0.1.0-alpha0
+- First public release
 
