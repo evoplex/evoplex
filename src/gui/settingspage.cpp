@@ -24,6 +24,7 @@
 #include "settingspage.h"
 #include "ui_settingspage.h"
 #include "core/experimentsmgr.h"
+#include "constants.h"
 
 namespace evoplex
 {
