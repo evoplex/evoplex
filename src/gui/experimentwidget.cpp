@@ -152,7 +152,7 @@ void ExperimentWidget::slotStatusChanged(Experiment::Status status)
         m_aPlayPause->setIcon(m_kIcon_play);
         m_aPlayPause->setEnabled(true);
         m_aNext->setEnabled(true);
-        m_aStop->setEnabled(true);
+        m_aStop->setEnabled(!m_exp->trials().empty());
         m_aReset->setEnabled(true);
     } else if (status == Experiment::RUNNING || status == Experiment::QUEUED) {
         m_aPlayPause->setIcon(m_kIcon_pause);
