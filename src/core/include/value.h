@@ -42,8 +42,13 @@ public:
     Value(const char* value);
     Value(const QString& value);
 
-    inline bool isValid() const;
     inline Type type() const;
+    inline bool isValid() const;
+    inline bool isBool() const;
+    inline bool isChar() const;
+    inline bool isDouble() const;
+    inline bool isInt() const;
+    inline bool isString() const;
 
     inline const bool toBool() const;
     inline const char toChar() const;
@@ -68,11 +73,26 @@ private:
    Value: Inline member functions
  ************************************************************************/
 
+inline Value::Type Value::type() const
+{ return m_type; }
+
 inline bool Value::isValid() const
 { return m_type != INVALID; }
 
-inline Value::Type Value::type() const
-{ return m_type; }
+inline bool Value::isBool() const
+{ return m_type == BOOL; }
+
+inline bool Value::isChar() const
+{ return m_type == CHAR; }
+
+inline bool Value::isDouble() const
+{ return m_type == DOUBLE; }
+
+inline bool Value::isInt() const
+{ return m_type == INT; }
+
+inline bool Value::isString() const
+{ return m_type == STRING; }
 
 inline const bool Value::toBool() const
 { return m_data.b; }
