@@ -189,11 +189,11 @@ bool Project::saveProject(QString& errMsg, std::function<void(int)>& progress)
         std::vector<QString> general = inputs->generalAttrs->names();
         header.insert(header.end(), general.begin(), general.end());
         // prefix all model attributes with the modelId
-        foreach (const QString& attrName, inputs->modelAttrs->names()) {
+        for (const QString& attrName : inputs->modelAttrs->names()) {
             header.emplace_back(exp->modelId() + "_" + attrName);
         }
         // prefix all graph attributes with the graphId
-        foreach (const QString& attrName, inputs->graphAttrs->names()) {
+        for (const QString& attrName : inputs->graphAttrs->names()) {
             header.emplace_back(exp->graphId() + "_" + attrName);
         }
     }
@@ -217,7 +217,7 @@ bool Project::saveProject(QString& errMsg, std::function<void(int)>& progress)
         const QString graphId_ = exp->graphId() + "_";
 
         QStringList values;
-        foreach (QString attrName, header) {
+        for (QString attrName : header) {
             int idx = inputs->generalAttrs->indexOf(attrName);
             if (idx != -1) {
                 values.append(inputs->generalAttrs->value(idx).toQString());

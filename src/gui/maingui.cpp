@@ -120,8 +120,9 @@ MainGUI::MainGUI(MainApp* mainApp, QWidget* parent)
     toolbar->setFloatable(false);
     this->addToolBar(Qt::LeftToolBarArea, toolbar);
     // remove the tooltips
-    foreach(QToolButton* btn, toolbar->findChildren<QToolButton*>())
+    for (QToolButton* btn : toolbar->findChildren<QToolButton*>()) {
         btn->installEventFilter(this);
+    }
 
     connect(actionGroup, SIGNAL(triggered(QAction*)), this, SLOT(slotPage(QAction*)));
     connect(m_projectsPage, &ProjectsPage::isEmpty, [this, acWelcome, acProjects](bool b) {

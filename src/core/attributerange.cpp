@@ -60,14 +60,14 @@ AttributeRange* AttributeRange::setOfValues(QString attrRangeStr, const int id, 
     if (attrRangeStr.startsWith("int")) {
         type = AttributeRange::Int_Set;
         valuesStr[0] = valuesStr[0].remove("int");
-        foreach (QString vStr, valuesStr) {
+        for (const QString& vStr : valuesStr) {
             values.push_back(vStr.toInt(&ok));
             if (!ok) break;
         }
     } else if (attrRangeStr.startsWith("double")) {
         type = AttributeRange::Double_Set;
         valuesStr[0] = valuesStr[0].remove("double");
-        foreach (QString vStr, valuesStr) {
+        for (const QString& vStr : valuesStr) {
             values.push_back(vStr.toDouble(&ok));
             if (!ok) break;
         }
@@ -75,7 +75,7 @@ AttributeRange* AttributeRange::setOfValues(QString attrRangeStr, const int id, 
         type = AttributeRange::String_Set;
         valuesStr[0] = valuesStr[0].remove("string");
         ok = true;
-        foreach (QString vStr, valuesStr) {
+        for (const QString& vStr : valuesStr) {
             values.push_back(vStr);
         }
     }

@@ -175,7 +175,7 @@ void ProjectsPage::slotOpenExperiment(Experiment* exp)
     }
 
     ExperimentWidget* ew = nullptr;
-    foreach (ExperimentWidget* e, m_experiments) {
+    for (ExperimentWidget* e : m_experiments) {
         if (exp == e->exp()) {
             ew = e;
             break;

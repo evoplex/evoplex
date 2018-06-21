@@ -246,9 +246,9 @@ void ExperimentDesigner::setExperiment(Experiment* exp)
 
     const Experiment::ExperimentInputs* inputs = exp->inputs();
     std::vector<QString> header = inputs->generalAttrs->names();
-    foreach (QString attrName, inputs->graphAttrs->names())
+    for (const QString& attrName : inputs->graphAttrs->names())
         header.emplace_back(exp->graphId() + "_" + attrName);
-    foreach (QString attrName, inputs->modelAttrs->names())
+    for (const QString& attrName : inputs->modelAttrs->names())
         header.emplace_back(exp->modelId() + "_" + attrName);
 
     std::vector<Value> values = inputs->generalAttrs->values();
