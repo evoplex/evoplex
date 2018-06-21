@@ -24,7 +24,7 @@ namespace evoplex {
 
 bool ModelNowak::init()
 {
-    m_temptation = attr("temptation").toDouble();
+    m_temptation = attr("temptation", -1.0).toDouble();
     return m_temptation >=1.0 && m_temptation <= 2.0;
 }
 
