@@ -66,11 +66,11 @@ int main(int argc, char* argv[])
                                                      .arg(QCoreApplication::organizationDomain());
 
     int maxLength = qMax(versionLine.size(), copyrightLine.size());
-    qDebug() << qPrintable(QString(" %1").arg(QString().fill('-', maxLength+2)));
-    qDebug() << qPrintable(QString("[ %1 ]").arg(versionLine.leftJustified(maxLength, ' ')));
-    qDebug() << qPrintable(QString("[ %1 ]").arg(copyrightLine.leftJustified(maxLength, ' ')));
-    qDebug() << qPrintable(QString(" %1").arg(QString().fill('-', maxLength+2)));
-    qDebug() << "Writing log file to:" << QDir::toNativeSeparators(evoplex::Logger::logFileName());
+    qInfo() << qPrintable(QString(" %1").arg(QString().fill('-', maxLength+2)));
+    qInfo() << qPrintable(QString("[ %1 ]").arg(versionLine.leftJustified(maxLength, ' ')));
+    qInfo() << qPrintable(QString("[ %1 ]").arg(copyrightLine.leftJustified(maxLength, ' ')));
+    qInfo() << qPrintable(QString(" %1").arg(QString().fill('-', maxLength+2)));
+    qInfo() << "Writing log file to:" << QDir::toNativeSeparators(evoplex::Logger::logFileName());
 
     // init application
     evoplex::MainApp mainApp;

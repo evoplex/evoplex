@@ -221,15 +221,29 @@ void Logger::deinit()
 
 void Logger::debugLogHandler(QtMsgType type, const QMessageLogContext& ctx, const QString& msg)
 {
-    QString formattedMessage = qFormatLogMessage(type, ctx, msg);
-    if (formattedMessage.isNull()) {
-        return;
+    int color = 39; // default color
+    QString formattedMsg = msg;
+    if (type == QtInfoMsg) {
+        color = 34; // blue
+    } else {
+        // format full function path to class::function only
+        QString classFunc(ctx.function);
+        classFunc.remove(0, classFunc.lastIndexOf("evoplex::") + 9);
+        classFunc.remove(classFunc.lastIndexOf("("), classFunc.lastIndexOf(")"));
+
+        formattedMsg = QString("[%1] %2").arg(classFunc).arg(formattedMsg);
+        if (type == QtWarningMsg) {
+            color = 35; // magenta
+        } else if (type == QtCriticalMsg || type == QtFatalMsg) {
+            color = 31; // red
+            formattedMsg = QString("%1 (%2:%3)").arg(formattedMsg).arg(ctx.file).arg(ctx.line);
+        }
     }
 
-    fprintf(stderr, "%s\n", qPrintable(formattedMessage));
+    fprintf(stderr, "\033[0;%um%s\033[0m\n", color, qPrintable(formattedMsg));
     fflush(stderr);
 
-    writeLog(formattedMessage);
+    writeLog(formattedMsg);
 }
 
 void Logger::writeLog(QString msg)
