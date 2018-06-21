@@ -27,6 +27,7 @@ namespace evoplex {
 
 SquareGrid::SquareGrid(const QString& name)
     : AbstractGraph(name)
+    , m_periodic(false)
     , m_numNeighbours(0)
     , m_height(0)
     , m_width(0)
@@ -35,15 +36,17 @@ SquareGrid::SquareGrid(const QString& name)
 
 bool SquareGrid::init()
 {
-    m_numNeighbours = attrs()->value(Neighbours).toInt();
-    if (m_numNeighbours != 4 && m_numNeighbours != 8) {
-        qWarning() << QString("The neighbourhood set is invalid (%1)."
-                              "It should be 4 or 8").arg(m_numNeighbours);
+    if (!attrExists("periodic") || !attrExists("neighbours") ||
+        !attrExists("height") || !attrExists("width")) {
+        qWarning() << "[SquareGrid]: missing attributes.";
         return false;
     }
 
-    m_height = attrs()->value(Height).toInt();
-    m_width = attrs()->value(Width).toInt();
+    m_periodic = attr("periodic").toBool();
+    m_numNeighbours = attr("neighbours").toInt();
+    m_height = attr("height").toInt();
+    m_width = attr("width").toInt();
+
     if (nodes().size() != m_height * m_width) {
         qWarning() << "[SquareGrid]: Wrong shape! The number of nodes should be equal to 'height'*'width'.";
         return false;
@@ -56,50 +59,63 @@ void SquareGrid::reset()
 {
     Utils::deleteAndShrink(m_edges);
 
-    bool isDirected;
+    const bool directed = isDirected();
     edgesFunc func;
-    if (type() == Directed) {
-        isDirected = true;
-        if (m_numNeighbours == 4) {
-            func = directed4Edges;
-        } else {
-            func = directed8Edges;
-        }
+    if (m_numNeighbours == 4) {
+        func = directed ? directed4Edges : undirected4Edges;
     } else {
-        isDirected = false;
-        if (m_numNeighbours == 4) {
-            func = undirected4Edges;
-        } else {
-            func = undirected8Edges;
-        }
+        func = directed ? directed8Edges : undirected8Edges;
     }
 
-    for (int id = 0; id < m_nodes.size(); ++id) {
-        int x, y;
-        Utils::ind2sub(id, m_width, y, x);
-        m_nodes.at(id)->setCoords(x, y);
-        createEdges(id, func, isDirected);
+    if (m_periodic) {
+        for (Node* node : m_nodes) {
+            int x, y;
+            Utils::ind2sub(node->id(), m_width, y, x);
+            node->setCoords(x, y);
+            createPeriodicEdges(node->id(), func, directed);
+        }
+    } else {
+        for (Node* node : m_nodes) {
+            int x, y;
+            Utils::ind2sub(node->id(), m_width, y, x);
+            node->setCoords(x, y);
+            createFixedEdges(node->id(), func, directed);
+        }
     }
 }
 
-void SquareGrid::createEdges(const int id, edgesFunc func, bool isDirected)
+void SquareGrid::createPeriodicEdges(const int id, edgesFunc func, const bool isDirected)
 {
     edges2d neighbors = func(id, m_width);
     for (std::pair<int,int> neighbor : neighbors) {
         if (neighbor.first < 0) {
             neighbor.first = m_height - 1;
-        } else if (neighbor.first > m_height - 1) {
+        } else if (neighbor.first >= m_height) {
             neighbor.first = 0;
         }
 
         if (neighbor.second < 0) {
             neighbor.second = m_width - 1;
-        } else if (neighbor.second > m_width - 1) {
+        } else if (neighbor.second >= m_width) {
             neighbor.second = 0;
         }
 
         int nId = Utils::linearIdx(neighbor, m_width);
-        Q_ASSERT(nId < m_nodes.size()); // neighbor must exist
+        Q_ASSERT_X(nId < m_nodes.size(), "SquareGrid::createEdges", "neighbor must exist");
+        m_edges.emplace_back(new Edge(node(id), node(nId), isDirected));
+    }
+}
+
+void SquareGrid::createFixedEdges(const int id, edgesFunc func, const bool isDirected)
+{
+    edges2d neighbors = func(id, m_width);
+    for (std::pair<int,int> neighbor : neighbors) {
+        if (neighbor.first < 0 || neighbor.first >= m_height ||
+            neighbor.second < 0 || neighbor.second >= m_width) {
+            continue;
+        }
+        int nId = Utils::linearIdx(neighbor, m_width);
+        Q_ASSERT_X(nId < m_nodes.size(), "SquareGrid::createEdges", "neighbor must exist");
         m_edges.emplace_back(new Edge(node(id), node(nId), isDirected));
     }
 }

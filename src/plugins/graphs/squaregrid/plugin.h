@@ -35,8 +35,7 @@ public:
     void reset();
 
 private:
-    // graph parameters
-    enum GraphAttr { Neighbours, Height, Width };
+    bool m_periodic;
     int m_numNeighbours;
     int m_width;
     int m_height;
@@ -44,7 +43,12 @@ private:
     typedef std::pair<int,int> rowCol;
     typedef std::vector<rowCol> edges2d;
     typedef std::function<edges2d(const int, const int)> edgesFunc;
-    void createEdges(const int id, edgesFunc func, bool isDirected);
+
+    // create edges with fixed boundary conditions
+    void createFixedEdges(const int id, edgesFunc func, const bool isDirected);
+
+    // create edges with periodic boundary conditions (i.e., a toroid)
+    void createPeriodicEdges(const int id, edgesFunc func, const bool isDirected);
 
     static edges2d directed4Edges(const int id, const int width);
     static edges2d directed8Edges(const int id, const int width);

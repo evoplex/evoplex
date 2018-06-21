@@ -3,11 +3,12 @@
   "uid": "squareGrid",
   "name": "Square Grid",
   "author": "Marcos Cardinot",
-  "description": "Regular lattice grid.",
+  "description": "Regular lattice grid with four or eight neighbours. It's able to generate graphs with either fixed or periodic boundary conditions. It expects that the total number of nodes is equal to 'height'*'width'.",
   "validGraphTypes": [ "undirected", "directed" ],
   "pluginAttributesScope": [
     { "neighbours": "int{4,8}" },
     { "height": "int[1,max]" },
-    { "width": "int[1,max]" }
+    { "width": "int[1,max]" },
+    { "periodic": "bool" }
   ]
 }
