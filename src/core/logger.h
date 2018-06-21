@@ -21,6 +21,7 @@
 #ifndef LOGGER_HPP
 #define LOGGER_HPP
 
+#include <QDir>
 #include <QString>
 #include <QFile>
 #include <QMutex>
@@ -53,6 +54,7 @@ private:
     static QFile m_logFile;
     static QString m_log;
     static QMutex m_fileMutex;
+    static QDir m_logDir;
 };
 } // evoplex
 #endif // LOGGER_HPP

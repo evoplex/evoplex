@@ -21,7 +21,6 @@
 #include <QCoreApplication>
 #include <QDateTime>
 #include <QDebug>
-#include <QDir>
 #include <QProcess>
 #include <QStandardPaths>
 #include <QSysInfo>
@@ -39,15 +38,17 @@ namespace evoplex
 QFile Logger::m_logFile;
 QString Logger::m_log;
 QMutex Logger::m_fileMutex;
+QDir Logger::m_logDir;
 
 void Logger::init()
 {
-    QDir dir(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation));
-    if (!dir.exists()) {
-        dir.mkpath(".");
+    m_logDir = QDir(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation));
+    if (!m_logDir.exists()) {
+        m_logDir.mkpath(".");
     }
 
-    m_logFile.setFileName(dir.absoluteFilePath("log.txt"));
+    QString currDate = QDateTime::currentDateTime().toString(Qt::ISODate);
+    m_logFile.setFileName(m_logDir.absoluteFilePath("log_%1.txt").arg(currDate));
     if (!m_logFile.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text | QIODevice::Unbuffered)) {
         qWarning() << "[Logger] ERROR! Unable to write the log file.";
         return;
@@ -55,7 +56,7 @@ void Logger::init()
 
     qInstallMessageHandler(Logger::debugLogHandler);
 
-    writeLog(QString("%1").arg(QDateTime::currentDateTime().toString(Qt::ISODate)));
+    writeLog(currDate);
     writeLog(QString("Evoplex version: %1-%2").arg(EVOPLEX_VERSION).arg(EVOPLEX_RELEASE));
     writeLog(QString("Built on %1 (branch: %2 commit: %3)")
             .arg(EVOPLEX_BUILDDATE).arg(EVOPLEX_GIT_BRANCH).arg(EVOPLEX_GIT_COMMIT_HASH));
@@ -220,6 +221,18 @@ void Logger::init()
 
 void Logger::deinit()
 {
+    const QDateTime sevenDaysAgo = QDateTime::currentDateTime().addDays(-7);
+    const QStringList oldLogs = m_logDir.entryList(QStringList("log_*.txt"), QDir::Files);
+    for (const QString& log : oldLogs) {
+        QString logDate = log;
+        logDate.remove("log_");
+        logDate.remove(".txt");
+        if (QDateTime::fromString(logDate, Qt::ISODate) <= sevenDaysAgo) {
+            qInfo() << "removing old log file:" << m_logDir.absoluteFilePath(log);
+            m_logDir.remove(log);
+        }
+    }
+
     qInstallMessageHandler(0);
     m_logFile.close();
 }
