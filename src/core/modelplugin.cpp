@@ -23,6 +23,7 @@
 
 #include "modelplugin.h"
 #include "abstractplugin.h"
+#include "constants.h"
 #include "utils.h"
 
 namespace evoplex {

@@ -22,6 +22,7 @@ set(EVOPLEX_CORE_INCLUDE
   include/plugininterfaces.h
   include/abstractgraph.h
   include/abstractmodel.h
+  include/baseplugin.h
 
   include/attributes.h
   include/attributerange.h

@@ -23,6 +23,7 @@
 
 #include "graphplugin.h"
 #include "abstractplugin.h"
+#include "constants.h"
 
 namespace evoplex {
 

@@ -22,49 +22,36 @@
 #define ABSTRACT_MODEL_H
 
 #include "abstractgraph.h"
-#include "node.h"
-#include "prg.h"
+#include "baseplugin.h"
 
 namespace evoplex {
 
-class AbstractBaseModel
+class BaseModel : public BasePlugin
 {
     friend class Experiment;
 
 public:
     inline AbstractGraph* graph() const;
-    inline PRG* prg() const;
-    inline const Attributes* attrs() const;
-    inline const Value& attr(const QString& name) const;
-    inline const Value& attr(int attrId) const;
-    inline const QString& attrName(int attrId) const;
     inline const int currStep() const;
     inline const int status() const;
 
 protected:
-    explicit AbstractBaseModel()
-        : m_graph(nullptr), m_prg(nullptr), m_attributes(nullptr),
-          m_currStep(0), m_status(0) {}
-
-    virtual ~AbstractBaseModel() {
+    explicit BaseModel() : BasePlugin(), m_graph(nullptr), m_currStep(0), m_status(0) {}
+    virtual ~BaseModel() {
         delete m_graph;
-        m_graph = nullptr;
         delete m_prg;
-        m_prg = nullptr;
     }
 
 private:
     AbstractGraph* m_graph;
-    PRG* m_prg;
-    const Attributes* m_attributes;
     int m_currStep;
     int m_status;
 
     // takes the ownership of the graph and the PRG
-    inline bool setup(PRG* prg, AbstractGraph* graphObj, const Attributes* attrs);
+    inline bool setup(PRG* prg, const Attributes* attrs, AbstractGraph* graphObj);
 };
 
-class AbstractModel : public AbstractBaseModel
+class AbstractModel : public BaseModel
 {
 public:
     // destructor
@@ -89,43 +76,24 @@ public:
 };
 
 /************************************************************************
-   AbstractBaseModel: Inline member functions
+   BaseModel: Inline member functions
  ************************************************************************/
 
-inline AbstractGraph* AbstractBaseModel::graph() const
+inline AbstractGraph* BaseModel::graph() const
 { return m_graph; }
 
-inline PRG* AbstractBaseModel::prg() const
-{ return m_prg; }
-
-inline const Attributes* AbstractBaseModel::attrs() const
-{ return m_attributes; }
-
-inline const Value& AbstractBaseModel::attr(const QString& name) const
-{ return m_attributes->value(name); }
-
-inline const Value& AbstractBaseModel::attr(int attrId) const
-{ return m_attributes->value(attrId);  }
-
-inline const QString& AbstractBaseModel::attrName(int attrId) const
-{ return m_attributes->name(attrId); }
-
-inline const int AbstractBaseModel::currStep() const
+inline const int BaseModel::currStep() const
 { return m_currStep; }
 
-inline const int AbstractBaseModel::status() const
+inline const int BaseModel::status() const
 { return m_status; }
 
-inline bool AbstractBaseModel::setup(PRG* prg, AbstractGraph* graphObj, const Attributes* attrs) {
-    Q_ASSERT_X(!m_prg && !m_graph, "AbstractBaseModel::setup", "tried to setup a model twice! It should be done only once!");
-    m_prg = prg;
-    m_graph = graphObj;
-    m_attributes = attrs;
-    m_currStep = 0;
-    if (!m_prg || !m_graph) {
-        return false;
+inline bool BaseModel::setup(PRG* prg, const Attributes* attrs, AbstractGraph* graphObj) {
+    if (BasePlugin::setup(prg, attrs)) {
+        m_graph = graphObj;
+        m_currStep = 0;
     }
-    return true;
+    return m_graph != nullptr;
 }
 
 
