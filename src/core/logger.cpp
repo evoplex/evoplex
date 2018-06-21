@@ -31,6 +31,7 @@
 
 #include "logger.h"
 #include "constants.h"
+#include "../config.h"
 
 namespace evoplex
 {
@@ -55,6 +56,10 @@ void Logger::init()
     qInstallMessageHandler(Logger::debugLogHandler);
 
     writeLog(QString("%1").arg(QDateTime::currentDateTime().toString(Qt::ISODate)));
+    writeLog(QString("Evoplex version: %1-%2").arg(EVOPLEX_VERSION).arg(EVOPLEX_RELEASE));
+    writeLog(QString("Built on %1 (branch: %2 commit: %3)")
+            .arg(EVOPLEX_BUILDDATE).arg(EVOPLEX_GIT_BRANCH).arg(EVOPLEX_GIT_COMMIT_HASH));
+
     writeLog(QString("Operating System: %1").arg(QSysInfo::prettyProductName()));
     writeLog(QString("Built with %1").arg(COMPILER_VERSION));
     writeLog(QString("Qt runtime version: %1").arg(qVersion()));
