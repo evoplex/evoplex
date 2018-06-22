@@ -73,6 +73,9 @@ find_package(Qt5Charts 5.8.0 REQUIRED)
 find_package(Qt5Widgets 5.8.0 REQUIRED)
 find_package(Qt5Test 5.8.0 REQUIRED)
 
+# Tests must be enabled from root
+enable_testing()
+
 # Compile source
 add_subdirectory(src)
 
