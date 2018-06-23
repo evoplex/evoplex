@@ -46,7 +46,8 @@ AttributeRange* AttributeRange::parse(int id, const QString& attrName, const QSt
 
     if (!vs || !vs->isValid()) {
         qWarning() << "[AttributeRange::parse]: unable to parse " << attrRangeStr;
-        return new SingleValue();
+        delete vs;
+        vs = new SingleValue();
     }
     return vs;
 }

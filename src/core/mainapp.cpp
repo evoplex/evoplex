@@ -186,16 +186,14 @@ const AbstractPlugin* MainApp::loadPlugin(const QString& path, QString& error, c
 
     AbstractPlugin* plugin = nullptr;
     if (type == "graph") {
-        GraphPlugin* graph = new GraphPlugin(instance, &metaData, path);
-        if (graph->isValid()) {
-            m_graphs.insert(graph->id(), graph);
-            plugin = graph;
+        plugin = new GraphPlugin(instance, &metaData, path);
+        if (plugin->isValid()) {
+            m_graphs.insert(plugin->id(), dynamic_cast<GraphPlugin*>(plugin));
         }
     } else {
-        ModelPlugin* model = new ModelPlugin(instance, &metaData, path);
-        if (model->isValid()) {
-            m_models.insert(model->id(), model);
-            plugin = model;
+        plugin = new ModelPlugin(instance, &metaData, path);
+        if (plugin->isValid()) {
+            m_models.insert(plugin->id(), dynamic_cast<ModelPlugin*>(plugin));
         }
     }
 
@@ -240,7 +238,7 @@ bool MainApp::unloadPlugin(const AbstractPlugin* plugin, QString& error)
     } else if (type == AbstractPlugin::ModelPlugin && m_models.contains(id)) {
         delete m_models.take(id);
     } else {
-        qFatal(qPrintable("[MainApp] Tried to unload a plugin (" + id + ") which has not been loaded before."));
+        qFatal("[MainApp] Tried to unload a plugin (%s) which has not been loaded before.", qPrintable(id));
     }
 
     emit (pluginRemoved(id, type));
