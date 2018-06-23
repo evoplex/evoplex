@@ -36,7 +36,7 @@ ExperimentsMgr::ExperimentsMgr()
     m_threads = m_userPrefs.value("settings/threads", m_threads).toInt();
     m_threads = m_threads > QThread::idealThreadCount() ? QThread::idealThreadCount() : m_threads;
     m_threadPool.setMaxThreadCount(m_threads);
-    qDebug() << "[ExperimentsMgr]: setting the max number of threads to" << m_threads;
+    qDebug() << "setting the max number of threads to" << m_threads;
 
     m_timerDestroy->setSingleShot(true);
     m_timerProgress->setSingleShot(true);
@@ -202,7 +202,7 @@ void ExperimentsMgr::setMaxThreadCount(const int newValue)
     if (m_threads == newValue) {
         return;
     } else if (newValue < 1 || newValue > QThread::idealThreadCount()) {
-        QString err = QString("[ExperimentMgr]: invalid number of threads!"
+        QString err = QString("invalid number of threads!"
                     "It should be an integer greater than 0 and less than %1.\n"
                     "Current: %2; Tried: %3").arg(QThread::idealThreadCount())
                     .arg(m_threads).arg(newValue);
@@ -226,7 +226,7 @@ void ExperimentsMgr::setMaxThreadCount(const int newValue)
 
     m_userPrefs.setValue("settings/threads", m_threads);
     m_threadPool.setMaxThreadCount(m_threads);
-    qDebug() << "[ExperimentsMgr] setting the max number of thread from"
+    qDebug() << "setting the max number of thread from"
              << previous << "to" << newValue;
 }
 

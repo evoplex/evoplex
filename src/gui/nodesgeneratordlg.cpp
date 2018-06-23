@@ -95,7 +95,7 @@ NodesGeneratorDlg::NodesGeneratorDlg(const AttributesScope& nodeAttrsScope, QWid
                                "Expected: " + ar->attrRangeStr());
                 le->setFocus();
             } else {
-                qFatal("[NodesGeneratorDlg] invalid function!");
+                qFatal("invalid function!");
             }
             le->setHidden(false);
         });
@@ -251,7 +251,7 @@ QString NodesGeneratorDlg::readCommand()
             }
         }
     } else {
-        qFatal("[NodesGeneratorDlg::slotOk()]");
+        qFatal("invalid command!");
     }
 
     return command;

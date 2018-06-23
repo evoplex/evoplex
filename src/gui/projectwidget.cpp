@@ -141,7 +141,7 @@ void ProjectWidget::slotUpdateRow(const Experiment* exp)
             return;
         }
     }
-    qFatal("[Experiment]: failed to update row! It should never happen.");
+    qFatal("failed to update row! It should never happen.");
 }
 
 void ProjectWidget::insertItem(int row, TableWidget::Header header, QString label, QString tooltip)

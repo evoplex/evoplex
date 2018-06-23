@@ -211,7 +211,7 @@ void ExperimentDesigner::setActiveWidget(PPageDockWidget* dw)
 {
     int id = m_ui->cbWidgets->findData(QVariant::fromValue(dw));
     if (id == -1 || !dw->project()) {
-        qFatal("[ExperimentDesigner]: project is null or qdockwidget is not in the list!");
+        qFatal("project is null or qdockwidget is not in the list!");
     }
     m_ui->cbWidgets->setCurrentIndex(id);
     m_project = dw->project();
@@ -296,7 +296,7 @@ void ExperimentDesigner::setExperiment(Experiment* exp)
             le->setText(values.at(i).toQString());
             continue;
         }
-        qFatal("[ExperimentDesigner]: unable to know the widget type.");
+        qFatal("unable to know the widget type.");
     }
 }
 
@@ -434,7 +434,7 @@ Experiment::ExperimentInputs* ExperimentDesigner::readInputs(const int expId, QS
             continue;
         }
 
-        qFatal("[ExperimentDesigner]: unable to know the widget type.");
+        qFatal("unable to know the widget type.");
     }
 
     if (!m_enableOutputs->isChecked()) {
@@ -521,7 +521,7 @@ void ExperimentDesigner::slotPluginAdded(const AbstractPlugin* plugin)
         slotModelSelected(STRING_NULL_PLUGINID); // to hide all fields
         cb = m_widgetFields.value(GENERAL_ATTRIBUTE_MODELID).value<QComboBox*>();
     } else {
-        qFatal("[ExperimentDesigner]: invalid plugin type!");
+        qFatal("invalid plugin type!");
     }
 
     cb->blockSignals(true);
@@ -541,7 +541,7 @@ void ExperimentDesigner::slotPluginRemoved(const QString& id, AbstractPlugin::Pl
         tree = m_treeItemModels;
         cb = m_widgetFields.value(GENERAL_ATTRIBUTE_MODELID).value<QComboBox*>();
     } else {
-        qFatal("[ExperimentDesigner]: invalid plugin type!");
+        qFatal("invalid plugin type!");
     }
 
     cb->blockSignals(true);

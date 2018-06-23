@@ -79,7 +79,7 @@ const double ModelNowak::playGame(const int sX, const int sY) const
     case 2: return m_temptation;    // DC : Temptation to defect
     case 3: return 0.0;             // DD : Punishment for mutual defection
     default:
-        qFatal("[ModelNowak::playGame()] Error! strategy should be 0 or 1!");
+        qFatal("Error! strategy should be 0 or 1!");
         return 0.0; // supress compiler warning
     }
 }

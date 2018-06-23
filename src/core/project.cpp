@@ -118,7 +118,7 @@ const int Project::importExperiments(const QString& filePath, QString& errorMsg)
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         errorMsg = "Couldn't read the experiments from:\n`" + filePath + "`"
                  + "Please, make sure it is a readable csv file.";
-        qWarning() << "[Project]: " << errorMsg;
+        qWarning() << errorMsg;
         return 0;
     }
 
@@ -129,7 +129,7 @@ const int Project::importExperiments(const QString& filePath, QString& errorMsg)
     if (header.isEmpty()) {
         errorMsg = "Couldn't read the experiments from:\n`" + filePath + "`"
                  + "\nThe header must have: " + m_mainApp->generalAttrsScope().keys().join(", ");
-        qWarning() << "[Project]: " << errorMsg;
+        qWarning() << errorMsg;
         return 0;
     }
 
@@ -142,7 +142,7 @@ const int Project::importExperiments(const QString& filePath, QString& errorMsg)
         if (!inputs || !newExperiment(inputs, expErrorMsg)) {
             errorMsg = QString("Couldn't read the experiment at line %1 from:\n`%2`\n"
                                "Error: %3").arg(row).arg(filePath).arg(expErrorMsg);
-            qWarning() << "[Project]: " << errorMsg;
+            qWarning() << errorMsg;
             delete inputs;
             file.close();
             return row - 1;
@@ -153,7 +153,7 @@ const int Project::importExperiments(const QString& filePath, QString& errorMsg)
 
     if (row == 1) {
         errorMsg = QString("This file is empty.\nThere were no experiments to be read.\n%1").arg(filePath);
-        qWarning() << "[Project]: " << errorMsg;
+        qWarning() << errorMsg;
         return 0;
     }
 
@@ -166,7 +166,7 @@ bool Project::saveProject(QString& errMsg, std::function<void(int)>& progress)
     if (m_experiments.empty()) {
         errMsg = QString("Unable to save the project '%1'.\n"
                 "This project is empty. There is nothing to save.").arg(name());
-        qWarning() << "[Project]" << errMsg;
+        qWarning() << errMsg;
         return false;
     }
 
@@ -177,7 +177,7 @@ bool Project::saveProject(QString& errMsg, std::function<void(int)>& progress)
         errMsg = QString("Unable to save the project '%1'.\n"
                 "Please, make sure the path below corresponds to a writable csv file!\n%2")
                 .arg(name()).arg(m_filepath);
-        qWarning() << "[Project]" << errMsg;
+        qWarning() << errMsg;
         return false;
     }
 
@@ -240,7 +240,7 @@ bool Project::saveProject(QString& errMsg, std::function<void(int)>& progress)
     m_hasUnsavedChanges = false;
     emit (hasUnsavedChanges(false));
     progress((100));
-    qWarning() << "[Project]: project has been saved!" << name();
+    qDebug() << "a project has been saved!" << name();
     return true;
 }
 

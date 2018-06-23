@@ -59,7 +59,7 @@ bool Experiment::init(ExperimentInputs* inputs, QString& error)
     if (m_expStatus == RUNNING || m_expStatus == QUEUED) {
         error = "Tried to initialize a running experiment.\n"
                 "Please, pause it and try again.";
-        qWarning() << "[Experiment]:" << error;
+        qWarning() << error;
         return false;
     }
 
@@ -98,7 +98,7 @@ bool Experiment::init(ExperimentInputs* inputs, QString& error)
 void Experiment::reset()
 {
     if (m_expStatus == RUNNING || m_expStatus == QUEUED) {
-        qWarning() << "[Experiment]: tried to reset a running experiment. You should pause it first.";
+        qWarning() << "tried to reset a running experiment. You should pause it first.";
         return;
     }
 
@@ -254,7 +254,7 @@ AbstractModel* Experiment::createTrial(const int trialId)
     if (m_expStatus == INVALID || m_pauseAt == 0) {
         return nullptr;
     } if (m_trials.size() == m_numTrials) {
-        QString e = QString("[Experiment]: FATAL! all the trials for this experiment have already been created."
+        QString e = QString("FATAL! all the trials for this experiment have already been created."
                             "It should never happen!\n Project: %1; Exp: %2; Trial: %3 (max=%4)\n")
                             .arg(m_project->name()).arg(m_id).arg(trialId).arg(m_numTrials);
         qFatal("%s", qPrintable(e));
@@ -272,7 +272,7 @@ AbstractModel* Experiment::createTrial(const int trialId)
     AbstractGraph* graphObj = m_graphPlugin->create();
     QString gType = m_inputs->generalAttrs->value(GENERAL_ATTRIBUTE_GRAPHTYPE).toString();
     if (!graphObj || !graphObj->setup(prg, m_inputs->graphAttrs, nodes, gType) || !graphObj->init()) {
-        qWarning() << "[Experiment]: unable to create the trials."
+        qWarning() << "unable to create the trials."
                    << "The graph could not be initialized."
                    << "Project:" << m_project->name() << "Experiment:" << m_id;
         delete graphObj;
@@ -283,7 +283,7 @@ AbstractModel* Experiment::createTrial(const int trialId)
 
     AbstractModel* modelObj = m_modelPlugin->create();
     if (!modelObj || !modelObj->setup(prg, m_inputs->modelAttrs, graphObj) || !modelObj->init()) {
-        qWarning() << "[Experiment]: unable to create the trials."
+        qWarning() << "unable to create the trials."
                    << "The model could not be initialized."
                    << "Project:" << m_project->name() << "Experiment:" << m_id;
         delete modelObj;
@@ -298,8 +298,7 @@ AbstractModel* Experiment::createTrial(const int trialId)
             stream << m_fileHeader;
             file.close();
         } else {
-            qWarning() << "[Experiment] unable to create the trials."
-                       << "Could not write in " << fpath;
+            qWarning() << "unable to create the trials. Could not write in " << fpath;
             delete modelObj;
             return nullptr;
         }
@@ -341,7 +340,7 @@ Nodes Experiment::createNodes()
     }
 
     if (nodes.empty()) {
-        errMsg = QString("[Experiment]: unable to create the trials."
+        errMsg = QString("unable to create the trials."
                          "The set of nodes could not be created (%1)."
                          "Project: %2 Experiment: %3")
                          .arg(errMsg).arg(m_project->name()).arg(m_id);
@@ -380,8 +379,7 @@ bool Experiment::writeCachedSteps(const int trialId)
     const QString fpath = m_filePathPrefix + QString("%1.csv").arg(trialId);
     QFile file(fpath);
     if (!file.open(QFile::WriteOnly | QFile::Append)) {
-        qWarning() << "[Experiment] unable to create the trials."
-                   << "Could not write in " << fpath;
+        qWarning() << "unable to create the trials. Could not write in " << fpath;
         return false;
     }
 
@@ -409,18 +407,18 @@ bool Experiment::writeCachedSteps(const int trialId)
 bool Experiment::removeOutput(OutputSP output)
 {
     if (m_expStatus != Experiment::READY) {
-        qWarning() << "[Experiment] : tried to remove an 'Output' from a running experiment. You should pause it first.";
+        qWarning() << "tried to remove an 'Output' from a running experiment. You should pause it first.";
         return false;
     }
 
     if (!output->isEmpty()) {
-        qWarning() << "[Experiment] : tried to remove an 'Output' that seems to be used somewhere. It should be cleaned first.";
+        qWarning() << "tried to remove an 'Output' that seems to be used somewhere. It should be cleaned first.";
         return false;
     }
 
     std::unordered_set<OutputSP>::iterator it = m_outputs.find(output);
     if (it == m_outputs.end()) {
-        qWarning() << "[Experiment] : tried to remove a non-existent 'Output'.";
+        qWarning() << "tried to remove a non-existent 'Output'.";
         return false;
     }
 

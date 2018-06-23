@@ -84,7 +84,7 @@ OutputWidget::OutputWidget(const ModelPlugin* modelPlugin, const std::vector<int
                 insertRow(rowInfo, func.toQString(), CustomFunc);
             }
         } else {
-            qFatal("[OutputWidget] : error! invalid Output object.");
+            qFatal("invalid Output object.");
         }
     }
 }

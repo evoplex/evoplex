@@ -217,7 +217,7 @@ void LineChart::updateSeries()
             } else if (row.second.at(0).type() == Value::DOUBLE) {
                 y = row.second.at(0).toDouble();
             } else {
-                qFatal("[LineChart] : the type is invalid!");
+                qFatal("the type is invalid!");
             }
             s.cache->flushFrontRow(m_currTrialId);
 

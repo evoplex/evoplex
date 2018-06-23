@@ -48,7 +48,7 @@ AbstractPlugin::AbstractPlugin(const QJsonObject* metaData, const QString& libPa
 
     if (m_id.isEmpty() || m_author.isEmpty() || m_name.isEmpty() || m_descr.isEmpty()
             || !attrsScope(metaData, PLUGIN_ATTRIBUTES_SCOPE, m_pluginAttrsScope, m_pluginAttrsNames)) {
-        qWarning() << "[AbstractPlugin]: failed to read the plugins's attributes!";
+        qWarning() << "failed to read the plugins's attributes!";
         m_isValid = false;
         return;
     }

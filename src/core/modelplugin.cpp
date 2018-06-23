@@ -38,13 +38,13 @@ ModelPlugin::ModelPlugin(const QObject* instance, const QJsonObject* metaData, c
     m_factory = qobject_cast<IPluginModel*>(instance);
 
     if (!attrsScope(metaData, PLUGIN_ATTRIBUTE_NODESCOPE, m_nodeAttrsScope, m_nodeAttrNames)) {
-        qWarning() << "[ModelPlugin]: failed to read the node's attributes!";
+        qWarning() << "failed to read the node's attributes!";
         m_isValid = false;
         return;
     }
 
     if (!attrsScope(metaData, PLUGIN_ATTRIBUTE_EDGESCOPE, m_edgeAttrsScope, m_edgeAttrNames)) {
-        qWarning() << "[ModelPlugin]: failed to read the edge's attributes!";
+        qWarning() << "failed to read the edge's attributes!";
         m_isValid = false;
         return;
     }

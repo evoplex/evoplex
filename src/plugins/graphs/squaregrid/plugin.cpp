@@ -38,7 +38,7 @@ bool SquareGrid::init()
 {
     if (!attrExists("periodic") || !attrExists("neighbours") ||
         !attrExists("height") || !attrExists("width")) {
-        qWarning() << "[SquareGrid]: missing attributes.";
+        qWarning() << "missing attributes.";
         return false;
     }
 
@@ -48,7 +48,7 @@ bool SquareGrid::init()
     m_width = attr("width").toInt();
 
     if (nodes().size() != m_height * m_width) {
-        qWarning() << "[SquareGrid]: Wrong shape! The number of nodes should be equal to 'height'*'width'.";
+        qWarning() << "Wrong shape! The number of nodes should be equal to 'height'*'width'.";
         return false;
     }
 

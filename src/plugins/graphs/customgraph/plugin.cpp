@@ -34,7 +34,7 @@ bool CustomGraph::init()
 {
     m_filePath = attrs()->value(FilePath).toString();
     if (m_filePath.isEmpty()) {
-        qWarning() << "[CustomGraph]: file path cannot be empty.";
+        qWarning() << "file path cannot be empty.";
         return false;
     }
     return true;
@@ -46,7 +46,7 @@ void CustomGraph::reset()
 
     QFile file(m_filePath);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        qWarning() << "[CustomGraph]: unable to read csv file with the set of nodes." << m_filePath;
+        qWarning() << "unable to read csv file with the set of nodes." << m_filePath;
         return;
     }
 
@@ -62,7 +62,7 @@ void CustomGraph::reset()
     }
 
     if (header.isEmpty()) {
-        qWarning() << "[CustomGraph]: header is invalid."
+        qWarning() << "the header is invalid."
                    << "It should have at least two columns: 'origin' and 'target'."
                    << m_filePath;
         return;
@@ -74,7 +74,7 @@ void CustomGraph::reset()
     while (!in.atEnd()) {
         QStringList values = in.readLine().split(",");
         if (values.size() != header.size()) {
-            qWarning() << "[CustomGraph]: rows must have the same number of columns!"
+            qWarning() << "rows must have the same number of columns!"
                        << m_filePath << "Row: " << row;
             isValid = false;
             break;
@@ -84,14 +84,14 @@ void CustomGraph::reset()
         int originId = values.at(0).toInt(&ok1);
         int targetId = values.at(1).toInt(&ok2);
         if (!ok1 || !ok2) {
-            qWarning() << "[CustomGraph]: invalid values."
+            qWarning() << "invalid values."
                        << "The values for 'origin' and 'target' must be integers."
                        << m_filePath << "Row: " << row;
             isValid = false;
             break;
         } else if (originId < 0 || originId >= m_nodes.size() ||
                    targetId < 0 || targetId >= m_nodes.size()) {
-            qWarning() << "[CustomGraph]: invalid values. 'origin' or 'target' are not in the set of nodes."
+            qWarning() << "invalid values. 'origin' or 'target' are not in the set of nodes."
                           << m_filePath << "Row: " << row;
             isValid = false;
             break;

@@ -45,7 +45,7 @@ AttributeRange* AttributeRange::parse(int id, const QString& attrName, const QSt
     }
 
     if (!vs || !vs->isValid()) {
-        qWarning() << "[AttributeRange::parse]: unable to parse " << attrRangeStr;
+        qWarning() << "unable to parse " << attrRangeStr;
         delete vs;
         vs = new SingleValue();
     }
@@ -133,7 +133,7 @@ Value AttributeRange::validate(const QString& valueStr) const
     if (m_type == String) {
         return Value(valueStr);
     } else if (valueStr.isEmpty()) {
-        qWarning() << "[AttributeRange::validate]: unable to validate value! It should not be empty."
+        qWarning() << "unable to validate value! It should not be empty."
                    << "Expected:" << m_attrRangeStr;
         return Value();
     }
@@ -221,7 +221,7 @@ Value AttributeRange::validate(const QString& valueStr) const
         break;
     }
 
-    qWarning() << "[AttributeRange]: unable to validate value!\n"
+    qWarning() << "unable to validate value!\n"
                << "Input:" << valueStr << "\nExpected:" << m_attrRangeStr;
     return Value();
 }
@@ -276,7 +276,7 @@ IntervalOfValues::IntervalOfValues(int id, const QString& attrName, Type type, V
         break;
     default:
         m_attrRangeStr.clear();
-        qFatal("[IntervalOfValues]: invalid type!");
+        qFatal("invalid type!");
     }
 }
 
@@ -297,7 +297,7 @@ SetOfValues::SetOfValues(int id, const QString& attrName, Type type, Values valu
         break;
     default:
         m_attrRangeStr.clear();
-        qFatal("[SetOfValues]: invalid type!");
+        qFatal("invalid type!");
     }
 
     m_attrRangeStr += values.front().toQString();

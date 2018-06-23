@@ -75,7 +75,7 @@ void PluginsPage::rowSelectionChanged()
     } else if (type == AbstractPlugin::ModelPlugin) {
         loadHtml(m_mainApp->model(m_ui->table->item(row, UID)->text()));
     } else {
-        qFatal("[PluginsPage]: invalid plugin type! It should never happen.");
+        qFatal("invalid plugin type! It should never happen.");
     }
 }
 
@@ -136,7 +136,7 @@ void PluginsPage::insertRow(const AbstractPlugin* plugin)
     } else if (plugin->type() == AbstractPlugin::GraphPlugin) {
         typeItem = new QTableWidgetItem("graph");
     } else {
-        qFatal("[PluginsPage]: invalid plugin type! It should never happen.");
+        qFatal("invalid plugin type! It should never happen.");
     }
     typeItem->setData(Qt::UserRole, plugin->type());
 

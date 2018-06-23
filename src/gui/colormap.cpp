@@ -40,7 +40,7 @@ ColorMapMgr::ColorMapMgr()
 
     QFile file(":colormaps/colormaps.json");
     if (!file.open(QIODevice::ReadOnly)) {
-        qWarning() << "[ColorMapMgr]: unable to open colormaps.json";
+        qWarning() << "unable to open colormaps.json";
         return;
     }
 
@@ -101,7 +101,7 @@ void ColorMapMgr::resetSettingsToDefault()
     if (!m_colormaps.contains(m_dfCMap)) {
         m_dfCMap = qMakePair(QString("Black"), 1);
         if (!m_colormaps.contains(m_dfCMap)) {
-            qFatal("[ColorMapMgr]: unable to reset default settings!");
+            qFatal("unable to reset default settings!");
         }
     }
 }
@@ -153,7 +153,7 @@ ColorMapRange::ColorMapRange(const Colors& colors, const IntervalOfValues* attrR
         m_max = attrRange->max().toDouble();
         m_min = attrRange->min().toDouble();
     } else {
-        qFatal("[ColorMapRange] : invalid attribute range!");
+        qFatal("invalid attribute range!");
     }
 }
 
@@ -165,7 +165,7 @@ const QColor ColorMapRange::colorFromValue(const Value& val) const
     } else if (val.type() == Value::DOUBLE) {
         value = val.toDouble();
     } else {
-        qFatal("[ColorMapRange]: invalid attribute range!");
+        qFatal("invalid attribute range!");
     }
     return m_colors.at(std::round((value * (m_colors.size()-1)) / m_max + m_min));
 }
@@ -186,7 +186,7 @@ const QColor ColorMapSet::colorFromValue(const Value& val) const
 {
     std::unordered_map<Value, QColor>::const_iterator i = m_cmap.find(val);
     if (i == m_cmap.end()) {
-        qWarning() << "[ColorMapSet]: invalid value!" << val.toQString();
+        qWarning() << "invalid value!" << val.toQString();
         return Qt::black;
     }
     return i->second;

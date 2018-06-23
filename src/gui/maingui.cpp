@@ -223,7 +223,7 @@ void MainGUI::closeEvent(QCloseEvent* event)
 
     m_userPrefs.setValue("gui/geometry", saveGeometry());
     m_userPrefs.setValue("gui/windowState", saveState());
-    qDebug() << "[MainGUI]: user settings stored at " << m_userPrefs.fileName();
+    qDebug() << "user settings stored at " << m_userPrefs.fileName();
 
     event->accept();
     QMainWindow::closeEvent(event);

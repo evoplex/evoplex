@@ -72,7 +72,7 @@ MainApp::MainApp()
 
     // load built-in plugins
     QDir pluginsDir = QDir(qApp->applicationDirPath() + "/../lib/evoplex/plugins");
-    qDebug() << "[MainApp]: searching for plugins at" << pluginsDir.absolutePath();
+    qDebug() << "searching for plugins at" << pluginsDir.absolutePath();
     if (pluginsDir.exists()) {
         const QStringList nameFilter(QString("*%1").arg(kPluginExtension));
         QStringList files = pluginsDir.entryList(nameFilter, QDir::Files);
@@ -129,7 +129,7 @@ const AbstractPlugin* MainApp::loadPlugin(const QString& path, QString& error, c
 {
     if (!QFile(path).exists()) {
         error = "Unable to find the file. " + path;
-        qWarning() << "[MainApp] " << error;
+        qWarning() << error;
         return nullptr;
     }
 
@@ -137,7 +137,7 @@ const AbstractPlugin* MainApp::loadPlugin(const QString& path, QString& error, c
     QJsonObject metaData = loader.metaData().value("MetaData").toObject();
     if (metaData.isEmpty()) {
         error = "Unable to load the plugin.\nWe couldn't find the meta data for this plugin.\n" + path;
-        qWarning() << "[MainApp] " << error;
+        qWarning() << error;
         return nullptr;
     } else if (!metaData.contains(PLUGIN_ATTRIBUTE_UID)
                || !metaData.contains(PLUGIN_ATTRIBUTE_TYPE)
@@ -146,7 +146,7 @@ const AbstractPlugin* MainApp::loadPlugin(const QString& path, QString& error, c
                 "Plese, make sure the following fields are not empty:\n"
                 "%2, %3, %4").arg(path).arg(PLUGIN_ATTRIBUTE_UID)
                 .arg(PLUGIN_ATTRIBUTE_TYPE).arg(PLUGIN_ATTRIBUTE_NAME);
-        qWarning() << "[MainApp] " << error;
+        qWarning() << error;
         return nullptr;
     }
 
@@ -154,7 +154,7 @@ const AbstractPlugin* MainApp::loadPlugin(const QString& path, QString& error, c
     if (type != "graph" && type != "model") {
         error = QString("Unable to load the plugin.\n'%1' must be equal to 'graph' or 'model'. %2")
                 .arg(PLUGIN_ATTRIBUTE_TYPE).arg(path);
-        qWarning() << "[MainApp] " << error;
+        qWarning() << error;
         return nullptr;
     }
 
@@ -164,14 +164,14 @@ const AbstractPlugin* MainApp::loadPlugin(const QString& path, QString& error, c
                         "The '%2:%3' should not have the underscore symbol.\n"
                         "Please, fix this id and try again.")
                         .arg(path).arg(PLUGIN_ATTRIBUTE_UID).arg(uid);
-        qWarning() << "[MainApp] " << error;
+        qWarning() << error;
         return nullptr;
     } else if (m_models.contains(uid) || m_graphs.contains(uid)) {
         error = QString("Unable to load the plugin (%1).\n"
                         "The %2 '%3' is already being used by another plugin.\n"
                         "Please, unload the plugin '%4' (or choose another id) and try again.")
                         .arg(path).arg(PLUGIN_ATTRIBUTE_UID).arg(uid).arg(uid);
-        qWarning() << "[MainApp] " << error;
+        qWarning() << error;
         return nullptr;
     }
 
@@ -180,7 +180,7 @@ const AbstractPlugin* MainApp::loadPlugin(const QString& path, QString& error, c
         error = QString("Unable to load the plugin.\n"
                         "Please, make sure it is a valid Evoplex plugin.\n %1").arg(path);
         loader.unload();
-        qWarning() << "[MainApp] " << error;
+        qWarning() << error;
         return nullptr;
     }
 
@@ -201,7 +201,7 @@ const AbstractPlugin* MainApp::loadPlugin(const QString& path, QString& error, c
         error = QString("Unable to load the plugin.\n"
                         "Please, check the metaData.json file.\n %1").arg(path);
         loader.unload();
-        qWarning() << "[MainApp] " << error;
+        qWarning() << error;
         delete plugin;
         return nullptr;
     }
@@ -213,7 +213,7 @@ const AbstractPlugin* MainApp::loadPlugin(const QString& path, QString& error, c
     }
 
     emit (pluginAdded(plugin));
-    qDebug() << "[MainApp] a plugin has been loaded." << path;
+    qDebug() << "a plugin has been loaded." << path;
     return plugin;
 }
 
@@ -223,7 +223,7 @@ bool MainApp::unloadPlugin(const AbstractPlugin* plugin, QString& error)
         error = QString("Couldn't unload the plugin `%1`.\n"
                 "Please, close all projects and try again!")
                 .arg(plugin->name());
-        qWarning() << "[MainApp]: " << error;
+        qWarning() << error;
         return false;
     }
 
@@ -238,11 +238,11 @@ bool MainApp::unloadPlugin(const AbstractPlugin* plugin, QString& error)
     } else if (type == AbstractPlugin::ModelPlugin && m_models.contains(id)) {
         delete m_models.take(id);
     } else {
-        qFatal("[MainApp] Tried to unload a plugin (%s) which has not been loaded before.", qPrintable(id));
+        qFatal("Tried to unload a plugin (%s) which has not been loaded before.", qPrintable(id));
     }
 
     emit (pluginRemoved(id, type));
-    qDebug() << "[MainApp] a plugin has been unloaded." << id;
+    qDebug() << "a plugin has been unloaded." << id;
     return true;
 }
 
@@ -250,17 +250,17 @@ ProjectSP MainApp::newProject(QString& error, const QString& filepath)
 {
     if (m_projects.size() > EVOPLEX_MAX_PROJECTS) {
         error = "There are too many opened projects already!";
-        qWarning() << "[MainApp] :" << error;
+        qWarning() << error;
         return nullptr;
     } else if (m_models.isEmpty()) {
         error = "There are no models available in the software.\n"
                 "Please, make sure you import the plugins you need first!";
-        qWarning() << "[MainApp] :" << error;
+        qWarning() << error;
         return nullptr;
     } else if (m_graphs.isEmpty()) {
         error = "There are no graphs available in the software.\n"
                 "Please, make sure you import the plugins you need first!";
-        qWarning() << "[MainApp] :" << error;
+        qWarning() << error;
         return nullptr;
     }
 
@@ -269,7 +269,7 @@ ProjectSP MainApp::newProject(QString& error, const QString& filepath)
         if (!fi.isReadable() || fi.suffix() != "csv") {
             error = "Failed to open the project!\n"
                     "Please, make sure it's a readable csv file!\n" + filepath;
-            qWarning() << "[MainApp] :" << error;
+            qWarning() << error;
             return nullptr;
         } else {
             addPathToRecentProjects(filepath);

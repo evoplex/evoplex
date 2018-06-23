@@ -74,7 +74,7 @@ Nodes AGFromFile::create(std::function<void(int)> progress)
 {
     QFile file(m_filePath);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        qWarning() << "[Node::readFromFile]: unable to read csv file with the set of nodes." << m_filePath;
+        qWarning() << "unable to read csv file with the set of nodes." << m_filePath;
         return Nodes();
     }
 
@@ -90,7 +90,7 @@ Nodes AGFromFile::create(std::function<void(int)> progress)
             QString attrName = header.at(i);
             for (int j = i+1; j < header.size(); ++j) {
                 if (attrName == header.at(j)) {
-                    qWarning() << "[Node::readFromFile]: unable to read the set of nodes from" << m_filePath
+                    qWarning() << "unable to read the set of nodes from" << m_filePath
                                << QString("The headers should be unique! '%1' is duplicated.").arg(attrName);
                     return Nodes();
                 }
@@ -104,7 +104,7 @@ Nodes AGFromFile::create(std::function<void(int)> progress)
         }
 
         if (hasCoordX != hasCoordY) {
-            qWarning() << "[Node::readFromFile]: unable to read the set of nodes from" << m_filePath
+            qWarning() << "unable to read the set of nodes from" << m_filePath
                        << "One of the 2d coordinates are missing. Make sure you have both 'x' and 'y' columns.";
             return Nodes();
         }
@@ -112,7 +112,7 @@ Nodes AGFromFile::create(std::function<void(int)> progress)
 
     for (const auto* vs : m_attrsScope) {
         if (!header.contains(vs->attrName())) {
-            qWarning() << "[Node::readFromFile]: the nodes from '" << m_filePath << "' are incompatible with the model."
+            qWarning() << "the nodes from '" << m_filePath << "' are incompatible with the model."
                        << "Expected attributes:" << m_attrsScope.keys();
             return Nodes();
         }
@@ -125,7 +125,7 @@ Nodes AGFromFile::create(std::function<void(int)> progress)
     while (!in.atEnd()) {
         QStringList values = in.readLine().split(",");
         if (values.size() != header.size()) {
-            qWarning() << "[Node::readFromFile]: rows must have the same number of columns!";
+            qWarning() << "rows must have the same number of columns!";
             isValid = false;
             break;
         }
@@ -194,7 +194,7 @@ AGSameFuncForAll::AGSameFuncForAll(const AttributesScope& attrsScope, const int 
         f_value = [this](const AttributeRange* attrRange) { return attrRange->rand(m_prg); };
         break;
     default:
-        qFatal("[AGSameFuncForAll]: invalid function!");
+        qFatal("invalid function!");
         break;
     }
 }
@@ -267,7 +267,7 @@ Nodes AGDiffFunctions::create(std::function<void(int)> progress)
             value = [cmd]() { return cmd.funcInput; };
             break;
         default:
-            qFatal("[AGDiffFunctions]: invalid function!");
+            qFatal("invalid function!");
         }
 
         for (Attributes& attrs : nodesAttrs) {
@@ -290,7 +290,7 @@ Nodes AGDiffFunctions::create(std::function<void(int)> progress)
 bool NodesGenerator::saveToFile(QString& filePath, Nodes nodes, std::function<void(int)>& progress)
 {
     if (nodes.empty()) {
-        qWarning() << "[NodesGenerator]: Tried to save an empty set of nodes.";
+        qWarning() << "tried to save an empty set of nodes.";
         return false;
     }
 
@@ -300,7 +300,7 @@ bool NodesGenerator::saveToFile(QString& filePath, Nodes nodes, std::function<vo
 
     QFile file(filePath);
     if (!file.open(QFile::WriteOnly | QFile::Truncate)) {
-        qWarning() << "[NodesGenerator]: Failed to save the set of nodes to file." << filePath;
+        qWarning() << "failed to save the set of nodes to file." << filePath;
         return false;
     }
 
@@ -337,7 +337,7 @@ NodesGenerator* NodesGenerator::parse(const AttributesScope& nodeAttrsScope,
         QStringList cmds = command.split(";");
         if (cmds.size() < 2) {
             errMsg = QString("The command %1 is invalid!").arg(command);
-            qWarning() << "[Node::createNodes()]:" << errMsg;
+            qWarning() << errMsg;
             return nullptr;
         }
 
@@ -348,7 +348,7 @@ NodesGenerator* NodesGenerator::parse(const AttributesScope& nodeAttrsScope,
             errMsg = QString("Unable to parse '%1'."
                     "\n'%2' should be an integer representing the number of nodes.")
                     .arg(command).arg(numNodesStr);
-            qWarning() << "[Node::createNodes()]:" << errMsg;
+            qWarning() << errMsg;
             return nullptr;
         }
 
@@ -357,7 +357,7 @@ NodesGenerator* NodesGenerator::parse(const AttributesScope& nodeAttrsScope,
                 errMsg = QString("Unable to parse '%1'."
                         "It should look like: '*numNodes;[min|max|rand_seed]'")
                         .arg(command).arg(numNodesStr);
-                qWarning() << "[Node::createNodes()]:" << errMsg;
+                qWarning() << errMsg;
                 return nullptr;
             }
 
@@ -372,14 +372,14 @@ NodesGenerator* NodesGenerator::parse(const AttributesScope& nodeAttrsScope,
                     errMsg = QString("Unable to parse '%1'."
                             "It should look like: '*numNodes;rand_seed'")
                             .arg(command);
-                    qWarning() << "[Node::createNodes()]:" << errMsg;
+                    qWarning() << errMsg;
                     return nullptr;
                 }
             } else if (func == F_Invalid) {
                 errMsg = QString("Unable to parse '%1'."
                         "It should look like: '*numNodes;[min|max|rand_seed]'")
                         .arg(command);
-                qWarning() << "[Node::createNodes()]:" << errMsg;
+                qWarning() << errMsg;
                 return nullptr;
             }
             ag = new AGSameFuncForAll(nodeAttrsScope, numNodes, func, value);
@@ -390,7 +390,7 @@ NodesGenerator* NodesGenerator::parse(const AttributesScope& nodeAttrsScope,
                         "It should look like: '#numNodes;attrName_[min|max|rand_seed|value_value]'"
                         "and must contain all attributes of the current model (i.e., '%2')")
                         .arg(command).arg(nodeAttrsScope.keys().join(", "));
-                qWarning() << "[Node::createNodes()]:" << errMsg;
+                qWarning() << errMsg;
                 return nullptr;
             }
 
@@ -409,7 +409,7 @@ NodesGenerator* NodesGenerator::parse(const AttributesScope& nodeAttrsScope,
                     errMsg = QString("Unable to parse '%1'."
                             "The attribute '%2' does not belong to the current model.")
                             .arg(command).arg(attrCmd.attrName);
-                    qWarning() << "[Node::createNodes()]:" << errMsg;
+                    qWarning() << errMsg;
                     return nullptr;
                 }
 
@@ -418,20 +418,20 @@ NodesGenerator* NodesGenerator::parse(const AttributesScope& nodeAttrsScope,
                     errMsg = QString("Unable to parse '%1'."
                                 "The function '%2' is invalid.")
                                 .arg(command).arg(attrCmdStr.at(1));
-                    qWarning() << "[Node::createNodes()]:" << errMsg;
+                    qWarning() << errMsg;
                     return nullptr;
                 } else if (attrCmd.func == F_Rand) {
                     attrCmd.funcInput = Value(attrCmdStr.at(2).toInt(&ok)); // seed
                     if (!ok) {
                         errMsg = QString("Unable to parse '%1'. The PRG seed should be an integer!").arg(command);
-                        qWarning() << "[Node::createNodes()]:" << errMsg;
+                        qWarning() << errMsg;
                         return nullptr;
                     }
                 } else if (attrCmd.func == F_Value){
                     attrCmd.funcInput = nodeAttrsScope.value(attrCmd.attrName)->validate(attrCmdStr.at(2));
                     if (!attrCmd.funcInput.isValid()) {
                         errMsg = QString("Unable to parse '%1'. The value is invalid!").arg(command);
-                        qWarning() << "[Node::createNodes()]:" << errMsg;
+                        qWarning() << errMsg;
                         return nullptr;
                     }
                 }
@@ -445,7 +445,7 @@ NodesGenerator* NodesGenerator::parse(const AttributesScope& nodeAttrsScope,
 
     if (!ag) {
         errMsg = QString("the command '%1'. is invalid!").arg(command);
-        qWarning() << "[Node::createNodes()]:" << errMsg;
+        qWarning() << errMsg;
         return nullptr;
     }
 

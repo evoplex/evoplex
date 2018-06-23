@@ -94,7 +94,7 @@ void DefaultOutput::doOperation(const int trialId, const AbstractModel* model)
         }
         break;
     default:
-        qFatal("doOperation() invalid function!");
+        qFatal("invalid function!");
         break;
     }
     updateCaches(trialId, model->currStep(), allValues);
@@ -170,7 +170,7 @@ void Output::deleteCache(Cache* cache)
 {
     std::vector<Cache*>::iterator it = std::find(m_caches.begin(), m_caches.end(), cache);
     if (it == m_caches.end()) {
-        qFatal("[Output]: tried to remove a non-existent cache.");
+        qFatal("tried to remove a non-existent cache.");
     }
     m_caches.erase(it);
     updateListOfInputs();
@@ -251,7 +251,7 @@ std::vector<Cache*> Output::parseHeader(const QStringList& header, const std::ve
         if (h.startsWith("custom_")) {
             h.remove("custom_");
             if (h.isEmpty()) {
-                errorMsg = "[OutputHeader] invalid header! Custom function cannot be empty.\n";
+                errorMsg = "invalid header! Custom function cannot be empty.\n";
                 qWarning() << errorMsg;
                 Utils::deleteAndShrink(caches);
                 return caches;
@@ -265,7 +265,7 @@ std::vector<Cache*> Output::parseHeader(const QStringList& header, const std::ve
             h.remove("count_");
             func = DefaultOutput::F_Count;
         } else {
-            errorMsg = QString("[OutputHeader] invalid header! Function does not exist. (%1)\n").arg(h);
+            errorMsg = QString("invalid header! Function does not exist. (%1)\n").arg(h);
             qWarning() << errorMsg;
             Utils::deleteAndShrink(caches);
             return caches;
@@ -282,7 +282,7 @@ std::vector<Cache*> Output::parseHeader(const QStringList& header, const std::ve
             entity = DefaultOutput::E_Edges;
             entityAttrsScope = model->edgeAttrsScope();
         } else {
-            errorMsg = QString("[OutputHeader] invalid header! Entity does not exist. (%1)\n").arg(h);
+            errorMsg = QString("invalid header! Entity does not exist. (%1)\n").arg(h);
             qWarning() << errorMsg;
             Utils::deleteAndShrink(caches);
             return caches;
@@ -291,7 +291,7 @@ std::vector<Cache*> Output::parseHeader(const QStringList& header, const std::ve
         QStringList attrHeaderStr = h.split("_");
         AttributeRange* attrRange = entityAttrsScope.value(attrHeaderStr.first());
         if (!attrRange->isValid()) {
-            errorMsg = QString("[OutputHeader] invalid header! Attribute does not exist. (%1)\n").arg(h);
+            errorMsg = QString("invalid header! Attribute does not exist. (%1)\n").arg(h);
             qWarning() << errorMsg;
             Utils::deleteAndShrink(caches);
             return caches;
@@ -302,7 +302,7 @@ std::vector<Cache*> Output::parseHeader(const QStringList& header, const std::ve
         for (QString valStr : attrHeaderStr) {
             Value val = attrRange->validate(valStr);
             if (!val.isValid()) {
-                errorMsg = QString("[OutputHeader] invalid header! Value of attribute is invalid. (%1)\n").arg(valStr);
+                errorMsg = QString("invalid header! Value of attribute is invalid. (%1)\n").arg(valStr);
                 qWarning() << errorMsg;
                 Utils::deleteAndShrink(caches);
                 return caches;
@@ -311,7 +311,7 @@ std::vector<Cache*> Output::parseHeader(const QStringList& header, const std::ve
         }
 
         if (attrHeader.empty()) {
-            errorMsg = "[OutputHeader] invalid header! Function cannot be empty.\n";
+            errorMsg = "invalid header! Function cannot be empty.\n";
             qWarning() << errorMsg;
             Utils::deleteAndShrink(caches);
             return caches;
