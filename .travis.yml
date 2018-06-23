@@ -1,0 +1,239 @@
+language: cpp
+
+env:
+  global:
+   - secure: "MjP07Df5gfXNcSuF0WsILg6SrFFR6oOL8tPchNJ9aCPeVaw7MObdz6GVBr1AxDUaAw+KZMZbq67MsB+QEOhugaBjUBO/lW0CFnZqMeCXKgp8ZidgBf5NnxesI8ES2l12HyHNpsViMxWXHyIqXjTiPZGB0NHoShI4oKSx7PK/lcs="
+
+matrix:
+  include:
+    - os: linux
+      dist: trusty
+      sudo: required
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-4.8
+          update:
+            - true
+        coverity_scan:
+          project:
+            name: "evoplex/evoplex"
+            description: "Evoplex is a multi-agent system for networks."
+          build_command_prepend: cov-configure --comptype gcc --compiler gcc-4.8 --template && cmake -DENABLE_TESTING=1 ..
+          build_command: make -j5
+          branch_pattern: coverity_scan
+          notification_email: evoplexmas@gmail.com
+      env:
+         - MATRIX_EVAL="CC=gcc-4.8 && CXX=g++-4.8"
+
+    - os: linux
+      dist: trusty
+      sudo: required
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-4.9
+          update:
+            - true
+      env:
+         - MATRIX_EVAL="CC=gcc-4.9 && CXX=g++-4.9"
+
+    - os: linux
+      dist: trusty
+      sudo: required
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-5
+          update:
+            - true
+      env:
+         - MATRIX_EVAL="CC=gcc-5 && CXX=g++-5"
+
+    - os: linux
+      dist: trusty
+      sudo: required
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-6
+          update:
+            - true
+      env:
+        - MATRIX_EVAL="CC=gcc-6 && CXX=g++-6"
+
+    - os: linux
+      dist: trusty
+      sudo: required
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-7
+          update:
+            - true
+      env:
+        - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7"
+
+    - os: linux
+      dist: trusty
+      sudo: required
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-precise-3.6
+          packages:
+            - clang-3.6
+          update:
+            - true
+      env:
+        - MATRIX_EVAL="CC=clang-3.6 && CXX=clang++-3.6"
+
+    - os: linux
+      dist: trusty
+      sudo: required
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-precise-3.7
+          packages:
+            - clang-3.7
+          update:
+            - true
+      env:
+        - MATRIX_EVAL="CC=clang-3.7 && CXX=clang++-3.7"
+
+    - os: linux
+      dist: trusty
+      sudo: required
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-precise-3.8
+          packages:
+            - clang-3.8
+          update:
+            - true
+      env:
+        - MATRIX_EVAL="CC=clang-3.8 && CXX=clang++-3.8"
+
+    - os: linux
+      dist: trusty
+      sudo: required
+      addons:
+        apt:
+          sources:
+            - llvm-toolchain-trusty-3.9
+          packages:
+            - clang-3.9
+          update:
+            - true
+      env:
+        - MATRIX_EVAL="CC=clang-3.9 && CXX=clang++-3.9"
+
+    - os: linux
+      dist: trusty
+      sudo: required
+      addons:
+        apt:
+          sources:
+            - llvm-toolchain-trusty-4.0
+          packages:
+            - clang-4.0
+          update:
+            - true
+      env:
+        - MATRIX_EVAL="CC=clang-4.0 && CXX=clang++-4.0"
+
+    - os: linux
+      dist: trusty
+      sudo: required
+      addons:
+        apt:
+          sources:
+            - llvm-toolchain-trusty-5.0
+          packages:
+            - clang-5.0
+          update:
+            - true
+      env:
+        - MATRIX_EVAL="CC=clang-5.0 && CXX=clang++-5.0"
+
+    - os: osx
+      osx_image: xcode7.3
+      env:
+        - MATRIX_EVAL="CC=clang && CXX=clang++"
+
+    - os: osx
+      osx_image: xcode8
+      env:
+        - MATRIX_EVAL="CC=clang && CXX=clang++"
+
+    - os: osx
+      osx_image: xcode8.3
+      env:
+        - MATRIX_EVAL="CC=clang && CXX=clang++"
+
+    - os: osx
+      osx_image: xcode9.2
+      env:
+        - MATRIX_EVAL="CC=clang && CXX=clang++"
+
+    - os: osx
+      osx_image: xcode9.4
+      env:
+        - MATRIX_EVAL="CC=clang && CXX=clang++"
+
+before_install:
+  - eval "${MATRIX_EVAL}"
+
+  - echo -n | openssl s_client -connect https://scan.coverity.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | sudo tee -a /etc/ssl/certs/ca-
+
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
+      mkdir qt5;
+      wget -q -O qt5.9.1.zip https://github.com/evoplex/evoplex-data/releases/download/data/qt5.9.1.zip;
+      unzip -qq qt5.9.1.zip -d qt;
+      export PATH=`pwd`/qt/5.9.1/gcc_64/bin:$PATH;
+      export QT_PLUGIN_PATH=`pwd`/qt/5.9.1/gcc_64/plugins;
+    elif [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+      brew update > /dev/null;
+      brew upgrade > /dev/null;
+      brew install qt;
+      export PATH="/usr/local/opt/qt/bin:$PATH";
+    fi
+
+#install:
+
+before_script:
+  - export DISPLAY=:99.0
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sh -e /etc/init.d/xvfb start ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then ( sudo Xvfb :99 -ac -screen 0 1024x768x8; echo ok )& fi
+  - sleep 3 # give xvfb some time to start
+  - mkdir build
+  - cd build
+
+script:
+  - cmake ..
+  - make -j5
+  - ctest --output-on-failure
+
+#after_success:
+
+notifications:
+  email:
+    recipients:
+      - evoplexmas@gmail.com
+    on_success: change
+    on_failure: always
