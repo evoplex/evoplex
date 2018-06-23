@@ -27,6 +27,7 @@ matrix:
           notification_email: evoplexmas@gmail.com
       env:
          - MATRIX_EVAL="CC=gcc-4.8 && CXX=g++-4.8"
+         - COVERITY_ENABLED=true
 
     - os: linux
       dist: trusty
@@ -199,7 +200,9 @@ matrix:
 before_install:
   - eval "${MATRIX_EVAL}"
 
-  - echo -n | openssl s_client -connect https://scan.coverity.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | sudo tee -a /etc/ssl/certs/ca-
+  - if [[ -n "$COVERITY_ENABLED" ]]; then
+      echo -n | openssl s_client -connect https://scan.coverity.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | sudo tee -a /etc/ssl/certs/ca-;
+    fi
 
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
       mkdir qt5;
