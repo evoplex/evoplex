@@ -2,7 +2,7 @@ language: cpp
 
 env:
   global:
-   - secure: "jnFFRLX5m4ex+E+T8mJJDVk5L7HFVOK0oJDyeSrgK9Y2JvIA5O5RXd2IqvueXguPcCYe5dFe3iNHtrmGboQ0rmqZlOeDdp4YId6uTJXTNUf0UL15jHbCFBwflx1faJUXGge0McWzqZg2RZDiEnLVSz64cuSbtvJa+u8A22Prstqai4NgFUl5aoo/DB55IDM2uuN2a/0TOCHylf9Fw/M4xbhZSOEioBhn70bUFZ88nxi5b4X9V4S4FUUGGRwXKQtuRVVWWFGnhnX+Y6WPFqe+bIT+sS2HSAxGRIfJ3a6LdRt7glPVH4tXgxLgyWRrn9ZqhgWK7i2x0GA1b8byOWWE9gWRLwSxQC7UfM/mKqgS61po8no7b1TBc/ghhmEozLUKFzbZT1PZQL/iHa3LQUKLuy/9/XyXoeIQcIFjVkP6vWVJwjRGFr3/46CGaQCuq+Acsb53+YEsXcHIT50hEhy6Si0uNIN9gtLhnEABkwWl9oGssJPXaWUmun8TEGoZygb4NxvczmziZgWIJwNywo9BGhfzfWd5smJhJq0KHLj18bfKreBqp+QkwPEV+Ut+UeEF9h3Tcek63YYfQSNDSpskK5kbXo7rp/o6aLjZDXcDDKp0b5NCRe6wpkIZO8RO5KpmvyonBYCevvHuvPv54oV/BAxaRgysMJSyI4nLmfrDLio="
+    - secure: "SPftPP1q9lWyMuGHWiNbGFkz9N7CfCCRZsztGU7IOHp/yDJpzTNFUttsr/t6KE+P+PXEVHokJfYK7CGMFSEi8AvagtPQ3ocrzypjwckHLZ+umJkPZpMJe9Ttv+3dFs6dPfOt38eedsYw/9Mwafh8ILNg8NwgWtoF1V5im1p14GHV7hOL6S+s5CWojlGawJNekyLKRA+rlzcsIzTlAfnM2bpOEhMOjfh4mrJf9AsQ8mo4o4JIwtuOuXi7a3NRQKdZpaP0KR/QK7X1xpekt/pjWXisj5XwE9ay7sZjSGoREsCGOOYEkxqd/lhZhhCXG51/jnI0/wtS/eLZe32jZgAKQwCF6XRTJCsJiIiHSqvW2I/YJfYtvQdkSwVcWgL0xP78MYfeMsLiYW0QF16DRFxasxcRt0myCX1cbVuHFYQTjcvVD0sQtdizqaWMrQyjdVrw/NU+oHYOnlZhNyAEsd+gIedu37RpD061Iyna5m1+oEANwMCa1Za6Rwcpq7kw/z3oh7pCnEp7PuSoHk1fTjvEC3AUfQDF0TVRdGoO9yr6iy0TObGoKHeCFNbKskdi84sddQSc3jnt6XrSxJLlwsSQaD/QXwl7w0FHhPM18TUHVXlFdcZDd/WuMFjaEZIaPv9sqRAvydWzhrv3aRKKGIZYh7/wpQAsuEWTxO6u+OffgqI="
 
 matrix:
   include:
@@ -202,7 +202,7 @@ before_install:
 
   - if [[ "$TRAVIS_BRANCH" == "coverity_scan" ]]; then
       if [[ -z "$COVERITY_ENABLED" ]]; then
-        SKIP_BUILD=true;
+        export SKIP_BUILD=true;
       else
         echo -n | openssl s_client -connect https://scan.coverity.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | sudo tee -a /etc/ssl/certs/ca- ;
       fi;
@@ -232,7 +232,9 @@ install:
 # before_script:
 
 script:
-  - ctest --output-on-failure
+  - if [[ -z "$SKIP_BUILD" ]]; then
+      ctest --output-on-failure ;
+    fi
 
 #after_success:
 
