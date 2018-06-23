@@ -80,9 +80,12 @@ enable_testing()
 add_subdirectory(src)
 
 # copy text files
+if(WIN32)
+  set(TXTDIR "bin/")
+endif(WIN32)
 foreach(TXTFILE LICENSE.txt README.md CHANGELOG.md)
-  configure_file(${TXTFILE} "${CMAKE_CURRENT_BINARY_DIR}/bin/${TXTFILE}" COPYONLY)
-  install(FILES ${TXTFILE} DESTINATION "${CMAKE_BINARY_DIR}/bin")
+  configure_file(${TXTFILE} "${CMAKE_CURRENT_BINARY_DIR}/${TXTDIR}${TXTFILE}" COPYONLY)
+  install(FILES ${TXTFILE} DESTINATION "share/evoplex/${TXTDIR}")
 endforeach(TXTFILE)
 
 # CPack: general configuration
