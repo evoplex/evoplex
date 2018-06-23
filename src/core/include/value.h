@@ -21,8 +21,9 @@
 #ifndef VALUE_H
 #define VALUE_H
 
-#include <QString>
+#include <functional>
 #include <vector>
+#include <QString>
 
 namespace evoplex
 {

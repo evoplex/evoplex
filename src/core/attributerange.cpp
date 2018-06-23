@@ -18,9 +18,9 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <float.h>
 #include <QDebug>
 #include <QFileInfo>
-#include <float.h>
 
 #include "attributerange.h"
 

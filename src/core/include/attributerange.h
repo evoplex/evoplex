@@ -21,8 +21,8 @@
 #ifndef ATTRIBUTE_RANGE_H
 #define ATTRIBUTE_RANGE_H
 
-#include <QHash>
 #include <vector>
+#include <QHash>
 
 #include "prg.h"
 #include "value.h"
@@ -61,6 +61,8 @@ public:
     //   - "double{1.1,1.2}     // set of doubles
     //   * you can use 'max' to take the maximum value for the type
     static AttributeRange* parse(int id, const QString& attrName, const QString& attrRangeStr);
+
+    virtual ~AttributeRange() {}
 
     virtual const Value& min() const = 0;
     virtual const Value& max() const = 0;
