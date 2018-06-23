@@ -2,7 +2,7 @@ language: cpp
 
 env:
   global:
-   - secure: "MjP07Df5gfXNcSuF0WsILg6SrFFR6oOL8tPchNJ9aCPeVaw7MObdz6GVBr1AxDUaAw+KZMZbq67MsB+QEOhugaBjUBO/lW0CFnZqMeCXKgp8ZidgBf5NnxesI8ES2l12HyHNpsViMxWXHyIqXjTiPZGB0NHoShI4oKSx7PK/lcs="
+   - secure: "jnFFRLX5m4ex+E+T8mJJDVk5L7HFVOK0oJDyeSrgK9Y2JvIA5O5RXd2IqvueXguPcCYe5dFe3iNHtrmGboQ0rmqZlOeDdp4YId6uTJXTNUf0UL15jHbCFBwflx1faJUXGge0McWzqZg2RZDiEnLVSz64cuSbtvJa+u8A22Prstqai4NgFUl5aoo/DB55IDM2uuN2a/0TOCHylf9Fw/M4xbhZSOEioBhn70bUFZ88nxi5b4X9V4S4FUUGGRwXKQtuRVVWWFGnhnX+Y6WPFqe+bIT+sS2HSAxGRIfJ3a6LdRt7glPVH4tXgxLgyWRrn9ZqhgWK7i2x0GA1b8byOWWE9gWRLwSxQC7UfM/mKqgS61po8no7b1TBc/ghhmEozLUKFzbZT1PZQL/iHa3LQUKLuy/9/XyXoeIQcIFjVkP6vWVJwjRGFr3/46CGaQCuq+Acsb53+YEsXcHIT50hEhy6Si0uNIN9gtLhnEABkwWl9oGssJPXaWUmun8TEGoZygb4NxvczmziZgWIJwNywo9BGhfzfWd5smJhJq0KHLj18bfKreBqp+QkwPEV+Ut+UeEF9h3Tcek63YYfQSNDSpskK5kbXo7rp/o6aLjZDXcDDKp0b5NCRe6wpkIZO8RO5KpmvyonBYCevvHuvPv54oV/BAxaRgysMJSyI4nLmfrDLio="
 
 matrix:
   include:
@@ -200,36 +200,38 @@ matrix:
 before_install:
   - eval "${MATRIX_EVAL}"
 
-  - if [[ -n "$COVERITY_ENABLED" ]]; then
-      echo -n | openssl s_client -connect https://scan.coverity.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | sudo tee -a /etc/ssl/certs/ca-;
+  - if [[ "$TRAVIS_BRANCH" == "coverity_scan" ]]; then
+      if [[ -z "$COVERITY_ENABLED" ]]; then
+        SKIP_BUILD=true;
+      else
+        echo -n | openssl s_client -connect https://scan.coverity.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | sudo tee -a /etc/ssl/certs/ca- ;
+      fi;
     fi
 
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
-      mkdir qt5;
-      wget -q -O qt5.9.1.zip https://github.com/evoplex/evoplex-data/releases/download/data/qt5.9.1.zip;
-      unzip -qq qt5.9.1.zip -d qt;
-      export PATH=`pwd`/qt/5.9.1/gcc_64/bin:$PATH;
-      export QT_PLUGIN_PATH=`pwd`/qt/5.9.1/gcc_64/plugins;
-    elif [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
-      brew update > /dev/null;
-      brew upgrade > /dev/null;
-      brew install qt;
-      export PATH="/usr/local/opt/qt/bin:$PATH";
+  - if [[ -z "$SKIP_BUILD" ]]; then
+      if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
+        mkdir qt5;
+        wget -q -O qt5.9.1.zip https://github.com/evoplex/evoplex-data/releases/download/data/qt5.9.1.zip;
+        unzip -qq qt5.9.1.zip -d qt;
+        export PATH=`pwd`/qt/5.9.1/gcc_64/bin:$PATH;
+        export QT_PLUGIN_PATH=`pwd`/qt/5.9.1/gcc_64/plugins;
+      elif [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+        brew update > /dev/null;
+        brew upgrade > /dev/null;
+        brew install qt;
+        export PATH="/usr/local/opt/qt/bin:$PATH";
+      fi
     fi
 
-#install:
+install:
+  - if [[ -z "$SKIP_BUILD" ]]; then
+      mkdir build && cd build ;
+      cmake .. && make -j5 ;
+    fi
 
-before_script:
-  - export DISPLAY=:99.0
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sh -e /etc/init.d/xvfb start ; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then ( sudo Xvfb :99 -ac -screen 0 1024x768x8; echo ok )& fi
-  - sleep 3 # give xvfb some time to start
-  - mkdir build
-  - cd build
+# before_script:
 
 script:
-  - cmake ..
-  - make -j5
   - ctest --output-on-failure
 
 #after_success:
