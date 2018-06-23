@@ -42,8 +42,7 @@ GraphPlugin::GraphPlugin(const QObject* instance, const QJsonObject* metaData, c
         return;
     } else {
         QJsonArray arr = metaData->value(PLUGIN_ATTRIBUTE_VALIDGRAPHTYPES).toArray();
-        QJsonArray::iterator it = arr.begin();
-        for (it; it != arr.end(); ++it) {
+        for (QJsonArray::iterator it = arr.begin(); it != arr.end(); ++it) {
             AbstractGraph::GraphType type = AbstractGraph::enumFromString((*it).toString());
             if (type == AbstractGraph::Invalid_Type) {
                 qWarning() << "[GraphPlugin]: invalid value for 'validGraphTypes':" << (*it).toString();

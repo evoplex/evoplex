@@ -63,6 +63,8 @@ public:
     // Export set of nodes to a csv file
     static bool saveToFile(QString& filepath, Nodes nodes, std::function<void(int)>& progress);
 
+    virtual ~NodesGenerator() {}
+
     virtual Nodes create(std::function<void(int)> progress = [](int){}) = 0;
 
     inline const QString& command() { return m_command; }

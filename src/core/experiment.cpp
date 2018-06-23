@@ -257,7 +257,7 @@ AbstractModel* Experiment::createTrial(const int trialId)
         QString e = QString("[Experiment]: FATAL! all the trials for this experiment have already been created."
                             "It should never happen!\n Project: %1; Exp: %2; Trial: %3 (max=%4)\n")
                             .arg(m_project->name()).arg(m_id).arg(trialId).arg(m_numTrials);
-        qFatal(qUtf8Printable(e));
+        qFatal("%s", qPrintable(e));
         return nullptr;
     }
 

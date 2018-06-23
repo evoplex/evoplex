@@ -121,7 +121,7 @@ struct hash<char*>
     size_t operator()(const char *s) const {
         size_t h = 5381;
         int c;
-        while (c = *s++) {
+        while ((c = *s++)) {
             h = ((h << 5) + h) + c;
         }
         return h;
@@ -133,11 +133,11 @@ struct hash<evoplex::Value>
 {
     size_t operator()(const evoplex::Value& v) const {
         switch (v.type()) {
-        case evoplex::Value::INT: return hash<int>()(v.toInt());
-        case evoplex::Value::DOUBLE: return hash<double>()(v.toDouble());
-        case evoplex::Value::BOOL: return hash<bool>()(v.toBool());
-        case evoplex::Value::CHAR: return hash<char>()(v.toChar());
-        case evoplex::Value::STRING: return hash<char*>()(v.toString());
+        case evoplex::Value::INT: return std::hash<int>()(v.toInt());
+        case evoplex::Value::DOUBLE: return std::hash<double>()(v.toDouble());
+        case evoplex::Value::BOOL: return std::hash<bool>()(v.toBool());
+        case evoplex::Value::CHAR: return std::hash<char>()(v.toChar());
+        case evoplex::Value::STRING: return std::hash<char*>()(v.toString());
         default: throw std::invalid_argument("invalid type of Value");
         }
     }
