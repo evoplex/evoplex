@@ -102,4 +102,9 @@ install(
 )
 
 # make the source code available in the top level to allow setting the tests
-set(EVOPLEX_GUI_CXX ${EVOPLEX_GUI_CXX} PARENT_SCOPE)
+if(TESTS)
+  foreach(cpp ${EVOPLEX_GUI_CXX})
+    set(EVOPLEX_GUI_SRC ${EVOPLEX_GUI_SRC} ${PROJECT_SOURCE_DIR}/src/gui/${cpp})
+  endforeach(cpp)
+  set(EVOPLEX_GUI_SRC ${EVOPLEX_GUI_SRC} PARENT_SCOPE)
+endif()
