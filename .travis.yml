@@ -15,6 +15,7 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-4.8
+            - lcov
           update:
             - true
         coverity_scan:
@@ -38,6 +39,7 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-4.9
+            - lcov
           update:
             - true
       env:
@@ -52,6 +54,7 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-5
+            - lcov
           update:
             - true
       env:
@@ -66,6 +69,7 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-6
+            - lcov
           update:
             - true
       env:
@@ -80,6 +84,7 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-7
+            - lcov
           update:
             - true
       env:
@@ -95,6 +100,7 @@ matrix:
             - llvm-toolchain-precise-3.6
           packages:
             - clang-3.6
+            - lcov
           update:
             - true
       env:
@@ -110,6 +116,7 @@ matrix:
             - llvm-toolchain-precise-3.7
           packages:
             - clang-3.7
+            - lcov
           update:
             - true
       env:
@@ -125,6 +132,7 @@ matrix:
             - llvm-toolchain-precise-3.8
           packages:
             - clang-3.8
+            - lcov
           update:
             - true
       env:
@@ -139,6 +147,7 @@ matrix:
             - llvm-toolchain-trusty-3.9
           packages:
             - clang-3.9
+            - lcov
           update:
             - true
       env:
@@ -153,6 +162,7 @@ matrix:
             - llvm-toolchain-trusty-4.0
           packages:
             - clang-4.0
+            - lcov
           update:
             - true
       env:
@@ -167,6 +177,7 @@ matrix:
             - llvm-toolchain-trusty-5.0
           packages:
             - clang-5.0
+            - lcov
           update:
             - true
       env:
@@ -226,7 +237,8 @@ before_install:
 install:
   - if [[ -z "$SKIP_BUILD" ]]; then
       mkdir build && cd build ;
-      cmake .. && make -j5 ;
+      cmake -DCMAKE_CXX_FLAGS="-g -O0 -fprofile-arcs -ftest-coverage" -DCMAKE_BUILD_TYPE=Debug  .. ;
+      make -j5 ;
     fi
 
 # before_script:
@@ -237,8 +249,8 @@ script:
     fi
 
 after_success:
-  - if [[ -z "$SKIP_BUILD" ]]; then
-      cd ${TRAVIS_BUILD_DIR};
+  - if [[ -z "$SKIP_BUILD" && "$TRAVIS_OS_NAME" == "linux"  ]]; then
+      cd ${TRAVIS_BUILD_DIR}/build;
       lcov --directory . --capture --output-file coverage.info;
       lcov --remove coverage.info '/usr/*' --output-file coverage.info;
       lcov --list coverage.info;
