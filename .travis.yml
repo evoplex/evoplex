@@ -202,7 +202,7 @@ before_install:
   - eval "${MATRIX_EVAL}"
 
   - if [[ "$COVERAGE_ENABLED" == true ]]; then
-      pip install --user cpp-coveralls
+      pip install --user cpp-coveralls;
     fi
 
   - if [[ "$TRAVIS_BRANCH" == "coverity_scan" ]]; then

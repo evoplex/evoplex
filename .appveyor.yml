@@ -37,8 +37,11 @@ environment:
 before_build:
 - cmd: >-
     set PATH=C:\Qt\%qtver%\%qtbin%\bin;%PATH%
+
     cd c:\evoplex
+
     mkdir build-%qtver%-%qtbin% && cd build-%qtver%-%qtbin%
+
     cmake -DTESTS=ON -G "%msvcname%" ..
 build:
   project: c:\evoplex\build-%qtver%-%qtbin%\evoplex.sln
