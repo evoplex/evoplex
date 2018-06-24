@@ -100,3 +100,6 @@ install(
   ARCHIVE DESTINATION lib/evoplex
   INCLUDES DESTINATION include/evoplex
 )
+
+# make the source code available in the top level to allow setting the tests
+set(EVOPLEX_GUI_CXX ${EVOPLEX_GUI_CXX} PARENT_SCOPE)

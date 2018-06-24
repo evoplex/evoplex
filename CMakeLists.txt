@@ -36,11 +36,16 @@ set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/src/cmake)
 option(TESTS "Turn on tests" OFF)
 if(TESTS)
   if(CMAKE_COMPILER_IS_GNUCXX)
+    # coverage must be in debug mode
     set(CMAKE_BUILD_TYPE Debug)
+    # codecov.io
     include(CodeCoverage)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pedantic")
     append_coverage_compiler_flags()
     setup_target_for_coverage(NAME "${PROJECT_NAME}_coverage" EXECUTABLE ctest --parallel 4)
+    # coveralls.io
+    include(Coveralls)
+    coveralls_turn_on_coverage()
   endif()
   enable_testing() # Tests must be enabled from root
 endif()

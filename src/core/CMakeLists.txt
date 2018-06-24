@@ -138,3 +138,6 @@ install(
   DESTINATION ${ConfigPackageLocation}
   COMPONENT Devel
 )
+
+# make the source code available in the top level to allow setting the tests
+set(EVOPLEX_CORE_CXX ${EVOPLEX_CORE_CXX} PARENT_SCOPE)

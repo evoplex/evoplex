@@ -24,6 +24,7 @@ add_subdirectory(plugins) # built-in plugins (models and graph generators)
 
 if(TESTS)
   add_subdirectory(test)
+  #  coveralls_setup("${EVOPLEX_CORE_CXX} ${EVOPLEX_GUI_CXX}" ON "${PROJECT_SOURCE_DIR}/src/cmake")
 endif()
 
 #### EXECUTABLE ####
