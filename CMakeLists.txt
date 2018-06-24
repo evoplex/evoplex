@@ -31,6 +31,20 @@ if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Release)
 endif()
 
+set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/src/cmake)
+
+option(TESTS "Turn on tests" OFF)
+if(TESTS)
+  if(CMAKE_COMPILER_IS_GNUCXX)
+    set(CMAKE_BUILD_TYPE Debug)
+    include(CodeCoverage)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pedantic")
+    append_coverage_compiler_flags()
+    setup_target_for_coverage(NAME "${PROJECT_NAME}_coverage" EXECUTABLE ctest --parallel 4)
+  endif()
+  enable_testing() # Tests must be enabled from root
+endif()
+
 # Get the current working branch
 execute_process(
   COMMAND git rev-parse --abbrev-ref HEAD
@@ -72,9 +86,6 @@ find_package(Qt5Concurrent 5.8.0 REQUIRED)
 find_package(Qt5Charts 5.8.0 REQUIRED)
 find_package(Qt5Widgets 5.8.0 REQUIRED)
 find_package(Qt5Test 5.8.0 REQUIRED)
-
-# Tests must be enabled from root
-enable_testing()
 
 # Compile source
 add_subdirectory(src)

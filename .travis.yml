@@ -231,7 +231,7 @@ before_script:
 
   - if [[ "$SKIP_BUILD" != true ]]; then
       if [[ "$COVERAGE_ENABLED" == true ]]; then
-        cmake -DCMAKE_CXX_FLAGS="-Wall -pedantic -pthread -g -O0 -fprofile-arcs -ftest-coverage" -DCMAKE_BUILD_TYPE=Debug  .. ;
+        cmake -DTESTS=ON .. ;
       else
         cmake .. ;
       fi
@@ -240,6 +240,7 @@ before_script:
 script:
   - if [[ "$SKIP_BUILD" != true ]]; then
       make -j5 ;
+      make -j5 evoplex_coverage ;
       ctest --output-on-failure ;
     fi
 

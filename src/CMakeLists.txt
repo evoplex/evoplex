@@ -21,7 +21,10 @@
 add_subdirectory(core)
 add_subdirectory(gui)
 add_subdirectory(plugins) # built-in plugins (models and graph generators)
-add_subdirectory(test)
+
+if(TESTS)
+  add_subdirectory(test)
+endif()
 
 #### EXECUTABLE ####
 add_executable(evoplex WIN32 main.cpp evoplex.rc gui/res/guiRes.qrc)
