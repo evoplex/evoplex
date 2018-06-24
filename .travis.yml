@@ -231,6 +231,8 @@ before_script:
 
   - if [[ "$SKIP_BUILD" != true ]]; then
       if [[ "$COVERAGE_ENABLED" == true ]]; then
+        export COVERALLS_SERVICE_NAME=travis-ci;
+        export COVERALLS_REPO_TOKEN=vLsFADbYfaOddNs4afYumdHwwxOWC129z;
         cmake -DTESTS=ON .. ;
       else
         cmake .. ;
