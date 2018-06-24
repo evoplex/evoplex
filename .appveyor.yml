@@ -1,0 +1,55 @@
+version: '{branch}-{build}'
+clone_folder: c:\evoplex
+configuration: Release
+clone_depth: 3
+environment:
+  matrix:
+  - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
+    platform: x64
+    qtver: 5.9.5
+    qtbin: msvc2015_64
+    msvcname: Visual Studio 14 2015 Win64
+  - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
+    platform: Win32
+    qtver: 5.9.5
+    qtbin: msvc2015
+    msvcname: Visual Studio 14 2015
+  - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
+    platform: x64
+    qtver: 5.11.0
+    qtbin: msvc2015_64
+    msvcname: Visual Studio 14 2015 Win64
+  - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
+    platform: Win32
+    qtver: 5.11.0
+    qtbin: msvc2015
+    msvcname: Visual Studio 14 2015
+  - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
+    platform: x64
+    qtver: 5.9.5
+    qtbin: msvc2017_64
+    msvcname: Visual Studio 15 2017 Win64
+  - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
+    platform: x64
+    qtver: 5.11.0
+    qtbin: msvc2017_64
+    msvcname: Visual Studio 15 2017 Win64
+before_build:
+- cmd: >-
+    set PATH=C:\Qt\%qtver%\%qtbin%\bin;%PATH%
+    cd c:\evoplex
+    mkdir build-%qtver%-%qtbin% && cd build-%qtver%-%qtbin%
+    cmake -DTESTS=ON -G "%msvcname%" ..
+build:
+  project: c:\evoplex\build-%qtver%-%qtbin%\evoplex.sln
+  parallel: true
+  verbosity: minimal
+test_script:
+- cmd: ctest --output-on-failure
+notifications:
+- provider: Email
+  to:
+  - evoplexmas@gmail.com
+  on_build_success: false
+  on_build_failure: true
+  on_build_status_changed: true
