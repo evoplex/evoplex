@@ -28,7 +28,7 @@ matrix:
           notification_email: evoplexmas@gmail.com
       env:
          - MATRIX_EVAL="CC=gcc-4.8 && CXX=g++-4.8"
-         - COVERITY_ENABLED=true
+         - COVERAGE_ENABLED=true
 
     - os: linux
       dist: trusty
@@ -39,7 +39,6 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-4.9
-            - lcov
           update:
             - true
       env:
@@ -54,7 +53,6 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-5
-            - lcov
           update:
             - true
       env:
@@ -69,7 +67,6 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-6
-            - lcov
           update:
             - true
       env:
@@ -84,7 +81,6 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-7
-            - lcov
           update:
             - true
       env:
@@ -100,7 +96,6 @@ matrix:
             - llvm-toolchain-precise-3.6
           packages:
             - clang-3.6
-            - lcov
           update:
             - true
       env:
@@ -116,7 +111,6 @@ matrix:
             - llvm-toolchain-precise-3.7
           packages:
             - clang-3.7
-            - lcov
           update:
             - true
       env:
@@ -132,7 +126,6 @@ matrix:
             - llvm-toolchain-precise-3.8
           packages:
             - clang-3.8
-            - lcov
           update:
             - true
       env:
@@ -147,7 +140,6 @@ matrix:
             - llvm-toolchain-trusty-3.9
           packages:
             - clang-3.9
-            - lcov
           update:
             - true
       env:
@@ -162,7 +154,6 @@ matrix:
             - llvm-toolchain-trusty-4.0
           packages:
             - clang-4.0
-            - lcov
           update:
             - true
       env:
@@ -177,7 +168,6 @@ matrix:
             - llvm-toolchain-trusty-5.0
           packages:
             - clang-5.0
-            - lcov
           update:
             - true
       env:
@@ -212,14 +202,14 @@ before_install:
   - eval "${MATRIX_EVAL}"
 
   - if [[ "$TRAVIS_BRANCH" == "coverity_scan" ]]; then
-      if [[ -z "$COVERITY_ENABLED" ]]; then
-        export SKIP_BUILD=true;
-      else
+      if [[ "$COVERAGE_ENABLED" == true ]]; then
         echo -n | openssl s_client -connect https://scan.coverity.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | sudo tee -a /etc/ssl/certs/ca- ;
+      else
+        export SKIP_BUILD=true;
       fi;
     fi
 
-  - if [[ -z "$SKIP_BUILD" ]]; then
+  - if [[ "$SKIP_BUILD" != true ]]; then
       if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
         mkdir qt5;
         wget -q -O qt5.9.1.zip https://github.com/evoplex/evoplex-data/releases/download/data/qt5.9.1.zip;
@@ -234,22 +224,27 @@ before_install:
       fi
     fi
 
-install:
-  - if [[ -z "$SKIP_BUILD" ]]; then
-      mkdir build && cd build ;
-      cmake -DCMAKE_CXX_FLAGS="-g -O0 -fprofile-arcs -ftest-coverage" -DCMAKE_BUILD_TYPE=Debug  .. ;
-      make -j5 ;
+#install:
+
+before_script:
+  - mkdir build && cd build
+
+  - if [[ "$SKIP_BUILD" != true ]]; then
+      if [[ "$COVERAGE_ENABLED" == true ]]; then
+        cmake -DCMAKE_CXX_FLAGS="-Wall -pedantic -pthread -g -O0 -fprofile-arcs -ftest-coverage" -DCMAKE_BUILD_TYPE=Debug  .. ;
+      else
+        cmake .. ;
+      fi
     fi
 
-# before_script:
-
 script:
-  - if [[ -z "$SKIP_BUILD" ]]; then
+  - if [[ "$SKIP_BUILD" != true ]]; then
+      make -j5 ;
       ctest --output-on-failure ;
     fi
 
 after_success:
-  - if [[ -z "$SKIP_BUILD" && "$TRAVIS_OS_NAME" == "linux"  ]]; then
+  - if [[ "$SKIP_BUILD" != true && "$COVERAGE_ENABLED" == true ]]; then
       cd ${TRAVIS_BUILD_DIR}/build;
       lcov --directory . --capture --output-file coverage.info;
       lcov --remove coverage.info '/usr/*' --output-file coverage.info;
