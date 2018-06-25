@@ -141,8 +141,8 @@ install(
 
 # make the source code available in the top level to allow setting the tests
 if(TESTS)
-  foreach(cpp ${EVOPLEX_CORE_CXX})
-      set(EVOPLEX_CORE_SRC ${EVOPLEX_CORE_SRC} ${PROJECT_SOURCE_DIR}/src/core/${cpp})
+  foreach(src ${EVOPLEX_CORE_CXX} ${EVOPLEX_CORE_H})
+    set(EVOPLEX_CORE_SRC ${EVOPLEX_CORE_SRC} ${PROJECT_SOURCE_DIR}/src/core/${src})
   endforeach(cpp)
   set(EVOPLEX_CORE_SRC ${EVOPLEX_CORE_SRC} PARENT_SCOPE)
 endif()

@@ -201,10 +201,6 @@ matrix:
 before_install:
   - eval "${MATRIX_EVAL}"
 
-  - if [[ "$COVERAGE_ENABLED" == true ]]; then
-      pip install --user cpp-coveralls;
-    fi
-
   - if [[ "$TRAVIS_BRANCH" == "coverity_scan" ]]; then
       if [[ "$COVERAGE_ENABLED" == true ]]; then
         echo -n | openssl s_client -connect https://scan.coverity.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | sudo tee -a /etc/ssl/certs/ca- ;
@@ -231,13 +227,15 @@ before_install:
 #install:
 
 before_script:
+  - mkdir build && cd build
+
   - if [[ "$SKIP_BUILD" != true ]]; then
       if [[ "$COVERAGE_ENABLED" == true ]]; then
         export COVERALLS_SERVICE_NAME=travis-ci;
         export COVERALLS_REPO_TOKEN=vLsFADbYfaOddNs4afYumdHwwxOWC129z;
-        cmake -DTESTS=ON . ;
+        cmake -DTESTS=ON .. ;
       else
-        cmake . ;
+        cmake .. ;
       fi
     fi
 
@@ -249,9 +247,9 @@ script:
       make -j5 evoplex_coverage ;
     fi
 
-    #  - if [[ "$SKIP_BUILD" != true && "$COVERAGE_ENABLED" == true ]]; then
-    # make coveralls ;
-    #fi
+  - if [[ "$SKIP_BUILD" != true && "$COVERAGE_ENABLED" == true ]]; then
+      make coveralls ;
+    fi
 
   - if [[ "$SKIP_BUILD" != true && "$COVERAGE_ENABLED" == true ]]; then
       ctest --output-on-failure ;
@@ -259,10 +257,7 @@ script:
 
 after_success:
   - if [[ "$SKIP_BUILD" != true && "$COVERAGE_ENABLED" == true ]]; then
-      cd ${TRAVIS_BUILD_DIR};
-
-      coveralls --gcov-options '\-lp' --include "src/core";
-
+      cd ${TRAVIS_BUILD_DIR}/build;
       lcov --directory . --capture --output-file coverage.info;
       lcov --remove coverage.info '/usr/*' --output-file coverage.info;
       lcov --list coverage.info;
