@@ -116,7 +116,7 @@ public:
     inline quint16 delay() const { return m_delay; }
     inline void setDelay(quint16 delay) { m_delay = delay; }
 
-    inline const Status expStatus() const { return m_expStatus; }
+    inline Status expStatus() const { return m_expStatus; }
     void setExpStatus(Status s);
 
     inline bool autoDeleteTrials() const { return m_autoDeleteTrials; }

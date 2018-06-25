@@ -39,10 +39,10 @@ public:
     explicit AbstractPlugin(const QJsonObject* metaData, const QString& libPath);
     virtual ~AbstractPlugin();
 
-    inline const bool isValid() const { return m_isValid; }
+    inline bool isValid() const { return m_isValid; }
 
     inline const QString& path() const { return m_libPath; }
-    inline const PluginType type() const { return m_type; }
+    inline PluginType type() const { return m_type; }
     inline const QString& id() const { return m_id; }
     inline const QString& author() const { return m_author; }
     inline const QString& name() const { return m_name; }

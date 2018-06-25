@@ -66,6 +66,7 @@ class ColorMap
 public:
     static ColorMap* create(const AttributeRange* attrRange, const Colors& colors);
 
+    virtual ~ColorMap() {}
     virtual const QColor colorFromValue(const Value& val) const = 0;
 
 protected:

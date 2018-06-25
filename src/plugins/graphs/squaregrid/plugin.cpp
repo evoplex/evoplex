@@ -47,7 +47,7 @@ bool SquareGrid::init()
     m_height = attr("height").toInt();
     m_width = attr("width").toInt();
 
-    if (nodes().size() != m_height * m_width) {
+    if (numNodes() != m_height * m_width) {
         qWarning() << "Wrong shape! The number of nodes should be equal to 'height'*'width'.";
         return false;
     }
@@ -101,7 +101,7 @@ void SquareGrid::createPeriodicEdges(const int id, edgesFunc func, const bool is
         }
 
         int nId = Utils::linearIdx(neighbor, m_width);
-        Q_ASSERT_X(nId < m_nodes.size(), "SquareGrid::createEdges", "neighbor must exist");
+        Q_ASSERT_X(nId < numNodes(), "SquareGrid::createEdges", "neighbor must exist");
         m_edges.emplace_back(new Edge(node(id), node(nId), isDirected));
     }
 }
@@ -115,7 +115,7 @@ void SquareGrid::createFixedEdges(const int id, edgesFunc func, const bool isDir
             continue;
         }
         int nId = Utils::linearIdx(neighbor, m_width);
-        Q_ASSERT_X(nId < m_nodes.size(), "SquareGrid::createEdges", "neighbor must exist");
+        Q_ASSERT_X(nId < numNodes(), "SquareGrid::createEdges", "neighbor must exist");
         m_edges.emplace_back(new Edge(node(id), node(nId), isDirected));
     }
 }

@@ -48,11 +48,11 @@ public:
     inline const Value& attr(const int id) const;
     inline void setAttr(const int id, const Value& value);
 
-    inline const int id() const;
+    inline int id() const;
 
-    inline const int x() const;
+    inline int x() const;
     inline void setX(int x);
-    inline const int y() const;
+    inline int y() const;
     inline void setY(int y);
     inline void setCoords(int x, int y);
 
@@ -62,9 +62,9 @@ public:
 
 private:
     const int m_id;
+    Attributes m_attrs;
     int m_x;
     int m_y;
-    Attributes m_attrs;
     Edges m_edges;
 };
 
@@ -87,16 +87,16 @@ inline const Value& Node::attr(const int id) const
 inline void Node::setAttr(const int id, const Value& value)
 { m_attrs.setValue(id, value); }
 
-inline const int Node::id() const
+inline int Node::id() const
 { return m_id; }
 
-inline const int Node::x() const
+inline int Node::x() const
 { return m_x; }
 
 inline void Node::setX(int x)
 { m_x = x; }
 
-inline const int Node::y() const
+inline int Node::y() const
 { return m_y; }
 
 inline void Node::setY(int y)

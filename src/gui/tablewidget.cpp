@@ -147,8 +147,8 @@ void TableWidget::onItemClicked(QTableWidgetItem* item)
 
 RowsDelegate::RowsDelegate(const Experiment* exp, TableWidget* table)
     : QStyledItemDelegate(table)
-    , m_table(table)
     , m_exp(exp)
+    , m_table(table)
     , m_hoveredRow(-1)
     , m_hoveredCol(-1)
 {

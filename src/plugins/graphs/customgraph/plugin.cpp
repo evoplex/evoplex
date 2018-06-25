@@ -89,8 +89,8 @@ void CustomGraph::reset()
                        << m_filePath << "Row: " << row;
             isValid = false;
             break;
-        } else if (originId < 0 || originId >= m_nodes.size() ||
-                   targetId < 0 || targetId >= m_nodes.size()) {
+        } else if (originId < 0 || originId >= numNodes() ||
+                   targetId < 0 || targetId >= numNodes()) {
             qWarning() << "invalid values. 'origin' or 'target' are not in the set of nodes."
                           << m_filePath << "Row: " << row;
             isValid = false;

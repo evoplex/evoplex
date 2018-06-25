@@ -37,8 +37,8 @@ public:
 private:
     bool m_periodic;
     int m_numNeighbours;
-    int m_width;
     int m_height;
+    int m_width;
 
     typedef std::pair<int,int> rowCol;
     typedef std::vector<rowCol> edges2d;

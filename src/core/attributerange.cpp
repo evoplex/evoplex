@@ -301,7 +301,7 @@ SetOfValues::SetOfValues(int id, const QString& attrName, Type type, Values valu
     }
 
     m_attrRangeStr += values.front().toQString();
-    for (int i = 1; i < values.size(); ++i) {
+    for (size_t i = 1; i < values.size(); ++i) {
         m_attrRangeStr += "," + values.at(i).toQString();
     }
     m_attrRangeStr += "}";

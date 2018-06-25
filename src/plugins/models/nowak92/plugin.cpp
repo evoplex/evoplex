@@ -71,7 +71,7 @@ bool ModelNowak::algorithmStep()
 
 // 0) cooperator; 1) new cooperator
 // 2) defector;   3) new defector
-const double ModelNowak::playGame(const int sX, const int sY) const
+double ModelNowak::playGame(const int sX, const int sY) const
 {
     switch (binarize(sX) * 2 + binarize(sY)) {
     case 0: return 1.0;             // CC : Reward for mutual cooperation
@@ -86,7 +86,7 @@ const double ModelNowak::playGame(const int sX, const int sY) const
 
 // transform from 0|2 -> 0 (cooperator)
 //                1|3 -> 1 (defector)
-const int ModelNowak::binarize(const int strategy) const
+int ModelNowak::binarize(const int strategy) const
 {
     return (strategy < 2) ? strategy : strategy - 2;
 }

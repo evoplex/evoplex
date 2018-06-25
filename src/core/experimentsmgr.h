@@ -46,7 +46,7 @@ public:
 
     void play(Experiment* exp);
 
-    inline const int maxThreadsCount() const { return m_threads; }
+    inline int maxThreadsCount() const { return m_threads; }
     void setMaxThreadCount(const int newValue);
 
 signals:

@@ -58,7 +58,7 @@ ColorMapMgr::ColorMapMgr()
                 colors.emplace_back(QColor(rgb.at(0).toInt(), rgb.at(1).toInt(), rgb.at(2).toInt()));
             }
             Q_ASSERT_X(colors.size() > 0 && colors.size() < INT_MAX, "ColorMapMgr", "the color size is invalid!");
-            CMapKey key(name, int(colors.size()));
+            CMapKey key(name, static_cast<int>(colors.size()));
             m_colormaps.insert(key, colors);
             sizes.append(QString::number(key.second));
         }
@@ -136,8 +136,9 @@ SingleColor::SingleColor(QColor color)
 {
 }
 
-const QColor SingleColor::colorFromValue(const Value &val) const
+const QColor SingleColor::colorFromValue(const Value& val) const
 {
+    Q_UNUSED(val);
     return m_colors.front();
 }
 
@@ -178,7 +179,7 @@ ColorMapSet::ColorMapSet(const Colors& colors, const SetOfValues* attrRange)
     int c = 0;
     for (const Value value : attrRange->values()) {
         m_cmap.insert({value, m_colors.at(c++)});
-        c = (c == m_colors.size()) ? 0 : c;
+        c = (c == static_cast<int>(m_colors.size())) ? 0 : c;
     }
 }
 

@@ -51,10 +51,10 @@ public:
     inline bool isInt() const;
     inline bool isString() const;
 
-    inline const bool toBool() const;
-    inline const char toChar() const;
-    inline const double toDouble() const;
-    inline const int toInt() const;
+    inline bool toBool() const;
+    inline char toChar() const;
+    inline double toDouble() const;
+    inline int toInt() const;
     inline const char* toString() const;
     QString toQString() const;
 
@@ -95,16 +95,16 @@ inline bool Value::isInt() const
 inline bool Value::isString() const
 { return m_type == STRING; }
 
-inline const bool Value::toBool() const
+inline bool Value::toBool() const
 { return m_data.b; }
 
-inline const char Value::toChar() const
+inline char Value::toChar() const
 { return m_data.c; }
 
-inline const double Value::toDouble() const
+inline double Value::toDouble() const
 { return m_data.d; }
 
-inline const int Value::toInt() const
+inline int Value::toInt() const
 { return m_data.i; }
 
 inline const char* Value::toString() const

@@ -95,8 +95,8 @@ public:
                               const Function& func, const Value& funcInput);
     ~AGSameFuncForAll();
     Nodes create(std::function<void(int)> progress = [](int){});
-    inline const int numNodes() const { return m_numNodes; }
-    inline const Function function() const { return m_function; }
+    inline int numNodes() const { return m_numNodes; }
+    inline Function function() const { return m_function; }
     inline const Value& functionInput() const { return m_functionInput; }
 private:
     const int m_numNodes;
@@ -121,8 +121,8 @@ public:
     explicit AGDiffFunctions(const AttributesScope& attrsScope, const int numNodes,
                              std::vector<AttrCmd> attrCmds);
     Nodes create(std::function<void(int)> progress = [](int){});
-    inline const int numNodes() const { return m_numNodes; }
-    inline const std::vector<AttrCmd> attrCmds() const { return m_attrCmds; }
+    inline int numNodes() const { return m_numNodes; }
+    inline const std::vector<AttrCmd>& attrCmds() const { return m_attrCmds; }
 private:
     const int m_numNodes;
     const std::vector<AttrCmd> m_attrCmds;

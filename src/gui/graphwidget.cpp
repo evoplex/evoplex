@@ -32,7 +32,6 @@ namespace evoplex
 
 GraphWidget::GraphWidget(MainGUI* mainGUI, Experiment* exp, ExperimentWidget* parent)
     : QDockWidget(parent)
-    , m_expWidget(parent)
     , m_ui(new Ui_GraphWidget)
     , m_settingsDlg(new GraphSettings(mainGUI, exp, this))
     , m_exp(exp)
@@ -43,8 +42,9 @@ GraphWidget::GraphWidget(MainGUI* mainGUI, Experiment* exp, ExperimentWidget* pa
     , m_nodeSizeRate(10.f)
     , m_nodeRadius(m_nodeSizeRate)
     , m_origin(5,25)
-    , m_posEntered(0,0)
     , m_cacheStatus(Ready)
+    , m_expWidget(parent)
+    , m_posEntered(0,0)
 {
     setAttribute(Qt::WA_DeleteOnClose, true);
     setFocusPolicy(Qt::StrongFocus);

@@ -112,7 +112,7 @@ bool Project::editExperiment(int expId, Experiment::ExperimentInputs* newInputs,
     return true;
 }
 
-const int Project::importExperiments(const QString& filePath, QString& errorMsg)
+int Project::importExperiments(const QString& filePath, QString& errorMsg)
 {
     QFile file(filePath);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
@@ -204,7 +204,7 @@ bool Project::saveProject(QString& errMsg, std::function<void(int)>& progress)
 
     progress(30);
     QTextStream out(&file);
-    for (int i = 0; i < header.size()-1; ++i) {
+    for (size_t i = 0; i < header.size()-1; ++i) {
         out << header.at(i) << ",";
     }
     out << header.at(header.size()-1) << "\n";

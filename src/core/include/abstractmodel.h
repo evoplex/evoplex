@@ -32,8 +32,8 @@ class BaseModel : public BasePlugin
 
 public:
     inline AbstractGraph* graph() const;
-    inline const int currStep() const;
-    inline const int status() const;
+    inline int currStep() const;
+    inline int status() const;
 
 protected:
     explicit BaseModel() : BasePlugin(), m_graph(nullptr), m_currStep(0), m_status(0) {}
@@ -71,6 +71,7 @@ public:
     // might be used by the GUI to generate custom plots or to be stored in a file.
     // The requested "header" must be defined in the modelMetaData.json file.
     virtual std::vector<Value> customOutputs(const Values& inputs) const {
+        Q_UNUSED(inputs);
         return std::vector<Value>();
     }
 };
@@ -82,10 +83,10 @@ public:
 inline AbstractGraph* BaseModel::graph() const
 { return m_graph; }
 
-inline const int BaseModel::currStep() const
+inline int BaseModel::currStep() const
 { return m_currStep; }
 
-inline const int BaseModel::status() const
+inline int BaseModel::status() const
 { return m_status; }
 
 inline bool BaseModel::setup(PRG* prg, const Attributes* attrs, AbstractGraph* graphObj) {

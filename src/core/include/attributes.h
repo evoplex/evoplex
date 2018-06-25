@@ -75,7 +75,7 @@ private:
  ************************************************************************/
 
 inline int Attributes::size() const
-{ return int(m_values.size()); }
+{ return static_cast<int>(m_values.size()); }
 
 inline void Attributes::resize(int size)
 { m_names.resize(size); m_values.resize(size); }
@@ -88,7 +88,7 @@ inline int Attributes::indexOf(const char* name) const
 
 inline int Attributes::indexOf(const QString& name) const {
     int idx = std::find(m_names.begin(), m_names.end(), name) - m_names.begin();
-    return idx == m_names.size() ? -1 : idx;
+    return idx == static_cast<int>(m_names.size()) ? -1 : idx;
 }
 
 inline bool Attributes::contains(const char* name) const

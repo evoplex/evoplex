@@ -253,7 +253,7 @@ AbstractModel* Experiment::createTrial(const int trialId)
 
     if (m_expStatus == INVALID || m_pauseAt == 0) {
         return nullptr;
-    } if (m_trials.size() == m_numTrials) {
+    } if (static_cast<int>(m_trials.size()) == m_numTrials) {
         QString e = QString("FATAL! all the trials for this experiment have already been created."
                             "It should never happen!\n Project: %1; Exp: %2; Trial: %3 (max=%4)\n")
                             .arg(m_project->name()).arg(m_id).arg(trialId).arg(m_numTrials);
@@ -319,7 +319,7 @@ Nodes Experiment::createNodes()
     if (m_expStatus == INVALID) {
         return Nodes();
     } else if (!m_clonableNodes.empty()) {
-        if (m_trials.size() == m_numTrials - 1) {
+        if (static_cast<int>(m_trials.size()) == m_numTrials - 1) {
             Nodes nodes = m_clonableNodes;
             Nodes().swap(m_clonableNodes);
             return nodes;

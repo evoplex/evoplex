@@ -276,7 +276,7 @@ ProjectSP MainApp::newProject(QString& error, const QString& filepath)
         }
     }
 
-    const int projectId = int(m_projects.size());
+    const int projectId = static_cast<int>(m_projects.size());
     ProjectSP project = ProjectSP::create(this, projectId);
     if (!project->init(error, filepath)) {
         return nullptr;

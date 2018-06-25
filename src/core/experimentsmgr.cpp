@@ -119,8 +119,9 @@ void ExperimentsMgr::play(Experiment* exp)
 
         for (int trialId = 0; trialId < exp->numTrials(); ++trialId) {
             m_runningTrials.emplace_back(std::make_pair(exp->id(), trialId));
-            m_threadPool.start(new TrialRunnable(this, exp, trialId),
-                               int(m_runningTrials.size()) * -1); // play in the same order of insertion
+            // play in the same order of insertion
+            const int priority = static_cast<int>(m_runningTrials.size()) * -1;
+            m_threadPool.start(new TrialRunnable(this, exp, trialId), priority);
         }
     } else if (exp->expStatus() != Experiment::QUEUED) {
         exp->setExpStatus(Experiment::QUEUED);

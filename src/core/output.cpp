@@ -131,7 +131,7 @@ bool CustomOutput::operator==(const OutputSP output) const
     auto other = std::dynamic_pointer_cast<const CustomOutput>(output);
     if (!other) return false;
     if (m_allInputs.size() != other->allInputs().size()) return false;
-    for (int i = 0; i < m_allInputs.size(); ++i) {
+    for (size_t i = 0; i < m_allInputs.size(); ++i) {
         if (m_allInputs.at(i) != other->allInputs().at(i))
             return false;
     }

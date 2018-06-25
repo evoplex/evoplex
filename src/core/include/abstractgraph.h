@@ -22,6 +22,7 @@
 #define ABSTRACT_GRAPH_H
 
 #include "baseplugin.h"
+#include "constants.h"
 #include "edge.h"
 #include "node.h"
 #include "utils.h"
@@ -55,6 +56,9 @@ public:
     inline const Nodes& nodes() const;
     inline Node* node(int id) const;
     inline Node* randNode() const;
+
+    inline int numNodes() const;
+    inline int numEdges() const;
 
 protected:
     Nodes m_nodes;
@@ -128,7 +132,14 @@ inline Node* BaseGraph::node(int id) const
 inline Node* BaseGraph::randNode() const
 { return m_nodes.at(prg()->randI(m_nodes.size()-1)); }
 
+inline int BaseGraph::numEdges() const
+{ return static_cast<int>(m_edges.size()); }
+
+inline int BaseGraph::numNodes() const
+{ return static_cast<int>(m_nodes.size()); }
+
 inline bool BaseGraph::setup(PRG* prg, const Attributes* attrs, Nodes& nodes, const QString& graphType) {
+    Q_ASSERT_X(nodes.size() < EVOPLEX_MAX_NODES, "BasePlugin::setup", "too many nodes! we cannot handle this.");
     if (BasePlugin::setup(prg, attrs)) {
         m_nodes = nodes;
         m_type = enumFromString(graphType);

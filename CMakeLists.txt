@@ -39,7 +39,7 @@ if(TESTS)
     set(CMAKE_BUILD_TYPE Debug) # coverage must be in debug mode
     include(CodeCoverage) # codecov.io
     include(Coveralls) # coveralls.io
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pedantic")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pedantic -Wextra")
     append_coverage_compiler_flags()
     setup_target_for_coverage(NAME "${PROJECT_NAME}_coverage" EXECUTABLE ctest --parallel 4)
   endif()

@@ -262,7 +262,7 @@ void ExperimentDesigner::setExperiment(Experiment* exp)
     header.shrink_to_fit();
     values.shrink_to_fit();
 
-    for (int i = 0; i < header.size(); ++i) {
+    for (size_t i = 0; i < header.size(); ++i) {
         // we don't have a field for the expId
         if (header.at(i) == GENERAL_ATTRIBUTE_EXPID) {
             continue;
