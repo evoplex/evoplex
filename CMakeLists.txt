@@ -63,6 +63,11 @@ execute_process(
 add_definitions("-DGIT_COMMIT_HASH=${EVOPLEX_GIT_COMMIT_HASH}")
 add_definitions("-DGIT_BRANCH=${EVOPLEX_GIT_BRANCH}")
 
+# http://doc.qt.io/qt-5/qmessagelogcontext.html
+# By default QMessageLogContext only works in Debug mode.
+# To make it permanent for all modes, we need to define QT_MESSAGELOGCONTEXT
+add_definitions("-DQT_MESSAGELOGCONTEXT")
+
 # https://cmake.org/Wiki/CMake_RPATH_handling
 # use, i.e. don't skip the full RPATH for the build tree
 set(CMAKE_SKIP_BUILD_RPATH  FALSE)

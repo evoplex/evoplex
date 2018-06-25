@@ -47,10 +47,11 @@ void Logger::init()
         m_logDir.mkpath(".");
     }
 
-    QString currDate = QDateTime::currentDateTime().toString(Qt::ISODate);
-    m_logFile.setFileName(m_logDir.absoluteFilePath("log_%1.txt").arg(currDate));
+    const QString currDate = QDateTime::currentDateTime().toString("yyyy-MM-dd_HHmmss");
+    const QString logFilename = m_logDir.absoluteFilePath("log_" + currDate + ".txt");
+    m_logFile.setFileName(logFilename);
     if (!m_logFile.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text | QIODevice::Unbuffered)) {
-        qWarning() << "ERROR! Unable to write the log file.";
+        qWarning() << "ERROR! Unable to write the log file." << logFilename;
         return;
     }
 
