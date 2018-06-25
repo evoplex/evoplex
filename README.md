@@ -1,5 +1,10 @@
 # Evoplex
 
+[![travis-ci](https://travis-ci.org/evoplex/evoplex.svg?branch=master)](https://travis-ci.org/evoplex/evoplex)
+[![coveralls](https://coveralls.io/repos/github/evoplex/evoplex/badge.svg)](https://coveralls.io/github/evoplex/evoplex)
+[![codecov](https://codecov.io/gh/evoplex/evoplex/branch/master/graph/badge.svg)](https://codecov.io/gh/evoplex/evoplex)
+[![gitter](https://badges.gitter.im/EvoplexMAS/evoplex.svg)](https://gitter.im/EvoplexMAS/evoplex?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+
 Evoplex is a multi-agent system for [networks (graphs)](https://en.wikipedia.org/wiki/Graph_theory). Here, each agent is represented as a node in the network and is constrained to interact only with its neighbours, which are linked by edges in the network.
 
 <p align="center">
