@@ -36,12 +36,15 @@ public:
     enum Type { BOOL, CHAR, DOUBLE, INT, STRING, INVALID };
 
     Value();
+    Value(const Value& value);
     Value(const bool value);
     Value(const char value);
     Value(const double value);
     Value(const int value);
     Value(const char* value);
     Value(const QString& value);
+
+    ~Value();
 
     inline Type type() const;
     inline bool isValid() const;
@@ -58,6 +61,7 @@ public:
     inline const char* toString() const;
     QString toQString() const;
 
+    Value& operator=(const Value& v);
     bool operator==(const Value& v) const;
     bool operator!=(const Value& v) const;
     bool operator<(const Value& v) const;

@@ -56,7 +56,7 @@ public:
 
     inline const std::vector<Value>& values() const;
 
-    inline void setValue(int id, Value value);
+    inline void setValue(int id, const Value& value);
 
     inline const Value& value(int id) const;
     inline const Value& value(const char* name) const;
@@ -112,7 +112,7 @@ inline const QString& Attributes::name(int id) const
 inline const std::vector<Value>& Attributes::values() const
 { return m_values; }
 
-inline void Attributes::setValue(int id, Value value)
+inline void Attributes::setValue(int id, const Value& value)
 { m_values.at(id) = value; }
 
 inline const Value& Attributes::value(int id) const

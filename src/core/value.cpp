@@ -28,6 +28,16 @@ Value::Value() : m_type(INVALID)
 {
 }
 
+Value::Value(const Value& value) : m_type(value.type())
+{
+    if (m_type == INT) m_data.i = value.toInt();
+    else if (m_type == DOUBLE) m_data.d = value.toDouble();
+    else if (m_type == BOOL) m_data.b = value.toBool();
+    else if (m_type == CHAR) m_data.c = value.toChar();
+    else if (m_type == STRING) m_data.s = qstrdup(value.toString());
+    else if (m_type != INVALID) qFatal("non-existent type");
+}
+
 Value::Value(const bool value) : m_type(BOOL)
 {
     m_data.b = value;
@@ -50,14 +60,24 @@ Value::Value(const int value) : m_type(INT)
 
 Value::Value(const char* value) : m_type(STRING)
 {
-    m_data.s = value;
+    // considering that Value(const QString& value) needs to call a new char[],
+    // which must be deleted in this class, for consistency, let's do the same
+    // here as well, and we can safely use delete[] whenever it's a STRING
+    m_data.s = qstrdup(value);
 }
 
 // converts the QString to a char*
-// qPrintable will return a temporary char*, so we use qstrdup (see ref)
-Value::Value(const QString& value)
-    : Value(qstrdup(qPrintable(value)))
+Value::Value(const QString& value) : m_type(STRING)
 {
+    QByteArray text = value.toLocal8Bit();
+    m_data.s = qstrdup(text.constData());
+}
+
+Value::~Value()
+{
+    if (m_type == STRING) {
+        delete [] m_data.s;
+    }
 }
 
 QString Value::toQString() const
@@ -70,6 +90,20 @@ QString Value::toQString() const
     case STRING: return QString::fromUtf8(m_data.s);
     default: throw std::invalid_argument("invalid type of Value");
     }
+}
+
+Value& Value::operator=(const Value& v)
+{
+    if(this != &v) { // check for self-assignment
+        m_type = v.m_type;
+        if (m_type == INT) m_data.i = v.m_data.i;
+        else if (m_type == DOUBLE) m_data.d = v.m_data.d;
+        else if (m_type == BOOL) m_data.b = v.m_data.b;
+        else if (m_type == CHAR) m_data.c = v.m_data.c;
+        else if (m_type == STRING) m_data.s = qstrdup(v.toString());
+        else if (m_type != INVALID) qFatal("non-existent type");
+    }
+    return *this;
 }
 
 bool Value::operator==(const Value& v) const
