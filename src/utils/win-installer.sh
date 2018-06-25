@@ -51,10 +51,7 @@ cd ..
 cd data
 cp -r $ROOTDIR/build/bin/. .
 cp -r $ROOTDIR/build/lib/ .
-mkdir bin
-mv evoplex.exe bin/
 cd ..
-
 
 cd $ROOTDIR/win-installer
 binarycreator.exe --offline-only -c config/config.xml -p packages evoplex_$EVOPLEX_RELEASE.exe
