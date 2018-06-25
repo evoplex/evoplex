@@ -139,10 +139,10 @@ install(
   COMPONENT Devel
 )
 
-# make the source code available in the top level to allow setting the tests
-if(TESTS)
+# add sources to coveralls
+if(TESTS AND CMAKE_COMPILER_IS_GNUCXX)
   foreach(src ${EVOPLEX_CORE_CXX} ${EVOPLEX_CORE_H})
     set(EVOPLEX_CORE_SRC ${EVOPLEX_CORE_SRC} ${PROJECT_SOURCE_DIR}/src/core/${src})
   endforeach(src)
-  set(EVOPLEX_CORE_SRC ${EVOPLEX_CORE_SRC} PARENT_SCOPE)
+  coveralls_setup("${EVOPLEX_CORE_SRC}" ON "${PROJECT_SOURCE_DIR}/src/cmake")
 endif()
