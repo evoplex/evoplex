@@ -59,7 +59,7 @@ public:
     inline double toDouble() const;
     inline int toInt() const;
     inline const char* toString() const;
-    QString toQString() const;
+    QString toQString(char format = 'g', int precision = 8) const;
 
     Value& operator=(const Value& v);
     bool operator==(const Value& v) const;

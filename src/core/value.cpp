@@ -69,7 +69,7 @@ Value::Value(const char* value) : m_type(STRING)
 // converts the QString to a char*
 Value::Value(const QString& value) : m_type(STRING)
 {
-    QByteArray text = value.toLocal8Bit();
+    QByteArray text = value.toUtf8();
     m_data.s = qstrdup(text.constData());
 }
 
@@ -80,11 +80,11 @@ Value::~Value()
     }
 }
 
-QString Value::toQString() const
+QString Value::toQString(char format, int precision) const
 {
     switch (m_type) {
     case INT: return QString::number(m_data.i);
-    case DOUBLE: return QString::number(m_data.d);
+    case DOUBLE: return QString::number(m_data.d, format, precision);
     case BOOL: return QString::number(m_data.b);
     case CHAR: return QString(m_data.c);
     case STRING: return QString::fromUtf8(m_data.s);
