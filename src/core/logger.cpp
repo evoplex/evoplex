@@ -39,6 +39,7 @@ QFile Logger::m_logFile;
 QString Logger::m_log;
 QMutex Logger::m_fileMutex;
 QDir Logger::m_logDir;
+QString Logger::m_logDateFormat;
 
 void Logger::init()
 {
@@ -47,7 +48,8 @@ void Logger::init()
         m_logDir.mkpath(".");
     }
 
-    const QString currDate = QDateTime::currentDateTime().toString("yyyy-MM-dd_HHmmss");
+    m_logDateFormat = "yyyy-MM-dd_HHmmss";
+    const QString currDate = QDateTime::currentDateTime().toString(m_logDateFormat);
     const QString logFilename = m_logDir.absoluteFilePath("log_" + currDate + ".txt");
     m_logFile.setFileName(logFilename);
     if (!m_logFile.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text | QIODevice::Unbuffered)) {
@@ -228,7 +230,7 @@ void Logger::deinit()
         QString logDate = log;
         logDate.remove("log_");
         logDate.remove(".txt");
-        if (QDateTime::fromString(logDate, Qt::ISODate) <= sevenDaysAgo) {
+        if (QDateTime::fromString(logDate, m_logDateFormat) <= sevenDaysAgo) {
             qInfo() << "removing old log file:" << m_logDir.absoluteFilePath(log);
             m_logDir.remove(log);
         }

@@ -55,6 +55,7 @@ private:
     static QString m_log;
     static QMutex m_fileMutex;
     static QDir m_logDir;
+    static QString m_logDateFormat;
 };
 } // evoplex
 #endif // LOGGER_HPP
