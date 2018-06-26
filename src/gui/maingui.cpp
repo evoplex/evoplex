@@ -93,9 +93,11 @@ MainGUI::MainGUI(MainApp* mainApp, QWidget* parent)
     QAction* acWelcome = new QAction(QIcon(":/icons/evoplex.svg"), "Welcome", actionGroup);
     acWelcome->setCheckable(true);
     acWelcome->setData(PAGE_WELCOME);
+    /* FIXME: queue widget is broken yet -- let's hide the button
     QAction* acQueue = new QAction(QIcon(":/icons/queue.svg"), "Queue", actionGroup);
     acQueue->setCheckable(true);
     acQueue->setData(PAGE_QUEUE);
+    */
     QAction* acProjects = new QAction(QIcon(":/icons/projects.svg"),"Projects", actionGroup);
     acProjects->setCheckable(true);
     acProjects->setData(PAGE_PROJECTS);
@@ -130,14 +132,15 @@ MainGUI::MainGUI(MainApp* mainApp, QWidget* parent)
         if (b && m_curPage == PAGE_PROJECTS)
             acWelcome->trigger();
     });
+    /* FIXME: queue widget is broken yet -- let's hide the button
     connect(m_queue, &QueuePage::isEmpty, [this, acWelcome, acQueue](bool b) {
         acQueue->setDisabled(b);
         if (b && m_curPage == PAGE_QUEUE)
             acWelcome->trigger();
     });
-
-    acProjects->setDisabled(true);
     acQueue->setDisabled(true);
+    */
+    acProjects->setDisabled(true);
     acWelcome->setChecked(true);
     slotPage(acWelcome);
 
