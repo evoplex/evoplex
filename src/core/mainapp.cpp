@@ -19,7 +19,6 @@
  */
 
 #include <QCoreApplication>
-#include <QDir>
 #include <QFile>
 #include <QJsonArray>
 #include <QJsonObject>
@@ -70,30 +69,18 @@ MainApp::MainApp()
     addAttrScope(id, OUTPUT_HEADER, "string");
     addAttrScope(id, OUTPUT_AVGTRIALS, "bool");
 
-    // load built-in plugins
-    QDir pluginsDir = QDir(qApp->applicationDirPath() + "/../lib/evoplex/plugins");
-    qDebug() << "searching for plugins at" << pluginsDir.absolutePath();
-    if (pluginsDir.exists()) {
-        const QStringList nameFilter(QString("*%1").arg(kPluginExtension));
-        QStringList files = pluginsDir.entryList(nameFilter, QDir::Files);
-        for (const QString& fileName : files) {
-            QString error;
-            loadPlugin(pluginsDir.absoluteFilePath(fileName), error, false);
+    QStringList searchPaths;
+    searchPaths << qApp->applicationDirPath() + "/lib/evoplex/plugins";
+    searchPaths << qApp->applicationDirPath() + "/../lib/evoplex/plugins";
+    for (const QString& path : searchPaths) {
+        m_systemPluginsDir.setPath(path);
+        if (m_systemPluginsDir.exists()) {
+            break;
         }
     }
-    // load user imported plugins
-    QStringList plugins = m_userPrefs.value("plugins").toStringList();
-    QStringList::iterator it = plugins.begin();
-    while (it != plugins.end()) {
-        QString error;
-        loadPlugin(pluginsDir.absoluteFilePath(*it), error, false);
-        if (error.isEmpty()) {
-            ++it;
-        } else {
-            it = plugins.erase(it);
-        }
-    }
-    m_userPrefs.setValue("plugins", plugins);
+
+    initSystemPlugins();
+    initUserPlugins();
 }
 
 MainApp::~MainApp()
@@ -123,6 +110,33 @@ void MainApp::setStepsToFlush(int steps)
 {
     m_stepsToFlush = steps;
     m_userPrefs.setValue("settings/stepsToFlush", m_stepsToFlush);
+}
+
+void MainApp::initSystemPlugins()
+{
+    qInfo() << "searching for plugins at" << m_systemPluginsDir.absolutePath();
+    const QStringList nameFilter(QString("*%1").arg(kPluginExtension));
+    QStringList files = m_systemPluginsDir.entryList(nameFilter, QDir::Files);
+    for (const QString& fileName : files) {
+        QString error;
+        loadPlugin(m_systemPluginsDir.absoluteFilePath(fileName), error, false);
+    }
+}
+
+void MainApp::initUserPlugins()
+{
+    QStringList plugins = m_userPrefs.value("plugins").toStringList();
+    QStringList::iterator it = plugins.begin();
+    while (it != plugins.end()) {
+        QString error;
+        loadPlugin(*it, error, false);
+        if (error.isEmpty()) {
+            ++it;
+        } else {
+            it = plugins.erase(it);
+        }
+    }
+    m_userPrefs.setValue("plugins", plugins);
 }
 
 const AbstractPlugin* MainApp::loadPlugin(const QString& path, QString& error, const bool addToUserPrefs)

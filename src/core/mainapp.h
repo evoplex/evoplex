@@ -21,11 +21,11 @@
 #ifndef MAINAPP_H
 #define MAINAPP_H
 
+#include <QDir>
 #include <QHash>
 #include <QObject>
 #include <QSettings>
 #include <memory>
-#include <QVector>
 
 #include "plugininterfaces.h"
 #include "attributes.h"
@@ -87,7 +87,15 @@ signals:
     void listOfRecentProjectsUpdated();
 
 private:
+    // Load built-in plugins
+    void initSystemPlugins();
+
+    // Load user imported plugins.
+    // It removes failed plugins from the list
+    void initUserPlugins();
+
     ExperimentsMgr* m_experimentsMgr;
+    QDir m_systemPluginsDir;
 
     QSettings m_userPrefs;
     quint16 m_defaultStepDelay; // msec
