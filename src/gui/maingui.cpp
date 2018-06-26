@@ -21,6 +21,7 @@
 #include <QCoreApplication>
 #include <QDate>
 #include <QDebug>
+#include <QDesktopServices>
 #include <QLabel>
 #include <QMenuBar>
 #include <QMessageBox>
@@ -335,6 +336,10 @@ void MainGUI::slotShowLog()
     QPushButton* copy = new QPushButton("Copy to Clipboard");
     connect(copy, &QPushButton::pressed, [text](){ text->selectAll(); text->copy(); });
     bts->addWidget(copy);
+    QPushButton* location = new QPushButton("Open Location");
+    connect(location, &QPushButton::pressed, [text](){
+        QDesktopServices::openUrl(QUrl("file:///"+Logger::logDir(), QUrl::TolerantMode)); });
+    bts->addWidget(location);
     QPushButton* close = new QPushButton("Close");
     connect(close, &QPushButton::pressed, [d](){ d->close(); });
     bts->addWidget(close);

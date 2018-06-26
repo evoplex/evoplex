@@ -50,6 +50,8 @@ public:
 
     static QString logFileName() { return m_logFile.fileName(); }
 
+    static QString logDir() { return m_logDir.absolutePath(); }
+
 private:
     static QFile m_logFile;
     static QString m_log;
