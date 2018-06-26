@@ -40,26 +40,34 @@ void TestValue::tst_build()
     Value v;
     QVERIFY(v.type() == Value::INVALID);
     QVERIFY(v.isValid() == false);
+    QVERIFY_EXCEPTION_THROWN(v.toQString(), std::invalid_argument);
 
     v = Value(true);
     QVERIFY(v.type() == Value::BOOL);
     QVERIFY(v.toBool() == true);
+    QCOMPARE(v.toQString(), "1");
 
     v = Value(4.5123788);
     QVERIFY(v.type() == Value::DOUBLE);
     QCOMPARE(v.toDouble(), 4.5123788);
+    QCOMPARE(v.toQString(), "4.5123788");
 
     v = Value(-10);
     QVERIFY(v.type() == Value::INT);
     QCOMPARE(v.toInt(), -10);
+    QCOMPARE(v.toQString(), "-10");
 
-    v = Value("abc£ãã&");
+    const char* chr = "abc£ãã&";
+    QString str("abc£ãã&");
+    v = Value(chr);
     QVERIFY(v.type() == Value::STRING);
-    QCOMPARE(v.toString(), "abc£ãã&");
+    QCOMPARE(v.toString(), chr);
+    QCOMPARE(v.toQString(), str);
 
-    v = Value(QString("abc£ãã&"));
+    v = Value(str);
     QVERIFY(v.type() == Value::STRING);
-    QCOMPARE(v.toString(), "abc£ãã&");
+    QCOMPARE(v.toString(), chr);
+    QCOMPARE(v.toQString(), str);
 }
 
 void TestValue::tst_compare()
