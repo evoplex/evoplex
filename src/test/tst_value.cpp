@@ -45,17 +45,17 @@ void TestValue::tst_build()
     v = Value(true);
     QVERIFY(v.type() == Value::BOOL);
     QVERIFY(v.toBool() == true);
-    QCOMPARE(v.toQString(), "1");
+    QCOMPARE(v.toQString(), QString("1"));
 
     v = Value(4.5123788);
     QVERIFY(v.type() == Value::DOUBLE);
     QCOMPARE(v.toDouble(), 4.5123788);
-    QCOMPARE(v.toQString(), "4.5123788");
+    QCOMPARE(v.toQString(), QString("4.5123788"));
 
     v = Value(-10);
     QVERIFY(v.type() == Value::INT);
     QCOMPARE(v.toInt(), -10);
-    QCOMPARE(v.toQString(), "-10");
+    QCOMPARE(v.toQString(), QString("-10"));
 
     const char* chr = "abc£ãã&";
     QString str("abc£ãã&");
