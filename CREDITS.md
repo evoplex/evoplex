@@ -3,6 +3,7 @@
 - Josephine Griffith
 - Colm O'Riordan
 - Adriana Cardinot
+- Ethan Padden
 
 # Acknowledgements
 - This software was supported by the National Council for Scientific and Technological Development (CNPq-Brazil).
