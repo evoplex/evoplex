@@ -37,7 +37,9 @@ The more information you can provide, the more likely someone will be successful
 
 ## Contributing to code
 
-Before contributing to code, please read the [Git workflow](https://github.com/evoplex/evoplex/wiki/Git-Contributor-Workflow) and our [coding conventions](https://github.com/evoplex/evoplex/wiki/Coding-Style-Guide) in the wiki.
+Before contributing to code, please read the [Git workflow](https://github.com/evoplex/evoplex/wiki/Git-Contributor-Workflow) and our [coding conventions](https://github.com/evoplex/evoplex/wiki/Coding-Style-Guide) in the wiki. You may also be interested in looking at the instructions to [build Evoplex from source code](https://github.com/evoplex/evoplex/wiki/Build-from-Source-Code).
+
+Be aware that by contributing to the code base, you are agreeing that Evoplex may redistribute your work under our [LICENSE](https://github.com/cardinot/evoplex/blob/master/LICENSE.txt).
 
 ### Did you write a patch that fixes a bug?
 - Open a new GitHub pull request with the patch.

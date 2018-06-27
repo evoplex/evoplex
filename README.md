@@ -5,7 +5,7 @@
 [![coveralls](https://coveralls.io/repos/github/evoplex/evoplex/badge.svg)](https://coveralls.io/github/evoplex/evoplex)
 [![codecov](https://codecov.io/gh/evoplex/evoplex/branch/master/graph/badge.svg)](https://codecov.io/gh/evoplex/evoplex)
 [![gitter](https://badges.gitter.im/EvoplexMAS/evoplex.svg)](https://gitter.im/EvoplexMAS/evoplex?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
-![awesome](https://img.shields.io/badge/awesome-yes-green.svg)
+[![awesome](https://img.shields.io/badge/awesome-yes-green.svg)](https://github.com/evoplex/evoplex/blob/master/README.md#evoplex)
 
 Evoplex is a multi-agent system for [networks (graphs)](https://en.wikipedia.org/wiki/Graph_theory). Here, each agent is represented as a node in the network and is constrained to interact only with its neighbours, which are linked by edges in the network.
 
@@ -31,17 +31,34 @@ Evoplex was originally developed to tackle problems in the field of [Evolutionar
 
 Evoplex is cross-platform and is available for Linux, Windows and macOS.
 
- * Installation
- * Compiling and running from source code
+For users:
+
+ * [Installation](https://github.com/evoplex/evoplex/releases)
+ * [Quick guide](https://github.com/evoplex/evoplex/wiki/Navigation)
+
+For developers:
+
+ * [Building and running Evoplex from source code](https://github.com/evoplex/evoplex/wiki/Build-from-Source-Code)
 
 ## Getting Involved
 
 As an open-source project, we welcome new contributions from the community. There are many ways you can participate in the project, for example:
 
- * Review the documentation and make pull requests for anything from typos to new content;
- * Report bugs and submit feature requests;
- * Review source code changes;
- * Showcase your plugins.
+ * Review the documentation and make pull requests for anything from typos to new content
+ * Report bugs and submit feature requests
+ * Review source code changes
+ * Add a new feature or change an existing one
+ * Showcase your plugins
 
-If you are interested in fixing issues and contributing directly to the code base, please see the [CONTRIBUTING](https://github.com/cardinot/evoplex/blob/master/CONTRIBUTING.md) file. Be aware that by contributing to the code base, you are agreeing that Evoplex may redistribute your work under our [LICENSE](https://github.com/cardinot/evoplex/blob/master/LICENSE.txt).
+Please see the [CONTRIBUTING](https://github.com/evoplex/evoplex/blob/master/CONTRIBUTING.md) file for details. Be aware that by contributing to the code base, you are agreeing that Evoplex may redistribute your work under our [LICENSE](https://github.com/cardinot/evoplex/blob/master/LICENSE.txt). Please see also our [Code of Conduct](https://github.com/evoplex/evoplex/blob/master/CODE_OF_CONDUCT.md).
 
+## Feedback
+
+- Ask a question in the [mailing list](https://groups.google.com/group/evoplex) (or send it directly to evoplex@googlegroups.com)
+- File a bug or request a new feature on [GitHub](https://github.com/evoplex/evoplex/issues)
+- Follow us on [Twitter](https://twitter.com/EvoplexMAS)
+- Join us on our [Gitter chat channel](https://gitter.im/EvoplexMAS/evoplex)
+
+## License
+
+Evoplex is licensed under the [GNU General Public License v3.0](https://github.com/evoplex/evoplex/blob/master/LICENSE.txt).
