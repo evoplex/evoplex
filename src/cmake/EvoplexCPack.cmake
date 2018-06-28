@@ -32,7 +32,15 @@ set(CPACK_PACKAGING_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX})
 set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}-${EVOPLEX_RELEASE}.${CMAKE_SYSTEM_PROCESSOR}")
 set(CPACK_OUTPUT_FILE_PREFIX releases)
 
-if(UNIX)
+if(APPLE)
+  install(CODE "execute_process(COMMAND macdeployqt ${CMAKE_BINARY_DIR}/bin/${PROJECT_NAME}.app -executable=${CMAKE_BINARY_DIR}/bin/${PROJECT_NAME}.app/Contents/MacOS/${PROJECT_NAME})")
+  set(CPACK_GENERATOR "DragNDrop")
+  set(CPACK_DMG_FORMAT "UDBZ")
+  set(CPACK_DMG_VOLUME_NAME ${PROJECT_NAME})
+  set(CPACK_DMG_DS_STORE "${CMAKE_SOURCE_DIR}/installer/osx/ds_store")
+  set(CPACK_SYSTEM_NAME "OSX")
+
+elseif(UNIX)
   set(CPACK_GENERATOR "RPM;DEB")
 
   # CPack: Debian package generator
@@ -51,13 +59,7 @@ if(UNIX)
   set(CPACK_RPM_PACKAGE_GROUP "Development/Tools")
   set(CPACK_RPM_PACKAGE_LICENSE "GPLv3")
 
-elseif(APPLE)
-  install(CODE "execute_process(COMMAND macdeployqt ${CMAKE_BINARY_DIR}/Evoplex.app -executable=${CMAKE_BINARY_DIR}/Evoplex.app/Contents/MacOS/Evoplex)")
-  install(TARGETS evoplex DESTINATION ./)
-  set(CPACK_GENERATOR "DragNDrop")
-  set(CPACK_DMG_DS_STORE "${CMAKE_SOURCE_DIR}/installer/osx/ds_store")
-  set(CPACK_DMG_VOLUME_NAME "Evoplex")
-endif(APPLE)
+endif()
 
 # CPack call
 include(CPack)
