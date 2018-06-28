@@ -28,9 +28,16 @@ endif()
 
 #### EXECUTABLE ####
 set(EXE_SRC main.cpp evoplex.rc gui/res/guiRes.qrc)
+set(RUNTIME_DEST "${CMAKE_BINARY_DIR}/bin")
 if (APPLE)
-  add_executable(${APP_NAME} MACOSX_BUNDLE ${EXE_SRC} "evoplex.icns")
+  set(APP_ICON ${CMAKE_CURRENT_SOURCE_DIR}/evoplex.icns)
+  set_source_files_properties(${APP_ICON} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
+
+  add_executable(${PROJECT_NAME} MACOSX_BUNDLE ${EXE_SRC} ${APP_ICON})
   set_target_properties(${PROJECT_NAME} PROPERTIES
+    OUTPUT_NAME ${PROJECT_NAME}
+    INSTALL_RPATH "@executable_path/../Frameworks"
+    RUNTIME_OUTPUT_DIRECTORY ${RUNTIME_DEST}
     MACOSX_BUNDLE_BUNDLE_NAME ${PROJECT_NAME}
     MACOSX_BUNDLE_COPYRIGHT "Copyright (c) 2018 Marcos Cardinot et al."
     MACOSX_BUNDLE_GUI_IDENTIFIER "org.evoplex.evoplex"
@@ -42,7 +49,6 @@ if (APPLE)
   )
 else()
   add_executable(${PROJECT_NAME} WIN32 ${EXE_SRC})
-  set(RUNTIME_DEST "${CMAKE_BINARY_DIR}/bin")
   set_target_properties(${PROJECT_NAME} PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${RUNTIME_DEST}
     RUNTIME_OUTPUT_DIRECTORY_DEBUG ${RUNTIME_DEST}
@@ -59,4 +65,5 @@ install(TARGETS ${PROJECT_NAME}
   LIBRARY DESTINATION lib/evoplex
   ARCHIVE DESTINATION lib/evoplex
   INCLUDES DESTINATION include/evoplex
+  BUNDLE DESTINATION .
 )
