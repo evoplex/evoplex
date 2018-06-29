@@ -33,6 +33,8 @@ private slots:
     void tst_prg();
     void tst_randD();
     void tst_randI();
+    void tst_randS();
+    void tst_randF();
 };
 
 void TestPRG::tst_prg()
@@ -126,5 +128,62 @@ void TestPRG::tst_randI()
     delete prg;
 }
 
+void TestPRG::tst_randS()
+{
+    PRG* prg = new PRG(0);
+    size_t v, min, max;
+
+    // [0, 10)
+    min = 0;
+    max = 10;
+    v = prg->randS(min, max);
+    QVERIFY(v >= min && v <= max);
+
+
+    // negative
+    min = -100;
+    max = -50;
+    v = prg->randS(min, max);
+    QVERIFY(v >= min && v <= max);
+
+    // same number
+    min = 123;
+    max = min;
+    v = prg->randS(min, max);
+    QVERIFY(v == min);
+
+    delete prg;
+}
+
+void TestPRG::tst_randF()
+{
+    PRG* prg = new PRG(0);
+    float v, min, max;
+
+    // [0, 10)
+    min = 0;
+    max = 10;
+    v = prg->randF(min, max);
+    QVERIFY(v >= min && v <= max);
+    v = prg->randF(max);
+    QVERIFY(v >= min && v <= max);
+    v = prg->randF();
+    max = 1;
+    QVERIFY(v >= min && v < max);
+
+    // negative
+    min = -100;
+    max = -50;
+    v = prg->randF(min, max);
+    QVERIFY(v >= min && v <= max);
+
+    // same number
+    min = 123;
+    max = min;
+    v = prg->randF(min, max);
+    QVERIFY(v == min);
+
+    delete prg;
+}
 QTEST_MAIN(TestPRG)
 #include "tst_prg.moc"
