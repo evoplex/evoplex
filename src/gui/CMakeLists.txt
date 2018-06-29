@@ -96,7 +96,7 @@ target_include_directories(EvoplexGUI PRIVATE ${CMAKE_SOURCE_DIR}/src)
 
 install(
   TARGETS EvoplexGUI
-  LIBRARY DESTINATION lib/evoplex
-  ARCHIVE DESTINATION lib/evoplex
-  INCLUDES DESTINATION include/evoplex
+  LIBRARY DESTINATION "${EVOPLEX_INSTALL_PREFIX}lib/evoplex"
+  ARCHIVE DESTINATION "${EVOPLEX_INSTALL_PREFIX}lib/evoplex"
+  INCLUDES DESTINATION "${EVOPLEX_INSTALL_PREFIX}include/evoplex"
 )

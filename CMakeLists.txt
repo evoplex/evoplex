@@ -108,6 +108,10 @@ find_package(Qt5Charts 5.8.0 REQUIRED)
 find_package(Qt5Widgets 5.8.0 REQUIRED)
 find_package(Qt5Test 5.8.0 REQUIRED)
 
+if (APPLE)
+  set(EVOPLEX_INSTALL_PREFIX "${PROJECT_NAME}.app/Contents/MacOS/")
+endif()
+
 # Compile source
 add_subdirectory(src)
 

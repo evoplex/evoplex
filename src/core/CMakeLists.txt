@@ -92,16 +92,16 @@ target_include_directories(EvoplexCore
 install(
   TARGETS EvoplexCore
   EXPORT EvoplexCoreTargets
-  LIBRARY DESTINATION lib/evoplex
-  ARCHIVE DESTINATION lib/evoplex
-  INCLUDES DESTINATION include/evoplex
+  LIBRARY DESTINATION "${EVOPLEX_INSTALL_PREFIX}lib/evoplex"
+  ARCHIVE DESTINATION "${EVOPLEX_INSTALL_PREFIX}lib/evoplex"
+  INCLUDES DESTINATION "${EVOPLEX_INSTALL_PREFIX}include/evoplex"
 )
 
 install(
   FILES
     ${EVOPLEX_CORE_INCLUDE}
     "${CMAKE_CURRENT_BINARY_DIR}/evoplexcore_export.h"
-  DESTINATION include/evoplex
+  DESTINATION "${EVOPLEX_INSTALL_PREFIX}include/evoplex"
   COMPONENT Devel
 )
 
@@ -125,7 +125,7 @@ configure_file(cmake/EvoplexCoreConfig.cmake
   COPYONLY
 )
 
-set(ConfigPackageLocation lib/cmake/Evoplex)
+set(ConfigPackageLocation "${EVOPLEX_INSTALL_PREFIX}lib/cmake/Evoplex")
 install(EXPORT EvoplexCoreTargets
   FILE EvoplexCoreTargets.cmake
   NAMESPACE Evoplex::

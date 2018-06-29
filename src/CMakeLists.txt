@@ -30,7 +30,7 @@ endif()
 set(EXE_SRC main.cpp evoplex.rc gui/res/guiRes.qrc)
 set(RUNTIME_DEST "${CMAKE_BINARY_DIR}/bin")
 if (APPLE)
-  set(APP_ICON ${CMAKE_CURRENT_SOURCE_DIR}/evoplex.icns)
+  set(APP_ICON "${CMAKE_CURRENT_SOURCE_DIR}/evoplex.icns")
   set_source_files_properties(${APP_ICON} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
 
   add_executable(${PROJECT_NAME} MACOSX_BUNDLE ${EXE_SRC} ${APP_ICON})
@@ -61,9 +61,6 @@ endif()
 target_link_libraries(${PROJECT_NAME} PUBLIC EvoplexCore EvoplexGUI)
 
 install(TARGETS ${PROJECT_NAME}
-  RUNTIME DESTINATION bin
-  LIBRARY DESTINATION lib/evoplex
-  ARCHIVE DESTINATION lib/evoplex
-  INCLUDES DESTINATION include/evoplex
+  RUNTIME DESTINATION "${EVOPLEX_INSTALL_PREFIX}bin"
   BUNDLE DESTINATION .
 )

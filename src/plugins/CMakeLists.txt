@@ -46,9 +46,8 @@ function(add_plugins ROOT_DIR PLUGINS)
         AUTOMOC_MACRO_NAMES "REGISTER_GRAPH;REGISTER_MODEL")
 
     install(TARGETS ${PLUGIN_NAME}
-        ARCHIVE DESTINATION lib/evoplex/plugins
-        LIBRARY DESTINATION lib/evoplex/plugins
-        RUNTIME DESTINATION lib/evoplex/plugins)
+        LIBRARY DESTINATION "${EVOPLEX_INSTALL_PREFIX}lib/evoplex/plugins"
+        ARCHIVE DESTINATION "${EVOPLEX_INSTALL_PREFIX}lib/evoplex/plugins")
   endforeach()
 endfunction(add_plugins)
 
