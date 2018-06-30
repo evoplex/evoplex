@@ -108,20 +108,32 @@ find_package(Qt5Charts 5.8.0 REQUIRED)
 find_package(Qt5Widgets 5.8.0 REQUIRED)
 find_package(Qt5Test 5.8.0 REQUIRED)
 
-if (APPLE)
+# set compilation and installation directories
+set(EVOPLEX_OUTPUT_RUNTIME "${CMAKE_BINARY_DIR}/")
+set(EVOPLEX_OUTPUT_RESOURCES "${CMAKE_BINARY_DIR}/")
+if(APPLE)
   set(EVOPLEX_INSTALL_PREFIX "${PROJECT_NAME}.app/Contents/MacOS/")
+  set(EVOPLEX_INSTALL_RUNTIME "${EVOPLEX_INSTALL_PREFIX}")
+  set(EVOPLEX_INSTALL_RESOURCES "${EVOPLEX_INSTALL_PREFIX}Resources/")
+elseif(UNIX)
+  set(EVOPLEX_OUTPUT_RUNTIME "${CMAKE_BINARY_DIR}/bin/")
+  set(EVOPLEX_OUTPUT_RESOURCES "${CMAKE_BINARY_DIR}/share/evoplex/")
+  set(EVOPLEX_INSTALL_RUNTIME "bin/")
+  set(EVOPLEX_INSTALL_RESOURCES "share/evoplex/")
 endif()
+set(EVOPLEX_OUTPUT_LIBRARY "${CMAKE_BINARY_DIR}lib/evoplex/")
+set(EVOPLEX_OUTPUT_ARCHIVE "${CMAKE_BINARY_DIR}lib/evoplex/")
+set(EVOPLEX_INSTALL_LIBRARY "${EVOPLEX_INSTALL_PREFIX}lib/evoplex/")
+set(EVOPLEX_INSTALL_ARCHIVE "${EVOPLEX_INSTALL_PREFIX}lib/evoplex/")
+set(EVOPLEX_INSTALL_INCLUDES "${EVOPLEX_INSTALL_PREFIX}include/evoplex/")
 
 # Compile source
 add_subdirectory(src)
 
 # copy text files
-if(WIN32)
-  set(TXTDIR "bin/")
-endif(WIN32)
 foreach(TXTFILE LICENSE.txt README.md CHANGELOG.md)
-  configure_file(${TXTFILE} "${CMAKE_CURRENT_BINARY_DIR}/${TXTDIR}${TXTFILE}" COPYONLY)
-  install(FILES ${TXTFILE} DESTINATION "share/evoplex/${TXTDIR}")
+  configure_file(${TXTFILE} "${EVOPLEX_OUTPUT_RESOURCES}${TXTFILE}" COPYONLY)
+  install(FILES ${TXTFILE} DESTINATION "${EVOPLEX_INSTALL_RESOURCES}")
 endforeach(TXTFILE)
 
 # Packaging
