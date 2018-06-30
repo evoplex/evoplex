@@ -32,7 +32,7 @@ set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}-${EV
 set(CPACK_OUTPUT_FILE_PREFIX releases)
 
 if(APPLE)
-  install(CODE "execute_process(COMMAND macdeployqt ${CMAKE_BINARY_DIR}/bin/${PROJECT_NAME}.app -executable=${CMAKE_BINARY_DIR}/bin/${PROJECT_NAME}.app/Contents/MacOS/${PROJECT_NAME})")
+  install(CODE "execute_process(COMMAND macdeployqt ${CMAKE_BINARY_DIR}/${PROJECT_NAME}.app -executable=${CMAKE_BINARY_DIR}/${PROJECT_NAME}.app/Contents/MacOS/${PROJECT_NAME})")
 
   set(CPACK_GENERATOR "DragNDrop")
   set(CPACK_SYSTEM_NAME "OSX")
