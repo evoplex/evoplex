@@ -31,7 +31,10 @@ set(CPACK_RESOURCE_FILE_README "${CMAKE_SOURCE_DIR}/README.md")
 set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}-${EVOPLEX_RELEASE}.${CMAKE_SYSTEM_PROCESSOR}")
 set(CPACK_OUTPUT_FILE_PREFIX releases)
 
-if(APPLE)
+if(WIN32)
+  add_custom_target(win-installer COMMAND "bash ${CMAKE_SOURCE_DIR}/src/utils/win/win-installer.sh")
+
+elseif(APPLE)
   install(CODE "execute_process(COMMAND macdeployqt ${CMAKE_BINARY_DIR}/${PROJECT_NAME}.app -executable=${CMAKE_BINARY_DIR}/${PROJECT_NAME}.app/Contents/MacOS/${PROJECT_NAME})")
 
   set(CPACK_GENERATOR "DragNDrop")
