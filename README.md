@@ -1,7 +1,7 @@
 # Evoplex
 
 [![travis-ci](https://travis-ci.org/evoplex/evoplex.svg?branch=master)](https://travis-ci.org/evoplex/evoplex)
-[![appveyor](https://ci.appveyor.com/api/projects/status/ulck2seq9rqgawbr?svg=true)](https://ci.appveyor.com/project/cardinot/evoplex)
+[![appveyor](https://ci.appveyor.com/api/projects/status/ulck2seq9rqgawbr/branch/master?svg=true)](https://ci.appveyor.com/project/cardinot/evoplex/branch/master)
 [![coveralls](https://coveralls.io/repos/github/evoplex/evoplex/badge.svg)](https://coveralls.io/github/evoplex/evoplex)
 [![codecov](https://codecov.io/gh/evoplex/evoplex/branch/master/graph/badge.svg)](https://codecov.io/gh/evoplex/evoplex)
 [![gitter](https://badges.gitter.im/EvoplexMAS/evoplex.svg)](https://gitter.im/EvoplexMAS/evoplex?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
