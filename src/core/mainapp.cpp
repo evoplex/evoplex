@@ -260,7 +260,7 @@ bool MainApp::unloadPlugin(const AbstractPlugin* plugin, QString& error)
     return true;
 }
 
-ProjectSP MainApp::newProject(QString& error, const QString& filepath)
+ProjectPtr MainApp::newProject(QString& error, const QString& filepath)
 {
     if (m_projects.size() > EVOPLEX_MAX_PROJECTS) {
         error = "There are too many opened projects already!";
@@ -291,7 +291,7 @@ ProjectSP MainApp::newProject(QString& error, const QString& filepath)
     }
 
     const int projectId = static_cast<int>(m_projects.size());
-    ProjectSP project = ProjectSP::create(this, projectId);
+    ProjectPtr project = ProjectPtr::create(this, projectId);
     if (!project->init(error, filepath)) {
         return nullptr;
     }
@@ -302,7 +302,7 @@ ProjectSP MainApp::newProject(QString& error, const QString& filepath)
 
 void MainApp::closeProject(int projId)
 {
-    std::map<int, ProjectSP>::iterator it = m_projects.find(projId);
+    std::map<int, ProjectPtr>::iterator it = m_projects.find(projId);
     if (it != m_projects.end()) {
         (*it).second->destroyExperiments();
         (*it).second.clear();

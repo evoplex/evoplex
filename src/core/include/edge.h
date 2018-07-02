@@ -36,7 +36,7 @@ class Edge
 {
 public:
     explicit Edge();
-    explicit Edge(Node *origin, Node *neighbour, Attributes* attrs, bool isDirected);
+    explicit Edge(Node* origin, Node* neighbour, Attributes* attrs, bool isDirected);
     explicit Edge(Node* origin, Node* neighbour, bool isDirected);
     ~Edge();
 

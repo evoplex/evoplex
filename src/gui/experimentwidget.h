@@ -39,7 +39,7 @@ public:
     ~ExperimentWidget();
 
     virtual void clearSelection() { emit (clearSelections()); }
-    virtual ProjectSP project() const { return m_exp->project(); }
+    virtual ProjectPtr project() const { return m_exp->project(); }
     inline Experiment* exp() const { return m_exp; }
 
 signals:

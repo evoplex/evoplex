@@ -83,7 +83,7 @@ public:
     static ExperimentInputs* readInputs(const MainApp* mainApp,
             const QStringList& header, const QStringList& values, QString& errorMsg);
 
-    explicit Experiment(MainApp* mainApp, ExperimentInputs* inputs, ProjectSP project);
+    explicit Experiment(MainApp* mainApp, ExperimentInputs* inputs, ProjectPtr project);
 
     ~Experiment();
 
@@ -123,15 +123,15 @@ public:
     inline void setAutoDeleteTrials(bool b) { m_autoDeleteTrials = b; }
 
     inline bool hasOutputs() const { return !m_outputs.empty(); }
-    inline void addOutput(OutputSP output) { m_outputs.insert(output); }
-    bool removeOutput(OutputSP output);
-    OutputSP searchOutput(const OutputSP find);
+    inline void addOutput(OutputPtr output) { m_outputs.insert(output); }
+    bool removeOutput(OutputPtr output);
+    OutputPtr searchOutput(const OutputPtr find);
 
     AbstractModel* trial(int trialId) const;
     inline const std::unordered_map<int, AbstractModel*>& trials() const { return m_trials; }
 
     inline int id() const { return m_id; }
-    inline ProjectSP project() const { return m_project; }
+    inline ProjectPtr project() const { return m_project; }
     inline int numTrials() const { return m_numTrials; }
     inline const ExperimentInputs* inputs() const { return m_inputs; }
     inline const QString& modelId() const { return m_modelPlugin->id(); }
@@ -153,7 +153,7 @@ private:
     QMutex m_mutex;
     MainApp* m_mainApp;
     const int m_id;
-    ProjectSP m_project;
+    ProjectPtr m_project;
 
     const ExperimentInputs* m_inputs;
     const GraphPlugin* m_graphPlugin;
@@ -164,7 +164,7 @@ private:
 
     QString m_fileHeader;   // file header is the same for all trials; let's save it then
     QString m_filePathPrefix;
-    std::unordered_set<OutputSP> m_outputs;
+    std::unordered_set<OutputPtr> m_outputs;
 
     int m_pauseAt;
     Status m_expStatus;

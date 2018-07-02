@@ -62,7 +62,7 @@ public slots:
     void setFontSize(int size);
 
 private slots:
-    void updateSaveButtons(ProjectSP proj);
+    void updateSaveButtons(ProjectPtr proj);
     void slotPage(QAction* action);
     void slotSave();
     void slotSaveAs();

@@ -364,11 +364,11 @@ void ExperimentDesigner::slotOutputWidget()
 
     OutputWidget* ow = new OutputWidget(model, trialIds, this, currFileCaches);
     if (ow->exec() == QDialog::Accepted) {
-        std::unordered_set<OutputSP> outputs;
+        std::unordered_set<OutputPtr> outputs;
         for (auto& it : ow->caches()) outputs.insert(it.second->output());
 
         QString outputStr;
-        for (OutputSP o : outputs) outputStr += o->printableHeader('_', true) + ";";
+        for (OutputPtr o : outputs) outputStr += o->printableHeader('_', true) + ";";
         outputStr.chop(1);
 
         m_widgetFields.value(OUTPUT_HEADER).value<QLineEdit*>()->setText(outputStr);

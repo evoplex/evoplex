@@ -31,7 +31,7 @@
 
 namespace evoplex {
 
-ProjectWidget::ProjectWidget(ProjectSP project, MainGUI* mainGUI, ProjectsPage* ppage)
+ProjectWidget::ProjectWidget(ProjectPtr project, MainGUI* mainGUI, ProjectsPage* ppage)
     : PPageDockWidget(ppage)
     , m_ui(new Ui_ProjectWidget)
     , m_mainGUI(mainGUI)

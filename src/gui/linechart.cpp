@@ -112,7 +112,7 @@ void LineChart::slotOutputWidget()
         Series s;
         s.series = new QtCharts::QLineSeries();
         //s.series->setUseOpenGL(true); TODO: make sure we can call it
-        OutputSP existingOutput = m_exp->searchOutput(cache->output());
+        OutputPtr existingOutput = m_exp->searchOutput(cache->output());
         if (existingOutput && existingOutput != cache->output()) {
             s.cache = existingOutput->addCache(cache->inputs(), {m_currTrialId});
             cache->deleteCache();
@@ -168,7 +168,7 @@ void LineChart::setTrial(int trialId)
     for (Series& s : m_series) {
         s.series->clear(); // remove all points
         Values inputs = s.cache->inputs(); // keep the same inputs
-        OutputSP parent = s.cache->output(); // keep the same parent
+        OutputPtr parent = s.cache->output(); // keep the same parent
         s.cache->deleteCache();
         s.cache = parent->addCache(inputs, {trialId});
     }
@@ -177,7 +177,7 @@ void LineChart::setTrial(int trialId)
 void LineChart::removeAllSeries()
 {
     for (Series& s : m_series) {
-        OutputSP parent = s.cache->output();
+        OutputPtr parent = s.cache->output();
         s.cache->deleteCache();
         if (parent->isEmpty()) {
             m_exp->removeOutput(parent);
