@@ -39,20 +39,26 @@ private slots:
     void tst_valueString();
 };
 
-void TestValue::tst_value(){
+void TestValue::tst_value()
+{
     Value v;
 
-    //VALUE TESTS
-    //Testing validity
-    QVERIFY(v.isValid() == false);
+    // VALUE TESTS
+    // Testing validity
+    QCOMPARE(v.isValid(), false);
 
-    //Testing type
+    // Testing type
     QVERIFY(v.type() == Value::INVALID);
+    QVERIFY(!v.isBool());
+    QVERIFY(!v.isChar());
+    QVERIFY(!v.isDouble());
+    QVERIFY(!v.isInt());
+    QVERIFY(!v.isString());
 
-    //Testing value
+    // Testing value
     QVERIFY_EXCEPTION_THROWN(v.toQString(), std::invalid_argument);
 
-    //COMPARISONS
+    // COMPARISONS
     // same invalid type
     Value v1, v2;
     QVERIFY_EXCEPTION_THROWN(v1 == v2, std::invalid_argument);
@@ -72,36 +78,43 @@ void TestValue::tst_value(){
     QVERIFY_EXCEPTION_THROWN(v1 < v2, std::invalid_argument);
 }
 
-void TestValue::tst_valueBool(){
+void TestValue::tst_valueBool()
+{
     Value v;
 
-    //VALUE TESTS
-    //case where v is set to true
+    // VALUE TESTS
+    // case where v is set to true
     v = Value(true);
 
-    //Testing validity
-    QVERIFY(v.isValid() == true);
+    // Testing validity
+    QCOMPARE(v.isValid(), true);
 
-    //Testing type
+    // Testing type
     QVERIFY(v.type() == Value::BOOL);
+    QVERIFY(v.isBool());
+    QVERIFY(!v.isChar());
+    QVERIFY(!v.isDouble());
+    QVERIFY(!v.isInt());
+    QVERIFY(!v.isString());
 
-    //Testing value
-    QVERIFY(v.toBool() == true);
+    // Testing value
+    QCOMPARE(v.toBool(), true);
     QCOMPARE(v.toQString(), QString("1"));
 
-    //case where v is set to false
+    // case where v is set to false
     v = Value(false);
 
-    //Testing validity
-    QVERIFY(v.isValid() == true);
+    // Testing validity
+    QCOMPARE(v.isValid(), true);
 
-    //Testing type
+    // Testing type
     QVERIFY(v.type() == Value::BOOL);
 
-    //Testing value
-    QVERIFY(v.toBool() == false);
+    // Testing value
+    QCOMPARE(v.toBool(), false);
+    QCOMPARE(v.toQString(), QString("0"));
 
-    //COMPARISON TESTS
+    // COMPARISON TESTS
     Value v1, v2;
     v1 = Value(true), v2 = Value(false);
     QCOMPARE(v1 == v2, false);
@@ -112,23 +125,29 @@ void TestValue::tst_valueBool(){
     QCOMPARE(v1 <  v2, false);
 }
 
-void TestValue::tst_valueDouble(){
+void TestValue::tst_valueDouble()
+{
     Value v;
 
-    //VALUE TESTS
+    // VALUE TESTS
     v = Value(4.5123788);
 
-    //Testing validity
-    QVERIFY(v.isValid() == true);
+    // Testing validity
+    QCOMPARE(v.isValid(), true);
 
-    //Testing type
+    // Testing type
     QVERIFY(v.type() == Value::DOUBLE);
+    QVERIFY(v.isDouble());
+    QVERIFY(!v.isBool());
+    QVERIFY(!v.isChar());
+    QVERIFY(!v.isInt());
+    QVERIFY(!v.isString());
 
-    //Testing value
+    // Testing value
     QCOMPARE(v.toDouble(), 4.5123788);
     QCOMPARE(v.toQString(), QString("4.5123788"));
 
-    //COMPARISON TESTS
+    // COMPARISON TESTS
     Value v1, v2;
     v1 = Value(100.2), v2 = Value(100.1);
     QCOMPARE(v1 == v2, false);
@@ -139,23 +158,29 @@ void TestValue::tst_valueDouble(){
     QCOMPARE(v1 <  v2, false);
 }
 
-void TestValue::tst_valueInt(){
+void TestValue::tst_valueInt()
+{
     Value v;
 
-    //VALUE TESTS
+    // VALUE TESTS
     v = Value(-10);
 
-    //Testing validity
-    QVERIFY(v.isValid() == true);
+    // Testing validity
+    QCOMPARE(v.isValid(), true);
 
-    //Testing type
+    // Testing type
     QVERIFY(v.type() == Value::INT);
+    QVERIFY(v.isInt());
+    QVERIFY(!v.isBool());
+    QVERIFY(!v.isChar());
+    QVERIFY(!v.isDouble());
+    QVERIFY(!v.isString());
 
-    //Testing value
+    // Testing value
     QCOMPARE(v.toInt(), -10);
     QCOMPARE(v.toQString(), QString("-10"));
 
-    //COMPARISON TESTS
+    // COMPARISON TESTS
     Value v1, v2;
     v1 = Value(100), v2 = Value(50);
     QCOMPARE(v1 == v2, false);
@@ -165,24 +190,31 @@ void TestValue::tst_valueInt(){
     QCOMPARE(v1 >  v2, true);
     QCOMPARE(v1 <  v2, false);
 }
-void TestValue::tst_valueChar(){
+void TestValue::tst_valueChar()
+{
     Value v;
 
-    //VALUE TESTS
-    const char* chr = "abc£ãã&";
+    // VALUE TESTS
+    char chr = 'a';
     v = Value(chr);
 
-    //Testing validity
-    QVERIFY(v.isValid() == true);
+    // Testing validity
+    QCOMPARE(v.isValid(), true);
 
-    //Testing type
-    //Verify that it is a string, as chr is a character pointer.
-    QVERIFY(v.type() == Value::STRING);
+    // Testing type
+    // Verify that it is a string, as chr is a character pointer.
+    QVERIFY(v.type() == Value::CHAR);
+    QVERIFY(v.isChar());
+    QVERIFY(!v.isString());
+    QVERIFY(!v.isBool());
+    QVERIFY(!v.isDouble());
+    QVERIFY(!v.isInt());
 
-    //Testing value
-    QCOMPARE(v.toString(), chr);
+    // Testing value
+    QCOMPARE(v.toChar(), chr);
+    QCOMPARE(v.toQString(), QString("a"));
 
-    //COMPARISON TESTS
+    // COMPARISON TESTS
     Value v1, v2;
     v1 = Value('d'), v2 = Value('c');
     QCOMPARE(v1 == v2, false);
@@ -192,25 +224,31 @@ void TestValue::tst_valueChar(){
     QCOMPARE(v1 >  v2, true);
     QCOMPARE(v1 <  v2, false);
 }
-void TestValue::tst_valueString(){
+void TestValue::tst_valueString()
+{
     Value v;
 
-    //VALUE TESTS
+    // VALUE TESTS
     QString str("abc£ãã&");
     const char* chr = "abc£ãã&";
     v = Value(str);
 
-    //Testing validity
-    QVERIFY(v.isValid() == true);
+    // Testing validity
+    QCOMPARE(v.isValid(), true);
 
-    //Testing type
+    // Testing type
     QVERIFY(v.type() == Value::STRING);
+    QVERIFY(v.isString());
+    QVERIFY(!v.isBool());
+    QVERIFY(!v.isChar());
+    QVERIFY(!v.isDouble());
+    QVERIFY(!v.isInt());
 
-    //Testing value
+    // Testing value
     QCOMPARE(v.toString(), chr);
     QCOMPARE(v.toQString(), str);
 
-    //COMPARISON TESTS
+    // COMPARISON TESTS
     Value v1, v2;
     v1 = Value("abc$"), v2 = Value("iua^sd");
     QCOMPARE(v1 == v2, false);

@@ -139,7 +139,6 @@ void TestPRG::tst_randS()
     v = prg->randS(min, max);
     QVERIFY(v >= min && v <= max);
 
-
     // negative
     min = -100;
     max = -50;
@@ -151,6 +150,12 @@ void TestPRG::tst_randS()
     max = min;
     v = prg->randS(min, max);
     QVERIFY(v == min);
+
+    // large numbers
+    min = UINT64_MAX - 10;
+    max = UINT64_MAX;
+    v = prg->randS(min, max);
+    QVERIFY(v >= min && v <= max);
 
     delete prg;
 }
