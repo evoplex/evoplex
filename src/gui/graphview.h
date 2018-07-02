@@ -37,7 +37,7 @@ protected:
 
 private:
     struct Cache {
-        Node* node = nullptr;
+        const Node* node = nullptr;
         QPointF xy;
         std::vector<QLineF> edges;
     };

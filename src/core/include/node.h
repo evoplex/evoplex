@@ -56,7 +56,7 @@ public:
     inline void setY(int y);
     inline void setCoords(int x, int y);
 
-    inline const Edges edges() const;
+    inline const Edges& edges() const;
     inline Node* neighbour(int localId) const;
     inline Node* randNeighbour(PRG* prg) const;
 
@@ -105,7 +105,7 @@ inline void Node::setY(int y)
 inline void Node::setCoords(int x, int y)
 { setX(x); setY(y); }
 
-inline const Edges Node::edges() const
+inline const Edges& Node::edges() const
 { return m_edges; }
 
 inline Node* Node::neighbour(int localId) const

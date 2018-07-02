@@ -64,7 +64,7 @@ int GraphView::refreshCache()
     float edgeSizeRate = m_edgeSizeRate * std::pow(1.25f, m_zoomLevel);
     m_cache.reserve(nodes.size());
 
-    for (Node* node : nodes) {
+    for (const Node* node : nodes) {
         QPointF xy(m_origin.x() + edgeSizeRate * (1.0 + node->x()),
                    m_origin.y() + edgeSizeRate * (1.0 + node->y()));
 
