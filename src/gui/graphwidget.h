@@ -37,7 +37,15 @@ class Ui_GraphWidget;
 
 namespace evoplex {
 
-class GraphWidget : public QDockWidget
+class GraphWidgetInterface
+{
+protected:
+    virtual void paintEvent(QPaintEvent*) = 0;
+    virtual NodePtr selectNode(const QPoint& pos) const = 0;
+    virtual int refreshCache() = 0;
+};
+
+class GraphWidget : public QDockWidget, public GraphWidgetInterface
 {
     Q_OBJECT
 
@@ -72,8 +80,7 @@ protected:
     void mouseReleaseEvent(QMouseEvent* e);
     void resizeEvent(QResizeEvent* e);
 
-    virtual void paintEvent(QPaintEvent*) = 0;
-    virtual const Node* selectNode(const QPoint& pos) const = 0;
+    virtual int refreshCache() { return Ready; }
 
 public slots:
     void updateView(bool forceUpdate);
@@ -95,10 +102,9 @@ private:
 
     std::vector<QLineEdit*> m_attrs;
 
-    void updateInspector(const Node* node);
+    void updateInspector(const NodePtr& node);
 
     void updateCache(bool force=false);
-    virtual int refreshCache() = 0;
 };
 }
 

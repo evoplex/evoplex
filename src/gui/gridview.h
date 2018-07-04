@@ -35,16 +35,15 @@ public:
 
 protected:
     void paintEvent(QPaintEvent*) override;
-    virtual const Node* selectNode(const QPoint& pos) const;
+    virtual NodePtr selectNode(const QPoint& pos) const override;
+    virtual int refreshCache() override;
 
 private:
     struct Cache {
-        Node* node = nullptr;
+        NodePtr node = nullptr;
         QRectF rect;
     };
     std::vector<Cache> m_cache;
-
-    virtual int refreshCache();
 };
 
 } // evoplex

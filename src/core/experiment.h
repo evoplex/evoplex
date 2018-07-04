@@ -196,13 +196,10 @@ private:
     // The trials are meant to have the same initial population.
     // So, considering that it might be a very expensive operation (eg, I/O),
     // this method will try to do the heavy stuff only once, storing the
-    // initial population in the 'm_clonableNodes' vector. Except when
+    // initial population in the 'm_clonableNodes' container. Except when
     // the experiment has only one trial.
     // This method is NOT thread-safe.
     Nodes createNodes();
-
-    // clone a population of nodes
-    Nodes cloneNodes(const Nodes& nodes) const;
 
     void deleteTrials();
 

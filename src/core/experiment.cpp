@@ -131,7 +131,7 @@ void Experiment::deleteTrials()
     }
     m_trials.clear();
 
-    Utils::deleteAndShrink(m_clonableNodes);
+    m_clonableNodes.clear();
 }
 
 void Experiment::updateProgressValue()
@@ -212,7 +212,7 @@ void Experiment::processTrial(const int& trialId)
         algorithmConverged = trial->algorithmStep();
         ++trial->m_currStep;
 
-        for (OutputPtr output : m_outputs)
+        for (const OutputPtr& output : m_outputs)
             output->doOperation(trialId, trial);
 
         if (m_inputs->fileCaches.size()
@@ -324,7 +324,7 @@ Nodes Experiment::createNodes()
             Nodes().swap(m_clonableNodes);
             return nodes;
         }
-        return cloneNodes(m_clonableNodes);
+        return Utils::clone(m_clonableNodes);
     }
 
     Q_ASSERT_X(m_trials.empty(), "Experiment::createNodes",
@@ -346,20 +346,10 @@ Nodes Experiment::createNodes()
                          .arg(errMsg).arg(m_project->name()).arg(m_id);
         qWarning() << errMsg;
     } else if (m_numTrials > 1) {
-        m_clonableNodes = cloneNodes(nodes);
+        m_clonableNodes = Utils::clone(nodes);
     }
 
     return nodes;
-}
-
-Nodes Experiment::cloneNodes(const Nodes& nodes) const
-{
-    Nodes cloned;
-    cloned.reserve(nodes.size());
-    for (Nodes::const_iterator it = nodes.begin(); it != nodes.end(); ++it) {
-        cloned.emplace_back((*it)->clone());
-    }
-    return cloned;
 }
 
 AbstractModel* Experiment::trial(int trialId) const

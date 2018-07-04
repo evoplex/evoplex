@@ -29,6 +29,7 @@
 
 #include "abstractmodel.h"
 #include "attributes.h"
+#include "attributerange.h"
 #include "modelplugin.h"
 #include "stats.h"
 

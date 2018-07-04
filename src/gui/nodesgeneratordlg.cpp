@@ -154,7 +154,7 @@ void NodesGeneratorDlg::slotSaveAs()
         pValue = numNodes;
         saved = NodesGenerator::saveToFile(path, nodes, progress);
 
-        Utils::deleteAndShrink(nodes);
+        nodes.clear();
     }
 
     if (saved) {

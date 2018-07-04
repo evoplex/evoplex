@@ -32,6 +32,11 @@ class BaseModel : public BasePlugin
 
 public:
     inline AbstractGraph* graph() const;
+    inline const Nodes& nodes() const;
+    inline const NodePtr& node(const int nodeId) const;
+    inline const Edges& edges() const;
+    inline const EdgePtr& edge(const int edgeId) const;
+    inline const EdgePtr& edge(const int originId, const int neighbourId) const;
     inline int currStep() const;
     inline int status() const;
 
@@ -82,6 +87,21 @@ public:
 
 inline AbstractGraph* BaseModel::graph() const
 { return m_graph; }
+
+inline const Nodes& BaseModel::nodes() const
+{ return m_graph->nodes(); }
+
+inline const NodePtr& BaseModel::node(const int nodeId) const
+{ return m_graph->nodes().at(nodeId); }
+
+inline const Edges& BaseModel::edges() const
+{ return m_graph->edges(); }
+
+inline const EdgePtr& BaseModel::edge(const int edgeId) const
+{ return m_graph->edges().at(edgeId); }
+
+inline const EdgePtr& BaseModel::edge(const int originId, const int neighbourId) const
+{ return node(originId)->outEdges().at(neighbourId); }
 
 inline int BaseModel::currStep() const
 { return m_currStep; }

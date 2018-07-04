@@ -50,16 +50,16 @@ int GridView::refreshCache()
     const Nodes& nodes = m_model->graph()->nodes();
     m_cache.reserve(nodes.size());
 
-    for (Node* node : nodes) {
-        QRectF r(m_origin.x() + node->x() * m_nodeRadius,
-                 m_origin.y() + node->y() * m_nodeRadius,
+    for (auto const& np : nodes) {
+        QRectF r(m_origin.x() + np.second->x() * m_nodeRadius,
+                 m_origin.y() + np.second->y() * m_nodeRadius,
                  m_nodeRadius, m_nodeRadius);
 
         if (!rect().contains(r.x(), r.y()))
             continue;
 
         Cache c;
-        c.node = node;
+        c.node = np.second;
         c.rect = r;
         m_cache.emplace_back(c);
     }
@@ -94,7 +94,7 @@ void GridView::paintEvent(QPaintEvent*)
     painter.end();
 }
 
-const Node* GridView::selectNode(const QPoint& pos) const
+NodePtr GridView::selectNode(const QPoint& pos) const
 {
     if (m_cacheStatus == Ready) {
         for (const Cache& cache : m_cache) {

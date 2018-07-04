@@ -22,6 +22,7 @@ set(EVOPLEX_CORE_INCLUDE
   include/plugininterfaces.h
   include/abstractgraph.h
   include/abstractmodel.h
+  include/basegraph.h
   include/baseplugin.h
 
   include/attributes.h
@@ -49,13 +50,13 @@ set(EVOPLEX_CORE_H
 )
 set(EVOPLEX_CORE_CXX
   abstractplugin.cpp
+  basegraph.cpp
   graphplugin.cpp
   modelplugin.cpp
   prg.cpp
 
   attributerange.cpp
   nodesgenerator.cpp
-  edge.cpp
   experiment.cpp
   experimentsmgr.cpp
   output.cpp

@@ -150,18 +150,16 @@ Nodes AGFromFile::create(std::function<void(int)> progress)
                 }
             }
         }
-        nodes.emplace_back(new Node(id, attributes, coordX, coordY));
+        // FIXME: handle node type
+        nodes.insert({id, std::make_shared<UNode>(id, attributes, coordX, coordY)});
         progress(id);
         ++id;
     }
     file.close();
 
-    if (isValid) {
-        nodes.shrink_to_fit();
-    } else {
-        Utils::deleteAndShrink(nodes);
+    if (!isValid) {
+        nodes.clear();
     }
-
     return nodes;
 }
 
@@ -213,7 +211,8 @@ Nodes AGSameFuncForAll::create(std::function<void(int)> progress)
         for (AttributeRange* attrRange : m_attrsScope) {
             attrs.replace(attrRange->id(), attrRange->attrName(), f_value(attrRange));
         }
-        nodes.emplace_back(new Node(nodeId, attrs));
+        // FIXME: handle node type
+        nodes.insert({nodeId, std::make_shared<UNode>(nodeId, attrs)});
         progress(nodeId);
     }
     return nodes;
@@ -279,7 +278,8 @@ Nodes AGDiffFunctions::create(std::function<void(int)> progress)
     Nodes nodes;
     nodes.reserve(m_numNodes);
     for (int nodeId = 0; nodeId < m_numNodes; ++nodeId) {
-        nodes.emplace_back(new Node(nodeId, nodesAttrs.at(nodeId)));
+        // FIXME: handle node type
+        nodes.insert({nodeId, std::make_shared<UNode>(nodeId, nodesAttrs.at(nodeId))});
         progress(nodeId);
     }
     return nodes;
@@ -305,21 +305,21 @@ bool NodesGenerator::saveToFile(QString& filePath, Nodes nodes, std::function<vo
     }
 
     QTextStream out(&file);
-    const std::vector<QString>& header = nodes.front()->attrs().names();
+    const std::vector<QString>& header = (*nodes.begin()).second->attrs().names();
     for (const QString& col : header) {
         out << col << ",";
     }
     out << "x,y\n";
 
-    for (Node* node : nodes) {
-        for (const Value& value : node->attrs().values()) {
+    for (auto const& pair : nodes) {
+        for (const Value& value : pair.second->attrs().values()) {
             out << value.toQString() << ",";
         }
-        out << node->x() << ",";
-        out << node->y() << "\n";
+        out << pair.second->x() << ",";
+        out << pair.second->y() << "\n";
 
         out.flush();
-        progress(node->id());
+        progress(pair.first);
     }
 
     file.close();

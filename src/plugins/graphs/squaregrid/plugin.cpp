@@ -22,6 +22,7 @@
 #include <QtMath>
 
 #include "plugin.h"
+#include "utils.h"
 
 namespace evoplex {
 
@@ -57,34 +58,33 @@ bool SquareGrid::init()
 
 void SquareGrid::reset()
 {
-    Utils::deleteAndShrink(m_edges);
+    m_edges.clear();
 
-    const bool directed = isDirected();
     edgesFunc func;
     if (m_numNeighbours == 4) {
-        func = directed ? directed4Edges : undirected4Edges;
+        func = isDirected() ? directed4Edges : undirected4Edges;
     } else {
-        func = directed ? directed8Edges : undirected8Edges;
+        func = isDirected() ? directed8Edges : undirected8Edges;
     }
 
     if (m_periodic) {
-        for (Node* node : m_nodes) {
+        for (auto const& node : m_nodes) {
             int x, y;
-            Utils::ind2sub(node->id(), m_width, y, x);
-            node->setCoords(x, y);
-            createPeriodicEdges(node->id(), func, directed);
+            Utils::ind2sub(node.first, m_width, y, x);
+            node.second->setCoords(x, y);
+            createPeriodicEdges(node.first, func);
         }
     } else {
-        for (Node* node : m_nodes) {
+        for (auto const& node : m_nodes) {
             int x, y;
-            Utils::ind2sub(node->id(), m_width, y, x);
-            node->setCoords(x, y);
-            createFixedEdges(node->id(), func, directed);
+            Utils::ind2sub(node.first, m_width, y, x);
+            node.second->setCoords(x, y);
+            createFixedEdges(node.first, func);
         }
     }
 }
 
-void SquareGrid::createPeriodicEdges(const int id, edgesFunc func, const bool isDirected)
+void SquareGrid::createPeriodicEdges(const int id, edgesFunc func)
 {
     edges2d neighbors = func(id, m_width);
     for (std::pair<int,int> neighbor : neighbors) {
@@ -102,11 +102,11 @@ void SquareGrid::createPeriodicEdges(const int id, edgesFunc func, const bool is
 
         int nId = Utils::linearIdx(neighbor, m_width);
         Q_ASSERT_X(nId < numNodes(), "SquareGrid::createEdges", "neighbor must exist");
-        m_edges.emplace_back(new Edge(node(id), node(nId), isDirected));
+        addEdge(node(id), node(nId), new Attributes());
     }
 }
 
-void SquareGrid::createFixedEdges(const int id, edgesFunc func, const bool isDirected)
+void SquareGrid::createFixedEdges(const int id, edgesFunc func)
 {
     edges2d neighbors = func(id, m_width);
     for (std::pair<int,int> neighbor : neighbors) {
@@ -116,7 +116,7 @@ void SquareGrid::createFixedEdges(const int id, edgesFunc func, const bool isDir
         }
         int nId = Utils::linearIdx(neighbor, m_width);
         Q_ASSERT_X(nId < numNodes(), "SquareGrid::createEdges", "neighbor must exist");
-        m_edges.emplace_back(new Edge(node(id), node(nId), isDirected));
+        addEdge(node(id), node(nId), new Attributes());
     }
 }
 

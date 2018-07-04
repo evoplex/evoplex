@@ -49,13 +49,15 @@ public:
 protected:
     PRG* m_prg;
 
-    explicit BasePlugin() : m_prg(nullptr), m_attributes(nullptr) {}
+    explicit BasePlugin() : m_prg(nullptr), m_attrs(nullptr) {}
     virtual ~BasePlugin() {}
 
+    // takes the ownership of the PRG
+    // cannot be called twice
     virtual inline bool setup(PRG* prg, const Attributes* attrs);
 
 private:
-    const Attributes* m_attributes;
+    const Attributes* m_attrs;
 };
 
 /************************************************************************
@@ -66,37 +68,37 @@ inline PRG* BasePlugin::prg() const
 { return m_prg; }
 
 inline const Attributes* BasePlugin::attrs() const
-{ return m_attributes; }
+{ return m_attrs; }
 
 inline const QString& BasePlugin::attrName(int attrId) const
-{ return m_attributes->name(attrId); }
+{ return m_attrs->name(attrId); }
 
 inline const Value& BasePlugin::attr(int attrId) const
-{ return m_attributes->value(attrId);  }
+{ return m_attrs->value(attrId);  }
 
 inline const Value& BasePlugin::attr(const char* name) const
-{ return m_attributes->value(name); }
+{ return m_attrs->value(name); }
 
 inline const Value& BasePlugin::attr(const QString& name) const
-{ return m_attributes->value(name); }
+{ return m_attrs->value(name); }
 
 inline const Value& BasePlugin::attr(const char* name, const Value& defaultValue) const
-{ return m_attributes->value(name, defaultValue); }
+{ return m_attrs->value(name, defaultValue); }
 
 inline const Value& BasePlugin::attr(const QString& name, const Value& defaultValue) const
-{ return m_attributes->value(name, defaultValue); }
+{ return m_attrs->value(name, defaultValue); }
 
 inline bool BasePlugin::attrExists(const char* name) const
-{ return m_attributes->contains(name); }
+{ return m_attrs->contains(name); }
 
 inline bool BasePlugin::attrExists(const QString& name) const
-{ return m_attributes->contains(name); }
+{ return m_attrs->contains(name); }
 
 inline bool BasePlugin::setup(PRG* prg, const Attributes* attrs) {
     Q_ASSERT_X(prg, "BasePlugin::setup", "PRG must not be null");
     Q_ASSERT_X(!m_prg, "BasePlugin::setup", "tried to setup a plugin twice");
     m_prg = prg;
-    m_attributes = attrs;
+    m_attrs = attrs;
     return m_prg != nullptr;
 }
 
