@@ -35,7 +35,7 @@
 #include "outputwidget.h"
 #include "ui_experimentdesigner.h"
 
-#include "core/nodesgenerator.h"
+#include "core/attrsgenerator.h"
 
 #define STRING_NULL_PLUGINID "--"
 
@@ -307,20 +307,10 @@ void ExperimentDesigner::slotNodesWidget()
         return;
     }
 
-    NodesGenerator* ag = nullptr;
     const ModelPlugin* model = m_mainApp->models().value(m_selectedModelId);
-    QString cmd = m_widgetFields.value(GENERAL_ATTRIBUTE_NODES).value<QLineEdit*>()->text();
-    if (!cmd.isEmpty()) {
-        QString errorMsg;
-        ag = NodesGenerator::parse(model->nodeAttrsScope(), cmd, errorMsg);
-        if (!errorMsg.isEmpty()) {
-            QMessageBox::warning(this, "Nodes Generator", errorMsg);
-            delete ag;
-            ag = nullptr;
-        }
-    }
+    const QString& cmd = m_widgetFields.value(GENERAL_ATTRIBUTE_NODES).value<QLineEdit*>()->text();
 
-    NodesGeneratorDlg* adlg = new NodesGeneratorDlg(model->nodeAttrsScope(), this, ag);
+    NodesGeneratorDlg* adlg = new NodesGeneratorDlg(this, model->nodeAttrsScope(), cmd);
     if (adlg->exec() == QDialog::Accepted) {
         m_widgetFields.value(GENERAL_ATTRIBUTE_NODES).value<QLineEdit*>()->setText(adlg->readCommand());
     }

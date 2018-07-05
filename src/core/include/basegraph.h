@@ -26,7 +26,7 @@
 
 #include "baseplugin.h"
 #include "edge.h"
-#include "node.h"
+#include "nodes.h"
 
 namespace evoplex {
 

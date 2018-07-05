@@ -25,8 +25,8 @@
 #include <QThread>
 
 #include "experiment.h"
+#include "attrsgenerator.h"
 #include "node.h"
-#include "nodesgenerator.h"
 #include "project.h"
 
 namespace evoplex
@@ -261,7 +261,8 @@ AbstractModel* Experiment::createTrial(const int trialId)
         return nullptr;
     }
 
-    Nodes nodes = createNodes();
+    const QString& gType = m_inputs->generalAttrs->value(GENERAL_ATTRIBUTE_GRAPHTYPE).toString();
+    Nodes nodes = createNodes(BaseGraph::enumFromString(gType));
     if (nodes.empty()) {
         return nullptr;
     }
@@ -270,7 +271,6 @@ AbstractModel* Experiment::createTrial(const int trialId)
     PRG* prg = new PRG(seed + trialId);
 
     AbstractGraph* graphObj = m_graphPlugin->create();
-    QString gType = m_inputs->generalAttrs->value(GENERAL_ATTRIBUTE_GRAPHTYPE).toString();
     if (!graphObj || !graphObj->setup(prg, m_inputs->graphAttrs, nodes, gType) || !graphObj->init()) {
         qWarning() << "unable to create the trials."
                    << "The graph could not be initialized."
@@ -314,9 +314,9 @@ AbstractModel* Experiment::createTrial(const int trialId)
     return modelObj;
 }
 
-Nodes Experiment::createNodes()
+Nodes Experiment::createNodes(const BaseGraph::GraphType gType)
 {
-    if (m_expStatus == INVALID) {
+    if (m_expStatus == INVALID || gType == BaseGraph::Invalid_Type) {
         return Nodes();
     } else if (!m_clonableNodes.empty()) {
         if (static_cast<int>(m_trials.size()) == m_numTrials - 1) {
@@ -330,25 +330,21 @@ Nodes Experiment::createNodes()
     Q_ASSERT_X(m_trials.empty(), "Experiment::createNodes",
                "if there is no trials to run, why is it trying to create nodes?");
 
-    Nodes nodes;
     QString errMsg;
-    NodesGenerator* ag = NodesGenerator::parse(m_modelPlugin->nodeAttrsScope(),
-                m_inputs->generalAttrs->value(GENERAL_ATTRIBUTE_NODES).toQString(), errMsg);
-    if (ag) {
-        nodes = ag->create();
-        delete ag;
-    }
-
-    if (nodes.empty()) {
+    const QString& cmd = m_inputs->generalAttrs->value(GENERAL_ATTRIBUTE_NODES).toQString();
+    Nodes nodes = Nodes::fromCmd(cmd, m_modelPlugin->nodeAttrsScope(), gType, &errMsg);
+    if (!errMsg.isEmpty() || nodes.empty()) {
         errMsg = QString("unable to create the trials."
-                         "The set of nodes could not be created (%1)."
+                         "The set of nodes could not be created.\n %1 \n"
                          "Project: %2 Experiment: %3")
                          .arg(errMsg).arg(m_project->name()).arg(m_id);
         qWarning() << errMsg;
-    } else if (m_numTrials > 1) {
-        m_clonableNodes = Utils::clone(nodes);
+        return Nodes();
     }
 
+    if (m_numTrials > 1) {
+        m_clonableNodes = Utils::clone(nodes);
+    }
     return nodes;
 }
 

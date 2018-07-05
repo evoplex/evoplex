@@ -31,6 +31,9 @@
 
 namespace evoplex {
 
+class Attributes;
+typedef std::vector<Attributes> SetOfAttributes;
+
 class Attributes
 {
 public:
@@ -38,9 +41,11 @@ public:
     Attributes(int size) { resize(size); }
     ~Attributes() {}
 
-    inline int size() const;
     inline void resize(int size);
     inline void reserve(int size);
+
+    inline int size() const;
+    inline bool isEmpty() const;
 
     inline int indexOf(const char* name) const;
     inline int indexOf(const QString& name) const;
@@ -74,14 +79,17 @@ private:
    Attributes: Inline member functions
  ************************************************************************/
 
-inline int Attributes::size() const
-{ return static_cast<int>(m_values.size()); }
-
 inline void Attributes::resize(int size)
 { m_names.resize(size); m_values.resize(size); }
 
 inline void Attributes::reserve(int size)
 { m_names.reserve(size); m_values.reserve(size); }
+
+inline int Attributes::size() const
+{ return static_cast<int>(m_values.size()); }
+
+inline bool Attributes::isEmpty() const
+{ return m_names.empty(); }
 
 inline int Attributes::indexOf(const char* name) const
 { return indexOf(QString::fromLocal8Bit(name)); }

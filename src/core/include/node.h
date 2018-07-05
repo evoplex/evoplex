@@ -22,7 +22,6 @@
 #define NODE_H
 
 #include <memory>
-#include <unordered_map>
 
 #include "attributes.h"
 #include "edge.h"
@@ -37,6 +36,7 @@ class NodeInterface
 {
     friend class BaseGraph;
 public:
+    virtual NodePtr clone() const = 0;
     virtual const Edges& inEdges() const = 0;
     virtual const Edges& outEdges() const = 0;
     virtual int degree() const = 0;
@@ -55,8 +55,6 @@ private:
 class Node : public NodeInterface
 {
 public:
-    inline NodePtr clone();
-
     inline const Attributes& attrs() const;
     inline const Value& attr(const char* name) const;
     inline const Value& attr(const int id) const;
@@ -75,8 +73,8 @@ public:
 protected:
     Edges m_outEdges;
 
-    explicit Node(int id, Attributes attr, int x, int y)
-        : m_id(id), m_attrs(attr), m_x(x), m_y(y) {}
+    explicit Node(int id, Attributes attrs, int x, int y)
+        : m_id(id), m_attrs(attrs), m_x(x), m_y(y) {}
 
     explicit Node(int id, Attributes attr)
         : Node(id, attr, 0, id) {}
@@ -93,10 +91,11 @@ private:
 class UNode : public Node
 {
 public:
-    explicit UNode(int id, Attributes attr, int x, int y) : Node(id, attr, x, y) {}
-    explicit UNode(int id, Attributes attr) : Node(id, attr) {}
+    explicit UNode(int id, Attributes attrs, int x, int y) : Node(id, attrs, x, y) {}
+    explicit UNode(int id, Attributes attrs) : Node(id, attrs) {}
     virtual ~UNode() {}
 
+    inline NodePtr clone() const override;
     inline const Edges& inEdges() const override;
     inline const Edges& outEdges() const override;
     inline int degree() const override;
@@ -115,10 +114,11 @@ private:
 class DNode : public Node
 {
 public:
-    explicit DNode(int id, Attributes attr, int x, int y) : Node(id, attr, x, y) {}
-    explicit DNode(int id, Attributes attr) : Node(id, attr) {}
+    explicit DNode(int id, Attributes attrs, int x, int y) : Node(id, attrs, x, y) {}
+    explicit DNode(int id, Attributes attrs) : Node(id, attrs) {}
     virtual ~DNode() {}
 
+    inline NodePtr clone() const override;
     inline const Edges& inEdges() const override;
     inline const Edges& outEdges() const override;
     inline int degree() const override;
@@ -136,37 +136,9 @@ private:
     inline void clearOutEdges() override;
 };
 
-struct Nodes : public std::unordered_map<int, NodePtr>
-{
-    struct Iterator : public iterator {
-        Iterator() {}
-        Iterator(const iterator& _a) : iterator(_a) {}
-        const int& id() const { return (*this)->first; }
-        NodePtr& node() const { return (*this)->second; }
-    };
-
-    struct ConstIterator : public const_iterator {
-        ConstIterator() {}
-        ConstIterator(const const_iterator& _a) : const_iterator(_a) {}
-        const int& id() const { return (*this)->first; }
-        const NodePtr& node() const { return (*this)->second; }
-    };
-
-    struct Pair {
-        const std::pair<const int, NodePtr>& _p;
-        Pair(const std::pair<const int, NodePtr>& _a) : _p(_a) {}
-        const int& id() const { return _p.first; }
-        const NodePtr& node() const { return _p.second; }
-    };
-};
-
 /************************************************************************
    Node: Inline member functions
  ************************************************************************/
-
-// FIXME: node type
-inline NodePtr Node::clone()
-{ return std::make_shared<UNode>(m_id, m_attrs, m_x, m_y); }
 
 inline const Attributes& Node::attrs() const
 { return m_attrs; }
@@ -205,6 +177,9 @@ inline const NodePtr& Node::randNeighbour(PRG* prg) const
    UNode: Inline member functions
  ************************************************************************/
 
+inline NodePtr UNode::clone() const
+{ return std::make_shared<UNode>(id(), attrs(), x(), y()); }
+
 inline const Edges& UNode::inEdges() const
 { return m_outEdges; }
 
@@ -241,6 +216,9 @@ inline void UNode::clearOutEdges()
 /************************************************************************
    DNode: Inline member functions
  ************************************************************************/
+
+inline NodePtr DNode::clone() const
+{ return std::make_shared<DNode>(id(), attrs(), x(), y()); }
 
 inline const Edges& DNode::inEdges() const
 { return m_inEdges; }

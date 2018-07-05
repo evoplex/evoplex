@@ -18,19 +18,18 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef NODESGENERATOR_H
-#define NODESGENERATOR_H
-
-#include <functional>
+#ifndef ATTRS_GENERATOR_H
+#define ATTRS_GENERATOR_H
 
 #include "attributerange.h"
-#include "node.h"
 #include "modelplugin.h"
 
-namespace evoplex
-{
+namespace evoplex {
 
-class NodesGenerator
+class AGSameFuncForAll;
+class AGDiffFunctions;
+
+class AttrsGenerator
 {
 public:
     enum Mode {
@@ -51,55 +50,49 @@ public:
     static Function enumFromString(const QString& funcStr);
 
     // Expected commands:
-    //   path to a csv file
-    //     'filepath'
-    //   same mode for all attributes
-    //     '*numNodes;[min|max|rand_seed]'
-    //   specific mode for each attribute
-    //     '#numNodes;attrName_[min|max|rand_seed|value_val];...'
-    static NodesGenerator* parse(const AttributesScope& nodeAttrsScope,
-                                  const QString& command, QString& errMsg);
+    //     - same mode for all attributes:
+    //         '*integer;[min|max|rand_seed]'
+    //     - specific mode for each attribute:
+    //         '#integer;attrName_[min|max|rand_seed|value_val];...'
+    static AttrsGenerator* parse(const AttributesScope& attrsScope, const QString& cmd, QString* errMsg = nullptr);
 
-    // Export set of nodes to a csv file
-    static bool saveToFile(QString& filepath, Nodes nodes, std::function<void(int)>& progress);
-
-    virtual ~NodesGenerator() {}
-
-    virtual Nodes create(std::function<void(int)> progress = [](int){}) = 0;
+    virtual ~AttrsGenerator() {}
+    virtual SetOfAttributes create(std::function<void(int)> progress = [](int){}) = 0;
 
     inline const QString& command() { return m_command; }
+    inline int numCopies() const { return m_numCopies; }
 
 protected:
-    explicit NodesGenerator(const AttributesScope &nodeAttrsScope);
-
     const AttributesScope m_attrsScope;
+    const int m_numCopies;
     QString m_command;
-};
 
-// Import a set of nodes from a csv file
-class AGFromFile : public NodesGenerator
-{
-public:
-    explicit AGFromFile(const AttributesScope& attrsScope, const QString& filePath);
-    Nodes create(std::function<void(int)> progress = [](int){});
-    inline const QString& filePath() const { return m_filePath; }
+    explicit AttrsGenerator(const AttributesScope& attrsScope, const int numCopies);
+
 private:
-    const QString m_filePath;
+    // auxiliar parser for commands starting with '*'
+    static AGSameFuncForAll* parseStarCmd(const AttributesScope& attrsScope,
+            const int numCopies, const QStringList& cmds, QString* errMsg = nullptr);
+
+    // auxiliar parser for commands starting with '#'
+    static AGDiffFunctions* parseHashCmd(const AttributesScope& attrsScope,
+            const int numCopies, const QStringList& cmds, QString* errMsg = nullptr);
 };
 
-// using the same function for all node attribute
-class AGSameFuncForAll : public NodesGenerator
+
+// using the same function for all attributes
+class AGSameFuncForAll : public AttrsGenerator
 {
 public:
-    explicit AGSameFuncForAll(const AttributesScope& attrsScope, const int numNodes,
+    explicit AGSameFuncForAll(const AttributesScope& attrsScope, const int numCopies,
                               const Function& func, const Value& funcInput);
-    ~AGSameFuncForAll();
-    Nodes create(std::function<void(int)> progress = [](int){});
-    inline int numNodes() const { return m_numNodes; }
+    virtual ~AGSameFuncForAll();
+
+    SetOfAttributes create(std::function<void(int)> progress = [](int){});
     inline Function function() const { return m_function; }
     inline const Value& functionInput() const { return m_functionInput; }
+
 private:
-    const int m_numNodes;
     const Function m_function;
     const Value m_functionInput;
 
@@ -107,8 +100,9 @@ private:
     PRG* m_prg;
 };
 
-// using different functions for each node attribute
-class AGDiffFunctions : public NodesGenerator
+
+// using different functions for each attribute
+class AGDiffFunctions : public AttrsGenerator
 {
 public:
     struct AttrCmd {
@@ -118,15 +112,16 @@ public:
         Value funcInput;
     };
 
-    explicit AGDiffFunctions(const AttributesScope& attrsScope, const int numNodes,
+    explicit AGDiffFunctions(const AttributesScope& attrsScope, const int numCopies,
                              std::vector<AttrCmd> attrCmds);
-    Nodes create(std::function<void(int)> progress = [](int){});
-    inline int numNodes() const { return m_numNodes; }
+    virtual ~AGDiffFunctions() {}
+
+    SetOfAttributes create(std::function<void(int)> progress = [](int){});
     inline const std::vector<AttrCmd>& attrCmds() const { return m_attrCmds; }
+
 private:
-    const int m_numNodes;
     const std::vector<AttrCmd> m_attrCmds;
 };
 
 } // evoplex
-#endif // NODESGENERATOR_H
+#endif // ATTRS_GENERATOR_H

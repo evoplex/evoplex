@@ -317,12 +317,12 @@ std::vector<Cache*> Output::parseHeader(const QStringList& header, const std::ve
             return caches;
         }
 
-        OutputPtr output (new DefaultOutput(func, entity, attrRange));
+        OutputPtr output = std::make_shared<DefaultOutput>(func, entity, attrRange);
         caches.emplace_back(output->addCache(attrHeader, trialIds));
     }
 
     if (!customHeader.empty()) {
-        OutputPtr output (new CustomOutput());
+        OutputPtr output = std::make_shared<CustomOutput>();
         caches.emplace_back(output->addCache(customHeader, trialIds));
     }
 
