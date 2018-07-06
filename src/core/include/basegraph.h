@@ -25,7 +25,7 @@
 #include <QMutex>
 
 #include "baseplugin.h"
-#include "edge.h"
+#include "edges.h"
 #include "nodes.h"
 
 namespace evoplex {

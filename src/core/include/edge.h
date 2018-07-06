@@ -37,8 +37,10 @@ typedef std::shared_ptr<Edge> EdgePtr;
 class Edge
 {
 public:
-    explicit Edge(int id, const NodePtr& origin, const NodePtr& neighbour, Attributes* attrs, bool takesOwnership)
-        : m_id(id), m_origin(origin), m_neighbour(neighbour), m_attrs(attrs), m_takesOwnership(takesOwnership) {}
+    explicit Edge(int id, const NodePtr& origin, const NodePtr& neighbour,
+        Attributes* attrs, bool takesOwnership)
+        : m_id(id), m_origin(origin), m_neighbour(neighbour), m_attrs(attrs),
+          m_takesOwnership(takesOwnership) {}
 
     ~Edge() { if (m_takesOwnership) delete m_attrs; }
 
@@ -57,30 +59,6 @@ private:
     const NodePtr& m_neighbour;
     Attributes* m_attrs;
     bool m_takesOwnership;
-};
-
-struct Edges : public std::unordered_map<int, EdgePtr>
-{
-    struct Iterator : public iterator {
-        Iterator() {}
-        Iterator(const iterator& _a) : iterator(_a) {}
-        const int& id() const { return (*this)->first; }
-        EdgePtr& edge() const { return (*this)->second; }
-    };
-
-    struct ConstIterator : public const_iterator {
-        ConstIterator() {}
-        ConstIterator(const const_iterator& _a) : const_iterator(_a) {}
-        const int& id() const { return (*this)->first; }
-        const EdgePtr& edge() const { return (*this)->second; }
-    };
-
-    struct Pair {
-        const std::pair<const int, EdgePtr>& _p;
-        Pair(const std::pair<const int, EdgePtr>& _a) : _p(_a) {}
-        const int& id() const { return _p.first; }
-        const EdgePtr& edge() const { return _p.second; }
-    };
 };
 
 /************************************************************************

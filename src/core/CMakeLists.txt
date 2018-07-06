@@ -30,6 +30,7 @@ set(EVOPLEX_CORE_INCLUDE
   include/node.h
   include/nodes.h
   include/edge.h
+  include/edges.h
   include/constants.h
   include/prg.h
   include/utils.h

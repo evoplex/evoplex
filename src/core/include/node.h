@@ -24,7 +24,7 @@
 #include <memory>
 
 #include "attributes.h"
-#include "edge.h"
+#include "edges.h"
 #include "prg.h"
 
 namespace evoplex {

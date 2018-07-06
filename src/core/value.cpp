@@ -103,7 +103,6 @@ Value& Value::operator=(const Value& v)
         case CHAR: m_data.c = v.m_data.c; break;
         case STRING: m_data.s = qstrdup(v.toString());
         case INVALID: break;
-        default: throw std::invalid_argument("non-existent type");
         }
     }
     return *this;
