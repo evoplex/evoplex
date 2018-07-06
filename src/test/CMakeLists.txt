@@ -20,6 +20,8 @@
 
 
 set(TESTS
+  tst_attributes
+  tst_node
   tst_prg
   tst_value
 )

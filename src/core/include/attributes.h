@@ -34,6 +34,10 @@ namespace evoplex {
 class Attributes;
 typedef std::vector<Attributes> SetOfAttributes;
 
+/**
+ *  @brief A container of Values which offers fixed time access to
+ *  individual elements in any order by id and linear time by name.
+ */
 class Attributes
 {
 public:
@@ -41,7 +45,24 @@ public:
     Attributes(int size) { resize(size); }
     ~Attributes() {}
 
+    /** @brief  Resizes the container to the specified number of elements.
+     *  @param  size Number of elements the container should contain.
+     *  This function will resize the container to the specified
+     *  number of elements. If the number is smaller than the
+     *  container's current size the container is truncated, otherwise
+     *  default constructed elements, i.e., empty name and Value() are
+     *  appended. */
     inline void resize(int size);
+
+    /** @brief Attempt to preallocate enough memory for specified number
+     *         of elements.
+     *  @param size  Number of elements required.
+     *  @throw std::length_error  If size n exceeds maximum size.
+     *  This function attempts to reserve enough memory for the
+     *  container to hold the specified number of elements.  If the
+     *  number requested is more than max_size(), length_error is
+     *  thrown.
+     */
     inline void reserve(int size);
 
     inline int size() const;
@@ -60,14 +81,14 @@ public:
     inline const QString& name(int id) const;
 
     inline const std::vector<Value>& values() const;
-
-    inline void setValue(int id, const Value& value);
-
     inline const Value& value(int id) const;
     inline const Value& value(const char* name) const;
     inline const Value& value(const QString& name) const;
+    inline const Value& value(int id, const Value& defaultValue) const;
     inline const Value& value(const char* name, const Value& defaultValue) const;
     inline const Value& value(const QString& name, const Value& defaultValue) const;
+
+    inline void setValue(int id, const Value& value);
 
 private:
     std::vector<QString> m_names;
@@ -120,9 +141,6 @@ inline const QString& Attributes::name(int id) const
 inline const std::vector<Value>& Attributes::values() const
 { return m_values; }
 
-inline void Attributes::setValue(int id, const Value& value)
-{ m_values.at(id) = value; }
-
 inline const Value& Attributes::value(int id) const
 { return m_values.at(id); }
 
@@ -131,6 +149,9 @@ inline const Value& Attributes::value(const char* name) const
 
 inline const Value& Attributes::value(const QString& name) const
 { return value(indexOf(name)); }
+
+inline const Value& Attributes::value(int id, const Value& defaultValue) const
+{ return (id >= 0 && id < size()) ? m_values.at(id) : defaultValue; }
 
 inline const Value& Attributes::value(const char* name, const Value& defaultValue) const {
     const int idx = indexOf(name);
@@ -142,6 +163,8 @@ inline const Value& Attributes::value(const QString& name, const Value& defaultV
     return idx < 0 ? defaultValue : value(idx);
 }
 
+inline void Attributes::setValue(int id, const Value& value)
+{ m_values.at(id) = value; }
 
 } // evoplex
 #endif // ATTRIBUTES_H
