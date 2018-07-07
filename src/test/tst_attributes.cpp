@@ -39,7 +39,7 @@ private slots:
 private: // auxiliary functions
     void _tst_empty(Attributes a);
     void _tst_resize(Attributes a, const int kSize);
-    void _tst_replace(Attributes a, int id, QString newName, Value newValue);
+    void _tst_replace(Attributes a, int id, QString newName, Value newValue, int origSize);
     void _tst_replace_invalid(Attributes a, int id, QString newName, Value newValue);
     void _tst_push_back(Attributes a, QString newName, Value newValue, int origSize);
     void _tst_setValue_with_name(Attributes a, int id, QString newName, Value newValue);
@@ -124,18 +124,16 @@ void TestAttributes::tst_resize()
     _tst_empty(a2);
 }
 
-void TestAttributes::_tst_replace(Attributes a, int id, QString newName, Value newValue)
+void TestAttributes::_tst_replace(Attributes a, int id, QString newName, Value newValue, int origSize)
 {
      QVERIFY(!a.isEmpty());
-     // TODO: Compare size?
+     QCOMPARE(a.size(), origSize);
 
      QCOMPARE(a.indexOf(newName), id);
-     // TODO: String version of name and/or value? (see below)
-//    QCOMPARE(a.indexOf(QString("abc")), -1);
+     QCOMPARE(a.indexOf(QString(newName)), id);
 
      QVERIFY(a.contains(newName));
-     // TODO: String version of name and/or value? (see below)
-//    QVERIFY(!a.contains(QString("abc")));
+     QVERIFY(a.contains(QString(newName)));
 
      QVERIFY(!a.names().empty());
      QCOMPARE(a.name(id), newName);
@@ -157,18 +155,18 @@ void TestAttributes::tst_replace()
     Attributes a1(3);
     a1.setValue(0, Value(123));
     a1.replace(0, "test", Value(234));
-    _tst_replace(a1, 0, "test", Value(234));
+    _tst_replace(a1, 0, "test", Value(234), 3);
 
     // test for attribute with nothing in position
     Attributes a2(3);
     a2.replace(0, "test", Value(234));
-    _tst_replace(a2, 0, "test", Value(234));
+    _tst_replace(a2, 0, "test", Value(234), 3);
 
     // test for empty attribute, resized
     Attributes a3;
     a3.resize(3);
     a3.replace(0, "test", Value(234));
-    _tst_replace(a3, 0, "test", Value(234));
+    _tst_replace(a3, 0, "test", Value(234), 3);
 }
 
 void TestAttributes::_tst_push_back(Attributes a, QString newName, Value newValue, int origSize)
@@ -246,7 +244,7 @@ void TestAttributes::_tst_setValue(Attributes a, int id, Value newValue){
     QVERIFY(a.size() > 0);
     QVERIFY(!a.isEmpty());
 
-    // Recreate for values
+    // FOR WITH NAME FUNCTION
 //    QCOMPARE(a.indexOf(newName), id);
 //    QCOMPARE(a.indexOf(QString(newName)), id);
 
@@ -260,7 +258,7 @@ void TestAttributes::_tst_setValue(Attributes a, int id, Value newValue){
     QCOMPARE(a.value(id), newValue);
 
     // String versions?
-    //QVERIFY_EXCEPTION_THROWN(a.value(QString("a")), std::out_of_range);
+   // QVERIFY_EXCEPTION_THROWN(a.value(QString(id)), newValue);
 
     // Sort out:
 //    QCOMPARE(a.value(0, 123), Value(123));
