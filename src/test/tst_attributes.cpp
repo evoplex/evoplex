@@ -39,6 +39,7 @@ private slots:
 private: // auxiliary functions
     void _tst_empty(Attributes a);
     void _tst_resize(Attributes a, const int kSize);
+    void _tst_replace(Attributes a, int id, QString newName, Value newValue);
 };
 
 void TestAttributes::_tst_empty(Attributes a)
@@ -119,9 +120,36 @@ void TestAttributes::tst_resize()
     _tst_empty(a2);
 }
 
+void TestAttributes::_tst_replace(Attributes a, int id, QString newName, Value newValue)
+{
+     QVERIFY(!a.isEmpty());
+     // TODO: Compare size?
+
+     QCOMPARE(a.indexOf(newName), id);
+     // TODO: String version of name and/or value? (see below)
+//    QCOMPARE(a.indexOf(QString("abc")), -1);
+
+     QVERIFY(!a.contains(newName));
+     // TODO: String version of name and/or value? (see below)
+//    QVERIFY(!a.contains(QString("abc")));
+
+     QVERIFY(!a.names().empty());
+     QCOMPARE(a.name(id), newName);
+
+     QVERIFY(!a.values().empty());
+     QCOMPARE(a.value(id), newValue);
+     QCOMPARE(a.value(newName), newValue);
+     QCOMPARE(a.value(QString(newName)), newValue);
+
+     // TODO: Sort out these functions:
+    // QCOMPARE(a.value(0, 123), Value(123));
+//    QCOMPARE(a.value("abc", 123), Value(123));
+//    QCOMPARE(a.value(QString('a'), 123), Value(123));
+}
+
 void TestAttributes::tst_replace()
 {
-    // TO DO!
+
 }
 
 void TestAttributes::tst_push_back()
