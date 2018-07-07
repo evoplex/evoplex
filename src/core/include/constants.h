@@ -33,7 +33,7 @@
     These constants hold the name of the properties common to any experiment.
 ******************************************************************************/
 #define GENERAL_ATTRIBUTE_EXPID "id"                    // the experiment id
-#define GENERAL_ATTRIBUTE_NODES "nodes"                 // a path to a csv file OR an integer with the number of nodes
+#define GENERAL_ATTRIBUTE_NODES "nodes"                 // a path to a csv file OR a command to AttrsGenerator
 #define GENERAL_ATTRIBUTE_GRAPHID "graphId"             // uid of the graph used
 #define GENERAL_ATTRIBUTE_MODELID "modelId"             // uid of the model used
 #define GENERAL_ATTRIBUTE_SEED "seed"                   // seed of the PRG

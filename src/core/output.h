@@ -29,6 +29,7 @@
 
 #include "abstractmodel.h"
 #include "attributes.h"
+#include "attributerange.h"
 #include "modelplugin.h"
 #include "stats.h"
 
@@ -39,9 +40,9 @@ class Output;
 class CustomOutput;
 class DefaultOutput;
 
-typedef std::shared_ptr<Output> OutputSP;
-typedef std::shared_ptr<CustomOutput> CustomOutputSP;
-typedef std::shared_ptr<DefaultOutput> DefaultOutputSP;
+typedef std::shared_ptr<Output> OutputPtr;
+typedef std::shared_ptr<CustomOutput> CustomOutputPtr;
+typedef std::shared_ptr<DefaultOutput> DefaultOutputPtr;
 
 class Cache
 {
@@ -55,7 +56,7 @@ public:
 
     QString printableHeader(const char sep, const bool joinInputs) const;
 
-    inline OutputSP output() const { return m_parent; }
+    inline OutputPtr output() const { return m_parent; }
     inline const Values& inputs() const { return m_inputs; }
     inline const Row& readFrontRow(const int trialId) const { return m_trials.at(trialId).rows.front(); }
     inline void flushFrontRow(const int trialId) { m_trials.at(trialId).rows.pop_front(); }
@@ -67,12 +68,12 @@ private:
         std::forward_list<Row>::const_iterator last;
     };
 
-    OutputSP m_parent;
+    OutputPtr m_parent;
     Values m_inputs; // columns
     std::unordered_map<int, Data> m_trials;
 
     // let's keep it private to ensure that only Output can create a Cache
-    explicit Cache(Values inputs, std::vector<int> trialIds, OutputSP parent);
+    explicit Cache(Values inputs, std::vector<int> trialIds, OutputPtr parent);
 };
 
 class Output : public std::enable_shared_from_this<Output>
@@ -97,7 +98,7 @@ public:
     // Format for DefaultOutput: "function_entity_attrName_value"
     const QString& printableHeaderPrefix() const { return m_headerPrefix; }
 
-    virtual bool operator==(const OutputSP output) const = 0;
+    virtual bool operator==(const OutputPtr output) const = 0;
 
     Cache* addCache(Values inputs, const std::vector<int> trialIds);
 
@@ -135,7 +136,7 @@ public:
 
     virtual void doOperation(const int trialId, const AbstractModel* model);
 
-    virtual bool operator==(const OutputSP output) const;
+    virtual bool operator==(const OutputPtr output) const;
 };
 
 
@@ -167,7 +168,7 @@ public:
 
     virtual void doOperation(const int trialId, const AbstractModel* model);
 
-    virtual bool operator==(const OutputSP output) const;
+    virtual bool operator==(const OutputPtr output) const;
 
     inline Function function() const { return m_func; }
     inline QString functionStr()  const { return DefaultOutput::stringFromFunc(m_func); }

@@ -89,7 +89,7 @@ void ProjectsPage::slotFocusChanged(QWidget*, QWidget* now)
     }
 }
 
-void ProjectsPage::addProjectWidget(ProjectSP project)
+void ProjectsPage::addProjectWidget(ProjectPtr project)
 {
     ProjectWidget* pw = new ProjectWidget(project, m_mainGUI, this);
     if (m_projects.isEmpty()) {
@@ -107,7 +107,7 @@ void ProjectsPage::addProjectWidget(ProjectSP project)
     //connect(m_contextMenu, SIGNAL(openView(int)), wp, SLOT(slotOpenView(int)));
     connect(pw, &ProjectWidget::expSelectionChanged, [this](Experiment* exp) { m_expDesigner->setExperiment(exp); });
     connect(pw, SIGNAL(openExperiment(Experiment*)), this, SLOT(slotOpenExperiment(Experiment*)));
-    connect(pw, SIGNAL(hasUnsavedChanges(ProjectSP)), SIGNAL(hasUnsavedChanges(ProjectSP)));
+    connect(pw, SIGNAL(hasUnsavedChanges(ProjectPtr)), SIGNAL(hasUnsavedChanges(ProjectPtr)));
     connect(pw, &ProjectWidget::closed, [this, pw, project]() {
         for (ExperimentWidget* expW : m_experiments) {
             if (expW->exp()->project() == project) {
@@ -133,7 +133,7 @@ void ProjectsPage::addProjectWidget(ProjectSP project)
 bool ProjectsPage::slotNewProject()
 {
     QString error;
-    ProjectSP p = m_mainApp->newProject(error);
+    ProjectPtr p = m_mainApp->newProject(error);
     if (p) {
         addProjectWidget(p);
     } else {
@@ -153,7 +153,7 @@ bool ProjectsPage::slotOpenProject(QString path)
     }
 
     QString error;
-    ProjectSP project = m_mainApp->newProject(error, path);
+    ProjectPtr project = m_mainApp->newProject(error, path);
     if (!project) {
         QMessageBox::warning(this, "Evoplex", error);
         return false;

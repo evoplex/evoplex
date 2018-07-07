@@ -27,7 +27,7 @@
 namespace evoplex
 {
 
-Cache::Cache(Values inputs, std::vector<int> trialIds, OutputSP parent)
+Cache::Cache(Values inputs, std::vector<int> trialIds, OutputPtr parent)
     : m_parent(parent)
     , m_inputs(inputs)
 {
@@ -100,7 +100,7 @@ void DefaultOutput::doOperation(const int trialId, const AbstractModel* model)
     updateCaches(trialId, model->currStep(), allValues);
 }
 
-bool DefaultOutput::operator==(const OutputSP output) const
+bool DefaultOutput::operator==(const OutputPtr output) const
 {
     auto other = std::dynamic_pointer_cast<const DefaultOutput>(output);
     if (!other) return false;
@@ -126,7 +126,7 @@ void CustomOutput::doOperation(const int trialId, const AbstractModel* model)
     updateCaches(trialId, model->currStep(), model->customOutputs(m_allInputs));
 }
 
-bool CustomOutput::operator==(const OutputSP output) const
+bool CustomOutput::operator==(const OutputPtr output) const
 {
     auto other = std::dynamic_pointer_cast<const CustomOutput>(output);
     if (!other) return false;
@@ -317,12 +317,12 @@ std::vector<Cache*> Output::parseHeader(const QStringList& header, const std::ve
             return caches;
         }
 
-        OutputSP output (new DefaultOutput(func, entity, attrRange));
+        OutputPtr output = std::make_shared<DefaultOutput>(func, entity, attrRange);
         caches.emplace_back(output->addCache(attrHeader, trialIds));
     }
 
     if (!customHeader.empty()) {
-        OutputSP output (new CustomOutput());
+        OutputPtr output = std::make_shared<CustomOutput>();
         caches.emplace_back(output->addCache(customHeader, trialIds));
     }
 

@@ -30,13 +30,18 @@ namespace evoplex {
 class Stats
 {
 public:
-    template<typename Iterator>
-    static std::vector<Value> count(Iterator entityBegin, Iterator entityEnd,
+    // count frequency of the header values in the container
+    // eg.,
+    //     if header is ['a', 'c'], it'll count how many a's and c's exist in the container
+    //     if there are 100 a's and 123 c's, it'll return [100, 123]
+    //     if there are no a's and c's, it'll return [0, 0]
+    template<typename ConstIterator>
+    static std::vector<Value> count(ConstIterator entityBegin, ConstIterator entityEnd,
                                     const int attrIdx, std::vector<Value> header)
     {
         std::vector<Value> ret(header.size(), 0);
         while (entityBegin != entityEnd) {
-            size_t i = std::find(header.begin(), header.end(), (*entityBegin)->attr(attrIdx)) - header.begin();
+            size_t i = std::find(header.begin(), header.end(), (*entityBegin).second->attr(attrIdx)) - header.begin();
             if (i != header.size()) {
                 ret[i] = ret[i].toInt() + 1;
             }
@@ -48,7 +53,7 @@ public:
     template<typename Container>
     static std::vector<Value> count(Container entity, const int attrIdx, std::vector<Value> values)
     {
-        return count(entity.begin(), entity.end(), attrIdx, values);
+        return count(entity.cbegin(), entity.cend(), attrIdx, values);
     }
 };
 

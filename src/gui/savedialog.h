@@ -37,15 +37,15 @@ public:
     explicit SaveDialog(QWidget* parent);
     ~SaveDialog();
 
-    bool save(ProjectSP project);
-    bool saveAs(ProjectSP project);
+    bool save(ProjectPtr project);
+    bool saveAs(ProjectPtr project);
 
 private slots:
     void browseDir();
 
 private:
     Ui_SaveDialog* m_ui;
-    ProjectSP m_currProject;
+    ProjectPtr m_currProject;
 };
 }
 #endif // SAVEDIALOG_H

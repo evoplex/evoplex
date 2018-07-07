@@ -31,7 +31,7 @@ class TestValue: public QObject
 private slots:
     void initTestCase() {}
     void cleanupTestCase() {}
-    void tst_value();
+    void tst_valueInvalid();
     void tst_valueBool();
     void tst_valueDouble();
     void tst_valueInt();
@@ -39,7 +39,7 @@ private slots:
     void tst_valueString();
 };
 
-void TestValue::tst_value()
+void TestValue::tst_valueInvalid()
 {
     Value v;
 
@@ -76,6 +76,11 @@ void TestValue::tst_value()
     QVERIFY_EXCEPTION_THROWN(v1 <= v2, std::invalid_argument);
     QVERIFY_EXCEPTION_THROWN(v1 > v2, std::invalid_argument);
     QVERIFY_EXCEPTION_THROWN(v1 < v2, std::invalid_argument);
+
+    // creating a Value from another Value
+    Value vInvalid;
+    QVERIFY_EXCEPTION_THROWN(Value(vInvalid) == vInvalid, std::invalid_argument);
+    QCOMPARE(Value(vInvalid).isValid(), false);
 }
 
 void TestValue::tst_valueBool()
@@ -123,6 +128,12 @@ void TestValue::tst_valueBool()
     QCOMPARE(v1 <= v2, false);
     QCOMPARE(v1 >  v2, true);
     QCOMPARE(v1 <  v2, false);
+
+    // creating a Value from another Value
+    Value vBool(false);
+    QCOMPARE(Value(vBool), vBool);
+    QCOMPARE(Value(vBool).isBool(), true);
+    QCOMPARE(Value(vBool).toBool(), false);
 }
 
 void TestValue::tst_valueDouble()
@@ -156,6 +167,12 @@ void TestValue::tst_valueDouble()
     QCOMPARE(v1 <= v2, false);
     QCOMPARE(v1 >  v2, true);
     QCOMPARE(v1 <  v2, false);
+
+    // creating a Value from another Value
+    Value vDouble(9.31231);
+    QCOMPARE(Value(vDouble), vDouble);
+    QCOMPARE(Value(vDouble).isDouble(), true);
+    QCOMPARE(Value(vDouble).toDouble(), 9.31231);
 }
 
 void TestValue::tst_valueInt()
@@ -189,7 +206,14 @@ void TestValue::tst_valueInt()
     QCOMPARE(v1 <= v2, false);
     QCOMPARE(v1 >  v2, true);
     QCOMPARE(v1 <  v2, false);
+
+    // creating a Value from another Value
+    Value vInt(9765112);
+    QCOMPARE(Value(vInt), vInt);
+    QCOMPARE(Value(vInt).isInt(), true);
+    QCOMPARE(Value(vInt).toInt(), 9765112);
 }
+
 void TestValue::tst_valueChar()
 {
     Value v;
@@ -223,7 +247,14 @@ void TestValue::tst_valueChar()
     QCOMPARE(v1 <= v2, false);
     QCOMPARE(v1 >  v2, true);
     QCOMPARE(v1 <  v2, false);
+
+    // creating a Value from another Value
+    Value vChar('a');
+    QCOMPARE(Value(vChar), vChar);
+    QCOMPARE(Value(vChar).isChar(), true);
+    QCOMPARE(Value(vChar).toChar(), 'a');
 }
+
 void TestValue::tst_valueString()
 {
     Value v;
@@ -257,6 +288,12 @@ void TestValue::tst_valueString()
     QVERIFY_EXCEPTION_THROWN(v1 <= v2, std::invalid_argument);
     QVERIFY_EXCEPTION_THROWN(v1 > v2, std::invalid_argument);
     QVERIFY_EXCEPTION_THROWN(v1 < v2, std::invalid_argument);
+
+    // creating a Value from another Value
+    Value vString("evoplex");
+    QCOMPARE(Value(vString), vString);
+    QCOMPARE(Value(vString).isString(), true);
+    QCOMPARE(Value(vString).toString(), "evoplex");
 }
 
 QTEST_MAIN(TestValue)

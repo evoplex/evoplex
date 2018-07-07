@@ -73,6 +73,17 @@ namespace Utils
         s.clear();
     }
 
+    // clone a population of nodes
+    template <class C>
+    C clone(const C& container) {
+        C ret;
+        ret.reserve(container.size());
+        for (auto const& pair : container) {
+            ret.insert({pair.first, pair.second->clone()});
+        }
+        return ret;
+    }
+
     // Fisher–Yates shuffle algorithm
     // https://bost.ocks.org/mike/shuffle
     // http://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle

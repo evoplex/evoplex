@@ -18,7 +18,6 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <QtDebug>
 #include <QFile>
 
 #include "plugin.h"
@@ -42,7 +41,7 @@ bool CustomGraph::init()
 
 void CustomGraph::reset()
 {
-    Utils::deleteAndShrink(m_edges);
+    m_edges.clear();
 
     QFile file(m_filePath);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
@@ -97,13 +96,13 @@ void CustomGraph::reset()
             break;
         }
 
-        m_edges.emplace_back(new Edge(m_nodes.at(originId), m_nodes.at(targetId), type() ==  Directed));
+        addEdge(originId, targetId, new Attributes());
         ++row;
     }
     file.close();
 
     if (!isValid) {
-        Utils::deleteAndShrink(m_edges);
+        m_edges.clear();
     }
 }
 

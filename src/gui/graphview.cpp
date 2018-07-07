@@ -60,25 +60,25 @@ int GraphView::refreshCache()
         return Ready;
     }
 
-    const Nodes nodes = m_model->graph()->nodes();
     float edgeSizeRate = m_edgeSizeRate * std::pow(1.25f, m_zoomLevel);
-    m_cache.reserve(nodes.size());
+    m_cache.reserve(m_model->nodes().size());
 
-    for (Node* node : nodes) {
-        QPointF xy(m_origin.x() + edgeSizeRate * (1.0 + node->x()),
-                   m_origin.y() + edgeSizeRate * (1.0 + node->y()));
+    for (auto const& np : m_model->nodes()) {
+        QPointF xy(m_origin.x() + edgeSizeRate * (1.0 + np.second->x()),
+                   m_origin.y() + edgeSizeRate * (1.0 + np.second->y()));
 
-        if (!rect().contains(xy.toPoint()))
+        if (!rect().contains(xy.toPoint())) {
             continue;
+        }
 
         Cache cache;
-        cache.node = node;
+        cache.node = np.second;
         cache.xy = xy;
-        cache.edges.reserve(node->edges().size());
+        cache.edges.reserve(np.second->outDegree());
 
-        for (const Edge* edge : node->edges()) {
-            QPointF xy2(m_origin.x() + edgeSizeRate * (1.0 + edge->neighbour()->x()),
-                        m_origin.y() + edgeSizeRate * (1.0 + edge->neighbour()->y()));
+        for (const Edges::Pair& ep : np.second->outEdges()) {
+            QPointF xy2(m_origin.x() + edgeSizeRate * (1.0 + ep.edge()->neighbour()->x()),
+                        m_origin.y() + edgeSizeRate * (1.0 + ep.edge()->neighbour()->y()));
             cache.edges.emplace_back(QLineF(xy, xy2));
         }
 
@@ -136,7 +136,7 @@ void GraphView::paintEvent(QPaintEvent*)
     painter.end();
 }
 
-const Node* GraphView::selectNode(const QPoint& pos) const
+NodePtr GraphView::selectNode(const QPoint& pos) const
 {
     if (m_cacheStatus == Ready) {
         for (const Cache& cache : m_cache) {

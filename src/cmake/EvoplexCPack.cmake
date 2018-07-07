@@ -35,9 +35,11 @@ if(APPLE)
   install(CODE "execute_process(COMMAND macdeployqt ${CMAKE_BINARY_DIR}/bin/${PROJECT_NAME}.app -executable=${CMAKE_BINARY_DIR}/bin/${PROJECT_NAME}.app/Contents/MacOS/${PROJECT_NAME})")
 
   set(CPACK_GENERATOR "DragNDrop")
+  set(CPACK_SYSTEM_NAME "OSX")
   set(CPACK_DMG_FORMAT "UDBZ")
   set(CPACK_DMG_VOLUME_NAME ${PROJECT_NAME})
-  set(CPACK_SYSTEM_NAME "OSX")
+  set(CPACK_DMG_BACKGROUND_IMAGE "${CMAKE_SOURCE_DIR}/src/utils/mac/EvoplexDMGBackground.tif")
+  set(CPACK_DMG_DS_STORE_SETUP_SCRIPT "${CMAKE_SOURCE_DIR}/src/utils/mac/EvoplexDMGSetup.scpt")
 
 elseif(UNIX)
   set(CPACK_GENERATOR "RPM;DEB")

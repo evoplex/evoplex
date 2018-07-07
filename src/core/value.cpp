@@ -96,12 +96,14 @@ Value& Value::operator=(const Value& v)
 {
     if(this != &v) { // check for self-assignment
         m_type = v.m_type;
-        if (m_type == INT) m_data.i = v.m_data.i;
-        else if (m_type == DOUBLE) m_data.d = v.m_data.d;
-        else if (m_type == BOOL) m_data.b = v.m_data.b;
-        else if (m_type == CHAR) m_data.c = v.m_data.c;
-        else if (m_type == STRING) m_data.s = qstrdup(v.toString());
-        else if (m_type != INVALID) qFatal("non-existent type");
+        switch (m_type) {
+        case INT: m_data.i = v.m_data.i; break;
+        case DOUBLE: m_data.d = v.m_data.d; break;
+        case BOOL: m_data.b = v.m_data.b; break;
+        case CHAR: m_data.c = v.m_data.c; break;
+        case STRING: m_data.s = qstrdup(v.toString());
+        case INVALID: break;
+        }
     }
     return *this;
 }

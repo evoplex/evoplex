@@ -21,48 +21,52 @@
 #ifndef EDGE_H
 #define EDGE_H
 
-#include <vector>
+#include <memory>
+#include <unordered_map>
 
 #include "attributes.h"
 
 namespace evoplex {
 
-class Node;
 class Edge;
+class Node;
 
-typedef std::vector<Edge*> Edges;
+typedef std::shared_ptr<Node> NodePtr;
+typedef std::shared_ptr<Edge> EdgePtr;
 
 class Edge
 {
 public:
-    explicit Edge();
-    explicit Edge(Node *origin, Node *neighbour, Attributes* attrs, bool isDirected);
-    explicit Edge(Node* origin, Node* neighbour, bool isDirected);
-    ~Edge();
+    explicit Edge(int id, const NodePtr& origin, const NodePtr& neighbour,
+        Attributes* attrs, bool takesOwnership)
+        : m_id(id), m_origin(origin), m_neighbour(neighbour), m_attrs(attrs),
+          m_takesOwnership(takesOwnership) {}
 
+    ~Edge() { if (m_takesOwnership) delete m_attrs; }
+
+    inline const Attributes* attrs() const;
     inline const Value& attr(const char* name) const;
     inline const Value& attr(const int id) const;
     inline void setAttr(const int id, const Value& value);
 
-    inline Node* origin() const;
-    inline Node* neighbour() const;
+    inline int id() const;
+    inline const NodePtr& origin() const;
+    inline const NodePtr& neighbour() const;
 
 private:
-    Node* m_origin;
-    Node* m_neighbour;
+    const int m_id;
+    const NodePtr& m_origin;
+    const NodePtr& m_neighbour;
     Attributes* m_attrs;
-
-    // If it's an undirected edge, it'll create a new edge in the
-    // opposite direction with the same attrs.
-    // This new edge is added for the sake of letting the neighbour
-    // aware that an edge has been attached to him, allowing him to
-    // access the attrs of this connection.
-    Edge* m_undirectedEdge;
+    bool m_takesOwnership;
 };
 
 /************************************************************************
    Edge: Inline member functions
  ************************************************************************/
+
+inline const Attributes* Edge::attrs() const
+{ return m_attrs; }
 
 inline const Value& Edge::attr(const char* name) const
 { return m_attrs->value(name); }
@@ -73,10 +77,13 @@ inline const Value& Edge::attr(const int id) const
 inline void Edge::setAttr(const int id, const Value& value)
 { m_attrs->setValue(id, value); }
 
-inline Node* Edge::origin() const
+inline int Edge::id() const
+{ return m_id; }
+
+inline const NodePtr& Edge::origin() const
 { return m_origin; }
 
-inline Node* Edge::neighbour() const
+inline const NodePtr& Edge::neighbour() const
 { return m_neighbour; }
 
 

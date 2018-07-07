@@ -24,7 +24,7 @@
 #include <QDialog>
 
 #include "attributerange.h"
-#include "core/nodesgenerator.h"
+#include "core/attrsgenerator.h"
 
 class Ui_NodesGeneratorDlg;
 
@@ -36,7 +36,7 @@ class NodesGeneratorDlg : public QDialog
     Q_OBJECT
 
 public:
-    explicit NodesGeneratorDlg(const AttributesScope& nodeAttrsScope, QWidget *parent, NodesGenerator* ag=nullptr);
+    explicit NodesGeneratorDlg(QWidget* parent, const AttributesScope& nodeAttrsScope, QString cmd = "");
     ~NodesGeneratorDlg();
 
     QString readCommand();
@@ -48,7 +48,7 @@ private:
     Ui_NodesGeneratorDlg* m_ui;
     const AttributesScope& m_nodeAttrsScope;
 
-    void fill(NodesGenerator* ag);
+    void fill(const QString& cmd);
 };
 
 } // evoplex

@@ -88,7 +88,7 @@ GraphWidget::GraphWidget(MainGUI* mainGUI, Experiment* exp, ExperimentWidget* pa
                 return;
             }
             QString err;
-            Node* node = m_model->graph()->node(m_ui->nodeId->value());
+            const NodePtr& node = m_model->node(m_ui->nodeId->value());
             if (m_model->status() == Experiment::RUNNING) {
                 err = "You cannot change things in a running experiment.\n"
                       "Please, pause it and try again.";
@@ -230,7 +230,7 @@ void GraphWidget::mouseReleaseEvent(QMouseEvent *e)
 
     m_selectedNode = -1;
     if (e->pos() == m_posEntered) {
-        const Node* node = selectNode(e->pos());
+        const NodePtr& node = selectNode(e->pos());
         if (node) {
             m_selectedNode = node->id();
             updateInspector(node);
@@ -252,10 +252,10 @@ void GraphWidget::resizeEvent(QResizeEvent* e)
     QWidget::resizeEvent(e);
 }
 
-void GraphWidget::updateInspector(const Node* node)
+void GraphWidget::updateInspector(const NodePtr& node)
 {
     m_ui->nodeId->setValue(node->id());
-    m_ui->neighbors->setText(QString::number(node->edges().size()));
+    m_ui->neighbors->setText(QString::number(node->outDegree()));
     for (int id = 0; id < node->attrs().size(); ++id) {
         m_attrs.at(id)->setText(node->attr(id).toQString());
     }

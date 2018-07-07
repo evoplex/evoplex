@@ -37,7 +37,7 @@ namespace evoplex {
 class ExperimentsMgr;
 class Project;
 
-typedef QSharedPointer<Project> ProjectSP;
+typedef QSharedPointer<Project> ProjectPtr;
 
 class MainApp : public QObject
 {
@@ -58,7 +58,7 @@ public:
     bool unloadPlugin(const AbstractPlugin* plugin, QString& error);
 
     // Create a new project
-    ProjectSP newProject(QString &error, const QString& filepath="");
+    ProjectPtr newProject(QString &error, const QString& filepath="");
 
     void closeProject(int projId);
 
@@ -71,11 +71,11 @@ public:
     inline ExperimentsMgr* expMgr() const { return m_experimentsMgr; }
     inline const QHash<QString, GraphPlugin*>& graphs() const { return m_graphs; }
     inline const QHash<QString, ModelPlugin*>& models() const { return m_models; }
-    inline const std::map<int, ProjectSP>& projects() const { return m_projects; }
+    inline const std::map<int, ProjectPtr>& projects() const { return m_projects; }
 
     inline const GraphPlugin* graph(const QString& graphId) const { return m_graphs.value(graphId, nullptr); }
     inline const ModelPlugin* model(const QString& modelId) const { return m_models.value(modelId, nullptr); }
-    inline ProjectSP project(int projId) const { return m_projects.at(projId); }
+    inline ProjectPtr project(int projId) const { return m_projects.at(projId); }
 
     inline const AttributesScope& generalAttrsScope() const { return m_generalAttrsScope; }
 
@@ -101,7 +101,7 @@ private:
     quint16 m_defaultStepDelay; // msec
     int m_stepsToFlush;
 
-    std::map<int, ProjectSP> m_projects; // opened projects.
+    std::map<int, ProjectPtr> m_projects; // opened projects.
 
     QHash<QString, GraphPlugin*> m_graphs;  // loaded graphs
     QHash<QString, ModelPlugin*> m_models;  // loaded models

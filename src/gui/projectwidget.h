@@ -40,10 +40,10 @@ class ProjectWidget : public PPageDockWidget
     Q_OBJECT
 
 public:
-    explicit ProjectWidget(ProjectSP project, MainGUI* mainGUI, ProjectsPage* ppage);
+    explicit ProjectWidget(ProjectPtr project, MainGUI* mainGUI, ProjectsPage* ppage);
     ~ProjectWidget();
 
-    virtual ProjectSP project() const { return m_project; }
+    virtual ProjectPtr project() const { return m_project; }
 
     void clearSelection();
 
@@ -56,7 +56,7 @@ protected:
 signals:
     void expSelectionChanged(Experiment* exp);
     void openExperiment(Experiment* exp);
-    void hasUnsavedChanges(ProjectSP project);
+    void hasUnsavedChanges(ProjectPtr project);
 
 public slots:
     void slotInsertRow(Experiment* exp);
@@ -70,7 +70,7 @@ private slots:
 private:
     Ui_ProjectWidget* m_ui;
     MainGUI* m_mainGUI;
-    ProjectSP m_project;
+    ProjectPtr m_project;
 
     QMap<TableWidget::Header, int> m_headerIdx; // map Header to column index
 

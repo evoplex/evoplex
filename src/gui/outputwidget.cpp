@@ -64,7 +64,7 @@ OutputWidget::OutputWidget(const ModelPlugin* modelPlugin, const std::vector<int
     // init table
     for (const Cache* cache : init) {
         const int rootId = m_ui->table->rowCount();
-        DefaultOutputSP df = std::dynamic_pointer_cast<DefaultOutput>(cache->output());
+        DefaultOutputPtr df = std::dynamic_pointer_cast<DefaultOutput>(cache->output());
         if (df) {
             const QString entityStr = df->entity() == DefaultOutput::E_Nodes
                                     ? m_ui->entityNode->text() : m_ui->entityEdge->text();
@@ -139,15 +139,15 @@ void OutputWidget::slotClose(bool canceled)
                 Value input = entityAttrRange->validate(inputStr);
                 DefaultOutput::Function func = DefaultOutput::funcFromString(funcStr);
                 Q_ASSERT(func != DefaultOutput::F_Invalid && input.isValid());
-                OutputSP newOutput (new DefaultOutput(func, entity, entityAttrRange));
+                OutputPtr newOutput (new DefaultOutput(func, entity, entityAttrRange));
                 cache = newOutput->addCache({input}, m_trialIds);
             } else {
-                OutputSP newOutput (new CustomOutput());
+                OutputPtr newOutput (new CustomOutput());
                 cache = newOutput->addCache({Value(funcStr)}, m_trialIds);
             }
             m_allCaches.insert({rinfo.id, cache});
         } else {
-            OutputSP existingOutput = m_allCaches.at(rinfo.equalToId)->output();
+            OutputPtr existingOutput = m_allCaches.at(rinfo.equalToId)->output();
             Value input;
             if (funcType == DefaultFunc) {
                 input = entityAttrRange->validate(inputStr);

@@ -21,28 +21,40 @@
 #ifndef NODE_H
 #define NODE_H
 
+#include <memory>
+
 #include "attributes.h"
-#include "edge.h"
+#include "edges.h"
 #include "prg.h"
 
-namespace evoplex
+namespace evoplex {
+
+class Node;
+typedef std::shared_ptr<Node> NodePtr;
+
+class NodeInterface
 {
-
-typedef std::vector<Node*> Nodes;
-
-class Node
-{
-    friend class Edge;
-
+    friend class BaseGraph;
 public:
-    explicit Node(int id, Attributes attr, int x, int y)
-        : m_id(id), m_attrs(attr), m_x(x), m_y(y) {}
+    virtual NodePtr clone() const = 0;
+    virtual const Edges& inEdges() const = 0;
+    virtual const Edges& outEdges() const = 0;
+    virtual int degree() const = 0;
+    virtual int inDegree() const = 0;
+    virtual int outDegree() const = 0;
 
-    explicit Node(int id, Attributes attr)
-        : Node(id, attr, 0, id) {}
+private:
+    virtual void addInEdge(const EdgePtr& inEdge) = 0;
+    virtual void addOutEdge(const EdgePtr& outEdge) = 0;
+    virtual void removeInEdge(const int edgeId) = 0;
+    virtual void removeOutEdge(const int edgeId) = 0;
+    virtual void clearInEdges() = 0;
+    virtual void clearOutEdges() = 0;
+};
 
-    inline Node* clone();
-
+class Node : public NodeInterface
+{
+public:
     inline const Attributes& attrs() const;
     inline const Value& attr(const char* name) const;
     inline const Value& attr(const int id) const;
@@ -56,24 +68,77 @@ public:
     inline void setY(int y);
     inline void setCoords(int x, int y);
 
-    inline const Edges edges() const;
-    inline Node* neighbour(int localId) const;
-    inline Node* randNeighbour(PRG* prg) const;
+    inline const NodePtr& randNeighbour(PRG* prg) const;
+
+protected:
+    Edges m_outEdges;
+
+    explicit Node(int id, Attributes attrs, int x, int y)
+        : m_id(id), m_attrs(attrs), m_x(x), m_y(y) {}
+
+    explicit Node(int id, Attributes attr)
+        : Node(id, attr, 0, id) {}
+
+    virtual ~Node() {}
 
 private:
     const int m_id;
     Attributes m_attrs;
     int m_x;
     int m_y;
-    Edges m_edges;
+};
+
+class UNode : public Node
+{
+public:
+    explicit UNode(int id, Attributes attrs, int x, int y) : Node(id, attrs, x, y) {}
+    explicit UNode(int id, Attributes attrs) : Node(id, attrs) {}
+    virtual ~UNode() {}
+
+    inline NodePtr clone() const override;
+    inline const Edges& inEdges() const override;
+    inline const Edges& outEdges() const override;
+    inline int degree() const override;
+    inline int inDegree() const override;
+    inline int outDegree() const override;
+
+private:
+    inline void addInEdge(const EdgePtr& inEdge) override;
+    inline void addOutEdge(const EdgePtr& outEdge) override;
+    inline void removeInEdge(const int edgeId) override;
+    inline void removeOutEdge(const int edgeId) override;
+    inline void clearInEdges() override;
+    inline void clearOutEdges() override;
+};
+
+class DNode : public Node
+{
+public:
+    explicit DNode(int id, Attributes attrs, int x, int y) : Node(id, attrs, x, y) {}
+    explicit DNode(int id, Attributes attrs) : Node(id, attrs) {}
+    virtual ~DNode() {}
+
+    inline NodePtr clone() const override;
+    inline const Edges& inEdges() const override;
+    inline const Edges& outEdges() const override;
+    inline int degree() const override;
+    inline int inDegree() const override;
+    inline int outDegree() const override;
+
+private:
+    Edges m_inEdges;
+
+    inline void addInEdge(const EdgePtr& inEdge) override;
+    inline void addOutEdge(const EdgePtr& outEdge) override;
+    inline void removeInEdge(const int edgeId) override;
+    inline void removeOutEdge(const int edgeId) override;
+    inline void clearInEdges() override;
+    inline void clearOutEdges() override;
 };
 
 /************************************************************************
    Node: Inline member functions
  ************************************************************************/
-
-inline Node* Node::clone()
-{ return new Node(m_id, m_attrs); }
 
 inline const Attributes& Node::attrs() const
 { return m_attrs; }
@@ -105,15 +170,88 @@ inline void Node::setY(int y)
 inline void Node::setCoords(int x, int y)
 { setX(x); setY(y); }
 
-inline const Edges Node::edges() const
-{ return m_edges; }
+inline const NodePtr& Node::randNeighbour(PRG* prg) const
+{ return (*std::next(m_outEdges.cbegin(), prg->randI(m_outEdges.size()-1))).second->neighbour(); }
 
-inline Node* Node::neighbour(int localId) const
-{ return m_edges.at(localId)->neighbour(); }
+/************************************************************************
+   UNode: Inline member functions
+ ************************************************************************/
 
-inline Node* Node::randNeighbour(PRG* prg) const
-{ return m_edges.at(prg->randI(m_edges.size()-1))->neighbour(); }
+inline NodePtr UNode::clone() const
+{ return std::make_shared<UNode>(id(), attrs(), x(), y()); }
 
+inline const Edges& UNode::inEdges() const
+{ return m_outEdges; }
+
+inline const Edges& UNode::outEdges() const
+{ return m_outEdges; }
+
+inline int UNode::degree() const
+{ return static_cast<int>(m_outEdges.size()); }
+
+inline int UNode::inDegree() const
+{ return degree(); }
+
+inline int UNode::outDegree() const
+{ return degree(); }
+
+inline void UNode::addInEdge(const EdgePtr& inEdge)
+{ addOutEdge(inEdge); }
+
+inline void UNode::addOutEdge(const EdgePtr& outEdge)
+{ m_outEdges.insert({outEdge->id(), outEdge}); }
+
+inline void UNode::removeInEdge(const int edgeId)
+{ removeOutEdge(edgeId); }
+
+inline void UNode::removeOutEdge(const int edgeId)
+{ m_outEdges.erase(edgeId); }
+
+inline void UNode::clearInEdges()
+{ clearOutEdges(); }
+
+inline void UNode::clearOutEdges()
+{ m_outEdges.clear(); }
+
+/************************************************************************
+   DNode: Inline member functions
+ ************************************************************************/
+
+inline NodePtr DNode::clone() const
+{ return std::make_shared<DNode>(id(), attrs(), x(), y()); }
+
+inline const Edges& DNode::inEdges() const
+{ return m_inEdges; }
+
+inline const Edges& DNode::outEdges() const
+{ return m_outEdges; }
+
+inline int DNode::degree() const
+{ return inDegree() + outDegree(); }
+
+inline int DNode::inDegree() const
+{ return static_cast<int>(m_inEdges.size()); }
+
+inline int DNode::outDegree() const
+{ return static_cast<int>(m_outEdges.size()); }
+
+inline void DNode::addInEdge(const EdgePtr& inEdge)
+{ m_inEdges.insert({inEdge->id(), inEdge}); }
+
+inline void DNode::addOutEdge(const EdgePtr& outEdge)
+{ m_outEdges.insert({outEdge->id(), outEdge}); }
+
+inline void DNode::removeInEdge(const int edgeId)
+{ m_inEdges.erase(edgeId); }
+
+inline void DNode::removeOutEdge(const int edgeId)
+{ m_outEdges.erase(edgeId); }
+
+inline void DNode::clearInEdges()
+{ m_inEdges.clear(); }
+
+inline void DNode::clearOutEdges()
+{ m_outEdges.clear(); }
 
 } // evoplex
 #endif // NODE_H

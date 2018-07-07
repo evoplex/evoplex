@@ -22,12 +22,15 @@ set(EVOPLEX_CORE_INCLUDE
   include/plugininterfaces.h
   include/abstractgraph.h
   include/abstractmodel.h
+  include/basegraph.h
   include/baseplugin.h
 
   include/attributes.h
   include/attributerange.h
   include/node.h
+  include/nodes.h
   include/edge.h
+  include/edges.h
   include/constants.h
   include/prg.h
   include/utils.h
@@ -38,7 +41,7 @@ set(EVOPLEX_CORE_H
   abstractplugin.h
   graphplugin.h
   modelplugin.h
-  nodesgenerator.h
+  attrsgenerator.h
   output.h
 
   experiment.h
@@ -49,13 +52,14 @@ set(EVOPLEX_CORE_H
 )
 set(EVOPLEX_CORE_CXX
   abstractplugin.cpp
+  basegraph.cpp
   graphplugin.cpp
   modelplugin.cpp
+  nodes.cpp
   prg.cpp
 
   attributerange.cpp
-  nodesgenerator.cpp
-  edge.cpp
+  attrsgenerator.cpp
   experiment.cpp
   experimentsmgr.cpp
   output.cpp
@@ -68,18 +72,17 @@ set(EVOPLEX_CORE_CXX
 add_library(EvoplexCore STATIC ${EVOPLEX_CORE_CXX})
 target_link_libraries(EvoplexCore Qt5::Core Qt5::Concurrent)
 
-set(LIB_DEST "${CMAKE_BINARY_DIR}/lib/evoplex")
 set_target_properties(EvoplexCore PROPERTIES
-    ARCHIVE_OUTPUT_DIRECTORY ${LIB_DEST}
-    ARCHIVE_OUTPUT_DIRECTORY_DEBUG ${LIB_DEST}
-    ARCHIVE_OUTPUT_DIRECTORY_MINSIZEREL ${LIB_DEST}
-    ARCHIVE_OUTPUT_DIRECTORY_RELEASE ${LIB_DEST}
-    ARCHIVE_OUTPUT_DIRECTORY_RELWITHDEBINFO ${LIB_DEST}
-    LIBRARY_OUTPUT_DIRECTORY ${LIB_DEST}
-    LIBRARY_OUTPUT_DIRECTORY_DEBUG ${LIB_DEST}
-    LIBRARY_OUTPUT_DIRECTORY_MINSIZEREL ${LIB_DEST}
-    LIBRARY_OUTPUT_DIRECTORY_RELEASE ${LIB_DEST}
-    LIBRARY_OUTPUT_DIRECTORY_RELWITHDEBINFO ${LIB_DEST})
+    ARCHIVE_OUTPUT_DIRECTORY ${EVOPLEX_OUTPUT_ARCHIVE}
+    ARCHIVE_OUTPUT_DIRECTORY_DEBUG ${EVOPLEX_OUTPUT_ARCHIVE}
+    ARCHIVE_OUTPUT_DIRECTORY_MINSIZEREL ${EVOPLEX_OUTPUT_ARCHIVE}
+    ARCHIVE_OUTPUT_DIRECTORY_RELEASE ${EVOPLEX_OUTPUT_ARCHIVE}
+    ARCHIVE_OUTPUT_DIRECTORY_RELWITHDEBINFO ${EVOPLEX_OUTPUT_ARCHIVE}
+    LIBRARY_OUTPUT_DIRECTORY ${EVOPLEX_OUTPUT_LIBRARY}
+    LIBRARY_OUTPUT_DIRECTORY_DEBUG ${EVOPLEX_OUTPUT_LIBRARY}
+    LIBRARY_OUTPUT_DIRECTORY_MINSIZEREL ${EVOPLEX_OUTPUT_LIBRARY}
+    LIBRARY_OUTPUT_DIRECTORY_RELEASE ${EVOPLEX_OUTPUT_LIBRARY}
+    LIBRARY_OUTPUT_DIRECTORY_RELWITHDEBINFO ${EVOPLEX_OUTPUT_LIBRARY})
 
 target_include_directories(EvoplexCore
   PUBLIC
@@ -92,16 +95,16 @@ target_include_directories(EvoplexCore
 install(
   TARGETS EvoplexCore
   EXPORT EvoplexCoreTargets
-  LIBRARY DESTINATION lib/evoplex
-  ARCHIVE DESTINATION lib/evoplex
-  INCLUDES DESTINATION include/evoplex
+  LIBRARY DESTINATION "${EVOPLEX_INSTALL_LIBRARY}"
+  ARCHIVE DESTINATION "${EVOPLEX_INSTALL_ARCHIVE}"
+  INCLUDES DESTINATION "${EVOPLEX_INSTALL_INCLUDES}"
 )
 
 install(
   FILES
     ${EVOPLEX_CORE_INCLUDE}
     "${CMAKE_CURRENT_BINARY_DIR}/evoplexcore_export.h"
-  DESTINATION include/evoplex
+  DESTINATION "${EVOPLEX_INSTALL_INCLUDES}"
   COMPONENT Devel
 )
 
@@ -125,7 +128,7 @@ configure_file(cmake/EvoplexCoreConfig.cmake
   COPYONLY
 )
 
-set(ConfigPackageLocation lib/cmake/Evoplex)
+set(ConfigPackageLocation "${EVOPLEX_INSTALL_PREFIX}lib/cmake/Evoplex")
 install(EXPORT EvoplexCoreTargets
   FILE EvoplexCoreTargets.cmake
   NAMESPACE Evoplex::

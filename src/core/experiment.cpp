@@ -25,14 +25,14 @@
 #include <QThread>
 
 #include "experiment.h"
+#include "attrsgenerator.h"
 #include "node.h"
-#include "nodesgenerator.h"
 #include "project.h"
 
 namespace evoplex
 {
 
-Experiment::Experiment(MainApp* mainApp, ExperimentInputs* inputs, ProjectSP project)
+Experiment::Experiment(MainApp* mainApp, ExperimentInputs* inputs, ProjectPtr project)
     : m_mainApp(mainApp)
     , m_id(inputs->generalAttrs->value(GENERAL_ATTRIBUTE_EXPID).toInt())
     , m_project(project)
@@ -106,7 +106,7 @@ void Experiment::reset()
 
     QMutexLocker locker(&m_mutex);
 
-    for (OutputSP o : m_outputs) {
+    for (OutputPtr o : m_outputs) {
         o->flushAll();
     }
 
@@ -131,7 +131,7 @@ void Experiment::deleteTrials()
     }
     m_trials.clear();
 
-    Utils::deleteAndShrink(m_clonableNodes);
+    m_clonableNodes.clear();
 }
 
 void Experiment::updateProgressValue()
@@ -212,7 +212,7 @@ void Experiment::processTrial(const int& trialId)
         algorithmConverged = trial->algorithmStep();
         ++trial->m_currStep;
 
-        for (OutputSP output : m_outputs)
+        for (const OutputPtr& output : m_outputs)
             output->doOperation(trialId, trial);
 
         if (m_inputs->fileCaches.size()
@@ -261,7 +261,8 @@ AbstractModel* Experiment::createTrial(const int trialId)
         return nullptr;
     }
 
-    Nodes nodes = createNodes();
+    const QString& gType = m_inputs->generalAttrs->value(GENERAL_ATTRIBUTE_GRAPHTYPE).toString();
+    Nodes nodes = createNodes(BaseGraph::enumFromString(gType));
     if (nodes.empty()) {
         return nullptr;
     }
@@ -270,7 +271,6 @@ AbstractModel* Experiment::createTrial(const int trialId)
     PRG* prg = new PRG(seed + trialId);
 
     AbstractGraph* graphObj = m_graphPlugin->create();
-    QString gType = m_inputs->generalAttrs->value(GENERAL_ATTRIBUTE_GRAPHTYPE).toString();
     if (!graphObj || !graphObj->setup(prg, m_inputs->graphAttrs, nodes, gType) || !graphObj->init()) {
         qWarning() << "unable to create the trials."
                    << "The graph could not be initialized."
@@ -304,7 +304,7 @@ AbstractModel* Experiment::createTrial(const int trialId)
         }
 
         // write this initial step to file
-        for (OutputSP output : m_outputs) {
+        for (OutputPtr output : m_outputs) {
             output->doOperation(trialId, modelObj);
         }
         writeCachedSteps(trialId);
@@ -314,9 +314,9 @@ AbstractModel* Experiment::createTrial(const int trialId)
     return modelObj;
 }
 
-Nodes Experiment::createNodes()
+Nodes Experiment::createNodes(const BaseGraph::GraphType gType)
 {
-    if (m_expStatus == INVALID) {
+    if (m_expStatus == INVALID || gType == BaseGraph::Invalid_Type) {
         return Nodes();
     } else if (!m_clonableNodes.empty()) {
         if (static_cast<int>(m_trials.size()) == m_numTrials - 1) {
@@ -324,42 +324,28 @@ Nodes Experiment::createNodes()
             Nodes().swap(m_clonableNodes);
             return nodes;
         }
-        return cloneNodes(m_clonableNodes);
+        return Utils::clone(m_clonableNodes);
     }
 
     Q_ASSERT_X(m_trials.empty(), "Experiment::createNodes",
                "if there is no trials to run, why is it trying to create nodes?");
 
-    Nodes nodes;
     QString errMsg;
-    NodesGenerator* ag = NodesGenerator::parse(m_modelPlugin->nodeAttrsScope(),
-                m_inputs->generalAttrs->value(GENERAL_ATTRIBUTE_NODES).toQString(), errMsg);
-    if (ag) {
-        nodes = ag->create();
-        delete ag;
-    }
-
-    if (nodes.empty()) {
+    const QString& cmd = m_inputs->generalAttrs->value(GENERAL_ATTRIBUTE_NODES).toQString();
+    Nodes nodes = Nodes::fromCmd(cmd, m_modelPlugin->nodeAttrsScope(), gType, &errMsg);
+    if (!errMsg.isEmpty() || nodes.empty()) {
         errMsg = QString("unable to create the trials."
-                         "The set of nodes could not be created (%1)."
+                         "The set of nodes could not be created.\n %1 \n"
                          "Project: %2 Experiment: %3")
                          .arg(errMsg).arg(m_project->name()).arg(m_id);
         qWarning() << errMsg;
-    } else if (m_numTrials > 1) {
-        m_clonableNodes = cloneNodes(nodes);
+        return Nodes();
     }
 
+    if (m_numTrials > 1) {
+        m_clonableNodes = Utils::clone(nodes);
+    }
     return nodes;
-}
-
-Nodes Experiment::cloneNodes(const Nodes& nodes) const
-{
-    Nodes cloned;
-    cloned.reserve(nodes.size());
-    for (Nodes::const_iterator it = nodes.begin(); it != nodes.end(); ++it) {
-        cloned.emplace_back((*it)->clone());
-    }
-    return cloned;
 }
 
 AbstractModel* Experiment::trial(int trialId) const
@@ -404,7 +390,7 @@ bool Experiment::writeCachedSteps(const int trialId)
     return true;
 }
 
-bool Experiment::removeOutput(OutputSP output)
+bool Experiment::removeOutput(OutputPtr output)
 {
     if (m_expStatus != Experiment::READY) {
         qWarning() << "tried to remove an 'Output' from a running experiment. You should pause it first.";
@@ -416,7 +402,7 @@ bool Experiment::removeOutput(OutputSP output)
         return false;
     }
 
-    std::unordered_set<OutputSP>::iterator it = m_outputs.find(output);
+    std::unordered_set<OutputPtr>::iterator it = m_outputs.find(output);
     if (it == m_outputs.end()) {
         qWarning() << "tried to remove a non-existent 'Output'.";
         return false;
@@ -426,9 +412,9 @@ bool Experiment::removeOutput(OutputSP output)
     return true;
 }
 
-OutputSP Experiment::searchOutput(const OutputSP find)
+OutputPtr Experiment::searchOutput(const OutputPtr find)
 {
-    for (OutputSP output : m_outputs) {
+    for (OutputPtr output : m_outputs) {
         if (output->operator==(find)) {
             return output;
         }
