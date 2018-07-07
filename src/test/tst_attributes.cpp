@@ -201,8 +201,18 @@ void TestAttributes::tst_push_back(){
     _tst_push_back(a1, "test", Value(123), 3);
 
     // test for empty attribute
+    Attributes a2;
+    a2.push_back("test", Value(123));
+    _tst_push_back(a2, "test", Value(123), 0);
 
     // test for attribute resized
+    Attributes a3;
+    a3.resize(3);
+    a3.push_back("test", Value(123));
+
+    // !!! CHECK
+    QCOMPARE(a3.value(3), Value(123));
+    //_tst_push_back(a2, "test", Value(123), 3);
 }
 
 void TestAttributes::tst_setValue()
