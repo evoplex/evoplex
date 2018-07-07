@@ -41,6 +41,7 @@ private: // auxiliary functions
     void _tst_resize(Attributes a, const int kSize);
     void _tst_replace(Attributes a, int id, QString newName, Value newValue);
     void _tst_replace_invalid(Attributes a, int id, QString newName, Value newValue);
+    void _tst_push_back(Attributes a, QString newName, Value newValue, int origSize);
 };
 
 void TestAttributes::_tst_empty(Attributes a)
@@ -168,9 +169,40 @@ void TestAttributes::tst_replace()
     _tst_replace(a3, 0, "test", Value(234));
 }
 
-void TestAttributes::tst_push_back()
+void TestAttributes::_tst_push_back(Attributes a, QString newName, Value newValue, int origSize)
 {
-    // TO DO!
+    // test the attribute has enlarged by 1
+    QCOMPARE(a.size(), (origSize+1));
+    QVERIFY(!a.isEmpty());
+
+    QCOMPARE(a.indexOf(newName), origSize);
+    QCOMPARE(a.indexOf(QString(newName)), origSize);
+
+    QVERIFY(a.contains(newName));
+    QVERIFY(a.contains(QString(newName)));
+
+    QVERIFY(!a.names().empty());
+    QCOMPARE(a.name(origSize), newName);
+
+    QVERIFY(!a.values().empty());
+    QCOMPARE(a.value(origSize), newValue);
+    QCOMPARE(a.value(QString(newName)), newValue);
+
+    // TODO: Sort out these functions:
+   // QCOMPARE(a.value(0, 123), Value(123));
+//    QCOMPARE(a.value("abc", 123), Value(123));
+//    QCOMPARE(a.value(QString('a'), 123), Value(123));
+}
+
+void TestAttributes::tst_push_back(){
+    // test for attribute with origional size > 0
+    Attributes a1(3);
+    a1.push_back("test", Value(123));
+    _tst_push_back(a1, "test", Value(123), 3);
+
+    // test for empty attribute
+
+    // test for attribute resized
 }
 
 void TestAttributes::tst_setValue()
