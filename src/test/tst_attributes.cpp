@@ -40,6 +40,7 @@ private: // auxiliary functions
     void _tst_empty(Attributes a);
     void _tst_resize(Attributes a, const int kSize);
     void _tst_replace(Attributes a, int id, QString newName, Value newValue);
+    void _tst_replace_invalid(Attributes a, int id, QString newName, Value newValue);
 };
 
 void TestAttributes::_tst_empty(Attributes a)
@@ -129,7 +130,7 @@ void TestAttributes::_tst_replace(Attributes a, int id, QString newName, Value n
      // TODO: String version of name and/or value? (see below)
 //    QCOMPARE(a.indexOf(QString("abc")), -1);
 
-     QVERIFY(!a.contains(newName));
+     QVERIFY(a.contains(newName));
      // TODO: String version of name and/or value? (see below)
 //    QVERIFY(!a.contains(QString("abc")));
 
@@ -149,7 +150,22 @@ void TestAttributes::_tst_replace(Attributes a, int id, QString newName, Value n
 
 void TestAttributes::tst_replace()
 {
+    // test for attribute with value currently in position
+    Attributes a1(3);
+    a1.setValue(0, Value(123));
+    a1.replace(0, "test", Value(234));
+    _tst_replace(a1, 0, "test", Value(234));
 
+    // test for attribute with nothing in position
+    Attributes a2(3);
+    a2.replace(0, "test", Value(234));
+    _tst_replace(a2, 0, "test", Value(234));
+
+    // test for empty attribute, resized
+    Attributes a3;
+    a3.resize(3);
+    a3.replace(0, "test", Value(234));
+    _tst_replace(a3, 0, "test", Value(234));
 }
 
 void TestAttributes::tst_push_back()
