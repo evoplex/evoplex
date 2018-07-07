@@ -126,9 +126,12 @@ void TestAttributes::tst_resize()
 
 void TestAttributes::_tst_replace(Attributes a, int id, QString newName, Value newValue, int origSize)
 {
+    // test size of attribute
      QVERIFY(!a.isEmpty());
+     QVERIFY(a.size() > 0);
      QCOMPARE(a.size(), origSize);
 
+    // test position of name
      QCOMPARE(a.indexOf(newName), id);
      QCOMPARE(a.indexOf(QString(newName)), id);
 
@@ -138,8 +141,11 @@ void TestAttributes::_tst_replace(Attributes a, int id, QString newName, Value n
      QVERIFY(!a.names().empty());
      QCOMPARE(a.name(id), newName);
 
+    // test position of value
      QVERIFY(!a.values().empty());
      QCOMPARE(a.value(id), newValue);
+
+    // test name against value
      QCOMPARE(a.value(newName), newValue);
      QCOMPARE(a.value(QString(newName)), newValue);
 
