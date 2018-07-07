@@ -42,6 +42,8 @@ private: // auxiliary functions
     void _tst_replace(Attributes a, int id, QString newName, Value newValue);
     void _tst_replace_invalid(Attributes a, int id, QString newName, Value newValue);
     void _tst_push_back(Attributes a, QString newName, Value newValue, int origSize);
+    void _tst_setValue_with_name(Attributes a, int id, QString newName, Value newValue);
+    void _tst_setValue(Attributes a, int id, Value newValue);
 };
 
 void TestAttributes::_tst_empty(Attributes a)
@@ -215,9 +217,66 @@ void TestAttributes::tst_push_back(){
     //_tst_push_back(a2, "test", Value(123), 3);
 }
 
+void TestAttributes::_tst_setValue_with_name(Attributes a, int id, QString newName, Value newValue){
+    QVERIFY(a.size() > 0);
+    QVERIFY(!a.isEmpty());
+
+    QCOMPARE(a.indexOf(newName), id);
+    QCOMPARE(a.indexOf(QString(newName)), id);
+
+    QVERIFY(a.contains(newName));
+    QVERIFY(a.contains(QString(newName)));
+
+    QVERIFY(!a.names().empty());
+    QCOMPARE(a.name(id), newName);
+
+    QVERIFY(!a.values().empty());
+    QCOMPARE(a.value(id), newValue);
+
+    // String versions?
+    //QVERIFY_EXCEPTION_THROWN(a.value(QString("a")), std::out_of_range);
+
+    // Sort out:
+//    QCOMPARE(a.value(0, 123), Value(123));
+//    QCOMPARE(a.value("abc", 123), Value(123));
+//    QCOMPARE(a.value(QString('a'), 123), Value(123));
+}
+
+void TestAttributes::_tst_setValue(Attributes a, int id, Value newValue){
+    QVERIFY(a.size() > 0);
+    QVERIFY(!a.isEmpty());
+
+    // Recreate for values
+//    QCOMPARE(a.indexOf(newName), id);
+//    QCOMPARE(a.indexOf(QString(newName)), id);
+
+//    QVERIFY(a.contains(newName));
+//    QVERIFY(a.contains(QString(newName)));
+
+//    QVERIFY(!a.names().empty());
+//    QCOMPARE(a.name(id), newName);
+
+    QVERIFY(!a.values().empty());
+    QCOMPARE(a.value(id), newValue);
+
+    // String versions?
+    //QVERIFY_EXCEPTION_THROWN(a.value(QString("a")), std::out_of_range);
+
+    // Sort out:
+//    QCOMPARE(a.value(0, 123), Value(123));
+//    QCOMPARE(a.value("abc", 123), Value(123));
+//    QCOMPARE(a.value(QString('a'), 123), Value(123));
+}
+
 void TestAttributes::tst_setValue()
 {
-    // TO DO!
+    // test for attribute that has no value at the index
+    Attributes a1(3);
+    a1.setValue(0, Value(123));
+
+    // test for attribute that has a value but no name at index
+
+    // test for attribute that has both a value and name at index
 }
 
 QTEST_MAIN(TestAttributes)
