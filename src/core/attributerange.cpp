@@ -18,7 +18,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <float.h>
+#include <cfloat>
 #include <QDebug>
 #include <QFileInfo>
 
@@ -27,21 +27,21 @@
 namespace evoplex
 {
 
-AttributeRange* AttributeRange::parse(int id, const QString& attrName, const QString& attrRangeStr)
+AttributeRange* AttributeRange::parse(int attrId, const QString& attrName, const QString& attrRangeStr)
 {
     AttributeRange* vs = nullptr;
     if (attrRangeStr == "bool") {
-        vs = new SingleValue(id, attrName, Bool, Value(false));
+        vs = new SingleValue(attrId, attrName, Bool, Value(false));
     } else if (attrRangeStr == "string") {
-        vs = new SingleValue(id, attrName, String, Value(QString()));
+        vs = new SingleValue(attrId, attrName, String, Value(QString()));
     } else if (attrRangeStr == "dirpath") {
-        vs = new SingleValue(id, attrName, DirPath, Value(QString()));
+        vs = new SingleValue(attrId, attrName, DirPath, Value(QString()));
     } else if (attrRangeStr == "filepath") {
-        vs = new SingleValue(id, attrName, FilePath, Value(QString()));
+        vs = new SingleValue(attrId, attrName, FilePath, Value(QString()));
     } else if (attrRangeStr.contains('{') && attrRangeStr.endsWith('}')) {
-        vs = setOfValues(attrRangeStr, id, attrName);
+        vs = setOfValues(attrRangeStr, attrId, attrName);
     } else if (attrRangeStr.contains('[') && attrRangeStr.endsWith(']')) {
-        vs = intervalOfValues(attrRangeStr, id, attrName);
+        vs = intervalOfValues(attrRangeStr, attrId, attrName);
     }
 
     if (!vs || !vs->isValid()) {
@@ -79,6 +79,8 @@ AttributeRange* AttributeRange::setOfValues(QString attrRangeStr, const int id, 
         for (const QString& vStr : valuesStr) {
             values.push_back(vStr);
         }
+    } else {
+        return new SingleValue();
     }
 
     if (!ok) {
@@ -120,6 +122,8 @@ AttributeRange* AttributeRange::intervalOfValues(QString attrRangeStr, const int
         } else {
             max = Value(values.at(1).toDouble(&ok2));
         }
+    } else {
+        return new SingleValue();
     }
 
     if (!ok1 || !ok2) {
@@ -132,7 +136,9 @@ Value AttributeRange::validate(const QString& valueStr) const
 {
     if (m_type == String) {
         return Value(valueStr);
-    } else if (valueStr.isEmpty()) {
+    }
+
+    if (valueStr.isEmpty()) {
         qWarning() << "unable to validate value! It should not be empty."
                    << "Expected:" << m_attrRangeStr;
         return Value();
@@ -140,79 +146,68 @@ Value AttributeRange::validate(const QString& valueStr) const
 
     switch (m_type) {
     case Bool: {
-        if (valueStr == "true" || valueStr == "1") {
-            return Value(true);
-        } else if (valueStr == "false" || valueStr == "0") {
-            return Value(false);
-        }
+        if (valueStr == "true" || valueStr == "1") return Value(true);
+        if (valueStr == "false" || valueStr == "0") return Value(false);
         break;
     }
     case DirPath: {
         QFileInfo dir(valueStr);
-        if (dir.exists() && dir.isDir()) {
-            return Value(valueStr);
-        }
+        if (dir.exists() && dir.isDir()) return Value(valueStr);
         break;
     }
     case FilePath: {
         QFileInfo file(valueStr);
-        if (file.exists() && file.isFile()) {
-            return Value(valueStr);
-        }
+        if (file.exists() && file.isFile()) return Value(valueStr);
         break;
     }
     case Int_Range: {
-        const IntervalOfValues* attrRange = dynamic_cast<const IntervalOfValues*>(this);
+        auto attrRange = dynamic_cast<const IntervalOfValues*>(this);
         bool ok = false;
         Value value(valueStr.toInt(&ok));
-        if (ok && value.isValid() && value >= attrRange->min() && value <= attrRange->max()) {
+        if (ok && value.isValid() && value >= attrRange->min() &&
+                value <= attrRange->max()) {
             return value;
         }
         break;
     }
     case Double_Range: {
-        const IntervalOfValues* iov = dynamic_cast<const IntervalOfValues*>(this);
+        auto iov = dynamic_cast<const IntervalOfValues*>(this);
         bool ok = false;
         Value value(valueStr.toDouble(&ok));
-        if (ok && value.isValid() && value >= iov->min() && value <= iov->max()) {
+        if (ok && value.isValid() && value >= iov->min() &&
+                value <= iov->max()) {
             return value;
         }
         break;
     }
     case Int_Set: {
-        const SetOfValues* sov = dynamic_cast<const SetOfValues*>(this);
+        auto sov = dynamic_cast<const SetOfValues*>(this);
         bool ok = false;
         Value value(valueStr.toInt(&ok));
         if (ok && value.isValid()) {
-            for (Value validValue : sov->values()) {
-                if (value == validValue) {
-                    return value;
-                }
+            for (const Value& validValue : sov->values()) {
+                if (value == validValue) return value;
             }
         }
         break;
     }
     case Double_Set: {
-        const SetOfValues* sov = dynamic_cast<const SetOfValues*>(this);
+        auto sov = dynamic_cast<const SetOfValues*>(this);
         bool ok = false;
         Value value(valueStr.toDouble(&ok));
         if (ok && value.isValid()) {
-            for (Value validValue : sov->values()) {
-                if (value == validValue) {
-                    return value;
-                }
+            for (const Value& validValue : sov->values()) {
+                if (value == validValue) return value;
             }
         }
         break;
     }
     case String_Set: {
-        const SetOfValues* sov = dynamic_cast<const SetOfValues*>(this);
+        auto sov = dynamic_cast<const SetOfValues*>(this);
         Value value(valueStr);
         if (value.isValid() && valueStr == value.toQString()) {
-            for (Value validValue : sov->values()) {
-                if (value == validValue) {
-                    return value;
-                }
+            for (const Value& validValue : sov->values()) {
+                if (value == validValue) return value;
             }
         }
         break;
@@ -226,6 +221,8 @@ Value AttributeRange::validate(const QString& valueStr) const
     return Value();
 }
 
+/**********************************/
+
 AttributeRange::AttributeRange(int id, const QString& attrName, Type type)
     : m_id(id)
     , m_attrName(attrName)
@@ -233,7 +230,9 @@ AttributeRange::AttributeRange(int id, const QString& attrName, Type type)
 {
 }
 
-SingleValue::SingleValue(int id, const QString& attrName, Type type, Value validValue)
+/**********************************/
+
+SingleValue::SingleValue(int id, const QString& attrName, Type type, const Value& validValue)
     : AttributeRange(id, attrName, type)
     , m_validValue(validValue)
 {
@@ -260,7 +259,9 @@ SingleValue::SingleValue()
 {
 }
 
-IntervalOfValues::IntervalOfValues(int id, const QString& attrName, Type type, Value min, Value max)
+/**********************************/
+
+IntervalOfValues::IntervalOfValues(int id, const QString& attrName, Type type, const Value& min, const Value& max)
     : AttributeRange(id, attrName, type)
     , m_min(min)
     , m_max(max)
@@ -279,6 +280,8 @@ IntervalOfValues::IntervalOfValues(int id, const QString& attrName, Type type, V
         qFatal("invalid type!");
     }
 }
+
+/**********************************/
 
 SetOfValues::SetOfValues(int id, const QString& attrName, Type type, Values values)
     : AttributeRange(id, attrName, type)
