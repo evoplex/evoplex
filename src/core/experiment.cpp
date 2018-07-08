@@ -144,9 +144,9 @@ void Experiment::updateProgressValue()
     } else if (m_expStatus == RUNNING) {
         float p = 0.f;
         for (auto& trial : m_trials) {
-            p += ((float) trial.second->m_currStep / m_pauseAt);
+            p += static_cast<float>(trial.second->m_currStep / m_pauseAt);
         }
-        m_progress = ceil(p * 360.f / m_numTrials);
+        m_progress = static_cast<quint16>(std::ceil(p * 360.f / m_numTrials));
     }
 
     if (lastProgress != m_progress) {
@@ -261,7 +261,7 @@ AbstractModel* Experiment::createTrial(const quint16 trialId)
     }
 
     const QString& gType = m_inputs->general(GENERAL_ATTRIBUTE_GRAPHTYPE).toString();
-    Nodes nodes = createNodes(BaseGraph::enumFromString(gType));
+    Nodes nodes = createNodes(AbstractGraph::enumFromString(gType));
     if (nodes.empty()) {
         return nullptr;
     }
@@ -313,9 +313,9 @@ AbstractModel* Experiment::createTrial(const quint16 trialId)
     return modelObj;
 }
 
-Nodes Experiment::createNodes(const BaseGraph::GraphType gType)
+Nodes Experiment::createNodes(const AbstractGraph::GraphType gType)
 {
-    if (m_expStatus == INVALID || gType == BaseGraph::Invalid_Type) {
+    if (m_expStatus == INVALID || gType == AbstractGraph::Invalid_Type) {
         return Nodes();
     } else if (!m_clonableNodes.empty()) {
         if (static_cast<int>(m_trials.size()) == m_numTrials - 1) {

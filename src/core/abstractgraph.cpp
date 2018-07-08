@@ -18,21 +18,21 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "basegraph.h"
+#include "abstractgraph.h"
 #include "constants.h"
 #include "utils.h"
 
 namespace evoplex {
 
-BaseGraph::GraphType BaseGraph::enumFromString(const QString& str)
+AbstractGraph::GraphType AbstractGraph::enumFromString(const QString& str)
 {
     if (str == "undirected") return Undirected;
     if (str == "directed") return Directed;
     return Invalid_Type;
 }
 
-BaseGraph::BaseGraph(const QString& name)
-    : BasePlugin(),
+AbstractGraph::AbstractGraph(const QString& name)
+    : AbstractPlugin(),
       m_name(name),
       m_type(Invalid_Type),
       m_lastNodeId(-1),
@@ -40,19 +40,19 @@ BaseGraph::BaseGraph(const QString& name)
 {
 }
 
-bool BaseGraph::setup(PRG* prg, const Attributes* attrs, Nodes& nodes, const QString& graphType)
+bool AbstractGraph::setup(PRG* prg, const Attributes* attrs, Nodes& nodes, const QString& graphType)
 {
-    Q_ASSERT_X(nodes.size() < EVOPLEX_MAX_NODES, "BasePlugin::setup", "too many nodes! we cannot handle this.");
-    if (BasePlugin::setup(prg, attrs)) {
+    Q_ASSERT_X(nodes.size() < EVOPLEX_MAX_NODES, "setup", "too many nodes! we cannot handle this.");
+    if (AbstractPlugin::setup(prg, attrs)) {
         m_nodes = nodes;
         m_type = enumFromString(graphType);
         m_typeStr = graphType;
-        m_lastNodeId = nodes.size();
+        m_lastNodeId = static_cast<int>(nodes.size());
     }
     return !m_nodes.empty() && m_type != Invalid_Type;
 }
 
-NodePtr BaseGraph::addNode(Attributes attr, int x, int y)
+NodePtr AbstractGraph::addNode(Attributes attr, int x, int y)
 {
     QMutexLocker locker(&m_mutex);
     ++m_lastNodeId;
@@ -66,7 +66,7 @@ NodePtr BaseGraph::addNode(Attributes attr, int x, int y)
     return node;
 }
 
-EdgePtr BaseGraph::addEdge(const NodePtr& origin, const NodePtr& neighbour, Attributes* attrs)
+EdgePtr AbstractGraph::addEdge(const NodePtr& origin, const NodePtr& neighbour, Attributes* attrs)
 {
     QMutexLocker locker(&m_mutex);
     ++m_lastEdgeId;
@@ -78,7 +78,7 @@ EdgePtr BaseGraph::addEdge(const NodePtr& origin, const NodePtr& neighbour, Attr
     return edgeOut;
 }
 
-void BaseGraph::removeAllEdges()
+void AbstractGraph::removeAllEdges()
 {
     QMutexLocker locker(&m_mutex);
     for (auto const& p : m_nodes) {
@@ -88,7 +88,7 @@ void BaseGraph::removeAllEdges()
     m_edges.clear();
 }
 
-void BaseGraph::removeAllEdges(const NodePtr& node)
+void AbstractGraph::removeAllEdges(const NodePtr& node)
 {
     QMutexLocker locker(&m_mutex);
     if (type() == Undirected) {
@@ -113,21 +113,21 @@ void BaseGraph::removeAllEdges(const NodePtr& node)
     }
 }
 
-void BaseGraph::removeNode(const NodePtr& node)
+void AbstractGraph::removeNode(const NodePtr& node)
 {
     removeAllEdges(node);
     QMutexLocker locker(&m_mutex);
     m_nodes.erase(node->id());
 }
 
-Nodes::iterator BaseGraph::removeNode(Nodes::iterator it)
+Nodes::iterator AbstractGraph::removeNode(Nodes::iterator it)
 {
     removeAllEdges((*it).second);
     QMutexLocker locker(&m_mutex);
     return m_nodes.erase(it);
 }
 
-void BaseGraph::removeEdge(const EdgePtr& edge)
+void AbstractGraph::removeEdge(const EdgePtr& edge)
 {
     QMutexLocker locker(&m_mutex);
     edge->origin()->removeOutEdge(edge->id());
@@ -135,7 +135,7 @@ void BaseGraph::removeEdge(const EdgePtr& edge)
     m_edges.erase(edge->id());
 }
 
-Edges::iterator BaseGraph::removeEdge(Edges::iterator it)
+Edges::iterator AbstractGraph::removeEdge(Edges::iterator it)
 {
     QMutexLocker locker(&m_mutex);
     const EdgePtr& edge = (*it).second;

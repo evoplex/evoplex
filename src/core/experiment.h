@@ -174,7 +174,7 @@ private:
     // initial population in the 'm_clonableNodes' container. Except when
     // the experiment has only one trial.
     // This method is NOT thread-safe.
-    Nodes createNodes(const BaseGraph::GraphType gType);
+    Nodes createNodes(const AbstractGraph::GraphType gType);
 
     void deleteTrials();
 

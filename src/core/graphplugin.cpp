@@ -22,13 +22,12 @@
 #include <QJsonArray>
 
 #include "graphplugin.h"
-#include "abstractplugin.h"
 #include "constants.h"
 
 namespace evoplex {
 
 GraphPlugin::GraphPlugin(const QObject* instance, const QJsonObject* metaData, const QString& libPath)
-    : AbstractPlugin(metaData, libPath)
+    : Plugin(metaData, libPath)
 {
     if (!isValid()) {
         return;

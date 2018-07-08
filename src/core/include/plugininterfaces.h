@@ -33,7 +33,7 @@ class IPluginModel
 {
 public:
     // provide the destructor to keep compilers happy.
-    virtual ~IPluginModel() {}
+    virtual ~IPluginModel() = default;
 
     // create the real model object.
     virtual AbstractModel* create() = 0;
@@ -43,7 +43,7 @@ class IPluginGraph
 {
 public:
     // provide the destructor to keep compilers happy.
-    virtual ~IPluginGraph() {}
+    virtual ~IPluginGraph() = default;
 
     // create the real graph object.
     virtual AbstractGraph* create() = 0;

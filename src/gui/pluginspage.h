@@ -40,7 +40,7 @@ public:
 private slots:
     void importPlugin();
     void rowSelectionChanged();
-    void insertRow(const AbstractPlugin *plugin);
+    void insertRow(const Plugin* plugin);
 
 private:
     enum TableCols {

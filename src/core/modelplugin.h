@@ -23,12 +23,12 @@
 
 #include <QVector>
 
-#include "abstractplugin.h"
+#include "plugin.h"
 #include "attributes.h"
 #include "plugininterfaces.h"
 
 namespace evoplex {
-class ModelPlugin : public AbstractPlugin
+class ModelPlugin : public Plugin
 {
 public:
     ModelPlugin(const QObject* instance, const QJsonObject* metaData, const QString& libPath);

@@ -22,14 +22,14 @@
 #include <QJsonArray>
 
 #include "modelplugin.h"
-#include "abstractplugin.h"
+#include "plugin.h"
 #include "constants.h"
 #include "utils.h"
 
 namespace evoplex {
 
 ModelPlugin::ModelPlugin(const QObject* instance, const QJsonObject* metaData, const QString& libPath)
-    : AbstractPlugin(metaData, libPath)
+    : Plugin(metaData, libPath)
 {
     if (!isValid()) {
         return;

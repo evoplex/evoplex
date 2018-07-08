@@ -25,7 +25,7 @@
 
 #include "nodesgeneratordlg.h"
 #include "ui_nodesgeneratordlg.h"
-#include "basegraph.h"
+#include "abstractgraph.h"
 #include "nodes.h"
 
 namespace evoplex
@@ -141,7 +141,7 @@ void NodesGeneratorDlg::slotSaveAs()
         std::function<void(int)> progress = [&progressDlg, &pValue](int p) { progressDlg.setValue(pValue + p); };
 
         QString errMsg;
-        Nodes nodes = Nodes::fromCmd(cmd, m_nodeAttrsScope, BaseGraph::Undirected, &errMsg, progress);
+        Nodes nodes = Nodes::fromCmd(cmd, m_nodeAttrsScope, AbstractGraph::Undirected, &errMsg, progress);
         Q_ASSERT_X(errMsg.isEmpty(), "NodesGeneratorDlg::slotSaveAs", "the command should be free of erros here");
         Q_ASSERT_X(!nodes.empty(), "NodesGeneratorDlg::slotSaveAs", "nodes size must be >0");
 
@@ -195,7 +195,7 @@ void NodesGeneratorDlg::fill(const QString& cmd)
     if (agdiff) {
         m_ui->bDiffData->setChecked(true);
         m_ui->numNodes2->setValue(agdiff->numCopies());
-        for (const AGDiffFunctions::AttrCmd ac : agdiff->attrCmds()) {
+        for (const AGDiffFunctions::AttrCmd& ac : agdiff->attrCmds()) {
             Q_ASSERT_X(m_ui->table->item(ac.attrId, 0)->text() == ac.attrName,
                        "NodesGeneratorDlg::fill", "attribute name mismatch. It should never happen!");
             QComboBox* cb = dynamic_cast<QComboBox*>(m_ui->table->cellWidget(ac.attrId, 1));

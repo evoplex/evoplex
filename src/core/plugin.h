@@ -18,8 +18,8 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ABSTRACTPLUGIN_H
-#define ABSTRACTPLUGIN_H
+#ifndef PLUGIN_H
+#define PLUGIN_H
 
 #include <QJsonObject>
 #include <QString>
@@ -28,21 +28,21 @@
 #include "attributerange.h"
 
 namespace evoplex {
-class AbstractPlugin
+class Plugin
 {
 public:
-    enum PluginType {
+    enum Type {
         GraphPlugin,
         ModelPlugin
     };
 
-    explicit AbstractPlugin(const QJsonObject* metaData, const QString& libPath);
-    virtual ~AbstractPlugin();
+    explicit Plugin(const QJsonObject* metaData, const QString& libPath);
+    virtual ~Plugin();
 
     inline bool isValid() const { return m_isValid; }
 
     inline const QString& path() const { return m_libPath; }
-    inline PluginType type() const { return m_type; }
+    inline Type type() const { return m_type; }
     inline const QString& id() const { return m_id; }
     inline const QString& author() const { return m_author; }
     inline const QString& name() const { return m_name; }
@@ -59,7 +59,7 @@ protected:
 
 private:
     const QString m_libPath;
-    PluginType m_type;
+    Type m_type;
     QString m_id;
     QString m_author;
     QString m_name;
@@ -68,4 +68,4 @@ private:
     std::vector<QString> m_pluginAttrsNames;
 };
 }
-#endif // ABSTRACTPLUGIN_H
+#endif // PLUGIN_H

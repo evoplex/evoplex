@@ -26,7 +26,7 @@
 
 #include "nodes.h"
 #include "attrsgenerator.h"
-#include "basegraph.h"
+#include "abstractgraph.h"
 
 namespace evoplex {
 
@@ -47,7 +47,7 @@ Nodes Nodes::fromCmd(const QString& cmd, const AttributesScope& attrsScope,
 
     Nodes nodes;
     int id = 0;
-    if (graphType == BaseGraph::Directed) {
+    if (graphType == AbstractGraph::Directed) {
         for (Attributes attrs : setOfAttrs) {
             nodes.insert({id, std::make_shared<DNode>(id, attrs)});
             ++id;
@@ -65,8 +65,8 @@ Nodes Nodes::fromCmd(const QString& cmd, const AttributesScope& attrsScope,
 Nodes Nodes::fromFile(const QString& filePath, const AttributesScope& attrsScope,
                       const int graphType, QString* errMsg, std::function<void(int)> progress)
 {
-    bool isDirected = graphType == BaseGraph::Directed;
-    Q_ASSERT_X(isDirected || graphType == BaseGraph::Undirected,
+    bool isDirected = graphType == AbstractGraph::Directed;
+    Q_ASSERT_X(isDirected || graphType == AbstractGraph::Undirected,
                "Nodes", "graph type must be 'directed' or 'undirected'");
 
     QFile file(filePath);

@@ -139,7 +139,7 @@ void MainApp::initUserPlugins()
     m_userPrefs.setValue("plugins", plugins);
 }
 
-const AbstractPlugin* MainApp::loadPlugin(const QString& path, QString& error, const bool addToUserPrefs)
+const Plugin* MainApp::loadPlugin(const QString& path, QString& error, const bool addToUserPrefs)
 {
     if (!QFile(path).exists()) {
         error = "Unable to find the file. " + path;
@@ -198,7 +198,7 @@ const AbstractPlugin* MainApp::loadPlugin(const QString& path, QString& error, c
         return nullptr;
     }
 
-    AbstractPlugin* plugin = nullptr;
+    Plugin* plugin = nullptr;
     if (type == "graph") {
         plugin = new GraphPlugin(instance, &metaData, path);
         if (plugin->isValid()) {
@@ -231,7 +231,7 @@ const AbstractPlugin* MainApp::loadPlugin(const QString& path, QString& error, c
     return plugin;
 }
 
-bool MainApp::unloadPlugin(const AbstractPlugin* plugin, QString& error)
+bool MainApp::unloadPlugin(const Plugin* plugin, QString& error)
 {
     if (!m_projects.empty()) {
         error = QString("Couldn't unload the plugin `%1`.\n"
@@ -246,10 +246,10 @@ bool MainApp::unloadPlugin(const AbstractPlugin* plugin, QString& error)
     m_userPrefs.setValue("plugins", paths);
 
     QString id = plugin->id();
-    AbstractPlugin::PluginType type = plugin->type();
-    if (type == AbstractPlugin::GraphPlugin && m_graphs.contains(id)) {
+    Plugin::Type type = plugin->type();
+    if (type == Plugin::GraphPlugin && m_graphs.contains(id)) {
         delete m_graphs.take(id);
-    } else if (type == AbstractPlugin::ModelPlugin && m_models.contains(id)) {
+    } else if (type == Plugin::ModelPlugin && m_models.contains(id)) {
         delete m_models.take(id);
     } else {
         qFatal("Tried to unload a plugin (%s) which has not been loaded before.", qPrintable(id));

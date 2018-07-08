@@ -22,45 +22,15 @@
 #define ABSTRACT_MODEL_H
 
 #include "abstractgraph.h"
-#include "baseplugin.h"
+#include "abstractplugin.h"
 
 namespace evoplex {
 
-class BaseModel : public BasePlugin
-{
-    friend class Experiment;
-
-public:
-    inline AbstractGraph* graph() const;
-    inline const Nodes& nodes() const;
-    inline const NodePtr& node(const int nodeId) const;
-    inline const Edges& edges() const;
-    inline const EdgePtr& edge(const int edgeId) const;
-    inline const EdgePtr& edge(const int originId, const int neighbourId) const;
-    inline int currStep() const;
-    inline int status() const;
-
-protected:
-    explicit BaseModel() : BasePlugin(), m_graph(nullptr), m_currStep(0), m_status(0) {}
-    virtual ~BaseModel() {
-        delete m_graph;
-        delete m_prg;
-    }
-
-private:
-    AbstractGraph* m_graph;
-    int m_currStep;
-    int m_status;
-
-    // takes the ownership of the graph and the PRG
-    inline bool setup(PRG* prg, const Attributes* attrs, AbstractGraph* graphObj);
-};
-
-class AbstractModel : public BaseModel
+class AbstractModelInterface
 {
 public:
     // destructor
-    virtual ~AbstractModel() {}
+    virtual ~AbstractModelInterface() = default;
 
     // This method is called before the actual simulation and
     // is mainly used to set the environment and parameters.
@@ -75,42 +45,76 @@ public:
     // This method allows you to custom outputs which, for example,
     // might be used by the GUI to generate custom plots or to be stored in a file.
     // The requested "header" must be defined in the modelMetaData.json file.
-    virtual std::vector<Value> customOutputs(const Values& inputs) const {
-        Q_UNUSED(inputs);
-        return std::vector<Value>();
+    virtual std::vector<Value> customOutputs(const Values& inputs) const = 0;
+};
+
+class AbstractModel : public AbstractModelInterface, public AbstractPlugin
+{
+    friend class Experiment;
+
+public:
+    inline AbstractGraph* graph() const;
+    inline const Nodes& nodes() const;
+    inline const NodePtr& node(const int nodeId) const;
+    inline const Edges& edges() const;
+    inline const EdgePtr& edge(const int edgeId) const;
+    inline const EdgePtr& edge(const int originId, const int neighbourId) const;
+    inline int currStep() const;
+    inline int status() const;
+
+    inline Values customOutputs(const Values& inputs) const override;
+
+protected:
+    AbstractGraph* m_graph;
+    int m_currStep;
+    int m_status;
+
+    explicit AbstractModel()
+        : AbstractPlugin(), m_graph(nullptr), m_currStep(0), m_status(0) {}
+
+    ~AbstractModel() override {
+        delete m_graph;
+        delete m_prg;
     }
+
+private:
+    // takes the ownership of the graph and the PRG
+    inline bool setup(PRG* prg, const Attributes* attrs, AbstractGraph* graphObj);
 };
 
 /************************************************************************
-   BaseModel: Inline member functions
+   AbstractModel: Inline member functions
  ************************************************************************/
 
-inline AbstractGraph* BaseModel::graph() const
+inline AbstractGraph* AbstractModel::graph() const
 { return m_graph; }
 
-inline const Nodes& BaseModel::nodes() const
+inline const Nodes& AbstractModel::nodes() const
 { return m_graph->nodes(); }
 
-inline const NodePtr& BaseModel::node(const int nodeId) const
+inline const NodePtr& AbstractModel::node(const int nodeId) const
 { return m_graph->nodes().at(nodeId); }
 
-inline const Edges& BaseModel::edges() const
+inline const Edges& AbstractModel::edges() const
 { return m_graph->edges(); }
 
-inline const EdgePtr& BaseModel::edge(const int edgeId) const
+inline const EdgePtr& AbstractModel::edge(const int edgeId) const
 { return m_graph->edges().at(edgeId); }
 
-inline const EdgePtr& BaseModel::edge(const int originId, const int neighbourId) const
+inline const EdgePtr& AbstractModel::edge(const int originId, const int neighbourId) const
 { return node(originId)->outEdges().at(neighbourId); }
 
-inline int BaseModel::currStep() const
+inline int AbstractModel::currStep() const
 { return m_currStep; }
 
-inline int BaseModel::status() const
+inline int AbstractModel::status() const
 { return m_status; }
 
-inline bool BaseModel::setup(PRG* prg, const Attributes* attrs, AbstractGraph* graphObj) {
-    if (BasePlugin::setup(prg, attrs)) {
+inline Values AbstractModel::customOutputs(const Values& inputs) const
+{ Q_UNUSED(inputs); return Values(); }
+
+inline bool AbstractModel::setup(PRG* prg, const Attributes* attrs, AbstractGraph* graphObj) {
+    if (AbstractPlugin::setup(prg, attrs)) {
         m_graph = graphObj;
         m_currStep = 0;
     }

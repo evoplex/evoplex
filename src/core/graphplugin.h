@@ -21,12 +21,12 @@
 #ifndef GRAPHPLUGIN_H
 #define GRAPHPLUGIN_H
 
-#include "abstractplugin.h"
+#include "plugin.h"
 #include "attributes.h"
 #include "plugininterfaces.h"
 
 namespace evoplex {
-class GraphPlugin : public AbstractPlugin
+class GraphPlugin : public Plugin
 {
 public:
     GraphPlugin(const QObject* instance, const QJsonObject* metaData, const QString& libPath);

@@ -52,10 +52,10 @@ public:
     void resetSettingsToDefault();
 
     // load plugin from a .so file; return nullptr if unsuccessful
-    const AbstractPlugin* loadPlugin(const QString& path, QString& error, const bool addToUserPrefs);
+    const Plugin* loadPlugin(const QString& path, QString& error, const bool addToUserPrefs);
 
     // unload an existing plugin; return true if successful
-    bool unloadPlugin(const AbstractPlugin* plugin, QString& error);
+    bool unloadPlugin(const Plugin* plugin, QString& error);
 
     // Create a new project
     ProjectPtr newProject(QString &error, const QString& filepath="");
@@ -82,8 +82,8 @@ public:
     void addPathToRecentProjects(const QString& projectFilePath);
 
 signals:
-    void pluginAdded(const AbstractPlugin* plugin);
-    void pluginRemoved(const QString& id, AbstractPlugin::PluginType t);
+    void pluginAdded(const Plugin* plugin);
+    void pluginRemoved(const QString& id, Plugin::Type t);
     void listOfRecentProjectsUpdated();
 
 private:

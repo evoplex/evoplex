@@ -34,7 +34,7 @@ typedef std::shared_ptr<Node> NodePtr;
 
 class NodeInterface
 {
-    friend class BaseGraph;
+    friend class AbstractGraph;
 public:
     virtual NodePtr clone() const = 0;
     virtual const Edges& inEdges() const = 0;

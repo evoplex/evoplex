@@ -47,8 +47,8 @@ PluginsPage::PluginsPage(MainGUI* mainGUI)
 
     for (GraphPlugin* g : m_mainApp->graphs()) { insertRow(g); }
     for (ModelPlugin* m : m_mainApp->models()) { insertRow(m); }
-    connect(m_mainApp, SIGNAL(pluginAdded(const AbstractPlugin*)),
-            SLOT(insertRow(const AbstractPlugin*)));
+    connect(m_mainApp, SIGNAL(pluginAdded(const Plugin*)),
+            SLOT(insertRow(const Plugin*)));
 
     QSettings s;
     m_innerWindow->restoreGeometry(s.value("gui/pluginsPageGeometry").toByteArray());
@@ -70,9 +70,9 @@ void PluginsPage::rowSelectionChanged()
     }
 
     int type = m_ui->table->item(row, TYPE)->data(Qt::UserRole).toInt();
-    if (type == AbstractPlugin::GraphPlugin) {
+    if (type == Plugin::GraphPlugin) {
         loadHtml(m_mainApp->graph(m_ui->table->item(row, UID)->text()));
-    } else if (type == AbstractPlugin::ModelPlugin) {
+    } else if (type == Plugin::ModelPlugin) {
         loadHtml(m_mainApp->model(m_ui->table->item(row, UID)->text()));
     } else {
         qFatal("invalid plugin type! It should never happen.");
@@ -124,16 +124,16 @@ void PluginsPage::importPlugin()
     }
 }
 
-void PluginsPage::insertRow(const AbstractPlugin* plugin)
+void PluginsPage::insertRow(const Plugin* plugin)
 {
     if (!plugin) {
         return;
     }
 
     QTableWidgetItem* typeItem;
-    if (plugin->type() == AbstractPlugin::ModelPlugin) {
+    if (plugin->type() == Plugin::ModelPlugin) {
         typeItem = new QTableWidgetItem("model");
-    } else if (plugin->type() == AbstractPlugin::GraphPlugin) {
+    } else if (plugin->type() == Plugin::GraphPlugin) {
         typeItem = new QTableWidgetItem("graph");
     } else {
         qFatal("invalid plugin type! It should never happen.");

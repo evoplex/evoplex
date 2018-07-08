@@ -22,13 +22,13 @@
 #include <QJsonArray>
 #include <QVariantMap>
 
-#include "abstractplugin.h"
+#include "plugin.h"
 #include "constants.h"
 #include "utils.h"
 
 namespace evoplex {
 
-AbstractPlugin::AbstractPlugin(const QJsonObject* metaData, const QString& libPath)
+Plugin::Plugin(const QJsonObject* metaData, const QString& libPath)
     : m_isValid(false)
     , m_libPath(libPath)
 {
@@ -56,13 +56,13 @@ AbstractPlugin::AbstractPlugin(const QJsonObject* metaData, const QString& libPa
     m_isValid = true;
 }
 
-AbstractPlugin::~AbstractPlugin()
+Plugin::~Plugin()
 {
     Utils::deleteAndShrink(m_pluginAttrsScope);
 }
 
-bool AbstractPlugin::attrsScope(const QJsonObject* metaData, const QString& name,
-                                AttributesScope& attrsScope, std::vector<QString>& keys) const
+bool Plugin::attrsScope(const QJsonObject* metaData, const QString& name,
+        AttributesScope& attrsScope, std::vector<QString>& keys) const
 {
     if (metaData->contains(name)) {
         QJsonArray json = metaData->value(name).toArray();
