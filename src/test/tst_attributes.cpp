@@ -158,6 +158,13 @@ void TestAttributes::_tst_replace(Attributes a, int id, QString newName, Value n
 
 void TestAttributes::tst_replace()
 {
+    // test for attribute with no value or name at position
+    // test for attribute with value but no name at position
+    // test for attribute with both value and name at position
+    // test for empty attribute
+    // test for empty attribute resized
+    // test for non-empty attribute resized
+
     // test for attribute with value currently in position
     Attributes a1(3);
     a1.setValue(0, Value(123));
@@ -209,6 +216,14 @@ void TestAttributes::_tst_push_back(Attributes a, QString newName, Value newValu
 }
 
 void TestAttributes::tst_push_back(){
+
+    // test for attribute with no value or name at position
+    // test for attribute with value but no name at position
+    // test for attribute with both value and name at position
+    // test for empty attribute
+    // test for empty attribute resized
+    // test for non-empty attribute resized
+
     // test for attribute with origional size > 0
     Attributes a1(3);
     a1.push_back("test", Value(123));
@@ -255,6 +270,11 @@ void TestAttributes::_tst_setValue_with_name(Attributes a, int id, QString newNa
 }
 
 void TestAttributes::_tst_setValue(Attributes a, int id, Value newValue, int origSize){
+
+    // test for attribute with no value or name at position
+    // test for attribute with value but no name at position
+    // test for attribut with both value and name at position
+
     // test size of attribute
     QVERIFY(a.size() > 0);
     QVERIFY(!a.isEmpty());
@@ -290,6 +310,13 @@ void TestAttributes::_tst_setValue(Attributes a, int id, Value newValue, int ori
 
 void TestAttributes::tst_setValue()
 {
+    // test for attribute with no value or name at position
+    // test for attribute with value but no name at position
+    // test for attribute with both value and name at position
+    // test for empty attribute
+    // test for empty attribute resized
+    // test for non-empty attribute resized
+
     // test for attribute that has no value at the index
     Attributes a1(3);
     a1.setValue(0, Value(123));
