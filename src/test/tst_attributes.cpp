@@ -123,7 +123,7 @@ void TestAttributes::tst_resize()
     a2.resize(0);
     _tst_empty(a2);
 }
-
+// =====================================
 void TestAttributes::_tst_replace(Attributes a, int id, QString newName, Value newValue, int origSize)
 {
     // test size of attribute
@@ -181,6 +181,7 @@ void TestAttributes::_tst_push_back(Attributes a, QString newName, Value newValu
     // test size of attribute
     QCOMPARE(a.size(), (origSize+1));
     QVERIFY(!a.isEmpty());
+    QVERIFY(a.size() > 0);
 
     // test position of name
     QCOMPARE(a.indexOf(newName), origSize);
@@ -198,6 +199,7 @@ void TestAttributes::_tst_push_back(Attributes a, QString newName, Value newValu
     QCOMPARE(a.value(origSize), newValue);
 
     // test name against value
+    QCOMPARE(a.value(newName), newValue);
     QCOMPARE(a.value(QString(newName)), newValue);
 
     // TODO: Sort out these functions:
@@ -267,10 +269,15 @@ void TestAttributes::_tst_setValue(Attributes a, int id, Value newValue, int ori
 
 //    QVERIFY(!a.names().empty());
 //    QCOMPARE(a.name(id), newName);
+//    QCOMPARE(a.name(id), QString(newName));
 
     // test position of values
     QVERIFY(!a.values().empty());
     QCOMPARE(a.value(id), newValue);
+
+    // test name against value
+//    QCOMPARE(a.value(newName), newValue);
+//    QCOMPARE(a.value(QString(newName)), newValue);
 
     // String versions?
    // QVERIFY_EXCEPTION_THROWN(a.value(QString(id)), newValue);
