@@ -130,6 +130,12 @@ void TestAttributes::_tst_replace(Attributes a, int id, QString newName, Value n
      QVERIFY(!a.isEmpty());
      QVERIFY(a.size() > 0);
      QCOMPARE(a.size(), origSize);
+     QVERIFY_EXCEPTION_THROWN(a.name(origSize), std::out_of_range);
+     QVERIFY_EXCEPTION_THROWN(a.name(-1), std::out_of_range);
+     QCOMPARE(a.names().size(), size_t(origSize));
+     QCOMPARE(a.values().size(), size_t(origSize));
+     QVERIFY_EXCEPTION_THROWN(a.value("a"), std::out_of_range);
+     QVERIFY_EXCEPTION_THROWN(a.value(QString("a")), std::out_of_range);
 
     // test position of name
      QCOMPARE(a.indexOf(newName), id);
@@ -149,6 +155,7 @@ void TestAttributes::_tst_replace(Attributes a, int id, QString newName, Value n
     // test name against value
      QCOMPARE(a.value(newName), newValue);
      QCOMPARE(a.value(QString(newName)), newValue);
+     QVERIFY(newValue.isValid());
 
      // TODO: Sort out these functions:
     // QCOMPARE(a.value(0, 123), Value(123));
@@ -189,6 +196,12 @@ void TestAttributes::_tst_push_back(Attributes a, QString newName, Value newValu
     QCOMPARE(a.size(), (origSize+1));
     QVERIFY(!a.isEmpty());
     QVERIFY(a.size() > 0);
+    QVERIFY_EXCEPTION_THROWN(a.name(origSize+1), std::out_of_range);
+    QVERIFY_EXCEPTION_THROWN(a.name(-1), std::out_of_range);
+    QCOMPARE(a.names().size(), size_t(origSize+1));
+    QCOMPARE(a.values().size(), size_t(origSize+1));
+    QVERIFY_EXCEPTION_THROWN(a.value("a"), std::out_of_range);
+    QVERIFY_EXCEPTION_THROWN(a.value(QString("a")), std::out_of_range);
 
     // test position of name
     QCOMPARE(a.indexOf(newName), origSize);
@@ -208,6 +221,7 @@ void TestAttributes::_tst_push_back(Attributes a, QString newName, Value newValu
     // test name against value
     QCOMPARE(a.value(newName), newValue);
     QCOMPARE(a.value(QString(newName)), newValue);
+    QVERIFY(newValue.isValid());
 
     // TODO: Sort out these functions:
    // QCOMPARE(a.value(0, 123), Value(123));
@@ -279,6 +293,12 @@ void TestAttributes::_tst_setValue(Attributes a, int id, Value newValue, int ori
     QVERIFY(a.size() > 0);
     QVERIFY(!a.isEmpty());
     QCOMPARE(a.size(), origSize);
+    QVERIFY_EXCEPTION_THROWN(a.name(origSize), std::out_of_range);
+    QVERIFY_EXCEPTION_THROWN(a.name(-1), std::out_of_range);
+    QCOMPARE(a.names().size(), size_t(origSize));
+    QCOMPARE(a.values().size(), size_t(origSize));
+    QVERIFY_EXCEPTION_THROWN(a.value("a"), std::out_of_range);
+    QVERIFY_EXCEPTION_THROWN(a.value(QString("a")), std::out_of_range);
 
     // FOR WITH NAME FUNCTION
 //    QCOMPARE(a.indexOf(newName), id);
@@ -298,6 +318,7 @@ void TestAttributes::_tst_setValue(Attributes a, int id, Value newValue, int ori
     // test name against value
 //    QCOMPARE(a.value(newName), newValue);
 //    QCOMPARE(a.value(QString(newName)), newValue);
+     QVERIFY(newValue.isValid());
 
     // String versions?
    // QVERIFY_EXCEPTION_THROWN(a.value(QString(id)), newValue);
