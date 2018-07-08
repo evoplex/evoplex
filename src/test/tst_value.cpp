@@ -56,26 +56,27 @@ void TestValue::tst_valueInvalid()
     QVERIFY(!v.isString());
 
     // Testing value
-    QVERIFY_EXCEPTION_THROWN(v.toQString(), std::invalid_argument);
+    QCOMPARE(v.toQString(), QString());
 
     // COMPARISONS
     // same invalid type
-    Value v1, v2;
-    QVERIFY_EXCEPTION_THROWN(v1 == v2, std::invalid_argument);
-    QVERIFY_EXCEPTION_THROWN(v1 != v2, std::invalid_argument);
-    QVERIFY_EXCEPTION_THROWN(v1 >= v2, std::invalid_argument);
-    QVERIFY_EXCEPTION_THROWN(v1 <= v2, std::invalid_argument);
-    QVERIFY_EXCEPTION_THROWN(v1 > v2, std::invalid_argument);
-    QVERIFY_EXCEPTION_THROWN(v1 < v2, std::invalid_argument);
+    Value i1, i2;
+    QVERIFY_EXCEPTION_THROWN(i1 == i2, std::invalid_argument);
+    QVERIFY_EXCEPTION_THROWN(i1 != i2, std::invalid_argument);
+    QVERIFY_EXCEPTION_THROWN(i1 >= i2, std::invalid_argument);
+    QVERIFY_EXCEPTION_THROWN(i1 <= i2, std::invalid_argument);
+    QVERIFY_EXCEPTION_THROWN(i1 >  i2, std::invalid_argument);
+    QVERIFY_EXCEPTION_THROWN(i1 <  i2, std::invalid_argument);
 
     // different valid types
-    v1 = Value(1), v2 = Value(1.0);
+    const Value v1(1);
+    const Value v2(1.0);
     QCOMPARE(v1 == v2, false);
     QCOMPARE(v1 != v2, true);
     QVERIFY_EXCEPTION_THROWN(v1 >= v2, std::invalid_argument);
     QVERIFY_EXCEPTION_THROWN(v1 <= v2, std::invalid_argument);
-    QVERIFY_EXCEPTION_THROWN(v1 > v2, std::invalid_argument);
-    QVERIFY_EXCEPTION_THROWN(v1 < v2, std::invalid_argument);
+    QVERIFY_EXCEPTION_THROWN(v1 >  v2, std::invalid_argument);
+    QVERIFY_EXCEPTION_THROWN(v1 <  v2, std::invalid_argument);
 
     // creating a Value from another Value
     Value vInvalid;
@@ -120,8 +121,8 @@ void TestValue::tst_valueBool()
     QCOMPARE(v.toQString(), QString("0"));
 
     // COMPARISON TESTS
-    Value v1, v2;
-    v1 = Value(true), v2 = Value(false);
+    const Value v1(true);
+    const Value v2(false);
     QCOMPARE(v1 == v2, false);
     QCOMPARE(v1 != v2, true);
     QCOMPARE(v1 >= v2, true);
@@ -159,14 +160,22 @@ void TestValue::tst_valueDouble()
     QCOMPARE(v.toQString(), QString("4.5123788"));
 
     // COMPARISON TESTS
-    Value v1, v2;
-    v1 = Value(100.2), v2 = Value(100.1);
+    const Value v1(103.200000008);
+    const Value v2(103.200000007);
     QCOMPARE(v1 == v2, false);
     QCOMPARE(v1 != v2, true);
     QCOMPARE(v1 >= v2, true);
     QCOMPARE(v1 <= v2, false);
     QCOMPARE(v1 >  v2, true);
     QCOMPARE(v1 <  v2, false);
+
+    const Value v3(103.200000008);
+    QCOMPARE(v1 == v3, true);
+    QCOMPARE(v1 != v3, false);
+    QCOMPARE(v1 >= v3, true);
+    QCOMPARE(v1 <= v3, true);
+    QCOMPARE(v1 >  v3, false);
+    QCOMPARE(v1 <  v3, false);
 
     // creating a Value from another Value
     Value vDouble(9.31231);
@@ -198,8 +207,8 @@ void TestValue::tst_valueInt()
     QCOMPARE(v.toQString(), QString("-10"));
 
     // COMPARISON TESTS
-    Value v1, v2;
-    v1 = Value(100), v2 = Value(50);
+    const Value v1(100);
+    const Value v2 = Value(50);
     QCOMPARE(v1 == v2, false);
     QCOMPARE(v1 != v2, true);
     QCOMPARE(v1 >= v2, true);
@@ -239,8 +248,8 @@ void TestValue::tst_valueChar()
     QCOMPARE(v.toQString(), QString("a"));
 
     // COMPARISON TESTS
-    Value v1, v2;
-    v1 = Value('d'), v2 = Value('c');
+    const Value v1('d');
+    const Value v2('c');
     QCOMPARE(v1 == v2, false);
     QCOMPARE(v1 != v2, true);
     QCOMPARE(v1 >= v2, true);
@@ -249,7 +258,7 @@ void TestValue::tst_valueChar()
     QCOMPARE(v1 <  v2, false);
 
     // creating a Value from another Value
-    Value vChar('a');
+    const Value vChar('a');
     QCOMPARE(Value(vChar), vChar);
     QCOMPARE(Value(vChar).isChar(), true);
     QCOMPARE(Value(vChar).toChar(), 'a');
@@ -280,8 +289,8 @@ void TestValue::tst_valueString()
     QCOMPARE(v.toQString(), str);
 
     // COMPARISON TESTS
-    Value v1, v2;
-    v1 = Value("abc$"), v2 = Value("iua^sd");
+    const Value v1("abc$");
+    const Value v2("iua^sd");
     QCOMPARE(v1 == v2, false);
     QCOMPARE(v1 != v2, true);
     QVERIFY_EXCEPTION_THROWN(v1 >= v2, std::invalid_argument);

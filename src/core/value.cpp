@@ -88,8 +88,9 @@ QString Value::toQString(char format, int precision) const
     case BOOL: return QString::number(m_data.b);
     case CHAR: return QString(m_data.c);
     case STRING: return QString::fromUtf8(m_data.s);
-    default: throw std::invalid_argument("invalid type of Value");
+    case INVALID: return QString();
     }
+    throw std::invalid_argument("invalid type of Value");
 }
 
 Value& Value::operator=(const Value& v)
@@ -101,8 +102,8 @@ Value& Value::operator=(const Value& v)
         case DOUBLE: m_data.d = v.m_data.d; break;
         case BOOL: m_data.b = v.m_data.b; break;
         case CHAR: m_data.c = v.m_data.c; break;
-        case STRING: m_data.s = qstrdup(v.toString());
-        case INVALID: break;
+        case STRING: m_data.s = qstrdup(v.toString()); break;
+        case INVALID: /* nothing-to-copy */ break;
         }
     }
     return *this;
@@ -116,7 +117,7 @@ bool Value::operator==(const Value& v) const
 
     switch (m_type) {
     case INT: return m_data.i == v.m_data.i;
-    case DOUBLE: return m_data.d == v.m_data.d;
+    case DOUBLE: return qFuzzyCompare(m_data.d, v.m_data.d);
     case BOOL: return m_data.b == v.m_data.b;
     case CHAR: return m_data.c == v.m_data.c;
     case STRING: return strcmp (m_data.s, v.m_data.s) == 0;
@@ -132,7 +133,7 @@ bool Value::operator!=(const Value& v) const
 
     switch (m_type) {
     case INT: return m_data.i != v.m_data.i;
-    case DOUBLE: return m_data.d != v.m_data.d;
+    case DOUBLE: return !qFuzzyCompare(m_data.d, v.m_data.d);
     case BOOL: return m_data.b != v.m_data.b;
     case CHAR: return m_data.c != v.m_data.c;
     case STRING: return strcmp (m_data.s, v.m_data.s) != 0;
