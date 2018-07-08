@@ -140,6 +140,7 @@ void TestAttributes::_tst_replace(Attributes a, int id, QString newName, Value n
 
      QVERIFY(!a.names().empty());
      QCOMPARE(a.name(id), newName);
+     QCOMPARE(a.name(id), QString(newName));
 
     // test position of value
      QVERIFY(!a.values().empty());
@@ -190,6 +191,7 @@ void TestAttributes::_tst_push_back(Attributes a, QString newName, Value newValu
 
     QVERIFY(!a.names().empty());
     QCOMPARE(a.name(origSize), newName);
+    QCOMPARE(a.name(origSize), QString(newName));
 
     // test position of value
     QVERIFY(!a.values().empty());
