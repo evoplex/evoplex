@@ -43,7 +43,7 @@ private: // auxiliary functions
     void _tst_replace_invalid(Attributes a, int id, QString newName, Value newValue);
     void _tst_push_back(Attributes a, QString newName, Value newValue, int origSize);
     void _tst_setValue_with_name(Attributes a, int id, QString newName, Value newValue);
-    void _tst_setValue(Attributes a, int id, Value newValue);
+    void _tst_setValue(Attributes a, int id, Value newValue, int origSize);
 };
 
 void TestAttributes::_tst_empty(Attributes a)
@@ -250,10 +250,11 @@ void TestAttributes::_tst_setValue_with_name(Attributes a, int id, QString newNa
 //    QCOMPARE(a.value(QString('a'), 123), Value(123));
 }
 
-void TestAttributes::_tst_setValue(Attributes a, int id, Value newValue){
+void TestAttributes::_tst_setValue(Attributes a, int id, Value newValue, int origSize){
     // test size of attribute
     QVERIFY(a.size() > 0);
     QVERIFY(!a.isEmpty());
+    QCOMPARE(a.size(), origSize);
 
     // FOR WITH NAME FUNCTION
 //    QCOMPARE(a.indexOf(newName), id);
@@ -283,6 +284,7 @@ void TestAttributes::tst_setValue()
     // test for attribute that has no value at the index
     Attributes a1(3);
     a1.setValue(0, Value(123));
+    _tst_setValue(a1, 0, Value(123) ,3);
 
     // test for attribute that has a value but no name at index
 
