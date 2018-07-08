@@ -177,10 +177,11 @@ void TestAttributes::tst_replace()
 
 void TestAttributes::_tst_push_back(Attributes a, QString newName, Value newValue, int origSize)
 {
-    // test the attribute has enlarged by 1
+    // test size of attribute
     QCOMPARE(a.size(), (origSize+1));
     QVERIFY(!a.isEmpty());
 
+    // test position of name
     QCOMPARE(a.indexOf(newName), origSize);
     QCOMPARE(a.indexOf(QString(newName)), origSize);
 
@@ -190,8 +191,11 @@ void TestAttributes::_tst_push_back(Attributes a, QString newName, Value newValu
     QVERIFY(!a.names().empty());
     QCOMPARE(a.name(origSize), newName);
 
+    // test position of value
     QVERIFY(!a.values().empty());
     QCOMPARE(a.value(origSize), newValue);
+
+    // test name against value
     QCOMPARE(a.value(QString(newName)), newValue);
 
     // TODO: Sort out these functions:
@@ -247,6 +251,7 @@ void TestAttributes::_tst_setValue_with_name(Attributes a, int id, QString newNa
 }
 
 void TestAttributes::_tst_setValue(Attributes a, int id, Value newValue){
+    // test size of attribute
     QVERIFY(a.size() > 0);
     QVERIFY(!a.isEmpty());
 
@@ -260,6 +265,7 @@ void TestAttributes::_tst_setValue(Attributes a, int id, Value newValue){
 //    QVERIFY(!a.names().empty());
 //    QCOMPARE(a.name(id), newName);
 
+    // test position of values
     QVERIFY(!a.values().empty());
     QCOMPARE(a.value(id), newValue);
 
