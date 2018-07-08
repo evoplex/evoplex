@@ -233,7 +233,7 @@ void ExperimentsMgr::setMaxThreadCount(const int newValue)
 
 /********************************/
 
-TrialRunnable::TrialRunnable(ExperimentsMgr* expMgr, Experiment* exp, int trialId)
+TrialRunnable::TrialRunnable(ExperimentsMgr* expMgr, Experiment* exp, quint16 trialId)
     : expMgr(expMgr)
     , m_exp(exp)
     , m_trialId(trialId)

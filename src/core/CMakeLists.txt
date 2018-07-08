@@ -45,6 +45,7 @@ set(EVOPLEX_CORE_H
   output.h
 
   experiment.h
+  expinputs.h
   experimentsmgr.h
   project.h
   logger.h
@@ -61,6 +62,7 @@ set(EVOPLEX_CORE_CXX
   attributerange.cpp
   attrsgenerator.cpp
   experiment.cpp
+  expinputs.cpp
   experimentsmgr.cpp
   output.cpp
   project.cpp

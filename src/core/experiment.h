@@ -29,6 +29,7 @@
 #include <unordered_set>
 #include <vector>
 
+#include "expinputs.h"
 #include "experimentsmgr.h"
 #include "mainapp.h"
 #include "constants.h"
@@ -57,37 +58,11 @@ public:
     };
     Q_ENUM(Status)
 
-    struct ExperimentInputs {
-        const Attributes* generalAttrs;
-        const Attributes* modelAttrs;
-        const Attributes* graphAttrs;
-        const std::vector<Cache*> fileCaches;
-
-        ExperimentInputs(const Attributes* general, const Attributes* model,
-                         const Attributes* graph, const std::vector<Cache*> caches)
-            : generalAttrs(general), modelAttrs(model), graphAttrs(graph), fileCaches(caches) {}
-
-        ~ExperimentInputs() {
-            delete generalAttrs;
-            delete modelAttrs;
-            delete graphAttrs;
-            for (Cache* c : fileCaches)
-                c->deleteCache();
-        }
-    };
-
-    // Read and validates the experiment inputs.
-    // We assume that all graph/model attributes start with 'uid_'. It is very
-    // important to avoid clashes between different attributes which use the same name.
-    // @return nullptr if unsuccessful
-    static ExperimentInputs* readInputs(const MainApp* mainApp,
-            const QStringList& header, const QStringList& values, QString& errorMsg);
-
-    explicit Experiment(MainApp* mainApp, ExperimentInputs* inputs, ProjectPtr project);
+    explicit Experiment(MainApp* mainApp, ExpInputs* inputs, ProjectPtr project);
 
     ~Experiment();
 
-    bool init(ExperimentInputs* inputs, QString& error);
+    bool init(ExpInputs* inputs, QString& error);
 
     void reset();
 
@@ -133,7 +108,7 @@ public:
     inline int id() const { return m_id; }
     inline ProjectPtr project() const { return m_project; }
     inline int numTrials() const { return m_numTrials; }
-    inline const ExperimentInputs* inputs() const { return m_inputs; }
+    inline const ExpInputs* inputs() const { return m_inputs; }
     inline const QString& modelId() const { return m_modelPlugin->id(); }
     inline const QString& graphId() const { return m_graphPlugin->id(); }
     inline const ModelPlugin* modelPlugin() const { return m_modelPlugin; }
@@ -155,7 +130,7 @@ private:
     const int m_id;
     ProjectPtr m_project;
 
-    const ExperimentInputs* m_inputs;
+    const ExpInputs* m_inputs;
     const GraphPlugin* m_graphPlugin;
     const ModelPlugin* m_modelPlugin;
     int m_numTrials;
@@ -186,12 +161,12 @@ private:
     // Here is where the actual simulation is performed.
     // This method will run in a worker thread until it reaches the max
     // number of steps or the pause criteria defined by the user.
-    void processTrial(const int& trialId);
+    void processTrial(const quint16 trialId);
 
     // We can safely consider that all parameters are valid at this point.
     // However, some things might fail (eg, missing nodes, broken graph etc),
     // and, in that case, a null pointer is returned.
-    AbstractModel* createTrial(const int trialId);
+    AbstractModel* createTrial(const quint16 trialId);
 
     // The trials are meant to have the same initial population.
     // So, considering that it might be a very expensive operation (eg, I/O),

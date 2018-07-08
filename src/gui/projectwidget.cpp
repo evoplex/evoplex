@@ -96,11 +96,10 @@ void ProjectWidget::fillRow(int row, const Experiment* exp)
     m_ui->table->setSortingEnabled(false);
 
     // general stuff
-    const Attributes* gep = exp->inputs()->generalAttrs;
     insertItem(row, TableWidget::H_EXPID, QString::number(exp->id()));
-    insertItem(row, TableWidget::H_SEED, gep->value(GENERAL_ATTRIBUTE_SEED).toQString());
-    insertItem(row, TableWidget::H_STOPAT, gep->value(GENERAL_ATTRIBUTE_STOPAT).toQString());
-    insertItem(row, TableWidget::H_TRIALS, gep->value(GENERAL_ATTRIBUTE_TRIALS).toQString());
+    insertItem(row, TableWidget::H_SEED, exp->inputs()->general(GENERAL_ATTRIBUTE_SEED).toQString());
+    insertItem(row, TableWidget::H_STOPAT, exp->inputs()->general(GENERAL_ATTRIBUTE_STOPAT).toQString());
+    insertItem(row, TableWidget::H_TRIALS, exp->inputs()->general(GENERAL_ATTRIBUTE_TRIALS).toQString());
 
     // lambda function to add the attributes of a plugin (ie, model or graph)
     auto pluginAtbs = [this, row](TableWidget::Header header, QString pluginId, const Attributes* attrs)
@@ -119,10 +118,10 @@ void ProjectWidget::fillRow(int row, const Experiment* exp)
     };
 
     // model stuff
-    pluginAtbs(TableWidget::H_MODEL, exp->modelId(), exp->inputs()->modelAttrs);
+    pluginAtbs(TableWidget::H_MODEL, exp->modelId(), exp->inputs()->model());
 
     // graph stuff
-    pluginAtbs(TableWidget::H_GRAPH, exp->graphId(), exp->inputs()->graphAttrs);
+    pluginAtbs(TableWidget::H_GRAPH, exp->graphId(), exp->inputs()->graph());
 
     m_ui->table->setSortingEnabled(true);
 }

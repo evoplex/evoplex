@@ -87,13 +87,13 @@ private:
 class TrialRunnable: public QRunnable
 {
 public:
-    TrialRunnable(ExperimentsMgr* expMgr, Experiment* exp, int trialId);
+    TrialRunnable(ExperimentsMgr* expMgr, Experiment* exp, quint16 trialId);
     void run();
 
 private:
     ExperimentsMgr* expMgr;
     Experiment* m_exp;
-    const int m_trialId;
+    const quint16 m_trialId;
 };
 
 }

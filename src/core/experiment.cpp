@@ -32,9 +32,9 @@
 namespace evoplex
 {
 
-Experiment::Experiment(MainApp* mainApp, ExperimentInputs* inputs, ProjectPtr project)
+Experiment::Experiment(MainApp* mainApp, ExpInputs* inputs, ProjectPtr project)
     : m_mainApp(mainApp)
-    , m_id(inputs->generalAttrs->value(GENERAL_ATTRIBUTE_EXPID).toInt())
+    , m_id(inputs->general(GENERAL_ATTRIBUTE_EXPID).toInt())
     , m_project(project)
     , m_inputs(nullptr)
     , m_expStatus(INVALID)
@@ -54,7 +54,7 @@ Experiment::~Experiment()
     m_project.clear();
 }
 
-bool Experiment::init(ExperimentInputs* inputs, QString& error)
+bool Experiment::init(ExpInputs* inputs, QString& error)
 {
     if (m_expStatus == RUNNING || m_expStatus == QUEUED) {
         error = "Tried to initialize a running experiment.\n"
@@ -69,13 +69,13 @@ bool Experiment::init(ExperimentInputs* inputs, QString& error)
 
     m_filePathPrefix.clear();
     m_fileHeader.clear();
-    if (!m_inputs->fileCaches.empty()) {
+    if (!m_inputs->fileCaches().empty()) {
         m_filePathPrefix = QString("%1/%2_e%3_t")
-                .arg(m_inputs->generalAttrs->value(OUTPUT_DIR).toQString())
+                .arg(m_inputs->general(OUTPUT_DIR).toQString())
                 .arg(m_project->name())
                 .arg(m_id);
 
-        for (Cache* cache : m_inputs->fileCaches) {
+        for (const Cache* cache : m_inputs->fileCaches()) {
             Q_ASSERT_X(cache->inputs().size() > 0, "Experiment::init", "a file cache must have inputs");
             m_fileHeader += cache->printableHeader(',', false) + ",";
             m_outputs.insert(cache->output());
@@ -84,11 +84,11 @@ bool Experiment::init(ExperimentInputs* inputs, QString& error)
         m_fileHeader += "\n";
     }
 
-    m_numTrials = m_inputs->generalAttrs->value(GENERAL_ATTRIBUTE_TRIALS).toInt();
-    m_autoDeleteTrials = m_inputs->generalAttrs->value(GENERAL_ATTRIBUTE_AUTODELETE).toBool();
+    m_numTrials = m_inputs->general(GENERAL_ATTRIBUTE_TRIALS).toInt();
+    m_autoDeleteTrials = m_inputs->general(GENERAL_ATTRIBUTE_AUTODELETE).toBool();
 
-    m_graphPlugin = m_mainApp->graph(m_inputs->generalAttrs->value(GENERAL_ATTRIBUTE_GRAPHID).toQString());
-    m_modelPlugin = m_mainApp->model(m_inputs->generalAttrs->value(GENERAL_ATTRIBUTE_MODELID).toQString());
+    m_graphPlugin = m_mainApp->graph(m_inputs->general(GENERAL_ATTRIBUTE_GRAPHID).toQString());
+    m_modelPlugin = m_mainApp->model(m_inputs->general(GENERAL_ATTRIBUTE_MODELID).toQString());
 
     reset();
 
@@ -112,7 +112,7 @@ void Experiment::reset()
 
     m_trials.reserve(m_numTrials);
     m_delay = m_mainApp->defaultStepDelay();
-    m_stopAt = m_inputs->generalAttrs->value(GENERAL_ATTRIBUTE_STOPAT).toInt();
+    m_stopAt = m_inputs->general(GENERAL_ATTRIBUTE_STOPAT).toInt();
     m_pauseAt = m_stopAt;
     m_progress = 0;
 
@@ -182,7 +182,7 @@ void Experiment::playNext()
     m_mainApp->expMgr()->play(this);
 }
 
-void Experiment::processTrial(const int& trialId)
+void Experiment::processTrial(const quint16 trialId)
 {
     if (m_expStatus == INVALID) {
         return;
@@ -215,7 +215,7 @@ void Experiment::processTrial(const int& trialId)
         for (const OutputPtr& output : m_outputs)
             output->doOperation(trialId, trial);
 
-        if (m_inputs->fileCaches.size()
+        if (m_inputs->fileCaches().size()
                 && trial->m_currStep % m_mainApp->stepsToFlush() == 0
                 && !writeCachedSteps(trialId)) {
             trial->m_status = INVALID;
@@ -245,7 +245,7 @@ void Experiment::processTrial(const int& trialId)
     }
 }
 
-AbstractModel* Experiment::createTrial(const int trialId)
+AbstractModel* Experiment::createTrial(const quint16 trialId)
 {
     // Make it thread-safe to make sure that we create one trial at a time.
     // Thus, if one trial fail, then the other will be aborted earlier.
@@ -258,20 +258,19 @@ AbstractModel* Experiment::createTrial(const int trialId)
                             "It should never happen!\n Project: %1; Exp: %2; Trial: %3 (max=%4)\n")
                             .arg(m_project->name()).arg(m_id).arg(trialId).arg(m_numTrials);
         qFatal("%s", qPrintable(e));
-        return nullptr;
     }
 
-    const QString& gType = m_inputs->generalAttrs->value(GENERAL_ATTRIBUTE_GRAPHTYPE).toString();
+    const QString& gType = m_inputs->general(GENERAL_ATTRIBUTE_GRAPHTYPE).toString();
     Nodes nodes = createNodes(BaseGraph::enumFromString(gType));
     if (nodes.empty()) {
         return nullptr;
     }
 
-    const int seed = m_inputs->generalAttrs->value(GENERAL_ATTRIBUTE_SEED).toInt();
+    const quint16 seed = static_cast<quint16>(m_inputs->general(GENERAL_ATTRIBUTE_SEED).toInt());
     PRG* prg = new PRG(seed + trialId);
 
     AbstractGraph* graphObj = m_graphPlugin->create();
-    if (!graphObj || !graphObj->setup(prg, m_inputs->graphAttrs, nodes, gType) || !graphObj->init()) {
+    if (!graphObj || !graphObj->setup(prg, m_inputs->graph(), nodes, gType) || !graphObj->init()) {
         qWarning() << "unable to create the trials."
                    << "The graph could not be initialized."
                    << "Project:" << m_project->name() << "Experiment:" << m_id;
@@ -282,7 +281,7 @@ AbstractModel* Experiment::createTrial(const int trialId)
     graphObj->reset();
 
     AbstractModel* modelObj = m_modelPlugin->create();
-    if (!modelObj || !modelObj->setup(prg, m_inputs->modelAttrs, graphObj) || !modelObj->init()) {
+    if (!modelObj || !modelObj->setup(prg, m_inputs->model(), graphObj) || !modelObj->init()) {
         qWarning() << "unable to create the trials."
                    << "The model could not be initialized."
                    << "Project:" << m_project->name() << "Experiment:" << m_id;
@@ -290,7 +289,7 @@ AbstractModel* Experiment::createTrial(const int trialId)
         return nullptr;
     }
 
-    if (!m_inputs->fileCaches.empty()) {
+    if (!m_inputs->fileCaches().empty()) {
         const QString fpath = m_filePathPrefix + QString("%4.csv").arg(trialId);
         QFile file(fpath);
         if (file.open(QFile::WriteOnly | QFile::Truncate)) {
@@ -331,7 +330,7 @@ Nodes Experiment::createNodes(const BaseGraph::GraphType gType)
                "if there is no trials to run, why is it trying to create nodes?");
 
     QString errMsg;
-    const QString& cmd = m_inputs->generalAttrs->value(GENERAL_ATTRIBUTE_NODES).toQString();
+    const QString& cmd = m_inputs->general(GENERAL_ATTRIBUTE_NODES).toQString();
     Nodes nodes = Nodes::fromCmd(cmd, m_modelPlugin->nodeAttrsScope(), gType, &errMsg);
     if (!errMsg.isEmpty() || nodes.empty()) {
         errMsg = QString("unable to create the trials."
@@ -358,7 +357,7 @@ AbstractModel* Experiment::trial(int trialId) const
 
 bool Experiment::writeCachedSteps(const int trialId)
 {
-    if (m_inputs->fileCaches.empty() || m_inputs->fileCaches.front()->isEmpty(trialId)) {
+    if (m_inputs->fileCaches().empty() || m_inputs->fileCaches().front()->isEmpty(trialId)) {
         return true;
     }
 
@@ -372,7 +371,7 @@ bool Experiment::writeCachedSteps(const int trialId)
     QTextStream stream(&file);
     do {
         QString row;
-        for (Cache* cache : m_inputs->fileCaches) {
+        for (Cache* cache : m_inputs->fileCaches()) {
             Values vals = cache->readFrontRow(trialId).second;
             cache->flushFrontRow(trialId);
             for (Value val : vals) {
@@ -384,7 +383,7 @@ bool Experiment::writeCachedSteps(const int trialId)
 
     // we synchronously flush all the io stuff. So, it's safe to say
     // that if the front Output is empty, then all others are also empty.
-    } while (!m_inputs->fileCaches.front()->isEmpty(trialId));
+    } while (!m_inputs->fileCaches().front()->isEmpty(trialId));
 
     file.close();
     return true;
@@ -420,135 +419,6 @@ OutputPtr Experiment::searchOutput(const OutputPtr find)
         }
     }
     return nullptr;
-}
-
-Experiment::ExperimentInputs* Experiment::readInputs(const MainApp* mainApp,
-        const QStringList& header, const QStringList& values, QString& errorMsg)
-{
-    if (header.isEmpty() || values.isEmpty() || header.size() != values.size()) {
-        errorMsg = "The 'header' and 'values' cannot be empty and must have the same number of elements.";
-        return nullptr;
-    }
-
-    // find the model and graph for this experiment
-    const int headerGraphId = header.indexOf(GENERAL_ATTRIBUTE_GRAPHID);
-    const int headerModelId = header.indexOf(GENERAL_ATTRIBUTE_MODELID);
-    if (headerGraphId < 0 && headerModelId < 0) {
-        errorMsg = "The experiment should have both graphId and modelId.";
-        return nullptr;
-    }
-
-    // check if the model and graph are available
-    const GraphPlugin* gPlugin = mainApp->graph(values.at(headerGraphId));
-    const ModelPlugin* mPlugin = mainApp->model(values.at(headerModelId));
-    if (!gPlugin || !mPlugin) {
-        errorMsg = QString("The graphId (%1) or modelId (%2) are not available."
-                           " Make sure to load them before trying to add this experiment.")
-                           .arg(values.at(headerGraphId)).arg(values.at(headerModelId));
-        return nullptr;
-    }
-
-    // make sure that the chosen graphId is allowed in this model
-    if (!mPlugin->graphIsSupported(gPlugin->id())) {
-        QString supportedGraphs = mPlugin->supportedGraphs().toList().join(", ");
-        errorMsg = QString("The graphId (%1) cannot be used in this model (%2). The allowed ones are: %3")
-                           .arg(gPlugin->id()).arg(mPlugin->id()).arg(supportedGraphs);
-        return nullptr;
-    }
-
-    // we assume that all graph/model attributes start with 'uid_'
-    const QString& graphId_ = gPlugin->id() + "_";
-    const QString& modelId_ = mPlugin->id() + "_";
-
-    // get the value of each attribute and make sure they are valid
-    QStringList failedAttributes;
-    Attributes* generalAttrs = new Attributes(mainApp->generalAttrsScope().size());
-    Attributes* modelAttrs = new Attributes(mPlugin->pluginAttrsScope().size());
-    Attributes* graphAttrs = new Attributes(gPlugin->pluginAttrsScope().size());
-    for (int i = 0; i < values.size(); ++i) {
-        const QString& vStr = values.at(i);
-        QString attrName = header.at(i);
-
-        AttributesScope::const_iterator gps = mainApp->generalAttrsScope().find(attrName);
-        if (gps != mainApp->generalAttrsScope().end()) {
-            Value value = gps.value()->validate(vStr);
-            if (value.isValid()) {
-                generalAttrs->replace(gps.value()->id(), attrName, value);
-            } else {
-                failedAttributes.append(attrName);
-            }
-        } else {
-            const AttributeRange* attrRange = nullptr;
-            Attributes* pluginAttrs = nullptr;
-            if (attrName.startsWith(modelId_)) {
-                attrName = attrName.remove(modelId_);
-                attrRange = mPlugin->pluginAttrRange(attrName);
-                pluginAttrs = modelAttrs;
-            } else if (attrName.startsWith(graphId_)) {
-                attrName = attrName.remove(graphId_);
-                attrRange = gPlugin->pluginAttrRange(attrName);
-                pluginAttrs = graphAttrs;
-            }
-
-            if (pluginAttrs) {
-                Value value;
-                if (attrRange) {
-                    value = attrRange->validate(vStr);
-                }
-
-                if (value.isValid()) {
-                    pluginAttrs->replace(attrRange->id(), attrName, value);
-                } else {
-                    failedAttributes.append(attrName);
-                }
-            }
-        }
-    }
-
-    std::vector<Cache*> fileCaches;
-    QString outHeader = generalAttrs->value(OUTPUT_HEADER, Value("")).toQString();
-    if (failedAttributes.isEmpty() && !outHeader.isEmpty()) {
-        const int numTrials = generalAttrs->value(GENERAL_ATTRIBUTE_TRIALS).toInt();
-        Q_ASSERT_X(numTrials > 0, "Experiment::readInputs", "what? an experiment without trials?");
-        std::vector<int> trialIds;
-        for (int i = 0; i < numTrials; ++i) {
-            trialIds.emplace_back(i);
-        }
-
-        fileCaches = Output::parseHeader(outHeader.split(";", QString::SkipEmptyParts), trialIds, mPlugin, errorMsg);
-        if (fileCaches.empty()) {
-            failedAttributes.append(OUTPUT_HEADER);
-        }
-
-        QFileInfo outDir(generalAttrs->value(OUTPUT_DIR, Value("")).toQString());
-        if (!outDir.isDir() || !outDir.isWritable()) {
-            errorMsg += "The output directory must be valid and writable!\n";
-            failedAttributes.append(OUTPUT_DIR);
-        }
-    }
-
-    // make sure all attributes exist
-    auto checkAll = [&failedAttributes](const Attributes* attrs, const AttributesScope& attrsScope) {
-        for (const AttributeRange* attrRange : attrsScope) {
-            if (!attrs->contains(attrRange->attrName())) {
-                failedAttributes.append(attrRange->attrName());
-            }
-        }
-    };
-    checkAll(generalAttrs, mainApp->generalAttrsScope());
-    checkAll(modelAttrs, mPlugin->pluginAttrsScope());
-    checkAll(graphAttrs, gPlugin->pluginAttrsScope());
-
-    ExperimentInputs* ei = new ExperimentInputs(generalAttrs, modelAttrs, graphAttrs, fileCaches);
-
-    if (!failedAttributes.isEmpty()) {
-        errorMsg += QString("The following attributes are missing/invalid: %1").arg(failedAttributes.join(","));
-        delete ei;
-        return nullptr;
-    }
-
-    // that's great! everything seems to be valid
-    return ei;
 }
 
 void Experiment::setExpStatus(Status s)

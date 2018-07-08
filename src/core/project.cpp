@@ -77,16 +77,16 @@ int Project::generateExpId() const
     return m_experiments.empty() ? 0 : (--m_experiments.end())->first + 1;
 }
 
-Experiment* Project::newExperiment(Experiment::ExperimentInputs* inputs, QString& error)
+Experiment* Project::newExperiment(ExpInputs* inputs, QString& error)
 {
     if (!inputs) {
-        error = "Null inputs!";
+        error += "Null inputs!";
         return nullptr;
     }
 
-    int expId = inputs->generalAttrs->value(GENERAL_ATTRIBUTE_EXPID).toInt();
+    int expId = inputs->general(GENERAL_ATTRIBUTE_EXPID).toInt();
     if (m_experiments.count(expId)) {
-        error = "The Experiment Id must be unique!";
+        error += "The Experiment Id must be unique!";
         return nullptr;
     }
 
@@ -99,7 +99,7 @@ Experiment* Project::newExperiment(Experiment::ExperimentInputs* inputs, QString
     return exp;
 }
 
-bool Project::editExperiment(int expId, Experiment::ExperimentInputs* newInputs, QString& error)
+bool Project::editExperiment(int expId, ExpInputs* newInputs, QString& error)
 {
     Experiment* exp = m_experiments.at(expId);
     Q_ASSERT_X(exp, "Experiment", "tried to edit a nonexistent experiment");
@@ -138,7 +138,7 @@ int Project::importExperiments(const QString& filePath, QString& errorMsg)
     while (!in.atEnd()) {
         const QStringList values = in.readLine().split(",");
         QString expErrorMsg;
-        Experiment::ExperimentInputs* inputs = Experiment::readInputs(m_mainApp, header, values, expErrorMsg);
+        ExpInputs* inputs = ExpInputs::parse(m_mainApp, header, values, expErrorMsg);
         if (!inputs || !newExperiment(inputs, expErrorMsg)) {
             errorMsg = QString("Couldn't read the experiment at line %1 from:\n`%2`\n"
                                "Error: %3").arg(row).arg(filePath).arg(expErrorMsg);
@@ -162,7 +162,6 @@ int Project::importExperiments(const QString& filePath, QString& errorMsg)
 
 bool Project::saveProject(QString& errMsg, std::function<void(int)>& progress)
 {
-    progress(0);
     if (m_experiments.empty()) {
         errMsg = QString("Unable to save the project '%1'.\n"
                 "This project is empty. There is nothing to save.").arg(name());
@@ -170,7 +169,6 @@ bool Project::saveProject(QString& errMsg, std::function<void(int)>& progress)
         return false;
     }
 
-    progress(5);
     QFile file(m_filepath);
     QFileInfo fi(file);
     if (fi.suffix() != "csv" || !file.open(QFile::WriteOnly | QFile::Truncate)) {
@@ -181,57 +179,58 @@ bool Project::saveProject(QString& errMsg, std::function<void(int)>& progress)
         return false;
     }
 
-    progress(10);
+    const float kProgress = (2.f * m_experiments.size()) / 100.f;
+    int _progress = 0;
+
+    // join the header of all experiments
     std::vector<QString> header;
+    QString lModelId, lGraphId;
     for (auto const& i : m_experiments) {
-        const Experiment* exp = i.second;
-        const Experiment::ExperimentInputs* inputs = exp->inputs();
-        std::vector<QString> general = inputs->generalAttrs->names();
-        header.insert(header.end(), general.begin(), general.end());
-        // prefix all model attributes with the modelId
-        for (const QString& attrName : inputs->modelAttrs->names()) {
-            header.emplace_back(exp->modelId() + "_" + attrName);
+        if (i.second->modelId() == lModelId && i.second->graphId() == lGraphId) {
+            continue;
         }
-        // prefix all graph attributes with the graphId
-        for (const QString& attrName : inputs->graphAttrs->names()) {
-            header.emplace_back(exp->graphId() + "_" + attrName);
-        }
+        lModelId = i.second->modelId();
+        lGraphId = i.second->graphId();
+        std::vector<QString> h = i.second->inputs()->exportAttrNames();
+        header.insert(header.end(), h.begin(), h.end());
+        _progress += kProgress;
+        progress(_progress);
     }
     // remove duplicates
-    progress(25);
     std::set<QString> s(header.begin(), header.end());
     header.assign(s.begin(), s.end());
 
-    progress(30);
+    // write header to file
     QTextStream out(&file);
-    for (size_t i = 0; i < header.size()-1; ++i) {
-        out << header.at(i) << ",";
+    for (size_t h = 0; h < header.size()-1; ++h) {
+        out << header.at(h) << ",";
     }
-    out << header.at(header.size()-1) << "\n";
+    out << header.at(header.size() - 1) << "\n";
 
-    progress(35);
+    // write values to file
     for (auto const& i : m_experiments) {
         const Experiment* exp = i.second;
-        const Experiment::ExperimentInputs* inputs = exp->inputs();
+        const ExpInputs* inputs = exp->inputs();
         const QString modelId_ = exp->modelId() + "_";
         const QString graphId_ = exp->graphId() + "_";
 
-        QStringList values;
+        QString values;
         for (QString attrName : header) {
-            int idx = inputs->generalAttrs->indexOf(attrName);
-            if (idx != -1) {
-                values.append(inputs->generalAttrs->value(idx).toQString());
-            } else if (attrName.startsWith(modelId_)) {
-                idx = inputs->modelAttrs->indexOf(attrName.remove(modelId_));
-                if (idx != -1) values.append(inputs->modelAttrs->value(idx).toQString());
+            Value v;
+            if (attrName.startsWith(modelId_)) {
+                v = inputs->model(attrName.remove(modelId_));
             } else if (attrName.startsWith(graphId_)) {
-                idx = inputs->graphAttrs->indexOf(attrName.remove(graphId_));
-                if (idx != -1) values.append(inputs->graphAttrs->value(idx).toQString());
+                v = inputs->graph(attrName.remove(graphId_));
             } else {
-                values.append(""); // not found; leave empty
+                v = inputs->general(attrName);
             }
+            values.append(v.toQString() + ","); // will leave empty if not found
         }
-        out << values.join(",") << "\n";
+        values.replace(values.size(), "\n");
+        out << values << "\n";
+
+        _progress += kProgress;
+        progress(_progress);
     }
     file.close();
 

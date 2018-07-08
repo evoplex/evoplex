@@ -45,10 +45,10 @@ public:
 
     // Add a new experiment to this project.
     // @return nullptr if unsuccessful
-    Experiment* newExperiment(Experiment::ExperimentInputs* inputs, QString& error);
+    Experiment* newExperiment(ExpInputs* inputs, QString& error);
 
     // Edit an experiment of this project.
-    bool editExperiment(int expId, Experiment::ExperimentInputs* newInputs, QString& error);
+    bool editExperiment(int expId, ExpInputs* newInputs, QString& error);
 
     // Import a set of experiments from a csv file. It stops if an experiment fails.
     // return the number of experiments imported.

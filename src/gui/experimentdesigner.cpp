@@ -244,16 +244,8 @@ void ExperimentDesigner::setExperiment(Experiment* exp)
     m_ui->bEdit->show();
     m_enableOutputs->setChecked(exp->hasOutputs());
 
-    const Experiment::ExperimentInputs* inputs = exp->inputs();
-    std::vector<QString> header = inputs->generalAttrs->names();
-    for (const QString& attrName : inputs->graphAttrs->names())
-        header.emplace_back(exp->graphId() + "_" + attrName);
-    for (const QString& attrName : inputs->modelAttrs->names())
-        header.emplace_back(exp->modelId() + "_" + attrName);
-
-    std::vector<Value> values = inputs->generalAttrs->values();
-    values.insert(values.end(), inputs->graphAttrs->values().begin(), inputs->graphAttrs->values().end());
-    values.insert(values.end(), inputs->modelAttrs->values().begin(), inputs->modelAttrs->values().end());
+    std::vector<QString> header = exp->inputs()->exportAttrNames();
+    std::vector<Value> values = exp->inputs()->exportAttrValues();
 
     // ensure graphId will be filled at the end
     header.emplace_back(GENERAL_ATTRIBUTE_GRAPHID);
@@ -367,7 +359,7 @@ void ExperimentDesigner::slotOutputWidget()
     for (Cache* c : currFileCaches) c->deleteCache();
 }
 
-Experiment::ExperimentInputs* ExperimentDesigner::readInputs(const int expId, QString& error) const
+ExpInputs* ExperimentDesigner::readInputs(const int expId, QString& error) const
 {
     if (m_selectedModelId == STRING_NULL_PLUGINID) {
         error = "Please, select a valid 'modelId'.";
@@ -433,7 +425,7 @@ Experiment::ExperimentInputs* ExperimentDesigner::readInputs(const int expId, QS
     }
 
     QString errorMsg;
-    Experiment::ExperimentInputs* inputs = Experiment::readInputs(m_mainApp, header, values, errorMsg);
+    ExpInputs* inputs = ExpInputs::parse(m_mainApp, header, values, errorMsg);
     if (!inputs) {
         error = "Unable to create the experiment.\nError: \"" + errorMsg + "\"";
     }
@@ -443,7 +435,7 @@ Experiment::ExperimentInputs* ExperimentDesigner::readInputs(const int expId, QS
 void ExperimentDesigner::slotCreateExperiment()
 {
     QString error;
-    Experiment::ExperimentInputs* inputs = readInputs(m_project->generateExpId(), error);
+    ExpInputs* inputs = readInputs(m_project->generateExpId(), error);
     if (inputs) {
         setExperiment(m_project->newExperiment(inputs, error));
     }
@@ -458,7 +450,7 @@ void ExperimentDesigner::slotEditExperiment()
 {
     Q_ASSERT_X(m_exp, "ExperimentDesigner", "tried to edit a null experiment");
     QString error;
-    Experiment::ExperimentInputs* inputs = readInputs(m_exp->id(), error);
+    ExpInputs* inputs = readInputs(m_exp->id(), error);
     if (!inputs || !m_project->editExperiment(m_exp->id(), inputs, error)) {
         QMessageBox::warning(this, "Experiment", error);
         delete inputs;
