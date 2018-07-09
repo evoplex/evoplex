@@ -26,37 +26,29 @@
 
 namespace evoplex {
 
-GraphPlugin::GraphPlugin(const QObject* instance, const QJsonObject* metaData, const QString& libPath)
-    : Plugin(metaData, libPath)
+GraphPlugin::GraphPlugin(const QJsonObject* metaData, const QString& libPath)
+    : Plugin(Plugin::Graph, metaData, libPath)
 {
-    if (!isValid()) {
+    if (m_type == Invalid) {
         return;
     }
-
-    m_factory = qobject_cast<IPluginGraph*>(instance);
 
     if (!metaData->contains(PLUGIN_ATTRIBUTE_VALIDGRAPHTYPES)) {
         qWarning() << "missing 'validGraphTypes'.";
-        m_isValid = false;
+        m_type = Invalid;
         return;
-    } else {
-        QJsonArray arr = metaData->value(PLUGIN_ATTRIBUTE_VALIDGRAPHTYPES).toArray();
-        for (QJsonArray::iterator it = arr.begin(); it != arr.end(); ++it) {
-            AbstractGraph::GraphType type = AbstractGraph::enumFromString((*it).toString());
-            if (type == AbstractGraph::Invalid_Type) {
-                qWarning() << "invalid value for 'validGraphTypes':" << (*it).toString();
-                m_isValid = false;
-                return;
-            }
-            m_validGraphTypes.emplace_back(type);
-        }
     }
 
-    m_isValid = true;
-}
-
-GraphPlugin::~GraphPlugin()
-{
+    QJsonArray array = metaData->value(PLUGIN_ATTRIBUTE_VALIDGRAPHTYPES).toArray();
+    for (auto it : array) {
+        AbstractGraph::GraphType type = AbstractGraph::enumFromString(it.toString());
+        if (type == AbstractGraph::Invalid_Type) {
+            qWarning() << "invalid value for 'validGraphTypes':" << it.toString();
+            m_type = Invalid;
+            return;
+        }
+        m_validGraphTypes.emplace_back(type);
+    }
 }
 
 } // evoplex

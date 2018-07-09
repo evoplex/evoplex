@@ -24,22 +24,26 @@
 #include <QJsonObject>
 #include <QString>
 
+#include "abstractplugin.h"
 #include "attributes.h"
 #include "attributerange.h"
+#include "plugininterface.h"
 
 namespace evoplex {
 class Plugin
 {
 public:
     enum Type {
-        GraphPlugin,
-        ModelPlugin
+        Graph,
+        Model,
+        Invalid
     };
 
-    explicit Plugin(const QJsonObject* metaData, const QString& libPath);
-    virtual ~Plugin();
+    static Type enumFromString(const QString& type);
 
-    inline bool isValid() const { return m_isValid; }
+    static Plugin* load(const QString& path, QString& error);
+
+    inline AbstractPlugin* create() const { return m_factory->create(); }
 
     inline const QString& path() const { return m_libPath; }
     inline Type type() const { return m_type; }
@@ -53,19 +57,25 @@ public:
     inline const AttributeRange* pluginAttrRange(const QString& attr) const { return m_pluginAttrsScope.value(attr); }
 
 protected:
-    bool m_isValid;
-    bool attrsScope(const QJsonObject* metaData, const QString& name,
-                    AttributesScope& attrsScope, std::vector<QString>& keys) const;
+    Type m_type;
+
+    explicit Plugin(Type type, const QJsonObject* metaData, const QString& libPath);
+    virtual ~Plugin();
+
+    bool readAttrsScope(const QJsonObject* metaData, const QString& name,
+            AttributesScope& attrsScope, std::vector<QString>& keys) const;
 
 private:
+    PluginInterface* m_factory;
     const QString m_libPath;
-    Type m_type;
     QString m_id;
     QString m_author;
     QString m_name;
     QString m_descr;
     AttributesScope m_pluginAttrsScope;
     std::vector<QString> m_pluginAttrsNames;
+
+    static bool checkMetaData(const QJsonObject& metaData, QString& error);
 };
-}
+} // evoplex
 #endif // PLUGIN_H

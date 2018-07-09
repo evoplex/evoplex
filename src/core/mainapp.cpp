@@ -19,12 +19,8 @@
  */
 
 #include <QCoreApplication>
-#include <QFile>
-#include <QJsonArray>
-#include <QJsonObject>
-#include <QPluginLoader>
-#include <QThread>
-#include <QtDebug>
+#include <QDebug>
+#include <QFileInfo>
 
 #include "mainapp.h"
 #include "experimentsmgr.h"
@@ -47,7 +43,7 @@ MainApp::MainApp()
     : m_experimentsMgr(new ExperimentsMgr())
 {
     resetSettingsToDefault();
-    m_defaultStepDelay = m_userPrefs.value("settings/stepDelay", m_defaultStepDelay).toInt();
+    m_defaultStepDelay = static_cast<quint16>(m_userPrefs.value("settings/stepDelay", m_defaultStepDelay).toInt());
     m_stepsToFlush = m_userPrefs.value("settings/stepsToFlush", m_stepsToFlush).toInt();
 
     int id = 0;
@@ -141,83 +137,23 @@ void MainApp::initUserPlugins()
 
 const Plugin* MainApp::loadPlugin(const QString& path, QString& error, const bool addToUserPrefs)
 {
-    if (!QFile(path).exists()) {
-        error = "Unable to find the file. " + path;
-        qWarning() << error;
+    Plugin* plugin = Plugin::load(path, error);
+    if (!plugin) {
         return nullptr;
     }
 
-    QPluginLoader loader(path);
-    QJsonObject metaData = loader.metaData().value("MetaData").toObject();
-    if (metaData.isEmpty()) {
-        error = "Unable to load the plugin.\nWe couldn't find the meta data for this plugin.\n" + path;
-        qWarning() << error;
-        return nullptr;
-    } else if (!metaData.contains(PLUGIN_ATTRIBUTE_UID)
-               || !metaData.contains(PLUGIN_ATTRIBUTE_TYPE)
-               || !metaData.contains(PLUGIN_ATTRIBUTE_NAME)) {
-        error = QString("Unable to load the plugin at '%1'.\n"
-                "Plese, make sure the following fields are not empty:\n"
-                "%2, %3, %4").arg(path).arg(PLUGIN_ATTRIBUTE_UID)
-                .arg(PLUGIN_ATTRIBUTE_TYPE).arg(PLUGIN_ATTRIBUTE_NAME);
-        qWarning() << error;
-        return nullptr;
-    }
-
-    QString type = metaData[PLUGIN_ATTRIBUTE_TYPE].toString();
-    if (type != "graph" && type != "model") {
-        error = QString("Unable to load the plugin.\n'%1' must be equal to 'graph' or 'model'. %2")
-                .arg(PLUGIN_ATTRIBUTE_TYPE).arg(path);
-        qWarning() << error;
-        return nullptr;
-    }
-
-    QString uid = metaData[PLUGIN_ATTRIBUTE_UID].toString();
-    if (uid.contains("_")) {
+    if (m_models.contains(plugin->id()) || m_graphs.contains(plugin->id())) {
         error = QString("Unable to load the plugin (%1).\n"
-                        "The '%2:%3' should not have the underscore symbol.\n"
-                        "Please, fix this id and try again.")
-                        .arg(path).arg(PLUGIN_ATTRIBUTE_UID).arg(uid);
-        qWarning() << error;
-        return nullptr;
-    } else if (m_models.contains(uid) || m_graphs.contains(uid)) {
-        error = QString("Unable to load the plugin (%1).\n"
-                        "The %2 '%3' is already being used by another plugin.\n"
-                        "Please, unload the plugin '%4' (or choose another id) and try again.")
-                        .arg(path).arg(PLUGIN_ATTRIBUTE_UID).arg(uid).arg(uid);
+                    "The %2 '%3' is already being used by another plugin.")
+                    .arg(path).arg(PLUGIN_ATTRIBUTE_UID).arg(plugin->id());
         qWarning() << error;
         return nullptr;
     }
 
-    QObject* instance = loader.instance(); // it'll load the plugin
-    if (!instance) {
-        error = QString("Unable to load the plugin.\n"
-                        "Please, make sure it is a valid Evoplex plugin.\n %1").arg(path);
-        loader.unload();
-        qWarning() << error;
-        return nullptr;
-    }
-
-    Plugin* plugin = nullptr;
-    if (type == "graph") {
-        plugin = new GraphPlugin(instance, &metaData, path);
-        if (plugin->isValid()) {
-            m_graphs.insert(plugin->id(), dynamic_cast<GraphPlugin*>(plugin));
-        }
+    if (plugin->type() == Plugin::Graph) {
+        m_graphs.insert(plugin->id(), dynamic_cast<GraphPlugin*>(plugin));
     } else {
-        plugin = new ModelPlugin(instance, &metaData, path);
-        if (plugin->isValid()) {
-            m_models.insert(plugin->id(), dynamic_cast<ModelPlugin*>(plugin));
-        }
-    }
-
-    if (!plugin || !plugin->isValid()) {
-        error = QString("Unable to load the plugin.\n"
-                        "Please, check the metaData.json file.\n %1").arg(path);
-        loader.unload();
-        qWarning() << error;
-        delete plugin;
-        return nullptr;
+        m_models.insert(plugin->id(), dynamic_cast<ModelPlugin*>(plugin));
     }
 
     if (addToUserPrefs) {
@@ -247,9 +183,9 @@ bool MainApp::unloadPlugin(const Plugin* plugin, QString& error)
 
     QString id = plugin->id();
     Plugin::Type type = plugin->type();
-    if (type == Plugin::GraphPlugin && m_graphs.contains(id)) {
+    if (type == Plugin::Graph && m_graphs.contains(id)) {
         delete m_graphs.take(id);
-    } else if (type == Plugin::ModelPlugin && m_models.contains(id)) {
+    } else if (type == Plugin::Model && m_models.contains(id)) {
         delete m_models.take(id);
     } else {
         qFatal("Tried to unload a plugin (%s) which has not been loaded before.", qPrintable(id));
