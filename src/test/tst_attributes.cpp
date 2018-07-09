@@ -166,30 +166,35 @@ void TestAttributes::_tst_replace(Attributes a, int id, QString newName, Value n
 void TestAttributes::tst_replace()
 {
     // test for attribute with no value or name at position (resize in the construction)
-    // test for attribute with value but no name at position
-    // test for attribute with both value and name at position
-    // test for empty attribute (empty constructor)
-    // test for empty attribute resized to 0 (forcing size zero)
-    // test for empty attribute resized (init empty and resize later)
-    // test for non-empty attribute resized
-    // resize to 0 again, it should be empty now
-
-    // test for attribute with value currently in position
     Attributes a1(3);
-    a1.setValue(0, Value(123));
     a1.replace(0, "test", Value(234));
     _tst_replace(a1, 0, "test", Value(234), 3);
 
-    // test for attribute with nothing in position
+    // test for attribute with value but no name at position
     Attributes a2(3);
+    a2.setValue(0, Value(123));
     a2.replace(0, "test", Value(234));
     _tst_replace(a2, 0, "test", Value(234), 3);
 
-    // test for empty attribute, resized
-    Attributes a3;
-    a3.resize(3);
-    a3.replace(0, "test", Value(234));
-    _tst_replace(a3, 0, "test", Value(234), 3);
+    // test for attribute with both value and name at position (using replace twice)
+    Attributes a3(3);
+    a3.replace(0, "test", Value(123));
+    a3.replace(0, "test2", Value(234));
+    _tst_replace(a3, 0, "test2", Value(234), 3);
+
+    // test for empty attribute resized (init empty and resize later)
+    Attributes a4;
+    a4.resize(3);
+    a4.replace(0, "test", Value(123));
+    _tst_replace(a4, 0, "test", Value(123), 3);
+
+    // test for non-empty attribute resized
+    Attributes a5(3);
+    a5.resize(1);
+    a5.replace(0, "test", Value(123));
+    _tst_replace(a5, 0, "test", Value(123), 1);
+    // resize to 0 again, it should be empty now
+
 }
 
 void TestAttributes::_tst_push_back(Attributes a, QString newName, Value newValue, int origSize)
@@ -233,33 +238,51 @@ void TestAttributes::_tst_push_back(Attributes a, QString newName, Value newValu
 
 void TestAttributes::tst_push_back(){
 
-    // test for attribute with no value or name at position
-    // test for attribute with value but no name at position
-    // test for attribute with both value and name at position
-    // test for empty attribute
-    // test for empty attribute resized to 0
-    // test for empty attribute resized
-    // test for non-empty attribute resized
-    // resize to 0 again, it should be empty now
-
-    // test for attribute with origional size > 0
+    // test for attribute with no value or name at position (resize in the construction)
     Attributes a1(3);
     a1.push_back("test", Value(123));
     _tst_push_back(a1, "test", Value(123), 3);
+    // test for attribute with value but no name at last position
+    Attributes a2(3);
+    a2.setValue(2, Value(123));
+    a2.push_back("test", Value(234));
+    _tst_push_back(a2, "test", Value(234), 3);
+
+//    // test for attribute with both value and name at position
+    Attributes a3(3);
+    a3.replace(2, "test", Value(123));
+    a3.push_back("test2", Value(234));
+    _tst_push_back(a3, "test2", Value(234), 3);
 
     // test for empty attribute
-    Attributes a2;
-    a2.push_back("test", Value(123));
-    _tst_push_back(a2, "test", Value(123), 0);
+    Attributes a4;
+    a4.push_back("test", Value(123));
+    _tst_push_back(a4, "test", Value(123), 0);
 
-    // test for attribute resized
-    Attributes a3;
-    a3.resize(3);
-    a3.push_back("test", Value(123));
+    // test for empty attribute resized to 0
+    Attributes a5(0);
+    a5.push_back("test", Value(123));
+    _tst_push_back(a5, "test", Value(123), 0);
 
-    // !!! CHECK
-    QCOMPARE(a3.value(3), Value(123));
-    //_tst_push_back(a2, "test", Value(123), 3);
+    // test for empty attribute resized
+    Attributes a6;
+    a6.resize(3);
+    a6.push_back("test", Value(123));
+    _tst_push_back(a6, "test", Value(123), 3);
+
+    // test for non-empty attribute resized
+    Attributes a7(3);
+    a7.resize(1);
+    a7.push_back("test", Value(123));
+    _tst_push_back(a7, "test", Value(123), 1);
+    // resize to 0 again, it should be empty now
+    a7.resize(0);
+    _tst_empty(a7);
+
+
+//    // !!! CHECK
+//    QCOMPARE(a3.value(3), Value(123));
+//    //_tst_push_back(a2, "test", Value(123), 3);
 }
 
 void TestAttributes::_tst_setValue_with_name(Attributes a, int id, QString newName, Value newValue){
@@ -336,22 +359,37 @@ void TestAttributes::_tst_setValue(Attributes a, int id, Value newValue, int ori
 void TestAttributes::tst_setValue()
 {
     // test for attribute with no value or name at position
-    // test for attribute with value but no name at position
-    // test for attribute with both value and name at position
-    // test for empty attribute
-    // test for empty attribute resized to 0
-    // test for empty attribute resized
-    // test for non-empty attribute resized
-    // resize to 0 again, it should be empty now
-
-    // test for attribute that has no value at the index
     Attributes a1(3);
     a1.setValue(0, Value(123));
-    _tst_setValue(a1, 0, Value(123) ,3);
+    _tst_setValue(a1, 0, Value(123), 3);
 
-    // test for attribute that has a value but no name at index
+    // CHECK!!!
+    // test for attribute with value but no name at position (using setValue twice)
+    Attributes a2(3);
+    a2.setValue(0, Value(123));
+    a2.setValue(0, Value(234));
+    _tst_setValue(a2, 0, Value(234), 3);
 
-    // test for attribute that has both a value and name at index
+    // test for attribute with both value and name at position
+    Attributes a3(3);
+    a3.replace(0, "test", Value(123));
+    _tst_setValue(a3, 0, Value(123), 3);
+
+    // test for empty attribute resized
+    Attributes a4;
+    a4.resize(3);
+    a4.setValue(0, Value(123));
+    _tst_setValue(a4, 0, Value(123), 3);
+
+    // test for non-empty attribute resized
+    Attributes a5(3);
+    a5.resize(1);
+    a5.setValue(0, Value(123));
+    _tst_setValue(a5, 0, Value(123), 1);
+
+    // resize to 0 again, it should be empty now
+    a5.resize(0);
+    _tst_empty(a5);
 }
 
 QTEST_MAIN(TestAttributes)
