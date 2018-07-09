@@ -151,16 +151,14 @@ void TestAttributes::_tst_replace(Attributes a, int id, QString newName, Value n
     // test position of value
      QVERIFY(!a.values().empty());
      QCOMPARE(a.value(id), newValue);
+     QCOMPARE(a.value(id, newValue), newValue);
 
     // test name against value
      QCOMPARE(a.value(newName), newValue);
      QCOMPARE(a.value(QString(newName)), newValue);
      QVERIFY(newValue.isValid());
-
-     // TODO: Sort out these functions:
-    // QCOMPARE(a.value(0, 123), Value(123));
-//    QCOMPARE(a.value("abc", 123), Value(123));
-//    QCOMPARE(a.value(QString('a'), 123), Value(123));
+     QCOMPARE(a.value(newName, newValue), newValue);
+     QCOMPARE(a.value(QString(newName), newValue), newValue);
 }
 
 void TestAttributes::tst_replace()
@@ -224,16 +222,14 @@ void TestAttributes::_tst_push_back(Attributes a, QString newName, Value newValu
     // test position of value
     QVERIFY(!a.values().empty());
     QCOMPARE(a.value(origSize), newValue);
+    QCOMPARE(a.value(origSize, newValue), newValue);
 
     // test name against value
     QCOMPARE(a.value(newName), newValue);
     QCOMPARE(a.value(QString(newName)), newValue);
     QVERIFY(newValue.isValid());
-
-    // TODO: Sort out these functions:
-   // QCOMPARE(a.value(0, 123), Value(123));
-//    QCOMPARE(a.value("abc", 123), Value(123));
-//    QCOMPARE(a.value(QString('a'), 123), Value(123));
+    QCOMPARE(a.value(newName, newValue), newValue);
+    QCOMPARE(a.value(QString(newName), newValue), newValue);
 }
 
 void TestAttributes::tst_push_back(){
@@ -301,10 +297,8 @@ void TestAttributes::_tst_setValue_with_name(Attributes a, int id, QString newNa
 
     QVERIFY_EXCEPTION_THROWN(a.value(QString("a")), std::out_of_range);
 
-    // Sort out:
-//    QCOMPARE(a.value(0, 123), Value(123));
-//    QCOMPARE(a.value("abc", 123), Value(123));
-//    QCOMPARE(a.value(QString('a'), 123), Value(123));
+    QCOMPARE(a.value(newName, newValue), newValue);
+    QCOMPARE(a.value(QString(newName), newValue), newValue);
 }
 
 void TestAttributes::_tst_setValue(Attributes a, int id, Value newValue, int origSize){
@@ -324,13 +318,9 @@ void TestAttributes::_tst_setValue(Attributes a, int id, Value newValue, int ori
     QVERIFY(!a.values().empty());
     QCOMPARE(a.value(id), newValue);
     QVERIFY(newValue.isValid());
+    QCOMPARE(a.value(id, newValue), newValue);
 
 
-
-    // Sort out:
-//    QCOMPARE(a.value(0, 123), Value(123));
-//    QCOMPARE(a.value("abc", 123), Value(123));
-//    QCOMPARE(a.value(QString('a'), 123), Value(123));
 }
 
 void TestAttributes::tst_setValue()
