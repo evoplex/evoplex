@@ -117,7 +117,7 @@ void ExperimentsMgr::play(Experiment* exp)
         m_running.emplace_back(exp);
         m_timerProgress->start(500); // every half a second, check progress
 
-        for (int trialId = 0; trialId < exp->numTrials(); ++trialId) {
+        for (quint16 trialId = 0; trialId < exp->numTrials(); ++trialId) {
             m_runningTrials.emplace_back(std::make_pair(exp->id(), trialId));
             // play in the same order of insertion
             const int priority = static_cast<int>(m_runningTrials.size()) * -1;

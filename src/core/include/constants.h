@@ -50,7 +50,7 @@
 /******************************************************************************
     Plugin stuff
 ******************************************************************************/
-#define PLUGIN_ATTRIBUTE_TYPE "type"                    // plugin's type
+#define PLUGIN_ATTRIBUTE_TYPE "type"                    // plugin's type (graph or model)
 #define PLUGIN_ATTRIBUTE_UID "uid"                      // plugin's unique id
 #define PLUGIN_ATTRIBUTE_AUTHOR "author"                // authors' name
 #define PLUGIN_ATTRIBUTE_NAME "name"                    // plugin's name
