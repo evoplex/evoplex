@@ -30,9 +30,28 @@ class TestNode: public QObject
 private slots:
     void initTestCase() {}
     void cleanupTestCase() {}
-
+    void tst_UNode();
 };
 
+void TestNode::tst_UNode(){
+    // test constructor
+    int id = 0, x = 1, y = 2;
+    Value values[3] = {Value(123), Value(234), Value(456)};
+    Attributes attrs(3);
+    attrs.replace(0, "test0_0", values[0]);
+    attrs.replace(1, "test0_1", values[1]);
+    attrs.replace(2, "test0_2", values[2]);
+
+    UNode node(id, attrs, x, y);
+
+    QCOMPARE(node.id(), id);
+    for (int i = 0; i < 3; i++){
+          QCOMPARE(node.attrs().name(i), attrs.name(i));
+          QCOMPARE(node.attrs().value(i), attrs.value(i));
+    }
+    QCOMPARE(node.x(), x);
+    QCOMPARE(node.y(), y);
+}
 /* TO DO:
 
 This test should cover the functions below.
