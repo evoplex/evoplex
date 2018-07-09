@@ -34,21 +34,57 @@ private slots:
 };
 
 void TestNode::tst_UNode(){
-    // test constructor
+    // test constructor and attrs()
     int id = 0, x = 1, y = 2;
     Value values[3] = {Value(123), Value(234), Value(456)};
+    QString names[3] = {"test0_0", "test0_1", "test0_2"};
+
     Attributes attrs(3);
-    attrs.replace(0, "test0_0", values[0]);
-    attrs.replace(1, "test0_1", values[1]);
-    attrs.replace(2, "test0_2", values[2]);
+    attrs.replace(0, names[0], values[0]);
+    attrs.replace(1, names[1], values[1]);
+    attrs.replace(2, names[2], values[2]);
 
     UNode node(id, attrs, x, y);
 
     QCOMPARE(node.id(), id);
+
+    QCOMPARE(node.attrs().size(), attrs.size());
+    QCOMPARE(node.attrs().names(), attrs.names());
+    QCOMPARE(node.attrs().values(), attrs.values());
+
     for (int i = 0; i < 3; i++){
           QCOMPARE(node.attrs().name(i), attrs.name(i));
           QCOMPARE(node.attrs().value(i), attrs.value(i));
     }
+
+    QCOMPARE(node.x(), x);
+    QCOMPARE(node.y(), y);
+
+    // Tests if 'Node::clone()' works as expected.
+    NodePtr clone = node.clone();
+    // test all associated getter methods
+
+    // Tests if 'Node::setAttr()' works as expected.
+    node.setAttr(0, Value(567));
+
+    QCOMPARE(node.attrs().name(0), attrs.name(0));
+    QCOMPARE(node.attr("test0_0"),Value(567));
+
+    QCOMPARE(node.attr(0), Value(567));
+    QCOMPARE(node.attrs().value(0), Value(567));
+
+    // Tests if 'Node::setX()' 'Node::setY()' work as expected (separate)
+    x = 2;
+    node.setX(x);
+    QCOMPARE(node.x(), x);
+
+    y = 3;
+    node.setY(y);
+    QCOMPARE(node.y(), y);
+
+    x = 3;
+    y = 4;
+    node.setCoords(x,y);
     QCOMPARE(node.x(), x);
     QCOMPARE(node.y(), y);
 }
@@ -80,6 +116,7 @@ functions:
     inline int inDegree() const override;
     inline int outDegree() const override;
 */
+
 
 QTEST_MAIN(TestNode)
 #include "tst_node.moc"
