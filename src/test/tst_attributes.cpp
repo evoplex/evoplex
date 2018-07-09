@@ -165,12 +165,14 @@ void TestAttributes::_tst_replace(Attributes a, int id, QString newName, Value n
 
 void TestAttributes::tst_replace()
 {
-    // test for attribute with no value or name at position
+    // test for attribute with no value or name at position (resize in the construction)
     // test for attribute with value but no name at position
     // test for attribute with both value and name at position
-    // test for empty attribute
-    // test for empty attribute resized
+    // test for empty attribute (empty constructor)
+    // test for empty attribute resized to 0 (forcing size zero)
+    // test for empty attribute resized (init empty and resize later)
     // test for non-empty attribute resized
+    // resize to 0 again, it should be empty now
 
     // test for attribute with value currently in position
     Attributes a1(3);
@@ -235,8 +237,10 @@ void TestAttributes::tst_push_back(){
     // test for attribute with value but no name at position
     // test for attribute with both value and name at position
     // test for empty attribute
+    // test for empty attribute resized to 0
     // test for empty attribute resized
     // test for non-empty attribute resized
+    // resize to 0 again, it should be empty now
 
     // test for attribute with origional size > 0
     Attributes a1(3);
@@ -335,8 +339,10 @@ void TestAttributes::tst_setValue()
     // test for attribute with value but no name at position
     // test for attribute with both value and name at position
     // test for empty attribute
+    // test for empty attribute resized to 0
     // test for empty attribute resized
     // test for non-empty attribute resized
+    // resize to 0 again, it should be empty now
 
     // test for attribute that has no value at the index
     Attributes a1(3);
