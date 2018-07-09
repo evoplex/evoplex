@@ -24,13 +24,12 @@
 #include <functional>
 #include <vector>
 
-#include <plugininterfaces.h>
+#include <plugininterface.h>
 
 namespace evoplex {
 class SquareGrid: public AbstractGraph
 {
 public:
-    SquareGrid(const QString &name);
     bool init();
     void reset();
 

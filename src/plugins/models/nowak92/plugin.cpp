@@ -93,5 +93,5 @@ int ModelNowak::binarize(const int strategy) const
 
 } // evoplex
 
-REGISTER_MODEL(ModelNowak)
+REGISTER_PLUGIN(ModelNowak)
 #include "plugin.moc"

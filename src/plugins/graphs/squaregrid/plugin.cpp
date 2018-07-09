@@ -26,15 +26,6 @@
 
 namespace evoplex {
 
-SquareGrid::SquareGrid(const QString& name)
-    : AbstractGraph(name)
-    , m_periodic(false)
-    , m_numNeighbours(0)
-    , m_height(0)
-    , m_width(0)
-{
-}
-
 bool SquareGrid::init()
 {
     if (!attrExists("periodic") || !attrExists("neighbours") ||
@@ -175,5 +166,5 @@ SquareGrid::edges2d SquareGrid::undirected8Edges(const int id, const int width)
 }
 
 } // evoplex
-REGISTER_GRAPH(SquareGrid)
+REGISTER_PLUGIN(SquareGrid)
 #include "plugin.moc"
