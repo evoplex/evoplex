@@ -123,44 +123,50 @@ void TestAttributes::tst_resize()
     a2.resize(0);
     _tst_empty(a2);
 }
-// =====================================
+
 void TestAttributes::_tst_replace(Attributes a, int id, QString newName, Value newValue, int origSize)
 {
     // test size of attribute
      QVERIFY(!a.isEmpty());
      QVERIFY(a.size() > 0);
      QCOMPARE(a.size(), origSize);
+
      QVERIFY_EXCEPTION_THROWN(a.name(origSize), std::out_of_range);
      QVERIFY_EXCEPTION_THROWN(a.name(-1), std::out_of_range);
+
      QCOMPARE(a.names().size(), size_t(origSize));
      QCOMPARE(a.values().size(), size_t(origSize));
+
      QVERIFY_EXCEPTION_THROWN(a.value("a"), std::out_of_range);
      QVERIFY_EXCEPTION_THROWN(a.value(QString("a")), std::out_of_range);
 
     // test position of name
+     QVERIFY(!a.names().empty());
+
      QCOMPARE(a.indexOf(newName), id);
      QCOMPARE(a.indexOf(QString(newName)), id);
 
      QVERIFY(a.contains(newName));
      QVERIFY(a.contains(QString(newName)));
 
-     QVERIFY(!a.names().empty());
      QCOMPARE(a.name(id), newName);
      QCOMPARE(a.name(id), QString(newName));
 
     // test position of value
      QVERIFY(!a.values().empty());
+     QVERIFY(newValue.isValid());
      QCOMPARE(a.value(id), newValue);
      QCOMPARE(a.value(id, newValue), newValue);
 
     // test name against value
      QCOMPARE(a.value(newName), newValue);
      QCOMPARE(a.value(QString(newName)), newValue);
-     QVERIFY(newValue.isValid());
+
      QCOMPARE(a.value(newName, newValue), newValue);
      QCOMPARE(a.value(QString(newName), newValue), newValue);
 }
 
+// Tests if 'Attributes::replace()' works as expected.
 void TestAttributes::tst_replace()
 {
     // test for attribute with no value or name at position (resize in the construction)
@@ -191,60 +197,69 @@ void TestAttributes::tst_replace()
     a5.resize(1);
     a5.replace(0, "test", Value(123));
     _tst_replace(a5, 0, "test", Value(123), 1);
-    // resize to 0 again, it should be empty now
 
+    // resize to 0 again, it should be empty now
+    a5.resize(0);
+    _tst_empty(a5);
 }
 
 void TestAttributes::_tst_push_back(Attributes a, QString newName, Value newValue, int origSize)
 {
     // test size of attribute
-    QCOMPARE(a.size(), (origSize+1));
     QVERIFY(!a.isEmpty());
     QVERIFY(a.size() > 0);
+    QCOMPARE(a.size(), (origSize+1));
+
     QVERIFY_EXCEPTION_THROWN(a.name(origSize+1), std::out_of_range);
     QVERIFY_EXCEPTION_THROWN(a.name(-1), std::out_of_range);
+
     QCOMPARE(a.names().size(), size_t(origSize+1));
     QCOMPARE(a.values().size(), size_t(origSize+1));
+
     QVERIFY_EXCEPTION_THROWN(a.value("a"), std::out_of_range);
     QVERIFY_EXCEPTION_THROWN(a.value(QString("a")), std::out_of_range);
 
     // test position of name
+    QVERIFY(!a.names().empty());
+
     QCOMPARE(a.indexOf(newName), origSize);
     QCOMPARE(a.indexOf(QString(newName)), origSize);
 
     QVERIFY(a.contains(newName));
     QVERIFY(a.contains(QString(newName)));
 
-    QVERIFY(!a.names().empty());
     QCOMPARE(a.name(origSize), newName);
     QCOMPARE(a.name(origSize), QString(newName));
 
     // test position of value
     QVERIFY(!a.values().empty());
+    QVERIFY(newValue.isValid());
     QCOMPARE(a.value(origSize), newValue);
     QCOMPARE(a.value(origSize, newValue), newValue);
 
     // test name against value
     QCOMPARE(a.value(newName), newValue);
     QCOMPARE(a.value(QString(newName)), newValue);
-    QVERIFY(newValue.isValid());
+
     QCOMPARE(a.value(newName, newValue), newValue);
     QCOMPARE(a.value(QString(newName), newValue), newValue);
 }
 
-void TestAttributes::tst_push_back(){
-
+// Tests if 'Attributes::push_back()' works as expected.
+void TestAttributes::tst_push_back()
+{
     // test for attribute with no value or name at position (resize in the construction)
     Attributes a1(3);
     a1.push_back("test", Value(123));
     _tst_push_back(a1, "test", Value(123), 3);
+
     // test for attribute with value but no name at last position
     Attributes a2(3);
     a2.setValue(2, Value(123));
     a2.push_back("test", Value(234));
     _tst_push_back(a2, "test", Value(234), 3);
 
-//    // test for attribute with both value and name at position
+    // test for attribute with both value and name at position
     Attributes a3(3);
     a3.replace(2, "test", Value(123));
     a3.push_back("test2", Value(234));
@@ -271,23 +286,23 @@ void TestAttributes::tst_push_back(){
     a7.resize(1);
     a7.push_back("test", Value(123));
     _tst_push_back(a7, "test", Value(123), 1);
+
     // resize to 0 again, it should be empty now
     a7.resize(0);
     _tst_empty(a7);
-
-
-//    // !!! CHECK
-//    QCOMPARE(a3.value(3), Value(123));
-//    //_tst_push_back(a2, "test", Value(123), 3);
 }
 
-void TestAttributes::_tst_setValue_with_name(Attributes a, int id, QString newName, Value newValue, int origSize){
+void TestAttributes::_tst_setValue_with_name(Attributes a, int id, QString newName, Value newValue, int origSize)
+{
+    // test position of name
+    QVERIFY(!a.names().empty());
 
     QCOMPARE(a.indexOf(newName), id);
     QCOMPARE(a.indexOf(QString(newName)), id);
+
     QVERIFY(a.contains(newName));
     QVERIFY(a.contains(QString(newName)));
-    QVERIFY(!a.names().empty());
+
     QCOMPARE(a.name(id), newName);
     QCOMPARE(a.name(id), QString(newName));
 
@@ -295,42 +310,41 @@ void TestAttributes::_tst_setValue_with_name(Attributes a, int id, QString newNa
     QCOMPARE(a.value(newName), newValue);
     QCOMPARE(a.value(QString(newName)), newValue);
 
-    QVERIFY_EXCEPTION_THROWN(a.value(QString("a")), std::out_of_range);
-
     QCOMPARE(a.value(newName, newValue), newValue);
     QCOMPARE(a.value(QString(newName), newValue), newValue);
 }
 
-void TestAttributes::_tst_setValue(Attributes a, int id, Value newValue, int origSize){
-
+void TestAttributes::_tst_setValue(Attributes a, int id, Value newValue, int origSize)
+{
     // test size of attribute
-    QVERIFY(a.size() > 0);
     QVERIFY(!a.isEmpty());
+    QVERIFY(a.size() > 0);
     QCOMPARE(a.size(), origSize);
+
     QVERIFY_EXCEPTION_THROWN(a.name(origSize), std::out_of_range);
     QVERIFY_EXCEPTION_THROWN(a.name(-1), std::out_of_range);
+
     QCOMPARE(a.names().size(), size_t(origSize));
     QCOMPARE(a.values().size(), size_t(origSize));
+
     QVERIFY_EXCEPTION_THROWN(a.value("a"), std::out_of_range);
     QVERIFY_EXCEPTION_THROWN(a.value(QString("a")), std::out_of_range);
 
-    // test position of values
+    // test position of value
     QVERIFY(!a.values().empty());
-    QCOMPARE(a.value(id), newValue);
     QVERIFY(newValue.isValid());
+    QCOMPARE(a.value(id), newValue);
     QCOMPARE(a.value(id, newValue), newValue);
-
-
 }
 
+// Tests if 'Attributes::setValue()' works as expected.
 void TestAttributes::tst_setValue()
 {
-    // test for attribute with no value or name at position
+    // test for attribute with no value or name at position (resize in the construction)
     Attributes a1(3);
     a1.setValue(0, Value(123));
     _tst_setValue(a1, 0, Value(123), 3);
 
-    // CHECK!!!
     // test for attribute with value but no name at position (using setValue twice)
     Attributes a2(3);
     a2.setValue(0, Value(123));
