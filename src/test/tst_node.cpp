@@ -34,7 +34,7 @@ private slots:
 };
 
 void TestNode::tst_UNode(){
-    // test constructor and attrs()
+    // Tests if constructor works as expected.
     int id = 0, x = 1, y = 2;
     Value values[3] = {Value(123), Value(234), Value(456)};
     QString names[3] = {"test0_0", "test0_1", "test0_2"};
@@ -60,9 +60,6 @@ void TestNode::tst_UNode(){
     QCOMPARE(node.x(), x);
     QCOMPARE(node.y(), y);
 
-    // Tests if 'Node::clone()' works as expected.
-    NodePtr clone = node.clone();
-    // test all associated getter methods
 
     // Tests if 'Node::setAttr()' works as expected.
     node.setAttr(0, Value(567));
@@ -73,20 +70,44 @@ void TestNode::tst_UNode(){
     QCOMPARE(node.attr(0), Value(567));
     QCOMPARE(node.attrs().value(0), Value(567));
 
-    // Tests if 'Node::setX()' 'Node::setY()' work as expected (separate)
+    QCOMPARE(node.attrs().size(), attrs.size());
+
+    // Tests if 'Node::setX()' works as expected
     x = 2;
     node.setX(x);
     QCOMPARE(node.x(), x);
 
+    // Tests if 'Node::setY()' works as expected
     y = 3;
     node.setY(y);
     QCOMPARE(node.y(), y);
 
+    // Tests if 'Node::setYCoords()' works as expected
     x = 3;
     y = 4;
     node.setCoords(x,y);
     QCOMPARE(node.x(), x);
     QCOMPARE(node.y(), y);
+
+    // test for unode and for dnode and for takes ownership cases
+    QCOMPARE(node.degree(), 0);
+    QCOMPARE(node.inDegree(), 0);
+    QCOMPARE(node.outDegree(), 0);
+
+    // Tests if 'Node::clone()' works as expected.
+    NodePtr clone = node.clone();
+    Node *c = clone.get();
+    QCOMPARE(c->id(), node.id());
+    QCOMPARE(c->x(), node.x());
+    QCOMPARE(c->y(), node.y());
+    QCOMPARE(c->attrs().size(), node.attrs().size());
+    QCOMPARE(c->attrs().names(), node.attrs().names());
+    QCOMPARE(c->attrs().values(), node.attrs().values());
+    QCOMPARE(c->degree(), node.degree());
+    QCOMPARE(c->inDegree(), node.inDegree());
+    QCOMPARE(c->outDegree(), node.outDegree());
+
+
 }
 /* TO DO:
 
@@ -116,7 +137,6 @@ functions:
     inline int inDegree() const override;
     inline int outDegree() const override;
 */
-
 
 QTEST_MAIN(TestNode)
 #include "tst_node.moc"
