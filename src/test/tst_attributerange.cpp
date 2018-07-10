@@ -31,10 +31,11 @@ class TestAttributeRange: public QObject
 private slots:
     void initTestCase() {}
     void cleanupTestCase() {}
-    void tst_attrRge();
+    void tst_attrRge(); // REMOVE
     void tst_bool();
     void tst_int_range();
     void tst_double_range();
+    void tst_int_set();
 
     // Auxiliary functions
     void _tst_int_value(Value v);
@@ -44,6 +45,7 @@ private slots:
 // attrNames and attrRangeStrs are stored in arrays in order to make it easier
 // to add test cases in the future
 
+// REMOVE
 void TestAttributeRange::tst_attrRge(){
 //    AttributeRange::Type t = AttributeRange::Int_Range;
 //    AttributeRange* a = AttributeRange::parse(0, "test", "int[0,1]");
@@ -51,7 +53,7 @@ void TestAttributeRange::tst_attrRge(){
 //    QCOMPARE(a->type(), t);
 
 }
-// test invalid type
+// TEST INVALID TYPE
 void TestAttributeRange::tst_bool(){
     AttributeRange* attrRge = AttributeRange::parse(0, "test", "bool");
     const int null = 0;
@@ -165,20 +167,7 @@ void TestAttributeRange::tst_int_range(){
     QCOMPARE(attrRge3->attrName(), attrNames[2]);
     QCOMPARE(attrRge3->attrRangeStr(), attrRangeStrs[2]);
 
-    QVERIFY(attrRge->isValid());
-    QCOMPARE(attrRge->id(), 0);
-    QCOMPARE(attrRge->attrName(), attrNames[0]);
-    QCOMPARE(attrRge->attrRangeStr(), attrRangeStrs[0]);
 
-    QVERIFY(attrRge2->isValid());
-    QCOMPARE(attrRge2->id(), 1);
-    QCOMPARE(attrRge2->attrName(), attrNames[1]);
-    QCOMPARE(attrRge2->attrRangeStr(), attrRangeStrs[1]);
-
-    QVERIFY(attrRge3->isValid());
-    QCOMPARE(attrRge3->id(), 2);
-    QCOMPARE(attrRge3->attrName(), attrNames[2]);
-    QCOMPARE(attrRge3->attrRangeStr(), attrRangeStrs[2]);
 
     AttributeRange::Type type = AttributeRange::Int_Range;
     QCOMPARE(attrRge->type(), type);
@@ -286,20 +275,6 @@ void TestAttributeRange::tst_double_range(){
     QCOMPARE(attrRge3->attrName(), attrNames[2]);
     QCOMPARE(attrRge3->attrRangeStr(), attrRangeStrs[2]);
 
-    QVERIFY(attrRge->isValid());
-    QCOMPARE(attrRge->id(), 0);
-    QCOMPARE(attrRge->attrName(), attrNames[0]);
-    QCOMPARE(attrRge->attrRangeStr(), attrRangeStrs[0]);
-
-    QVERIFY(attrRge2->isValid());
-    QCOMPARE(attrRge2->id(), 1);
-    QCOMPARE(attrRge2->attrName(), attrNames[1]);
-    QCOMPARE(attrRge2->attrRangeStr(), attrRangeStrs[1]);
-
-    QVERIFY(attrRge3->isValid());
-    QCOMPARE(attrRge3->id(), 2);
-    QCOMPARE(attrRge3->attrName(), attrNames[2]);
-    QCOMPARE(attrRge3->attrRangeStr(), attrRangeStrs[2]);
 
     AttributeRange::Type type = AttributeRange::Double_Range;
     QCOMPARE(attrRge->type(), type);
@@ -338,6 +313,49 @@ void TestAttributeRange::tst_double_range(){
     _tst_double_value(v);
     QVERIFY(v.toDouble() >= min);
     QVERIFY(v.toDouble() <= max);
+}
+
+void TestAttributeRange::tst_int_set(){
+    const char* attrName = "test";
+    const char* attrRangeStr = "int{0,1,-5,100,-100}";
+    int min = -100;
+    int max = 100;
+
+    // Set with positive, negative and large numbers
+    //=====================================
+    AttributeRange* attrRge = AttributeRange::parse(0, attrName, attrRangeStr);
+
+    // Tests value returned by 'AttributeRange::validate()'
+
+    Value v = attrRge->validate("-100");   //min
+    _tst_int_value(v);
+    v = attrRge->validate("100");   //max
+    _tst_int_value(v);
+
+    // Tests if functions work as expected
+    QVERIFY(attrRge->isValid());
+    QCOMPARE(attrRge->id(), 0);
+    QCOMPARE(attrRge->attrName(), attrName);
+    QCOMPARE(attrRge->attrRangeStr(), attrRangeStr);
+
+//    QVERIFY(attrRge2->isValid());
+
+    AttributeRange::Type type = AttributeRange::Int_Set;
+    QCOMPARE(attrRge->type(), type);
+
+
+
+    // Tests min(), max() and rand() functions
+    PRG* prg = new PRG(123);
+// CHECK!!!
+//    QCOMPARE(attrRge->min(), min);
+//    QCOMPARE(attrRge->max(), max);
+//    v = attrRge->rand(prg);
+//    _tst_int_value(v);
+//    QVERIFY(v.toInt() >= min);
+//    QVERIFY(v.toInt() <= max);
+
+
 }
 QTEST_MAIN(TestAttributeRange)
 #include "tst_attributerange.moc"
