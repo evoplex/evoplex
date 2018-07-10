@@ -34,6 +34,9 @@ private slots:
     void tst_attrRge();
     void tst_bool();
     void tst_int_range();
+    void tst_double_range();
+
+    // Auxiliary functions
     void _tst_int_value(Value v);
     void _tst_double_value(Value v);
 };
@@ -231,6 +234,110 @@ void TestAttributeRange::_tst_double_value(Value v){
     QVERIFY(!v.isChar());
     QVERIFY(!v.isBool());
     QVERIFY(!v.isString());
+}
+
+void TestAttributeRange::tst_double_range(){
+    const int TEST_CASES = 3;
+    const char* attrNames[TEST_CASES] = {"test0", "test1", "test2"};
+    // Case 1: regular range
+    // Case 2: negative numbers
+    // Case 3: large range
+    const char* attrRangeStrs[TEST_CASES] = {"double[1.1,1.2]", "double[-5.5,-3.3]", "double[-95.7,87.5]"};
+
+    AttributeRange* attrRge = AttributeRange::parse(0, attrNames[0], attrRangeStrs[0]);
+    AttributeRange* attrRge2 = AttributeRange::parse(1, attrNames[1], attrRangeStrs[1]);
+    AttributeRange* attrRge3 = AttributeRange::parse(2, attrNames[2], attrRangeStrs[2]);
+
+    // Tests value returned by 'AttributeRange::validate()'
+    Value v = attrRge->validate("1.1");   //min
+    _tst_double_value(v);
+    v = attrRge->validate("1.2");   //max
+    _tst_double_value(v);
+    v = attrRge->validate("1.15");   //other value
+    _tst_double_value(v);
+
+    v = attrRge2->validate("-5.5");   //min
+    _tst_double_value(v);
+    v = attrRge2->validate("-3.3");   //max
+    _tst_double_value(v);
+    v = attrRge2->validate("-4.1");   //other value
+    _tst_double_value(v);
+
+    v = attrRge3->validate("-95.7");   //min
+    _tst_double_value(v);
+    v = attrRge3->validate("87.5");   //max
+    _tst_double_value(v);
+    v = attrRge3->validate("5.6");   //other value
+    _tst_double_value(v);
+
+    // Tests if functions work as expected
+    QVERIFY(attrRge->isValid());
+    QCOMPARE(attrRge->id(), 0);
+    QCOMPARE(attrRge->attrName(), attrNames[0]);
+    QCOMPARE(attrRge->attrRangeStr(), attrRangeStrs[0]);
+
+    QVERIFY(attrRge2->isValid());
+    QCOMPARE(attrRge2->id(), 1);
+    QCOMPARE(attrRge2->attrName(), attrNames[1]);
+    QCOMPARE(attrRge2->attrRangeStr(), attrRangeStrs[1]);
+
+    QVERIFY(attrRge3->isValid());
+    QCOMPARE(attrRge3->id(), 2);
+    QCOMPARE(attrRge3->attrName(), attrNames[2]);
+    QCOMPARE(attrRge3->attrRangeStr(), attrRangeStrs[2]);
+
+    QVERIFY(attrRge->isValid());
+    QCOMPARE(attrRge->id(), 0);
+    QCOMPARE(attrRge->attrName(), attrNames[0]);
+    QCOMPARE(attrRge->attrRangeStr(), attrRangeStrs[0]);
+
+    QVERIFY(attrRge2->isValid());
+    QCOMPARE(attrRge2->id(), 1);
+    QCOMPARE(attrRge2->attrName(), attrNames[1]);
+    QCOMPARE(attrRge2->attrRangeStr(), attrRangeStrs[1]);
+
+    QVERIFY(attrRge3->isValid());
+    QCOMPARE(attrRge3->id(), 2);
+    QCOMPARE(attrRge3->attrName(), attrNames[2]);
+    QCOMPARE(attrRge3->attrRangeStr(), attrRangeStrs[2]);
+
+    AttributeRange::Type type = AttributeRange::Double_Range;
+    QCOMPARE(attrRge->type(), type);
+    QCOMPARE(attrRge2->type(), type);
+    QCOMPARE(attrRge3->type(), type);
+
+
+
+    // Tests min(), max() and rand() functions
+    double min, max;
+    PRG* prg = new PRG(123);
+
+    min = 1.1;
+    max = 1.2;
+    QCOMPARE(attrRge->min(), min);
+    QCOMPARE(attrRge->max(), max);
+    v = attrRge->rand(prg);
+    _tst_double_value(v);
+    QVERIFY(v.toDouble() >= min);
+    QVERIFY(v.toDouble() <= max);
+
+    min = -5.5;
+    max = -3.3;
+    QCOMPARE(attrRge2->min(), min);
+    QCOMPARE(attrRge2->max(), max);
+    v = attrRge2->rand(prg);
+    _tst_double_value(v);
+    QVERIFY(v.toDouble() >= min);
+    QVERIFY(v.toDouble() <= max);
+
+    min = -95.7;
+    max = 87.5;
+    QCOMPARE(attrRge3->min(), min);
+    QCOMPARE(attrRge3->max(), max);
+    v = attrRge3->rand(prg);
+    _tst_double_value(v);
+    QVERIFY(v.toDouble() >= min);
+    QVERIFY(v.toDouble() <= max);
 }
 QTEST_MAIN(TestAttributeRange)
 #include "tst_attributerange.moc"
