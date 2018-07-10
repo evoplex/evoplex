@@ -37,6 +37,7 @@ private slots:
     void tst_int_set();
     void tst_string();
     void tst_string_range();
+    void tst_double_set();
 
     // Auxiliary functions
     void _tst_value(Value v);
@@ -293,9 +294,15 @@ void TestAttributeRange::tst_int_set(){
 
     // Tests value returned by 'AttributeRange::validate()'
     Value v;
-    v = attrRge->validate("-100");   //min
+    v = attrRge->validate("0");
     _tst_value(v);
-    v = attrRge->validate("100");   //max
+    v = attrRge->validate("1");
+    _tst_value(v);
+    v = attrRge->validate("-5");
+    _tst_value(v);
+    v = attrRge->validate("100");
+    _tst_value(v);
+    v = attrRge->validate("-100");
     _tst_value(v);
 
     // Tests if functions work as expected
@@ -320,7 +327,7 @@ void TestAttributeRange::tst_int_set(){
 //    _tst_int_value(v);
 //    QVERIFY(v.toInt() >= min);
 //    QVERIFY(v.toInt() <= max);
-
+delete prg;
 
 }
 
@@ -480,6 +487,55 @@ void TestAttributeRange::tst_string_range(){
 //    _tst_value(v);
 //    QVERIFY(v.toInt() >= min);
 //    QVERIFY(v.toInt() <= max);
+}
+
+void TestAttributeRange::tst_double_set(){
+    const char* attrName = "test";
+    const char* attrRangeStr = "double{0,1.2,-5.5,-95.7,87.5}";
+    int min = -95.7;
+    int max = 87.5;
+
+    // Set with positive, negative and large numbers
+    //=====================================
+    AttributeRange* attrRge = AttributeRange::parse(0, attrName, attrRangeStr);
+
+    // Tests value returned by 'AttributeRange::validate()'
+    Value v;
+    v = attrRge->validate("0");
+    _tst_value(v);
+    v = attrRge->validate("1.2");
+    _tst_value(v);
+    v = attrRge->validate("-5.5");   //max
+    _tst_value(v);
+    v = attrRge->validate("-95.7");   //max
+    _tst_value(v);
+    v = attrRge->validate("87.5");   //max
+    _tst_value(v);
+
+    // Tests if functions work as expected
+    QVERIFY(attrRge->isValid());
+    QCOMPARE(attrRge->id(), 0);
+    QCOMPARE(attrRge->attrName(), attrName);
+    QCOMPARE(attrRge->attrRangeStr(), attrRangeStr);
+
+//    QVERIFY(attrRge2->isValid());
+
+    AttributeRange::Type type = AttributeRange::Double_Set;
+    QCOMPARE(attrRge->type(), type);
+
+
+
+    // Tests min(), max() and rand() functions
+    PRG* prg = new PRG(123);
+// CHECK INT VERSION BEFORE ADDING
+//    QCOMPARE(attrRge->min(), min);
+//    QCOMPARE(attrRge->max(), max);
+//    v = attrRge->rand(prg);
+//    _tst_int_value(v);
+//    QVERIFY(v.toInt() >= min);
+//    QVERIFY(v.toInt() <= max);
+delete prg;
+
 }
 QTEST_MAIN(TestAttributeRange)
 #include "tst_attributerange.moc"
