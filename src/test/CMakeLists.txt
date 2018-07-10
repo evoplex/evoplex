@@ -21,6 +21,8 @@
 
 set(TESTS
   tst_attributes
+  tst_attributerange
+  tst_edge
   tst_node
   tst_prg
   tst_value

@@ -38,16 +38,17 @@ class Edge
 {
 public:
     explicit Edge(int id, const NodePtr& origin, const NodePtr& neighbour,
-        Attributes* attrs, bool takesOwnership)
-        : m_id(id), m_origin(origin), m_neighbour(neighbour), m_attrs(attrs),
-          m_takesOwnership(takesOwnership) {}
+                  Attributes* attrs=new Attributes(), bool ownsAttrs=true)
+        : m_id(id), m_origin(origin), m_neighbour(neighbour),
+          m_attrs(attrs), m_ownsAttrs(ownsAttrs) {}
 
-    ~Edge() { if (m_takesOwnership) delete m_attrs; }
+    ~Edge() { if (m_ownsAttrs) delete m_attrs; }
 
     inline const Attributes* attrs() const;
     inline const Value& attr(const char* name) const;
     inline const Value& attr(const int id) const;
     inline void setAttr(const int id, const Value& value);
+    inline void addAttr(QString name, Value value);
 
     inline int id() const;
     inline const NodePtr& origin() const;
@@ -58,7 +59,7 @@ private:
     const NodePtr& m_origin;
     const NodePtr& m_neighbour;
     Attributes* m_attrs;
-    bool m_takesOwnership;
+    bool m_ownsAttrs;
 };
 
 /************************************************************************
@@ -76,6 +77,9 @@ inline const Value& Edge::attr(const int id) const
 
 inline void Edge::setAttr(const int id, const Value& value)
 { m_attrs->setValue(id, value); }
+
+inline void Edge::addAttr(QString name, Value value)
+{ m_attrs->push_back(name, value); }
 
 inline int Edge::id() const
 { return m_id; }
