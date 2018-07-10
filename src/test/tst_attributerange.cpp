@@ -33,6 +33,7 @@ private slots:
     void cleanupTestCase() {}
     void tst_attrRge();
     void tst_bool();
+    void tst_int_range();
 };
 
 void TestAttributeRange::tst_attrRge(){
@@ -47,8 +48,20 @@ void TestAttributeRange::tst_bool(){
     AttributeRange* attrRge = AttributeRange::parse(0, "test", "bool");
     const int null = 0;
 
-    // Tests value returned by 'AttributeRange::validate()'
+    // Tests value returned by 'AttributeRange::validate()' for true
     Value v = attrRge->validate("true");
+    QVERIFY(v.isValid());
+
+    QVERIFY(v.type() == Value::BOOL);
+    QVERIFY(v.isBool());
+
+    QVERIFY(!v.isDouble());
+    QVERIFY(!v.isChar());
+    QVERIFY(!v.isInt());
+    QVERIFY(!v.isString());
+
+    // Tests value returned by 'AttributeRange::validate()' for false
+    v = attrRge->validate("false");
     QVERIFY(v.isValid());
 
     QVERIFY(v.type() == Value::BOOL);
@@ -83,6 +96,50 @@ void TestAttributeRange::tst_bool(){
     QVERIFY(!v1.isInt());
     QVERIFY(!v1.isString());
 }
-//More than or equal to min, less than or equal to max
+
+void TestAttributeRange::tst_int_range(){
+    AttributeRange* attrRge = AttributeRange::parse(0, "test", "int[0, 1]");
+    AttributeRange* attrRge2 = AttributeRange::parse(0, "test", "int[-5, 5]");      //Negative numbers
+    AttributeRange* attrRge3 = AttributeRange::parse(0, "test", "int[-100, 100]");  //Large range
+
+    // Tests value returned by 'AttributeRange::validate()'
+//    Value v = attrRge->validate("true");
+//    QVERIFY(v.isValid());
+
+//    QVERIFY(v.type() == Value::BOOL);
+//    QVERIFY(v.isBool());
+
+//    QVERIFY(!v.isDouble());
+//    QVERIFY(!v.isChar());
+//    QVERIFY(!v.isInt());
+//    QVERIFY(!v.isString());
+
+//    // Tests if functions work as expected
+//    QVERIFY(attrRge->isValid());
+//    QCOMPARE(attrRge->id(), 0);
+//    QCOMPARE(attrRge->attrName(), "test");
+//    QCOMPARE(attrRge->attrRangeStr(), "bool");
+
+//    AttributeRange::Type type = AttributeRange::Bool;
+//    QCOMPARE(attrRge->type(), type);
+
+//    // min() and max() are not tested as both return <null> for a boolean type
+
+//    // Tests 'AttributeRange::rand()' works as expected
+//    PRG* prg = new PRG(123);
+//    Value v1 = attrRge->rand(prg);
+//    QVERIFY(v1.isValid());
+
+//    QVERIFY(v1.type() == Value::BOOL);
+//    QVERIFY(v1.isBool());
+
+//    QVERIFY(!v1.isDouble());
+//    QVERIFY(!v1.isChar());
+//    QVERIFY(!v1.isInt());
+//    QVERIFY(!v1.isString());
+    //More than or equal to min, less than or equal to max
+}
+
+
 QTEST_MAIN(TestAttributeRange)
 #include "tst_attributerange.moc"
