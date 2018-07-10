@@ -85,6 +85,11 @@ void TestEdge::tst_edge(){
 
     QCOMPARE(edge.attrs()->name(1), "test1");
     QCOMPARE(edge.attrs()->value(1), Value(345));
+
+    // Tests if 'Edge::id()' works as expected
+    QCOMPARE(edge.id(), 0);
+    QCOMPARE(edge.origin(), m_nodeA);
+    QCOMPARE(edge.neighbour(), m_nodeB);
 }
 
 QTEST_MAIN(TestEdge)
