@@ -44,14 +44,10 @@ void TestEdge::initTestCase()
     m_nodeB = std::make_shared<UNode>(1, Attributes());
 }
 
-void TestEdge::tst_edge(){
-    // NOTES:
-    // create for both directions and ways
-    // check marked tests
-    // check with boolean, and that it deletes that attributes pointer
-    // fix comments
-
+void TestEdge::tst_edge()
+{
     // Tests if all ways of creating edges work as expected
+    // Tests are repeated for each method
 
     // Tests method 1: adding attributes after edge is constructed
     Edge edge(0, m_nodeA, m_nodeB);
@@ -171,8 +167,6 @@ void TestEdge::tst_edge(){
     QCOMPARE(edge3.id(), 1);
     QCOMPARE(edge3.origin(), m_nodeA);
     QCOMPARE(edge3.neighbour(), m_nodeB);
-
-
 }
 
 QTEST_MAIN(TestEdge)
