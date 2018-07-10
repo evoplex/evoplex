@@ -21,6 +21,7 @@
 #include <QtTest>
 #include <attributerange.h>
 
+
 using namespace evoplex;
 
 class TestAttributeRange: public QObject
@@ -30,10 +31,63 @@ class TestAttributeRange: public QObject
 private slots:
     void initTestCase() {}
     void cleanupTestCase() {}
-
+    void tst_attrRge();
+    void tst_bool();
 };
 
-// TO DO:
+void TestAttributeRange::tst_attrRge(){
+//    AttributeRange::Type t = AttributeRange::Int_Range;
+//    AttributeRange* a = AttributeRange::parse(0, "test", "int[0,1]");
+//    Value v = a->validate("int[0,1]");
+//    QCOMPARE(a->type(), t);
+
+}
+// test invalid type
+void TestAttributeRange::tst_bool(){
+    AttributeRange* attrRge = AttributeRange::parse(0, "test", "bool");
+    const int null = 0;
+
+    // Tests value returned by 'AttributeRange::validate()'
+    Value v = attrRge->validate("true");
+    QVERIFY(v.isValid());
+
+    QVERIFY(v.type() == Value::BOOL);
+    QVERIFY(v.isBool());
+
+    QVERIFY(!v.isDouble());
+    QVERIFY(!v.isChar());
+    QVERIFY(!v.isInt());
+    QVERIFY(!v.isString());
+
+    // Tests if functions work as expected
+    QVERIFY(attrRge->isValid());
+    QCOMPARE(attrRge->id(), 0);
+    QCOMPARE(attrRge->attrName(), "test");
+    QCOMPARE(attrRge->attrRangeStr(), "bool");
+
+    AttributeRange::Type type = AttributeRange::Bool;
+    QCOMPARE(attrRge->type(), type);
+
+    // Tests min/max functions
+    // For bool?
+    //QCOMPARE(attrRge->min(), true);
+//Min max
+
+    // Rand?
+    PRG* prg = new PRG(123);
+    Value v1 = attrRge->rand(prg);
+    QVERIFY(v1.isValid());
+
+    QVERIFY(v1.type() == Value::BOOL);
+    QVERIFY(v1.isBool());
+
+    QVERIFY(!v1.isDouble());
+    QVERIFY(!v1.isChar());
+    QVERIFY(!v1.isInt());
+    QVERIFY(!v1.isString());
+
+    //More than or equal to min, less than or equal to max
+}
 
 QTEST_MAIN(TestAttributeRange)
 #include "tst_attributerange.moc"
