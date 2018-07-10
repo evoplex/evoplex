@@ -67,6 +67,8 @@ QueuePage::QueuePage(MainGUI* mainGUI)
 
 void QueuePage::slotStatusChanged(Experiment* exp)
 {
+    Q_UNUSED(exp);
+    /* FIXME
     const rowKey key = std::make_pair(exp->project()->id(), exp->id());
     Row prev = m_rows.value(key, Row());
     Row next;
@@ -99,7 +101,7 @@ void QueuePage::slotStatusChanged(Experiment* exp)
     }
 
     m_rows.insert(key, next);
-    emit (isEmpty(false));
+    emit (isEmpty(false));*/
 }
 
 QTableWidgetItem* QueuePage::insertRow(TableWidget* table, Experiment* exp)

@@ -31,13 +31,13 @@
 namespace evoplex {
 
 Nodes Nodes::fromCmd(const QString& cmd, const AttributesScope& attrsScope,
-             const int graphType, QString* errMsg, std::function<void(int)> progress)
+        const int graphType, QString& error, std::function<void(int)> progress)
 {
     if (QFileInfo::exists(cmd)) {
-        return Nodes::fromFile(cmd, attrsScope, graphType, errMsg, progress);
+        return Nodes::fromFile(cmd, attrsScope, graphType, error, progress);
     }
 
-    AttrsGenerator* ag = AttrsGenerator::parse(attrsScope, cmd, errMsg);
+    AttrsGenerator* ag = AttrsGenerator::parse(attrsScope, cmd, error);
     if (!ag) {
         return Nodes();
     }
@@ -63,7 +63,7 @@ Nodes Nodes::fromCmd(const QString& cmd, const AttributesScope& attrsScope,
 }
 
 Nodes Nodes::fromFile(const QString& filePath, const AttributesScope& attrsScope,
-                      const int graphType, QString* errMsg, std::function<void(int)> progress)
+        const int graphType, QString& error, std::function<void(int)> progress)
 {
     bool isDirected = graphType == AbstractGraph::Directed;
     Q_ASSERT_X(isDirected || graphType == AbstractGraph::Undirected,
@@ -71,8 +71,8 @@ Nodes Nodes::fromFile(const QString& filePath, const AttributesScope& attrsScope
 
     QFile file(filePath);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        *errMsg = "unable to read csv file with the set of nodes.\n" + filePath;
-        qWarning() << *errMsg;
+        error = "unable to read csv file with the set of nodes.\n" + filePath;
+        qWarning() << error;
         return Nodes();
     }
 
@@ -81,10 +81,10 @@ Nodes Nodes::fromFile(const QString& filePath, const AttributesScope& attrsScope
     // read and validate header
     QStringList header;
     if (!in.atEnd()) {
-        header = validateHeader(in.readLine(), attrsScope);
+        header = validateHeader(in.readLine(), attrsScope, error);
         if (header.isEmpty()) {
-            *errMsg = "failed to read attributes from file.\n" + filePath;
-            qWarning() << *errMsg;
+            error = "failed to read attributes from file.\n" + filePath;
+            qWarning() << error;
             return Nodes();
         }
     }
@@ -94,10 +94,10 @@ Nodes Nodes::fromFile(const QString& filePath, const AttributesScope& attrsScope
     Nodes nodes;
     while (!in.atEnd()) {
         QStringList values = in.readLine().split(",");
-        NodePtr node = readRow(row, header, values, attrsScope, isDirected);
+        NodePtr node = readRow(row, header, values, attrsScope, isDirected, error);
         if (!node) {
-            *errMsg = QString("%1\n row: %2").arg(*errMsg).arg(row);
-            qWarning() << *errMsg;
+            error = QString("%1\n row: %2").arg(error).arg(row);
+            qWarning() << error;
             return Nodes();
         }
         nodes.insert({row, node});
@@ -148,28 +148,29 @@ bool Nodes::saveToFile(QString filePath, std::function<void(int)> progress) cons
     return true;
 }
 
-QStringList Nodes::validateHeader(const QString& header, const AttributesScope& attrsScope, QString* errMsg)
+QStringList Nodes::validateHeader(const QString& header,
+        const AttributesScope& attrsScope, QString& error)
 {
     QStringList headerList = header.split(",");
     int duplicates = headerList.removeDuplicates();
     if (duplicates > 0) {
-        *errMsg = QString("there are '%1' duplicated keys.").arg(duplicates);
+        error = QString("there are '%1' duplicated keys.").arg(duplicates);
         return QStringList();
     } else if (headerList.empty()) {
-        *errMsg = "the header cannot be empty. Is it comma-separated format?";
+        error = "the header cannot be empty. Is it comma-separated format?";
         return QStringList();
     }
 
     const int xIdx = headerList.indexOf("x");
     const int yIdx = headerList.indexOf("y");
     if ((xIdx != -1 && yIdx == -1) || (xIdx == -1 && yIdx != -1)) {
-        *errMsg = "missing 'x' or 'y' columns. It should have both or none.";
+        error = "missing 'x' or 'y' columns. It should have both or none.";
         return QStringList();
     }
 
     for (const auto* attrRange : attrsScope) {
         if (!header.contains(attrRange->attrName())) {
-            *errMsg = QString("the header is imcompatible for the model.\n"
+            error = QString("the header is imcompatible for the model.\n"
                               "Expected attributes: %1").arg(attrsScope.keys().join(", "));
             return QStringList();
         }
@@ -178,10 +179,10 @@ QStringList Nodes::validateHeader(const QString& header, const AttributesScope& 
 }
 
 NodePtr Nodes::readRow(const int row, const QStringList& header, const QStringList& values,
-                       const AttributesScope& attrsScope, const bool isDirected, QString* errMsg)
+                       const AttributesScope& attrsScope, const bool isDirected, QString& error)
 {
     if (values.size() != header.size()) {
-        *errMsg = "rows must have the same number of columns!";
+        error = "rows must have the same number of columns!";
         return nullptr;
     }
 
@@ -206,7 +207,7 @@ NodePtr Nodes::readRow(const int row, const QStringList& header, const QStringLi
         }
 
         if (!isValid) {
-            *errMsg = QString("invalid value at column: %1").arg(col);
+            error = QString("invalid value at column: %1").arg(col);
             return nullptr;
         }
     }
