@@ -31,6 +31,7 @@ class TestEdge: public QObject
 private slots:
     void initTestCase();
     void cleanupTestCase() {}
+    void tst_edge();
 
 private:
     NodePtr m_nodeA;
@@ -43,8 +44,48 @@ void TestEdge::initTestCase()
     m_nodeB = std::make_shared<UNode>(1, Attributes());
 }
 
+void TestEdge::tst_edge(){
+    // NOTES:
+    // create for both directions and ways
 
-// TO DO
+    // Tests if both ways of creating edges work as expected
+    Edge edge(0, m_nodeA, m_nodeB);
+
+    // Tests if the attributes of a node is empty on creation
+    QVERIFY(edge.attrs()->isEmpty());
+    QCOMPARE(edge.attrs()->size(), 0);
+    QCOMPARE(edge.attrs()->names().size(), 0);
+    QCOMPARE(edge.attrs()->values().size(), 0);
+
+    // Tests if 'Edge::addAttr()' works as expected, for an empty attribute
+    edge.addAttr("test0", Value(123));
+    QVERIFY(!edge.attrs()->isEmpty());
+    QCOMPARE(edge.attrs()->size(), 1);
+    QCOMPARE(edge.attrs()->names().size(), 1);
+    QCOMPARE(edge.attrs()->values().size(), 1);
+
+    QCOMPARE(edge.attrs()->name(0), "test0");
+    QCOMPARE(edge.attrs()->value(0), Value(123));
+
+    // Tests if 'Edge::attr()' works as expected
+    QCOMPARE(edge.attr("test0"), Value(123));
+    QCOMPARE(edge.attr(0), Value(123));
+
+    // Tests if 'Edge::setAttr()' works as expected
+    edge.setAttr(0, Value(234));
+    QCOMPARE(edge.attrs()->name(0), "test0"); // Tests that name has not changed
+    QCOMPARE(edge.attr(0), Value(234));
+
+    // Tests if 'Edge::addAttr()' works as expected, for an attribute with an existing value
+    edge.addAttr("test1", Value(345));
+    QVERIFY(!edge.attrs()->isEmpty());
+    QCOMPARE(edge.attrs()->size(), 2);
+    QCOMPARE(edge.attrs()->names().size(), 2);
+    QCOMPARE(edge.attrs()->values().size(), 2);
+
+    QCOMPARE(edge.attrs()->name(1), "test1");
+    QCOMPARE(edge.attrs()->value(1), Value(345));
+}
 
 QTEST_MAIN(TestEdge)
 #include "tst_edge.moc"
