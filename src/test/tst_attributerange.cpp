@@ -68,12 +68,9 @@ void TestAttributeRange::tst_bool(){
     AttributeRange::Type type = AttributeRange::Bool;
     QCOMPARE(attrRge->type(), type);
 
-    // Tests min/max functions
-    // For bool?
-    //QCOMPARE(attrRge->min(), true);
-//Min max
+    // min() and max() are not tested as both return <null> for a boolean type
 
-    // Rand?
+    // Tests 'AttributeRange::rand()' works as expected
     PRG* prg = new PRG(123);
     Value v1 = attrRge->rand(prg);
     QVERIFY(v1.isValid());
@@ -85,9 +82,7 @@ void TestAttributeRange::tst_bool(){
     QVERIFY(!v1.isChar());
     QVERIFY(!v1.isInt());
     QVERIFY(!v1.isString());
-
-    //More than or equal to min, less than or equal to max
 }
-
+//More than or equal to min, less than or equal to max
 QTEST_MAIN(TestAttributeRange)
 #include "tst_attributerange.moc"
