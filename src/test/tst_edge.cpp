@@ -47,8 +47,12 @@ void TestEdge::initTestCase()
 void TestEdge::tst_edge(){
     // NOTES:
     // create for both directions and ways
+    // check marked tests
+    // check with boolean, and that it deletes that attributes pointer
 
     // Tests if both ways of creating edges work as expected
+
+    // Tests method 1: adding attributes after edge is constructed
     Edge edge(0, m_nodeA, m_nodeB);
 
     // Tests if the attributes of a node is empty on creation
@@ -90,6 +94,45 @@ void TestEdge::tst_edge(){
     QCOMPARE(edge.id(), 0);
     QCOMPARE(edge.origin(), m_nodeA);
     QCOMPARE(edge.neighbour(), m_nodeB);
+
+    // Tests method 2: adding attributes in constructor
+    Attributes* attrs = new Attributes();
+    attrs->push_back("test0", Value(123));
+    Edge edge2(1, m_nodeA, m_nodeB, attrs);
+
+    QVERIFY(!edge2.attrs()->isEmpty());
+    QCOMPARE(edge2.attrs()->size(), 1);
+    QCOMPARE(edge2.attrs()->names().size(), 1);
+    QCOMPARE(edge2.attrs()->values().size(), 1);
+
+    QCOMPARE(edge2.attrs()->name(0), "test0");
+    QCOMPARE(edge2.attrs()->value(0), Value(123));
+
+    // Tests if 'Edge::attr()' works as expected
+    QCOMPARE(edge2.attr("test0"), Value(123));
+    QCOMPARE(edge2.attr(0), Value(123));
+
+    // Tests if 'Edge::setAttr()' works as expected
+    edge2.setAttr(0, Value(234));
+    QCOMPARE(edge2.attrs()->name(0), "test0"); // Tests that name has not changed
+    QCOMPARE(edge2.attr(0), Value(234));
+
+    // CHECK !!!
+//    // Tests if 'Edge::addAttr()' works as expected, for an attribute with an existing value
+//    edge.addAttr("test1", Value(345));
+//    QVERIFY(!edge2.attrs()->isEmpty());
+//    QCOMPARE(edge2.attrs()->size(), 2);
+//    QCOMPARE(edge2.attrs()->names().size(), 2);
+//    QCOMPARE(edge2.attrs()->values().size(), 2);
+
+//    QCOMPARE(edge2.attrs()->name(1), "test1");
+//    QCOMPARE(edge2.attrs()->value(1), Value(345));
+
+    // Tests if 'Edge::id()' works as expected
+    QCOMPARE(edge2.id(), 1);
+    QCOMPARE(edge2.origin(), m_nodeA);
+    QCOMPARE(edge2.neighbour(), m_nodeB);
+
 }
 
 QTEST_MAIN(TestEdge)
