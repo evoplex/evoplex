@@ -36,6 +36,7 @@ private slots:
     void tst_int_range();
     void tst_double_range();
     void tst_int_set();
+    void tst_string();
 
     // Auxiliary functions
     void _tst_value(Value v);
@@ -53,12 +54,14 @@ void TestAttributeRange::tst_attrRge(){
 
 }
 // TEST INVALID TYPE
+// RECHECK DOCUMENT FOR RANGE ETC
 void TestAttributeRange::tst_bool(){
     AttributeRange* attrRge = AttributeRange::parse(0, "test", "bool");
     const int null = 0;
 
     // Tests value returned by 'AttributeRange::validate()' for true
-    Value v = attrRge->validate("true");
+    Value v;
+    v = attrRge->validate("true");
     _tst_value(v);
 
     // Tests value returned by 'AttributeRange::validate()' for false
@@ -103,7 +106,8 @@ void TestAttributeRange::tst_int_range(){
     AttributeRange* attrRge3 = AttributeRange::parse(2, attrNames[2], attrRangeStrs[2]);
 
     // Tests value returned by 'AttributeRange::validate()'
-    Value v = attrRge->validate("0");   //min
+    Value v;
+    v = attrRge->validate("0");   //min
     _tst_value(v);
     v = attrRge->validate("1");   //max
     _tst_value(v);
@@ -197,7 +201,8 @@ void TestAttributeRange::tst_double_range(){
     AttributeRange* attrRge3 = AttributeRange::parse(2, attrNames[2], attrRangeStrs[2]);
 
     // Tests value returned by 'AttributeRange::validate()'
-    Value v = attrRge->validate("1.1");   //min
+    Value v;
+    v = attrRge->validate("1.1");   //min
     _tst_value(v);
     v = attrRge->validate("1.2");   //max
     _tst_value(v);
@@ -285,8 +290,8 @@ void TestAttributeRange::tst_int_set(){
     AttributeRange* attrRge = AttributeRange::parse(0, attrName, attrRangeStr);
 
     // Tests value returned by 'AttributeRange::validate()'
-
-    Value v = attrRge->validate("-100");   //min
+    Value v;
+    v = attrRge->validate("-100");   //min
     _tst_value(v);
     v = attrRge->validate("100");   //max
     _tst_value(v);
@@ -356,6 +361,55 @@ void TestAttributeRange::_tst_value(Value v){
     default:
         break;
     }
+}
+
+void TestAttributeRange::tst_string(){
+    AttributeRange* attrRge = AttributeRange::parse(0, "test", "string");
+
+    // Tests value returned by 'AttributeRange::validate()'
+    Value v;
+    // Case 1: normal string
+    v = attrRge->validate("sample");
+    _tst_value(v);
+
+    // Case 2: long string
+    v = attrRge->validate("this sentence is a long string, for testing purposes");
+    _tst_value(v);
+
+    // Case 3: single character
+    v = attrRge->validate("a");
+    _tst_value(v);
+
+    // Case 4: unusual characters
+    v = attrRge->validate("abc£ãã&!£$%^*(áéí)");
+    _tst_value(v);
+
+    // Case 5: empty string
+    v = attrRge->validate("");
+    _tst_value(v);
+
+    // Tests if functions work as expected
+    QVERIFY(attrRge->isValid());
+    QCOMPARE(attrRge->id(), 0);
+    QCOMPARE(attrRge->attrName(), "test");
+    QCOMPARE(attrRge->attrRangeStr(), "string");
+
+    AttributeRange::Type type = AttributeRange::String;
+    QCOMPARE(attrRge->type(), type);
+//TEST AGAINST ASCII
+//    // Tests min(), max() and rand() functions
+//    int min, max;
+//    PRG* prg = new PRG(123);
+
+//    min = 0;
+//    max = 1;
+//    QCOMPARE(attrRge->min(), min);
+//    QCOMPARE(attrRge->max(), max);
+//    v = attrRge->rand(prg);
+//    _tst_value(v);
+//    QVERIFY(v.toInt() >= min);
+//    QVERIFY(v.toInt() <= max);
+
 }
 QTEST_MAIN(TestAttributeRange)
 #include "tst_attributerange.moc"
