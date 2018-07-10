@@ -49,8 +49,9 @@ void TestEdge::tst_edge(){
     // create for both directions and ways
     // check marked tests
     // check with boolean, and that it deletes that attributes pointer
+    // fix comments
 
-    // Tests if both ways of creating edges work as expected
+    // Tests if all ways of creating edges work as expected
 
     // Tests method 1: adding attributes after edge is constructed
     Edge edge(0, m_nodeA, m_nodeB);
@@ -117,21 +118,60 @@ void TestEdge::tst_edge(){
     QCOMPARE(edge2.attrs()->name(0), "test0"); // Tests that name has not changed
     QCOMPARE(edge2.attr(0), Value(234));
 
-    // CHECK !!!
-//    // Tests if 'Edge::addAttr()' works as expected, for an attribute with an existing value
-//    edge.addAttr("test1", Value(345));
-//    QVERIFY(!edge2.attrs()->isEmpty());
-//    QCOMPARE(edge2.attrs()->size(), 2);
-//    QCOMPARE(edge2.attrs()->names().size(), 2);
-//    QCOMPARE(edge2.attrs()->values().size(), 2);
 
-//    QCOMPARE(edge2.attrs()->name(1), "test1");
-//    QCOMPARE(edge2.attrs()->value(1), Value(345));
+   // Tests if 'Edge::addAttr()' works as expected, for an attribute with an existing value
+    edge2.addAttr("test1", Value(345));
+    QVERIFY(!edge2.attrs()->isEmpty());
+    QCOMPARE(edge2.attrs()->size(), 2);
+    QCOMPARE(edge2.attrs()->names().size(), 2);
+    QCOMPARE(edge2.attrs()->values().size(), 2);
+
+    QCOMPARE(edge2.attrs()->name(1), "test1");
+    QCOMPARE(edge2.attrs()->value(1), Value(345));
 
     // Tests if 'Edge::id()' works as expected
     QCOMPARE(edge2.id(), 1);
     QCOMPARE(edge2.origin(), m_nodeA);
     QCOMPARE(edge2.neighbour(), m_nodeB);
+
+    // Tests method 3: adding attributes in constructor, with ownsAttrs = true
+    Attributes* attrs2 = new Attributes();
+    attrs2->push_back("test0", Value(123));
+    Edge edge3(1, m_nodeA, m_nodeB, attrs2, true);
+
+    QVERIFY(!edge3.attrs()->isEmpty());
+    QCOMPARE(edge3.attrs()->size(), 1);
+    QCOMPARE(edge3.attrs()->names().size(), 1);
+    QCOMPARE(edge3.attrs()->values().size(), 1);
+
+    QCOMPARE(edge3.attrs()->name(0), "test0");
+    QCOMPARE(edge3.attrs()->value(0), Value(123));
+
+    // Tests if 'Edge::attr()' works as expected
+    QCOMPARE(edge3.attr("test0"), Value(123));
+    QCOMPARE(edge3.attr(0), Value(123));
+
+    // Tests if 'Edge::setAttr()' works as expected
+    edge3.setAttr(0, Value(234));
+    QCOMPARE(edge3.attrs()->name(0), "test0"); // Tests that name has not changed
+    QCOMPARE(edge3.attr(0), Value(234));
+
+
+   // Tests if 'Edge::addAttr()' works as expected, for an attribute with an existing value
+    edge3.addAttr("test1", Value(345));
+    QVERIFY(!edge3.attrs()->isEmpty());
+    QCOMPARE(edge3.attrs()->size(), 2);
+    QCOMPARE(edge3.attrs()->names().size(), 2);
+    QCOMPARE(edge3.attrs()->values().size(), 2);
+
+    QCOMPARE(edge3.attrs()->name(1), "test1");
+    QCOMPARE(edge3.attrs()->value(1), Value(345));
+
+    // Tests if 'Edge::id()' works as expected
+    QCOMPARE(edge3.id(), 1);
+    QCOMPARE(edge3.origin(), m_nodeA);
+    QCOMPARE(edge3.neighbour(), m_nodeB);
+
 
 }
 
