@@ -35,6 +35,7 @@ private slots:
     void tst_bool();
     void tst_int_range();
     void _tst_int_value(Value v);
+    void _tst_double_value(Value v);
 };
 
 // attrNames and attrRangeStrs are stored in arrays in order to make it easier
@@ -220,6 +221,16 @@ void TestAttributeRange::tst_int_range(){
 
 }
 
+void TestAttributeRange::_tst_double_value(Value v){
+    QVERIFY(v.isValid());
 
+    QVERIFY(v.type() == Value::DOUBLE);
+    QVERIFY(v.isDouble());
+
+    QVERIFY(!v.isInt());
+    QVERIFY(!v.isChar());
+    QVERIFY(!v.isBool());
+    QVERIFY(!v.isString());
+}
 QTEST_MAIN(TestAttributeRange)
 #include "tst_attributerange.moc"
