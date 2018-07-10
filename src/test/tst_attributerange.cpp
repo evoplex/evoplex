@@ -34,6 +34,7 @@ private slots:
     void tst_attrRge();
     void tst_bool();
     void tst_int_range();
+    void _tst_int_value(Value v);
 };
 
 void TestAttributeRange::tst_attrRge(){
@@ -97,28 +98,58 @@ void TestAttributeRange::tst_bool(){
     QVERIFY(!v1.isString());
 }
 
+void TestAttributeRange::_tst_int_value(Value v){
+    QVERIFY(v.isValid());
+
+    QVERIFY(v.type() == Value::INT);
+    QVERIFY(v.isInt());
+
+    QVERIFY(!v.isDouble());
+    QVERIFY(!v.isChar());
+    QVERIFY(!v.isBool());
+    QVERIFY(!v.isString());
+}
+
 void TestAttributeRange::tst_int_range(){
-    AttributeRange* attrRge = AttributeRange::parse(0, "test", "int[0, 1]");
-    AttributeRange* attrRge2 = AttributeRange::parse(0, "test", "int[-5, 5]");      //Negative numbers
-    AttributeRange* attrRge3 = AttributeRange::parse(0, "test", "int[-100, 100]");  //Large range
+    AttributeRange* attrRge = AttributeRange::parse(0, "test", "int[0,1]");
+    AttributeRange* attrRge2 = AttributeRange::parse(0, "test2", "int[-5,5]");      //Negative numbers
+    AttributeRange* attrRge3 = AttributeRange::parse(0, "test3", "int[-100,100]");  //Large range
 
     // Tests value returned by 'AttributeRange::validate()'
-//    Value v = attrRge->validate("true");
-//    QVERIFY(v.isValid());
+    Value v = attrRge->validate("0");   //min
+    _tst_int_value(v);
+    v = attrRge->validate("1");   //max
+    _tst_int_value(v);
 
-//    QVERIFY(v.type() == Value::BOOL);
-//    QVERIFY(v.isBool());
+    v = attrRge2->validate("-5");   //min
+    _tst_int_value(v);
+    v = attrRge2->validate("5");   //max
+    _tst_int_value(v);
+    v = attrRge2->validate("0");   //other value
+    _tst_int_value(v);
 
-//    QVERIFY(!v.isDouble());
-//    QVERIFY(!v.isChar());
-//    QVERIFY(!v.isInt());
-//    QVERIFY(!v.isString());
+    v = attrRge3->validate("-100");   //min
+    _tst_int_value(v);
+    v = attrRge3->validate("100");   //max
+    _tst_int_value(v);
+    v = attrRge3->validate("0");   //other value
+    _tst_int_value(v);
 
-//    // Tests if functions work as expected
-//    QVERIFY(attrRge->isValid());
-//    QCOMPARE(attrRge->id(), 0);
-//    QCOMPARE(attrRge->attrName(), "test");
-//    QCOMPARE(attrRge->attrRangeStr(), "bool");
+    // Tests if functions work as expected
+    QVERIFY(attrRge->isValid());
+    QCOMPARE(attrRge->id(), 0);
+    QCOMPARE(attrRge->attrName(), "test");
+    QCOMPARE(attrRge->attrRangeStr(), "int[0,1]");
+
+    QVERIFY(attrRge2->isValid());
+    QCOMPARE(attrRge2->id(), 0);
+    QCOMPARE(attrRge2->attrName(), "test2");
+    QCOMPARE(attrRge2->attrRangeStr(), "int[-5,5]");
+
+    QVERIFY(attrRge3->isValid());
+    QCOMPARE(attrRge3->id(), 0);
+    QCOMPARE(attrRge3->attrName(), "test3");
+    QCOMPARE(attrRge3->attrRangeStr(), "int[-100,100]");
 
 //    AttributeRange::Type type = AttributeRange::Bool;
 //    QCOMPARE(attrRge->type(), type);
