@@ -21,7 +21,6 @@
 #include <QtTest>
 #include <attributerange.h>
 
-
 using namespace evoplex;
 
 class TestAttributeRange: public QObject
@@ -37,6 +36,7 @@ private slots:
     void tst_double_range();
     void tst_int_set();
     void tst_string();
+    void tst_string_range();
 
     // Auxiliary functions
     void _tst_value(Value v);
@@ -55,6 +55,8 @@ void TestAttributeRange::tst_attrRge(){
 }
 // TEST INVALID TYPE
 // RECHECK DOCUMENT FOR RANGE ETC
+// VARIABLES AS IN RANGE_SET
+// TEST A STRING OR INT IS NOT IN A SET
 void TestAttributeRange::tst_bool(){
     AttributeRange* attrRge = AttributeRange::parse(0, "test", "bool");
     const int null = 0;
@@ -373,7 +375,7 @@ void TestAttributeRange::tst_string(){
     _tst_value(v);
 
     // Case 2: long string
-    v = attrRge->validate("this sentence is a long string, for testing purposes");
+    v = attrRge->validate("this sentence is a long string for testing purposes");
     _tst_value(v);
 
     // Case 3: single character
@@ -410,6 +412,74 @@ void TestAttributeRange::tst_string(){
 //    QVERIFY(v.toInt() >= min);
 //    QVERIFY(v.toInt() <= max);
 
+}
+
+void TestAttributeRange::tst_string_range(){
+    const char* attrName = "test";
+
+    // Case 1: normal string
+    // Case 2: long string
+    // Case 3: single character
+    // Case 4: unusual characters
+
+    const char* attrRangeStr = "string{sample,this sentence is a long string for testing purposes,a,abc£ãã&!£$%^*(áéí)}";
+
+    AttributeRange* attrRge = AttributeRange::parse(0, attrName, attrRangeStr);
+
+    // Tests value returned by 'AttributeRange::validate()'
+    Value v;
+    v = attrRge->validate("sample");
+    _tst_value(v);
+
+    v = attrRge->validate("this sentence is a long string for testing purposes");
+    _tst_value(v);
+
+    v = attrRge->validate("a");
+    _tst_value(v);
+
+    v = attrRge->validate("abc£ãã&!£$%^*(áéí)");
+    _tst_value(v);
+
+    // Tests if functions work as expected
+    QVERIFY(attrRge->isValid());
+    QCOMPARE(attrRge->id(), 0);
+    QCOMPARE(attrRge->attrName(), attrName);
+    QCOMPARE(attrRge->attrRangeStr(), attrRangeStr);
+
+    AttributeRange::Type type = AttributeRange::String_Set;
+    QCOMPARE(attrRge->type(), type);
+
+    // TEST AGAINST ASCII TABLE
+//    // Tests min(), max() and rand() functions
+//    int min, max;
+//    PRG* prg = new PRG(123);
+
+//    min = 0;
+//    max = 1;
+//    QCOMPARE(attrRge->min(), min);
+//    QCOMPARE(attrRge->max(), max);
+//    v = attrRge->rand(prg);
+//    _tst_value(v);
+//    QVERIFY(v.toInt() >= min);
+//    QVERIFY(v.toInt() <= max);
+
+//    min = -10;
+//    max = -5;
+//    QCOMPARE(attrRge2->min(), min);
+//    QCOMPARE(attrRge2->max(), max);
+//    v = attrRge2->rand(prg);
+//    _tst_value(v);
+//    QVERIFY(v.toInt() >= min);
+//    QVERIFY(v.toInt() <= max);
+
+//    min = -100;
+//    max = 100;
+//    QCOMPARE(attrRge3->min(), min);
+//    QCOMPARE(attrRge3->max(), max);
+//    v = attrRge3->rand(prg);
+//    _tst_value(v);
+//    QVERIFY(v.toInt() >= min);
+//    QVERIFY(v.toInt() <= max);
 }
 QTEST_MAIN(TestAttributeRange)
 #include "tst_attributerange.moc"
