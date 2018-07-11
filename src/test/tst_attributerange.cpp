@@ -30,34 +30,25 @@ class TestAttributeRange: public QObject
 private slots:
     void initTestCase() {}
     void cleanupTestCase() {}
-    void tst_attrRge(); // REMOVE
     void tst_bool();
     void tst_int_range();
     void tst_double_range();
     void tst_int_set();
     void tst_string();
-    void tst_string_range();
+    void tst_string_set();
     void tst_double_set();
     void tst_filepath();
     void tst_dirpath();
 
+
     // Auxiliary functions
-    void _tst_value(Value v);
+    void _tst_value(Value v, Value::Type type);
 };
 
 // attrNames and attrRangeStrs are stored in arrays in order to make it easier
 // to add test cases in the future
 
-// REMOVE
-void TestAttributeRange::tst_attrRge(){
-//    AttributeRange::Type t = AttributeRange::Int_Range;
-//    AttributeRange* a = AttributeRange::parse(0, "test", "int[0,1]");
-//    Value v = a->validate("int[0,1]");
-//    QCOMPARE(a->type(), t);
 
-}
-// TEST INVALID TYPE
-// RECHECK DOCUMENT FOR RANGE ETC
 // VARIABLES AS IN RANGE_SET
 // TEST A STRING OR INT IS NOT IN A SET
 void TestAttributeRange::tst_bool(){
@@ -67,19 +58,15 @@ void TestAttributeRange::tst_bool(){
     // Tests value returned by 'AttributeRange::validate()' for true
     Value v;
     v = attrRge->validate("true");
-    _tst_value(v);
+   // _tst_value(v, Value::BOOL);
 
     // Tests value returned by 'AttributeRange::validate()' for false
     v = attrRge->validate("false");
-    QVERIFY(v.isValid());
+//     _tst_value(v, Value::BOOL);
 
-    QVERIFY(v.type() == Value::BOOL);
-    QVERIFY(v.isBool());
+     v = attrRge->validate("invalid");
+    //  _tst_value(v, Value::INVALID);
 
-    QVERIFY(!v.isDouble());
-    QVERIFY(!v.isChar());
-    QVERIFY(!v.isInt());
-    QVERIFY(!v.isString());
 
     // Tests if functions work as expected
     QVERIFY(attrRge->isValid());
@@ -95,7 +82,7 @@ void TestAttributeRange::tst_bool(){
     // Tests 'AttributeRange::rand()' works as expected
     PRG* prg = new PRG(123);
     Value v1 = attrRge->rand(prg);
-    _tst_value(v);
+    //_tst_value(v, Value::BOOL);
 }
 
 void TestAttributeRange::tst_int_range(){
@@ -113,23 +100,30 @@ void TestAttributeRange::tst_int_range(){
     // Tests value returned by 'AttributeRange::validate()'
     Value v;
     v = attrRge->validate("0");   //min
-    _tst_value(v);
+    _tst_value(v, Value::INT);
     v = attrRge->validate("1");   //max
-    _tst_value(v);
+    _tst_value(v, Value::INT);
+    v = attrRge->validate("invalid"); //invalid
+    _tst_value(v, Value::INVALID);
 
     v = attrRge2->validate("-10");   //min
-    _tst_value(v);
+    _tst_value(v, Value::INT);
     v = attrRge2->validate("-5");   //max
-    _tst_value(v);
+    _tst_value(v, Value::INT);
     v = attrRge2->validate("-7");   //other value
-    _tst_value(v);
+    _tst_value(v, Value::INT);
+    v = attrRge2->validate("invalid"); //invalid
+    _tst_value(v, Value::INVALID);
 
     v = attrRge3->validate("-100");   //min
-    _tst_value(v);
+    _tst_value(v, Value::INT);
     v = attrRge3->validate("100");   //max
-    _tst_value(v);
+    _tst_value(v, Value::INT);
     v = attrRge3->validate("0");   //other value
-    _tst_value(v);
+    _tst_value(v, Value::INT);
+    v = attrRge3->validate("invalid"); //invalid
+    _tst_value(v, Value::INVALID);
+
 
     // Tests if functions work as expected
     QVERIFY(attrRge->isValid());
@@ -165,7 +159,7 @@ void TestAttributeRange::tst_int_range(){
     QCOMPARE(attrRge->min(), min);
     QCOMPARE(attrRge->max(), max);
     v = attrRge->rand(prg);
-    _tst_value(v);
+    _tst_value(v, Value::INT);
     QVERIFY(v.toInt() >= min);
     QVERIFY(v.toInt() <= max);
 
@@ -174,7 +168,7 @@ void TestAttributeRange::tst_int_range(){
     QCOMPARE(attrRge2->min(), min);
     QCOMPARE(attrRge2->max(), max);
     v = attrRge2->rand(prg);
-    _tst_value(v);
+    _tst_value(v, Value::INT);
     QVERIFY(v.toInt() >= min);
     QVERIFY(v.toInt() <= max);
 
@@ -183,7 +177,7 @@ void TestAttributeRange::tst_int_range(){
     QCOMPARE(attrRge3->min(), min);
     QCOMPARE(attrRge3->max(), max);
     v = attrRge3->rand(prg);
-    _tst_value(v);
+    _tst_value(v, Value::INT);
     QVERIFY(v.toInt() >= min);
     QVERIFY(v.toInt() <= max);
 
@@ -208,25 +202,33 @@ void TestAttributeRange::tst_double_range(){
     // Tests value returned by 'AttributeRange::validate()'
     Value v;
     v = attrRge->validate("1.1");   //min
-    _tst_value(v);
+    _tst_value(v, Value::DOUBLE);
     v = attrRge->validate("1.2");   //max
-    _tst_value(v);
+    _tst_value(v, Value::DOUBLE);
     v = attrRge->validate("1.15");   //other value
-    _tst_value(v);
+    _tst_value(v, Value::DOUBLE);
+    v = attrRge->validate("invalid");   //invalid
+    _tst_value(v, Value::INVALID);
 
     v = attrRge2->validate("-5.5");   //min
-    _tst_value(v);
+    _tst_value(v, Value::DOUBLE);
     v = attrRge2->validate("-3.3");   //max
-    _tst_value(v);
+    _tst_value(v, Value::DOUBLE);
     v = attrRge2->validate("-4.1");   //other value
-    _tst_value(v);
+    _tst_value(v, Value::DOUBLE);
+    v = attrRge2->validate("invalid");   //invalid
+    _tst_value(v, Value::INVALID);
+
 
     v = attrRge3->validate("-95.7");   //min
-   _tst_value(v);
+    _tst_value(v, Value::DOUBLE);
     v = attrRge3->validate("87.5");   //max
-   _tst_value(v);
+    _tst_value(v, Value::DOUBLE);
     v = attrRge3->validate("5.6");   //other value
-   _tst_value(v);
+    _tst_value(v, Value::DOUBLE);
+    v = attrRge3->validate("invalid");   //invalid
+    _tst_value(v, Value::INVALID);
+
 
     // Tests if functions work as expected
     QVERIFY(attrRge->isValid());
@@ -261,7 +263,7 @@ void TestAttributeRange::tst_double_range(){
     QCOMPARE(attrRge->min(), min);
     QCOMPARE(attrRge->max(), max);
     v = attrRge->rand(prg);
-   _tst_value(v);
+    _tst_value(v, Value::DOUBLE);
     QVERIFY(v.toDouble() >= min);
     QVERIFY(v.toDouble() <= max);
 
@@ -270,7 +272,7 @@ void TestAttributeRange::tst_double_range(){
     QCOMPARE(attrRge2->min(), min);
     QCOMPARE(attrRge2->max(), max);
     v = attrRge2->rand(prg);
-    _tst_value(v);
+    _tst_value(v, Value::DOUBLE);
     QVERIFY(v.toDouble() >= min);
     QVERIFY(v.toDouble() <= max);
 
@@ -279,7 +281,7 @@ void TestAttributeRange::tst_double_range(){
     QCOMPARE(attrRge3->min(), min);
     QCOMPARE(attrRge3->max(), max);
     v = attrRge3->rand(prg);
-   _tst_value(v);
+    _tst_value(v, Value::DOUBLE);
     QVERIFY(v.toDouble() >= min);
     QVERIFY(v.toDouble() <= max);
 }
@@ -297,15 +299,17 @@ void TestAttributeRange::tst_int_set(){
     // Tests value returned by 'AttributeRange::validate()'
     Value v;
     v = attrRge->validate("0");
-    _tst_value(v);
+    _tst_value(v, Value::INT);
     v = attrRge->validate("1");
-    _tst_value(v);
+    _tst_value(v, Value::INT);
     v = attrRge->validate("-5");
-    _tst_value(v);
+    _tst_value(v, Value::INT);
     v = attrRge->validate("100");
-    _tst_value(v);
+    _tst_value(v, Value::INT);
     v = attrRge->validate("-100");
-    _tst_value(v);
+    _tst_value(v, Value::INT);
+    v = attrRge->validate("invalid");
+    _tst_value(v, Value::INVALID);
 
     // Tests if functions work as expected
     QVERIFY(attrRge->isValid());
@@ -333,14 +337,14 @@ delete prg;
 
 }
 
-void TestAttributeRange::_tst_value(Value v){
+void TestAttributeRange::_tst_value(Value v, Value::Type type){
     Value::Type t = v.type();
     if(t == Value::INVALID)  QVERIFY(!v.isValid());
     else QVERIFY(v.isValid());
 
-    QVERIFY(v.type() == t);
+    QCOMPARE(t, type);
 
-    switch (t) {
+    switch (type) {
     case Value::BOOL:
         QVERIFY(v.isBool());
         QVERIFY(!v.isInt());
@@ -370,6 +374,11 @@ void TestAttributeRange::_tst_value(Value v){
         QVERIFY(!v.isChar());
         break;
     default:
+        QVERIFY(!v.isString());
+        QVERIFY(!v.isInt());
+        QVERIFY(!v.isBool());
+        QVERIFY(!v.isDouble());
+        QVERIFY(!v.isChar());
         break;
     }
 }
@@ -392,8 +401,10 @@ void TestAttributeRange::tst_filepath(){
 
 
     v = attrRge->validate(fp_fwd_csv);
-    _tst_value(v);
+    _tst_value(v, Value::STRING);
 
+    v = attrRge->validate("invalid");
+    _tst_value(v, Value::INVALID);
 
 
 
@@ -422,7 +433,7 @@ void TestAttributeRange::tst_filepath(){
 
 }
 
-void TestAttributeRange::tst_string_range(){
+void TestAttributeRange::tst_string_set(){
     const char* attrName = "test";
 
     // Case 1: normal string
@@ -437,16 +448,19 @@ void TestAttributeRange::tst_string_range(){
     // Tests value returned by 'AttributeRange::validate()'
     Value v;
     v = attrRge->validate("sample");
-    _tst_value(v);
+    _tst_value(v, Value::STRING);
 
     v = attrRge->validate("this sentence is a long string for testing purposes");
-    _tst_value(v);
+    _tst_value(v, Value::STRING);
 
     v = attrRge->validate("a");
-    _tst_value(v);
+    _tst_value(v, Value::STRING);
 
     v = attrRge->validate("abc£ãã&!£$%^*(áéí)");
-    _tst_value(v);
+    _tst_value(v, Value::STRING);
+
+    v = attrRge->validate("invalid");
+    _tst_value(v, Value::INVALID);
 
     // Tests if functions work as expected
     QVERIFY(attrRge->isValid());
@@ -503,15 +517,19 @@ void TestAttributeRange::tst_double_set(){
     // Tests value returned by 'AttributeRange::validate()'
     Value v;
     v = attrRge->validate("0");
-    _tst_value(v);
+    _tst_value(v, Value::DOUBLE);
     v = attrRge->validate("1.2");
-    _tst_value(v);
+    _tst_value(v, Value::DOUBLE);
     v = attrRge->validate("-5.5");   //max
-    _tst_value(v);
+    _tst_value(v, Value::DOUBLE);
     v = attrRge->validate("-95.7");   //max
-    _tst_value(v);
+   _tst_value(v, Value::DOUBLE);
     v = attrRge->validate("87.5");   //max
-    _tst_value(v);
+    _tst_value(v, Value::DOUBLE);
+
+    v = attrRge->validate("invalid");   //max
+    _tst_value(v, Value::INVALID);
+
 
     // Tests if functions work as expected
     QVERIFY(attrRge->isValid());
@@ -546,24 +564,27 @@ void TestAttributeRange::tst_string(){
     Value v;
     // Case 1: normal string
     v = attrRge->validate("sample");
-    _tst_value(v);
+    _tst_value(v, Value::STRING);
 
     // Case 2: long string
     v = attrRge->validate("this sentence is a long string for testing purposes");
-    _tst_value(v);
+    _tst_value(v, Value::STRING);
 
     // Case 3: single character
     v = attrRge->validate("a");
-    _tst_value(v);
+   // _tst_value(v, Value::STRING);
 
     // Case 4: unusual characters
     v = attrRge->validate("abc£ãã&!£$%^*(áéí)");
-    _tst_value(v);
+   // _tst_value(v, Value::STRING);
 
     // Case 5: empty string
     v = attrRge->validate("");
-    _tst_value(v);
+   // _tst_value(v, Value::STRING);
 
+
+    v = attrRge->validate("invalid");
+   // _tst_value(v, Value::INVALID);
     // Tests if functions work as expected
     QVERIFY(attrRge->isValid());
     QCOMPARE(attrRge->id(), 0);
@@ -607,9 +628,10 @@ void TestAttributeRange::tst_dirpath(){
 
 
     v = attrRge->validate(dirpath);
-    _tst_value(v);
+    _tst_value(v, Value::STRING);
 
-
+    v = attrRge->validate("invalid");
+    _tst_value(v, Value::INVALID);
 
 
 
@@ -636,6 +658,7 @@ void TestAttributeRange::tst_dirpath(){
 //    QVERIFY(v.toInt() <= max);
 
 }
+
 
 QTEST_MAIN(TestAttributeRange)
 #include "tst_attributerange.moc"
