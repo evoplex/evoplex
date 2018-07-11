@@ -483,7 +483,7 @@ void TestAttributeRange::tst_string_set(){
     AttributeRange::Type type = AttributeRange::String_Set;
     QCOMPARE(attrRge->type(), type);
 
-    // TEST AGAINST ASCII TABLE
+
     // Tests min(), max() and rand() functions
 
     // The min and max values are taken to be the value of the first character
@@ -570,19 +570,16 @@ void TestAttributeRange::tst_string(){
 
     // Case 3: single character
     v = attrRge->validate("a");
-   // _tst_value(v, Value::STRING);
+    _tst_value(v, Value::STRING);
 
     // Case 4: unusual characters
     v = attrRge->validate("abc£ãã&!£$%^*(áéí)");
-   // _tst_value(v, Value::STRING);
+    _tst_value(v, Value::STRING);
 
     // Case 5: empty string
     v = attrRge->validate("");
-   // _tst_value(v, Value::STRING);
+    _tst_value(v, Value::STRING);
 
-
-    v = attrRge->validate("invalid");
-   // _tst_value(v, Value::INVALID);
     // Tests if functions work as expected
     QVERIFY(attrRge->isValid());
     QCOMPARE(attrRge->id(), 0);
@@ -591,19 +588,16 @@ void TestAttributeRange::tst_string(){
 
     AttributeRange::Type type = AttributeRange::String;
     QCOMPARE(attrRge->type(), type);
-//TEST AGAINST ASCII
-//    // Tests min(), max() and rand() functions
-//    int min, max;
-//    PRG* prg = new PRG(123);
 
-//    min = 0;
-//    max = 1;
-//    QCOMPARE(attrRge->min(), min);
-//    QCOMPARE(attrRge->max(), max);
-//    v = attrRge->rand(prg);
-//    _tst_value(v);
-//    QVERIFY(v.toInt() >= min);
-//    QVERIFY(v.toInt() <= max);
+    //========================================
+    // Tests min(), max() and rand() functions
+
+    // Both 'AttributeRange::min()' and 'AttributeRange::max()'
+    // return <null> for a string type
+    PRG* prg = new PRG(123);
+
+    v = attrRge->rand(prg);
+    _tst_value(v, Value::STRING);
 }
 
 void TestAttributeRange::tst_dirpath(){
