@@ -449,12 +449,10 @@ void TestAttributeRange::tst_filepath(){
 
 void TestAttributeRange::tst_string_set(){
     const char* attrName = "test";
-
     // Case 1: normal string
     // Case 2: long string
     // Case 3: single character
     // Case 4: unusual characters
-
     const char* attrRangeStr = "string{sample,this sentence is a long string for testing purposes,a,abc£ãã&!£$%^*(áéí)}";
 
     AttributeRange* attrRge = AttributeRange::parse(0, attrName, attrRangeStr);
@@ -486,36 +484,23 @@ void TestAttributeRange::tst_string_set(){
     QCOMPARE(attrRge->type(), type);
 
     // TEST AGAINST ASCII TABLE
-//    // Tests min(), max() and rand() functions
-//    int min, max;
-//    PRG* prg = new PRG(123);
+    // Tests min(), max() and rand() functions
 
-//    min = 0;
-//    max = 1;
+    // The min and max values are taken to be the value of the first character
+    // of the string according to the ASCII table
+    const char* min = "a";
+    const char* max = "this sentence is a long string for testing purposes";
+    PRG* prg = new PRG(123);
+
+    // FAIL - both 'AttributeRange::min()' and 'AttributeRange::max()'
+    // return <null> for a string set
 //    QCOMPARE(attrRge->min(), min);
 //    QCOMPARE(attrRge->max(), max);
-//    v = attrRge->rand(prg);
-//    _tst_value(v);
-//    QVERIFY(v.toInt() >= min);
-//    QVERIFY(v.toInt() <= max);
+    v = attrRge->rand(prg);
+    _tst_value(v, Value::STRING);
 
-//    min = -10;
-//    max = -5;
-//    QCOMPARE(attrRge2->min(), min);
-//    QCOMPARE(attrRge2->max(), max);
-//    v = attrRge2->rand(prg);
-//    _tst_value(v);
-//    QVERIFY(v.toInt() >= min);
-//    QVERIFY(v.toInt() <= max);
-
-//    min = -100;
-//    max = 100;
-//    QCOMPARE(attrRge3->min(), min);
-//    QCOMPARE(attrRge3->max(), max);
-//    v = attrRge3->rand(prg);
-//    _tst_value(v);
-//    QVERIFY(v.toInt() >= min);
-//    QVERIFY(v.toInt() <= max);
+    QVERIFY(strcmp(v.toString(), max) <= 0);
+    QVERIFY(strcmp(v.toString(), min) >= 0);
 }
 
 void TestAttributeRange::tst_double_set(){
