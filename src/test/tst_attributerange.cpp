@@ -453,7 +453,8 @@ void TestAttributeRange::tst_filepath()
     delete prg;
 }
 
-void TestAttributeRange::tst_string_set(){
+void TestAttributeRange::tst_string_set()
+{
     const char* attrName = "test";
     // Case 1: normal string
     // Case 2: long string
@@ -465,6 +466,7 @@ void TestAttributeRange::tst_string_set(){
 
     // Tests value returned by 'AttributeRange::validate()'
     Value v;
+
     v = attrRge->validate("sample");
     _tst_value(v, Value::STRING);
 
@@ -477,7 +479,7 @@ void TestAttributeRange::tst_string_set(){
     v = attrRge->validate("abc£ãã&!£$%^*(áéí)");
     _tst_value(v, Value::STRING);
 
-    v = attrRge->validate("invalid");
+    v = attrRge->validate("invalid");  // invalid
     _tst_value(v, Value::INVALID);
 
     // Tests if functions work as expected
@@ -489,24 +491,25 @@ void TestAttributeRange::tst_string_set(){
     AttributeRange::Type type = AttributeRange::String_Set;
     QCOMPARE(attrRge->type(), type);
 
-
     // Tests min(), max() and rand() functions
 
     // The min and max values are taken to be the value of the first character
     // of the string according to the ASCII table
     const char* min = "a";
     const char* max = "this sentence is a long string for testing purposes";
+
     PRG* prg = new PRG(123);
 
-    // FAIL - both 'AttributeRange::min()' and 'AttributeRange::max()'
-    // return <null> for a string set
+    // FAIL - both 'AttributeRange::min()' and 'AttributeRange::max()' return <null> for a string set
 //    QCOMPARE(attrRge->min(), min);
 //    QCOMPARE(attrRge->max(), max);
+
     v = attrRge->rand(prg);
     _tst_value(v, Value::STRING);
 
     QVERIFY(strcmp(v.toString(), max) <= 0);
     QVERIFY(strcmp(v.toString(), min) >= 0);
+
     delete prg;
 }
 
@@ -560,11 +563,13 @@ void TestAttributeRange::tst_double_set()
     delete prg;
 }
 
-void TestAttributeRange::tst_string(){
+void TestAttributeRange::tst_string()
+{
     AttributeRange* attrRge = AttributeRange::parse(0, "test", "string");
 
     // Tests value returned by 'AttributeRange::validate()'
     Value v;
+
     // Case 1: normal string
     v = attrRge->validate("sample");
     _tst_value(v, Value::STRING);
@@ -596,12 +601,12 @@ void TestAttributeRange::tst_string(){
 
     // Tests min(), max() and rand() functions
 
-    // Both 'AttributeRange::min()' and 'AttributeRange::max()'
-    // return <null> for a string type
+    // Both 'AttributeRange::min()' and 'AttributeRange::max()' return <null> for a string type
     PRG* prg = new PRG(123);
 
     v = attrRge->rand(prg);
     _tst_value(v, Value::STRING);
+
     delete prg;
 }
 
