@@ -400,10 +400,10 @@ void TestAttributeRange::_tst_value(Value v, Value::Type type){
 void TestAttributeRange::tst_filepath(){
     AttributeRange* attrRge = AttributeRange::parse(0, "test", "filepath");
 
-    // '\e' is recognised as an unknown escape sequence
-    const char* fp_back_slash = "C:\Users\experiment.csv";  // Case 1: .csv filepath with backward slashes
+    // '\e' is recognised as an unknown escape sequence - causes warnings
+    //const char* fp_back_slash = "C:\Users\experiment.csv";  // Case 1: .csv filepath with backward slashes
     const char* fp_fwd_slash = "C:/Users/experiment.csv";  // Case 2: .csv filepath with forward slashes
-    const char* fp_back_slash_no_ext = "C:\Users\experiment";  // Case 1: .csv filepath with backward slashes
+    //const char* fp_back_slash_no_ext = "C:\Users\experiment";  // Case 1: .csv filepath with backward slashes
     const char* fp_fwd_slash_no_ext = "C:/Users/experiment";  // Case 2: .csv filepath with forward slashes
 
 
@@ -598,24 +598,21 @@ void TestAttributeRange::tst_string(){
 
 void TestAttributeRange::tst_dirpath(){
     AttributeRange* attrRge = AttributeRange::parse(0, "test", "dirpath");
-    // File paths kept in variables so that they can be easily changed,
-    // as validate() relies on the file existing on the computer,
-    // which would have a different format
-
-    //Look at doc for all file types
-   // const char* fp_back_csv = "C:\Users\experiment.csv";  // Case 1: .csv filepath with backward slashes
-    //const char* fp_fwd_csv = "C:/Users/experiment.csv";  // Case 1: .csv filepath with forward slashes
+// '\e' is recognised as an unknown escape sequence - causes warnings
+    //const char* dp_back_slash = "C:\Users\ethan\Documents";  // Case 1: .csv filepath with backward slashes
+    const char* dp_fwd_slash = "C:/Users/ethan/Documents";  // Case 1: .csv filepath with forward slashes
    // const char* fp_back_txt = "C:\Users\experiment.txt";  // Case 1: .csv filepath with backward slashes
    // const char* fp_fwd_txt = "C:/Users/experiment.txt";  // Case 1: .csv filepath with forward slashes
 
-
-    const char* dirpath = "C:/Users";
     // Tests value returned by 'AttributeRange::validate()'
     Value v;
 
 
+// FAIL - dirpaths with backward slashes are not recognised as dirpaths
+//    v = attrRge->validate(dp_back_slash);
+//    _tst_value(v, Value::STRING);
 
-    v = attrRge->validate(dirpath);
+    v = attrRge->validate(dp_fwd_slash);
     _tst_value(v, Value::STRING);
 
     v = attrRge->validate("invalid");
@@ -631,19 +628,14 @@ void TestAttributeRange::tst_dirpath(){
 
     AttributeRange::Type type = AttributeRange::DirPath;
     QCOMPARE(attrRge->type(), type);
-//TEST AGAINST ASCII
-//    // Tests min(), max() and rand() functions
-//    int min, max;
-//    PRG* prg = new PRG(123);
 
-//    min = 0;
-//    max = 1;
-//    QCOMPARE(attrRge->min(), min);
-//    QCOMPARE(attrRge->max(), max);
-//    v = attrRge->rand(prg);
-//    _tst_value(v);
-//    QVERIFY(v.toInt() >= min);
-//    QVERIFY(v.toInt() <= max);
+    // Tests min(), max() and rand() functions
+    // Both 'AttributeRange::min()' and 'AttributeRange::max()'
+    // return <null> for a filepath type
+
+    PRG* prg = new PRG(123);
+    v = attrRge->rand(prg);
+    _tst_value(v, Value::STRING);
 
 }
 
