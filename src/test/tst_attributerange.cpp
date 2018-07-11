@@ -356,7 +356,8 @@ void TestAttributeRange::tst_int_set()
     delete prg;
 }
 
-void TestAttributeRange::_tst_value(Value v, Value::Type type){
+void TestAttributeRange::_tst_value(Value v, Value::Type type)
+{
     Value::Type t = v.type();
     if(t == Value::INVALID)  QVERIFY(!v.isValid());
     else QVERIFY(v.isValid());
@@ -402,15 +403,15 @@ void TestAttributeRange::_tst_value(Value v, Value::Type type){
     }
 }
 
-void TestAttributeRange::tst_filepath(){
+void TestAttributeRange::tst_filepath()
+{
     AttributeRange* attrRge = AttributeRange::parse(0, "test", "filepath");
 
     // '\e' is recognised as an unknown escape sequence - causes warnings
-    //const char* fp_back_slash = "C:\Users\experiment.csv";  // Case 1: .csv filepath with backward slashes
+//    const char* fp_back_slash = "C:\Users\experiment.csv";  // Case 1: .csv filepath with backward slashes
     const char* fp_fwd_slash = "C:/Users/experiment.csv";  // Case 2: .csv filepath with forward slashes
-    //const char* fp_back_slash_no_ext = "C:\Users\experiment";  // Case 1: .csv filepath with backward slashes
+//    const char* fp_back_slash_no_ext = "C:\Users\experiment";  // Case 1: .csv filepath with backward slashes
     const char* fp_fwd_slash_no_ext = "C:/Users/experiment";  // Case 2: .csv filepath with forward slashes
-
 
     // Tests value returned by 'AttributeRange::validate()'
     Value v;
@@ -442,11 +443,13 @@ void TestAttributeRange::tst_filepath(){
     QCOMPARE(attrRge->type(), type);
 
     // Tests min(), max() and rand() functions
-    // Both 'AttributeRange::min()' and 'AttributeRange::max()'
-    // return <null> for a filepath type
+
+    // Both 'AttributeRange::min()' and 'AttributeRange::max()' return <null> for a filepath type
+
     PRG* prg = new PRG(123);
     v = attrRge->rand(prg);
     _tst_value(v, Value::STRING);
+
     delete prg;
 }
 
@@ -545,7 +548,7 @@ void TestAttributeRange::tst_double_set()
     // Tests min(), max() and rand() functions
     PRG* prg = new PRG(123);
 
-   // FAIL - 'AttributeRange::min()' returns <null>
+   // FAIL - 'AttributeRange::min()' returns <null> for a double set
 //  QCOMPARE(attrRge->min(), min);
     QCOMPARE(attrRge->max(), max);
 
@@ -602,19 +605,20 @@ void TestAttributeRange::tst_string(){
     delete prg;
 }
 
-void TestAttributeRange::tst_dirpath(){
+void TestAttributeRange::tst_dirpath()
+{
     AttributeRange* attrRge = AttributeRange::parse(0, "test", "dirpath");
-// '\e' is recognised as an unknown escape sequence - causes warnings
-    //const char* dp_back_slash = "C:\Users\ethan\Documents";  // Case 1: .csv filepath with backward slashes
+
+    // '\e' is recognised as an unknown escape sequence - causes warnings
+//    const char* dp_back_slash = "C:\Users\ethan\Documents";  // Case 1: .csv filepath with backward slashes
     const char* dp_fwd_slash = "C:/Users/ethan/Documents";  // Case 1: .csv filepath with forward slashes
-   // const char* fp_back_txt = "C:\Users\experiment.txt";  // Case 1: .csv filepath with backward slashes
-   // const char* fp_fwd_txt = "C:/Users/experiment.txt";  // Case 1: .csv filepath with forward slashes
+//    const char* fp_back_txt = "C:\Users\experiment.txt";  // Case 1: .csv filepath with backward slashes
+//    const char* fp_fwd_txt = "C:/Users/experiment.txt";  // Case 1: .csv filepath with forward slashes
 
     // Tests value returned by 'AttributeRange::validate()'
     Value v;
 
-
-// FAIL - dirpaths with backward slashes are not recognised as dirpaths
+    // FAIL - dirpaths with backward slashes are not recognised as dirpaths
 //    v = attrRge->validate(dp_back_slash);
 //    _tst_value(v, Value::STRING);
 
@@ -623,8 +627,6 @@ void TestAttributeRange::tst_dirpath(){
 
     v = attrRge->validate("invalid");
     _tst_value(v, Value::INVALID);
-
-
 
     // Tests if functions work as expected
     QVERIFY(attrRge->isValid());
@@ -636,14 +638,14 @@ void TestAttributeRange::tst_dirpath(){
     QCOMPARE(attrRge->type(), type);
 
     // Tests min(), max() and rand() functions
-    // Both 'AttributeRange::min()' and 'AttributeRange::max()'
-    // return <null> for a filepath type
+
+    // Both 'AttributeRange::min()' and 'AttributeRange::max()' return <null> for a dirpath type
 
     PRG* prg = new PRG(123);
     v = attrRge->rand(prg);
     _tst_value(v, Value::STRING);
-    delete prg;
 
+    delete prg;
 }
 
 
