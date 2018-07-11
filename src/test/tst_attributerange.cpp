@@ -45,12 +45,8 @@ private slots:
     void _tst_value(Value v, Value::Type type);
 };
 
-// attrNames and attrRangeStrs are stored in arrays in order to make it easier
-// to add test cases in the future
 
 
-// VARIABLES AS IN RANGE_SET
-// DELETE PRG
 void TestAttributeRange::tst_bool()
 {
     AttributeRange* attrRge = AttributeRange::parse(0, "test", "bool");
@@ -112,7 +108,7 @@ void TestAttributeRange::tst_bool()
 //    QCOMPARE(attrRge->min().toInt(), min_int_alt);  // Fails
 //    QCOMPARE(attrRge->max().toInt(), max_int_alt);  // Fails
 
-
+delete prg;
 }
 
 void TestAttributeRange::tst_int_range(){
@@ -206,6 +202,7 @@ void TestAttributeRange::tst_int_range(){
     _tst_value(v, Value::INT);
     QVERIFY(v.toInt() >= min);
     QVERIFY(v.toInt() <= max);
+    delete prg;
 }
 
 void TestAttributeRange::tst_double_range(){
@@ -300,6 +297,7 @@ void TestAttributeRange::tst_double_range(){
     _tst_value(v, Value::DOUBLE);
     QVERIFY(v.toDouble() >= min);
     QVERIFY(v.toDouble() <= max);
+    delete prg;
 }
 
 void TestAttributeRange::tst_int_set(){
@@ -442,6 +440,7 @@ void TestAttributeRange::tst_filepath(){
     PRG* prg = new PRG(123);
     v = attrRge->rand(prg);
     _tst_value(v, Value::STRING);
+    delete prg;
 }
 
 void TestAttributeRange::tst_string_set(){
@@ -498,6 +497,7 @@ void TestAttributeRange::tst_string_set(){
 
     QVERIFY(strcmp(v.toString(), max) <= 0);
     QVERIFY(strcmp(v.toString(), min) >= 0);
+    delete prg;
 }
 
 void TestAttributeRange::tst_double_set(){
@@ -594,6 +594,7 @@ void TestAttributeRange::tst_string(){
 
     v = attrRge->rand(prg);
     _tst_value(v, Value::STRING);
+    delete prg;
 }
 
 void TestAttributeRange::tst_dirpath(){
@@ -636,6 +637,7 @@ void TestAttributeRange::tst_dirpath(){
     PRG* prg = new PRG(123);
     v = attrRge->rand(prg);
     _tst_value(v, Value::STRING);
+    delete prg;
 
 }
 
