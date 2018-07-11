@@ -40,12 +40,9 @@ private slots:
     void tst_filepath();
     void tst_dirpath();
 
-
     // Auxiliary function
     void _tst_value(Value v, Value::Type type);
 };
-
-
 
 void TestAttributeRange::tst_bool()
 {
@@ -78,11 +75,11 @@ void TestAttributeRange::tst_bool()
     bool min_bool = false;
     bool max_bool = true;
 
-    // where min and max are integers, casted to type bool
+    // where min and max are integers, casted to boolean type
     bool min_int = Value(0).toBool();
     bool max_int = Value(1).toBool();
 
-    // where min and max are booleans, casted to type int
+    // where min and max are booleans, casted to integer type
     int min_int_alt = Value(false).toInt();
     int max_int_alt = Value(true).toInt();
 
@@ -101,14 +98,14 @@ void TestAttributeRange::tst_bool()
 
     // For a boolean type, 'AttributeRange::min()' and 'AttributeRange::max()'
     // both return <null>
-//    QCOMPARE(attrRge->min(), min_bool);  // Succeeds, as <null> is recognised as 0
-//    QCOMPARE(attrRge->max(), max_bool);  // Fails
-//    QCOMPARE(attrRge->min(), min_int);  // Fails
-//    QCOMPARE(attrRge->max(), max_int);  // Fails
-//    QCOMPARE(attrRge->min().toInt(), min_int_alt);  // Fails
-//    QCOMPARE(attrRge->max().toInt(), max_int_alt);  // Fails
+//  QCOMPARE(attrRge->min(), min_bool);  // Succeeds, as <null> is recognised as 0
+//  QCOMPARE(attrRge->max(), max_bool);  // Fails
+//  QCOMPARE(attrRge->min(), min_int);  // Fails
+//  QCOMPARE(attrRge->max(), max_int);  // Fails
+//  QCOMPARE(attrRge->min().toInt(), min_int_alt);  // Fails
+//  QCOMPARE(attrRge->max().toInt(), max_int_alt);  // Fails
 
-delete prg;
+    delete prg;
 }
 
 void TestAttributeRange::tst_int_range(){
