@@ -50,6 +50,7 @@ void TestAttributeRange::tst_bool()
 
     // Tests value returned by 'AttributeRange::validate()' for true
     Value v;
+
     v = attrRge->validate("true");
     _tst_value(v, Value::BOOL);
 
@@ -108,7 +109,8 @@ void TestAttributeRange::tst_bool()
     delete prg;
 }
 
-void TestAttributeRange::tst_int_range(){
+void TestAttributeRange::tst_int_range()
+{
     const int TEST_CASES = 3;
     const char* attrNames[TEST_CASES] = {"test0", "test1", "test2"};
     // Case 1: regular range
@@ -122,29 +124,30 @@ void TestAttributeRange::tst_int_range(){
 
     // Tests value returned by 'AttributeRange::validate()'
     Value v;
-    v = attrRge->validate("0");   //min
+
+    v = attrRge->validate("0");   // min
     _tst_value(v, Value::INT);
-    v = attrRge->validate("1");   //max
+    v = attrRge->validate("1");   // max
     _tst_value(v, Value::INT);
-    v = attrRge->validate("invalid"); //invalid
+    v = attrRge->validate("invalid"); // invalid
     _tst_value(v, Value::INVALID);
 
-    v = attrRge2->validate("-10");   //min
+    v = attrRge2->validate("-10");   // min
     _tst_value(v, Value::INT);
-    v = attrRge2->validate("-5");   //max
+    v = attrRge2->validate("-5");   // max
     _tst_value(v, Value::INT);
-    v = attrRge2->validate("-7");   //other value
+    v = attrRge2->validate("-7");   // other value
     _tst_value(v, Value::INT);
-    v = attrRge2->validate("invalid"); //invalid
+    v = attrRge2->validate("invalid"); // invalid
     _tst_value(v, Value::INVALID);
 
-    v = attrRge3->validate("-100");   //min
+    v = attrRge3->validate("-100");   // min
     _tst_value(v, Value::INT);
-    v = attrRge3->validate("100");   //max
+    v = attrRge3->validate("100");   // max
     _tst_value(v, Value::INT);
-    v = attrRge3->validate("0");   //other value
+    v = attrRge3->validate("0");   // other value
     _tst_value(v, Value::INT);
-    v = attrRge3->validate("invalid"); //invalid
+    v = attrRge3->validate("invalid"); // invalid
     _tst_value(v, Value::INVALID);
 
 
@@ -199,10 +202,12 @@ void TestAttributeRange::tst_int_range(){
     _tst_value(v, Value::INT);
     QVERIFY(v.toInt() >= min);
     QVERIFY(v.toInt() <= max);
+
     delete prg;
 }
 
-void TestAttributeRange::tst_double_range(){
+void TestAttributeRange::tst_double_range()
+{
     const int TEST_CASES = 3;
     const char* attrNames[TEST_CASES] = {"test0", "test1", "test2"};
     // Case 1: regular range
@@ -216,6 +221,7 @@ void TestAttributeRange::tst_double_range(){
 
     // Tests value returned by 'AttributeRange::validate()'
     Value v;
+
     v = attrRge->validate("1.1");   //min
     _tst_value(v, Value::DOUBLE);
     v = attrRge->validate("1.2");   //max
@@ -294,10 +300,12 @@ void TestAttributeRange::tst_double_range(){
     _tst_value(v, Value::DOUBLE);
     QVERIFY(v.toDouble() >= min);
     QVERIFY(v.toDouble() <= max);
+
     delete prg;
 }
 
-void TestAttributeRange::tst_int_set(){
+void TestAttributeRange::tst_int_set()
+{
     const char* attrName = "test";
     // Set with positive, negative and large numbers
     const char* attrRangeStr = "int{0,1,-5,100,-100}";
@@ -308,6 +316,7 @@ void TestAttributeRange::tst_int_set(){
 
     // Tests value returned by 'AttributeRange::validate()'
     Value v;
+
     v = attrRge->validate("0");
     _tst_value(v, Value::INT);
     v = attrRge->validate("1");
@@ -318,7 +327,7 @@ void TestAttributeRange::tst_int_set(){
     _tst_value(v, Value::INT);
     v = attrRge->validate("-100");
     _tst_value(v, Value::INT);
-    v = attrRge->validate("invalid");
+    v = attrRge->validate("invalid");  // invalid
     _tst_value(v, Value::INVALID);
 
     // Tests if functions work as expected
@@ -333,13 +342,14 @@ void TestAttributeRange::tst_int_set(){
     // Tests min(), max() and rand() functions
     PRG* prg = new PRG(123);
 
-    // FAIL - both 'AttributeRange::min()' and 'AttributeRange::max()' return <null>
+    // FAIL - both 'AttributeRange::min()' and 'AttributeRange::max()' return <null> for an int set
 //  QCOMPARE(attrRge->min(), min);
 //  QCOMPARE(attrRge->max(), max);
+
     v = attrRge->rand(prg);
     _tst_value(v, Value::INT);
 
-    // SUCCEEDS - because our own variables are used, eg min not attrRge->min()
+    // PASSES - because our own variables are used, e.g. min not attrRge->min()
     QVERIFY(v.toInt() >= min);
     QVERIFY(v.toInt() <= max);
 
@@ -497,7 +507,8 @@ void TestAttributeRange::tst_string_set(){
     delete prg;
 }
 
-void TestAttributeRange::tst_double_set(){
+void TestAttributeRange::tst_double_set()
+{
     const char* attrName = "test";
     // Set with positive, negative and large numbers
     const char* attrRangeStr = "double{0,1.2,-5.5,-95.7,87.5}";
@@ -508,22 +519,18 @@ void TestAttributeRange::tst_double_set(){
 
     // Tests value returned by 'AttributeRange::validate()'
     Value v;
+
     v = attrRge->validate("0");
     _tst_value(v, Value::DOUBLE);
-
     v = attrRge->validate("1.2");
     _tst_value(v, Value::DOUBLE);
-
-    v = attrRge->validate("-5.5");   //max
+    v = attrRge->validate("-5.5");
     _tst_value(v, Value::DOUBLE);
-
-    v = attrRge->validate("-95.7");   //max
+    v = attrRge->validate("-95.7");
    _tst_value(v, Value::DOUBLE);
-
-    v = attrRge->validate("87.5");   //max
+    v = attrRge->validate("87.5");
     _tst_value(v, Value::DOUBLE);
-
-    v = attrRge->validate("invalid");   //invalid
+    v = attrRge->validate("invalid");  // invalid
     _tst_value(v, Value::INVALID);
 
     // Tests if functions work as expected
@@ -534,11 +541,12 @@ void TestAttributeRange::tst_double_set(){
 
     AttributeRange::Type type = AttributeRange::Double_Set;
     QCOMPARE(attrRge->type(), type);
+
     // Tests min(), max() and rand() functions
     PRG* prg = new PRG(123);
 
-   // FAIL - both 'AttributeRange::min()'
-//    QCOMPARE(attrRge->min(), min);
+   // FAIL - 'AttributeRange::min()' returns <null>
+//  QCOMPARE(attrRge->min(), min);
     QCOMPARE(attrRge->max(), max);
 
     v = attrRge->rand(prg);
