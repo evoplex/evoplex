@@ -399,29 +399,33 @@ void TestAttributeRange::_tst_value(Value v, Value::Type type){
 
 void TestAttributeRange::tst_filepath(){
     AttributeRange* attrRge = AttributeRange::parse(0, "test", "filepath");
-    // File paths kept in variables so that they can be easily changed,
-    // as validate() relies on the file existing on the computer,
-    // which would have a different format
 
-    //Look at doc for all file types
-   // const char* fp_back_csv = "C:\Users\experiment.csv";  // Case 1: .csv filepath with backward slashes
-    const char* fp_fwd_csv = "C:/Users/experiment.csv";  // Case 1: .csv filepath with forward slashes
-   // const char* fp_back_txt = "C:\Users\experiment.txt";  // Case 1: .csv filepath with backward slashes
-   // const char* fp_fwd_txt = "C:/Users/experiment.txt";  // Case 1: .csv filepath with forward slashes
+    // '\e' is recognised as an unknown escape sequence
+    const char* fp_back_slash = "C:\Users\experiment.csv";  // Case 1: .csv filepath with backward slashes
+    const char* fp_fwd_slash = "C:/Users/experiment.csv";  // Case 2: .csv filepath with forward slashes
+    const char* fp_back_slash_no_ext = "C:\Users\experiment";  // Case 1: .csv filepath with backward slashes
+    const char* fp_fwd_slash_no_ext = "C:/Users/experiment";  // Case 2: .csv filepath with forward slashes
+
 
     // Tests value returned by 'AttributeRange::validate()'
     Value v;
 
+    // FAIL - filepaths with backward slashes are not recognised as filepaths
+//    v = attrRge->validate(fp_back_slash);
+//    _tst_value(v, Value::STRING);
 
-
-    v = attrRge->validate(fp_fwd_csv);
+    v = attrRge->validate(fp_fwd_slash);
     _tst_value(v, Value::STRING);
+
+    // FAIL - filepaths must have extenstions
+//    v = attrRge->validate(fp_back_slash_no_ext);
+//    _tst_value(v, Value::STRING);
+
+//    v = attrRge->validate(fp_back_slash_no_ext);
+//    _tst_value(v, Value::STRING);
 
     v = attrRge->validate("invalid");
     _tst_value(v, Value::INVALID);
-
-
-
 
     // Tests if functions work as expected
     QVERIFY(attrRge->isValid());
@@ -431,20 +435,13 @@ void TestAttributeRange::tst_filepath(){
 
     AttributeRange::Type type = AttributeRange::FilePath;
     QCOMPARE(attrRge->type(), type);
-//TEST AGAINST ASCII
-//    // Tests min(), max() and rand() functions
-//    int min, max;
-//    PRG* prg = new PRG(123);
 
-//    min = 0;
-//    max = 1;
-//    QCOMPARE(attrRge->min(), min);
-//    QCOMPARE(attrRge->max(), max);
-//    v = attrRge->rand(prg);
-//    _tst_value(v);
-//    QVERIFY(v.toInt() >= min);
-//    QVERIFY(v.toInt() <= max);
-
+    // Tests min(), max() and rand() functions
+    // Both 'AttributeRange::min()' and 'AttributeRange::max()'
+    // return <null> for a filepath type
+    PRG* prg = new PRG(123);
+    v = attrRge->rand(prg);
+    _tst_value(v, Value::STRING);
 }
 
 void TestAttributeRange::tst_string_set(){
@@ -589,7 +586,6 @@ void TestAttributeRange::tst_string(){
     AttributeRange::Type type = AttributeRange::String;
     QCOMPARE(attrRge->type(), type);
 
-    //========================================
     // Tests min(), max() and rand() functions
 
     // Both 'AttributeRange::min()' and 'AttributeRange::max()'
