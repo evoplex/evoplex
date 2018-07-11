@@ -21,6 +21,8 @@
 #ifndef ABSTRACT_MODEL_H
 #define ABSTRACT_MODEL_H
 
+#include <vector>
+
 #include "abstractgraph.h"
 #include "abstractplugin.h"
 
@@ -32,14 +34,9 @@ public:
     // destructor
     virtual ~AbstractModelInterface() = default;
 
-    // This method is called before the actual simulation and
-    // is mainly used to set the environment and parameters.
-    // Return false if anything goes wrong with the initialization.
-    virtual bool init() = 0;
-
     // Implements the metaheuristic.
-    // That is, it has to contain all the logic to perform ONE step.
-    // If return is true, algorithm converged and simulation will stop asap.
+    // That is, it contains all the logic to perform ONE step.
+    // Return true if algorithm is good for another step or false to stop asap.
     virtual bool algorithmStep() = 0;
 
     // This method allows you to custom outputs which, for example,
@@ -50,76 +47,40 @@ public:
 
 class AbstractModel : public AbstractModelInterface, public AbstractPlugin
 {
-    friend class Experiment;
+    friend class Trial;
 
 public:
-    inline AbstractGraph* graph() const;
+    AbstractGraph* graph() const;
+    int currStep() const;
+    int status() const;
+
     inline const Nodes& nodes() const;
     inline const NodePtr& node(const int nodeId) const;
     inline const Edges& edges() const;
     inline const EdgePtr& edge(const int edgeId) const;
     inline const EdgePtr& edge(const int originId, const int neighbourId) const;
-    inline int currStep() const;
-    inline int status() const;
 
-    inline Values customOutputs(const Values& inputs) const override;
-
-protected:
-    AbstractGraph* m_graph;
-    int m_currStep;
-    int m_status;
-
-    explicit AbstractModel()
-        : AbstractPlugin(), m_graph(nullptr), m_currStep(0), m_status(0) {}
-
-    ~AbstractModel() override {
-        delete m_graph;
-        delete m_prg;
-    }
-
-private:
-    // takes the ownership of the graph and the PRG
-    inline bool setup(PRG* prg, const Attributes* attrs, AbstractGraph* graphObj);
+    Values customOutputs(const Values& inputs) const override;
 };
 
 /************************************************************************
    AbstractModel: Inline member functions
  ************************************************************************/
 
-inline AbstractGraph* AbstractModel::graph() const
-{ return m_graph; }
-
 inline const Nodes& AbstractModel::nodes() const
-{ return m_graph->nodes(); }
+{ return graph()->nodes(); }
 
 inline const NodePtr& AbstractModel::node(const int nodeId) const
-{ return m_graph->nodes().at(nodeId); }
+{ return graph()->node(nodeId); }
 
 inline const Edges& AbstractModel::edges() const
-{ return m_graph->edges(); }
+{ return graph()->edges(); }
 
 inline const EdgePtr& AbstractModel::edge(const int edgeId) const
-{ return m_graph->edges().at(edgeId); }
+{ return graph()->edges().at(edgeId); }
 
 inline const EdgePtr& AbstractModel::edge(const int originId, const int neighbourId) const
 { return node(originId)->outEdges().at(neighbourId); }
-
-inline int AbstractModel::currStep() const
-{ return m_currStep; }
-
-inline int AbstractModel::status() const
-{ return m_status; }
-
-inline Values AbstractModel::customOutputs(const Values& inputs) const
-{ Q_UNUSED(inputs); return Values(); }
-
-inline bool AbstractModel::setup(PRG* prg, const Attributes* attrs, AbstractGraph* graphObj) {
-    if (AbstractPlugin::setup(prg, attrs)) {
-        m_graph = graphObj;
-        m_currStep = 0;
-    }
-    return m_graph != nullptr;
-}
 
 
 } // evoplex
