@@ -44,6 +44,53 @@ private slots:
     void _tst_value(Value v, Value::Type type);
 };
 
+void TestAttributeRange::_tst_value(Value v, Value::Type type)
+{
+    Value::Type t = v.type();
+    if(t == Value::INVALID)  QVERIFY(!v.isValid());
+    else QVERIFY(v.isValid());
+
+    QCOMPARE(t, type);
+
+    switch (type) {
+    case Value::BOOL:
+        QVERIFY(v.isBool());
+        QVERIFY(!v.isInt());
+        QVERIFY(!v.isChar());
+        QVERIFY(!v.isDouble());
+        QVERIFY(!v.isString());
+        break;
+    case Value::INT:
+        QVERIFY(v.isInt());
+        QVERIFY(!v.isBool());
+        QVERIFY(!v.isChar());
+        QVERIFY(!v.isDouble());
+        QVERIFY(!v.isString());
+        break;
+    case Value::DOUBLE:
+        QVERIFY(v.isDouble());
+        QVERIFY(!v.isInt());
+        QVERIFY(!v.isBool());
+        QVERIFY(!v.isChar());
+        QVERIFY(!v.isString());
+        break;
+    case Value::STRING:
+        QVERIFY(v.isString());
+        QVERIFY(!v.isInt());
+        QVERIFY(!v.isBool());
+        QVERIFY(!v.isDouble());
+        QVERIFY(!v.isChar());
+        break;
+    default:
+        QVERIFY(!v.isString());
+        QVERIFY(!v.isInt());
+        QVERIFY(!v.isBool());
+        QVERIFY(!v.isDouble());
+        QVERIFY(!v.isChar());
+        break;
+    }
+}
+
 void TestAttributeRange::tst_bool()
 {
     AttributeRange* attrRge = AttributeRange::parse(0, "test", "bool");
@@ -356,163 +403,6 @@ void TestAttributeRange::tst_int_set()
     delete prg;
 }
 
-void TestAttributeRange::_tst_value(Value v, Value::Type type)
-{
-    Value::Type t = v.type();
-    if(t == Value::INVALID)  QVERIFY(!v.isValid());
-    else QVERIFY(v.isValid());
-
-    QCOMPARE(t, type);
-
-    switch (type) {
-    case Value::BOOL:
-        QVERIFY(v.isBool());
-        QVERIFY(!v.isInt());
-        QVERIFY(!v.isChar());
-        QVERIFY(!v.isDouble());
-        QVERIFY(!v.isString());
-        break;
-    case Value::INT:
-        QVERIFY(v.isInt());
-        QVERIFY(!v.isBool());
-        QVERIFY(!v.isChar());
-        QVERIFY(!v.isDouble());
-        QVERIFY(!v.isString());
-        break;
-    case Value::DOUBLE:
-        QVERIFY(v.isDouble());
-        QVERIFY(!v.isInt());
-        QVERIFY(!v.isBool());
-        QVERIFY(!v.isChar());
-        QVERIFY(!v.isString());
-        break;
-    case Value::STRING:
-        QVERIFY(v.isString());
-        QVERIFY(!v.isInt());
-        QVERIFY(!v.isBool());
-        QVERIFY(!v.isDouble());
-        QVERIFY(!v.isChar());
-        break;
-    default:
-        QVERIFY(!v.isString());
-        QVERIFY(!v.isInt());
-        QVERIFY(!v.isBool());
-        QVERIFY(!v.isDouble());
-        QVERIFY(!v.isChar());
-        break;
-    }
-}
-
-void TestAttributeRange::tst_filepath()
-{
-    AttributeRange* attrRge = AttributeRange::parse(0, "test", "filepath");
-
-    // '\e' is recognised as an unknown escape sequence - causes warnings
-//    const char* fp_back_slash = "C:\Users\experiment.csv";  // Case 1: .csv filepath with backward slashes
-    const char* fp_fwd_slash = "C:/Users/experiment.csv";  // Case 2: .csv filepath with forward slashes
-//    const char* fp_back_slash_no_ext = "C:\Users\experiment";  // Case 1: .csv filepath with backward slashes
-    const char* fp_fwd_slash_no_ext = "C:/Users/experiment";  // Case 2: .csv filepath with forward slashes
-
-    // Tests value returned by 'AttributeRange::validate()'
-    Value v;
-
-    // FAIL - filepaths with backward slashes are not recognised as filepaths
-//    v = attrRge->validate(fp_back_slash);
-//    _tst_value(v, Value::STRING);
-
-    v = attrRge->validate(fp_fwd_slash);
-    _tst_value(v, Value::STRING);
-
-    // FAIL - filepaths must have extenstions
-//    v = attrRge->validate(fp_back_slash_no_ext);
-//    _tst_value(v, Value::STRING);
-
-//    v = attrRge->validate(fp_back_slash_no_ext);
-//    _tst_value(v, Value::STRING);
-
-    v = attrRge->validate("invalid");
-    _tst_value(v, Value::INVALID);
-
-    // Tests if functions work as expected
-    QVERIFY(attrRge->isValid());
-    QCOMPARE(attrRge->id(), 0);
-    QCOMPARE(attrRge->attrName(), "test");
-    QCOMPARE(attrRge->attrRangeStr(), "filepath");
-
-    AttributeRange::Type type = AttributeRange::FilePath;
-    QCOMPARE(attrRge->type(), type);
-
-    // Tests min(), max() and rand() functions
-
-    // Both 'AttributeRange::min()' and 'AttributeRange::max()' return <null> for a filepath type
-
-    PRG* prg = new PRG(123);
-    v = attrRge->rand(prg);
-    _tst_value(v, Value::STRING);
-
-    delete prg;
-}
-
-void TestAttributeRange::tst_string_set()
-{
-    const char* attrName = "test";
-    // Case 1: normal string
-    // Case 2: long string
-    // Case 3: single character
-    // Case 4: unusual characters
-    const char* attrRangeStr = "string{sample,this sentence is a long string for testing purposes,a,abc£ãã&!£$%^*(áéí)}";
-
-    AttributeRange* attrRge = AttributeRange::parse(0, attrName, attrRangeStr);
-
-    // Tests value returned by 'AttributeRange::validate()'
-    Value v;
-
-    v = attrRge->validate("sample");
-    _tst_value(v, Value::STRING);
-
-    v = attrRge->validate("this sentence is a long string for testing purposes");
-    _tst_value(v, Value::STRING);
-
-    v = attrRge->validate("a");
-    _tst_value(v, Value::STRING);
-
-    v = attrRge->validate("abc£ãã&!£$%^*(áéí)");
-    _tst_value(v, Value::STRING);
-
-    v = attrRge->validate("invalid");  // invalid
-    _tst_value(v, Value::INVALID);
-
-    // Tests if functions work as expected
-    QVERIFY(attrRge->isValid());
-    QCOMPARE(attrRge->id(), 0);
-    QCOMPARE(attrRge->attrName(), attrName);
-    QCOMPARE(attrRge->attrRangeStr(), attrRangeStr);
-
-    AttributeRange::Type type = AttributeRange::String_Set;
-    QCOMPARE(attrRge->type(), type);
-
-    // Tests min(), max() and rand() functions
-
-    // The min and max values are taken to be the value of the first character
-    // of the string according to the ASCII table
-    const char* min = "a";
-    const char* max = "this sentence is a long string for testing purposes";
-
-    PRG* prg = new PRG(123);
-
-    // FAIL - both 'AttributeRange::min()' and 'AttributeRange::max()' return <null> for a string set
-//    QCOMPARE(attrRge->min(), min);
-//    QCOMPARE(attrRge->max(), max);
-
-    v = attrRge->rand(prg);
-    _tst_value(v, Value::STRING);
-
-    QVERIFY(strcmp(v.toString(), max) <= 0);
-    QVERIFY(strcmp(v.toString(), min) >= 0);
-
-    delete prg;
-}
-
 void TestAttributeRange::tst_double_set()
 {
     const char* attrName = "test";
@@ -610,6 +500,116 @@ void TestAttributeRange::tst_string()
     delete prg;
 }
 
+void TestAttributeRange::tst_string_set()
+{
+    const char* attrName = "test";
+    // Case 1: normal string
+    // Case 2: long string
+    // Case 3: single character
+    // Case 4: unusual characters
+    const char* attrRangeStr = "string{sample,this sentence is a long string for testing purposes,a,abc£ãã&!£$%^*(áéí)}";
+
+    AttributeRange* attrRge = AttributeRange::parse(0, attrName, attrRangeStr);
+
+    // Tests value returned by 'AttributeRange::validate()'
+    Value v;
+
+    v = attrRge->validate("sample");
+    _tst_value(v, Value::STRING);
+
+    v = attrRge->validate("this sentence is a long string for testing purposes");
+    _tst_value(v, Value::STRING);
+
+    v = attrRge->validate("a");
+    _tst_value(v, Value::STRING);
+
+    v = attrRge->validate("abc£ãã&!£$%^*(áéí)");
+    _tst_value(v, Value::STRING);
+
+    v = attrRge->validate("invalid");  // invalid
+    _tst_value(v, Value::INVALID);
+
+    // Tests if functions work as expected
+    QVERIFY(attrRge->isValid());
+    QCOMPARE(attrRge->id(), 0);
+    QCOMPARE(attrRge->attrName(), attrName);
+    QCOMPARE(attrRge->attrRangeStr(), attrRangeStr);
+
+    AttributeRange::Type type = AttributeRange::String_Set;
+    QCOMPARE(attrRge->type(), type);
+
+    // Tests min(), max() and rand() functions
+
+    // The min and max values are taken to be the value of the first character
+    // of the string according to the ASCII table
+    const char* min = "a";
+    const char* max = "this sentence is a long string for testing purposes";
+
+    PRG* prg = new PRG(123);
+
+    // FAIL - both 'AttributeRange::min()' and 'AttributeRange::max()' return <null> for a string set
+//    QCOMPARE(attrRge->min(), min);
+//    QCOMPARE(attrRge->max(), max);
+
+    v = attrRge->rand(prg);
+    _tst_value(v, Value::STRING);
+
+    QVERIFY(strcmp(v.toString(), max) <= 0);
+    QVERIFY(strcmp(v.toString(), min) >= 0);
+
+    delete prg;
+}
+
+void TestAttributeRange::tst_filepath()
+{
+    AttributeRange* attrRge = AttributeRange::parse(0, "test", "filepath");
+
+    // '\e' is recognised as an unknown escape sequence - causes warnings
+//    const char* fp_back_slash = "C:\Users\experiment.csv";  // Case 1: .csv filepath with backward slashes
+    const char* fp_fwd_slash = "C:/Users/experiment.csv";  // Case 2: .csv filepath with forward slashes
+//    const char* fp_back_slash_no_ext = "C:\Users\experiment";  // Case 1: .csv filepath with backward slashes
+    const char* fp_fwd_slash_no_ext = "C:/Users/experiment";  // Case 2: .csv filepath with forward slashes
+
+    // Tests value returned by 'AttributeRange::validate()'
+    Value v;
+
+    // FAIL - filepaths with backward slashes are not recognised as filepaths
+//    v = attrRge->validate(fp_back_slash);
+//    _tst_value(v, Value::STRING);
+
+    v = attrRge->validate(fp_fwd_slash);
+    _tst_value(v, Value::STRING);
+
+    // FAIL - filepaths must have extenstions
+//    v = attrRge->validate(fp_back_slash_no_ext);
+//    _tst_value(v, Value::STRING);
+
+//    v = attrRge->validate(fp_back_slash_no_ext);
+//    _tst_value(v, Value::STRING);
+
+    v = attrRge->validate("invalid");
+    _tst_value(v, Value::INVALID);
+
+    // Tests if functions work as expected
+    QVERIFY(attrRge->isValid());
+    QCOMPARE(attrRge->id(), 0);
+    QCOMPARE(attrRge->attrName(), "test");
+    QCOMPARE(attrRge->attrRangeStr(), "filepath");
+
+    AttributeRange::Type type = AttributeRange::FilePath;
+    QCOMPARE(attrRge->type(), type);
+
+    // Tests min(), max() and rand() functions
+
+    // Both 'AttributeRange::min()' and 'AttributeRange::max()' return <null> for a filepath type
+
+    PRG* prg = new PRG(123);
+    v = attrRge->rand(prg);
+    _tst_value(v, Value::STRING);
+
+    delete prg;
+}
+
 void TestAttributeRange::tst_dirpath()
 {
     AttributeRange* attrRge = AttributeRange::parse(0, "test", "dirpath");
@@ -652,7 +652,6 @@ void TestAttributeRange::tst_dirpath()
 
     delete prg;
 }
-
 
 QTEST_MAIN(TestAttributeRange)
 #include "tst_attributerange.moc"
