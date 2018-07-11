@@ -171,14 +171,10 @@ void TestAttributeRange::tst_int_range(){
     QCOMPARE(attrRge3->attrName(), attrNames[2]);
     QCOMPARE(attrRge3->attrRangeStr(), attrRangeStrs[2]);
 
-
-
     AttributeRange::Type type = AttributeRange::Int_Range;
     QCOMPARE(attrRge->type(), type);
     QCOMPARE(attrRge2->type(), type);
     QCOMPARE(attrRge3->type(), type);
-
-
 
     // Tests min(), max() and rand() functions
     int min, max;
@@ -210,11 +206,6 @@ void TestAttributeRange::tst_int_range(){
     _tst_value(v, Value::INT);
     QVERIFY(v.toInt() >= min);
     QVERIFY(v.toInt() <= max);
-
-
-
-
-
 }
 
 void TestAttributeRange::tst_double_range(){
@@ -249,7 +240,6 @@ void TestAttributeRange::tst_double_range(){
     v = attrRge2->validate("invalid");   //invalid
     _tst_value(v, Value::INVALID);
 
-
     v = attrRge3->validate("-95.7");   //min
     _tst_value(v, Value::DOUBLE);
     v = attrRge3->validate("87.5");   //max
@@ -258,7 +248,6 @@ void TestAttributeRange::tst_double_range(){
     _tst_value(v, Value::DOUBLE);
     v = attrRge3->validate("invalid");   //invalid
     _tst_value(v, Value::INVALID);
-
 
     // Tests if functions work as expected
     QVERIFY(attrRge->isValid());
@@ -276,13 +265,10 @@ void TestAttributeRange::tst_double_range(){
     QCOMPARE(attrRge3->attrName(), attrNames[2]);
     QCOMPARE(attrRge3->attrRangeStr(), attrRangeStrs[2]);
 
-
     AttributeRange::Type type = AttributeRange::Double_Range;
     QCOMPARE(attrRge->type(), type);
     QCOMPARE(attrRge2->type(), type);
     QCOMPARE(attrRge3->type(), type);
-
-
 
     // Tests min(), max() and rand() functions
     double min, max;
