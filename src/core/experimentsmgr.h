@@ -36,8 +36,6 @@ class ExperimentsMgr: public QObject
 {
     Q_OBJECT
 
-    friend class TrialRunnable;
-
 public:
     explicit ExperimentsMgr();
     ~ExperimentsMgr();
@@ -48,6 +46,10 @@ public:
 
     inline int maxThreadsCount() const { return m_threads; }
     void setMaxThreadCount(const int newValue);
+
+    // trigged when an Trial ends
+    // also runs in a work thread
+    void finished(Experiment* exp, const int trialId);
 
 signals:
     void expFinished();
@@ -71,31 +73,12 @@ private:
     QTimer* m_timerProgress; // update the progress value of all running experiments
     QTimer* m_timerDestroy;
 
-    std::list<std::pair<int,int>> m_runningTrials;
+    std::list<std::pair<int,quint16>> m_runningTrials;
     std::list<Experiment*> m_running;
     std::list<Experiment*> m_queued;
     std::list<Experiment*> m_idle;
     std::list<Experiment*> m_toDestroy;
-
-    // trigged when an experiment ends (TrialRunnable)
-    // also runs in a work thread
-    void finished(Experiment* exp, const int trialId);
 };
 
-/********************************/
-
-class TrialRunnable: public QRunnable
-{
-public:
-    TrialRunnable(ExperimentsMgr* expMgr, Experiment* exp, quint16 trialId);
-    void run();
-
-private:
-    ExperimentsMgr* expMgr;
-    Experiment* m_exp;
-    const quint16 m_trialId;
-};
-
-}
-
+} // evoplex
 #endif // EXPERIMENTMGR_H

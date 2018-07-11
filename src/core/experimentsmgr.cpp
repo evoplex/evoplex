@@ -117,11 +117,11 @@ void ExperimentsMgr::play(Experiment* exp)
         m_running.emplace_back(exp);
         m_timerProgress->start(500); // every half a second, check progress
 
-        for (quint16 trialId = 0; trialId < exp->numTrials(); ++trialId) {
-            m_runningTrials.emplace_back(std::make_pair(exp->id(), trialId));
+        for (auto const& it : exp->trials()) {
+            m_runningTrials.emplace_back(std::make_pair(exp->id(), it.first));
             // play in the same order of insertion
             const int priority = static_cast<int>(m_runningTrials.size()) * -1;
-            m_threadPool.start(new TrialRunnable(this, exp, trialId), priority);
+            m_threadPool.start(it.second, priority);
         }
     } else if (exp->expStatus() != Experiment::QUEUED) {
         exp->setExpStatus(Experiment::QUEUED);
@@ -134,9 +134,9 @@ void ExperimentsMgr::finished(Experiment* exp, const int trialId)
     QMutexLocker locker(&m_mutex);
 
     m_runningTrials.remove(std::make_pair(exp->id(), trialId));
-    for (auto& expTrial : m_runningTrials) {
+    for (auto const& expTrial : m_runningTrials) {
         if (expTrial.first == exp->id()) {
-            return;
+            return; // there are more trials for this exp running yet...
         }
     }
 
@@ -145,7 +145,7 @@ void ExperimentsMgr::finished(Experiment* exp, const int trialId)
     if (std::find(m_toDestroy.begin(), m_toDestroy.end(), exp) != m_toDestroy.end()) {
         exp->setExpStatus(Experiment::INVALID);
     } else if(exp->expStatus() != Experiment::INVALID) {
-        for (auto& trial : exp->trials()) {
+        for (auto const& trial : exp->trials()) {
             if (trial.second->status() != Experiment::FINISHED) {
                 exp->setExpStatus(Experiment::READY);
                 exp->setPauseAt(EVOPLEX_MAX_STEPS); // reset the pauseAt flag to maximum
@@ -231,19 +231,4 @@ void ExperimentsMgr::setMaxThreadCount(const int newValue)
              << previous << "to" << newValue;
 }
 
-/********************************/
-
-TrialRunnable::TrialRunnable(ExperimentsMgr* expMgr, Experiment* exp, quint16 trialId)
-    : expMgr(expMgr)
-    , m_exp(exp)
-    , m_trialId(trialId)
-{
-}
-
-void TrialRunnable::run()
-{
-    m_exp->processTrial(m_trialId);
-    expMgr->finished(m_exp, m_trialId);
-}
-
-}
+} // evoplex
