@@ -34,9 +34,9 @@ Experiment::Experiment(MainApp* mainApp, ExpInputs* inputs, ProjectPtr project)
       m_inputs(nullptr),
       m_expStatus(INVALID)
 {
+    Q_ASSERT_X(m_project, "Experiment", "an experiment must belong to a valid project");
     QString error;
     init(inputs, error);
-    Q_ASSERT_X(m_project, "Experiment", "tried to create an experiment from a null project");
 }
 
 Experiment::~Experiment()
@@ -62,6 +62,25 @@ bool Experiment::init(ExpInputs* inputs, QString& error)
     delete m_inputs;
     m_inputs = inputs;
 
+    m_graphType = AbstractGraph::enumFromString(m_inputs->general(GENERAL_ATTRIBUTE_GRAPHTYPE).toQString());
+    if (m_graphType == AbstractGraph::Invalid_Type) {
+        error = "the graph type is invalid!";
+        qWarning() << error;
+        return false;
+    }
+
+    m_numTrials = m_inputs->general(GENERAL_ATTRIBUTE_TRIALS).toInt();
+    if (m_numTrials < 1 || m_numTrials > EVOPLEX_MAX_TRIALS) {
+        error = QString("number of trials should be >0 and <%1!").arg(EVOPLEX_MAX_TRIALS);
+        qWarning() << error;
+        return false;
+    }
+
+    m_graphPlugin = m_mainApp->graph(m_inputs->general(GENERAL_ATTRIBUTE_GRAPHID).toQString());
+    m_modelPlugin = m_mainApp->model(m_inputs->general(GENERAL_ATTRIBUTE_MODELID).toQString());
+
+    m_autoDeleteTrials = m_inputs->general(GENERAL_ATTRIBUTE_AUTODELETE).toBool();
+
     m_filePathPrefix.clear();
     m_fileHeader.clear();
     if (!m_inputs->fileCaches().empty()) {
@@ -78,14 +97,6 @@ bool Experiment::init(ExpInputs* inputs, QString& error)
         m_fileHeader.chop(1);
         m_fileHeader += "\n";
     }
-
-    m_autoDeleteTrials = m_inputs->general(GENERAL_ATTRIBUTE_AUTODELETE).toBool();
-    m_numTrials = m_inputs->general(GENERAL_ATTRIBUTE_TRIALS).toInt();
-    Q_ASSERT_X(m_numTrials > 0 && m_numTrials <= EVOPLEX_MAX_TRIALS,
-               "Experiment", "number of trials is not supported!");
-
-    m_graphPlugin = m_mainApp->graph(m_inputs->general(GENERAL_ATTRIBUTE_GRAPHID).toQString());
-    m_modelPlugin = m_mainApp->model(m_inputs->general(GENERAL_ATTRIBUTE_MODELID).toQString());
 
     reset();
 
@@ -217,17 +228,10 @@ Nodes Experiment::cloneCachedNodes(const int trialId)
 
 bool Experiment::createNodes(Nodes& nodes) const
 {
-    const AbstractGraph::GraphType gType = AbstractGraph::enumFromString(
-                m_inputs->general(GENERAL_ATTRIBUTE_GRAPHTYPE).toString());
-
-    if (gType == AbstractGraph::Invalid_Type) {
-        return false;
-    }
-
     const QString& cmd = m_inputs->general(GENERAL_ATTRIBUTE_NODES).toQString();
 
     QString error;
-    nodes = Nodes::fromCmd(cmd, m_modelPlugin->nodeAttrsScope(), gType, error);
+    nodes = Nodes::fromCmd(cmd, m_modelPlugin->nodeAttrsScope(), m_graphType, error);
     if (nodes.empty() || !error.isEmpty()) {
         error = QString("unable to create the trials."
                          "The set of nodes could not be created.\n %1 \n"

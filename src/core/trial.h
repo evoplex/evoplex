@@ -24,6 +24,8 @@
 #include <unordered_map>
 #include <QRunnable>
 
+#include "abstractgraph.h"
+
 namespace evoplex {
 
 class AbstractGraph;
@@ -54,6 +56,8 @@ public:
     // This method will run in a worker thread until it reaches the max
     // number of steps or the pause criteria defined by the user.
     void run() override;
+
+    AbstractGraph::GraphType graphType() const;
 
     inline quint16 id() const;
     inline int step() const;

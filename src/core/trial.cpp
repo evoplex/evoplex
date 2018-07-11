@@ -34,12 +34,15 @@ namespace evoplex {
 Trial::Trial(const quint16 id, Experiment* exp)
     : m_id(id),
       m_exp(exp),
-      m_step(-1),
+      m_step(0),
       m_status(Experiment::UNSET),
       m_prg(nullptr),
       m_graph(nullptr),
       m_model(nullptr)
 {
+    Q_ASSERT_X(m_exp, "Trial", "a trial must belong to a valid experiment");
+    // important! Trials are deleted by the Experiment class,
+    // let's turn off the autoDelete from QRunnable by default
     setAutoDelete(false);
 }
 
@@ -48,6 +51,11 @@ Trial::~Trial()
     delete m_graph;
     delete m_model;
     delete m_prg;
+}
+
+AbstractGraph::GraphType Trial::graphType() const
+{
+    return  m_exp->graphType();
 }
 
 bool Trial::init()

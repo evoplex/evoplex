@@ -117,6 +117,7 @@ public:
     inline const QString& graphId() const;
     inline const ModelPlugin* modelPlugin() const;
     inline const GraphPlugin* graphPlugin() const;
+    inline AbstractGraph::GraphType graphType() const;
 
 signals:
     void trialCreated(int trialId);
@@ -138,6 +139,7 @@ private:
     const ExpInputs* m_inputs;
     const GraphPlugin* m_graphPlugin;
     const ModelPlugin* m_modelPlugin;
+    AbstractGraph::GraphType m_graphType;
     int m_numTrials;
     bool m_autoDeleteTrials;
     int m_stopAt;
@@ -240,6 +242,9 @@ inline const ModelPlugin* Experiment::modelPlugin() const
 
 inline const GraphPlugin* Experiment::graphPlugin() const
 { return m_graphPlugin; }
+
+inline AbstractGraph::GraphType Experiment::graphType() const
+{ return m_graphType; }
 
 } // evoplex
 
