@@ -41,7 +41,7 @@ private slots:
     void tst_dirpath();
 
 
-    // Auxiliary functions
+    // Auxiliary function
     void _tst_value(Value v, Value::Type type);
 };
 
@@ -50,23 +50,23 @@ private slots:
 
 
 // VARIABLES AS IN RANGE_SET
-// TEST A STRING OR INT IS NOT IN A SET
-void TestAttributeRange::tst_bool(){
+
+void TestAttributeRange::tst_bool()
+{
     AttributeRange* attrRge = AttributeRange::parse(0, "test", "bool");
-    const int null = 0;
 
     // Tests value returned by 'AttributeRange::validate()' for true
     Value v;
     v = attrRge->validate("true");
-   // _tst_value(v, Value::BOOL);
+    _tst_value(v, Value::BOOL);
 
     // Tests value returned by 'AttributeRange::validate()' for false
     v = attrRge->validate("false");
-//     _tst_value(v, Value::BOOL);
+    _tst_value(v, Value::BOOL);
 
+    // Tests value returned by 'AttributeRange::validate()' for an invalid string
      v = attrRge->validate("invalid");
-    //  _tst_value(v, Value::INVALID);
-
+     _tst_value(v, Value::INVALID);
 
     // Tests if functions work as expected
     QVERIFY(attrRge->isValid());
@@ -77,12 +77,42 @@ void TestAttributeRange::tst_bool(){
     AttributeRange::Type type = AttributeRange::Bool;
     QCOMPARE(attrRge->type(), type);
 
-    // min() and max() are not tested as both return <null> for a boolean type
+    // Tests min(), max() and rand() functions work as expected
+    // where min and max are boolean values
+    bool min_bool = false;
+    bool max_bool = true;
 
-    // Tests 'AttributeRange::rand()' works as expected
+    // where min and max are integers, casted to type bool
+    bool min_int = Value(0).toBool();
+    bool max_int = Value(1).toBool();
+
+    // where min and max are booleans, casted to type int
+    int min_int_alt = Value(false).toInt();
+    int max_int_alt = Value(true).toInt();
+
+    // For a boolean type, 'AttributeRange::rand()' returns a bool
     PRG* prg = new PRG(123);
-    Value v1 = attrRge->rand(prg);
-    //_tst_value(v, Value::BOOL);
+    v = attrRge->rand(prg);
+
+    _tst_value(v, Value::BOOL);
+
+    QVERIFY(v >= min_bool);
+    QVERIFY(v <= max_bool);
+    QVERIFY(v >= min_int);
+    QVERIFY(v <= max_int);
+    QVERIFY(v.toInt() >= min_int_alt);
+    QVERIFY(v.toInt() <= max_int_alt);
+
+    // For a boolean type, 'AttributeRange::min()' and 'AttributeRange::max()'
+    // both return <null>
+//    QCOMPARE(attrRge->min(), min_bool);  // Succeeds, as <null> is recognised as 0
+//    QCOMPARE(attrRge->max(), max_bool);  // Fails
+//    QCOMPARE(attrRge->min(), min_int);  // Fails
+//    QCOMPARE(attrRge->max(), max_int);  // Fails
+//    QCOMPARE(attrRge->min().toInt(), min_int_alt);  // Fails
+//    QCOMPARE(attrRge->max().toInt(), max_int_alt);  // Fails
+
+
 }
 
 void TestAttributeRange::tst_int_range(){
