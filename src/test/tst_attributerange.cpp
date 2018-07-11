@@ -38,6 +38,7 @@ private slots:
     void tst_string();
     void tst_string_range();
     void tst_double_set();
+    void tst_filepath();
 
     // Auxiliary functions
     void _tst_value(Value v);
@@ -372,38 +373,37 @@ void TestAttributeRange::_tst_value(Value v){
     }
 }
 
-void TestAttributeRange::tst_string(){
-    AttributeRange* attrRge = AttributeRange::parse(0, "test", "string");
+void TestAttributeRange::tst_filepath(){
+    AttributeRange* attrRge = AttributeRange::parse(0, "test", "filepath");
+    // File paths kept in variables so that they can be easily changed,
+    // as validate() relies on the file existing on the computer,
+    // which would have a different format
+
+    //Look at doc for all file types
+   // const char* fp_back_csv = "C:\Users\experiment.csv";  // Case 1: .csv filepath with backward slashes
+    const char* fp_fwd_csv = "C:/Users/experiment.csv";  // Case 1: .csv filepath with forward slashes
+   // const char* fp_back_txt = "C:\Users\experiment.txt";  // Case 1: .csv filepath with backward slashes
+   // const char* fp_fwd_txt = "C:/Users/experiment.txt";  // Case 1: .csv filepath with forward slashes
 
     // Tests value returned by 'AttributeRange::validate()'
     Value v;
-    // Case 1: normal string
-    v = attrRge->validate("sample");
+
+
+
+    v = attrRge->validate(fp_fwd_csv);
     _tst_value(v);
 
-    // Case 2: long string
-    v = attrRge->validate("this sentence is a long string for testing purposes");
-    _tst_value(v);
 
-    // Case 3: single character
-    v = attrRge->validate("a");
-    _tst_value(v);
 
-    // Case 4: unusual characters
-    v = attrRge->validate("abc£ãã&!£$%^*(áéí)");
-    _tst_value(v);
 
-    // Case 5: empty string
-    v = attrRge->validate("");
-    _tst_value(v);
 
     // Tests if functions work as expected
     QVERIFY(attrRge->isValid());
     QCOMPARE(attrRge->id(), 0);
     QCOMPARE(attrRge->attrName(), "test");
-    QCOMPARE(attrRge->attrRangeStr(), "string");
+    QCOMPARE(attrRge->attrRangeStr(), "filepath");
 
-    AttributeRange::Type type = AttributeRange::String;
+    AttributeRange::Type type = AttributeRange::FilePath;
     QCOMPARE(attrRge->type(), type);
 //TEST AGAINST ASCII
 //    // Tests min(), max() and rand() functions
@@ -536,6 +536,54 @@ void TestAttributeRange::tst_double_set(){
 //    QVERIFY(v.toInt() <= max);
 delete prg;
 
+}
+
+void TestAttributeRange::tst_string(){
+    AttributeRange* attrRge = AttributeRange::parse(0, "test", "string");
+
+    // Tests value returned by 'AttributeRange::validate()'
+    Value v;
+    // Case 1: normal string
+    v = attrRge->validate("sample");
+    _tst_value(v);
+
+    // Case 2: long string
+    v = attrRge->validate("this sentence is a long string for testing purposes");
+    _tst_value(v);
+
+    // Case 3: single character
+    v = attrRge->validate("a");
+    _tst_value(v);
+
+    // Case 4: unusual characters
+    v = attrRge->validate("abc£ãã&!£$%^*(áéí)");
+    _tst_value(v);
+
+    // Case 5: empty string
+    v = attrRge->validate("");
+    _tst_value(v);
+
+    // Tests if functions work as expected
+    QVERIFY(attrRge->isValid());
+    QCOMPARE(attrRge->id(), 0);
+    QCOMPARE(attrRge->attrName(), "test");
+    QCOMPARE(attrRge->attrRangeStr(), "string");
+
+    AttributeRange::Type type = AttributeRange::String;
+    QCOMPARE(attrRge->type(), type);
+//TEST AGAINST ASCII
+//    // Tests min(), max() and rand() functions
+//    int min, max;
+//    PRG* prg = new PRG(123);
+
+//    min = 0;
+//    max = 1;
+//    QCOMPARE(attrRge->min(), min);
+//    QCOMPARE(attrRge->max(), max);
+//    v = attrRge->rand(prg);
+//    _tst_value(v);
+//    QVERIFY(v.toInt() >= min);
+//    QVERIFY(v.toInt() <= max);
 }
 QTEST_MAIN(TestAttributeRange)
 #include "tst_attributerange.moc"
