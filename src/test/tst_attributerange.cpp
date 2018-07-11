@@ -304,12 +304,11 @@ void TestAttributeRange::tst_double_range(){
 
 void TestAttributeRange::tst_int_set(){
     const char* attrName = "test";
+    // Set with positive, negative and large numbers
     const char* attrRangeStr = "int{0,1,-5,100,-100}";
     int min = -100;
     int max = 100;
 
-    // Set with positive, negative and large numbers
-    //=====================================
     AttributeRange* attrRge = AttributeRange::parse(0, attrName, attrRangeStr);
 
     // Tests value returned by 'AttributeRange::validate()'
@@ -333,24 +332,23 @@ void TestAttributeRange::tst_int_set(){
     QCOMPARE(attrRge->attrName(), attrName);
     QCOMPARE(attrRge->attrRangeStr(), attrRangeStr);
 
-//    QVERIFY(attrRge2->isValid());
-
     AttributeRange::Type type = AttributeRange::Int_Set;
     QCOMPARE(attrRge->type(), type);
 
-
-
     // Tests min(), max() and rand() functions
     PRG* prg = new PRG(123);
-// CHECK!!!
-//    QCOMPARE(attrRge->min(), min);
-//    QCOMPARE(attrRge->max(), max);
-//    v = attrRge->rand(prg);
-//    _tst_int_value(v);
-//    QVERIFY(v.toInt() >= min);
-//    QVERIFY(v.toInt() <= max);
-delete prg;
 
+    // FAIL - both 'AttributeRange::min()' and 'AttributeRange::max()' return <null>
+//  QCOMPARE(attrRge->min(), min);
+//  QCOMPARE(attrRge->max(), max);
+    v = attrRge->rand(prg);
+    _tst_value(v, Value::INT);
+
+    // SUCCEEDS - because our own variables are used, eg min not attrRge->min()
+    QVERIFY(v.toInt() >= min);
+    QVERIFY(v.toInt() <= max);
+
+    delete prg;
 }
 
 void TestAttributeRange::_tst_value(Value v, Value::Type type){
