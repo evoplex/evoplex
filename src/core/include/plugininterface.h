@@ -42,14 +42,14 @@ public:
 };
 }
 
-Q_DECLARE_INTERFACE(evoplex::PluginInterface, "org.evoplex.plugininterface")
+Q_DECLARE_INTERFACE(evoplex::PluginInterface, "org.evoplex.PluginInterface")
 
 #define REGISTER_PLUGIN(CLASSNAME)                                   \
     namespace evoplex {                                              \
-    class PM_##CLASSNAME : public QObject, public PluginInterface    \
+    class PG_##CLASSNAME : public QObject, public PluginInterface    \
     {                                                                \
     Q_OBJECT                                                         \
-    Q_PLUGIN_METADATA(IID "org.evoplex.plugininterface"              \
+    Q_PLUGIN_METADATA(IID "org.evoplex.PluginInterface"              \
                       FILE "metadata.json")                          \
     Q_INTERFACES(evoplex::PluginInterface)                           \
     public:                                                          \

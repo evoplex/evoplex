@@ -33,8 +33,7 @@ AbstractGraph::GraphType AbstractGraph::enumFromString(const QString& str)
 }
 
 AbstractGraph::AbstractGraph()
-    : AbstractPlugin(),
-      m_lastNodeId(-1),
+    : m_lastNodeId(-1),
       m_lastEdgeId(-1)
 {
 }
@@ -48,7 +47,7 @@ bool AbstractGraph::setup(Trial& trial, const Attributes& attrs, Nodes& nodes)
     return AbstractPlugin::setup(trial, attrs);
 }
 
-inline AbstractGraph::GraphType AbstractGraph::type() const
+AbstractGraph::GraphType AbstractGraph::type() const
 {
     return m_trial->graphType();
 }

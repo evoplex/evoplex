@@ -30,8 +30,6 @@
 
 namespace evoplex {
 
-class Trial;
-
 class AbstractGraphInterface
 {
 public:
