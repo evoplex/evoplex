@@ -88,6 +88,8 @@ private:
 
     // If any file output is set, it'll write the cached steps to file.
     bool writeCachedSteps();
+
+    bool _run();
 };
 
 /************************************************************************

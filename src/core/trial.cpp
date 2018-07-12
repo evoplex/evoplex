@@ -119,9 +119,18 @@ bool Trial::init()
 
 void Trial::run()
 {
-    if (m_exp->expStatus() == Experiment::INVALID) {
+    if (!_run()) {
         m_status = Experiment::INVALID;
-        return;
+        m_exp->setExpStatus(Experiment::INVALID);
+        m_exp->pause();
+    }
+    m_exp->m_mainApp->expMgr()->finished(m_exp, m_id);
+}
+
+bool Trial::_run()
+{
+    if (m_exp->expStatus() == Experiment::INVALID) {
+        return false;
     }
 
     if (m_status == Experiment::UNSET) {
@@ -129,11 +138,8 @@ void Trial::run()
         // Thus, if one trial fail, the others will be aborted earlier.
         m_exp->m_mutex.lock();
         if (!init()) {
-            m_status = Experiment::INVALID;
-            m_exp->m_expStatus = Experiment::INVALID;
-            m_exp->pause();
             m_exp->m_mutex.unlock();
-            return;
+            return false;
         }
         m_exp->m_mutex.unlock();
         m_graph->reset();
@@ -146,15 +152,13 @@ void Trial::run()
         if (writeCachedSteps()) {
             m_status = Experiment::FINISHED;
         } else {
-            m_status = Experiment::INVALID;
-            m_exp->setExpStatus(Experiment::INVALID);
-            m_exp->pause();
+            return false;
         }
     } else {
         m_status = Experiment::READY;
     }
 
-    m_exp->m_mainApp->expMgr()->finished(m_exp, m_id);
+    return true;
 }
 
 bool Trial::runSteps()

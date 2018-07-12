@@ -19,7 +19,7 @@
 ##########################################################################
 
 set(EVOPLEX_CORE_INCLUDE
-  include/plugininterfaces.h
+  include/plugininterface.h
   include/abstractplugin.h
   include/abstractgraph.h
   include/abstractmodel.h
@@ -43,6 +43,7 @@ set(EVOPLEX_CORE_H
   output.h
   plugin.h
 
+  trial.h
   experiment.h
   expinputs.h
   experimentsmgr.h
@@ -52,14 +53,18 @@ set(EVOPLEX_CORE_H
 )
 set(EVOPLEX_CORE_CXX
   plugin.cpp
+  abstractplugin.cpp
   abstractgraph.cpp
+  abstractmodel.cpp
   graphplugin.cpp
   modelplugin.cpp
+  node.cpp
   nodes.cpp
   prg.cpp
 
   attributerange.cpp
   attrsgenerator.cpp
+  trial.cpp
   experiment.cpp
   expinputs.cpp
   experimentsmgr.cpp

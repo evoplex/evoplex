@@ -95,7 +95,6 @@ void DefaultOutput::doOperation(const int trialId, const AbstractModel* model)
         break;
     default:
         qFatal("invalid function!");
-        break;
     }
     updateCaches(trialId, model->currStep(), allValues);
 }
@@ -211,7 +210,7 @@ void Output::updateCaches(const int trialId, const int currStep, const Values& a
         newRow.second.reserve(cache->m_inputs.size());
 
         for (Value input : cache->m_inputs) {
-            int col = std::find(m_allInputs.begin(), m_allInputs.end(), input) - m_allInputs.begin();
+            const size_t col = std::find(m_allInputs.begin(), m_allInputs.end(), input) - m_allInputs.begin();
             newRow.second.emplace_back(allValues.at(col));
         }
         if (data.rows.empty()) data.last = data.rows.before_begin();
