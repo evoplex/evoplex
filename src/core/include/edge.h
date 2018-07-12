@@ -34,15 +34,26 @@ class Node;
 typedef std::shared_ptr<Node> NodePtr;
 typedef std::shared_ptr<Edge> EdgePtr;
 
+/**
+ * @brief An Edge connects a node to itself or to another node.
+ * @attention An edge can only be created by an AbstractGraph derived object.
+ */
 class Edge
 {
-public:
-    explicit Edge(int id, const NodePtr& origin, const NodePtr& neighbour,
-        Attributes* attrs, bool takesOwnership)
-        : m_id(id), m_origin(origin), m_neighbour(neighbour), m_attrs(attrs),
-          m_takesOwnership(takesOwnership) {}
+    friend class AbstractGraph;
+    friend class TestEdge;
 
-    ~Edge() { if (m_takesOwnership) delete m_attrs; }
+private:
+    struct constructor_key { /* this is a private key accessible only to friends */ };
+
+public:
+    explicit Edge(const constructor_key&, int id, const NodePtr& origin,
+                  const NodePtr& neighbour, Attributes* attrs=new Attributes(),
+                  bool ownsAttrs=true)
+        : m_id(id), m_origin(origin), m_neighbour(neighbour),
+          m_attrs(attrs), m_ownsAttrs(ownsAttrs) {}
+
+    ~Edge() { if (m_ownsAttrs) delete m_attrs; }
 
     inline const Attributes* attrs() const;
     inline const Value& attr(const char* name) const;
@@ -58,7 +69,7 @@ private:
     const NodePtr& m_origin;
     const NodePtr& m_neighbour;
     Attributes* m_attrs;
-    bool m_takesOwnership;
+    const bool m_ownsAttrs;
 };
 
 /************************************************************************

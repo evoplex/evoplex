@@ -45,16 +45,17 @@ Nodes Nodes::fromCmd(const QString& cmd, const AttributesScope& attrsScope,
     SetOfAttributes setOfAttrs = ag->create();
     delete ag;
 
+    Node::constructor_key k;
     Nodes nodes;
     int id = 0;
     if (graphType == AbstractGraph::Directed) {
         for (Attributes attrs : setOfAttrs) {
-            nodes.insert({id, std::make_shared<DNode>(id, attrs)});
+            nodes.insert({id, std::make_shared<DNode>(k, id, attrs)});
             ++id;
         }
-    } else {
+    } else if (graphType == AbstractGraph::Undirected) {
         for (Attributes attrs : setOfAttrs) {
-            nodes.insert({id, std::make_shared<UNode>(id, attrs)});
+            nodes.insert({id, std::make_shared<UNode>(k, id, attrs)});
             ++id;
         }
     }
@@ -212,10 +213,11 @@ NodePtr Nodes::readRow(const int row, const QStringList& header, const QStringLi
         }
     }
 
+    Node::constructor_key k;
     if (isDirected) {
-        return std::make_shared<DNode>(row, attrs, coordX, coordY);
+        return std::make_shared<DNode>(k, row, attrs, coordX, coordY);
     }
-    return std::make_shared<UNode>(row, attrs, coordX, coordY);
+    return std::make_shared<UNode>(k, row, attrs, coordX, coordY);
 }
 
 } // evoplex
