@@ -62,7 +62,7 @@ private:
     bool m_finished;
     int m_currTrialId;
 
-    AbstractModel* m_model;
+    const Trial* m_trial;
     int m_currStep;
 
     void removeAllSeries();

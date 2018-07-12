@@ -23,6 +23,7 @@
 #include "gridview.h"
 #include "ui_graphwidget.h"
 #include "ui_graphsettings.h"
+#include "utils.h"
 
 namespace evoplex
 {
@@ -43,11 +44,11 @@ int GridView::refreshCache()
         return Scheduled;
     }
     Utils::deleteAndShrink(m_cache);
-    if (!m_model) {
+    if (!m_trial || !m_trial->graph()) {
         return Ready;
     }
 
-    const Nodes& nodes = m_model->graph()->nodes();
+    const Nodes& nodes = m_trial->graph()->nodes();
     m_cache.reserve(nodes.size());
 
     for (auto const& np : nodes) {

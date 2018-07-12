@@ -91,7 +91,7 @@ void ProjectWidget::closeEvent(QCloseEvent* event)
 
 void ProjectWidget::fillRow(int row, const Experiment* exp)
 {
-    Q_ASSERT(exp);
+    Q_ASSERT(exp && exp->inputs());
 
     m_ui->table->setSortingEnabled(false);
 
@@ -101,8 +101,13 @@ void ProjectWidget::fillRow(int row, const Experiment* exp)
     insertItem(row, TableWidget::H_STOPAT, exp->inputs()->general(GENERAL_ATTRIBUTE_STOPAT).toQString());
     insertItem(row, TableWidget::H_TRIALS, exp->inputs()->general(GENERAL_ATTRIBUTE_TRIALS).toQString());
 
+    if (exp->expStatus() == Experiment::INVALID) {
+        m_ui->table->setSortingEnabled(true);
+        return;
+    }
+
     // lambda function to add the attributes of a plugin (ie, model or graph)
-    auto pluginAtbs = [this, row](TableWidget::Header header, QString pluginId, const Attributes* attrs)
+    auto pluginAtbs = [this, row](TableWidget::Header header, const QString& pluginId, const Attributes* attrs)
     {
         QString pluginAttrs = pluginId;
         for (const Value& v : attrs->values()) {

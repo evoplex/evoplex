@@ -57,7 +57,7 @@ protected:
     Ui_GraphWidget* m_ui;
     GraphSettings* m_settingsDlg;
     Experiment* m_exp;
-    AbstractModel* m_model;
+    const Trial* m_trial;
 
     int m_currStep;
     int m_selectedNode;

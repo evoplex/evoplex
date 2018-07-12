@@ -36,7 +36,7 @@ LineChart::LineChart(Experiment* exp, QWidget* parent)
     , m_maxY(0)
     , m_finished(false)
     , m_currTrialId(0)
-    , m_model(nullptr)
+    , m_trial(nullptr)
     , m_currStep(0)
 {
     setWindowTitle("Line Chart");
@@ -59,7 +59,7 @@ LineChart::LineChart(Experiment* exp, QWidget* parent)
 
     connect(exp, &Experiment::trialCreated, [this](int trialId) {
         if (trialId == m_currTrialId) {
-            m_model = m_exp->trial(trialId);
+            m_trial = m_exp->trial(trialId);
             m_currStep = 0;
         }
     });
@@ -163,7 +163,7 @@ void LineChart::setTrial(int trialId)
     }
 
     m_currTrialId = trialId;
-    m_model = m_exp->trial(trialId);
+    m_trial = m_exp->trial(trialId);
 
     for (Series& s : m_series) {
         s.series->clear(); // remove all points
@@ -189,7 +189,8 @@ void LineChart::removeAllSeries()
 
 void LineChart::updateSeries()
 {
-    if (!m_model || !m_chart->isVisible() || m_series.empty() || m_model->currStep() == m_currStep) {
+    if (!m_trial || !m_trial->model() || !m_chart->isVisible() ||
+            m_series.empty() || m_trial->step() == m_currStep) {
         return;
     }
 

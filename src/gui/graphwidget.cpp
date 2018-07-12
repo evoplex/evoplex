@@ -35,7 +35,7 @@ GraphWidget::GraphWidget(MainGUI* mainGUI, Experiment* exp, ExperimentWidget* pa
     , m_ui(new Ui_GraphWidget)
     , m_settingsDlg(new GraphSettings(mainGUI, exp, this))
     , m_exp(exp)
-    , m_model(nullptr)
+    , m_trial(nullptr)
     , m_currStep(-1)
     , m_selectedNode(-1)
     , m_zoomLevel(0)
@@ -84,12 +84,12 @@ GraphWidget::GraphWidget(MainGUI* mainGUI, Experiment* exp, ExperimentWidget* pa
         QLineEdit* le = new QLineEdit();
         le->setToolTip(attrRange->attrRangeStr());
         connect(le, &QLineEdit::editingFinished, [this, attrRange, le]() {
-            if (!m_model || !m_model->graph() || m_ui->nodeId->value() < 0) {
+            if (!m_trial || !m_trial->graph() || m_ui->nodeId->value() < 0) {
                 return;
             }
             QString err;
-            const NodePtr& node = m_model->node(m_ui->nodeId->value());
-            if (m_model->status() == Experiment::RUNNING) {
+            const NodePtr& node = m_trial->graph()->node(m_ui->nodeId->value());
+            if (m_trial->status() == Experiment::RUNNING) {
                 err = "You cannot change things in a running experiment.\n"
                       "Please, pause it and try again.";
             } else {
@@ -124,7 +124,7 @@ GraphWidget::GraphWidget(MainGUI* mainGUI, Experiment* exp, ExperimentWidget* pa
 
 GraphWidget::~GraphWidget()
 {
-    m_model = nullptr;
+    m_trial = nullptr;
     m_exp = nullptr;
     delete m_ui;
     delete m_nodeCMap;
@@ -166,7 +166,7 @@ void GraphWidget::slotRestarted()
     }
     m_selectedNode = -1;
     m_ui->inspector->hide();
-    m_model = nullptr;
+    m_trial = nullptr;
     m_ui->currStep->setText("--");
     updateCache(true);
 }
@@ -181,9 +181,9 @@ void GraphWidget::setNodeCMap(ColorMap* cmap)
 void GraphWidget::setTrial(int trialId)
 {
     m_currTrialId = trialId;
-    m_model = m_exp->trial(trialId);
-    if (m_model) {
-        m_ui->currStep->setText(QString::number(m_model->currStep()));
+    m_trial = m_exp->trial(trialId);
+    if (m_trial && m_trial->model()) {
+        m_ui->currStep->setText(QString::number(m_trial->step()));
     } else {
         m_ui->currStep->setText("--");
     }
@@ -216,15 +216,15 @@ void GraphWidget::resetView()
 
 void GraphWidget::mousePressEvent(QMouseEvent* e)
 {
-    if (e->button() == Qt::LeftButton)
+    if (e->button() == Qt::LeftButton) {
         m_posEntered = e->pos();
+    }
 }
 
 void GraphWidget::mouseReleaseEvent(QMouseEvent *e)
 {
-    if (!m_model || e->button() != Qt::LeftButton
-            || (m_ui->inspector->isVisible()
-                && m_ui->inspector->geometry().contains(e->pos()))) {
+    if (!m_trial || !m_trial->model() || e->button() != Qt::LeftButton ||
+            (m_ui->inspector->isVisible() && m_ui->inspector->geometry().contains(e->pos()))) {
         return;
     }
 
@@ -263,10 +263,10 @@ void GraphWidget::updateInspector(const NodePtr& node)
 
 void GraphWidget::updateView(bool forceUpdate)
 {
-    if (!m_model || (!forceUpdate && m_model->currStep() == m_currStep)) {
+    if (!m_trial || !m_trial->model() || (!forceUpdate && m_trial->step() == m_currStep)) {
         return;
     }
-    m_currStep = m_model->currStep();
+    m_currStep = m_trial->step();
     m_ui->currStep->setText(QString::number(m_currStep));
     update();
 }

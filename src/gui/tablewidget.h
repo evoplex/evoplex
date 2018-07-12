@@ -50,7 +50,7 @@ public:
         H_TRIALS
     };
 
-    explicit TableWidget(QWidget* parent = 0);
+    explicit TableWidget(QWidget* parent);
 
     int insertRow(Experiment* exp);
     void insertColumns(const QList<Header> headers);
