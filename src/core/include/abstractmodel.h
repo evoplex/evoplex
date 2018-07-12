@@ -51,8 +51,7 @@ class AbstractModel : public AbstractModelInterface, public AbstractPlugin
 
 public:
     AbstractGraph* graph() const;
-    int currStep() const;
-    int status() const;
+    int step() const;
 
     inline const Nodes& nodes() const;
     inline const NodePtr& node(const int nodeId) const;

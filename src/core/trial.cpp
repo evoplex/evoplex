@@ -35,7 +35,7 @@ Trial::Trial(const quint16 id, Experiment* exp)
     : m_id(id),
       m_exp(exp),
       m_step(0),
-      m_status(Experiment::UNSET),
+      m_status(Status::Unset),
       m_prg(nullptr),
       m_graph(nullptr),
       m_model(nullptr)
@@ -53,14 +53,14 @@ Trial::~Trial()
     delete m_prg;
 }
 
-AbstractGraph::GraphType Trial::graphType() const
+GraphType Trial::graphType() const
 {
     return  m_exp->graphType();
 }
 
 bool Trial::init()
 {
-    if (m_exp->expStatus() == Experiment::INVALID || m_exp->pauseAt() == 0) {
+    if (m_exp->expStatus() == Status::Invalid || m_exp->pauseAt() == 0) {
         return false;
     }
 
@@ -104,7 +104,7 @@ bool Trial::init()
 
         // write this initial step to file
         for (OutputPtr output : m_exp->m_outputs) {
-            output->doOperation(m_id, m_model);
+            output->doOperation(this);
         }
         writeCachedSteps();
     }
@@ -120,8 +120,8 @@ bool Trial::init()
 void Trial::run()
 {
     if (!_run()) {
-        m_status = Experiment::INVALID;
-        m_exp->setExpStatus(Experiment::INVALID);
+        m_status = Status::Invalid;
+        m_exp->setExpStatus(Status::Invalid);
         m_exp->pause();
     }
     m_exp->m_mainApp->expMgr()->finished(m_exp, m_id);
@@ -129,11 +129,11 @@ void Trial::run()
 
 bool Trial::_run()
 {
-    if (m_exp->expStatus() == Experiment::INVALID) {
+    if (m_exp->expStatus() == Status::Invalid) {
         return false;
     }
 
-    if (m_status == Experiment::UNSET) {
+    if (m_status == Status::Unset) {
         // Ensure we init one trial at a time.
         // Thus, if one trial fail, the others will be aborted earlier.
         m_exp->m_mutex.lock();
@@ -145,17 +145,17 @@ bool Trial::_run()
         m_graph->reset();
     }
 
-    m_status = Experiment::RUNNING;
+    m_status = Status::Running;
     emit (m_exp->trialCreated(m_id));
 
     if (!runSteps() || m_step >= m_exp->stopAt()) {
         if (writeCachedSteps()) {
-            m_status = Experiment::FINISHED;
+            m_status = Status::Finished;
         } else {
             return false;
         }
     } else {
-        m_status = Experiment::READY;
+        m_status = Status::Ready;
     }
 
     return true;
@@ -172,12 +172,12 @@ bool Trial::runSteps()
         ++m_step;
 
         for (const OutputPtr& output : m_exp->m_outputs) {
-            output->doOperation(m_id, m_model);
+            output->doOperation(this);
         }
 
         if (m_step % m_exp->m_mainApp->stepsToFlush() == 0 && !writeCachedSteps()) {
-            m_status = Experiment::INVALID;
-            m_exp->setExpStatus(Experiment::INVALID);
+            m_status = Status::Invalid;
+            m_exp->setExpStatus(Status::Invalid);
             m_exp->pause();
             return false;
         }

@@ -35,6 +35,7 @@ set(EVOPLEX_CORE_INCLUDE
   include/utils.h
   include/value.h
   include/stats.h
+  include/enum.h
 )
 set(EVOPLEX_CORE_H
   graphplugin.h

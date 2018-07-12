@@ -84,8 +84,7 @@ LineChart::~LineChart()
 
 void LineChart::slotOutputWidget()
 {
-    if (m_exp->expStatus() == Experiment::RUNNING
-            || m_exp->expStatus() == Experiment::QUEUED) {
+    if (m_exp->expStatus() == Status::Running || m_exp->expStatus() == Status::Queued) {
         QMessageBox::warning(this, "Line Chart",
                     "You cannot edit the series of a running experiment.\n"
                     "Please, pause it and try again.");
@@ -143,8 +142,7 @@ void LineChart::slotRestarted()
 
 void LineChart::setTrial(int trialId)
 {
-    if (m_exp->expStatus() == Experiment::RUNNING
-               || m_exp->expStatus() == Experiment::QUEUED) {
+    if (m_exp->expStatus() == Status::Running || m_exp->expStatus() == Status::Queued) {
         QMessageBox::warning(this, "Line Chart",
                 "Tried to change the trial in a running experiment.\n"
                 "Please, pause it and try again.");
@@ -260,7 +258,7 @@ void LineChart::updateSeries()
     }
 
     m_finished = m_series.front().cache->isEmpty(m_currTrialId)
-            && m_exp->expStatus() == Experiment::FINISHED;
+            && m_exp->expStatus() == Status::Finished;
 }
 
 } // evoplex

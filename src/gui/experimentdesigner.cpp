@@ -36,6 +36,7 @@
 #include "ui_experimentdesigner.h"
 
 #include "core/attrsgenerator.h"
+#include "core/include/enum.h"
 
 #define STRING_NULL_PLUGINID "--"
 
@@ -93,8 +94,8 @@ ExperimentDesigner::ExperimentDesigner(MainApp* mainApp, QWidget *parent)
     addTreeWidget(m_treeItemGraphs, GENERAL_ATTRIBUTE_GRAPHID, QVariant::fromValue(cb));
     // --  graph type
     cb = new QComboBox(m_ui->treeWidget);
-    cb->insertItem(0, "undirected", AbstractGraph::Undirected);
-    cb->insertItem(1, "directed", AbstractGraph::Directed);
+    cb->insertItem(0, "undirected", static_cast<int>(GraphType::Undirected));
+    cb->insertItem(1, "directed", static_cast<int>(GraphType::Directed));
     m_customGraphIdx = m_treeItemGraphs->childCount();
     addTreeWidget(m_treeItemGraphs, GENERAL_ATTRIBUTE_GRAPHTYPE, QVariant::fromValue(cb));
 

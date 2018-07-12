@@ -21,8 +21,9 @@
 #ifndef GRAPHPLUGIN_H
 #define GRAPHPLUGIN_H
 
-#include "abstractgraph.h"
-#include "attributes.h"
+#include <vector>
+
+#include "enum.h"
 #include "plugin.h"
 
 namespace evoplex {
@@ -32,7 +33,7 @@ class GraphPlugin : public Plugin
     friend class MainApp;
 
 public:
-    using GraphTypes = std::vector<AbstractGraph::GraphType>;
+    using GraphTypes = std::vector<GraphType>;
 
     virtual ~GraphPlugin() = default;
 
@@ -42,7 +43,7 @@ protected:
     explicit GraphPlugin(const QJsonObject* metaData, const QString& libPath);
 
 private:
-    std::vector<AbstractGraph::GraphType> m_validGraphTypes;
+    std::vector<GraphType> m_validGraphTypes;
 };
 
 /************************************************************************

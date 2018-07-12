@@ -46,14 +46,6 @@ class AbstractGraph : public AbstractGraphInterface, public AbstractPlugin
     friend class Trial;
 
 public:
-    enum GraphType {
-        Invalid_Type = 0,
-        Undirected = 1,
-        Directed = 2
-    };
-
-    static GraphType enumFromString(const QString& str);
-
     GraphType type() const;
     inline bool isDirected() const;
     inline bool isUndirected() const;
@@ -103,10 +95,10 @@ private:
  ************************************************************************/
 
 inline bool AbstractGraph::isDirected() const
-{ return type() == Directed; }
+{ return type() == GraphType::Directed; }
 
 inline bool AbstractGraph::isUndirected() const
-{ return type() == Undirected; }
+{ return type() == GraphType::Undirected; }
 
 inline const Edges& AbstractGraph::edges() const
 { return m_edges; }

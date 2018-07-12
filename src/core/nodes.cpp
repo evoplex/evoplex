@@ -26,12 +26,11 @@
 
 #include "nodes.h"
 #include "attrsgenerator.h"
-#include "abstractgraph.h"
 
 namespace evoplex {
 
 Nodes Nodes::fromCmd(const QString& cmd, const AttributesScope& attrsScope,
-        const int graphType, QString& error, std::function<void(int)> progress)
+        const GraphType& graphType, QString& error, std::function<void(int)> progress)
 {
     if (QFileInfo::exists(cmd)) {
         return Nodes::fromFile(cmd, attrsScope, graphType, error, progress);
@@ -48,12 +47,12 @@ Nodes Nodes::fromCmd(const QString& cmd, const AttributesScope& attrsScope,
     Node::constructor_key k;
     Nodes nodes;
     int id = 0;
-    if (graphType == AbstractGraph::Directed) {
+    if (graphType == GraphType::Directed) {
         for (Attributes attrs : setOfAttrs) {
             nodes.insert({id, std::make_shared<DNode>(k, id, attrs)});
             ++id;
         }
-    } else if (graphType == AbstractGraph::Undirected) {
+    } else if (graphType == GraphType::Undirected) {
         for (Attributes attrs : setOfAttrs) {
             nodes.insert({id, std::make_shared<UNode>(k, id, attrs)});
             ++id;
@@ -64,10 +63,10 @@ Nodes Nodes::fromCmd(const QString& cmd, const AttributesScope& attrsScope,
 }
 
 Nodes Nodes::fromFile(const QString& filePath, const AttributesScope& attrsScope,
-        const int graphType, QString& error, std::function<void(int)> progress)
+        const GraphType& graphType, QString& error, std::function<void(int)> progress)
 {
-    bool isDirected = graphType == AbstractGraph::Directed;
-    Q_ASSERT_X(isDirected || graphType == AbstractGraph::Undirected,
+    bool isDirected = graphType == GraphType::Directed;
+    Q_ASSERT_X(isDirected || graphType == GraphType::Undirected,
                "Nodes", "graph type must be 'directed' or 'undirected'");
 
     QFile file(filePath);

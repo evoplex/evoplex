@@ -42,6 +42,8 @@ const char* MainApp::kPluginExtension = ".so";
 MainApp::MainApp()
     : m_experimentsMgr(new ExperimentsMgr())
 {
+    qRegisterMetaType<Status>("Status"); // makes it available for signals/slots
+
     resetSettingsToDefault();
     m_defaultStepDelay = static_cast<quint16>(m_userPrefs.value("settings/stepDelay", m_defaultStepDelay).toInt());
     m_stepsToFlush = m_userPrefs.value("settings/stepsToFlush", m_stepsToFlush).toInt();

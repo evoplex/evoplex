@@ -28,14 +28,9 @@ AbstractGraph* AbstractModel::graph() const
     return m_trial->graph();
 }
 
-int AbstractModel::currStep() const
+int AbstractModel::step() const
 {
     return m_trial->step();
-}
-
-int AbstractModel::status() const
-{
-    return m_trial->status();
 }
 
 inline Values AbstractModel::customOutputs(const Values& inputs) const

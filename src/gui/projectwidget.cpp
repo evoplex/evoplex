@@ -101,7 +101,7 @@ void ProjectWidget::fillRow(int row, const Experiment* exp)
     insertItem(row, TableWidget::H_STOPAT, exp->inputs()->general(GENERAL_ATTRIBUTE_STOPAT).toQString());
     insertItem(row, TableWidget::H_TRIALS, exp->inputs()->general(GENERAL_ATTRIBUTE_TRIALS).toQString());
 
-    if (exp->expStatus() == Experiment::INVALID) {
+    if (exp->expStatus() == Status::Invalid) {
         m_ui->table->setSortingEnabled(true);
         return;
     }

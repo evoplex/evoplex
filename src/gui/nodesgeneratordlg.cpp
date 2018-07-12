@@ -141,7 +141,7 @@ void NodesGeneratorDlg::slotSaveAs()
         std::function<void(int)> progress = [&progressDlg, &pValue](int p) { progressDlg.setValue(pValue + p); };
 
         QString errMsg;
-        Nodes nodes = Nodes::fromCmd(cmd, m_nodeAttrsScope, AbstractGraph::Undirected, errMsg, progress);
+        Nodes nodes = Nodes::fromCmd(cmd, m_nodeAttrsScope, GraphType::Undirected, errMsg, progress);
         Q_ASSERT_X(errMsg.isEmpty(), "NodesGeneratorDlg::slotSaveAs", "the command should be free of erros here");
         Q_ASSERT_X(!nodes.empty(), "NodesGeneratorDlg::slotSaveAs", "nodes size must be >0");
 

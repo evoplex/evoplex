@@ -41,8 +41,8 @@ GraphPlugin::GraphPlugin(const QJsonObject* metaData, const QString& libPath)
 
     QJsonArray array = metaData->value(PLUGIN_ATTRIBUTE_VALIDGRAPHTYPES).toArray();
     for (auto it : array) {
-        AbstractGraph::GraphType type = AbstractGraph::enumFromString(it.toString());
-        if (type == AbstractGraph::Invalid_Type) {
+        GraphType type = _enumFromString<GraphType>(it.toString());
+        if (type == GraphType::Invalid) {
             qWarning() << "invalid value for 'validGraphTypes':" << it.toString();
             m_type = Invalid;
             return;

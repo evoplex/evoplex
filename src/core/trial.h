@@ -24,7 +24,7 @@
 #include <unordered_map>
 #include <QRunnable>
 
-#include "abstractgraph.h"
+#include "enum.h"
 
 namespace evoplex {
 
@@ -57,11 +57,11 @@ public:
     // number of steps or the pause criteria defined by the user.
     void run() override;
 
-    AbstractGraph::GraphType graphType() const;
+    GraphType graphType() const;
 
     inline quint16 id() const;
     inline int step() const;
-    inline int status() const;  // FIXME
+    inline Status status() const;
 
     inline PRG* prg() const;
     inline const AbstractModel* model() const;
@@ -71,7 +71,7 @@ private:
     const quint16 m_id;
     Experiment* m_exp;
     int m_step;
-    int m_status;
+    Status m_status;
 
     PRG* m_prg;
     AbstractGraph* m_graph;
@@ -102,7 +102,7 @@ inline quint16 Trial::id() const
 inline int Trial::step() const
 { return m_step; }
 
-inline int Trial::status() const
+inline Status Trial::status() const
 { return m_status; }
 
 inline PRG* Trial::prg() const

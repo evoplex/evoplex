@@ -166,7 +166,7 @@ void ProjectsPage::slotOpenExperiment(Experiment* exp)
 {
     if (!exp) {
         return;
-    } else if (exp->expStatus() == Experiment::INVALID) {
+    } else if (exp->expStatus() == Status::Invalid) {
         QMessageBox::warning(this, "Experiment",
                 "This experiment is invalid.\n"
                 "It seems that something went wrong with its settings.\n"

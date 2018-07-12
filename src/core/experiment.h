@@ -27,10 +27,11 @@
 
 #include <QMutex>
 
+#include "constants.h"
+#include "enum.h"
 #include "expinputs.h"
 #include "experimentsmgr.h"
 #include "mainapp.h"
-#include "constants.h"
 #include "output.h"
 #include "trial.h"
 #include "graphplugin.h"
@@ -49,18 +50,7 @@ class Experiment : public QObject
     friend class Trial;
 
 public:
-    enum Status {
-        INVALID,  // something went wrong
-        UNSET,    // has not yet been initialized
-        READY,    // ready for another step
-        QUEUED,   // queued to run
-        RUNNING,  // running in a work thread
-        FINISHED, // all is done
-    };
-    Q_ENUM(Status) // important to make the signals work
-
     explicit Experiment(MainApp* mainApp, ExpInputs* inputs, ProjectPtr project);
-
     ~Experiment();
 
     bool init(ExpInputs* inputs, QString& error);
@@ -117,13 +107,13 @@ public:
     inline const QString& graphId() const;
     inline const ModelPlugin* modelPlugin() const;
     inline const GraphPlugin* graphPlugin() const;
-    inline AbstractGraph::GraphType graphType() const;
+    inline GraphType graphType() const;
 
 signals:
     void trialCreated(int trialId);
     void restarted();
     void progressUpdated();
-    void statusChanged(Experiment::Status);
+    void statusChanged(Status);
 
 private slots:
     // Updates the progress value.
@@ -139,7 +129,7 @@ private:
     const ExpInputs* m_inputs;
     const GraphPlugin* m_graphPlugin;
     const ModelPlugin* m_modelPlugin;
-    AbstractGraph::GraphType m_graphType;
+    GraphType m_graphType;
     int m_numTrials;
     bool m_autoDeleteTrials;
     int m_stopAt;
@@ -222,7 +212,7 @@ inline ProjectPtr Experiment::project() const
 inline int Experiment::numTrials() const
 { return m_numTrials; }
 
-inline Experiment::Status Experiment::expStatus() const
+inline Status Experiment::expStatus() const
 { return m_expStatus; }
 
 inline quint16 Experiment::progress() const
@@ -243,7 +233,7 @@ inline const ModelPlugin* Experiment::modelPlugin() const
 inline const GraphPlugin* Experiment::graphPlugin() const
 { return m_graphPlugin; }
 
-inline AbstractGraph::GraphType Experiment::graphType() const
+inline GraphType Experiment::graphType() const
 { return m_graphType; }
 
 } // evoplex

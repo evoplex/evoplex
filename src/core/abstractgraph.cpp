@@ -25,13 +25,6 @@
 
 namespace evoplex {
 
-AbstractGraph::GraphType AbstractGraph::enumFromString(const QString& str)
-{
-    if (str == "undirected") return Undirected;
-    if (str == "directed") return Directed;
-    return Invalid_Type;
-}
-
 AbstractGraph::AbstractGraph()
     : m_lastNodeId(-1),
       m_lastEdgeId(-1)
@@ -47,7 +40,7 @@ bool AbstractGraph::setup(Trial& trial, const Attributes& attrs, Nodes& nodes)
     return AbstractPlugin::setup(trial, attrs);
 }
 
-AbstractGraph::GraphType AbstractGraph::type() const
+GraphType AbstractGraph::type() const
 {
     return m_trial->graphType();
 }

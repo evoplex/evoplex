@@ -51,7 +51,7 @@ protected:
     void closeEvent(QCloseEvent *event);
 
 private slots:
-    void slotStatusChanged(Experiment::Status status);
+    void slotStatusChanged(Status status);
 
 private:
     const QIcon m_kIcon_play;

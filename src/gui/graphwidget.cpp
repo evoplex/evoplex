@@ -89,7 +89,7 @@ GraphWidget::GraphWidget(MainGUI* mainGUI, Experiment* exp, ExperimentWidget* pa
             }
             QString err;
             const NodePtr& node = m_trial->graph()->node(m_ui->nodeId->value());
-            if (m_trial->status() == Experiment::RUNNING) {
+            if (m_trial->status() == Status::Running) {
                 err = "You cannot change things in a running experiment.\n"
                       "Please, pause it and try again.";
             } else {

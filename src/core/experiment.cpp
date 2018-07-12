@@ -32,7 +32,7 @@ Experiment::Experiment(MainApp* mainApp, ExpInputs* inputs, ProjectPtr project)
       m_id(inputs->general(GENERAL_ATTRIBUTE_EXPID).toInt()),
       m_project(project),
       m_inputs(nullptr),
-      m_expStatus(INVALID)
+      m_expStatus(Status::Invalid)
 {
     Q_ASSERT_X(m_project, "Experiment", "an experiment must belong to a valid project");
     QString error;
@@ -41,7 +41,7 @@ Experiment::Experiment(MainApp* mainApp, ExpInputs* inputs, ProjectPtr project)
 
 Experiment::~Experiment()
 {
-    Q_ASSERT_X(m_expStatus != RUNNING && m_expStatus != QUEUED,
+    Q_ASSERT_X(m_expStatus != Status::Running && m_expStatus != Status::Queued,
                "~Experiment", "tried to delete a running experiment");
     deleteTrials();
     m_outputs.clear();
@@ -51,7 +51,7 @@ Experiment::~Experiment()
 
 bool Experiment::init(ExpInputs* inputs, QString& error)
 {
-    if (m_expStatus == RUNNING || m_expStatus == QUEUED) {
+    if (m_expStatus == Status::Running || m_expStatus == Status::Queued) {
         error = "Tried to initialize a running experiment.\n"
                 "Please, pause it and try again.";
         qWarning() << error;
@@ -62,8 +62,8 @@ bool Experiment::init(ExpInputs* inputs, QString& error)
     delete m_inputs;
     m_inputs = inputs;
 
-    m_graphType = AbstractGraph::enumFromString(m_inputs->general(GENERAL_ATTRIBUTE_GRAPHTYPE).toQString());
-    if (m_graphType == AbstractGraph::Invalid_Type) {
+    m_graphType = _enumFromString<GraphType>(m_inputs->general(GENERAL_ATTRIBUTE_GRAPHTYPE).toQString());
+    if (m_graphType == GraphType::Invalid) {
         error = "the graph type is invalid!";
         qWarning() << error;
         return false;
@@ -105,7 +105,7 @@ bool Experiment::init(ExpInputs* inputs, QString& error)
 
 void Experiment::reset()
 {
-    if (m_expStatus == RUNNING || m_expStatus == QUEUED) {
+    if (m_expStatus == Status::Running || m_expStatus == Status::Queued) {
         qWarning() << "tried to reset a running experiment. You should pause it first.";
         return;
     }
@@ -128,7 +128,7 @@ void Experiment::reset()
     m_pauseAt = m_stopAt;
     m_progress = 0;
 
-    m_expStatus = READY;
+    m_expStatus = Status::Ready;
     emit (statusChanged(m_expStatus));
 
     emit (restarted());
@@ -157,11 +157,11 @@ void Experiment::deleteTrials()
 void Experiment::updateProgressValue()
 {
     quint16 lastProgress = m_progress;
-    if (m_expStatus == FINISHED) {
+    if (m_expStatus == Status::Finished) {
         m_progress = 360;
-    } else if (m_expStatus == INVALID) {
+    } else if (m_expStatus == Status::Invalid) {
         m_progress = 0;
-    } else if (m_expStatus == RUNNING) {
+    } else if (m_expStatus == Status::Running) {
         float p = 0.f;
         for (auto& trial : m_trials) {
             p += (static_cast<float>(trial.second->step()) / m_pauseAt);
@@ -176,11 +176,11 @@ void Experiment::updateProgressValue()
 
 void Experiment::toggle()
 {
-    if (m_expStatus == RUNNING) {
+    if (m_expStatus == Status::Running) {
         pause();
-    } else if (m_expStatus == READY) {
+    } else if (m_expStatus == Status::Ready) {
         play();
-    } else if (m_expStatus == QUEUED) {
+    } else if (m_expStatus == Status::Queued) {
         m_mainApp->expMgr()->removeFromQueue(this);
     }
 }
@@ -192,7 +192,7 @@ void Experiment::play()
 
 void Experiment::playNext()
 {
-    if (m_expStatus != READY) {
+    if (m_expStatus != Status::Ready) {
         return;
     } else if (m_trials.empty()) {
         setPauseAt(-1); // just create and set the trials
@@ -215,7 +215,7 @@ Nodes Experiment::cloneCachedNodes(const int trialId)
 
     // if it's not the last trial, just take a copy of the nodes
     for (auto const& it : m_trials) {
-        if (it.first != trialId && it.second->status() == UNSET) {
+        if (it.first != trialId && it.second->status() == Status::Unset) {
             return Utils::clone(m_clonableNodes);
         }
     }
@@ -247,7 +247,7 @@ bool Experiment::createNodes(Nodes& nodes) const
 
 bool Experiment::removeOutput(OutputPtr output)
 {
-    if (m_expStatus != Experiment::READY) {
+    if (m_expStatus != Status::Ready) {
         qWarning() << "tried to remove an 'Output' from a running experiment. You should pause it first.";
         return false;
     }

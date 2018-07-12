@@ -26,6 +26,7 @@
 #include <unordered_map>
 
 #include "attributerange.h"
+#include "enum.h"
 #include "node.h"
 
 namespace evoplex {
@@ -55,11 +56,11 @@ public:
     };
 
     static Nodes fromCmd(const QString& cmd, const AttributesScope& attrsScope,
-            const int graphType, QString& error, std::function<void(int)> progress = [](int){});
+            const GraphType& graphType, QString& error, std::function<void(int)> progress = [](int){});
 
     // Read a set of nodes from a csv file
     static Nodes fromFile(const QString& filePath, const AttributesScope& attrsScope,
-            const int graphType, QString& error, std::function<void(int)> progress = [](int){});
+            const GraphType& graphType, QString& error, std::function<void(int)> progress = [](int){});
 
     // Export set of nodes to a csv file
     bool saveToFile(QString filepath, std::function<void(int)> progress = [](int){}) const;
