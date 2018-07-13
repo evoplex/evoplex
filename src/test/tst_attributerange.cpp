@@ -159,12 +159,11 @@ void TestAttributeRange::tst_bool()
 
 void TestAttributeRange::tst_int_range()
 {
-    const int TEST_CASES = 3;
-    const char* attrNames[TEST_CASES] = {"test0", "test1", "test2"};
+    QStringList attrNames = {"test0", "test1", "test2"};
     // Case 1: regular range
     // Case 2: negative numbers
     // Case 3: large range
-    const char* attrRangeStrs[TEST_CASES] = {"int[0,1]", "int[-10,-5]", "int[-100,100]"};
+    QStringList attrRangeStrs = {"int[0,1]", "int[-10,-5]", "int[-100,100]"};
 
     AttributeRange* attrRge = AttributeRange::parse(0, attrNames[0], attrRangeStrs[0]);
     AttributeRange* attrRge2 = AttributeRange::parse(1, attrNames[1], attrRangeStrs[1]);
@@ -198,22 +197,21 @@ void TestAttributeRange::tst_int_range()
     v = attrRge3->validate("invalid"); // invalid
     _tst_value(v, Value::INVALID);
 
-
     // Tests if functions work as expected
     QVERIFY(attrRge->isValid());
     QCOMPARE(attrRge->id(), 0);
-    QCOMPARE(attrRge->attrName(), QString(attrNames[0]));
-    QCOMPARE(attrRge->attrRangeStr(), QString(attrRangeStrs[0]));
+    QCOMPARE(attrRge->attrName(), attrNames.at(0));
+    QCOMPARE(attrRge->attrRangeStr(), attrRangeStrs.at(0));
 
     QVERIFY(attrRge2->isValid());
     QCOMPARE(attrRge2->id(), 1);
-    QCOMPARE(attrRge2->attrName(), QString(attrNames[1]));
-    QCOMPARE(attrRge2->attrRangeStr(), QString(attrRangeStrs[1]));
+    QCOMPARE(attrRge2->attrName(), attrNames.at(1));
+    QCOMPARE(attrRge2->attrRangeStr(), attrRangeStrs.at(1));
 
     QVERIFY(attrRge3->isValid());
     QCOMPARE(attrRge3->id(), 2);
-    QCOMPARE(attrRge3->attrName(), QString(attrNames[2]));
-    QCOMPARE(attrRge3->attrRangeStr(), QString(attrRangeStrs[2]));
+    QCOMPARE(attrRge3->attrName(), attrNames.at(2));
+    QCOMPARE(attrRge3->attrRangeStr(), attrRangeStrs.at(2));
 
     AttributeRange::Type type = AttributeRange::Int_Range;
     QCOMPARE(attrRge->type(), type);
@@ -256,16 +254,15 @@ void TestAttributeRange::tst_int_range()
 
 void TestAttributeRange::tst_double_range()
 {
-    const int TEST_CASES = 3;
-    const char* attrNames[TEST_CASES] = {"test0", "test1", "test2"};
+    QStringList attrNames = {"test0", "test1", "test2"};
     // Case 1: regular range
     // Case 2: negative numbers
     // Case 3: large range
-    const char* attrRangeStrs[TEST_CASES] = {"double[1.1,1.2]", "double[-5.5,-3.3]", "double[-95.7,87.5]"};
+    QStringList attrRangeStrs = {"double[1.1,1.2]", "double[-5.5,-3.3]", "double[-95.7,87.5]"};
 
-    AttributeRange* attrRge = AttributeRange::parse(0, attrNames[0], attrRangeStrs[0]);
-    AttributeRange* attrRge2 = AttributeRange::parse(1, attrNames[1], attrRangeStrs[1]);
-    AttributeRange* attrRge3 = AttributeRange::parse(2, attrNames[2], attrRangeStrs[2]);
+    AttributeRange* attrRge = AttributeRange::parse(0, attrNames.at(0), attrRangeStrs.at(0));
+    AttributeRange* attrRge2 = AttributeRange::parse(1, attrNames.at(1), attrRangeStrs.at(1));
+    AttributeRange* attrRge3 = AttributeRange::parse(2, attrNames.at(2), attrRangeStrs.at(2));
 
     // Tests value returned by 'AttributeRange::validate()'
     Value v;
@@ -300,18 +297,18 @@ void TestAttributeRange::tst_double_range()
     // Tests if functions work as expected
     QVERIFY(attrRge->isValid());
     QCOMPARE(attrRge->id(), 0);
-    QCOMPARE(attrRge->attrName(), QString(attrNames[0]));
-    QCOMPARE(attrRge->attrRangeStr(), QString(attrRangeStrs[0]));
+    QCOMPARE(attrRge->attrName(), attrNames.at(0));
+    QCOMPARE(attrRge->attrRangeStr(), attrRangeStrs.at(0));
 
     QVERIFY(attrRge2->isValid());
     QCOMPARE(attrRge2->id(), 1);
-    QCOMPARE(attrRge2->attrName(), QString(attrNames[1]));
-    QCOMPARE(attrRge2->attrRangeStr(), QString(attrRangeStrs[1]));
+    QCOMPARE(attrRge2->attrName(), attrNames.at(1));
+    QCOMPARE(attrRge2->attrRangeStr(), attrRangeStrs.at(1));
 
     QVERIFY(attrRge3->isValid());
     QCOMPARE(attrRge3->id(), 2);
-    QCOMPARE(attrRge3->attrName(), QString(attrNames[2]));
-    QCOMPARE(attrRge3->attrRangeStr(), QString(attrRangeStrs[2]));
+    QCOMPARE(attrRge3->attrName(), attrNames.at(2));
+    QCOMPARE(attrRge3->attrRangeStr(), attrRangeStrs.at(2));
 
     AttributeRange::Type type = AttributeRange::Double_Range;
     QCOMPARE(attrRge->type(), type);
