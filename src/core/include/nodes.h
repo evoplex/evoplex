@@ -26,6 +26,7 @@
 #include <unordered_map>
 
 #include "attributerange.h"
+#include "enum.h"
 #include "node.h"
 
 namespace evoplex {
@@ -55,13 +56,11 @@ public:
     };
 
     static Nodes fromCmd(const QString& cmd, const AttributesScope& attrsScope,
-            const int graphType, QString* errMsg = nullptr,
-            std::function<void(int)> progress = [](int){});
+            const GraphType& graphType, QString& error, std::function<void(int)> progress = [](int){});
 
     // Read a set of nodes from a csv file
     static Nodes fromFile(const QString& filePath, const AttributesScope& attrsScope,
-            const int graphType, QString* errMsg = nullptr,
-            std::function<void(int)> progress = [](int){});
+            const GraphType& graphType, QString& error, std::function<void(int)> progress = [](int){});
 
     // Export set of nodes to a csv file
     bool saveToFile(QString filepath, std::function<void(int)> progress = [](int){}) const;
@@ -71,11 +70,11 @@ private:
     // don't have duplicates, has (or not) 2d coordinates ('x' and 'y')
     // and has all the required attributes (attrsScope)
     static QStringList validateHeader(const QString& header,
-            const AttributesScope& attrsScope, QString* errMsg = nullptr);
+            const AttributesScope& attrsScope, QString& error);
 
     static NodePtr readRow(const int row, const QStringList& header,
             const QStringList& values, const AttributesScope& attrsScope,
-            const bool isDirected, QString* errMsg = nullptr);
+            const bool isDirected, QString& error);
 };
 
 } // evoplex

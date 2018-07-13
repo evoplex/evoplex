@@ -77,15 +77,15 @@ void ExperimentsMgr::destroyExperiments()
     std::list<Experiment*>::iterator it = m_toDestroy.begin();
     while (it != m_toDestroy.end()) {
         Experiment* exp = (*it);
-        if (exp->expStatus() == Experiment::INVALID) {
+        if (exp->expStatus() == Status::Invalid) {
             exp->deleteLater();
             it = m_toDestroy.erase(it);
             continue;
-        } else if (exp->expStatus() == Experiment::RUNNING) {
+        } else if (exp->expStatus() == Status::Running) {
             exp->pause();
         } else {
             m_queued.remove(exp);
-            exp->setExpStatus(Experiment::INVALID);
+            exp->setExpStatus(Status::Invalid);
         }
         ++it;
     }
@@ -105,26 +105,37 @@ void ExperimentsMgr::play(Experiment* exp)
 {
     QMutexLocker locker(&m_mutex);
 
-    if (exp->expStatus() != Experiment::READY
-            && exp->expStatus() != Experiment::QUEUED) {
+    if (exp->expStatus() == Status::Unset) {
+        QFuture<void> future = QtConcurrent::run(exp, &Experiment::init);
+        QFutureWatcher<void>* watcher = new QFutureWatcher<void>;
+        connect(watcher, &QFutureWatcher<void>::finished, [this, exp, watcher]() {
+            watcher->deleteLater();
+            this->play(exp);
+        });
+        watcher->setFuture(future);
+        return;
+    }
+
+    if (exp->expStatus() != Status::Ready
+            && exp->expStatus() != Status::Queued) {
         return;
     }
 
     if (m_threadPool.activeThreadCount() < m_threads) {
-        exp->setExpStatus(Experiment::RUNNING);
+        exp->setExpStatus(Status::Running);
         m_queued.remove(exp);
 
         m_running.emplace_back(exp);
         m_timerProgress->start(500); // every half a second, check progress
 
-        for (int trialId = 0; trialId < exp->numTrials(); ++trialId) {
-            m_runningTrials.emplace_back(std::make_pair(exp->id(), trialId));
+        for (auto const& it : exp->trials()) {
+            m_runningTrials.emplace_back(std::make_pair(exp->id(), it.first));
             // play in the same order of insertion
             const int priority = static_cast<int>(m_runningTrials.size()) * -1;
-            m_threadPool.start(new TrialRunnable(this, exp, trialId), priority);
+            m_threadPool.start(it.second, priority);
         }
-    } else if (exp->expStatus() != Experiment::QUEUED) {
-        exp->setExpStatus(Experiment::QUEUED);
+    } else if (exp->expStatus() != Status::Queued) {
+        exp->setExpStatus(Status::Queued);
         m_queued.emplace_back(exp);
     }
 }
@@ -134,28 +145,28 @@ void ExperimentsMgr::finished(Experiment* exp, const int trialId)
     QMutexLocker locker(&m_mutex);
 
     m_runningTrials.remove(std::make_pair(exp->id(), trialId));
-    for (auto& expTrial : m_runningTrials) {
+    for (auto const& expTrial : m_runningTrials) {
         if (expTrial.first == exp->id()) {
-            return;
+            return; // there are more trials for this exp running yet...
         }
     }
 
     m_running.remove(exp);
 
     if (std::find(m_toDestroy.begin(), m_toDestroy.end(), exp) != m_toDestroy.end()) {
-        exp->setExpStatus(Experiment::INVALID);
-    } else if(exp->expStatus() != Experiment::INVALID) {
-        for (auto& trial : exp->trials()) {
-            if (trial.second->status() != Experiment::FINISHED) {
-                exp->setExpStatus(Experiment::READY);
+        exp->setExpStatus(Status::Invalid);
+    } else if(exp->expStatus() != Status::Invalid) {
+        for (auto const& trial : exp->trials()) {
+            if (trial.second->status() != Status::Finished) {
+                exp->setExpStatus(Status::Ready);
                 exp->setPauseAt(EVOPLEX_MAX_STEPS); // reset the pauseAt flag to maximum
                 m_idle.emplace_back(exp);
                 break;
             }
         }
 
-        if (exp->expStatus() != Experiment::READY) {
-            exp->setExpStatus(Experiment::FINISHED);
+        if (exp->expStatus() != Status::Ready) {
+            exp->setExpStatus(Status::Finished);
             if (exp->autoDeleteTrials()) {
                 exp->deleteTrials();
             } else {
@@ -171,9 +182,9 @@ void ExperimentsMgr::removeFromQueue(Experiment* exp)
 {
     QMutexLocker locker(&m_mutex);
 
-    if (exp->expStatus() == Experiment::QUEUED) {
+    if (exp->expStatus() == Status::Queued) {
         m_queued.remove(exp);
-        exp->setExpStatus(Experiment::READY);
+        exp->setExpStatus(Status::Ready);
     }
 }
 
@@ -183,7 +194,7 @@ void ExperimentsMgr::clearQueue()
 
     for (Experiment* exp : m_queued) {
         exp->pause();
-        exp->setExpStatus(Experiment::READY);
+        exp->setExpStatus(Status::Ready);
     }
     m_queued.clear();
 }
@@ -231,19 +242,4 @@ void ExperimentsMgr::setMaxThreadCount(const int newValue)
              << previous << "to" << newValue;
 }
 
-/********************************/
-
-TrialRunnable::TrialRunnable(ExperimentsMgr* expMgr, Experiment* exp, quint16 trialId)
-    : expMgr(expMgr)
-    , m_exp(exp)
-    , m_trialId(trialId)
-{
-}
-
-void TrialRunnable::run()
-{
-    m_exp->processTrial(m_trialId);
-    expMgr->finished(m_exp, m_trialId);
-}
-
-}
+} // evoplex

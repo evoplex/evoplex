@@ -36,11 +36,6 @@ public:
     // Provide the destructor to keep compilers happy.
     virtual ~AbstractGraphInterface() = default;
 
-    // Initializes the graph object.
-    // This method is called once when a new graph object is being created.
-    // It is usually used to validate the graph attributes and the set of nodes.
-    virtual bool init() = 0;
-
     // Resets the graph object to the original state.
     // This method is triggered after a successful init()
     virtual void reset() = 0;
@@ -48,22 +43,10 @@ public:
 
 class AbstractGraph : public AbstractGraphInterface, public AbstractPlugin
 {
-    friend class Experiment;
+    friend class Trial;
 
 public:
-    enum GraphType {
-        Invalid_Type = 0,
-        Undirected = 1,
-        Directed = 2
-    };
-
-    static GraphType enumFromString(const QString& str);
-
-    ~AbstractGraph() = default;
-
-    inline const QString& name() const;
-    inline const GraphType& type() const;
-    inline const QString& typeString() const;
+    GraphType type() const;
     inline bool isDirected() const;
     inline bool isUndirected() const;
 
@@ -92,22 +75,18 @@ public:
     Edges::iterator removeEdge(Edges::iterator it);
 
 protected:
-    Nodes m_nodes;
     Edges m_edges;
+    Nodes m_nodes;
 
-    explicit AbstractGraph(const QString& name);
+    explicit AbstractGraph();
+    ~AbstractGraph() override = default;
+
+    bool setup(Trial& trial, const Attributes& attrs, Nodes& nodes);
 
 private:
-    const QString m_name;
-    GraphType m_type;
-    QString m_typeStr;
     int m_lastNodeId;
     int m_lastEdgeId;
     QMutex m_mutex;
-
-    // takes the ownership of the PRG
-    // cannot be called twice
-    bool setup(PRG* prg, const Attributes* attrs, Nodes& nodes, const QString& graphType);
 };
 
 
@@ -115,20 +94,11 @@ private:
    AbstractGraph: Inline member functions
  ************************************************************************/
 
-inline const QString& AbstractGraph::name() const
-{ return m_name; }
-
-inline const AbstractGraph::GraphType& AbstractGraph::type() const
-{ return m_type; }
-
-inline const QString& AbstractGraph::typeString() const
-{ return m_typeStr; }
-
 inline bool AbstractGraph::isDirected() const
-{ return m_type == Directed; }
+{ return type() == GraphType::Directed; }
 
 inline bool AbstractGraph::isUndirected() const
-{ return m_type == Undirected; }
+{ return type() == GraphType::Undirected; }
 
 inline const Edges& AbstractGraph::edges() const
 { return m_edges; }
@@ -140,7 +110,7 @@ inline const NodePtr& AbstractGraph::node(int id) const
 { return m_nodes.at(id); }
 
 inline const NodePtr& AbstractGraph::randNode() const
-{ return m_nodes.at(prg()->randI(m_nodes.size()-1)); }
+{ return m_nodes.at(prg()->randI(numNodes()-1)); }
 
 inline int AbstractGraph::numEdges() const
 { return static_cast<int>(m_edges.size()); }

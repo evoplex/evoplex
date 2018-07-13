@@ -134,12 +134,11 @@ bool ProjectsPage::slotNewProject()
 {
     QString error;
     ProjectPtr p = m_mainApp->newProject(error);
-    if (p) {
-        addProjectWidget(p);
-    } else {
+    if (p.isNull()) {
         QMessageBox::warning(this, "Evoplex", error);
         return false;
     }
+    addProjectWidget(p);
     return true;
 }
 
@@ -154,9 +153,16 @@ bool ProjectsPage::slotOpenProject(QString path)
 
     QString error;
     ProjectPtr project = m_mainApp->newProject(error, path);
-    if (!project) {
-        QMessageBox::warning(this, "Evoplex", error);
+    if (project.isNull()) {
+        QMessageBox::critical(this, "Evoplex", error);
         return false;
+    } else if (!error.isEmpty()) {
+        error = QString("There are issues with this project.\n\n%1\n"
+                        "Would you like to open it anyway?").arg(error);
+        int res = QMessageBox::warning(this, "Evoplex", error, QMessageBox::No, QMessageBox::Yes);
+        if (res == QMessageBox::No) {
+            return false;
+        }
     }
     addProjectWidget(project);
     return true;
@@ -166,7 +172,7 @@ void ProjectsPage::slotOpenExperiment(Experiment* exp)
 {
     if (!exp) {
         return;
-    } else if (exp->expStatus() == Experiment::INVALID) {
+    } else if (exp->expStatus() == Status::Invalid) {
         QMessageBox::warning(this, "Experiment",
                 "This experiment is invalid.\n"
                 "It seems that something went wrong with its settings.\n"

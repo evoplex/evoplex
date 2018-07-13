@@ -44,7 +44,7 @@ function(add_plugins ROOT_DIR PLUGINS)
 
     # Qt Object macro is hidden in another macro; let's add them here
     set_property(TARGET ${PLUGIN_NAME} APPEND PROPERTY
-        AUTOMOC_MACRO_NAMES "REGISTER_GRAPH;REGISTER_MODEL")
+        AUTOMOC_MACRO_NAMES "REGISTER_PLUGIN")
 
     install(TARGETS ${PLUGIN_NAME}
         LIBRARY DESTINATION "${EVOPLEX_INSTALL_LIBRARY}plugins"

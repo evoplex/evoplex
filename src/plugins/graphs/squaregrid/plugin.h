@@ -24,18 +24,17 @@
 #include <functional>
 #include <vector>
 
-#include <plugininterfaces.h>
+#include <plugininterface.h>
 
 namespace evoplex {
 class SquareGrid: public AbstractGraph
 {
 public:
-    SquareGrid(const QString &name);
     bool init();
     void reset();
 
 private:
-    bool m_periodic;
+    bool m_periodic; // boundary conditions: false for fixed
     int m_numNeighbours;
     int m_height;
     int m_width;
@@ -55,7 +54,23 @@ private:
 
     static edges2d undirected4Edges(const int id, const int width);
     static edges2d undirected8Edges(const int id, const int width);
-};
-}
 
+    // convert a linear index to row and column
+    static inline void ind2sub(const int ind, const int cols, int &row, int &col);
+
+    // return the linear index of an element in a matrix.
+    static inline int linearIdx(const int row, const int col, const int cols);
+    static inline int linearIdx(std::pair<int,int> rowCol, const int cols);
+};
+
+inline void SquareGrid::ind2sub(const int ind, const int cols, int &row, int &col)
+{ row = ind / cols; col = ind % cols; }
+
+inline int SquareGrid::linearIdx(const int row, const int col, const int cols)
+{ return row * cols + col; }
+
+inline int SquareGrid::linearIdx(std::pair<int,int> rowCol, const int cols)
+{ return linearIdx(rowCol.first, rowCol.second, cols); }
+
+} // evoplex
 #endif // SQUARE_GRID_H

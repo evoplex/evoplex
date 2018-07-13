@@ -34,11 +34,22 @@ class Node;
 typedef std::shared_ptr<Node> NodePtr;
 typedef std::shared_ptr<Edge> EdgePtr;
 
+/**
+ * @brief An Edge connects a node to itself or to another node.
+ * @attention An edge can only be created by an AbstractGraph derived object.
+ */
 class Edge
 {
+    friend class AbstractGraph;
+    friend class TestEdge;
+
+private:
+    struct constructor_key { /* this is a private key accessible only to friends */ };
+
 public:
-    explicit Edge(int id, const NodePtr& origin, const NodePtr& neighbour,
-                  Attributes* attrs=new Attributes(), bool ownsAttrs=true)
+    explicit Edge(const constructor_key&, int id, const NodePtr& origin,
+                  const NodePtr& neighbour, Attributes* attrs=new Attributes(),
+                  bool ownsAttrs=true)
         : m_id(id), m_origin(origin), m_neighbour(neighbour),
           m_attrs(attrs), m_ownsAttrs(ownsAttrs) {}
 
@@ -59,7 +70,7 @@ private:
     const NodePtr& m_origin;
     const NodePtr& m_neighbour;
     Attributes* m_attrs;
-    bool m_ownsAttrs;
+    const bool m_ownsAttrs;
 };
 
 /************************************************************************

@@ -18,26 +18,25 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef MOORE_GRID_H
-#define MOORE_GRID_H
-
-#include <QPair>
-#include <vector>
-
-#include <plugininterface.h>
+#include "abstractmodel.h"
+#include "trial.h"
 
 namespace evoplex {
-class CustomGraph: public AbstractGraph
-{
-public:
-    bool init();
-    void reset();
 
-private:
-    // graph parameters
-    enum GraphAttr { FilePath };
-    QString m_filePath;
-};
+AbstractGraph* AbstractModel::graph() const
+{
+    return m_trial->graph();
 }
 
-#endif // MOORE_GRID_H
+int AbstractModel::step() const
+{
+    return m_trial->step();
+}
+
+inline Values AbstractModel::customOutputs(const Values& inputs) const
+{
+    Q_UNUSED(inputs);
+    return Values();
+}
+
+} // evoplex

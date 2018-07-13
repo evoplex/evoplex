@@ -23,6 +23,7 @@
 #include "graphview.h"
 #include "ui_graphwidget.h"
 #include "ui_graphsettings.h"
+#include "utils.h"
 
 namespace evoplex
 {
@@ -56,16 +57,16 @@ int GraphView::refreshCache()
         return Scheduled;
     }
     Utils::deleteAndShrink(m_cache);
-    if (!m_model) {
+    if (!m_trial || !m_trial->graph()) {
         return Ready;
     }
 
-    float edgeSizeRate = m_edgeSizeRate * std::pow(1.25f, m_zoomLevel);
-    m_cache.reserve(m_model->nodes().size());
+    float edgeSizeRate = m_edgeSizeRate * static_cast<float>(std::pow(1.25f, m_zoomLevel));
+    m_cache.reserve(m_trial->graph()->nodes().size());
 
-    for (auto const& np : m_model->nodes()) {
-        QPointF xy(m_origin.x() + edgeSizeRate * (1.0 + np.second->x()),
-                   m_origin.y() + edgeSizeRate * (1.0 + np.second->y()));
+    for (auto const& np : m_trial->graph()->nodes()) {
+        QPointF xy(m_origin.x() + edgeSizeRate * (1.f + np.second->x()),
+                   m_origin.y() + edgeSizeRate * (1.f + np.second->y()));
 
         if (!rect().contains(xy.toPoint())) {
             continue;

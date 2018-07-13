@@ -29,7 +29,14 @@ namespace evoplex {
 class AGSameFuncForAll;
 class AGDiffFunctions;
 
-class AttrsGenerator
+class AttrsGeneratorInterface
+{
+public:
+    virtual ~AttrsGeneratorInterface() = default;
+    virtual SetOfAttributes create(std::function<void(int)> progress = [](int){}) = 0;
+};
+
+class AttrsGenerator : public AttrsGeneratorInterface
 {
 public:
     enum Mode {
@@ -54,10 +61,10 @@ public:
     //         '*integer;[min|max|rand_seed]'
     //     - specific mode for each attribute:
     //         '#integer;attrName_[min|max|rand_seed|value_val];...'
-    static AttrsGenerator* parse(const AttributesScope& attrsScope, const QString& cmd, QString* errMsg = nullptr);
+    static AttrsGenerator* parse(const AttributesScope& attrsScope,
+                                 const QString& cmd, QString& error);
 
-    virtual ~AttrsGenerator() {}
-    virtual SetOfAttributes create(std::function<void(int)> progress = [](int){}) = 0;
+    virtual ~AttrsGenerator();
 
     inline const QString& command() { return m_command; }
     inline int numCopies() const { return m_numCopies; }
@@ -72,11 +79,11 @@ protected:
 private:
     // auxiliar parser for commands starting with '*'
     static AGSameFuncForAll* parseStarCmd(const AttributesScope& attrsScope,
-            const int numCopies, const QStringList& cmds, QString* errMsg = nullptr);
+            const int numCopies, const QStringList& cmds, QString& error);
 
     // auxiliar parser for commands starting with '#'
     static AGDiffFunctions* parseHashCmd(const AttributesScope& attrsScope,
-            const int numCopies, const QStringList& cmds, QString* errMsg = nullptr);
+            const int numCopies, const QStringList& cmds, QString& error);
 };
 
 
@@ -86,9 +93,9 @@ class AGSameFuncForAll : public AttrsGenerator
 public:
     explicit AGSameFuncForAll(const AttributesScope& attrsScope, const int numCopies,
                               const Function& func, const Value& funcInput);
-    virtual ~AGSameFuncForAll();
+    ~AGSameFuncForAll() override;
 
-    SetOfAttributes create(std::function<void(int)> progress = [](int){});
+    SetOfAttributes create(std::function<void(int)> progress = [](int){}) override;
     inline Function function() const { return m_function; }
     inline const Value& functionInput() const { return m_functionInput; }
 
@@ -114,9 +121,9 @@ public:
 
     explicit AGDiffFunctions(const AttributesScope& attrsScope, const int numCopies,
                              std::vector<AttrCmd> attrCmds);
-    virtual ~AGDiffFunctions() {}
+    ~AGDiffFunctions() override = default;
 
-    SetOfAttributes create(std::function<void(int)> progress = [](int){});
+    SetOfAttributes create(std::function<void(int)> progress = [](int){}) override;
     inline const std::vector<AttrCmd>& attrCmds() const { return m_attrCmds; }
 
 private:

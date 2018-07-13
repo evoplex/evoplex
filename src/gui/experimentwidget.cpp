@@ -92,9 +92,7 @@ ExperimentWidget::ExperimentWidget(Experiment* exp, MainGUI* mainGUI, ProjectsPa
     connect(m_aReset, &QAction::triggered, [this]() { m_exp->reset(); });
     connect(m_delay, &QSlider::valueChanged, [this](int v) { m_exp->setDelay(v); });
 
-    qRegisterMetaType<Experiment::Status>("Experiment::Status");
-    connect(m_exp, SIGNAL(statusChanged(Experiment::Status)),
-            SLOT(slotStatusChanged(Experiment::Status)));
+    connect(m_exp, SIGNAL(statusChanged(Status)), SLOT(slotStatusChanged(Status)));
     slotStatusChanged(exp->expStatus()); // just to init the controls
 
     QVBoxLayout* layout = new QVBoxLayout(new QWidget(this));
@@ -128,7 +126,7 @@ ExperimentWidget::ExperimentWidget(Experiment* exp, MainGUI* mainGUI, ProjectsPa
     */
 
     connect(m_timer, &QTimer::timeout, [this]() {
-        if (m_exp->expStatus() != Experiment::INVALID)
+        if (m_exp->expStatus() != Status::Invalid)
             emit(updateWidgets(false));
     });
     m_timer->start(100);
@@ -146,29 +144,31 @@ void ExperimentWidget::closeEvent(QCloseEvent* event)
     QDockWidget::closeEvent(event);
 }
 
-void ExperimentWidget::slotStatusChanged(Experiment::Status status)
+void ExperimentWidget::slotStatusChanged(Status status)
 {
-    if (status == Experiment::READY) {
+    if (status == Status::Ready || status == Status::Unset) {
         m_aPlayPause->setIcon(m_kIcon_play);
         m_aPlayPause->setEnabled(true);
         m_aNext->setEnabled(true);
-        m_aStop->setEnabled(!m_exp->trials().empty());
+        m_aStop->setEnabled(status != Status::Unset);
         m_aReset->setEnabled(true);
-    } else if (status == Experiment::RUNNING || status == Experiment::QUEUED) {
+    } else if (status == Status::Running || status == Status::Queued) {
         m_aPlayPause->setIcon(m_kIcon_pause);
         m_aPlayPause->setEnabled(true);
         m_aNext->setEnabled(false);
         m_aStop->setEnabled(true);
         m_aReset->setEnabled(false);
-    } else if (status == Experiment::FINISHED || status == Experiment::INVALID) {
+    } else if (status == Status::Finished || status == Status::Invalid) {
         m_aPlayPause->setIcon(m_kIcon_play);
         m_aPlayPause->setEnabled(false);
         m_aNext->setEnabled(false);
         m_aStop->setEnabled(false);
         m_aReset->setEnabled(true);
+    } else {
+        qFatal("invalid status!");
     }
 
-    if (status == Experiment::INVALID) {
+    if (status == Status::Invalid) {
         QMessageBox::warning(this, "Experiment", "Something went wrong with your settings!");
     }
 }

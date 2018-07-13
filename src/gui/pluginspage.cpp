@@ -70,9 +70,9 @@ void PluginsPage::rowSelectionChanged()
     }
 
     int type = m_ui->table->item(row, TYPE)->data(Qt::UserRole).toInt();
-    if (type == Plugin::GraphPlugin) {
+    if (type == Plugin::Graph) {
         loadHtml(m_mainApp->graph(m_ui->table->item(row, UID)->text()));
-    } else if (type == Plugin::ModelPlugin) {
+    } else if (type == Plugin::Model) {
         loadHtml(m_mainApp->model(m_ui->table->item(row, UID)->text()));
     } else {
         qFatal("invalid plugin type! It should never happen.");
@@ -131,9 +131,9 @@ void PluginsPage::insertRow(const Plugin* plugin)
     }
 
     QTableWidgetItem* typeItem;
-    if (plugin->type() == Plugin::ModelPlugin) {
+    if (plugin->type() == Plugin::Model) {
         typeItem = new QTableWidgetItem("model");
-    } else if (plugin->type() == Plugin::GraphPlugin) {
+    } else if (plugin->type() == Plugin::Graph) {
         typeItem = new QTableWidgetItem("graph");
     } else {
         qFatal("invalid plugin type! It should never happen.");

@@ -2,7 +2,7 @@
  *  This file is part of Evoplex.
  *
  *  Evoplex is a multi-agent system for networks.
- *  Copyright (C) 2018 - Marcos Cardinot <marcos@cardinot.net>
+ *  Copyright (C) 2016 - Marcos Cardinot <marcos@cardinot.net>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -18,26 +18,21 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef MOORE_GRID_H
-#define MOORE_GRID_H
-
-#include <QPair>
-#include <vector>
-
-#include <plugininterface.h>
+#include "abstractplugin.h"
+#include "trial.h"
 
 namespace evoplex {
-class CustomGraph: public AbstractGraph
-{
-public:
-    bool init();
-    void reset();
 
-private:
-    // graph parameters
-    enum GraphAttr { FilePath };
-    QString m_filePath;
-};
+bool AbstractPlugin::setup(Trial& trial, const Attributes& attrs)
+{
+    m_trial = &trial;
+    m_attrs = &attrs;
+    return init();
 }
 
-#endif // MOORE_GRID_H
+PRG* AbstractPlugin::prg() const
+{
+    return m_trial->prg();
+}
+
+} // evoplex

@@ -202,8 +202,8 @@ void RowsDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option,
     painter->save();
     painter->setRenderHint(QPainter::Antialiasing);
     QPoint center = opt.rect.center();
-    Experiment::Status status = m_exp->expStatus();
-    if (status == Experiment::READY) {
+    Status status = m_exp->expStatus();
+    if (status == Status::Ready || status == Status::Unset) {
         if (btnIsHovered) { //play (only when hovered)
             painter->drawPixmap(center.x()-14, center.y()-14, m_table->kIcon_playon);
         } else if (rowIsHovered) {
@@ -214,7 +214,7 @@ void RowsDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option,
             painter->setPen(m_table->kPen_blue);
             painter->drawArc(center.x()-14, center.y()-14, 28, 28, 90*16, -m_exp->progress()*16);
         }
-    } else if (status == Experiment::RUNNING || status == Experiment::QUEUED) {
+    } else if (status == Status::Running || status == Status::Queued) {
         if (btnIsHovered || rowIsHovered) { // pause (always show)
             painter->drawPixmap(center.x()-14, center.y()-14, m_table->kIcon_pauseon);
         } else {
@@ -225,7 +225,7 @@ void RowsDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option,
             painter->setPen(m_table->kPen_blue);
             painter->drawArc(center.x()-14, center.y()-14, 28, 28, 90*16, -m_exp->progress()*16);
         }
-    } else if (status == Experiment::FINISHED) { // check (always)
+    } else if (status == Status::Finished) { // check (always)
         painter->drawPixmap(center.x()-7, center.y()-7, m_table->kIcon_check);
     } else {
         painter->drawPixmap(center.x()-7, center.y()-7, m_table->kIcon_x);

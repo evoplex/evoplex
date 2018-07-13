@@ -20,36 +20,29 @@
 
 #include "abstractgraph.h"
 #include "constants.h"
+#include "trial.h"
 #include "utils.h"
 
 namespace evoplex {
 
-AbstractGraph::GraphType AbstractGraph::enumFromString(const QString& str)
-{
-    if (str == "undirected") return Undirected;
-    if (str == "directed") return Directed;
-    return Invalid_Type;
-}
-
-AbstractGraph::AbstractGraph(const QString& name)
-    : AbstractPlugin(),
-      m_name(name),
-      m_type(Invalid_Type),
-      m_lastNodeId(-1),
+AbstractGraph::AbstractGraph()
+    : m_lastNodeId(-1),
       m_lastEdgeId(-1)
 {
 }
 
-bool AbstractGraph::setup(PRG* prg, const Attributes* attrs, Nodes& nodes, const QString& graphType)
+bool AbstractGraph::setup(Trial& trial, const Attributes& attrs, Nodes& nodes)
 {
-    Q_ASSERT_X(nodes.size() < EVOPLEX_MAX_NODES, "setup", "too many nodes! we cannot handle this.");
-    if (AbstractPlugin::setup(prg, attrs)) {
-        m_nodes = nodes;
-        m_type = enumFromString(graphType);
-        m_typeStr = graphType;
-        m_lastNodeId = static_cast<int>(nodes.size());
-    }
-    return !m_nodes.empty() && m_type != Invalid_Type;
+    Q_ASSERT_X(nodes.size() < EVOPLEX_MAX_NODES, "setup", "too many nodes!");
+    Q_ASSERT_X(!nodes.empty(), "setup", "set of nodes cannot be empty!");
+    m_nodes = nodes;
+    m_lastNodeId = static_cast<int>(m_nodes.size());
+    return AbstractPlugin::setup(trial, attrs);
+}
+
+GraphType AbstractGraph::type() const
+{
+    return m_trial->graphType();
 }
 
 NodePtr AbstractGraph::addNode(Attributes attr, int x, int y)
@@ -57,10 +50,11 @@ NodePtr AbstractGraph::addNode(Attributes attr, int x, int y)
     QMutexLocker locker(&m_mutex);
     ++m_lastNodeId;
     NodePtr node;
-    if (type() == Undirected) {
-        node = std::make_shared<UNode>(m_lastNodeId, attr, x, y);
+    Node::constructor_key k;
+    if (isDirected()) {
+        node = std::make_shared<DNode>(k, m_lastNodeId, attr, x, y);
     } else {
-        node = std::make_shared<DNode>(m_lastNodeId, attr, x, y);
+        node = std::make_shared<UNode>(k, m_lastNodeId, attr, x, y);
     }
     m_nodes.insert({m_lastNodeId, node});
     return node;
@@ -70,8 +64,9 @@ EdgePtr AbstractGraph::addEdge(const NodePtr& origin, const NodePtr& neighbour, 
 {
     QMutexLocker locker(&m_mutex);
     ++m_lastEdgeId;
-    EdgePtr edgeOut = std::make_shared<Edge>(m_lastEdgeId, origin, neighbour, attrs, true);
-    EdgePtr edgeIn = std::make_shared<Edge>(m_lastEdgeId, neighbour, origin, attrs, false);
+    Edge::constructor_key k;
+    EdgePtr edgeOut = std::make_shared<Edge>(k, m_lastEdgeId, origin, neighbour, attrs, true);
+    EdgePtr edgeIn = std::make_shared<Edge>(k, m_lastEdgeId, neighbour, origin, attrs, false);
     origin->addOutEdge(edgeOut);
     neighbour->addInEdge(edgeIn); // neighbour must be aware of the in-connection
     m_edges.insert({m_lastEdgeId, edgeOut}); // store only the original direction
@@ -91,13 +86,13 @@ void AbstractGraph::removeAllEdges()
 void AbstractGraph::removeAllEdges(const NodePtr& node)
 {
     QMutexLocker locker(&m_mutex);
-    if (type() == Undirected) {
+    if (isUndirected()) {
         for (auto const& p : node->outEdges()) {
             p.second->neighbour()->removeInEdge(p.first);
             m_edges.erase(p.first);
         }
         node->clearOutEdges();
-    } else if (type() == Directed) {
+    } else if (isDirected()) {
         for (auto const& p : node->outEdges()) {
             p.second->neighbour()->removeInEdge(p.first);
             m_edges.erase(p.first);

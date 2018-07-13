@@ -18,26 +18,48 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef MOORE_GRID_H
-#define MOORE_GRID_H
+#include "node.h"
 
-#include <QPair>
-#include <vector>
-
-#include <plugininterface.h>
-
+// we need this cpp file to avoi weak-vtable issues
 namespace evoplex {
-class CustomGraph: public AbstractGraph
-{
-public:
-    bool init();
-    void reset();
 
-private:
-    // graph parameters
-    enum GraphAttr { FilePath };
-    QString m_filePath;
-};
+Node::Node(const constructor_key&, int id, Attributes attrs, int x, int y)
+    : m_id(id),
+      m_attrs(attrs),
+      m_x(x),
+      m_y(y)
+{
 }
 
-#endif // MOORE_GRID_H
+Node::Node(const constructor_key& k, int id, Attributes attr)
+    : Node(k, id, attr, 0, id) {}
+
+Node::~Node()
+{
+}
+
+/*******************/
+
+UNode::UNode(const constructor_key& k, int id, Attributes attrs, int x, int y)
+    : Node(k, id, attrs, x, y)
+{
+}
+
+UNode::UNode(const constructor_key& k, int id, Attributes attrs)
+    : Node(k, id, attrs)
+{
+}
+
+/*******************/
+
+DNode::DNode(const constructor_key& k, int id, Attributes attrs, int x, int y)
+    : Node(k, id, attrs, x, y)
+{
+}
+
+DNode::DNode(const constructor_key& k, int id, Attributes attrs)
+    : Node(k, id, attrs)
+{
+}
+
+} // evoplex

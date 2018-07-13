@@ -27,7 +27,6 @@
 #include <unordered_map>
 #include <vector>
 
-#include "abstractmodel.h"
 #include "attributes.h"
 #include "attributerange.h"
 #include "modelplugin.h"
@@ -87,7 +86,7 @@ public:
 
     virtual ~Output();
 
-    virtual void doOperation(const int trialId, const AbstractModel* model) = 0;
+    virtual void doOperation(const Trial* trial) = 0;
 
     // Printable header with all columns of this operation separated by 'sep'.
     // If joinInputs is enabled: eg: func_attr_input1[sep]input2
@@ -134,7 +133,7 @@ class CustomOutput: public Output
 public:
     explicit CustomOutput();
 
-    virtual void doOperation(const int trialId, const AbstractModel* model);
+    virtual void doOperation(const Trial* trial);
 
     virtual bool operator==(const OutputPtr output) const;
 };
@@ -166,7 +165,7 @@ public:
 
     explicit DefaultOutput(const Function f, const Entity e, const AttributeRange* attrRange);
 
-    virtual void doOperation(const int trialId, const AbstractModel* model);
+    virtual void doOperation(const Trial* trial);
 
     virtual bool operator==(const OutputPtr output) const;
 

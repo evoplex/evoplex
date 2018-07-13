@@ -21,13 +21,13 @@
 #ifndef MAINAPP_H
 #define MAINAPP_H
 
+#include <memory>
+
 #include <QDir>
 #include <QHash>
 #include <QObject>
 #include <QSettings>
-#include <memory>
 
-#include "plugininterfaces.h"
 #include "attributes.h"
 #include "graphplugin.h"
 #include "modelplugin.h"
