@@ -113,8 +113,8 @@ void TestAttributeRange::tst_bool()
     // Tests if functions work as expected
     QVERIFY(attrRge->isValid());
     QCOMPARE(attrRge->id(), 0);
-    QCOMPARE(attrRge->attrName(), "test");
-    QCOMPARE(attrRge->attrRangeStr(), "bool");
+    QCOMPARE(attrRge->attrName(), QString("test"));
+    QCOMPARE(attrRge->attrRangeStr(), QString("bool"));
 
     AttributeRange::Type type = AttributeRange::Bool;
     QCOMPARE(attrRge->type(), type);
@@ -202,18 +202,18 @@ void TestAttributeRange::tst_int_range()
     // Tests if functions work as expected
     QVERIFY(attrRge->isValid());
     QCOMPARE(attrRge->id(), 0);
-    QCOMPARE(attrRge->attrName(), attrNames[0]);
-    QCOMPARE(attrRge->attrRangeStr(), attrRangeStrs[0]);
+    QCOMPARE(attrRge->attrName(), QString(attrNames[0]));
+    QCOMPARE(attrRge->attrRangeStr(), QString(attrRangeStrs[0]));
 
     QVERIFY(attrRge2->isValid());
     QCOMPARE(attrRge2->id(), 1);
-    QCOMPARE(attrRge2->attrName(), attrNames[1]);
-    QCOMPARE(attrRge2->attrRangeStr(), attrRangeStrs[1]);
+    QCOMPARE(attrRge2->attrName(), QString(attrNames[1]));
+    QCOMPARE(attrRge2->attrRangeStr(), QString(attrRangeStrs[1]));
 
     QVERIFY(attrRge3->isValid());
     QCOMPARE(attrRge3->id(), 2);
-    QCOMPARE(attrRge3->attrName(), attrNames[2]);
-    QCOMPARE(attrRge3->attrRangeStr(), attrRangeStrs[2]);
+    QCOMPARE(attrRge3->attrName(), QString(attrNames[2]));
+    QCOMPARE(attrRge3->attrRangeStr(), QString(attrRangeStrs[2]));
 
     AttributeRange::Type type = AttributeRange::Int_Range;
     QCOMPARE(attrRge->type(), type);
@@ -300,18 +300,18 @@ void TestAttributeRange::tst_double_range()
     // Tests if functions work as expected
     QVERIFY(attrRge->isValid());
     QCOMPARE(attrRge->id(), 0);
-    QCOMPARE(attrRge->attrName(), attrNames[0]);
-    QCOMPARE(attrRge->attrRangeStr(), attrRangeStrs[0]);
+    QCOMPARE(attrRge->attrName(), QString(attrNames[0]));
+    QCOMPARE(attrRge->attrRangeStr(), QString(attrRangeStrs[0]));
 
     QVERIFY(attrRge2->isValid());
     QCOMPARE(attrRge2->id(), 1);
-    QCOMPARE(attrRge2->attrName(), attrNames[1]);
-    QCOMPARE(attrRge2->attrRangeStr(), attrRangeStrs[1]);
+    QCOMPARE(attrRge2->attrName(), QString(attrNames[1]));
+    QCOMPARE(attrRge2->attrRangeStr(), QString(attrRangeStrs[1]));
 
     QVERIFY(attrRge3->isValid());
     QCOMPARE(attrRge3->id(), 2);
-    QCOMPARE(attrRge3->attrName(), attrNames[2]);
-    QCOMPARE(attrRge3->attrRangeStr(), attrRangeStrs[2]);
+    QCOMPARE(attrRge3->attrName(), QString(attrNames[2]));
+    QCOMPARE(attrRge3->attrRangeStr(), QString(attrRangeStrs[2]));
 
     AttributeRange::Type type = AttributeRange::Double_Range;
     QCOMPARE(attrRge->type(), type);
@@ -381,8 +381,8 @@ void TestAttributeRange::tst_int_set()
     // Tests if functions work as expected
     QVERIFY(attrRge->isValid());
     QCOMPARE(attrRge->id(), 0);
-    QCOMPARE(attrRge->attrName(), attrName);
-    QCOMPARE(attrRge->attrRangeStr(), attrRangeStr);
+    QCOMPARE(attrRge->attrName(), QString(attrName));
+    QCOMPARE(attrRge->attrRangeStr(), QString(attrRangeStr));
 
     AttributeRange::Type type = AttributeRange::Int_Set;
     QCOMPARE(attrRge->type(), type);
@@ -433,8 +433,8 @@ void TestAttributeRange::tst_double_set()
     // Tests if functions work as expected
     QVERIFY(attrRge->isValid());
     QCOMPARE(attrRge->id(), 0);
-    QCOMPARE(attrRge->attrName(), attrName);
-    QCOMPARE(attrRge->attrRangeStr(), attrRangeStr);
+    QCOMPARE(attrRge->attrName(), QString(attrName));
+    QCOMPARE(attrRge->attrRangeStr(), QString(attrRangeStr));
 
     AttributeRange::Type type = AttributeRange::Double_Set;
     QCOMPARE(attrRge->type(), type);
@@ -484,8 +484,8 @@ void TestAttributeRange::tst_string()
     // Tests if functions work as expected
     QVERIFY(attrRge->isValid());
     QCOMPARE(attrRge->id(), 0);
-    QCOMPARE(attrRge->attrName(), "test");
-    QCOMPARE(attrRge->attrRangeStr(), "string");
+    QCOMPARE(attrRge->attrName(), QString("test"));
+    QCOMPARE(attrRge->attrRangeStr(), QString("string"));
 
     AttributeRange::Type type = AttributeRange::String;
     QCOMPARE(attrRge->type(), type);
@@ -533,8 +533,8 @@ void TestAttributeRange::tst_string_set()
     // Tests if functions work as expected
     QVERIFY(attrRge->isValid());
     QCOMPARE(attrRge->id(), 0);
-    QCOMPARE(attrRge->attrName(), attrName);
-    QCOMPARE(attrRge->attrRangeStr(), attrRangeStr);
+    QCOMPARE(attrRge->attrName(), QString(attrName));
+    QCOMPARE(attrRge->attrRangeStr(), QString(attrRangeStr));
 
     AttributeRange::Type type = AttributeRange::String_Set;
     QCOMPARE(attrRge->type(), type);
@@ -594,8 +594,8 @@ void TestAttributeRange::tst_filepath()
     // Tests if functions work as expected
     QVERIFY(attrRge->isValid());
     QCOMPARE(attrRge->id(), 0);
-    QCOMPARE(attrRge->attrName(), "test");
-    QCOMPARE(attrRge->attrRangeStr(), "filepath");
+    QCOMPARE(attrRge->attrName(), QString("test"));
+    QCOMPARE(attrRge->attrRangeStr(), QString("filepath"));
 
     AttributeRange::Type type = AttributeRange::FilePath;
     QCOMPARE(attrRge->type(), type);
@@ -637,8 +637,8 @@ void TestAttributeRange::tst_dirpath()
     // Tests if functions work as expected
     QVERIFY(attrRge->isValid());
     QCOMPARE(attrRge->id(), 0);
-    QCOMPARE(attrRge->attrName(), "test");
-    QCOMPARE(attrRge->attrRangeStr(), "dirpath");
+    QCOMPARE(attrRge->attrName(), QString("test"));
+    QCOMPARE(attrRge->attrRangeStr(), QString("dirpath"));
 
     AttributeRange::Type type = AttributeRange::DirPath;
     QCOMPARE(attrRge->type(), type);
