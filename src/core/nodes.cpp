@@ -133,15 +133,22 @@ bool Nodes::saveToFile(QString filePath, std::function<void(int)> progress) cons
     }
     out << "x,y\n";
 
+    std::vector<int> orderedIds;
     for (auto const& pair : (*this)) {
-        for (const Value& value : pair.second->attrs().values()) {
+        orderedIds.emplace_back(pair.first);
+    }
+    std::sort(orderedIds.begin(), orderedIds.end());
+
+    for (const int id : orderedIds) {
+        const NodePtr& node = this->at(id);
+        for (const Value& value : node->attrs().values()) {
             out << value.toQString() << ",";
         }
-        out << pair.second->x() << ",";
-        out << pair.second->y() << "\n";
+        out << node->x() << ",";
+        out << node->y() << "\n";
 
         out.flush();
-        progress(pair.first);
+        progress(node->id());
     }
 
     file.close();

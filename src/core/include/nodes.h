@@ -55,14 +55,21 @@ public:
         const NodePtr& node() const { return _p.second; }
     };
 
+    // Expected commands:
+    //     - same mode for all attributes:
+    //         '*integer;[min|max|rand_seed]'
+    //     - specific mode for each attribute:
+    //         '#integer;attrName_[min|max|rand_seed|value_val];...'
     static Nodes fromCmd(const QString& cmd, const AttributesScope& attrsScope,
             const GraphType& graphType, QString& error, std::function<void(int)> progress = [](int){});
 
     // Read a set of nodes from a csv file
+    // Return empty if something goes wrong
     static Nodes fromFile(const QString& filePath, const AttributesScope& attrsScope,
             const GraphType& graphType, QString& error, std::function<void(int)> progress = [](int){});
 
     // Export set of nodes to a csv file
+    // Return true if successful
     bool saveToFile(QString filepath, std::function<void(int)> progress = [](int){}) const;
 
 private:
