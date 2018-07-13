@@ -1,0 +1,4 @@
+int-zero-two,bool,any-string
+0,true,row1
+1,false,row2
+2,true,row3
