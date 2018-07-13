@@ -42,7 +42,7 @@ private: // auxiliary functions
     void _tst_replace(Attributes a, int id, QString newName, Value newValue, int origSize);
     void _tst_replace_invalid(Attributes a, int id, QString newName, Value newValue);
     void _tst_push_back(Attributes a, QString newName, Value newValue, int origSize);
-    void _tst_setValue_with_name(Attributes a, int id, QString newName, Value newValue, int origSize);
+    void _tst_setValue_with_name(Attributes a, int id, QString newName, Value newValue);
     void _tst_setValue(Attributes a, int id, Value newValue, int origSize);
 };
 
@@ -292,7 +292,7 @@ void TestAttributes::tst_push_back()
     _tst_empty(a7);
 }
 
-void TestAttributes::_tst_setValue_with_name(Attributes a, int id, QString newName, Value newValue, int origSize)
+void TestAttributes::_tst_setValue_with_name(Attributes a, int id, QString newName, Value newValue)
 {
     // test position of name
     QVERIFY(!a.names().empty());
@@ -355,7 +355,7 @@ void TestAttributes::tst_setValue()
     Attributes a3(3);
     a3.replace(0, "test", Value(123));
     _tst_setValue(a3, 0, Value(123), 3);
-    _tst_setValue_with_name(a3, 0, "test", Value(123), 3 );
+    _tst_setValue_with_name(a3, 0, "test", Value(123));
 
     // test for empty attribute resized
     Attributes a4;

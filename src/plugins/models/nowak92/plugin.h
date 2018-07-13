@@ -27,8 +27,8 @@ namespace evoplex {
 class ModelNowak: public AbstractModel
 {
 public:
-    virtual bool init();
-    virtual bool algorithmStep();
+    bool init() override;
+    bool algorithmStep() override;
 
 private:
     enum NodeAttr { Strategy, Score };

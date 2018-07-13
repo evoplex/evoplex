@@ -20,6 +20,7 @@
 
 #include "expinputs.h"
 #include "constants.h"
+#include "graphplugin.h"
 
 namespace evoplex {
 

@@ -30,8 +30,8 @@ namespace evoplex {
 class CustomGraph: public AbstractGraph
 {
 public:
-    bool init();
-    void reset();
+    bool init() override;
+    void reset() override;
 
 private:
     // graph parameters

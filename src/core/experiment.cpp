@@ -73,6 +73,9 @@ bool Experiment::setInputs(ExpInputs* inputs, QString& error)
     m_fileHeader.clear();
     delete m_inputs;
     m_inputs = inputs;
+    locker.unlock();
+    deleteTrials();
+    locker.relock();
 
     m_graphPlugin = m_mainApp->graph(m_inputs->general(GENERAL_ATTRIBUTE_GRAPHID).toQString());
     m_modelPlugin = m_mainApp->model(m_inputs->general(GENERAL_ATTRIBUTE_MODELID).toQString());
@@ -108,6 +111,7 @@ bool Experiment::setInputs(ExpInputs* inputs, QString& error)
 
     m_expStatus = Status::Unset;
     emit (statusChanged(m_expStatus));
+    emit (restarted());
     return true;
 }
 

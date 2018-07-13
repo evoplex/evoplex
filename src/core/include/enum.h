@@ -47,6 +47,18 @@ enum class Status {
     Finished, // all is done
 };
 
+enum class PluginType : int {
+    Invalid = 0,
+    Graph = 1,
+    Model = 2
+};
+template<>
+inline PluginType _enumFromString<PluginType>(const QString& str) {
+    if (str == "graph") return PluginType::Graph;
+    if (str == "model") return PluginType::Model;
+    return PluginType::Invalid;
+}
+
 enum class GraphType : int {
     Invalid = 0,
     Undirected = 1,

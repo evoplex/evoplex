@@ -29,21 +29,21 @@
 namespace evoplex {
 
 ModelPlugin::ModelPlugin(const QJsonObject* metaData, const QString& libPath)
-    : Plugin(Plugin::Model, metaData, libPath)
+    : Plugin(PluginType::Model, metaData, libPath)
 {
-    if (m_type == Invalid) {
+    if (m_type == PluginType::Invalid) {
         return;
     }
 
     if (!readAttrsScope(metaData, PLUGIN_ATTRIBUTE_NODESCOPE, m_nodeAttrsScope, m_nodeAttrNames)) {
         qWarning() << "failed to read the node's attributes!";
-        m_type = Invalid;
+        m_type = PluginType::Invalid;
         return;
     }
 
     if (!readAttrsScope(metaData, PLUGIN_ATTRIBUTE_EDGESCOPE, m_edgeAttrsScope, m_edgeAttrNames)) {
         qWarning() << "failed to read the edge's attributes!";
-        m_type = Invalid;
+        m_type = PluginType::Invalid;
         return;
     }
 

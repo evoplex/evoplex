@@ -47,6 +47,8 @@ public:
 class AbstractPlugin : public AbstractPluginInterface
 {
 public:
+    inline bool init() override;
+
     PRG* prg() const;
     inline const Attributes* attrs() const;
 
@@ -64,8 +66,8 @@ public:
 protected:
     Trial* m_trial;
 
-    explicit AbstractPlugin() = default;
-    virtual ~AbstractPlugin() = default;
+    AbstractPlugin() = default;
+    ~AbstractPlugin() override = default;
 
     bool setup(Trial& trial, const Attributes& attrs);
 
@@ -76,6 +78,9 @@ private:
 /************************************************************************
    AbstractPlugin: Inline member functions
  ************************************************************************/
+
+inline bool AbstractPlugin::init()
+{ return false; }
 
 inline const Attributes* AbstractPlugin::attrs() const
 { return m_attrs; }

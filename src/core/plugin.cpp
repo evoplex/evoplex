@@ -32,13 +32,6 @@
 
 namespace evoplex {
 
-Plugin::Type Plugin::enumFromString(const QString& type)
-{
-    if (type == "graph") return Graph;
-    if (type == "model") return Model;
-    return Invalid;
-}
-
 bool Plugin::checkMetaData(const QJsonObject& metaData, QString& error)
 {
     if (metaData.isEmpty()) {
@@ -59,8 +52,8 @@ bool Plugin::checkMetaData(const QJsonObject& metaData, QString& error)
         }
     }
 
-    const Type type = enumFromString(metaData[PLUGIN_ATTRIBUTE_TYPE].toString());
-    if (type == Invalid) {
+    const PluginType type = _enumFromString<PluginType>(metaData[PLUGIN_ATTRIBUTE_TYPE].toString());
+    if (type == PluginType::Invalid) {
         error = QString("'%1' must be equal to 'graph' or 'model'")
                 .arg(PLUGIN_ATTRIBUTE_TYPE);
         return false;
@@ -102,14 +95,14 @@ Plugin* Plugin::load(const QString& path, QString& error)
     }
 
     Plugin* plugin = nullptr;
-    const Type type = enumFromString(metaData[PLUGIN_ATTRIBUTE_TYPE].toString());
-    if (type == Graph) {
+    const PluginType type = _enumFromString<PluginType>(metaData[PLUGIN_ATTRIBUTE_TYPE].toString());
+    if (type == PluginType::Graph) {
         plugin = new GraphPlugin(&metaData, path);
-    } else if (type == Model) {
+    } else if (type == PluginType::Model) {
         plugin = new ModelPlugin(&metaData, path);
     }
 
-    if (!plugin || plugin->type() == Plugin::Invalid) {
+    if (!plugin || plugin->type() == PluginType::Invalid) {
         error = QString("Unable to load the plugin.\n"
                 "Please, check the metaData.json file.\n %1").arg(path);
         loader.unload();
@@ -121,7 +114,7 @@ Plugin* Plugin::load(const QString& path, QString& error)
     return plugin;
 }
 
-Plugin::Plugin(Type type, const QJsonObject* metaData, const QString& libPath)
+Plugin::Plugin(PluginType type, const QJsonObject* metaData, const QString& libPath)
     : m_type(type),
       m_libPath(libPath)
 {
@@ -137,7 +130,7 @@ Plugin::Plugin(Type type, const QJsonObject* metaData, const QString& libPath)
     if (!readAttrsScope(metaData, PLUGIN_ATTRIBUTES_SCOPE,
                         m_pluginAttrsScope, m_pluginAttrsNames)) {
         qWarning() << "failed to read the plugins's attributes!";
-        m_type = Invalid;
+        m_type = PluginType::Invalid;
         return;
     }
 

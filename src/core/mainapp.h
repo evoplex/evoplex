@@ -21,6 +21,7 @@
 #ifndef MAINAPP_H
 #define MAINAPP_H
 
+#include <map>
 #include <memory>
 
 #include <QDir>
@@ -28,14 +29,16 @@
 #include <QObject>
 #include <QSettings>
 
-#include "attributes.h"
-#include "graphplugin.h"
-#include "modelplugin.h"
+#include "attributerange.h"
+#include "enum.h"
 
 namespace evoplex {
 
 class ExperimentsMgr;
+class GraphPlugin;
+class ModelPlugin;
 class Project;
+class Plugin;
 
 typedef QSharedPointer<Project> ProjectPtr;
 
@@ -62,28 +65,28 @@ public:
 
     void closeProject(int projId);
 
-    inline quint16 defaultStepDelay() const { return m_defaultStepDelay; }
+    inline quint16 defaultStepDelay() const;
     void setDefaultStepDelay(quint16 msec);
 
-    inline int stepsToFlush() const { return m_stepsToFlush; }
+    inline int stepsToFlush() const;
     void setStepsToFlush(int steps);
 
-    inline ExperimentsMgr* expMgr() const { return m_experimentsMgr; }
-    inline const QHash<QString, GraphPlugin*>& graphs() const { return m_graphs; }
-    inline const QHash<QString, ModelPlugin*>& models() const { return m_models; }
-    inline const std::map<int, ProjectPtr>& projects() const { return m_projects; }
+    inline ExperimentsMgr* expMgr() const;
+    inline const QHash<QString, GraphPlugin*>& graphs() const;
+    inline const QHash<QString, ModelPlugin*>& models() const;
+    inline const std::map<int, ProjectPtr>& projects() const;
 
-    inline const GraphPlugin* graph(const QString& graphId) const { return m_graphs.value(graphId, nullptr); }
-    inline const ModelPlugin* model(const QString& modelId) const { return m_models.value(modelId, nullptr); }
-    inline ProjectPtr project(int projId) const { return m_projects.at(projId); }
+    inline const GraphPlugin* graph(const QString& graphId) const;
+    inline const ModelPlugin* model(const QString& modelId) const;
+    ProjectPtr project(int projId) const;
 
-    inline const AttributesScope& generalAttrsScope() const { return m_generalAttrsScope; }
+    inline const AttributesScope& generalAttrsScope() const;
 
     void addPathToRecentProjects(const QString& projectFilePath);
 
 signals:
     void pluginAdded(const Plugin* plugin);
-    void pluginRemoved(const QString& id, Plugin::Type t);
+    void pluginRemoved(const QString& id, PluginType t);
     void listOfRecentProjectsUpdated();
 
 private:
@@ -110,6 +113,37 @@ private:
     // it is important to validate the contents of csv files
     AttributesScope m_generalAttrsScope;
 };
-}
 
+/************************************************************************
+   MainApp: Inline member functions
+ ************************************************************************/
+
+inline quint16 MainApp::defaultStepDelay() const
+{ return m_defaultStepDelay; }
+
+inline int MainApp::stepsToFlush() const
+{ return m_stepsToFlush; }
+
+inline ExperimentsMgr* MainApp::expMgr() const
+{ return m_experimentsMgr; }
+
+inline const QHash<QString, GraphPlugin*>& MainApp::graphs() const
+{ return m_graphs; }
+
+inline const QHash<QString, ModelPlugin*>& MainApp::models() const
+{ return m_models; }
+
+inline const std::map<int, ProjectPtr>& MainApp::projects() const
+{ return m_projects; }
+
+inline const GraphPlugin* MainApp::graph(const QString& graphId) const
+{ return m_graphs.value(graphId, nullptr); }
+
+inline const ModelPlugin* MainApp::model(const QString& modelId) const
+{ return m_models.value(modelId, nullptr); }
+
+inline const AttributesScope& MainApp::generalAttrsScope() const
+{ return m_generalAttrsScope; }
+
+} // evoplex
 #endif // MAINAPP_H

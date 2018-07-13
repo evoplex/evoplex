@@ -30,7 +30,7 @@
 namespace evoplex {
 
 class AttributeRange;
-typedef QHash<QString, AttributeRange*> AttributesScope;
+using AttributesScope = QHash<QString, AttributeRange*>;
 
 class AttributeRangeInterface
 {

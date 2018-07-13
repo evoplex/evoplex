@@ -495,11 +495,11 @@ void ExperimentDesigner::pluginSelected(QTreeWidgetItem* itemRoot, const QString
 void ExperimentDesigner::slotPluginAdded(const Plugin* plugin)
 {
     QComboBox* cb;
-    if (plugin->type() == Plugin::Graph) {
+    if (plugin->type() == PluginType::Graph) {
         addPluginAttrs(m_treeItemGraphs, plugin);
         slotGraphSelected(STRING_NULL_PLUGINID); // to hide all fields
         cb = m_widgetFields.value(GENERAL_ATTRIBUTE_GRAPHID).value<QComboBox*>();
-    } else if (plugin->type() == Plugin::Model) {
+    } else if (plugin->type() == PluginType::Model) {
         addPluginAttrs(m_treeItemModels, plugin);
         slotModelSelected(STRING_NULL_PLUGINID); // to hide all fields
         cb = m_widgetFields.value(GENERAL_ATTRIBUTE_MODELID).value<QComboBox*>();
@@ -513,14 +513,14 @@ void ExperimentDesigner::slotPluginAdded(const Plugin* plugin)
     cb->blockSignals(false);
 }
 
-void ExperimentDesigner::slotPluginRemoved(const QString& id, Plugin::Type type)
+void ExperimentDesigner::slotPluginRemoved(const QString& id, PluginType type)
 {
     QTreeWidgetItem* tree;
     QComboBox* cb;
-    if (type == Plugin::Graph) {
+    if (type == PluginType::Graph) {
         tree = m_treeItemGraphs;
         cb = m_widgetFields.value(GENERAL_ATTRIBUTE_GRAPHID).value<QComboBox*>();
-    } else if (type == Plugin::Model) {
+    } else if (type == PluginType::Model) {
         tree = m_treeItemModels;
         cb = m_widgetFields.value(GENERAL_ATTRIBUTE_MODELID).value<QComboBox*>();
     } else {

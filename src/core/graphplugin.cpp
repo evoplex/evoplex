@@ -27,15 +27,15 @@
 namespace evoplex {
 
 GraphPlugin::GraphPlugin(const QJsonObject* metaData, const QString& libPath)
-    : Plugin(Plugin::Graph, metaData, libPath)
+    : Plugin(PluginType::Graph, metaData, libPath)
 {
-    if (m_type == Invalid) {
+    if (m_type == PluginType::Invalid) {
         return;
     }
 
     if (!metaData->contains(PLUGIN_ATTRIBUTE_VALIDGRAPHTYPES)) {
         qWarning() << "missing 'validGraphTypes'.";
-        m_type = Invalid;
+        m_type = PluginType::Invalid;
         return;
     }
 
@@ -44,7 +44,7 @@ GraphPlugin::GraphPlugin(const QJsonObject* metaData, const QString& libPath)
         GraphType type = _enumFromString<GraphType>(it.toString());
         if (type == GraphType::Invalid) {
             qWarning() << "invalid value for 'validGraphTypes':" << it.toString();
-            m_type = Invalid;
+            m_type = PluginType::Invalid;
             return;
         }
         m_validGraphTypes.emplace_back(type);

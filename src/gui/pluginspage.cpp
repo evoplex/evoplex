@@ -26,6 +26,9 @@
 #include "ui_pluginspage.h"
 #include "pluginspage.h"
 
+#include "core/graphplugin.h"
+#include "core/modelplugin.h"
+
 namespace evoplex {
 
 PluginsPage::PluginsPage(MainGUI* mainGUI)
@@ -69,10 +72,10 @@ void PluginsPage::rowSelectionChanged()
         return;
     }
 
-    int type = m_ui->table->item(row, TYPE)->data(Qt::UserRole).toInt();
-    if (type == Plugin::Graph) {
+    PluginType type = static_cast<PluginType>(m_ui->table->item(row, TYPE)->data(Qt::UserRole).toInt());
+    if (type == PluginType::Graph) {
         loadHtml(m_mainApp->graph(m_ui->table->item(row, UID)->text()));
-    } else if (type == Plugin::Model) {
+    } else if (type == PluginType::Model) {
         loadHtml(m_mainApp->model(m_ui->table->item(row, UID)->text()));
     } else {
         qFatal("invalid plugin type! It should never happen.");
@@ -131,14 +134,14 @@ void PluginsPage::insertRow(const Plugin* plugin)
     }
 
     QTableWidgetItem* typeItem;
-    if (plugin->type() == Plugin::Model) {
+    if (plugin->type() == PluginType::Model) {
         typeItem = new QTableWidgetItem("model");
-    } else if (plugin->type() == Plugin::Graph) {
+    } else if (plugin->type() == PluginType::Graph) {
         typeItem = new QTableWidgetItem("graph");
     } else {
         qFatal("invalid plugin type! It should never happen.");
     }
-    typeItem->setData(Qt::UserRole, plugin->type());
+    typeItem->setData(Qt::UserRole, static_cast<int>(plugin->type()));
 
     QPushButton* bUnload = new QPushButton();
     bUnload->setFlat(true);

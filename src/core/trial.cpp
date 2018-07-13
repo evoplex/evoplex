@@ -23,6 +23,8 @@
 #include <QFileInfo>
 #include <QThread>
 
+#include "abstractgraph.h"
+#include "abstractmodel.h"
 #include "trial.h"
 #include "project.h"
 #include "utils.h"

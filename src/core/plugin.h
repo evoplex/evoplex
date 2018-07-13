@@ -21,6 +21,8 @@
 #ifndef PLUGIN_H
 #define PLUGIN_H
 
+#include <vector>
+
 #include <QJsonObject>
 #include <QString>
 
@@ -33,20 +35,12 @@ namespace evoplex {
 class Plugin
 {
 public:
-    enum Type {
-        Graph,
-        Model,
-        Invalid
-    };
-
-    static Type enumFromString(const QString& type);
-
     static Plugin* load(const QString& path, QString& error);
 
     inline AbstractPlugin* create() const { return m_factory->create(); }
 
     inline const QString& path() const { return m_libPath; }
-    inline Type type() const { return m_type; }
+    inline PluginType type() const { return m_type; }
     inline const QString& id() const { return m_id; }
     inline const QString& author() const { return m_author; }
     inline const QString& name() const { return m_name; }
@@ -57,9 +51,9 @@ public:
     inline const AttributeRange* pluginAttrRange(const QString& attr) const { return m_pluginAttrsScope.value(attr); }
 
 protected:
-    Type m_type;
+    PluginType m_type;
 
-    explicit Plugin(Type type, const QJsonObject* metaData, const QString& libPath);
+    explicit Plugin(PluginType type, const QJsonObject* metaData, const QString& libPath);
     virtual ~Plugin();
 
     bool readAttrsScope(const QJsonObject* metaData, const QString& name,

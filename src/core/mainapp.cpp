@@ -23,8 +23,12 @@
 #include <QFileInfo>
 
 #include "mainapp.h"
+#include "attributes.h"
 #include "experimentsmgr.h"
+#include "graphplugin.h"
 #include "logger.h"
+#include "modelplugin.h"
+#include "plugin.h"
 #include "project.h"
 #include "constants.h"
 #include "utils.h"
@@ -152,7 +156,7 @@ const Plugin* MainApp::loadPlugin(const QString& path, QString& error, const boo
         return nullptr;
     }
 
-    if (plugin->type() == Plugin::Graph) {
+    if (plugin->type() == PluginType::Graph) {
         m_graphs.insert(plugin->id(), dynamic_cast<GraphPlugin*>(plugin));
     } else {
         m_models.insert(plugin->id(), dynamic_cast<ModelPlugin*>(plugin));
@@ -184,10 +188,10 @@ bool MainApp::unloadPlugin(const Plugin* plugin, QString& error)
     m_userPrefs.setValue("plugins", paths);
 
     QString id = plugin->id();
-    Plugin::Type type = plugin->type();
-    if (type == Plugin::Graph && m_graphs.contains(id)) {
+    PluginType type = plugin->type();
+    if (type == PluginType::Graph && m_graphs.contains(id)) {
         delete m_graphs.take(id);
-    } else if (type == Plugin::Model && m_models.contains(id)) {
+    } else if (type == PluginType::Model && m_models.contains(id)) {
         delete m_models.take(id);
     } else {
         qFatal("Tried to unload a plugin (%s) which has not been loaded before.", qPrintable(id));
@@ -255,6 +259,10 @@ void MainApp::addPathToRecentProjects(const QString& projectFilePath)
     }
     m_userPrefs.setValue("recentProjects", recentProjects);
     emit (listOfRecentProjectsUpdated());
+}
+
+ProjectPtr MainApp::project(int projId) const {
+    return m_projects.at(projId);
 }
 
 } // evoplex

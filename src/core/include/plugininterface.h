@@ -29,8 +29,6 @@
 
 namespace evoplex {
 
-class Trial;
-
 class PluginInterface
 {
 public:

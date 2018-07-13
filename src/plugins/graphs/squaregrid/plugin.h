@@ -30,8 +30,8 @@ namespace evoplex {
 class SquareGrid: public AbstractGraph
 {
 public:
-    bool init();
-    void reset();
+    bool init() override;
+    void reset() override;
 
 private:
     bool m_periodic; // boundary conditions: false for fixed

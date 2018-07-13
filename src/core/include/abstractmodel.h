@@ -21,10 +21,13 @@
 #ifndef ABSTRACT_MODEL_H
 #define ABSTRACT_MODEL_H
 
+#include <memory.h>
 #include <vector>
 
-#include "abstractgraph.h"
 #include "abstractplugin.h"
+#include "abstractgraph.h"
+#include "edges.h"
+#include "nodes.h"
 
 namespace evoplex {
 
@@ -42,10 +45,10 @@ public:
     // This method allows you to custom outputs which, for example,
     // might be used by the GUI to generate custom plots or to be stored in a file.
     // The requested "header" must be defined in the modelMetaData.json file.
-    virtual std::vector<Value> customOutputs(const Values& inputs) const = 0;
+    virtual Values customOutputs(const Values& inputs) const = 0;
 };
 
-class AbstractModel : public AbstractModelInterface, public AbstractPlugin
+class AbstractModel : public AbstractPlugin, public AbstractModelInterface
 {
     friend class Trial;
 
@@ -59,7 +62,13 @@ public:
     inline const EdgePtr& edge(const int edgeId) const;
     inline const EdgePtr& edge(const int originId, const int neighbourId) const;
 
+    inline bool init() override;
+    inline bool algorithmStep() override;
     Values customOutputs(const Values& inputs) const override;
+
+protected:
+    AbstractModel() = default;
+    ~AbstractModel() override;
 };
 
 /************************************************************************
@@ -76,11 +85,16 @@ inline const Edges& AbstractModel::edges() const
 { return graph()->edges(); }
 
 inline const EdgePtr& AbstractModel::edge(const int edgeId) const
-{ return graph()->edges().at(edgeId); }
+{ return graph()->edge(edgeId); }
 
 inline const EdgePtr& AbstractModel::edge(const int originId, const int neighbourId) const
 { return node(originId)->outEdges().at(neighbourId); }
 
+inline bool AbstractModel::init()
+{ return false; }
+
+inline bool AbstractModel::algorithmStep()
+{ return false; }
 
 } // evoplex
 #endif // ABSTRACT_MODEL_H

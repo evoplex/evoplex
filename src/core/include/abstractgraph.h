@@ -41,16 +41,20 @@ public:
     virtual void reset() = 0;
 };
 
-class AbstractGraph : public AbstractGraphInterface, public AbstractPlugin
+class AbstractGraph : public AbstractPlugin, public AbstractGraphInterface
 {
     friend class Trial;
 
 public:
+    inline bool init() override;
+    inline void reset() override;
+
     GraphType type() const;
     inline bool isDirected() const;
     inline bool isUndirected() const;
 
     inline const Edges& edges() const;
+    inline const EdgePtr& edge(int id) const;
     inline const Nodes& nodes() const;
     inline const NodePtr& node(int id) const;
     inline const NodePtr& randNode() const;
@@ -62,8 +66,8 @@ public:
     NodePtr addNode(Attributes attr, int x, int y);
 
     // nodes must belong to the graph
-    inline EdgePtr addEdge(const int originId, const int neighbourId, Attributes* attrs = new Attributes());
-    EdgePtr addEdge(const NodePtr& origin, const NodePtr& neighbour, Attributes* attrs = new Attributes());
+    inline EdgePtr addEdge(const int originId, const int neighbourId, Attributes* attrs=new Attributes());
+    EdgePtr addEdge(const NodePtr& origin, const NodePtr& neighbour, Attributes* attrs=new Attributes());
 
     void removeAllEdges();
     void removeAllEdges(const NodePtr& node);
@@ -78,7 +82,7 @@ protected:
     Edges m_edges;
     Nodes m_nodes;
 
-    explicit AbstractGraph();
+    AbstractGraph();
     ~AbstractGraph() override = default;
 
     bool setup(Trial& trial, const Attributes& attrs, Nodes& nodes);
@@ -94,6 +98,12 @@ private:
    AbstractGraph: Inline member functions
  ************************************************************************/
 
+inline bool AbstractGraph::init()
+{ return false; }
+
+inline void AbstractGraph::reset()
+{ /* nothing */ }
+
 inline bool AbstractGraph::isDirected() const
 { return type() == GraphType::Directed; }
 
@@ -105,6 +115,9 @@ inline const Edges& AbstractGraph::edges() const
 
 inline const Nodes& AbstractGraph::nodes() const
 { return m_nodes; }
+
+inline const EdgePtr& AbstractGraph::edge(int id) const
+{ return m_edges.at(id); }
 
 inline const NodePtr& AbstractGraph::node(int id) const
 { return m_nodes.at(id); }

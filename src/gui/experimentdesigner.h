@@ -57,7 +57,7 @@ private slots:
     void slotModelSelected(const QString& modelId);
     void slotGraphSelected(const QString& graphId);
     void slotPluginAdded(const Plugin* plugin);
-    void slotPluginRemoved(const QString& id, Plugin::Type type);
+    void slotPluginRemoved(const QString& id, PluginType type);
     void slotSetActiveWidget(int idx);
 
 private:

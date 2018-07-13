@@ -23,6 +23,10 @@
 
 namespace evoplex {
 
+AbstractModel::~AbstractModel()
+{
+}
+
 AbstractGraph* AbstractModel::graph() const
 {
     return m_trial->graph();
@@ -33,7 +37,7 @@ int AbstractModel::step() const
     return m_trial->step();
 }
 
-inline Values AbstractModel::customOutputs(const Values& inputs) const
+Values AbstractModel::customOutputs(const Values& inputs) const
 {
     Q_UNUSED(inputs);
     return Values();
