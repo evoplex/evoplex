@@ -132,25 +132,24 @@ void TestAttributeRange::tst_bool()
     int min_int_alt = Value(false).toInt();
     int max_int_alt = Value(true).toInt();
 
-    // For a boolean type, 'AttributeRange::rand()' returns a bool
+    // Tests 'AttributeRange::rand()'
     PRG* prg = new PRG(123);
     v = attrRge->rand(prg);
 
     _tst_value(v, Value::BOOL);
 
-    QVERIFY(v >= min_bool);
-    QVERIFY(v <= max_bool);
-    QVERIFY(v >= min_int);
-    QVERIFY(v <= max_int);
+    QVERIFY(v.toBool() >= min_bool);
+    QVERIFY(v.toBool() <= max_bool);
+    QVERIFY(v.toBool() >= min_int);
+    QVERIFY(v.toBool() <= max_int);
     QVERIFY(v.toInt() >= min_int_alt);
     QVERIFY(v.toInt() <= max_int_alt);
 
-    // For a boolean type, 'AttributeRange::min()' and 'AttributeRange::max()'
-    // both return <null>
-//  QCOMPARE(attrRge->min(), min_bool);  // Succeeds, as <null> is recognised as 0
-//  QCOMPARE(attrRge->max(), max_bool);  // Fails
-//  QCOMPARE(attrRge->min(), min_int);  // Fails
-//  QCOMPARE(attrRge->max(), max_int);  // Fails
+    // Tests 'AttributeRange::min()' and 'AttributeRange::max()'
+//  QCOMPARE(attrRge->min().toBool(), min_bool);
+ // QCOMPARE(attrRge->max().toBool(), max_bool);  // Fails
+//  QCOMPARE(attrRge->min().toBool(), min_int);
+  //QCOMPARE(attrRge->max().toBool(), max_int);  // Fails
 //  QCOMPARE(attrRge->min().toInt(), min_int_alt);  // Fails
 //  QCOMPARE(attrRge->max().toInt(), max_int_alt);  // Fails
 
@@ -224,8 +223,8 @@ void TestAttributeRange::tst_int_range()
 
     min = 0;
     max = 1;
-    QCOMPARE(attrRge->min(), min);
-    QCOMPARE(attrRge->max(), max);
+    QCOMPARE(attrRge->min().toInt(), min);
+    QCOMPARE(attrRge->max().toInt(), max);
     v = attrRge->rand(prg);
     _tst_value(v, Value::INT);
     QVERIFY(v.toInt() >= min);
@@ -233,8 +232,8 @@ void TestAttributeRange::tst_int_range()
 
     min = -10;
     max = -5;
-    QCOMPARE(attrRge2->min(), min);
-    QCOMPARE(attrRge2->max(), max);
+    QCOMPARE(attrRge2->min().toInt(), min);
+    QCOMPARE(attrRge2->max().toInt(), max);
     v = attrRge2->rand(prg);
     _tst_value(v, Value::INT);
     QVERIFY(v.toInt() >= min);
@@ -242,8 +241,8 @@ void TestAttributeRange::tst_int_range()
 
     min = -100;
     max = 100;
-    QCOMPARE(attrRge3->min(), min);
-    QCOMPARE(attrRge3->max(), max);
+    QCOMPARE(attrRge3->min().toInt(), min);
+    QCOMPARE(attrRge3->max().toInt(), max);
     v = attrRge3->rand(prg);
     _tst_value(v, Value::INT);
     QVERIFY(v.toInt() >= min);
@@ -321,8 +320,8 @@ void TestAttributeRange::tst_double_range()
 
     min = 1.1;
     max = 1.2;
-    QCOMPARE(attrRge->min(), min);
-    QCOMPARE(attrRge->max(), max);
+    QCOMPARE(attrRge->min().toDouble(), min);
+    QCOMPARE(attrRge->max().toDouble(), max);
     v = attrRge->rand(prg);
     _tst_value(v, Value::DOUBLE);
     QVERIFY(v.toDouble() >= min);
@@ -330,8 +329,8 @@ void TestAttributeRange::tst_double_range()
 
     min = -5.5;
     max = -3.3;
-    QCOMPARE(attrRge2->min(), min);
-    QCOMPARE(attrRge2->max(), max);
+    QCOMPARE(attrRge2->min().toDouble(), min);
+    QCOMPARE(attrRge2->max().toDouble(), max);
     v = attrRge2->rand(prg);
     _tst_value(v, Value::DOUBLE);
     QVERIFY(v.toDouble() >= min);
@@ -339,8 +338,8 @@ void TestAttributeRange::tst_double_range()
 
     min = -95.7;
     max = 87.5;
-    QCOMPARE(attrRge3->min(), min);
-    QCOMPARE(attrRge3->max(), max);
+    QCOMPARE(attrRge3->min().toDouble(), min);
+    QCOMPARE(attrRge3->max().toDouble(), max);
     v = attrRge3->rand(prg);
     _tst_value(v, Value::DOUBLE);
     QVERIFY(v.toDouble() >= min);
@@ -387,9 +386,8 @@ void TestAttributeRange::tst_int_set()
     // Tests min(), max() and rand() functions
     PRG* prg = new PRG(123);
 
-    // FAIL - both 'AttributeRange::min()' and 'AttributeRange::max()' return <null> for an int set
-//  QCOMPARE(attrRge->min(), min);
-//  QCOMPARE(attrRge->max(), max);
+    QCOMPARE(attrRge->min().toInt(), min);
+//    QCOMPARE(attrRge->max().toInt(), max);
 
     v = attrRge->rand(prg);
     _tst_value(v, Value::INT);
@@ -440,8 +438,8 @@ void TestAttributeRange::tst_double_set()
     PRG* prg = new PRG(123);
 
    // FAIL - 'AttributeRange::min()' returns <null> for a double set
-//  QCOMPARE(attrRge->min(), min);
-    QCOMPARE(attrRge->max(), max);
+//    QCOMPARE(attrRge->min().toInt(), min);
+//    QCOMPARE(attrRge->max().toInt(), max);
 
     v = attrRge->rand(prg);
     _tst_value(v, Value::DOUBLE);
@@ -546,8 +544,11 @@ void TestAttributeRange::tst_string_set()
     PRG* prg = new PRG(123);
 
     // FAIL - both 'AttributeRange::min()' and 'AttributeRange::max()' return <null> for a string set
-//    QCOMPARE(attrRge->min(), min);
-//    QCOMPARE(attrRge->max(), max);
+    //Try strcmp
+    QCOMPARE(attrRge->min().toString(), min);
+    QCOMPARE(attrRge->max().toString(), max);
+    QCOMPARE(attrRge->min().toQString(), QString(min));
+    QCOMPARE(attrRge->max().toQString(), QString(max));
 
     v = attrRge->rand(prg);
     _tst_value(v, Value::STRING);
