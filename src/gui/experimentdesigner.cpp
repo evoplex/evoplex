@@ -185,9 +185,10 @@ ExperimentDesigner::ExperimentDesigner(MainApp* mainApp, QWidget *parent)
 
     for (const GraphPlugin* g : m_mainApp->graphs()) { slotPluginAdded(g); }
     for (const ModelPlugin* m : m_mainApp->models()) { slotPluginAdded(m); }
-    connect(m_mainApp, SIGNAL(pluginAdded(const Plugin*)), SLOT(slotPluginAdded(const Plugin*)));
-    connect(m_mainApp, SIGNAL(pluginRemoved(QString,Plugin::Type)),
-            SLOT(slotPluginRemoved(QString,Plugin::Type)));
+    connect(m_mainApp, SIGNAL(pluginAdded(const Plugin*)),
+            SLOT(slotPluginAdded(const Plugin*)));
+    connect(m_mainApp, SIGNAL(pluginRemoved(QString, PluginType)),
+            SLOT(slotPluginRemoved(QString,PluginType)));
 }
 
 ExperimentDesigner::~ExperimentDesigner()
