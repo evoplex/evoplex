@@ -56,6 +56,7 @@ public:
     ~Edge() { if (m_ownsAttrs) delete m_attrs; }
 
     inline const Attributes* attrs() const;
+    inline const Value& attr(const QString& name) const;
     inline const Value& attr(const char* name) const;
     inline const Value& attr(const int id) const;
     inline void setAttr(const int id, const Value& value);
@@ -79,6 +80,9 @@ private:
 
 inline const Attributes* Edge::attrs() const
 { return m_attrs; }
+
+inline const Value& Edge::attr(const QString& name) const
+{ return m_attrs->value(name); }
 
 inline const Value& Edge::attr(const char* name) const
 { return m_attrs->value(name); }

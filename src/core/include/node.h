@@ -74,6 +74,7 @@ class Node : public NodeInterface
 
 public:
     inline const Attributes& attrs() const;
+    inline const Value& attr(const QString& name) const;
     inline const Value& attr(const char* name) const;
     inline const Value& attr(const int id) const;
     inline void setAttr(const int id, const Value& value);
@@ -158,6 +159,9 @@ private:
 
 inline const Attributes& Node::attrs() const
 { return m_attrs; }
+
+inline const Value& Node::attr(const QString& name) const
+{ return m_attrs.value(name); }
 
 inline const Value& Node::attr(const char* name) const
 { return m_attrs.value(name); }
