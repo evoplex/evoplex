@@ -31,7 +31,7 @@
 
 namespace evoplex {
 
-struct Nodes : public std::unordered_map<int, NodePtr>
+class Nodes : public std::unordered_map<int, NodePtr>
 {
 public:
     struct Iterator : public iterator {
