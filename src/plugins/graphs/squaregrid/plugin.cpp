@@ -22,7 +22,6 @@
 #include <QtMath>
 
 #include "plugin.h"
-#include "utils.h"
 
 namespace evoplex {
 
@@ -61,14 +60,14 @@ void SquareGrid::reset()
     if (m_periodic) {
         for (auto const& node : m_nodes) {
             int x, y;
-            Utils::ind2sub(node.first, m_width, y, x);
+            ind2sub(node.first, m_width, y, x);
             node.second->setCoords(x, y);
             createPeriodicEdges(node.first, func);
         }
     } else {
         for (auto const& node : m_nodes) {
             int x, y;
-            Utils::ind2sub(node.first, m_width, y, x);
+            ind2sub(node.first, m_width, y, x);
             node.second->setCoords(x, y);
             createFixedEdges(node.first, func);
         }
@@ -91,7 +90,7 @@ void SquareGrid::createPeriodicEdges(const int id, edgesFunc func)
             neighbor.second = 0;
         }
 
-        int nId = Utils::linearIdx(neighbor, m_width);
+        int nId = linearIdx(neighbor, m_width);
         Q_ASSERT_X(nId < numNodes(), "SquareGrid::createEdges", "neighbor must exist");
         addEdge(node(id), node(nId), new Attributes());
     }
@@ -105,7 +104,7 @@ void SquareGrid::createFixedEdges(const int id, edgesFunc func)
             neighbor.second < 0 || neighbor.second >= m_width) {
             continue;
         }
-        int nId = Utils::linearIdx(neighbor, m_width);
+        int nId = linearIdx(neighbor, m_width);
         Q_ASSERT_X(nId < numNodes(), "SquareGrid::createEdges", "neighbor must exist");
         addEdge(node(id), node(nId), new Attributes());
     }
@@ -114,7 +113,7 @@ void SquareGrid::createFixedEdges(const int id, edgesFunc func)
 SquareGrid::edges2d SquareGrid::directed4Edges(const int id, const int width)
 {
     int row, col;
-    Utils::ind2sub(id, width, row, col);
+    ind2sub(id, width, row, col);
     edges2d neighbors {
         std::make_pair(row-1, col  ), // n
         std::make_pair(row  , col-1), // w
@@ -127,7 +126,7 @@ SquareGrid::edges2d SquareGrid::directed4Edges(const int id, const int width)
 SquareGrid::edges2d SquareGrid::undirected4Edges(const int id, const int width)
 {
     int row, col;
-    Utils::ind2sub(id, width, row, col);
+    ind2sub(id, width, row, col);
     edges2d neighbors {
         std::make_pair(row-1, col  ), // n
         std::make_pair(row  , col-1), // w
@@ -138,7 +137,7 @@ SquareGrid::edges2d SquareGrid::undirected4Edges(const int id, const int width)
 SquareGrid::edges2d SquareGrid::directed8Edges(const int id, const int width)
 {
     int row, col;
-    Utils::ind2sub(id, width, row, col);
+    ind2sub(id, width, row, col);
     edges2d neighbors {
         std::make_pair(row-1, col-1), // nw
         std::make_pair(row-1, col  ), // n
@@ -155,7 +154,7 @@ SquareGrid::edges2d SquareGrid::directed8Edges(const int id, const int width)
 SquareGrid::edges2d SquareGrid::undirected8Edges(const int id, const int width)
 {
     int row, col;
-    Utils::ind2sub(id, width, row, col);
+    ind2sub(id, width, row, col);
     edges2d neighbors {
         std::make_pair(row-1, col-1), // nw
         std::make_pair(row-1, col  ), // n
