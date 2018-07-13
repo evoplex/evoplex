@@ -235,7 +235,7 @@ void ExperimentDesigner::slotSetActiveWidget(int idx)
 
 void ExperimentDesigner::setExperiment(Experiment* exp)
 {
-    if (!exp || exp->expStatus() == Status::Unset) {
+    if (!exp || exp->expStatus() == Status::Invalid) {
         m_exp = nullptr;
         m_ui->bEdit->hide();
         return;
