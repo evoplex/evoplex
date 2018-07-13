@@ -9,6 +9,6 @@
     { "neighbours": "int{4,8}" },
     { "height": "int[1,max]" },
     { "width": "int[1,max]" },
-    { "periodic": "bool" }
+    { "boundary": "string{periodic,fixed}" }
   ]
 }

@@ -27,13 +27,13 @@ namespace evoplex {
 
 bool SquareGrid::init()
 {
-    if (!attrExists("periodic") || !attrExists("neighbours") ||
+    if (!attrExists("boundary") || !attrExists("neighbours") ||
         !attrExists("height") || !attrExists("width")) {
         qWarning() << "missing attributes.";
         return false;
     }
 
-    m_periodic = attr("periodic").toBool();
+    m_periodic = attr("boundary").toQString() == QString("periodic");
     m_numNeighbours = attr("neighbours").toInt();
     m_height = attr("height").toInt();
     m_width = attr("width").toInt();

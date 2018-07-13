@@ -34,7 +34,7 @@ public:
     void reset();
 
 private:
-    bool m_periodic;
+    bool m_periodic; // boundary conditions: false for fixed
     int m_numNeighbours;
     int m_height;
     int m_width;
