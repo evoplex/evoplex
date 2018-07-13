@@ -24,12 +24,12 @@
 #include <unordered_map>
 #include <QRunnable>
 
+#include "abstractgraph.h"
+#include "abstractmodel.h"
 #include "enum.h"
 
 namespace evoplex {
 
-class AbstractGraph;
-class AbstractModel;
 class Experiment;
 class PRG;
 class Trial;

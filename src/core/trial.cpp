@@ -24,8 +24,6 @@
 #include <QThread>
 
 #include "trial.h"
-#include "abstractgraph.h"
-#include "abstractmodel.h"
 #include "project.h"
 #include "utils.h"
 

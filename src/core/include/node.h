@@ -37,6 +37,7 @@ class NodeInterface
     friend class AbstractGraph;
     friend class Nodes;
     friend class TestNode;
+    friend class TestEdge;
 
 public:
     virtual ~NodeInterface() = default;
@@ -69,6 +70,7 @@ class Node : public NodeInterface
     friend class AbstractGraph;
     friend class Nodes;
     friend class TestNode;
+    friend class TestEdge;
 
 public:
     inline const Attributes& attrs() const;
