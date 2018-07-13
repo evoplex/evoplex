@@ -105,6 +105,17 @@ void ExperimentsMgr::play(Experiment* exp)
 {
     QMutexLocker locker(&m_mutex);
 
+    if (exp->expStatus() == Status::Unset) {
+        QFuture<void> future = QtConcurrent::run(exp, &Experiment::init);
+        QFutureWatcher<void>* watcher = new QFutureWatcher<void>;
+        connect(watcher, &QFutureWatcher<void>::finished, [this, exp, watcher]() {
+            watcher->deleteLater();
+            this->play(exp);
+        });
+        watcher->setFuture(future);
+        return;
+    }
+
     if (exp->expStatus() != Status::Ready
             && exp->expStatus() != Status::Queued) {
         return;

@@ -146,11 +146,11 @@ void ExperimentWidget::closeEvent(QCloseEvent* event)
 
 void ExperimentWidget::slotStatusChanged(Status status)
 {
-    if (status == Status::Ready) {
+    if (status == Status::Ready || status == Status::Unset) {
         m_aPlayPause->setIcon(m_kIcon_play);
         m_aPlayPause->setEnabled(true);
         m_aNext->setEnabled(true);
-        m_aStop->setEnabled(true);
+        m_aStop->setEnabled(status != Status::Unset);
         m_aReset->setEnabled(true);
     } else if (status == Status::Running || status == Status::Queued) {
         m_aPlayPause->setIcon(m_kIcon_pause);
@@ -164,6 +164,8 @@ void ExperimentWidget::slotStatusChanged(Status status)
         m_aNext->setEnabled(false);
         m_aStop->setEnabled(false);
         m_aReset->setEnabled(true);
+    } else {
+        qFatal("invalid status!");
     }
 
     if (status == Status::Invalid) {

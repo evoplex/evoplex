@@ -41,6 +41,7 @@ Project::Project(MainApp* mainApp, int id)
 
 bool Project::init(QString& error, const QString& filepath)
 {
+    Q_ASSERT_X(m_experiments.empty(), "Project", "a project cannot be initialized twice");
     setFilePath(filepath);
     if (!filepath.isEmpty()) {
         this->blockSignals(true);
@@ -48,7 +49,7 @@ bool Project::init(QString& error, const QString& filepath)
         this->blockSignals(false);
     }
     m_hasUnsavedChanges = false;
-    return error.isEmpty();
+    return !error.isEmpty();
 }
 
 void Project::destroyExperiments()
@@ -90,8 +91,9 @@ Experiment* Project::newExperiment(ExpInputs* inputs, QString& error)
         return nullptr;
     }
 
-    Experiment* exp = new Experiment(m_mainApp, inputs, sharedFromThis());
+    Experiment* exp = new Experiment(m_mainApp, expId, sharedFromThis());
     m_experiments.insert({expId, exp});
+    exp->setInputs(inputs, error);
 
     m_hasUnsavedChanges = true;
     emit (hasUnsavedChanges(m_hasUnsavedChanges));
@@ -103,7 +105,7 @@ bool Project::editExperiment(int expId, ExpInputs* newInputs, QString& error)
 {
     Experiment* exp = m_experiments.at(expId);
     Q_ASSERT_X(exp, "Experiment", "tried to edit a nonexistent experiment");
-    if (!exp->init(newInputs, error)) {
+    if (!exp->setInputs(newInputs, error)) {
         return false;
     }
     m_hasUnsavedChanges = true;
@@ -112,13 +114,13 @@ bool Project::editExperiment(int expId, ExpInputs* newInputs, QString& error)
     return true;
 }
 
-int Project::importExperiments(const QString& filePath, QString& errorMsg)
+int Project::importExperiments(const QString& filePath, QString& error)
 {
     QFile file(filePath);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        errorMsg = "Couldn't read the experiments from:\n`" + filePath + "`"
-                 + "Please, make sure it is a readable csv file.";
-        qWarning() << errorMsg;
+        error += QString("Couldn't read the experiments from:\n'%1'\n"
+                 "Please, make sure it is a readable csv file.\n").arg(filePath);
+        qWarning() << error;
         return 0;
     }
 
@@ -127,9 +129,10 @@ int Project::importExperiments(const QString& filePath, QString& errorMsg)
     // read header
     const QStringList header = in.readLine().split(",");
     if (header.isEmpty()) {
-        errorMsg = "Couldn't read the experiments from:\n`" + filePath + "`"
-                 + "\nThe header must have: " + m_mainApp->generalAttrsScope().keys().join(", ");
-        qWarning() << errorMsg;
+        error += QString("Couldn't read the experiments from:\n'%1'\n"
+                 "The header must have the following columns: %2\n")
+                 .arg(filePath).arg(m_mainApp->generalAttrsScope().keys().join(", "));
+        qWarning() << error;
         return 0;
     }
 
@@ -139,22 +142,28 @@ int Project::importExperiments(const QString& filePath, QString& errorMsg)
         const QStringList values = in.readLine().split(",");
         QString expErrorMsg;
         ExpInputs* inputs = ExpInputs::parse(m_mainApp, header, values, expErrorMsg);
+        if (!expErrorMsg.isEmpty()) {
+            error += QString("Row %1 : Warning: %2\n").arg(row).arg(expErrorMsg);
+        }
+        expErrorMsg.clear();
         if (!inputs || !newExperiment(inputs, expErrorMsg)) {
-            errorMsg = QString("Couldn't read the experiment at line %1 from:\n`%2`\n"
-                               "Error: %3").arg(row).arg(filePath).arg(expErrorMsg);
-            qWarning() << errorMsg;
-            delete inputs;
-            file.close();
-            return row - 1;
+            error += QString("Row %1 (skipped): Critical error: %2\n").arg(row).arg(expErrorMsg);
+        }
+        if (!expErrorMsg.isEmpty()) {
+            error += QString("Row %1 : Warning: %2\n").arg(row).arg(expErrorMsg);
         }
         ++row;
     }
     file.close();
 
     if (row == 1) {
-        errorMsg = QString("This file is empty.\nThere were no experiments to be read.\n%1").arg(filePath);
-        qWarning() << errorMsg;
-        return 0;
+        error += QString("This file is empty.\n"
+                 "There were no experiments to be read.\n'%1'\n").arg(filePath);
+    }
+
+    if (!error.isEmpty()) {
+        error += QString("`%1`\n").arg(filePath);
+        qWarning() << error;
     }
 
     return row - 1;

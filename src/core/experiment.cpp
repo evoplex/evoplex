@@ -27,16 +27,23 @@
 
 namespace evoplex {
 
-Experiment::Experiment(MainApp* mainApp, ExpInputs* inputs, ProjectPtr project)
+Experiment::Experiment(MainApp* mainApp, const int id, ProjectPtr project)
     : m_mainApp(mainApp),
-      m_id(inputs->general(GENERAL_ATTRIBUTE_EXPID).toInt()),
+      m_id(id),
       m_project(project),
       m_inputs(nullptr),
+      m_graphPlugin(nullptr),
+      m_modelPlugin(nullptr),
+      m_graphType(GraphType::Invalid),
+      m_numTrials(0),
+      m_autoDeleteTrials(true),
+      m_stopAt(0),
+      m_pauseAt(0),
+      m_progress(0),
+      m_delay(0),
       m_expStatus(Status::Invalid)
 {
-    Q_ASSERT_X(m_project, "Experiment", "an experiment must belong to a valid project");
-    QString error;
-    init(inputs, error);
+    Q_ASSERT_X(!m_project.isNull(), "Experiment", "an experiment must belong to a valid project");
 }
 
 Experiment::~Experiment()
@@ -49,40 +56,66 @@ Experiment::~Experiment()
     m_project.clear();
 }
 
-bool Experiment::init(ExpInputs* inputs, QString& error)
+bool Experiment::setInputs(ExpInputs* inputs, QString& error)
 {
+    QMutexLocker locker(&m_mutex);
+
     if (m_expStatus == Status::Running || m_expStatus == Status::Queued) {
-        error = "Tried to initialize a running experiment.\n"
-                "Please, pause it and try again.";
+        error += "Tried to initialize a running experiment.\n"
+                 "Please, pause it and try again.";
         qWarning() << error;
         return false;
     }
 
+    m_expStatus = Status::Invalid;
     m_outputs.clear();
+    m_filePathPrefix.clear();
+    m_fileHeader.clear();
     delete m_inputs;
     m_inputs = inputs;
 
+    m_graphPlugin = m_mainApp->graph(m_inputs->general(GENERAL_ATTRIBUTE_GRAPHID).toQString());
+    m_modelPlugin = m_mainApp->model(m_inputs->general(GENERAL_ATTRIBUTE_MODELID).toQString());
+
+    // a few asserts for critical things that should never happen!
+    Q_ASSERT_X(this == m_project->experiment(m_id),
+        "Experiment", "an experiment must be aware of its parent project!");
+    Q_ASSERT_X(m_id == inputs->general(GENERAL_ATTRIBUTE_EXPID).toInt(),
+        "Experiment", "mismatched experiment id!");
+    Q_ASSERT_X(m_graphPlugin && m_modelPlugin,
+        "Experiment", "tried to setup an experiment with invalid plugins!");
+
     m_graphType = _enumFromString<GraphType>(m_inputs->general(GENERAL_ATTRIBUTE_GRAPHTYPE).toQString());
     if (m_graphType == GraphType::Invalid) {
-        error = "the graph type is invalid!";
+        error += "the graph type is invalid!";
         qWarning() << error;
+        emit (statusChanged(m_expStatus));
         return false;
     }
 
     m_numTrials = m_inputs->general(GENERAL_ATTRIBUTE_TRIALS).toInt();
     if (m_numTrials < 1 || m_numTrials > EVOPLEX_MAX_TRIALS) {
-        error = QString("number of trials should be >0 and <%1!").arg(EVOPLEX_MAX_TRIALS);
+        error += QString("number of trials should be >0 and <%1!").arg(EVOPLEX_MAX_TRIALS);
         qWarning() << error;
+        emit (statusChanged(m_expStatus));
         return false;
     }
 
-    m_graphPlugin = m_mainApp->graph(m_inputs->general(GENERAL_ATTRIBUTE_GRAPHID).toQString());
-    m_modelPlugin = m_mainApp->model(m_inputs->general(GENERAL_ATTRIBUTE_MODELID).toQString());
-
     m_autoDeleteTrials = m_inputs->general(GENERAL_ATTRIBUTE_AUTODELETE).toBool();
+    m_stopAt = m_inputs->general(GENERAL_ATTRIBUTE_STOPAT).toInt();
+    m_pauseAt = m_stopAt;
+    m_progress = 0;
 
-    m_filePathPrefix.clear();
-    m_fileHeader.clear();
+    m_expStatus = Status::Unset;
+    emit (statusChanged(m_expStatus));
+    return true;
+}
+
+void Experiment::init()
+{
+    Q_ASSERT_X(m_inputs, "Experiment", "tried to init an experiment without inputs");
+    Q_ASSERT_X(m_expStatus == Status::Unset, "Experiment", "tried to init an experiment twice");
+
     if (!m_inputs->fileCaches().empty()) {
         m_filePathPrefix = QString("%1/%2_e%3_t")
                 .arg(m_inputs->general(OUTPUT_DIR).toQString())
@@ -98,21 +131,33 @@ bool Experiment::init(ExpInputs* inputs, QString& error)
         m_fileHeader += "\n";
     }
 
+    // if it comes from playNext(), pauseAt should not be reset
+    const int pauseAt = m_pauseAt;
+    m_expStatus = Status::Ready;
     reset();
-
-    return true;
+    m_pauseAt = pauseAt;
 }
 
 void Experiment::reset()
 {
+    Q_ASSERT_X(m_expStatus != Status::Unset, "Experiment",
+               "the experiment must be initialized first");
+
+    QMutexLocker locker(&m_mutex);
+
     if (m_expStatus == Status::Running || m_expStatus == Status::Queued) {
         qWarning() << "tried to reset a running experiment. You should pause it first.";
         return;
     }
 
-    deleteTrials();
+    m_delay = m_mainApp->defaultStepDelay();
+    m_stopAt = m_inputs->general(GENERAL_ATTRIBUTE_STOPAT).toInt();
+    m_pauseAt = m_stopAt;
+    m_progress = 0;
 
-    QMutexLocker locker(&m_mutex);
+    locker.unlock();
+    deleteTrials();
+    locker.relock();
 
     for (OutputPtr o : m_outputs) {
         o->flushAll();
@@ -122,11 +167,6 @@ void Experiment::reset()
     for (quint16 trialId = 0; trialId < m_numTrials; ++trialId) {
         m_trials.insert({trialId, new Trial(trialId, this)});
     }
-
-    m_delay = m_mainApp->defaultStepDelay();
-    m_stopAt = m_inputs->general(GENERAL_ATTRIBUTE_STOPAT).toInt();
-    m_pauseAt = m_stopAt;
-    m_progress = 0;
 
     m_expStatus = Status::Ready;
     emit (statusChanged(m_expStatus));
@@ -178,7 +218,7 @@ void Experiment::toggle()
 {
     if (m_expStatus == Status::Running) {
         pause();
-    } else if (m_expStatus == Status::Ready) {
+    } else if (m_expStatus == Status::Ready || m_expStatus == Status::Unset) {
         play();
     } else if (m_expStatus == Status::Queued) {
         m_mainApp->expMgr()->removeFromQueue(this);
@@ -192,18 +232,16 @@ void Experiment::play()
 
 void Experiment::playNext()
 {
-    if (m_expStatus != Status::Ready) {
+    if (m_expStatus != Status::Ready && m_expStatus != Status::Unset) {
         return;
-    } else if (m_trials.empty()) {
-        setPauseAt(-1); // just create and set the trials
-    } else {
-        int maxCurrStep = 0;
-        for (const auto& trial : m_trials) {
-            int currStep = trial.second->step();
-            if (currStep > maxCurrStep) maxCurrStep = currStep;
-        }
-        setPauseAt(maxCurrStep + 1);
     }
+
+    int maxCurrStep = -100;
+    for (const auto& trial : m_trials) {
+        int currStep = trial.second->step();
+        if (currStep > maxCurrStep) maxCurrStep = currStep;
+    }
+    setPauseAt(maxCurrStep + 1);
     m_mainApp->expMgr()->play(this);
 }
 

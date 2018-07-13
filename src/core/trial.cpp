@@ -34,7 +34,7 @@ namespace evoplex {
 Trial::Trial(const quint16 id, Experiment* exp)
     : m_id(id),
       m_exp(exp),
-      m_step(0),
+      m_step(-1), // important! an unset trial starts from -1
       m_status(Status::Unset),
       m_prg(nullptr),
       m_graph(nullptr),
@@ -60,7 +60,7 @@ GraphType Trial::graphType() const
 
 bool Trial::init()
 {
-    if (m_exp->expStatus() == Status::Invalid || m_exp->pauseAt() == 0) {
+    if (m_exp->expStatus() == Status::Invalid) {
         return false;
     }
 
@@ -113,6 +113,8 @@ bool Trial::init()
     if (m_exp->numTrials() > 1 && m_exp->m_clonableNodes.empty()) {
         m_exp->m_clonableNodes = Utils::clone(nodes);
     }
+
+    m_step = 0; // important!
 
     return true;
 }

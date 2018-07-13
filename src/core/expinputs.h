@@ -33,12 +33,9 @@ public:
     // Read and validate the experiment inputs.
     // We assume that all graph/model attributes start with 'uid_'. It is very
     // important to avoid clashes between different attributes which use the same name.
-    // @return nullptr if unsuccessful
+    // @return nullptr if doesn't have valid plugins
     static ExpInputs* parse(const MainApp* mainApp, const QStringList& header,
                             const QStringList& values, QString& errMsg);
-
-    ExpInputs(Attributes* general, Attributes* model,
-              Attributes* graph, std::vector<Cache*> caches);
 
     ~ExpInputs();
 
@@ -59,12 +56,16 @@ public:
     // Export all the attributes' values to a vector.
     std::vector<Value> exportAttrValues() const;
 
+protected:
+    explicit ExpInputs(Attributes* general, Attributes* graph,
+                       Attributes* model, std::vector<Cache*> caches);
+
 private:
     using Plugins = std::pair<const GraphPlugin*, const ModelPlugin*>;
 
     Attributes* m_generalAttrs;
-    Attributes* m_modelAttrs;
     Attributes* m_graphAttrs;
+    Attributes* m_modelAttrs;
     std::vector<Cache*> m_fileCaches;
 
     static Plugins findPlugins(const MainApp* mainApp, const QStringList& header,

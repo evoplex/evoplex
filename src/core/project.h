@@ -52,7 +52,7 @@ public:
 
     // Import a set of experiments from a csv file. It stops if an experiment fails.
     // return the number of experiments imported.
-    int importExperiments(const QString& filePath, QString& errorMsg);
+    int importExperiments(const QString& filePath, QString& error);
 
     // Save project into the dest directory.
     // A project is composed of plain csv files

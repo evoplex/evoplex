@@ -230,10 +230,7 @@ ProjectPtr MainApp::newProject(QString& error, const QString& filepath)
 
     const int projectId = static_cast<int>(m_projects.size());
     ProjectPtr project = ProjectPtr::create(this, projectId);
-    if (!project->init(error, filepath)) {
-        return nullptr;
-    }
-
+    project->init(error, filepath);
     m_projects.insert({projectId, project});
     return project;
 }

@@ -50,10 +50,13 @@ class Experiment : public QObject
     friend class Trial;
 
 public:
-    explicit Experiment(MainApp* mainApp, ExpInputs* inputs, ProjectPtr project);
+    explicit Experiment(MainApp* mainApp, const int id, ProjectPtr project);
     ~Experiment();
 
-    bool init(ExpInputs* inputs, QString& error);
+    // set the experiment inputs
+    // Return true if successful
+    // this method IS thread-safe
+    bool setInputs(ExpInputs* inputs, QString& error);
 
     void reset();
 
@@ -139,9 +142,9 @@ private:
     std::unordered_set<OutputPtr> m_outputs;
 
     int m_pauseAt;
-    Status m_expStatus;
     quint16 m_progress; // current progress value [0, 360]
     quint16 m_delay;
+    Status m_expStatus;
 
     Trials m_trials;
 
@@ -158,6 +161,8 @@ private:
     Nodes cloneCachedNodes(const int trialId);
 
     void deleteTrials();
+
+    void init();
 };
 
 /************************************************************************
