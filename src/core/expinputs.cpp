@@ -68,8 +68,11 @@ std::vector<Value> ExpInputs::exportAttrValues() const
 ExpInputs* ExpInputs::parse(const MainApp* mainApp, const QStringList& header,
                             const QStringList& values, QString& errMsg)
 {
-    if (header.isEmpty() || values.isEmpty() || header.size() != values.size()) {
-        errMsg += "The 'header' and 'values' cannot be empty and must have the same number of elements.";
+    if (header.isEmpty() || values.isEmpty()) {
+        errMsg += "The 'header' and 'values' cannot be empty.";
+        return nullptr;
+    } else if (header.size() != values.size()) {
+        errMsg += "The 'header' and 'values' must have the same number of elements.";
         return nullptr;
     }
 

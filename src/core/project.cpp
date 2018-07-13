@@ -235,7 +235,7 @@ bool Project::saveProject(QString& errMsg, std::function<void(int)>& progress)
             }
             values.append(v.toQString() + ","); // will leave empty if not found
         }
-        values.replace(values.size(), "\n");
+        values.remove(values.size()-1, 1); // remove last comma
         out << values << "\n";
 
         _progress += kProgress;
