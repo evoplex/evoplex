@@ -23,6 +23,7 @@
 #include <QDate>
 #include <QDebug>
 #include <QDir>
+#include <QFontDatabase>
 #include <QScopedPointer>
 #include <QSplashScreen>
 #include <QStyleFactory>
@@ -108,6 +109,13 @@ int main(int argc, char* argv[])
         darkPalette.setColor(QPalette::Highlight, QColor(42, 130, 218));
         darkPalette.setColor(QPalette::HighlightedText, Qt::black);
         app->setPalette(darkPalette);
+
+        QFontDatabase::addApplicationFont(":/fonts/fonts/Roboto/Roboto-Regular.ttf");
+        QFontDatabase::addApplicationFont(":/fonts/fonts/Roboto/Roboto-Bold.ttf");
+        QFontDatabase::addApplicationFont(":/fonts/fonts/Roboto/Roboto-Italic.ttf");
+        QFont font("Roboto");
+        font.setStyleHint(QFont::SansSerif);
+        app->setFont(font);
 
         evoplex::MainGUI gui(&mainApp);
         splash->finish(&gui);
