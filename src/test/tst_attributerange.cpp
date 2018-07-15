@@ -551,15 +551,20 @@ void TestAttributeRange::tst_string_set()
     // of the string according to the ASCII table
     const char* min = "a";
     const char* max = "this sentence is a long string for testing purposes";
+    const char* min_of_set = "sample";
+    const char* max_of_set = "abc£ãã&!£$%^*(áéí)";
 
     PRG* prg = new PRG(123);
 
-    // FAIL - both 'AttributeRange::min()' and 'AttributeRange::max()' return <null> for a string set
-    //Try strcmp
-//    QCOMPARE(attrRge->min().toString(), min);
-//    QCOMPARE(attrRge->max().toString(), max);
-//    QCOMPARE(attrRge->min().toQString(), QString(min));
-//    QCOMPARE(attrRge->max().toQString(), QString(max));
+    // min() returns the first value in the set
+    // max() returns the last value in the set
+    // Provided the set is ordered, these are the min and max values
+
+    QCOMPARE(attrRge->min().toString(), min_of_set);
+    QCOMPARE(attrRge->max().toString(), max_of_set);
+    QCOMPARE(attrRge->min().toQString(), QString(min_of_set));
+    QCOMPARE(attrRge->max().toQString(), QString(max_of_set));
+
 
     v = attrRge->rand(prg);
     _tst_value(v, Value::STRING);
