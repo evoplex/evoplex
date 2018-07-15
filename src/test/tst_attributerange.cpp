@@ -92,7 +92,6 @@ void TestAttributeRange::_tst_value(Value v, Value::Type type)
     }
 }
 
-// TODO: bool values
 void TestAttributeRange::tst_bool()
 {
     AttributeRange* attrRge = AttributeRange::parse(0, "test", "bool");
@@ -141,24 +140,16 @@ void TestAttributeRange::tst_bool()
     QVERIFY(v.toBool() <= max_int);
 
     // Tests 'AttributeRange::min()' and 'AttributeRange::max()'
-//    QCOMPARE(attrRge->min().toBool(), min_bool);
-//    QCOMPARE(attrRge->max().toBool(), max_bool);
-//    // Fails:
-    // attrRge->min().toBool() returns 0
-//    QCOMPARE(attrRge->max().toBool(), max_bool);
-//    QCOMPARE(attrRge->max().toBool(), 0);
+    QCOMPARE(attrRge->min().toBool(), min_bool);
 
-    // Passes:
-//    QCOMPARE(attrRge->min().toBool(), min_int);
+    // 'attrRge->max().toBool()' returns 0
+//    QCOMPARE(attrRge->max().toBool(), max_bool);
+    QCOMPARE(attrRge->max().toBool(), false);
 
-    // Fails:
-    // Same reason as above
+    QCOMPARE(attrRge->min().toBool(), min_int);
+
 //    QCOMPARE(attrRge->max().toBool(), max_int);
-
-    // Fails:
-    // attrRge->min().toInt() returns -842150656
-//    QCOMPARE(attrRge->min().toInt(), min_int_alt);
-//    QCOMPARE(attrRge->max().toInt(), max_int_alt);
+    QCOMPARE(attrRge->max().toBool(), false);
 
     delete prg;
 }
