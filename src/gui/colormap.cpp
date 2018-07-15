@@ -129,6 +129,10 @@ ColorMap::ColorMap(const Colors& colors)
     Q_ASSERT_X(colors.size() > 0, "ColorMap", "the color size is invalid!");
 }
 
+ColorMap::~ColorMap()
+{
+}
+
 /************************************************************************/
 
 SingleColor::SingleColor(QColor color)
@@ -151,8 +155,8 @@ ColorMapRange::ColorMapRange(const Colors& colors, const IntervalOfValues* attrR
         m_max = attrRange->max().toInt();
         m_min = attrRange->min().toInt();
     } else if (attrRange->type() == AttributeRange::Double_Range) {
-        m_max = attrRange->max().toDouble();
-        m_min = attrRange->min().toDouble();
+        m_max = static_cast<float>(attrRange->max().toDouble());
+        m_min = static_cast<float>(attrRange->min().toDouble());
     } else {
         qFatal("invalid attribute range!");
     }
@@ -164,11 +168,11 @@ const QColor ColorMapRange::colorFromValue(const Value& val) const
     if (val.type() == Value::INT) {
         value = val.toInt();
     } else if (val.type() == Value::DOUBLE) {
-        value = val.toDouble();
+        value = static_cast<float>(val.toDouble());
     } else {
         qFatal("invalid attribute range!");
     }
-    return m_colors.at(std::round((value * (m_colors.size()-1)) / m_max + m_min));
+    return m_colors.at(static_cast<size_t>(std::round((value * (m_colors.size()-1)) / m_max) + m_min));
 }
 
 /************************************************************************/
@@ -176,10 +180,10 @@ const QColor ColorMapRange::colorFromValue(const Value& val) const
 ColorMapSet::ColorMapSet(const Colors& colors, const SetOfValues* attrRange)
     : ColorMap(colors)
 {
-    int c = 0;
-    for (const Value value : attrRange->values()) {
+    size_t c = 0;
+    for (const Value& value : attrRange->values()) {
         m_cmap.insert({value, m_colors.at(c++)});
-        c = (c == static_cast<int>(m_colors.size())) ? 0 : c;
+        c = (c == m_colors.size()) ? 0 : c;
     }
 }
 
@@ -187,7 +191,7 @@ const QColor ColorMapSet::colorFromValue(const Value& val) const
 {
     std::unordered_map<Value, QColor>::const_iterator i = m_cmap.find(val);
     if (i == m_cmap.end()) {
-        qWarning() << "invalid value!" << val.toQString();
+        // qWarning() << "invalid value!" << val.toQString();
         return Qt::black;
     }
     return i->second;
