@@ -556,7 +556,6 @@ void TestAttributeRange::tst_string_set()
     QCOMPARE(attrRge->min().toQString(), QString(min_of_set));
     QCOMPARE(attrRge->max().toQString(), QString(max_of_set));
 
-
     v = attrRge->rand(prg);
     _tst_value(v, Value::STRING);
 
