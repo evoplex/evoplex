@@ -46,20 +46,13 @@ public:
     explicit MainGUI(MainApp* mainApp, QWidget* parent=0);
     ~MainGUI();
 
-    void resetSettingsToDefault();
-
     inline MainApp* mainApp() const { return m_mainApp; }
     inline ColorMapMgr* colorMapMgr() const { return m_colorMapMgr; }
     inline SaveDialog* saveDialog() const { return m_saveDialog; }
 
-    int fontSize();
-
 signals:
     void newProject();
     void openProject(QString path);
-
-public slots:
-    void setFontSize(int size);
 
 private slots:
     void updateSaveButtons(ProjectPtr proj);
@@ -84,7 +77,6 @@ private:
         PAGE_SETTINGS
     };
 
-    QSettings m_userPrefs;
     MainApp* m_mainApp;
     ColorMapMgr* m_colorMapMgr;
 

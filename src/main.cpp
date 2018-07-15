@@ -57,6 +57,9 @@ int main(int argc, char* argv[])
     QCoreApplication::setApplicationName("Evoplex");
     QCoreApplication::setApplicationVersion(EVOPLEX_VERSION "-" EVOPLEX_RELEASE);
 
+    // Enables high-DPI scaling in Qt on supported platforms
+    QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling, true);
+
     evoplex::Logger::init();
 
     const QString copyright = "Copyright (C) 2016-" + QDate::currentDate().toString("yyyy");
@@ -79,6 +82,17 @@ int main(int argc, char* argv[])
     int result = -1;
     QApplication* app = qobject_cast<QApplication*>(coreApp.data());
     if (app) {
+        QFontDatabase::addApplicationFont(":/fonts/fonts/Roboto/Roboto-Regular.ttf");
+        QFontDatabase::addApplicationFont(":/fonts/fonts/Roboto/Roboto-Bold.ttf");
+        QFontDatabase::addApplicationFont(":/fonts/fonts/Roboto/Roboto-Italic.ttf");
+        QFontDatabase::addApplicationFont(":/fonts/fonts/Roboto/Roboto-Light.ttf");
+        QFontDatabase::addApplicationFont(":/fonts/fonts/Roboto/Roboto-Medium.ttf");
+        QFont font("Roboto Regular");
+        font.setPixelSize(14); // body 2
+        font.setLetterSpacing(QFont::AbsoluteSpacing, 0.25);
+        font.setStyleHint(QFont::SansSerif);
+        app->setFont(font);
+
         QPixmap pixmap(":icons/splash.svg");
         QSplashScreen* splash = new QSplashScreen(pixmap, Qt::WindowStaysOnTopHint);
         QFont splashFont = qApp->font();
@@ -109,13 +123,6 @@ int main(int argc, char* argv[])
         darkPalette.setColor(QPalette::Highlight, QColor(42, 130, 218));
         darkPalette.setColor(QPalette::HighlightedText, Qt::black);
         app->setPalette(darkPalette);
-
-        QFontDatabase::addApplicationFont(":/fonts/fonts/Roboto/Roboto-Regular.ttf");
-        QFontDatabase::addApplicationFont(":/fonts/fonts/Roboto/Roboto-Bold.ttf");
-        QFontDatabase::addApplicationFont(":/fonts/fonts/Roboto/Roboto-Italic.ttf");
-        QFont font("Roboto");
-        font.setStyleHint(QFont::SansSerif);
-        app->setFont(font);
 
         evoplex::MainGUI gui(&mainApp);
         splash->finish(&gui);
