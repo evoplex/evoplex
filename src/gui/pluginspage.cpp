@@ -25,6 +25,7 @@
 
 #include "ui_pluginspage.h"
 #include "pluginspage.h"
+#include "fontstyles.h"
 
 #include "core/graphplugin.h"
 #include "core/modelplugin.h"
@@ -44,6 +45,8 @@ PluginsPage::PluginsPage(MainGUI* mainGUI)
     m_ui->dockBrowser->setTitleBarWidget(0);
     m_innerWindow->addDockWidget(Qt::RightDockWidgetArea, m_ui->dockBrowser);
     m_ui->iwLayout->addWidget(m_innerWindow);
+
+    m_ui->labelPlugins->setFont(FontStyles::subtitle1());
 
     connect(m_ui->bImport, SIGNAL(pressed()), SLOT(importPlugin()));
     connect(m_ui->table, SIGNAL(itemSelectionChanged()), SLOT(rowSelectionChanged()));

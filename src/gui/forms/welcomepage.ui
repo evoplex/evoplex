@@ -23,15 +23,10 @@
       <number>0</number>
      </property>
      <property name="bottomMargin">
-      <number>0</number>
+      <number>55</number>
      </property>
      <item>
-      <widget class="QLabel" name="label">
-       <property name="font">
-        <font>
-         <pointsize>22</pointsize>
-        </font>
-       </property>
+      <widget class="QLabel" name="labelEvoplex">
        <property name="text">
         <string>Evoplex</string>
        </property>
@@ -69,13 +64,11 @@
      <property name="bottomMargin">
       <number>20</number>
      </property>
+     <property name="verticalSpacing">
+      <number>10</number>
+     </property>
      <item row="0" column="2">
-      <widget class="QLabel" name="label_4">
-       <property name="font">
-        <font>
-         <pointsize>14</pointsize>
-        </font>
-       </property>
+      <widget class="QLabel" name="labelRecent">
        <property name="text">
         <string>Recent Projects</string>
        </property>
@@ -83,9 +76,6 @@
      </item>
      <item row="1" column="2" rowspan="2">
       <widget class="QListWidget" name="recent">
-       <property name="styleSheet">
-        <string notr="true">background-color: rgb(51,51,51);</string>
-       </property>
        <property name="frameShape">
         <enum>QFrame::NoFrame</enum>
        </property>
@@ -104,12 +94,21 @@
        <property name="selectionMode">
         <enum>QAbstractItemView::NoSelection</enum>
        </property>
+       <property name="spacing">
+        <number>2</number>
+       </property>
       </widget>
      </item>
      <item row="1" column="0">
       <layout class="QVBoxLayout" name="verticalLayout_2">
+       <property name="spacing">
+        <number>12</number>
+       </property>
        <property name="leftMargin">
         <number>10</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
        </property>
        <property name="rightMargin">
         <number>20</number>
@@ -144,12 +143,7 @@
       </layout>
      </item>
      <item row="0" column="0">
-      <widget class="QLabel" name="label_3">
-       <property name="font">
-        <font>
-         <pointsize>14</pointsize>
-        </font>
-       </property>
+      <widget class="QLabel" name="labelStart">
        <property name="text">
         <string>Start</string>
        </property>

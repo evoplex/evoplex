@@ -25,6 +25,7 @@
 #include <QTableWidgetItem>
 
 #include "projectwidget.h"
+#include "fontstyles.h"
 #include "savedialog.h"
 #include "ui_projectwidget.h"
 #include "core/experimentsmgr.h"
@@ -42,6 +43,8 @@ ProjectWidget::ProjectWidget(ProjectPtr project, MainGUI* mainGUI, ProjectsPage*
     setObjectName(m_project->name());
     setWindowTitle(objectName());
     setFocusPolicy(Qt::StrongFocus);
+
+    m_ui->labelExps->setFont(FontStyles::subtitle1());
 
     connect(m_project.data(), SIGNAL(expAdded(Experiment*)), SLOT(slotInsertRow(Experiment*)));
     connect(m_project.data(), SIGNAL(expEdited(const Experiment*)), SLOT(slotUpdateRow(const Experiment*)));

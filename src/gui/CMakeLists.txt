@@ -25,6 +25,7 @@ set(EVOPLEX_GUI_H
   #contextmenutable.h
   experimentdesigner.h
   experimentwidget.h
+  fontstyles.h
   linechart.h
   outputwidget.h
   graphview.h
@@ -50,6 +51,7 @@ set(EVOPLEX_GUI_CXX
   colormap.cpp
   #contextmenutable.cpp
   experimentwidget.cpp
+  fontstyles.cpp
   linechart.cpp
   outputwidget.cpp
   graphview.cpp

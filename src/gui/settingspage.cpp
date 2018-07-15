@@ -21,10 +21,12 @@
 #include <QStringList>
 #include <QThread>
 
+#include "core/experimentsmgr.h"
+#include "core/include/constants.h"
+
 #include "settingspage.h"
 #include "ui_settingspage.h"
-#include "core/experimentsmgr.h"
-#include "constants.h"
+#include "fontstyles.h"
 
 namespace evoplex
 {
@@ -35,6 +37,8 @@ SettingsPage::SettingsPage(MainGUI* mainGUI)
     , m_mainGUI(mainGUI)
 {
     m_ui->setupUi(this);
+
+    m_ui->labelSettings->setFont(FontStyles::subtitle1());
 
     connect(m_ui->reset, SIGNAL(pressed()), SLOT(resetDefaults()));
 
@@ -47,7 +51,9 @@ SettingsPage::SettingsPage(MainGUI* mainGUI)
     connect(m_ui->colormaps, SIGNAL(currentIndexChanged(QString)), SLOT(setDfCMapName(QString)));
     connect(m_ui->colormapsize, SIGNAL(currentTextChanged(QString)), SLOT(setDfCMapSize(QString)));
 
-    connect(m_ui->delay, &QSlider::valueChanged, [mainGUI](int v) { mainGUI->mainApp()->setDefaultStepDelay(v); });
+    connect(m_ui->delay, &QSlider::valueChanged, [mainGUI](int v) {
+        mainGUI->mainApp()->setDefaultStepDelay(static_cast<quint16>(v));
+    });
 
     m_ui->stepsToFlush->setMinimum(1);
     m_ui->stepsToFlush->setMaximum(EVOPLEX_MAX_STEPS);
