@@ -212,7 +212,23 @@ void TestNodes::tst_fromFile_nodes_invalid_attrs() {
     QCOMPARE(nodesFromFile.size(), 0);
 }
 // invalid file
-void TestNodes::tst_fromFile_nodes_invalid_file() {}
+void TestNodes::tst_fromFile_nodes_invalid_file() {
+    QString errorMsg;
+    GraphType graphType = GraphType::Undirected;
+
+    // valid attrsScope for the existing file
+    const QString filePath(":/data/data/nodes_with_invalid_file.csv");
+    AttributesScope attrsScope;
+
+    // Attribute Range to be used for both sets of nodes
+    AttributeRange* col0 = AttributeRange::parse(0, "bool", "bool");
+    attrsScope.insert(col0->attrName(), col0);
+
+    // Nodes with values read from file
+    Nodes nodesFromFile = Nodes::fromFile(filePath, attrsScope, graphType, errorMsg);
+
+    QCOMPARE(nodesFromFile.size(), 0);
+}
 /****************** TO DO ****************************/
 
 void TestNodes::tst_saveToFile_no_attrs()
