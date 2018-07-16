@@ -22,6 +22,11 @@
         <file>line-chart.svg</file>
         <file>splash.svg</file>
         <file>x.png</file>
+        <file>icons/material/toggle/svg/production/ic_radio_button_unchecked_24px.svg</file>
+        <file>icons/material/toggle/svg/production/ic_radio_button_checked_24px.svg</file>
+        <file>icons/material/toggle/svg/production/ic_indeterminate_check_box_24px.svg</file>
+        <file>icons/material/toggle/svg/production/ic_check_box_outline_blank_24px.svg</file>
+        <file>icons/material/toggle/svg/production/ic_check_box_24px.svg</file>
     </qresource>
     <qresource prefix="/colormaps">
         <file>colormaps.json</file>

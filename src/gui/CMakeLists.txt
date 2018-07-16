@@ -18,6 +18,66 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##########################################################################
 
+###############################################################################
+# EXTERNAL
+###############################################################################
+set(_EXTERNAL_QT_MATERIAL_WIDGETS
+    qtmaterialappbar.cpp
+    qtmaterialautocomplete.cpp
+    qtmaterialautocomplete_internal.cpp
+    qtmaterialavatar.cpp
+    qtmaterialbadge.cpp
+    qtmaterialcheckbox.cpp
+    qtmaterialcircularprogress.cpp
+    qtmaterialcircularprogress_internal.cpp
+    qtmaterialdialog.cpp
+    qtmaterialdialog_internal.cpp
+    qtmaterialdrawer.cpp
+    qtmaterialdrawer_internal.cpp
+    qtmaterialfab.cpp
+    qtmaterialflatbutton.cpp
+    qtmaterialflatbutton_internal.cpp
+    qtmaterialiconbutton.cpp
+    qtmateriallist.cpp
+    qtmateriallistitem.cpp
+    qtmaterialmenu.cpp
+    qtmaterialmenu_internal.cpp
+    qtmaterialpaper.cpp
+    qtmaterialprogress.cpp
+    qtmaterialprogress_internal.cpp
+    qtmaterialradiobutton.cpp
+    qtmaterialraisedbutton.cpp
+    qtmaterialscrollbar.cpp
+    qtmaterialscrollbar_internal.cpp
+    qtmaterialslider.cpp
+    qtmaterialslider_internal.cpp
+    qtmaterialsnackbar.cpp
+    qtmaterialsnackbar_internal.cpp
+    qtmaterialtable.cpp
+    qtmaterialtabs.cpp
+    qtmaterialtabs_internal.cpp
+    qtmaterialtextfield.cpp
+    qtmaterialtextfield_internal.cpp
+    qtmaterialtoggle.cpp
+    qtmaterialtoggle_internal.cpp
+
+    lib/qtmaterialcheckable.cpp
+    lib/qtmaterialcheckable_internal.cpp
+    lib/qtmaterialoverlaywidget.cpp
+    lib/qtmaterialripple.cpp
+    lib/qtmaterialrippleoverlay.cpp
+    lib/qtmaterialstatetransition.cpp
+    lib/qtmaterialstyle.cpp
+    lib/qtmaterialtheme.cpp
+)
+foreach(cpp ${_EXTERNAL_QT_MATERIAL_WIDGETS})
+  set(EXTERNAL_QT_MATERIAL_WIDGETS ${EXTERNAL_QT_MATERIAL_WIDGETS}
+      external/qt-material-widgets/${cpp})
+endforeach(cpp)
+
+###############################################################################
+# EVOPLEX GUI
+###############################################################################
 set(EVOPLEX_GUI_H
   maingui.h
   nodesgeneratordlg.h
@@ -90,7 +150,7 @@ foreach(uiform ${EVOPLEX_GUI_UIFORM})
 endforeach(uiform)
 qt5_wrap_ui(EVOPLEX_GUI_UI ${EVOPLEX_GUI_UI})
 
-add_library(EvoplexGUI STATIC ${EVOPLEX_GUI_CXX} ${EVOPLEX_GUI_UI})
+add_library(EvoplexGUI STATIC ${EVOPLEX_GUI_CXX} ${EVOPLEX_GUI_UI} ${EXTERNAL_QT_MATERIAL_WIDGETS})
 target_link_libraries(EvoplexGUI EvoplexCore Qt5::Core Qt5::Concurrent Qt5::Widgets Qt5::Charts)
 set_target_properties(EvoplexGUI PROPERTIES
   LIBRARY_OUTPUT_DIRECTORY ${EVOPLEX_OUTPUT_LIBRARY})
