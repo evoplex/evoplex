@@ -118,7 +118,47 @@ void TestNodes::tst_fromFile_nodes_no_xy()
 
 /****************** TO DO ****************************/
 // valid attributes AND both xy coordinates
-void TestNodes::tst_fromFile_nodes_with_xy() {}
+void TestNodes::tst_fromFile_nodes_with_xy() {
+    QString errorMsg;
+    GraphType graphType = GraphType::Undirected;
+
+    // valid attrsScope for the existing file
+    const QString filePath(":/data/data/nodes_with_xy.csv");
+    AttributesScope attrsScope;
+
+    // Attribute Range to be used for both sets of nodes
+    AttributeRange* col0 = AttributeRange::parse(0, "bool", "bool");
+    attrsScope.insert(col0->attrName(), col0);
+    AttributeRange* col1 = AttributeRange::parse(1, "x", "int[-1000,1000]");
+    attrsScope.insert(col1->attrName(), col1);
+    AttributeRange* col2 = AttributeRange::parse(2, "y", "int[-1000,1000]");
+    attrsScope.insert(col2->attrName(), col2);
+
+    // Nodes with values read from file
+    Nodes nodesFromFile = Nodes::fromFile(filePath, attrsScope, graphType, errorMsg);
+
+    // Nodes to test against ones from file
+    Nodes nodes = Nodes::fromCmd("*3;min", attrsScope, graphType, errorMsg);
+
+    nodes.at(0)->setAttr(0, true);
+    nodes.at(0)->setX(123);
+    nodes.at(0)->setY(456);
+
+    nodes.at(1)->setAttr(0, false);
+    nodes.at(1)->setX(456);
+    nodes.at(1)->setY(-789);
+
+    nodes.at(2)->setAttr(0, true);
+    nodes.at(2)->setX(-789);
+    nodes.at(2)->setY(789);
+
+    QCOMPARE(nodes.size(), nodesFromFile.size());
+    for(int i = 0; i < 3; i++){
+         QCOMPARE(nodes.at(i)->attrs().value(0), nodesFromFile.at(i)->attrs().value(0));
+         QCOMPARE(nodes.at(i)->x(), nodesFromFile.at(i)->x());
+         QCOMPARE(nodes.at(i)->y(), nodesFromFile.at(i)->y());
+    }
+}
 // valid attributes AND x coordinates (only)
 void TestNodes::tst_fromFile_nodes_with_x() {}
 // valid attributes AND y coordinates (only)
