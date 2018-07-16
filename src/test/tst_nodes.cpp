@@ -152,50 +152,11 @@ void TestNodes::tst_fromFile_nodes_with_xy() {
 }
 // valid attributes AND x coordinates (only)
 void TestNodes::tst_fromFile_nodes_with_x() {
-    QString errorMsg;
-    GraphType graphType = GraphType::Undirected;
-
-    // valid attrsScope for the existing file
-    const QString filePath(":/data/data/nodes_with_x_alt.csv");
-    AttributesScope attrsScope;
-
-    // Attribute Range to be used for both sets of nodes
-    AttributeRange* col0 = AttributeRange::parse(0, "double-zero-one", "double[0,2]");
-    attrsScope.insert(col0->attrName(), col0);
-
-    // Nodes with values read from file
-    Nodes nodesFromFile = Nodes::fromFile(filePath, attrsScope, graphType, errorMsg);
-
-    // Nodes to test against ones from file
-    Nodes nodes = Nodes::fromCmd("*3;min", attrsScope, graphType, errorMsg);
-
-    nodes.at(0)->setAttr(0, 0);
-    nodes.at(0)->setX(123);
-
-    nodes.at(1)->setAttr(0, 1);
-    nodes.at(1)->setX(789);
-
-    nodes.at(2)->setAttr(0, 2);
-    nodes.at(2)->setX(456);
-
-    QCOMPARE(nodes.size(), nodesFromFile.size());
-    for (int id = 0; id < static_cast<int>(nodes.size()); ++id) {
-        NodePtr nA = nodes.at(id);
-        NodePtr nB = nodesFromFile.at(id);
-//        QCOMPARE(nA->id(), nB->id());
-//        QCOMPARE(nA->attrs().names(), nB->attrs().names());
-//        QCOMPARE(nA->attrs().values(), nB->attrs().values());
-//        QCOMPARE(nA->x(), nB->x());
-    }
-    // issue: true value
-}
-// valid attributes AND y coordinates (only)
-void TestNodes::tst_fromFile_nodes_with_y() {
 //    QString errorMsg;
 //    GraphType graphType = GraphType::Undirected;
 
 //    // valid attrsScope for the existing file
-//    const QString filePath(":/data/data/nodes_with_x.csv");
+//    const QString filePath(":/data/data/nodes_with_x_alt.csv");
 //    AttributesScope attrsScope;
 
 //    // Attribute Range to be used for both sets of nodes
@@ -221,14 +182,35 @@ void TestNodes::tst_fromFile_nodes_with_y() {
 //    for (int id = 0; id < static_cast<int>(nodes.size()); ++id) {
 //        NodePtr nA = nodes.at(id);
 //        NodePtr nB = nodesFromFile.at(id);
-////        QCOMPARE(nA->id(), nB->id());
-////        QCOMPARE(nA->attrs().names(), nB->attrs().names());
-////        QCOMPARE(nA->attrs().values(), nB->attrs().values());
-////        QCOMPARE(nA->x(), nB->x());
+//        QCOMPARE(nA->id(), nB->id());
+//        QCOMPARE(nA->attrs().names(), nB->attrs().names());
+//        QCOMPARE(nA->attrs().values(), nB->attrs().values());
+//        QCOMPARE(nA->x(), nB->x());
 //    }
+    // issue: true value
+}
+// valid attributes AND y coordinates (only)
+void TestNodes::tst_fromFile_nodes_with_y() {
+
 }
 // invalid attributes
-void TestNodes::tst_fromFile_nodes_invalid_attrs() {}
+void TestNodes::tst_fromFile_nodes_invalid_attrs() {
+    QString errorMsg;
+    GraphType graphType = GraphType::Undirected;
+
+    // valid attrsScope for the existing file
+    const QString filePath(":/data/data/nodes_with_invalid_attributes.csv");
+    AttributesScope attrsScope;
+
+    // Attribute Range to be used for both sets of nodes
+    AttributeRange* col0 = AttributeRange::parse(0, "bool", "bool");
+    attrsScope.insert(col0->attrName(), col0);
+
+    // Nodes with values read from file
+    Nodes nodesFromFile = Nodes::fromFile(filePath, attrsScope, graphType, errorMsg);
+
+    QCOMPARE(nodesFromFile.size(), 0);
+}
 // invalid file
 void TestNodes::tst_fromFile_nodes_invalid_file() {}
 /****************** TO DO ****************************/
