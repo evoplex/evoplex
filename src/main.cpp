@@ -124,6 +124,13 @@ int main(int argc, char* argv[])
         darkPalette.setColor(QPalette::HighlightedText, Qt::black);
         app->setPalette(darkPalette);
 
+        // load dark style sheet
+        QFile styleSheet(":/stylesheets/stylesheets/dark.qss");
+        if (styleSheet.open(QIODevice::Text | QIODevice::Unbuffered | QIODevice::ReadOnly)) {
+            app->setStyleSheet(styleSheet.readAll());
+            styleSheet.close();
+        }
+
         evoplex::MainGUI gui(&mainApp);
         splash->finish(&gui);
         gui.show();

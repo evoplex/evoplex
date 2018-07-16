@@ -52,7 +52,7 @@ ExperimentWidget::ExperimentWidget(Experiment* exp, MainGUI* mainGUI, ProjectsPa
     m_innerWindow->setDockNestingEnabled(true);
     m_innerWindow->setAnimated(true);
     m_innerWindow->setStyleSheet("QMainWindow { background-color: rgb(24,24,24); }");
-    m_innerWindow->setCentralWidget(0);
+    m_innerWindow->setCentralWidget(nullptr);
 
     QToolBar* tb = new QToolBar("Controls", this);
     m_aPlayPause = tb->addAction(m_kIcon_play, "Play/Pause");
@@ -83,14 +83,16 @@ ExperimentWidget::ExperimentWidget(Experiment* exp, MainGUI* mainGUI, ProjectsPa
     tb->setMovable(false);
     tb->setFloatable(false);
     tb->setIconSize(QSize(20,20));
-    tb->setStyleSheet("background: rgb(53,53,53);");
+    tb->setStyleSheet("padding: 0px; background: rgb(53,53,53);");
     tb->setFocusPolicy(Qt::StrongFocus);
 
     connect(m_aPlayPause, &QAction::triggered, [this]() { m_exp->toggle(); });
     connect(m_aNext, &QAction::triggered, [this]() { m_exp->playNext(); });
     connect(m_aStop, &QAction::triggered, [this]() { m_exp->stop(); });
     connect(m_aReset, &QAction::triggered, [this]() { m_exp->reset(); });
-    connect(m_delay, &QSlider::valueChanged, [this](int v) { m_exp->setDelay(v); });
+    connect(m_delay, &QSlider::valueChanged, [this](int v) {
+        m_exp->setDelay(static_cast<quint16>(v));
+    });
 
     connect(m_exp, SIGNAL(statusChanged(Status)), SLOT(slotStatusChanged(Status)));
     slotStatusChanged(exp->expStatus()); // just to init the controls

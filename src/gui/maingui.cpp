@@ -34,6 +34,7 @@
 #include <QVBoxLayout>
 
 #include "maingui.h"
+#include "fontstyles.h"
 #include "projectwidget.h"
 #include "savedialog.h"
 #include "pluginspage.h"
@@ -116,9 +117,8 @@ MainGUI::MainGUI(MainApp* mainApp, QWidget* parent)
     acSettings->setData(PAGE_SETTINGS);
     toolbar->addAction(acSettings);
 
-    toolbar->setStyleSheet("font: 8pt;");
     toolbar->setIconSize(QSize(32, 32));
-    toolbar->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+    toolbar->setToolButtonStyle(Qt::ToolButtonIconOnly);
     toolbar->setMovable(false);
     toolbar->setFloatable(false);
     this->addToolBar(Qt::LeftToolBarArea, toolbar);
