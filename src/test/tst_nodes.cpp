@@ -62,7 +62,10 @@ private:
     void _tst_invalid(QString cmd, bool has_attrs, GraphType graphType);
 };
 
-
+// NOTES:
+// Empty commands should fail
+// Check function and comment consistency
+// Filepath alternative method
 
 void TestNodes::_tst_empty_nodes(const Nodes& a, int size){
     QCOMPARE(a.size(), size);
@@ -73,11 +76,12 @@ void TestNodes::_tst_empty_nodes(const Nodes& a, int size){
     QCOMPARE(a.at(i)->outDegree(), 0);
 
 //    // Nodes are created at the origin
-//    QCOMPARE(nodes.at(i)->x(), 0);
-//    QCOMPARE(nodes.at(i)->y(), 1);
+//    QCOMPARE(a.at(i)->x(), 0);
+//    QCOMPARE(a.at(i)->y(), 1);
 }
 
 }
+
 void TestNodes::_tst_attrs(NodePtr node, Attributes attrs)
 {
     QCOMPARE(node->attrs().names(), attrs.names());
@@ -86,18 +90,6 @@ void TestNodes::_tst_attrs(NodePtr node, Attributes attrs)
 
     QCOMPARE(node->attrs().size(), attrs.size());
 }
-
-//void TestNodes::_tst_Node(NodePtr node, Attributes attrs)
-//{
-//    int id = 0, x = 123, y = 456;
-
-//    QCOMPARE(node->id(), id);
-//    _tst_attrs(node, attrs);
-//    QCOMPARE(node->x(), x);
-//    QCOMPARE(node->y(), y);
-//}
-
-// Empty commands should fail
 
 void TestNodes::_tst_invalid(QString cmd, bool has_attrs, GraphType graphType){
     QString errorMsg;
@@ -115,12 +107,10 @@ void TestNodes::_tst_invalid(QString cmd, bool has_attrs, GraphType graphType){
         AttributeRange* col2 = AttributeRange::parse(2, names[2], "int[0,1000]");
         attrsScope.insert(col2->attrName(), col2);
     }
+
     Nodes nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
-    if(has_attrs){
-         QCOMPARE(nodes.size(), 0);
-    }else{
-    _tst_empty_nodes(nodes, 0);
-    }
+    if(!has_attrs) _tst_empty_nodes(nodes, 0);
+    QCOMPARE(nodes.size(), 0);
 }
 
 void TestNodes::tst_fromCmd()
