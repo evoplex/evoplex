@@ -122,6 +122,7 @@ void TestNodes::_tst_invalid(QString cmd, bool has_attrs, GraphType graphType){
     _tst_empty_nodes(nodes, 0);
     }
 }
+
 void TestNodes::tst_fromCmd()
 {
     QString errorMsg;
@@ -129,28 +130,20 @@ void TestNodes::tst_fromCmd()
     const QStringList names = { "test0", "test1", "test2" };
     const Value values[] = { Value(123), Value(234), Value(456) };
     AttributesScope attrsScope;
+    Attributes attrs(3);
     Nodes nodes;
     GraphType graphType = GraphType::Undirected;
 
 
     // Empty commands
-    // Undirected with empty attrsScope
     QString cmd = "";
-    _tst_invalid(cmd, false, GraphType::Undirected);
-
-    // Undirected with non-empty attrsScope
-    _tst_invalid(cmd, true, GraphType::Undirected);
-
-    // Directed with empty attrsScope
-    _tst_invalid(cmd, false, GraphType::Undirected);
-
-
-    // Directed with non-empty attrsScope
-    _tst_invalid(cmd, false, GraphType::Directed);
+    _tst_invalid(cmd, false, GraphType::Undirected); // Undirected with empty attrsScope
+    _tst_invalid(cmd, true, GraphType::Undirected); // Undirected with non-empty attrsScope
+    _tst_invalid(cmd, false, GraphType::Undirected); // Directed with empty attrsScope
+    _tst_invalid(cmd, false, GraphType::Directed); // Directed with non-empty attrsScope
 
     // Valid * command cases
     // Undirected with empty attrsScope
-
     cmd = "*3;min";
     nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
     _tst_empty_nodes(nodes, 3);
@@ -163,7 +156,6 @@ void TestNodes::tst_fromCmd()
     AttributeRange* col2 = AttributeRange::parse(2, names[2], "int[0,1000]");
     attrsScope.insert(col2->attrName(), col2);
 
-    Attributes attrs(3);
     for(int i = 0; i < 3; i++){
        attrs.replace(i, names[i], values[i]);
     }
@@ -265,70 +257,42 @@ void TestNodes::tst_fromCmd()
     }
     _tst_attrs(node, attrs);
 
-    // Invalid commands
-    // Undirected with empty attrsScope
+    // Invalid comands
     cmd = "this-is-invalid";
-    _tst_invalid(cmd, false, GraphType::Undirected);
-
-    // Undirected with non-empty attrsScope
-    _tst_invalid(cmd, true, GraphType::Undirected);
-
-    // Directed with empty attrsScope
-     _tst_invalid(cmd, false, GraphType::Directed);
-
-    // Directed with non-empty attrsScope
-     _tst_invalid(cmd, true, GraphType::Directed);
+    _tst_invalid(cmd, false, GraphType::Undirected); // Undirected with empty attrsScope
+    _tst_invalid(cmd, true, GraphType::Undirected); // Undirected with non-empty attrsScope
+    _tst_invalid(cmd, false, GraphType::Directed); // Directed with empty attrsScope
+    _tst_invalid(cmd, true, GraphType::Directed); // Directed with non-empty attrsScope
 
 
     // Negative number of nodes
     cmd = "#-3;myInt_value_123;myInt2_value_123";
-
-    // Undirected with empty attrsScope
-    _tst_invalid(cmd, false, GraphType::Undirected);
-
-    // Undirected with non-empty attrsScope
-    _tst_invalid(cmd, true, GraphType::Undirected);
-
-    // Directed with empty attrsScope
-     _tst_invalid(cmd, false, GraphType::Directed);
-
-    // Directed with non-empty attrsScope
-     _tst_invalid(cmd, true, GraphType::Directed);
+    _tst_invalid(cmd, false, GraphType::Undirected); // Undirected with empty attrsScope
+    _tst_invalid(cmd, true, GraphType::Undirected); // Undirected with non-empty attrsScope
+    _tst_invalid(cmd, false, GraphType::Directed); // Directed with empty attrsScope
+    _tst_invalid(cmd, true, GraphType::Directed); // Directed with non-empty attrsScope
 
     // Zero nodes
-         cmd = "#0;myInt_value_123;myInt2_value_123";
-
-     // Undirected with empty attrsScope
-     _tst_invalid(cmd, false, GraphType::Undirected);
-
-     // Undirected with non-empty attrsScope
-     _tst_invalid(cmd, true, GraphType::Undirected);
-
-     // Directed with empty attrsScope
-      _tst_invalid(cmd, false, GraphType::Directed);
-
-     // Directed with non-empty attrsScope
-      _tst_invalid(cmd, true, GraphType::Directed);
+     cmd = "#0;myInt_value_123;myInt2_value_123";
+     _tst_invalid(cmd, false, GraphType::Undirected); // Undirected with empty attrsScope
+     _tst_invalid(cmd, true, GraphType::Undirected); // Undirected with non-empty attrsScope
+     _tst_invalid(cmd, false, GraphType::Directed); // Directed with empty attrsScope
+     _tst_invalid(cmd, true, GraphType::Directed); // Directed with non-empty attrsScope
 
 
-//     *      - cmd with an attribute that is not in attrsScope
+    // Command with attribute not in attrsScope
     cmd = "#3;myInt_value_123;myInt3_value_123";
-    // Undirected with empty attrsScope
-    _tst_invalid(cmd, false, GraphType::Undirected);
+    _tst_invalid(cmd, false, GraphType::Undirected); // Undirected with empty attrsScope
+    _tst_invalid(cmd, true, GraphType::Undirected); // Undirected with non-empty attrsScope
+    _tst_invalid(cmd, false, GraphType::Directed); // Directed with empty attrsScope
+    _tst_invalid(cmd, true, GraphType::Directed); // Directed with non-empty attrsScope
 
-    // Undirected with non-empty attrsScope
-    _tst_invalid(cmd, true, GraphType::Undirected);
-
-    // Directed with empty attrsScope
-     _tst_invalid(cmd, false, GraphType::Directed);
-
-    // Directed with non-empty attrsScope
-     _tst_invalid(cmd, true, GraphType::Directed);
 
     // Invalid graph type
     cmd = "#3;myInt_value_123;myInt2_value_123";
-    _tst_invalid(cmd, false, GraphType::Invalid);
-    _tst_invalid(cmd, true, GraphType::Invalid);
+    _tst_invalid(cmd, false, GraphType::Invalid); // Empty attrsScope
+    _tst_invalid(cmd, true, GraphType::Invalid); // Non-empty attrsScope
+
 //     *  - Undirected graph: should return a set of UNodes
 //     *  - Directed graph: should return a set of DNodes
 
