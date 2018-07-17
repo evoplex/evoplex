@@ -102,11 +102,26 @@ void TestNodes::_tst_attrs(NodePtr node, Attributes attrs)
 void TestNodes::_tst_invalid(QString cmd, bool has_attrs, GraphType graphType){
     QString errorMsg;
     NodePtr node;
-    const QStringList names = { "test0", "test1", "test2" };
-    const Value values[] = { Value(123), Value(234), Value(456) };
+
     AttributesScope attrsScope;
+
+    if(has_attrs){
+        const QStringList names = { "test0", "test1", "test2" };
+        const Value values[] = { Value(123), Value(234), Value(456) };
+
+        AttributeRange* col0 = AttributeRange::parse(0, names[0], "int[0,1000]");
+        attrsScope.insert(col0->attrName(), col0);
+        AttributeRange* col1 = AttributeRange::parse(1, names[1], "int[0,1000]");
+        attrsScope.insert(col1->attrName(), col1);
+        AttributeRange* col2 = AttributeRange::parse(2, names[2], "int[0,1000]");
+        attrsScope.insert(col2->attrName(), col2);
+    }
     Nodes nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
+    if(has_attrs){
+         QCOMPARE(nodes.size(), 0);
+    }else{
     _tst_empty_nodes(nodes, 0);
+    }
 }
 void TestNodes::tst_fromCmd()
 {
@@ -118,10 +133,28 @@ void TestNodes::tst_fromCmd()
     Nodes nodes;
     GraphType graphType = GraphType::Undirected;
 
+
     // Empty commands
     // Undirected with empty attrsScope
     QString cmd = "";
     _tst_invalid(cmd, false, GraphType::Undirected);
+
+    // Undirected with non-empty attrsScope
+    _tst_invalid(cmd, true, GraphType::Undirected);
+
+    // Directed with empty attrsScope
+    _tst_invalid(cmd, false, GraphType::Undirected);
+
+
+    // Directed with non-empty attrsScope
+    _tst_invalid(cmd, false, GraphType::Directed);
+
+    // Valid * command cases
+    // Undirected with empty attrsScope
+
+    cmd = "*3;min";
+    nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
+    _tst_empty_nodes(nodes, 3);
 
     // Undirected with non-empty attrsScope
     AttributeRange* col0 = AttributeRange::parse(0, names[0], "int[0,1000]");
@@ -129,41 +162,6 @@ void TestNodes::tst_fromCmd()
     AttributeRange* col1 = AttributeRange::parse(1, names[1], "int[0,1000]");
     attrsScope.insert(col1->attrName(), col1);
     AttributeRange* col2 = AttributeRange::parse(2, names[2], "int[0,1000]");
-    attrsScope.insert(col2->attrName(), col2);
-
-    nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
-    QCOMPARE(nodes.size(), 0);
-
-    // Directed with empty attrsScope
-    graphType = GraphType::Directed;
-    attrsScope.clear();
-    nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
-    _tst_empty_nodes(nodes, 0);
-
-    // Directed with non-empty attrsScope
-    col0 = AttributeRange::parse(0, names[0], "int[0,1000]");
-    attrsScope.insert(col0->attrName(), col0);
-    col1 = AttributeRange::parse(1, names[1], "int[0,1000]");
-    attrsScope.insert(col1->attrName(), col1);
-    col2 = AttributeRange::parse(2, names[2], "int[0,1000]");
-    attrsScope.insert(col2->attrName(), col2);
-
-    nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
-    QCOMPARE(nodes.size(), 0);
-
-    // Valid * command cases
-    // Undirected with empty attrsScope
-    attrsScope.clear();
-    cmd = "*3;min";
-    nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
-    _tst_empty_nodes(nodes, 3);
-
-    // Undirected with non-empty attrsScope
-    col0 = AttributeRange::parse(0, names[0], "int[0,1000]");
-    attrsScope.insert(col0->attrName(), col0);
-    col1 = AttributeRange::parse(1, names[1], "int[0,1000]");
-    attrsScope.insert(col1->attrName(), col1);
-    col2 = AttributeRange::parse(2, names[2], "int[0,1000]");
     attrsScope.insert(col2->attrName(), col2);
 
     Attributes attrs(3);
