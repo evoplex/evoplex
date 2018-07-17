@@ -119,15 +119,40 @@ void TestNodes::tst_fromCmd()
 
     //    It should look like: '#integer;attrName_[min|max|rand_seed|value_value]'"
 
-    cmd = "#3;myInt_0";
+    // Single attribute
+    AttributeRange* col0 = AttributeRange::parse(0, "myInt", "int[0,200]");
+    attrsScope.insert(col0->attrName(), col0);
+
+    cmd = "#3;myInt_value_123";
     nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
-//    QCOMPARE(nodes.at(0)->attrs().value(0),0);
+
+    QCOMPARE(nodes.size(), 3);
+    QCOMPARE(nodes.at(0)->attrs().value("myInt"), 123);
+
+    // Multiple attributes
+    col0 = AttributeRange::parse(0, "myInt", "int[0,200]");
+    attrsScope.insert(col0->attrName(), col0);
+    AttributeRange* col1 = AttributeRange::parse(1, "myInt2", "int[0,200]");
+    attrsScope.insert(col1->attrName(), col1);
+
+    cmd = "#3;myInt_value_123;myInt2_value_123";
+    nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
+
+    QCOMPARE(nodes.size(), 3);
+    QCOMPARE(nodes.at(0)->attrs().value("myInt"), 123);
+
 //     *  - empty command: should fail
 //     *  - empty attrsScope: ok! a set of nodes without attrs
 //     *  - invalid commands
 //     *      - negavite number of nodes
+//    cmd = "#-3;myInt_value_123;myInt2_value_123";
+//    nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
 //     *      - zero nodes
+//    cmd = "#0;myInt_value_123;myInt2_value_123";
+//    nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
 //     *      - cmd with an attribute that is not in attrsScope
+//    cmd = "#3;myInt_value_123;myInt2_value_123";
+//    nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
 //     *  - Invalid graph type: should fail
 //     *  - Undirected graph: should return a set of UNodes
 //     *  - Directed graph: should return a set of DNodes
