@@ -98,17 +98,58 @@ void TestNodes::_tst_attrs(NodePtr node, Attributes attrs)
 void TestNodes::tst_fromCmd()
 {
     QString errorMsg;
+    NodePtr node;
     const QStringList names = { "test0", "test1", "test2" };
     const Value values[] = { Value(123), Value(234), Value(456) };
 
+    // Empty commands
+    // Undirected with empty attrsScope
     QString cmd = "";
     AttributesScope attrsScope;
     GraphType graphType = GraphType::Undirected;
     Nodes nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
     _tst_empty_nodes(nodes, 0);
 
+    // Undirected with non-empty attrsScope
+    AttributeRange* col0 = AttributeRange::parse(0, names[0], "int[0,1000]");
+    attrsScope.insert(col0->attrName(), col0);
+    AttributeRange* col1 = AttributeRange::parse(1, names[1], "int[0,1000]");
+    attrsScope.insert(col1->attrName(), col1);
+    AttributeRange* col2 = AttributeRange::parse(2, names[2], "int[0,1000]");
+    attrsScope.insert(col2->attrName(), col2);
+
+    nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
+    QCOMPARE(nodes.size(), 0);
+
+    // Directed with empty attrsScope
+    graphType = GraphType::Directed;
+    attrsScope.clear();
+    nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
+    _tst_empty_nodes(nodes, 0);
+
+    // Directed with non-empty attrsScope
+    col0 = AttributeRange::parse(0, names[0], "int[0,1000]");
+    attrsScope.insert(col0->attrName(), col0);
+    col1 = AttributeRange::parse(1, names[1], "int[0,1000]");
+    attrsScope.insert(col1->attrName(), col1);
+    col2 = AttributeRange::parse(2, names[2], "int[0,1000]");
+    attrsScope.insert(col2->attrName(), col2);
+
+    nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
+    QCOMPARE(nodes.size(), 0);
+
+//    col0 = AttributeRange::parse(0, names[0], "int[0,1000]");
+//    attrsScope.insert(col0->attrName(), col0);
+//    col1 = AttributeRange::parse(1, names[1], "int[0,1000]");
+//    attrsScope.insert(col1->attrName(), col1);
+//    col2 = AttributeRange::parse(2, names[2], "int[0,1000]");
+//    attrsScope.insert(col2->attrName(), col2);
+
+//    nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
+//    _tst_empty_nodes(nodes, 0);
     // Valid * command cases
     // Undirected with empty attrsScope
+    attrsScope.clear();
     cmd = "*3;min";
     nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
     _tst_empty_nodes(nodes, 3);
@@ -122,11 +163,11 @@ void TestNodes::tst_fromCmd()
     _tst_empty_nodes(nodes, 3);
 
     // Undirected with non-empty attrsScope
-    AttributeRange* col0 = AttributeRange::parse(0, names[0], "int[0,1000]");
+    col0 = AttributeRange::parse(0, names[0], "int[0,1000]");
     attrsScope.insert(col0->attrName(), col0);
-    AttributeRange* col1 = AttributeRange::parse(1, names[1], "int[0,1000]");
+    col1 = AttributeRange::parse(1, names[1], "int[0,1000]");
     attrsScope.insert(col1->attrName(), col1);
-    AttributeRange* col2 = AttributeRange::parse(2, names[2], "int[0,1000]");
+    col2 = AttributeRange::parse(2, names[2], "int[0,1000]");
     attrsScope.insert(col2->attrName(), col2);
 
     Attributes attrs(3);
@@ -138,7 +179,7 @@ void TestNodes::tst_fromCmd()
     nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
 
     for(int i = 0; i < 3; i++){
-        NodePtr node = nodes.at(i);
+        node = nodes.at(i);
         _tst_attrs(node, attrs);
     }
 
@@ -219,7 +260,7 @@ void TestNodes::tst_fromCmd()
 
     QCOMPARE(nodes.size(), 3);
     QCOMPARE(nodes.at(0)->attrs().value(names[0]), values[0]);
-    NodePtr node = nodes.at(0);
+    node = nodes.at(0);
     _tst_attrs(node, attrs);
 
     // Undirected with multiple attributes
