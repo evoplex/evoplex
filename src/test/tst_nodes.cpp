@@ -56,14 +56,14 @@ private slots:
 private:
     // checks if sets of nodes have the same content
     void _compare_nodes(const Nodes& a, const Nodes& b) const;
-    void _empty_nodes(const Nodes& a, int size);
+    void _tst_empty_nodes(const Nodes& a, int size);
     void _tst_Node(Node *node, Attributes attrs);
     void _tst_attrs(NodePtr node, Attributes attrs);
 };
 
 
 
-void TestNodes::_empty_nodes(const Nodes& a, int size){
+void TestNodes::_tst_empty_nodes(const Nodes& a, int size){
     QCOMPARE(a.size(), size);
     for(int i = 0; i < a.size(); i++){
     QVERIFY(a.at(i)->attrs().isEmpty());
@@ -106,24 +106,21 @@ void TestNodes::tst_fromCmd()
     AttributesScope attrsScope;
     GraphType graphType = GraphType::Undirected;
     Nodes nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
-    _empty_nodes(nodes, 0);
+    _tst_empty_nodes(nodes, 0);
 
     // Valid * command cases
     // Undirected with empty attrsScope
-
-
     cmd = "*3;min";
     nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
-    _empty_nodes(nodes, 3);
+    _tst_empty_nodes(nodes, 3);
 
     cmd = "*3;max";
     nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
-    _empty_nodes(nodes, 3);
+    _tst_empty_nodes(nodes, 3);
 
     cmd = "*3;rand_123";
     nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
-    _empty_nodes(nodes, 3);
-
+    _tst_empty_nodes(nodes, 3);
 
     // Undirected with non-empty attrsScope
     AttributeRange* col0 = AttributeRange::parse(0, names[0], "int[0,1000]");
@@ -160,31 +157,55 @@ void TestNodes::tst_fromCmd()
         _tst_attrs(node, attrs);
     }
 
-//    // Directed
-//    attrsScope.clear();
-//    graphType = GraphType::Directed;
-//    cmd = "*3;min";
-//    nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
-//    _empty_nodes(nodes, 3);
+    // Directed with empty attrsScope
+    graphType = GraphType::Undirected;
+    attrsScope.clear();
 
-//    cmd = "*3;max";
-//    nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
-//    _empty_nodes(nodes, 3);
+    cmd = "*3;min";
+    nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
+    _tst_empty_nodes(nodes, 3);
 
-//    cmd = "*3;rand_123";
-//    nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
-//    _empty_nodes(nodes, 3);
+    cmd = "*3;max";
+    nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
+    _tst_empty_nodes(nodes, 3);
 
-//    // Valid # command cases
-//    //    It should look like: '#integer;attrName_[min|max|rand_seed|value_value]'"
+    cmd = "*3;rand_123";
+    nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
+    _tst_empty_nodes(nodes, 3);
 
-//    // Single attribute
+    // Directed with non-empty attrsScope
+    col0 = AttributeRange::parse(0, names[0], "int[0,1000]");
+    attrsScope.insert(col0->attrName(), col0);
+    col1 = AttributeRange::parse(1, names[1], "int[0,1000]");
+    attrsScope.insert(col1->attrName(), col1);
+    col2 = AttributeRange::parse(2, names[2], "int[0,1000]");
+    attrsScope.insert(col2->attrName(), col2);
 
-//    col0 = AttributeRange::parse(0, names[0], "int[0,200]");
-//    attrsScope.insert(col0->attrName(), col0);
+    for(int i = 0; i < 3; i++){
+       attrs.replace(i, names[i], values[i]);
+    }
 
+    cmd = "*3;min";
+    nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
 
+    for(int i = 0; i < 3; i++){
+        NodePtr node = nodes.at(i);
+        _tst_attrs(node, attrs);
+    }
 
+    cmd = "*3;max";
+    nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
+    for(int i = 0; i < 3; i++){
+        NodePtr node = nodes.at(i);
+        _tst_attrs(node, attrs);
+    }
+
+    cmd = "*3;rand_123";
+    nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
+    for(int i = 0; i < 3; i++){
+        NodePtr node = nodes.at(i);
+        _tst_attrs(node, attrs);
+    }
     // Attributes to use
 //    Attributes attrs(1);
 //    attrs.replace(0, names[0], values[0]);
