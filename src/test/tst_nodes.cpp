@@ -535,9 +535,22 @@ void TestNodes::tst_saveToFile_with_attrs()
 {
     QString errorMsg;
     const QString tempFilePath = QDir::temp().absoluteFilePath("nodes.csv");
+    const QStringList names = { "test0", "test1", "test2" };
+    // saving a set of nodes without attributes
+    AttributesScope attrsScope;
+    AttributeRange* col0 = AttributeRange::parse(0, names[0], "int[0,1000]");
+    attrsScope.insert(col0->attrName(), col0);
+    AttributeRange* col1 = AttributeRange::parse(1, names[1], "int[0,1000]");
+    attrsScope.insert(col1->attrName(), col1);
+    AttributeRange* col2 = AttributeRange::parse(2, names[2], "int[0,1000]");
+    attrsScope.insert(col2->attrName(), col2);
 
-    /** TO DO:
-     * similar to 'tst_saveToFile_no_attrs()', but here we pass a non-empty attrsScope **/
+    Nodes nodes = Nodes::fromCmd("*3;min", attrsScope, GraphType::Undirected, errorMsg);
+    QVERIFY(nodes.saveToFile(tempFilePath));
+
+    // retrieve saved file
+    Nodes nodesFromFile = Nodes::fromFile(tempFilePath, attrsScope, GraphType::Undirected, errorMsg);
+    _compare_nodes(nodes, nodesFromFile);
 }
 
 void TestNodes::_compare_nodes(const Nodes& a, const Nodes& b) const
