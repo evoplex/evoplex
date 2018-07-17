@@ -57,8 +57,8 @@ private:
     // checks if sets of nodes have the same content
     void _compare_nodes(const Nodes& a, const Nodes& b) const;
     void _empty_nodes(const Nodes& a, int size);
-    void _tst_Node(Node *node);
-    void _tst_attrs(Node* node, Attributes attrs);
+    void _tst_Node(Node *node, Attributes attrs);
+    void _tst_attrs(NodePtr node, Attributes attrs);
 };
 
 
@@ -77,38 +77,25 @@ void TestNodes::_empty_nodes(const Nodes& a, int size){
 }
 
 }
-void TestNodes::_tst_attrs(Node* node, Attributes attrs)
+void TestNodes::_tst_attrs(NodePtr node, Attributes attrs)
 {
     QCOMPARE(node->attrs().names(), attrs.names());
     QCOMPARE(node->attrs().values(), attrs.values());
 
-    // Tests if 'Node::setAttr()' works as expected.
-    const Value newValue = "another-type";
-    node->setAttr(0, newValue);
-
     QCOMPARE(node->attrs().name(0), attrs.name(0));
-    QCOMPARE(node->attr(attrs.name(0)), newValue);
-    QCOMPARE(node->attrs().value(0), newValue);
-    QCOMPARE(node->attr(0), newValue);
+
     QCOMPARE(node->attrs().size(), attrs.size());
 }
 
-void TestNodes::_tst_Node(Node *node)
-{
-    int id = 0, x = 123, y = 456;
-    const QStringList names = { "test0", "test1", "test2" };
-    const Value values[] = { Value(123), Value(234), Value(456) };
+//void TestNodes::_tst_Node(NodePtr node, Attributes attrs)
+//{
+//    int id = 0, x = 123, y = 456;
 
-    Attributes attrs(names.size());
-    for(int i = 0; i < names.size(); ++i){
-        attrs.replace(i, names[i], values[i]);
-    }
-
-    QCOMPARE(node->id(), id);
-    _tst_attrs(node, attrs);
-    QCOMPARE(node->x(), x);
-    QCOMPARE(node->y(), y);
-}
+//    QCOMPARE(node->id(), id);
+////    _tst_attrs(node, attrs);
+//    QCOMPARE(node->x(), x);
+//    QCOMPARE(node->y(), y);
+//}
 void TestNodes::tst_fromCmd()
 {
     QString errorMsg;
@@ -119,7 +106,7 @@ void TestNodes::tst_fromCmd()
     Nodes nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
     _empty_nodes(nodes, 0);
 
-//     *  - valid * command cases
+    // Valid * command cases
     // Undirected
     cmd = "*3;min";
     nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
@@ -148,19 +135,29 @@ void TestNodes::tst_fromCmd()
     nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
     _empty_nodes(nodes, 3);
 
-//     *  - valid # command
-
+    // Valid # command cases
     //    It should look like: '#integer;attrName_[min|max|rand_seed|value_value]'"
 
     // Single attribute
-    AttributeRange* col0 = AttributeRange::parse(0, "myInt", "int[0,200]");
+    const QStringList names = { "test0", "test1", "test2" };
+    const Value values[] = { Value(123), Value(234), Value(456) };
+
+    AttributeRange* col0 = AttributeRange::parse(0, names[0], "int[0,200]");
     attrsScope.insert(col0->attrName(), col0);
 
-    cmd = "#3;myInt_value_123";
+
+
+    // Attributes to use
+    Attributes attrs(1);
+    attrs.replace(0, names[0], values[0]);
+
+    cmd = QString("#3;%1_value_%2").arg(Value(names[0]).toQString()).arg(values[0].toQString());
     nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
 
     QCOMPARE(nodes.size(), 3);
-    QCOMPARE(nodes.at(0)->attrs().value("myInt"), 123);
+    QCOMPARE(nodes.at(0)->attrs().value(names[0]), 123);
+    NodePtr node = nodes.at(0);
+    _tst_attrs(node, attrs);
 
     // Multiple attributes
     col0 = AttributeRange::parse(0, "myInt", "int[0,200]");
