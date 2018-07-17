@@ -237,6 +237,36 @@ void TestNodes::tst_fromCmd()
     }
     _tst_attrs(node, attrs);
 
+    // Directed with single attribute
+    graphType = GraphType::Directed;
+    attrs.resize(1);
+    attrsScope.clear();
+    col0 = AttributeRange::parse(0, names[0], "int[0,1000]");
+    attrsScope.insert(col0->attrName(), col0);
+
+    cmd = QString("#3;%1_value_%2").arg(names[0]).arg(values[0].toQString());
+    nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
+
+    QCOMPARE(nodes.size(), 3);
+    QCOMPARE(nodes.at(0)->attrs().value(names[0]), values[0]);
+    node = nodes.at(0);
+    _tst_attrs(node, attrs);
+
+    // Directed with multiple attributes
+    col1 = AttributeRange::parse(1, names[1], "int[0,1000]");
+    attrsScope.insert(col1->attrName(), col1);
+
+    cmd = QString("#3;%1_value_%2;%3_value_%4").arg(names[0]).arg(values[0].toQString()).arg(names[1]).arg(values[1].toQString());
+    nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
+
+    QCOMPARE(nodes.size(), 3);
+    node = nodes.at(0);
+    attrs.resize(2);
+    for(int i = 0; i < 2; i++){
+       attrs.replace(i, names[i], values[i]);
+    }
+    _tst_attrs(node, attrs);
+
 //     *  - empty command: should fail
 //     *  - empty attrsScope: ok! a set of nodes without attrs
 //     *  - invalid commands
