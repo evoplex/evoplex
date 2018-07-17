@@ -313,6 +313,8 @@ void TestNodes::tst_fromFile_nodes_no_xy()
     // valid attrsScope for the existing file
     const QString filePath(":/data/data/nodes_no_xy.csv");
     AttributesScope attrsScope;
+
+    // AttributeRange to be used for both sets of nodes
     AttributeRange* col0 = AttributeRange::parse(0, "int-zero-two", "int[0,2]");
     attrsScope.insert(col0->attrName(), col0);
     AttributeRange* col1 = AttributeRange::parse(1, "bool", "bool");
@@ -320,8 +322,33 @@ void TestNodes::tst_fromFile_nodes_no_xy()
     AttributeRange* col2 = AttributeRange::parse(2, "any-string", "string");
     attrsScope.insert(col2->attrName(), col2);
 
-    Nodes nodes = Nodes::fromFile(filePath, attrsScope, graphType, errorMsg);
+    // Nodes with values read from file
+    Nodes nodesFromFile = Nodes::fromFile(filePath, attrsScope, graphType, errorMsg);
 
+    // Nodes to test against
+    Nodes nodes = Nodes::fromCmd("*3;min", attrsScope, graphType, errorMsg);
+
+    nodes.at(0)->setAttr(0, 0);
+    nodes.at(0)->setAttr(1, true);
+    nodes.at(0)->setAttr(2, "row1");
+
+    nodes.at(1)->setAttr(0, 1);
+    nodes.at(1)->setAttr(1, false);
+    nodes.at(1)->setAttr(2, "row2");
+
+    nodes.at(2)->setAttr(0, 2);
+    nodes.at(2)->setAttr(1, true);
+    nodes.at(2)->setAttr(2, "row3");
+
+    _compare_nodes(nodes, nodesFromFile);
+
+    AttributeRange* col3 = AttributeRange::parse(3, "not-in-file", "string");
+    attrsScope.insert(col3->attrName(), col3);
+
+    // Nodes with values read from file
+    nodesFromFile = Nodes::fromFile(filePath, attrsScope, graphType, errorMsg);
+
+    _tst_empty_nodes(nodesFromFile, 0);
     /*
      * Potential cases:
      *  - check if Nodes contains the same data as 'nodes_no_xy.csv'
