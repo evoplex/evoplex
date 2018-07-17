@@ -310,21 +310,25 @@ void TestNodes::tst_fromCmd()
      // Directed with non-empty attrsScope
       _tst_invalid(cmd, true, GraphType::Directed);
 
-//    nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
 
 //     *      - cmd with an attribute that is not in attrsScope
-//    cmd = "#3;myInt_value_123;myInt3_value_123";
-//    nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
-//    // Fails, but only when the following tests are performed:
-//    QCOMPARE(nodes.size(), 3);
+    cmd = "#3;myInt_value_123;myInt3_value_123";
+    // Undirected with empty attrsScope
+    _tst_invalid(cmd, false, GraphType::Undirected);
 
-//     *  - Invalid graph type: should fail
-//    cmd = "#3;myInt_value_123;myInt2_value_123";
-//    graphType = GraphType::Invalid;
-//    nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
-    // Fails, but only when the following tests are performed:
-//    QCOMPARE(nodes.size(), 3);
+    // Undirected with non-empty attrsScope
+    _tst_invalid(cmd, true, GraphType::Undirected);
 
+    // Directed with empty attrsScope
+     _tst_invalid(cmd, false, GraphType::Directed);
+
+    // Directed with non-empty attrsScope
+     _tst_invalid(cmd, true, GraphType::Directed);
+
+    // Invalid graph type
+    cmd = "#3;myInt_value_123;myInt2_value_123";
+    _tst_invalid(cmd, false, GraphType::Invalid);
+    _tst_invalid(cmd, true, GraphType::Invalid);
 //     *  - Undirected graph: should return a set of UNodes
 //     *  - Directed graph: should return a set of DNodes
 
