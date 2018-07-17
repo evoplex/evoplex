@@ -102,7 +102,6 @@ void TestNodes::_tst_attrs(NodePtr node, Attributes attrs)
 void TestNodes::_tst_invalid(QString cmd, bool has_attrs, GraphType graphType){
     QString errorMsg;
     NodePtr node;
-
     AttributesScope attrsScope;
 
     if(has_attrs){
@@ -281,12 +280,36 @@ void TestNodes::tst_fromCmd()
      _tst_invalid(cmd, true, GraphType::Directed);
 
 
-//     *      - negavite number of nodes
-//    cmd = "#-3;myInt_value_123;myInt2_value_123";
-//    nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
+    // Negative number of nodes
+    cmd = "#-3;myInt_value_123;myInt2_value_123";
 
-//     *      - zero nodes
-//    cmd = "#0;myInt_value_123;myInt2_value_123";
+    // Undirected with empty attrsScope
+    _tst_invalid(cmd, false, GraphType::Undirected);
+
+    // Undirected with non-empty attrsScope
+    _tst_invalid(cmd, true, GraphType::Undirected);
+
+    // Directed with empty attrsScope
+     _tst_invalid(cmd, false, GraphType::Directed);
+
+    // Directed with non-empty attrsScope
+     _tst_invalid(cmd, true, GraphType::Directed);
+
+    // Zero nodes
+         cmd = "#0;myInt_value_123;myInt2_value_123";
+
+     // Undirected with empty attrsScope
+     _tst_invalid(cmd, false, GraphType::Undirected);
+
+     // Undirected with non-empty attrsScope
+     _tst_invalid(cmd, true, GraphType::Undirected);
+
+     // Directed with empty attrsScope
+      _tst_invalid(cmd, false, GraphType::Directed);
+
+     // Directed with non-empty attrsScope
+      _tst_invalid(cmd, true, GraphType::Directed);
+
 //    nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
 
 //     *      - cmd with an attribute that is not in attrsScope
