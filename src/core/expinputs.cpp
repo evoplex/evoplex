@@ -127,13 +127,13 @@ ExpInputs::Plugins ExpInputs::findPlugins(const MainApp* mainApp,
     if (!plugins.first) {
         errMsg += QString("The graph plugin '%1' is not available."
                           " Make sure you load it before trying to add this experiment.")
-                          .arg(values.at(headerGraphId)).arg(values.at(headerModelId));
+                          .arg(values.at(headerGraphId));
         return Plugins();
     }
     if (!plugins.second) {
         errMsg += QString("The model plugin '%1' is not available."
                           " Make sure you load it before trying to add this experiment.")
-                          .arg(values.at(headerGraphId)).arg(values.at(headerModelId));
+                          .arg(values.at(headerModelId));
         return Plugins();
     }
 

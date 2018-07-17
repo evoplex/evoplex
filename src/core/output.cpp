@@ -32,6 +32,7 @@ Cache::Cache(Values inputs, std::vector<int> trialIds, OutputPtr parent)
     : m_parent(parent)
     , m_inputs(inputs)
 {
+    Q_ASSERT_X(!m_inputs.empty(), "Cache", "inputs cannot be empty");
     for (int trialId : trialIds) {
         m_trials.insert({trialId, Data()});
     }

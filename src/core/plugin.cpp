@@ -138,7 +138,11 @@ Plugin::Plugin(PluginType type, const QJsonObject* metaData, const QString& libP
     QObject* instance = loader.instance();
     Q_ASSERT(loader.isLoaded() && instance);
     m_factory = qobject_cast<PluginInterface*>(instance);
-    Q_ASSERT_X(m_factory, "Plugin", qPrintable(QString("factory could not be created for '%1'").arg(m_name)));
+    if (!m_factory) {
+        qWarning() << QString("factory could not be created for '%1'").arg(m_name);
+        m_type = PluginType::Invalid;
+        return;
+    }
 }
 
 Plugin::~Plugin()
