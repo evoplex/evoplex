@@ -62,11 +62,6 @@ private:
     void _tst_invalid(QString cmd, bool has_attrs, GraphType graphType);
 };
 
-// NOTES:
-// Empty commands should fail
-// Check function and comment consistency
-// Filepath alternative method
-
 void TestNodes::_tst_empty_nodes(const Nodes& a, int size){
     QCOMPARE(a.size(), size);
     for(int i = 0; i < a.size(); i++){
@@ -115,42 +110,38 @@ void TestNodes::_tst_invalid(QString cmd, bool has_attrs, GraphType graphType){
 
 void TestNodes::tst_fromCmd()
 {
-    QString errorMsg;
+    QString errorMsg, cmd;
+    const char* attrRangeStr = "int[0,1000]";
+    Nodes nodes;
     NodePtr node;
+    GraphType graphType;
+
     const QStringList names = { "test0", "test1", "test2" };
     const Value values[] = { Value(123), Value(234), Value(456) };
+
     AttributesScope attrsScope;
     Attributes attrs(3);
-    Nodes nodes;
-    GraphType graphType = GraphType::Undirected;
-
-
-    // Empty commands
-    QString cmd = "";
-    _tst_invalid(cmd, false, GraphType::Undirected); // Undirected with empty attrsScope
-    _tst_invalid(cmd, true, GraphType::Undirected); // Undirected with non-empty attrsScope
-    _tst_invalid(cmd, false, GraphType::Undirected); // Directed with empty attrsScope
-    _tst_invalid(cmd, false, GraphType::Directed); // Directed with non-empty attrsScope
 
     // Valid * command cases
     // Undirected with empty attrsScope
+    graphType = GraphType::Undirected;
     cmd = "*3;min";
+
     nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
     _tst_empty_nodes(nodes, 3);
 
     // Undirected with non-empty attrsScope
-    AttributeRange* col0 = AttributeRange::parse(0, names[0], "int[0,1000]");
+    AttributeRange* col0 = AttributeRange::parse(0, names[0], attrRangeStr);
     attrsScope.insert(col0->attrName(), col0);
-    AttributeRange* col1 = AttributeRange::parse(1, names[1], "int[0,1000]");
+    AttributeRange* col1 = AttributeRange::parse(1, names[1], attrRangeStr);
     attrsScope.insert(col1->attrName(), col1);
-    AttributeRange* col2 = AttributeRange::parse(2, names[2], "int[0,1000]");
+    AttributeRange* col2 = AttributeRange::parse(2, names[2], attrRangeStr);
     attrsScope.insert(col2->attrName(), col2);
 
     for(int i = 0; i < 3; i++){
        attrs.replace(i, names[i], values[i]);
     }
 
-    cmd = "*3;min";
     nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
 
     for(int i = 0; i < 3; i++){
@@ -162,23 +153,21 @@ void TestNodes::tst_fromCmd()
     graphType = GraphType::Directed;
     attrsScope.clear();
 
-    cmd = "*3;min";
     nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
     _tst_empty_nodes(nodes, 3);
 
     // Directed with non-empty attrsScope
-    col0 = AttributeRange::parse(0, names[0], "int[0,1000]");
+    col0 = AttributeRange::parse(0, names[0], attrRangeStr);
     attrsScope.insert(col0->attrName(), col0);
-    col1 = AttributeRange::parse(1, names[1], "int[0,1000]");
+    col1 = AttributeRange::parse(1, names[1], attrRangeStr);
     attrsScope.insert(col1->attrName(), col1);
-    col2 = AttributeRange::parse(2, names[2], "int[0,1000]");
+    col2 = AttributeRange::parse(2, names[2], attrRangeStr);
     attrsScope.insert(col2->attrName(), col2);
 
     for(int i = 0; i < 3; i++){
        attrs.replace(i, names[i], values[i]);
     }
 
-    cmd = "*3;min";
     nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
 
     for(int i = 0; i < 3; i++){
@@ -189,10 +178,9 @@ void TestNodes::tst_fromCmd()
     // Valid # command cases
     // Undirected with single attribute
     graphType = GraphType::Undirected;
-    attrs.resize(1);
     attrsScope.clear();
-    col0 = AttributeRange::parse(0, names[0], "int[0,1000]");
     attrsScope.insert(col0->attrName(), col0);
+    attrs.resize(1);
 
     cmd = QString("#3;%1_value_%2").arg(names[0]).arg(values[0].toQString());
     nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
@@ -203,26 +191,25 @@ void TestNodes::tst_fromCmd()
     _tst_attrs(node, attrs);
 
     // Undirected with multiple attributes
-    col1 = AttributeRange::parse(1, names[1], "int[0,1000]");
     attrsScope.insert(col1->attrName(), col1);
+    attrs.resize(2);
+
+    for(int i = 0; i < 2; i++){
+       attrs.replace(i, names[i], values[i]);
+    }
 
     cmd = QString("#3;%1_value_%2;%3_value_%4").arg(names[0]).arg(values[0].toQString()).arg(names[1]).arg(values[1].toQString());
     nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
 
     QCOMPARE(nodes.size(), 3);
     node = nodes.at(0);
-    attrs.resize(2);
-    for(int i = 0; i < 2; i++){
-       attrs.replace(i, names[i], values[i]);
-    }
     _tst_attrs(node, attrs);
 
     // Directed with single attribute
     graphType = GraphType::Directed;
-    attrs.resize(1);
     attrsScope.clear();
-    col0 = AttributeRange::parse(0, names[0], "int[0,1000]");
     attrsScope.insert(col0->attrName(), col0);
+    attrs.resize(1);
 
     cmd = QString("#3;%1_value_%2").arg(names[0]).arg(values[0].toQString());
     nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
@@ -233,19 +220,25 @@ void TestNodes::tst_fromCmd()
     _tst_attrs(node, attrs);
 
     // Directed with multiple attributes
-    col1 = AttributeRange::parse(1, names[1], "int[0,1000]");
     attrsScope.insert(col1->attrName(), col1);
+    attrs.resize(2);
 
+    for(int i = 0; i < 2; i++){
+       attrs.replace(i, names[i], values[i]);
+    }
     cmd = QString("#3;%1_value_%2;%3_value_%4").arg(names[0]).arg(values[0].toQString()).arg(names[1]).arg(values[1].toQString());
     nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
 
     QCOMPARE(nodes.size(), 3);
     node = nodes.at(0);
-    attrs.resize(2);
-    for(int i = 0; i < 2; i++){
-       attrs.replace(i, names[i], values[i]);
-    }
     _tst_attrs(node, attrs);
+
+    // Empty commands
+    cmd = "";
+    _tst_invalid(cmd, false, GraphType::Undirected); // Undirected with empty attrsScope
+    _tst_invalid(cmd, true, GraphType::Undirected); // Undirected with non-empty attrsScope
+    _tst_invalid(cmd, false, GraphType::Undirected); // Directed with empty attrsScope
+    _tst_invalid(cmd, false, GraphType::Directed); // Directed with non-empty attrsScope
 
     // Invalid comands
     cmd = "this-is-invalid";
@@ -253,7 +246,6 @@ void TestNodes::tst_fromCmd()
     _tst_invalid(cmd, true, GraphType::Undirected); // Undirected with non-empty attrsScope
     _tst_invalid(cmd, false, GraphType::Directed); // Directed with empty attrsScope
     _tst_invalid(cmd, true, GraphType::Directed); // Directed with non-empty attrsScope
-
 
     // Negative number of nodes
     cmd = "#-3;myInt_value_123;myInt2_value_123";
@@ -269,14 +261,12 @@ void TestNodes::tst_fromCmd()
      _tst_invalid(cmd, false, GraphType::Directed); // Directed with empty attrsScope
      _tst_invalid(cmd, true, GraphType::Directed); // Directed with non-empty attrsScope
 
-
     // Command with attribute not in attrsScope
     cmd = "#3;myInt_value_123;myInt3_value_123";
     _tst_invalid(cmd, false, GraphType::Undirected); // Undirected with empty attrsScope
     _tst_invalid(cmd, true, GraphType::Undirected); // Undirected with non-empty attrsScope
     _tst_invalid(cmd, false, GraphType::Directed); // Directed with empty attrsScope
     _tst_invalid(cmd, true, GraphType::Directed); // Directed with non-empty attrsScope
-
 
     // Invalid graph type
     cmd = "#3;myInt_value_123;myInt2_value_123";
@@ -332,21 +322,19 @@ void TestNodes::tst_fromFile_nodes_no_xy()
 
     _compare_nodes(nodes, nodesFromFile);
 
+    // Add attribute that is not in file
     AttributeRange* col3 = AttributeRange::parse(3, "not-in-file", "string");
     attrsScope.insert(col3->attrName(), col3);
 
     // Nodes with values read from file
     nodesFromFile = Nodes::fromFile(filePath, attrsScope, graphType, errorMsg);
 
-    _tst_empty_nodes(nodesFromFile, 0);
-    /*
-     * Potential cases:
-     *  - check if Nodes contains the same data as 'nodes_no_xy.csv'
-     *  - what if attrsScope has more attributes than 'nodes_no_xy.csv'? should fail
-     */
+    _tst_empty_nodes(nodesFromFile, 0); // Confirms the nodes returned are empty
+
+    // Fails as expected:
+//    _compare_nodes(nodes, nodesFromFile);
 }
 
-/****************** TO DO ****************************/
 // valid attributes AND both xy coordinates
 void TestNodes::tst_fromFile_nodes_with_xy() {
     QString errorMsg;
@@ -379,7 +367,20 @@ void TestNodes::tst_fromFile_nodes_with_xy() {
     nodes.at(2)->setY(789);
 
     _compare_nodes(nodes,nodesFromFile);
+
+    // Add attribute that is not in file
+    AttributeRange* col3 = AttributeRange::parse(3, "not-in-file", "string");
+    attrsScope.insert(col3->attrName(), col3);
+
+    // Nodes with values read from file
+    nodesFromFile = Nodes::fromFile(filePath, attrsScope, graphType, errorMsg);
+
+    _tst_empty_nodes(nodesFromFile, 0); // Confirms the nodes returned are empty
+
+    // Fails as expected:
+//    _compare_nodes(nodes, nodesFromFile);
 }
+
 // valid attributes AND x coordinates (only)
 void TestNodes::tst_fromFile_nodes_with_x() {
 //    QString errorMsg;
@@ -429,12 +430,14 @@ void TestNodes::tst_fromFile_nodes_with_x() {
 //        QCOMPARE(nA->x(), nB->x());
 //    }
 }
+
 // valid attributes AND y coordinates (only)
 void TestNodes::tst_fromFile_nodes_with_y() {
 //    QString errorMsg;
 //    GraphType graphType = GraphType::Undirected;
 
 //    // valid attrsScope for the existing file
+//    // Fails - see 'TestNodes::tst_fromFile_nodes_with_x()'
 //    const QString filePath(":/data/data/nodes_with_y.csv");
 //    AttributesScope attrsScope;
 
@@ -468,6 +471,7 @@ void TestNodes::tst_fromFile_nodes_with_y() {
 //        QCOMPARE(nA->y(), nB->y());
 //    }
 }
+
 // invalid attributes
 void TestNodes::tst_fromFile_nodes_invalid_attrs() {
     QString errorMsg;
@@ -484,8 +488,15 @@ void TestNodes::tst_fromFile_nodes_invalid_attrs() {
     // Nodes with values read from file
     Nodes nodesFromFile = Nodes::fromFile(filePath, attrsScope, graphType, errorMsg);
 
-    QCOMPARE(nodesFromFile.size(), 0);
+    // Nodes to test against
+    Nodes nodes = Nodes::fromCmd("*2;min", attrsScope, graphType, errorMsg);
+
+    QCOMPARE(nodesFromFile.size(), 0); // Confirms the nodes returned are empty
+
+    // Fails as expected:
+//    _compare_nodes(nodes, nodesFromFile);
 }
+
 // invalid file
 void TestNodes::tst_fromFile_nodes_invalid_file() {
     QString errorMsg;
@@ -502,9 +513,14 @@ void TestNodes::tst_fromFile_nodes_invalid_file() {
     // Nodes with values read from file
     Nodes nodesFromFile = Nodes::fromFile(filePath, attrsScope, graphType, errorMsg);
 
-    QCOMPARE(nodesFromFile.size(), 0);
+    // Nodes to test against
+    Nodes nodes = Nodes::fromCmd("*2;min", attrsScope, graphType, errorMsg);
+
+    QCOMPARE(nodesFromFile.size(), 0); // Confirms the nodes returned are empty
+
+    // Fails as expected:
+//    _compare_nodes(nodes, nodesFromFile);
 }
-/****************** TO DO ****************************/
 
 void TestNodes::tst_saveToFile_no_attrs()
 {
