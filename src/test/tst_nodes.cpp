@@ -95,6 +95,8 @@ void TestNodes::_tst_attrs(NodePtr node, Attributes attrs)
 //    QCOMPARE(node->x(), x);
 //    QCOMPARE(node->y(), y);
 //}
+
+// Empty commands should fail
 void TestNodes::tst_fromCmd()
 {
     QString errorMsg;
@@ -154,14 +156,6 @@ void TestNodes::tst_fromCmd()
     nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
     _tst_empty_nodes(nodes, 3);
 
-    cmd = "*3;max";
-    nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
-    _tst_empty_nodes(nodes, 3);
-
-    cmd = "*3;rand_123";
-    nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
-    _tst_empty_nodes(nodes, 3);
-
     // Undirected with non-empty attrsScope
     col0 = AttributeRange::parse(0, names[0], "int[0,1000]");
     attrsScope.insert(col0->attrName(), col0);
@@ -183,33 +177,11 @@ void TestNodes::tst_fromCmd()
         _tst_attrs(node, attrs);
     }
 
-    cmd = "*3;max";
-    nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
-    for(int i = 0; i < 3; i++){
-        NodePtr node = nodes.at(i);
-        _tst_attrs(node, attrs);
-    }
-
-    cmd = "*3;rand_123";
-    nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
-    for(int i = 0; i < 3; i++){
-        NodePtr node = nodes.at(i);
-        _tst_attrs(node, attrs);
-    }
-
     // Directed with empty attrsScope
     graphType = GraphType::Directed;
     attrsScope.clear();
 
     cmd = "*3;min";
-    nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
-    _tst_empty_nodes(nodes, 3);
-
-    cmd = "*3;max";
-    nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
-    _tst_empty_nodes(nodes, 3);
-
-    cmd = "*3;rand_123";
     nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
     _tst_empty_nodes(nodes, 3);
 
@@ -228,20 +200,6 @@ void TestNodes::tst_fromCmd()
     cmd = "*3;min";
     nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
 
-    for(int i = 0; i < 3; i++){
-        NodePtr node = nodes.at(i);
-        _tst_attrs(node, attrs);
-    }
-
-    cmd = "*3;max";
-    nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
-    for(int i = 0; i < 3; i++){
-        NodePtr node = nodes.at(i);
-        _tst_attrs(node, attrs);
-    }
-
-    cmd = "*3;rand_123";
-    nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
     for(int i = 0; i < 3; i++){
         NodePtr node = nodes.at(i);
         _tst_attrs(node, attrs);
@@ -308,8 +266,7 @@ void TestNodes::tst_fromCmd()
     }
     _tst_attrs(node, attrs);
 
-//     *  - empty command: should fail
-//     *  - empty attrsScope: ok! a set of nodes without attrs
+
 //     *  - invalid commands
 //     *      - negavite number of nodes
 //    cmd = "#-3;myInt_value_123;myInt2_value_123";
