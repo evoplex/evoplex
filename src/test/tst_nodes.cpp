@@ -59,6 +59,7 @@ private:
     void _tst_empty_nodes(const Nodes& a, int size);
     void _tst_Node(Node *node, Attributes attrs);
     void _tst_attrs(NodePtr node, Attributes attrs);
+    void _tst_invalid(QString cmd, bool has_attrs, GraphType graphType);
 };
 
 
@@ -97,20 +98,30 @@ void TestNodes::_tst_attrs(NodePtr node, Attributes attrs)
 //}
 
 // Empty commands should fail
+
+void TestNodes::_tst_invalid(QString cmd, bool has_attrs, GraphType graphType){
+    QString errorMsg;
+    NodePtr node;
+    const QStringList names = { "test0", "test1", "test2" };
+    const Value values[] = { Value(123), Value(234), Value(456) };
+    AttributesScope attrsScope;
+    Nodes nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
+    _tst_empty_nodes(nodes, 0);
+}
 void TestNodes::tst_fromCmd()
 {
     QString errorMsg;
     NodePtr node;
     const QStringList names = { "test0", "test1", "test2" };
     const Value values[] = { Value(123), Value(234), Value(456) };
+    AttributesScope attrsScope;
+    Nodes nodes;
+    GraphType graphType = GraphType::Undirected;
 
     // Empty commands
     // Undirected with empty attrsScope
     QString cmd = "";
-    AttributesScope attrsScope;
-    GraphType graphType = GraphType::Undirected;
-    Nodes nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
-    _tst_empty_nodes(nodes, 0);
+    _tst_invalid(cmd, false, GraphType::Undirected);
 
     // Undirected with non-empty attrsScope
     AttributeRange* col0 = AttributeRange::parse(0, names[0], "int[0,1000]");
