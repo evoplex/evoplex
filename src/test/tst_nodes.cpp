@@ -82,7 +82,6 @@ void TestNodes::_tst_attrs(NodePtr node, Attributes attrs)
     QCOMPARE(node->attrs().names(), attrs.names());
 //    QCOMPARE(node->attrs().values(), attrs.values());
 
-    QCOMPARE(node->attrs().name(0), attrs.name(0));
 
     QCOMPARE(node->attrs().size(), attrs.size());
 }
@@ -158,7 +157,7 @@ void TestNodes::tst_fromCmd()
     }
 
     // Directed with empty attrsScope
-    graphType = GraphType::Undirected;
+    graphType = GraphType::Directed;
     attrsScope.clear();
 
     cmd = "*3;min";
@@ -206,30 +205,37 @@ void TestNodes::tst_fromCmd()
         NodePtr node = nodes.at(i);
         _tst_attrs(node, attrs);
     }
-    // Attributes to use
-//    Attributes attrs(1);
-//    attrs.replace(0, names[0], values[0]);
 
-//    cmd = QString("#3;%1_value_%2").arg(Value(names[0]).toQString()).arg(values[0].toQString());
-//    nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
+    // Valid # command cases
+    // Undirected with single attribute
+    graphType = GraphType::Undirected;
+    attrs.resize(1);
+    attrsScope.clear();
+    col0 = AttributeRange::parse(0, names[0], "int[0,1000]");
+    attrsScope.insert(col0->attrName(), col0);
 
-//    QCOMPARE(nodes.size(), 3);
-//    QCOMPARE(nodes.at(0)->attrs().value(names[0]), 123);
-//    NodePtr node = nodes.at(0);
-//    _tst_attrs(node, attrs);
+    cmd = QString("#3;%1_value_%2").arg(names[0]).arg(values[0].toQString());
+    nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
 
-//    // Multiple attributes
-//    col0 = AttributeRange::parse(0, "myInt", "int[0,200]");
-//    attrsScope.insert(col0->attrName(), col0);
-//    col1 = AttributeRange::parse(1, "myInt2", "int[0,200]");
-//    attrsScope.insert(col1->attrName(), col1);
+    QCOMPARE(nodes.size(), 3);
+    QCOMPARE(nodes.at(0)->attrs().value(names[0]), values[0]);
+    NodePtr node = nodes.at(0);
+    _tst_attrs(node, attrs);
 
-//    cmd = "#3;myInt_value_123;myInt2_value_123";
-//    nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
+    // Undirected with multiple attributes
+    col1 = AttributeRange::parse(1, names[1], "int[0,1000]");
+    attrsScope.insert(col1->attrName(), col1);
 
-//    QCOMPARE(nodes.size(), 3);
-//    QCOMPARE(nodes.at(0)->attrs().value("myInt"), 123);
-//    QCOMPARE(nodes.at(0)->attrs().value("myInt2"), 123);
+    cmd = QString("#3;%1_value_%2;%3_value_%4").arg(names[0]).arg(values[0].toQString()).arg(names[1]).arg(values[1].toQString());
+    nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
+
+    QCOMPARE(nodes.size(), 3);
+    node = nodes.at(0);
+    attrs.resize(2);
+    for(int i = 0; i < 2; i++){
+       attrs.replace(i, names[i], values[i]);
+    }
+    _tst_attrs(node, attrs);
 
 //     *  - empty command: should fail
 //     *  - empty attrsScope: ok! a set of nodes without attrs
@@ -249,9 +255,9 @@ void TestNodes::tst_fromCmd()
 //    QCOMPARE(nodes.size(), 3);
 
 //     *  - Invalid graph type: should fail
-    cmd = "#3;myInt_value_123;myInt2_value_123";
-    graphType = GraphType::Invalid;
-    nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
+//    cmd = "#3;myInt_value_123;myInt2_value_123";
+//    graphType = GraphType::Invalid;
+//    nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
     // Fails, but only when the following tests are performed:
 //    QCOMPARE(nodes.size(), 3);
 
