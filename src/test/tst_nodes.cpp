@@ -56,34 +56,82 @@ private slots:
 private:
     // checks if sets of nodes have the same content
     void _compare_nodes(const Nodes& a, const Nodes& b) const;
+    void _empty_nodes(const Nodes& a, int size);
 };
+
+
+
+void TestNodes::_empty_nodes(const Nodes& a, int size){
+    QCOMPARE(a.size(), size);
+    for(int i = 0; i < a.size(); i++){
+    QVERIFY(a.at(i)->attrs().isEmpty());
+    QCOMPARE(a.at(i)->degree(), 0);
+    QCOMPARE(a.at(i)->inDegree(), 0);
+    QCOMPARE(a.at(i)->outDegree(), 0);
+
+//    // Nodes are created at the origin
+//    QCOMPARE(nodes.at(i)->x(), 0);
+//    QCOMPARE(nodes.at(i)->y(), 1);
+}
+
+}
 
 void TestNodes::tst_fromCmd()
 {
     QString errorMsg;
 
-    /* example of empty call
-     *
     QString cmd = "";
     AttributesScope attrsScope;
     GraphType graphType = GraphType::Undirected;
     Nodes nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
-    */
+    _empty_nodes(nodes, 0);
 
-    /*
-     * Potential cases:
-     *  - valid * command
-     *  - valid # command
-     *  - empty command: should fail
-     *  - empty attrsScope: ok! a set of nodes without attrs
-     *  - invalid commands
-     *      - negavite number of nodes
-     *      - zero nodes
-     *      - cmd with an attribute that is not in attrsScope
-     *  - Invalid graph type: should fail
-     *  - Undirected graph: should return a set of UNodes
-     *  - Directed graph: should return a set of DNodes
-     */
+//     *  - valid * command cases
+    // Undirected
+    cmd = "*3;min";
+    nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
+    _empty_nodes(nodes, 3);
+
+
+    cmd = "*3;max";
+    nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
+    _empty_nodes(nodes, 3);
+
+    cmd = "*3;rand_123";
+    nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
+    _empty_nodes(nodes, 3);
+
+    // Directed
+    graphType = GraphType::Directed;
+    cmd = "*3;min";
+    nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
+    _empty_nodes(nodes, 3);
+
+    cmd = "*3;max";
+    nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
+    _empty_nodes(nodes, 3);
+
+    cmd = "*3;rand_123";
+    nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
+    _empty_nodes(nodes, 3);
+
+//     *  - valid # command
+
+    //    It should look like: '#integer;attrName_[min|max|rand_seed|value_value]'"
+
+    cmd = "#3;myInt_0";
+    nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
+//    QCOMPARE(nodes.at(0)->attrs().value(0),0);
+//     *  - empty command: should fail
+//     *  - empty attrsScope: ok! a set of nodes without attrs
+//     *  - invalid commands
+//     *      - negavite number of nodes
+//     *      - zero nodes
+//     *      - cmd with an attribute that is not in attrsScope
+//     *  - Invalid graph type: should fail
+//     *  - Undirected graph: should return a set of UNodes
+//     *  - Directed graph: should return a set of DNodes
+
      /** IMPORTANT! The command validation is powered by another class, which we will be testing later.
       *    So, the main purpose of this test is to check if the returned Nodes are reflecting the command,
       *    that's the number of nodes is right, the attrs are there etc.
