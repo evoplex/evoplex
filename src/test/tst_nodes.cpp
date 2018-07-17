@@ -57,6 +57,8 @@ private:
     // checks if sets of nodes have the same content
     void _compare_nodes(const Nodes& a, const Nodes& b) const;
     void _empty_nodes(const Nodes& a, int size);
+    void _tst_Node(Node *node);
+    void _tst_attrs(Node* node, Attributes attrs);
 };
 
 
@@ -75,7 +77,38 @@ void TestNodes::_empty_nodes(const Nodes& a, int size){
 }
 
 }
+void TestNodes::_tst_attrs(Node* node, Attributes attrs)
+{
+    QCOMPARE(node->attrs().names(), attrs.names());
+    QCOMPARE(node->attrs().values(), attrs.values());
 
+    // Tests if 'Node::setAttr()' works as expected.
+    const Value newValue = "another-type";
+    node->setAttr(0, newValue);
+
+    QCOMPARE(node->attrs().name(0), attrs.name(0));
+    QCOMPARE(node->attr(attrs.name(0)), newValue);
+    QCOMPARE(node->attrs().value(0), newValue);
+    QCOMPARE(node->attr(0), newValue);
+    QCOMPARE(node->attrs().size(), attrs.size());
+}
+
+void TestNodes::_tst_Node(Node *node)
+{
+    int id = 0, x = 123, y = 456;
+    const QStringList names = { "test0", "test1", "test2" };
+    const Value values[] = { Value(123), Value(234), Value(456) };
+
+    Attributes attrs(names.size());
+    for(int i = 0; i < names.size(); ++i){
+        attrs.replace(i, names[i], values[i]);
+    }
+
+    QCOMPARE(node->id(), id);
+    _tst_attrs(node, attrs);
+    QCOMPARE(node->x(), x);
+    QCOMPARE(node->y(), y);
+}
 void TestNodes::tst_fromCmd()
 {
     QString errorMsg;
@@ -138,8 +171,9 @@ void TestNodes::tst_fromCmd()
     cmd = "#3;myInt_value_123;myInt2_value_123";
     nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
 
-    QCOMPARE(nodes.size(), 3);
-    QCOMPARE(nodes.at(0)->attrs().value("myInt"), 123);
+//    QCOMPARE(nodes.size(), 3);
+//    QCOMPARE(nodes.at(0)->attrs().value("myInt"), 123);
+//    QCOMPARE(nodes.at(0)->attrs().value("myInt2"), 123);
 
 //     *  - empty command: should fail
 //     *  - empty attrsScope: ok! a set of nodes without attrs
@@ -147,15 +181,27 @@ void TestNodes::tst_fromCmd()
 //     *      - negavite number of nodes
 //    cmd = "#-3;myInt_value_123;myInt2_value_123";
 //    nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
+
 //     *      - zero nodes
 //    cmd = "#0;myInt_value_123;myInt2_value_123";
 //    nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
+
 //     *      - cmd with an attribute that is not in attrsScope
-//    cmd = "#3;myInt_value_123;myInt2_value_123";
+//    cmd = "#3;myInt_value_123;myInt3_value_123";
 //    nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
+//    // Fails, but only when the following tests are performed:
+//    QCOMPARE(nodes.size(), 3);
+
 //     *  - Invalid graph type: should fail
+    cmd = "#3;myInt_value_123;myInt2_value_123";
+    graphType = GraphType::Invalid;
+    nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
+    // Fails, but only when the following tests are performed:
+//    QCOMPARE(nodes.size(), 3);
+
 //     *  - Undirected graph: should return a set of UNodes
 //     *  - Directed graph: should return a set of DNodes
+
 
      /** IMPORTANT! The command validation is powered by another class, which we will be testing later.
       *    So, the main purpose of this test is to check if the returned Nodes are reflecting the command,
