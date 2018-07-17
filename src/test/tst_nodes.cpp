@@ -269,38 +269,17 @@ void TestNodes::tst_fromCmd()
     // Invalid commands
     // Undirected with empty attrsScope
     cmd = "this-is-invalid";
-    attrsScope;
-    graphType = GraphType::Undirected;
-    nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
-    _tst_empty_nodes(nodes, 0);
+    _tst_invalid(cmd, false, GraphType::Undirected);
 
     // Undirected with non-empty attrsScope
-    col0 = AttributeRange::parse(0, names[0], "int[0,1000]");
-    attrsScope.insert(col0->attrName(), col0);
-    col1 = AttributeRange::parse(1, names[1], "int[0,1000]");
-    attrsScope.insert(col1->attrName(), col1);
-    col2 = AttributeRange::parse(2, names[2], "int[0,1000]");
-    attrsScope.insert(col2->attrName(), col2);
-
-    nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
-    QCOMPARE(nodes.size(), 0);
+    _tst_invalid(cmd, true, GraphType::Undirected);
 
     // Directed with empty attrsScope
-    graphType = GraphType::Directed;
-    attrsScope.clear();
-    nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
-    _tst_empty_nodes(nodes, 0);
+     _tst_invalid(cmd, false, GraphType::Directed);
 
     // Directed with non-empty attrsScope
-    col0 = AttributeRange::parse(0, names[0], "int[0,1000]");
-    attrsScope.insert(col0->attrName(), col0);
-    col1 = AttributeRange::parse(1, names[1], "int[0,1000]");
-    attrsScope.insert(col1->attrName(), col1);
-    col2 = AttributeRange::parse(2, names[2], "int[0,1000]");
-    attrsScope.insert(col2->attrName(), col2);
+     _tst_invalid(cmd, true, GraphType::Directed);
 
-    nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
-    QCOMPARE(nodes.size(), 0);
 
 //     *      - negavite number of nodes
 //    cmd = "#-3;myInt_value_123;myInt2_value_123";
