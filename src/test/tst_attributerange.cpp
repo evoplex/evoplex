@@ -71,6 +71,7 @@ void TestAttributeRange::tst_bool()
     v = attrRge->rand(prg);
 
     QVERIFY((v == Value(true))||(v == Value(false)));
+    QCOMPARE(v.type(), Value::BOOL);
     QVERIFY(v.toBool() >= min);
     QVERIFY(v.toBool() <= max);
 
@@ -140,6 +141,7 @@ void TestAttributeRange::tst_int_range()
     QCOMPARE(attrRge->min().toInt(), min);
     QCOMPARE(attrRge->max().toInt(), max);
     v = attrRge->rand(prg);
+    QCOMPARE(v.type(), Value::INT);
     QVERIFY(v.toInt() >= min);
     QVERIFY(v.toInt() <= max);
 
@@ -148,6 +150,7 @@ void TestAttributeRange::tst_int_range()
     QCOMPARE(attrRge2->min().toInt(), min);
     QCOMPARE(attrRge2->max().toInt(), max);
     v = attrRge2->rand(prg);
+    QCOMPARE(v.type(), Value::INT);
     QVERIFY(v.toInt() >= min);
     QVERIFY(v.toInt() <= max);
 
@@ -156,6 +159,7 @@ void TestAttributeRange::tst_int_range()
     QCOMPARE(attrRge3->min().toInt(), min);
     QCOMPARE(attrRge3->max().toInt(), max);
     v = attrRge3->rand(prg);
+    QCOMPARE(v.type(), Value::INT);
     QVERIFY(v.toInt() >= min);
     QVERIFY(v.toInt() <= max);
 
@@ -218,6 +222,7 @@ void TestAttributeRange::tst_double_range()
     QCOMPARE(attrRge->min().toDouble(), min);
     QCOMPARE(attrRge->max().toDouble(), max);
     v = attrRge->rand(prg);
+    QCOMPARE(v.type(), Value::DOUBLE);
     QVERIFY(v.toDouble() >= min);
     QVERIFY(v.toDouble() <= max);
 
@@ -226,6 +231,7 @@ void TestAttributeRange::tst_double_range()
     QCOMPARE(attrRge2->min().toDouble(), min);
     QCOMPARE(attrRge2->max().toDouble(), max);
     v = attrRge2->rand(prg);
+    QCOMPARE(v.type(), Value::DOUBLE);
     QVERIFY(v.toDouble() >= min);
     QVERIFY(v.toDouble() <= max);
 
@@ -234,6 +240,7 @@ void TestAttributeRange::tst_double_range()
     QCOMPARE(attrRge3->min().toDouble(), min);
     QCOMPARE(attrRge3->max().toDouble(), max);
     v = attrRge3->rand(prg);
+    QCOMPARE(v.type(), Value::DOUBLE);
     QVERIFY(v.toDouble() >= min);
     QVERIFY(v.toDouble() <= max);
 
@@ -277,6 +284,7 @@ void TestAttributeRange::tst_int_set()
     // Provided the set is ordered, these are the min and max values
 
     v = attrRge->rand(prg);
+    QCOMPARE(v.type(), Value::INT);
 
     QVERIFY(v.toInt() >= min);
     QVERIFY(v.toInt() <= max);
@@ -321,6 +329,7 @@ void TestAttributeRange::tst_double_set()
     // Provided the set is ordered, these are the min and max values
 
     v = attrRge->rand(prg);
+    QCOMPARE(v.type(), Value::DOUBLE);
     QVERIFY(v.toInt() >= min);
     QVERIFY(v.toInt() <= max);
 
@@ -381,6 +390,7 @@ void TestAttributeRange::tst_string()
     PRG* prg = new PRG(123);
 
     v = attrRge->rand(prg);
+    QCOMPARE(v.type(), Value::STRING);
 
     delete prg;
 }
@@ -455,6 +465,7 @@ void TestAttributeRange::tst_string_set()
     QCOMPARE(attrRge->max().toQString(), QString(max_of_set));
 
     v = attrRge->rand(prg);
+    QCOMPARE(v.type(), Value::STRING);
 
     QVERIFY(strcmp(v.toString(), max) <= 0);
     QVERIFY(strcmp(v.toString(), min) >= 0);
@@ -497,6 +508,7 @@ void TestAttributeRange::tst_filepath()
     Value v;
     PRG* prg = new PRG(123);
     v = attrRge->rand(prg);
+    QCOMPARE(v.type(), Value::STRING);
 
     delete prg;
 }
@@ -530,6 +542,7 @@ void TestAttributeRange::tst_dirpath()
     Value v;
     PRG* prg = new PRG(123);
     v = attrRge->rand(prg);
+    QCOMPARE(v.type(), Value::STRING);
 
     delete prg;
 }
