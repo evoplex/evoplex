@@ -40,57 +40,7 @@ private slots:
     void tst_double_set();
     void tst_filepath();
     void tst_dirpath();
-
-    // Auxiliary function
-    void _tst_value(Value v, Value::Type type);
 };
-
-void TestAttributeRange::_tst_value(Value v, Value::Type type)
-{
-    Value::Type t = v.type();
-    if(t == Value::INVALID)  QVERIFY(!v.isValid());
-    else QVERIFY(v.isValid());
-
-    QCOMPARE(t, type);
-
-    switch (type) {
-    case Value::BOOL:
-        QVERIFY(v.isBool());
-        QVERIFY(!v.isInt());
-        QVERIFY(!v.isChar());
-        QVERIFY(!v.isDouble());
-        QVERIFY(!v.isString());
-        break;
-    case Value::INT:
-        QVERIFY(v.isInt());
-        QVERIFY(!v.isBool());
-        QVERIFY(!v.isChar());
-        QVERIFY(!v.isDouble());
-        QVERIFY(!v.isString());
-        break;
-    case Value::DOUBLE:
-        QVERIFY(v.isDouble());
-        QVERIFY(!v.isInt());
-        QVERIFY(!v.isBool());
-        QVERIFY(!v.isChar());
-        QVERIFY(!v.isString());
-        break;
-    case Value::STRING:
-        QVERIFY(v.isString());
-        QVERIFY(!v.isInt());
-        QVERIFY(!v.isBool());
-        QVERIFY(!v.isDouble());
-        QVERIFY(!v.isChar());
-        break;
-    default:
-        QVERIFY(!v.isString());
-        QVERIFY(!v.isInt());
-        QVERIFY(!v.isBool());
-        QVERIFY(!v.isDouble());
-        QVERIFY(!v.isChar());
-        break;
-    }
-}
 
 void TestAttributeRange::tst_bool()
 {
@@ -341,7 +291,6 @@ void TestAttributeRange::tst_int_set()
     // Provided the set is ordered, these are the min and max values
 
     v = attrRge->rand(prg);
-    _tst_value(v, Value::INT);
 
     QVERIFY(v.toInt() >= min);
     QVERIFY(v.toInt() <= max);
