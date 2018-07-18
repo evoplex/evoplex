@@ -32,7 +32,9 @@ class TestEdge: public QObject
 private slots:
     void initTestCase();
     void cleanupTestCase() {}
-    void tst_edge();
+    void tst_edge3();
+    void tst_edge1();
+    void tst_edge2();
 
 private:
     NodePtr m_nodeA;
@@ -45,11 +47,55 @@ void TestEdge::initTestCase()
     m_nodeB = std::make_shared<UNode>(1, Attributes());
 }
 
-void TestEdge::tst_edge()
+void TestEdge::tst_edge3()
 {
     // Tests if all ways of creating edges work as expected
     // Tests are repeated for each method
 
+
+
+
+
+    // Tests method 3: adding attributes in constructor, with ownsAttrs = true
+    Attributes* attrs2 = new Attributes();
+    attrs2->push_back("test0", Value(123));
+    Edge edge3(1, m_nodeA, m_nodeB, attrs2, true);
+
+    QVERIFY(!edge3.attrs()->isEmpty());
+    QCOMPARE(edge3.attrs()->size(), 1);
+    QCOMPARE(edge3.attrs()->names().size(), 1);
+    QCOMPARE(edge3.attrs()->values().size(), 1);
+
+    QCOMPARE(edge3.attrs()->name(0), "test0");
+    QCOMPARE(edge3.attrs()->value(0), Value(123));
+
+    // Tests if 'Edge::attr()' works as expected
+    QCOMPARE(edge3.attr("test0"), Value(123));
+    QCOMPARE(edge3.attr(0), Value(123));
+
+    // Tests if 'Edge::setAttr()' works as expected
+    edge3.setAttr(0, Value(234));
+    QCOMPARE(edge3.attrs()->name(0), "test0"); // Tests that name has not changed
+    QCOMPARE(edge3.attr(0), Value(234));
+
+
+   // Tests if 'Edge::addAttr()' works as expected, for an attribute with an existing value
+    edge3.addAttr("test1", Value(345));
+    QVERIFY(!edge3.attrs()->isEmpty());
+    QCOMPARE(edge3.attrs()->size(), 2);
+    QCOMPARE(edge3.attrs()->names().size(), 2);
+    QCOMPARE(edge3.attrs()->values().size(), 2);
+
+    QCOMPARE(edge3.attrs()->name(1), "test1");
+    QCOMPARE(edge3.attrs()->value(1), Value(345));
+
+    // Tests if 'Edge::id()' works as expected
+    QCOMPARE(edge3.id(), 1);
+    QCOMPARE(edge3.origin(), m_nodeA);
+    QCOMPARE(edge3.neighbour(), m_nodeB);
+}
+
+void TestEdge::tst_edge1(){
     // Tests method 1: adding attributes after edge is constructed
     Edge edge(0, m_nodeA, m_nodeB);
 
@@ -92,7 +138,9 @@ void TestEdge::tst_edge()
     QCOMPARE(edge.id(), 0);
     QCOMPARE(edge.origin(), m_nodeA);
     QCOMPARE(edge.neighbour(), m_nodeB);
+}
 
+void TestEdge::tst_edge2(){
     // Tests method 2: adding attributes in constructor
     Attributes* attrs = new Attributes();
     attrs->push_back("test0", Value(123));
@@ -130,44 +178,6 @@ void TestEdge::tst_edge()
     QCOMPARE(edge2.id(), 1);
     QCOMPARE(edge2.origin(), m_nodeA);
     QCOMPARE(edge2.neighbour(), m_nodeB);
-
-    // Tests method 3: adding attributes in constructor, with ownsAttrs = true
-    Attributes* attrs2 = new Attributes();
-    attrs2->push_back("test0", Value(123));
-    Edge edge3(1, m_nodeA, m_nodeB, attrs2, true);
-
-    QVERIFY(!edge3.attrs()->isEmpty());
-    QCOMPARE(edge3.attrs()->size(), 1);
-    QCOMPARE(edge3.attrs()->names().size(), 1);
-    QCOMPARE(edge3.attrs()->values().size(), 1);
-
-    QCOMPARE(edge3.attrs()->name(0), "test0");
-    QCOMPARE(edge3.attrs()->value(0), Value(123));
-
-    // Tests if 'Edge::attr()' works as expected
-    QCOMPARE(edge3.attr("test0"), Value(123));
-    QCOMPARE(edge3.attr(0), Value(123));
-
-    // Tests if 'Edge::setAttr()' works as expected
-    edge3.setAttr(0, Value(234));
-    QCOMPARE(edge3.attrs()->name(0), "test0"); // Tests that name has not changed
-    QCOMPARE(edge3.attr(0), Value(234));
-
-
-   // Tests if 'Edge::addAttr()' works as expected, for an attribute with an existing value
-    edge3.addAttr("test1", Value(345));
-    QVERIFY(!edge3.attrs()->isEmpty());
-    QCOMPARE(edge3.attrs()->size(), 2);
-    QCOMPARE(edge3.attrs()->names().size(), 2);
-    QCOMPARE(edge3.attrs()->values().size(), 2);
-
-    QCOMPARE(edge3.attrs()->name(1), "test1");
-    QCOMPARE(edge3.attrs()->value(1), Value(345));
-
-    // Tests if 'Edge::id()' works as expected
-    QCOMPARE(edge3.id(), 1);
-    QCOMPARE(edge3.origin(), m_nodeA);
-    QCOMPARE(edge3.neighbour(), m_nodeB);
 }
 
 QTEST_MAIN(TestEdge)
