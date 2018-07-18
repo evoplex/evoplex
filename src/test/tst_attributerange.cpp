@@ -538,24 +538,16 @@ void TestAttributeRange::tst_filepath()
     const char* fp_fwd_slash_no_ext = "C:/Users/experiment";  // Case 2: .csv filepath with forward slashes
 
     // Tests value returned by 'AttributeRange::validate()'
-    Value v;
 
     // FAIL - filepaths with backward slashes are not recognised as filepaths
-//    v = attrRge->validate(fp_back_slash);
-//    _tst_value(v, Value::STRING);
+//    QCOMPARE(attrRge->validate(fp_back_slash), Value(fp_back_slash));
 
-    v = attrRge->validate(fp_fwd_slash);
-    _tst_value(v, Value::STRING);
+    QCOMPARE(attrRge->validate(fp_fwd_slash), Value(fp_fwd_slash));
 
-    // FAIL - filepaths must have extenstions
-//    v = attrRge->validate(fp_back_slash_no_ext);
-//    _tst_value(v, Value::STRING);
+    // FAIL - filepaths with backward slashes are not recognised as filepaths
+//    QCOMPARE(attrRge->validate(fp_back_slash_no_ext), Value(fp_back_slash_no_ext));
 
-//    v = attrRge->validate(fp_back_slash_no_ext);
-//    _tst_value(v, Value::STRING);
-
-    v = attrRge->validate("invalid");
-    _tst_value(v, Value::INVALID);
+    QCOMPARE(attrRge->validate(fp_fwd_slash), Value(fp_fwd_slash));
 
     // Tests if functions work as expected
     QVERIFY(attrRge->isValid());
@@ -569,10 +561,10 @@ void TestAttributeRange::tst_filepath()
     // Tests min(), max() and rand() functions
 
     // Both 'AttributeRange::min()' and 'AttributeRange::max()' return <null> for a filepath type
-
+    Value v;
     PRG* prg = new PRG(123);
+
     v = attrRge->rand(prg);
-    _tst_value(v, Value::STRING);
 
     delete prg;
 }
@@ -584,21 +576,17 @@ void TestAttributeRange::tst_dirpath()
     // '\e' is recognised as an unknown escape sequence - causes warnings
 //    const char* dp_back_slash = "C:\Users\ethan\Documents";  // Case 1: .csv filepath with backward slashes
     const char* dp_fwd_slash = "C:/Users/ethan/Documents";  // Case 1: .csv filepath with forward slashes
-//    const char* fp_back_txt = "C:\Users\experiment.txt";  // Case 1: .csv filepath with backward slashes
-//    const char* fp_fwd_txt = "C:/Users/experiment.txt";  // Case 1: .csv filepath with forward slashes
+
 
     // Tests value returned by 'AttributeRange::validate()'
-    Value v;
+
 
     // FAIL - dirpaths with backward slashes are not recognised as dirpaths
-//    v = attrRge->validate(dp_back_slash);
-//    _tst_value(v, Value::STRING);
+//     QCOMPARE(attrRge->validate(dp_back_slash), Value(dp_back_slash));
 
-    v = attrRge->validate(dp_fwd_slash);
-    _tst_value(v, Value::STRING);
+    QCOMPARE(attrRge->validate(dp_fwd_slash), Value(dp_fwd_slash));
 
-    v = attrRge->validate("invalid");
-    _tst_value(v, Value::INVALID);
+
 
     // Tests if functions work as expected
     QVERIFY(attrRge->isValid());
@@ -612,10 +600,9 @@ void TestAttributeRange::tst_dirpath()
     // Tests min(), max() and rand() functions
 
     // Both 'AttributeRange::min()' and 'AttributeRange::max()' return <null> for a dirpath type
-
+Value v;
     PRG* prg = new PRG(123);
     v = attrRge->rand(prg);
-    _tst_value(v, Value::STRING);
 
     delete prg;
 }
