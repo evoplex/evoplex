@@ -39,7 +39,7 @@ set(EVOPLEX_GUI_H
 
   pluginspage.h
   projectspage.h
-  queuepage.h
+  #queuepage.h
   settingspage.h
   welcomepage.h
 )
@@ -65,7 +65,7 @@ set(EVOPLEX_GUI_CXX
 
   pluginspage.cpp
   projectspage.cpp
-  queuepage.cpp
+  #queuepage.cpp
   settingspage.cpp
   welcomepage.cpp
 )
