@@ -62,13 +62,8 @@ void TestAttributeRange::tst_bool()
     QCOMPARE(attrRge->type(), type);
 
     // Tests min(), max() and rand() functions work as expected
-    // where min and max are boolean values
-    bool min_bool = false;
-    bool max_bool = true;
-
-    // where min and max are integers, casted to boolean type
-    bool min_int = Value(0).toBool();
-    bool max_int = Value(1).toBool();
+    bool min = false;
+    bool max = true;
 
     // Tests 'AttributeRange::rand()'
     Value v;
@@ -76,21 +71,14 @@ void TestAttributeRange::tst_bool()
     v = attrRge->rand(prg);
 
     QVERIFY((v == Value(true))||(v == Value(false)));
-    QVERIFY(v.toBool() >= min_bool);
-    QVERIFY(v.toBool() <= max_bool);
-    QVERIFY(v.toBool() >= min_int);
-    QVERIFY(v.toBool() <= max_int);
+    QVERIFY(v.toBool() >= min);
+    QVERIFY(v.toBool() <= max);
 
     // Tests 'AttributeRange::min()' and 'AttributeRange::max()'
-    QCOMPARE(attrRge->min().toBool(), min_bool);
+    QCOMPARE(attrRge->min().toBool(), min);
 
     // 'attrRge->max().toBool()' returns 0
-//    QCOMPARE(attrRge->max().toBool(), max_bool);
-    QCOMPARE(attrRge->max().toBool(), false);
-
-    QCOMPARE(attrRge->min().toBool(), min_int);
-
-//    QCOMPARE(attrRge->max().toBool(), max_int);
+//    QCOMPARE(attrRge->max().toBool(), max);
     QCOMPARE(attrRge->max().toBool(), false);
 
     delete prg;
