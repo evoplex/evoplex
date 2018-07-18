@@ -314,20 +314,12 @@ void TestAttributeRange::tst_int_set()
     AttributeRange* attrRge = AttributeRange::parse(0, attrName, attrRangeStr);
 
     // Tests value returned by 'AttributeRange::validate()'
-    Value v;
 
-    v = attrRge->validate("0");
-    _tst_value(v, Value::INT);
-    v = attrRge->validate("1");
-    _tst_value(v, Value::INT);
-    v = attrRge->validate("-5");
-    _tst_value(v, Value::INT);
-    v = attrRge->validate("100");
-    _tst_value(v, Value::INT);
-    v = attrRge->validate("-100");
-    _tst_value(v, Value::INT);
-    v = attrRge->validate("invalid");  // invalid
-    _tst_value(v, Value::INVALID);
+    QCOMPARE(attrRge->validate("0"), Value(0));
+    QCOMPARE(attrRge->validate("1"), Value(1));
+    QCOMPARE(attrRge->validate("-5"), Value(-5));
+    QCOMPARE(attrRge->validate("100"), Value(100));
+    QCOMPARE(attrRge->validate("-100"), Value(-100));
 
     // Tests if functions work as expected
     QVERIFY(attrRge->isValid());
@@ -339,6 +331,7 @@ void TestAttributeRange::tst_int_set()
     QCOMPARE(attrRge->type(), type);
 
     // Tests min(), max() and rand() functions
+    Value v;
     PRG* prg = new PRG(123);
 
     // min() returns the first value in the set
@@ -367,20 +360,11 @@ void TestAttributeRange::tst_double_set()
     AttributeRange* attrRge = AttributeRange::parse(0, attrName, attrRangeStr);
 
     // Tests value returned by 'AttributeRange::validate()'
-    Value v;
-
-    v = attrRge->validate("0");
-    _tst_value(v, Value::DOUBLE);
-    v = attrRge->validate("1.2");
-    _tst_value(v, Value::DOUBLE);
-    v = attrRge->validate("-5.5");
-    _tst_value(v, Value::DOUBLE);
-    v = attrRge->validate("-95.7");
-   _tst_value(v, Value::DOUBLE);
-    v = attrRge->validate("87.5");
-    _tst_value(v, Value::DOUBLE);
-    v = attrRge->validate("invalid");  // invalid
-    _tst_value(v, Value::INVALID);
+    QCOMPARE(attrRge->validate("0"), Value(0.0));
+    QCOMPARE(attrRge->validate("1.2"), Value(1.2));
+    QCOMPARE(attrRge->validate("-5.5"), Value(-5.5));
+    QCOMPARE(attrRge->validate("-95.7"), Value(-95.7));
+    QCOMPARE(attrRge->validate("87.5"), Value(87.5));
 
     // Tests if functions work as expected
     QVERIFY(attrRge->isValid());
@@ -392,6 +376,7 @@ void TestAttributeRange::tst_double_set()
     QCOMPARE(attrRge->type(), type);
 
     // Tests min(), max() and rand() functions
+    Value v;
     PRG* prg = new PRG(123);
 
     // min() returns the first value in the set
@@ -401,7 +386,6 @@ void TestAttributeRange::tst_double_set()
     // Provided the set is ordered, these are the min and max values
 
     v = attrRge->rand(prg);
-    _tst_value(v, Value::DOUBLE);
     QVERIFY(v.toInt() >= min);
     QVERIFY(v.toInt() <= max);
 
