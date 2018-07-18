@@ -397,27 +397,38 @@ void TestAttributeRange::tst_string()
     AttributeRange* attrRge = AttributeRange::parse(0, "test", "string");
 
     // Tests value returned by 'AttributeRange::validate()'
-    Value v;
+    const char* test_str;
+    QString test_qstr;
 
     // Case 1: normal string
-    v = attrRge->validate("sample");
-    _tst_value(v, Value::STRING);
+    test_str = "sample";
+    test_qstr = "sample";
+    QCOMPARE(attrRge->validate(test_str), Value(test_str));
+    QCOMPARE(attrRge->validate(test_qstr), Value(test_qstr));
 
     // Case 2: long string
-    v = attrRge->validate("this sentence is a long string for testing purposes");
-    _tst_value(v, Value::STRING);
+    test_str = "this sentence is a long string for testing purposes";
+    test_qstr = "this sentence is a long string for testing purposes";
+    QCOMPARE(attrRge->validate(test_str), Value(test_str));
+    QCOMPARE(attrRge->validate(test_qstr), Value(test_qstr));
 
     // Case 3: single character
-    v = attrRge->validate("a");
-    _tst_value(v, Value::STRING);
+    test_str = "a";
+    test_qstr = "a";
+    QCOMPARE(attrRge->validate(test_str), Value(test_str));
+    QCOMPARE(attrRge->validate(test_qstr), Value(test_qstr));
 
     // Case 4: unusual characters
-    v = attrRge->validate("abc£ãã&!£$%^*(áéí)");
-    _tst_value(v, Value::STRING);
+    test_str = "abc£ãã&!£$%^*(áéí)";
+    test_qstr = "abc£ãã&!£$%^*(áéí)";
+    QCOMPARE(attrRge->validate(test_str), Value(test_str));
+    QCOMPARE(attrRge->validate(test_qstr), Value(test_qstr));
 
     // Case 5: empty string
-    v = attrRge->validate("");
-    _tst_value(v, Value::STRING);
+    test_str = "";
+    test_qstr = "";
+    QCOMPARE(attrRge->validate(test_str), Value(test_str));
+    QCOMPARE(attrRge->validate(test_qstr), Value(test_qstr));
 
     // Tests if functions work as expected
     QVERIFY(attrRge->isValid());
@@ -431,10 +442,10 @@ void TestAttributeRange::tst_string()
     // Tests min(), max() and rand() functions
 
     // Both 'AttributeRange::min()' and 'AttributeRange::max()' return <null> for a string type
+    Value v;
     PRG* prg = new PRG(123);
 
     v = attrRge->rand(prg);
-    _tst_value(v, Value::STRING);
 
     delete prg;
 }
@@ -451,22 +462,32 @@ void TestAttributeRange::tst_string_set()
     AttributeRange* attrRge = AttributeRange::parse(0, attrName, attrRangeStr);
 
     // Tests value returned by 'AttributeRange::validate()'
-    Value v;
+    const char* test_str;
+    QString test_qstr;
 
-    v = attrRge->validate("sample");
-    _tst_value(v, Value::STRING);
+    // Case 1: normal string
+    test_str = "sample";
+    test_qstr = "sample";
+    QCOMPARE(attrRge->validate(test_str), Value(test_str));
+    QCOMPARE(attrRge->validate(test_qstr), Value(test_qstr));
 
-    v = attrRge->validate("this sentence is a long string for testing purposes");
-    _tst_value(v, Value::STRING);
+    // Case 2: long string
+    test_str = "this sentence is a long string for testing purposes";
+    test_qstr = "this sentence is a long string for testing purposes";
+    QCOMPARE(attrRge->validate(test_str), Value(test_str));
+    QCOMPARE(attrRge->validate(test_qstr), Value(test_qstr));
 
-    v = attrRge->validate("a");
-    _tst_value(v, Value::STRING);
+    // Case 3: single character
+    test_str = "a";
+    test_qstr = "a";
+    QCOMPARE(attrRge->validate(test_str), Value(test_str));
+    QCOMPARE(attrRge->validate(test_qstr), Value(test_qstr));
 
-    v = attrRge->validate("abc£ãã&!£$%^*(áéí)");
-    _tst_value(v, Value::STRING);
-
-    v = attrRge->validate("invalid");  // invalid
-    _tst_value(v, Value::INVALID);
+    // Case 4: unusual characters
+    test_str = "abc£ãã&!£$%^*(áéí)";
+    test_qstr = "abc£ãã&!£$%^*(áéí)";
+    QCOMPARE(attrRge->validate(test_str), Value(test_str));
+    QCOMPARE(attrRge->validate(test_qstr), Value(test_qstr));
 
     // Tests if functions work as expected
     QVERIFY(attrRge->isValid());
@@ -486,6 +507,7 @@ void TestAttributeRange::tst_string_set()
     const char* min_of_set = "sample";
     const char* max_of_set = "abc£ãã&!£$%^*(áéí)";
 
+    Value v;
     PRG* prg = new PRG(123);
 
     // min() returns the first value in the set
@@ -498,7 +520,6 @@ void TestAttributeRange::tst_string_set()
     QCOMPARE(attrRge->max().toQString(), QString(max_of_set));
 
     v = attrRge->rand(prg);
-    _tst_value(v, Value::STRING);
 
     QVERIFY(strcmp(v.toString(), max) <= 0);
     QVERIFY(strcmp(v.toString(), min) >= 0);
