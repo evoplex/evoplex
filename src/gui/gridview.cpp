@@ -20,6 +20,8 @@
 
 #include <QPainter>
 
+#include "core/trial.h"
+
 #include "gridview.h"
 #include "ui_graphwidget.h"
 #include "ui_graphsettings.h"
@@ -28,7 +30,7 @@
 namespace evoplex
 {
 
-GridView::GridView(MainGUI* mainGUI, Experiment* exp, ExperimentWidget* parent)
+GridView::GridView(MainGUI* mainGUI, ExperimentPtr exp, ExperimentWidget* parent)
     : GraphWidget(mainGUI, exp, parent)
 {
     setWindowTitle("Grid");

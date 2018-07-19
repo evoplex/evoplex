@@ -21,6 +21,7 @@
 #ifndef PROJECTSPAGE_H
 #define PROJECTSPAGE_H
 
+#include <QDockWidget>
 #include <QMainWindow>
 
 #include "maingui.h"
@@ -51,7 +52,7 @@ signals:
 public slots:
     bool slotNewProject();
     bool slotOpenProject(QString path);
-    void slotOpenExperiment(Experiment* exp);
+    void slotOpenExperiment(ExperimentPtr exp);
 
 private slots:
     void slotFocusChanged(QWidget*, QWidget* now);
@@ -79,6 +80,5 @@ public:
     virtual void clearSelection() = 0;
 };
 
-}
-
+} // evoplex
 #endif // PROJECTSPAGE_H

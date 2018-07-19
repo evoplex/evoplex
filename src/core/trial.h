@@ -23,18 +23,20 @@
 
 #include <unordered_map>
 #include <QRunnable>
+#include <QSharedPointer>
 
 #include "enum.h"
+#include "experiment.h"
 
 namespace evoplex {
-
+/*
 class AbstractGraph;
 class AbstractModel;
 class Experiment;
 class PRG;
 class Trial;
 
-using Trials = std::unordered_map<quint16, Trial*>;
+using ExperimentPtr = QSharedPointer<Experiment>;*/
 
 /**
  * A trial is part of an experiment which might have several other trials.
@@ -48,8 +50,10 @@ using Trials = std::unordered_map<quint16, Trial*>;
  */
 class Trial : public QRunnable
 {
+    friend class ExperimentsMgr;
+
 public:
-    explicit Trial(const quint16 id, Experiment* exp);
+    explicit Trial(const quint16 id, ExperimentPtr exp);
     ~Trial() override;
 
     // Here is where the simulation is performed.
@@ -69,7 +73,7 @@ public:
 
 private:
     const quint16 m_id;
-    Experiment* m_exp;
+    QWeakPointer<Experiment> m_exp;
     int m_step;
     Status m_status;
 
@@ -80,16 +84,14 @@ private:
     // We can safely consider that all parameters are valid at this point.
     // However, some things might fail (eg, missing nodes, broken graph etc),
     // and, in that case, false is returned.
-    bool init();
+    bool init(const ExperimentPtr& exp);
 
     // The main loop for calling the model steps
     // Returns true if it has a next step
-    bool runSteps();
+    bool runSteps(const ExperimentPtr& exp);
 
     // If any file output is set, it'll write the cached steps to file.
-    bool writeCachedSteps();
-
-    bool _run();
+    bool writeCachedSteps(const ExperimentPtr& exp) const;
 };
 
 /************************************************************************

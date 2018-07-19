@@ -39,12 +39,12 @@ template <typename T>
 T _enumFromString(const QString& str);
 
 enum class Status {
-    Invalid,  // something went wrong
-    Unset,    // has not yet been initialized
-    Ready,    // ready for another step
-    Queued,   // queued to run
-    Running,  // running in a work thread
-    Finished, // all is done
+    Invalid,   // something went wrong
+    Disabled,  // has not yet been initialized
+    Paused,    // ready for another step
+    Queued,    // queued to run
+    Running,   // running in a work thread
+    Finished,  // all is done
 };
 
 enum class PluginType : int {

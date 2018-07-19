@@ -18,6 +18,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <QMessageBox>
 #include <QStringList>
 #include <QThread>
 
@@ -45,7 +46,16 @@ SettingsPage::SettingsPage(MainGUI* mainGUI)
     m_ui->threads->setMinimum(1);
     m_ui->threads->setMaximum(QThread::idealThreadCount());
     connect(m_ui->threads, static_cast<void(QSpinBox::*)(int)>(&QSpinBox::valueChanged),
-            [mainGUI](int newValue) { mainGUI->mainApp()->expMgr()->setMaxThreadCount(newValue); });
+    [this, mainGUI](int newValue) {
+        QString error;
+        mainGUI->mainApp()->expMgr()->setMaxThreadCount(newValue, &error);
+        if (!error.isEmpty()) {
+            QMessageBox::warning(this, "Evoplex", error);
+            m_ui->threads->blockSignals(true);
+            m_ui->threads->setValue(m_mainGUI->mainApp()->expMgr()->maxThreadsCount());
+            m_ui->threads->blockSignals(false);
+        }
+    });
 
     m_ui->colormaps->insertItems(0, m_mainGUI->colorMapMgr()->names());
     connect(m_ui->colormaps, SIGNAL(currentIndexChanged(QString)), SLOT(setDfCMapName(QString)));

@@ -225,7 +225,7 @@ void ExperimentDesigner::setActiveWidget(PPageDockWidget* dw)
 void ExperimentDesigner::slotSetActiveWidget(int idx)
 {
     QVariant v = m_ui->cbWidgets->itemData(idx);
-    if (v.isValid()) {
+    if (v.isValid() && !v.isNull()) {
         PPageDockWidget* dw = v.value<PPageDockWidget*>();
         dw->show();
         dw->raise();
@@ -234,9 +234,9 @@ void ExperimentDesigner::slotSetActiveWidget(int idx)
     }
 }
 
-void ExperimentDesigner::setExperiment(Experiment* exp)
+void ExperimentDesigner::setExperiment(ExperimentPtr exp)
 {
-    if (!exp || exp->expStatus() == Status::Invalid) {
+    if (!exp) {
         m_exp = nullptr;
         m_ui->bEdit->hide();
         return;
@@ -329,7 +329,7 @@ void ExperimentDesigner::slotOutputWidget()
 
     int numTrials = m_widgetFields.value(GENERAL_ATTRIBUTE_TRIALS).value<QSpinBox*>()->value();
     std::vector<int> trialIds;
-    trialIds.reserve(numTrials);
+    trialIds.reserve(static_cast<size_t>(numTrials));
     for (int id = 0; id < numTrials; ++id) {
         trialIds.emplace_back(id);
     }
@@ -450,10 +450,16 @@ void ExperimentDesigner::slotCreateExperiment()
 
 void ExperimentDesigner::slotEditExperiment()
 {
-    Q_ASSERT_X(m_exp, "ExperimentDesigner", "tried to edit a null experiment");
+    ExperimentPtr exp = m_exp ? m_exp.toStrongRef() : nullptr;
+    if (!exp) {
+        QMessageBox::warning(this, "Experiment",
+                "This experiment is no longer part of this project.");
+        setExperiment(nullptr);
+        return;
+    }
     QString error;
-    ExpInputs* inputs = readInputs(m_exp->id(), error);
-    if (!inputs || !m_project->editExperiment(m_exp->id(), inputs, error)) {
+    ExpInputs* inputs = readInputs(exp->id(), error);
+    if (!inputs || !m_project->editExperiment(exp->id(), inputs, error)) {
         QMessageBox::warning(this, "Experiment", error);
         delete inputs;
     }

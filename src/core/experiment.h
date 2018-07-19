@@ -26,6 +26,7 @@
 #include <vector>
 
 #include <QMutex>
+#include <QEnableSharedFromThis>
 
 #include "constants.h"
 #include "enum.h"
@@ -33,20 +34,27 @@
 #include "experimentsmgr.h"
 #include "mainapp.h"
 #include "output.h"
-#include "trial.h"
 #include "graphplugin.h"
 #include "modelplugin.h"
 
 namespace evoplex {
 
+
+class Experiment;
+class Trial;
+
+using ExperimentPtr = QSharedPointer<Experiment>;
+using Trials = std::unordered_map<quint16, Trial*>;
+
 /**
  * Evoplex assumes that any experiment belongs to a valid project.
  */
-class Experiment : public QObject
+class Experiment : public QObject, public QEnableSharedFromThis<Experiment>
 {
     Q_OBJECT
 
     friend class ExperimentsMgr;
+    friend class Project;
     friend class Trial;
 
 public:
@@ -58,11 +66,9 @@ public:
     // this method IS thread-safe
     bool setInputs(ExpInputs* inputs, QString& error);
 
-    void reset();
+    bool disable(QString* error=nullptr);
 
-    // set experiment status
-    // this IS thread-safe
-    void setExpStatus(Status s);
+    bool reset(QString*error=nullptr);
 
     // play if it's paused and pause it's running
     void toggle();
@@ -86,6 +92,8 @@ public:
     inline void setPauseAt(int step);
 
     // stop all trials asap
+    // It sets stopAt and playAt to 0 and makes sure that all trials are
+    // triggred once to make them turn from Disabled (-1) to Finished (0)
     inline void stop();
     // stop all trials at a specific step
     inline int stopAt() const;
@@ -115,7 +123,7 @@ public:
 signals:
     void trialCreated(int trialId);
     void restarted();
-    void progressUpdated();
+    void progressUpdated(quint16);
     void statusChanged(Status);
 
 private slots:
@@ -127,7 +135,7 @@ private:
     QMutex m_mutex;
     MainApp* m_mainApp;
     const int m_id;
-    ProjectPtr m_project;
+    QWeakPointer<Project> m_project;
 
     const ExpInputs* m_inputs;
     const GraphPlugin* m_graphPlugin;
@@ -162,7 +170,23 @@ private:
 
     void deleteTrials();
 
-    void init();
+    // trigged when a Trial ends
+    // also runs in a work thread
+    void trialFinished(Trial *trial);
+
+    // trigged when this Experiment ends
+    // also runs in a work thread
+    void expFinished();
+
+    // auxiliary method to initialize the experiment
+    void enable();
+
+    // set experiment status and emit statusChanged()
+    // this IS thread-safe
+    void setExpStatus(Status s);
+
+    // set progress value and emit progressUpdated()
+    void setProgress(quint16 p);
 };
 
 /************************************************************************
@@ -176,7 +200,7 @@ inline void Experiment::addOutput(OutputPtr output)
 { m_outputs.insert(output); }
 
 inline void Experiment::pause()
-{ m_pauseAt = 0; }
+{ m_pauseAt = -1; }
 
 inline int Experiment::pauseAt() const
 { return m_pauseAt; }
@@ -185,7 +209,7 @@ inline void Experiment::setPauseAt(int step)
 { m_pauseAt = step > m_stopAt ? m_stopAt : step; }
 
 inline void Experiment::stop()
-{ pause(); m_stopAt = 0; play(); }
+{ m_stopAt = 0; m_pauseAt = 0; play(); }
 
 inline int Experiment::stopAt() const
 { return m_stopAt; }
@@ -212,7 +236,7 @@ inline int Experiment::id() const
 { return m_id; }
 
 inline ProjectPtr Experiment::project() const
-{ return m_project; }
+{ return m_project.toStrongRef(); }
 
 inline int Experiment::numTrials() const
 { return m_numTrials; }

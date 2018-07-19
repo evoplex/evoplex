@@ -20,6 +20,8 @@
 
 #include <QPainter>
 
+#include "core/trial.h"
+
 #include "graphview.h"
 #include "ui_graphwidget.h"
 #include "ui_graphsettings.h"
@@ -28,7 +30,7 @@
 namespace evoplex
 {
 
-GraphView::GraphView(MainGUI* mainGUI, Experiment* exp, ExperimentWidget* parent)
+GraphView::GraphView(MainGUI* mainGUI, ExperimentPtr exp, ExperimentWidget* parent)
     : GraphWidget(mainGUI, exp, parent)
     , m_edgeSizeRate(25.f)
 {

@@ -36,7 +36,7 @@ class GraphSettings : public QDialog
     Q_OBJECT
 
 public:
-    explicit GraphSettings(MainGUI* mainGUI, Experiment* exp, QWidget* parent);
+    explicit GraphSettings(MainGUI* mainGUI, ExperimentPtr exp, QWidget* parent);
     ~GraphSettings();
 
     int nodeAttr() const;
@@ -63,7 +63,7 @@ private slots:
 
 private:
     Ui_GraphSettings* m_ui;
-    const Experiment* m_exp;
+    const ExperimentPtr m_exp;
     const ModelPlugin* m_modelPlugin;
     const ColorMapMgr* m_cmMgr;
     ColorMap* m_nodeCMap;

@@ -49,13 +49,13 @@
 
 namespace evoplex {
 
-MainGUI::MainGUI(MainApp* mainApp, QWidget* parent)
-    : QMainWindow(parent)
+MainGUI::MainGUI(MainApp* mainApp)
+    : QMainWindow(nullptr)
     , m_mainApp(mainApp)
     , m_colorMapMgr(new ColorMapMgr)
     , m_saveDialog(new SaveDialog(this))
     , m_welcome(new WelcomePage(this))
-    , m_queue(new QueuePage(this))
+    //, m_queue(new QueuePage(this))
     , m_projectsPage(new ProjectsPage(this))
     , m_plugins(new PluginsPage(this))
     , m_settings(new SettingsPage(this))
@@ -75,13 +75,13 @@ MainGUI::MainGUI(MainApp* mainApp, QWidget* parent)
     //
     QHBoxLayout* centralLayout = new QHBoxLayout(new QWidget(this));
     centralLayout->addWidget(m_welcome);
-    centralLayout->addWidget(m_queue);
+    //centralLayout->addWidget(m_queue);
     centralLayout->addWidget(m_projectsPage);
     centralLayout->addWidget(m_plugins);
     centralLayout->addWidget(m_settings);
     this->setCentralWidget(centralLayout->parentWidget());
     m_welcome->hide();
-    m_queue->hide();
+    //m_queue->hide();
     m_projectsPage->hide();
     m_plugins->hide();
     m_settings->hide();
@@ -231,7 +231,7 @@ void MainGUI::closeEvent(QCloseEvent* event)
 
 void MainGUI::slotPage(QAction* action)
 {
-    Page page = (Page) action->data().toInt();
+    Page page = static_cast<Page>(action->data().toInt());
     action->setChecked(true);
     if (m_curPage != page) {
         setPageVisible(m_curPage, false);
@@ -244,7 +244,7 @@ void MainGUI::setPageVisible(Page page, bool visible)
 {
     switch (page) {
         case PAGE_QUEUE:
-            m_queue->setVisible(visible);
+            //m_queue->setVisible(visible);
             break;
         case PAGE_PROJECTS:
             m_projectsPage->setVisible(visible);
@@ -319,7 +319,7 @@ void MainGUI::slotShowLog()
     connect(copy, &QPushButton::pressed, [text](){ text->selectAll(); text->copy(); });
     bts->addWidget(copy);
     QPushButton* location = new QPushButton("Open Location");
-    connect(location, &QPushButton::pressed, [text](){
+    connect(location, &QPushButton::pressed, [](){
         QDesktopServices::openUrl(QUrl("file:///"+Logger::logDir(), QUrl::TolerantMode)); });
     bts->addWidget(location);
     QPushButton* close = new QPushButton("Close");

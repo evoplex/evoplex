@@ -31,11 +31,11 @@
 
 namespace evoplex {
 
-Trial::Trial(const quint16 id, Experiment* exp)
+Trial::Trial(const quint16 id, ExperimentPtr exp)
     : m_id(id),
       m_exp(exp),
-      m_step(-1), // important! an unset trial starts from -1
-      m_status(Status::Unset),
+      m_step(-1), // important! a trial starts from -1
+      m_status(Status::Disabled),
       m_prg(nullptr),
       m_graph(nullptr),
       m_model(nullptr)
@@ -55,47 +55,45 @@ Trial::~Trial()
 
 GraphType Trial::graphType() const
 {
-    return  m_exp->graphType();
+    return  m_exp.data()->graphType();
 }
 
-bool Trial::init()
+bool Trial::init(const ExperimentPtr& exp)
 {
-    if (m_exp->expStatus() == Status::Invalid) {
+    if (!exp || exp->expStatus() == Status::Invalid || exp->pauseAt() < 0) {
         return false;
     }
 
-    Nodes nodes = m_exp->cloneCachedNodes(m_id);
-    if (nodes.empty()) {
-        m_exp->createNodes(nodes);
+    Nodes nodes = exp->cloneCachedNodes(m_id);
+    if (nodes.empty() && !exp->createNodes(nodes)) {
+        return false;
     }
 
-    const quint16 seed = static_cast<quint16>(m_exp->inputs()->general(GENERAL_ATTRIBUTE_SEED).toInt());
+    const quint16 seed = static_cast<quint16>(exp->inputs()->general(GENERAL_ATTRIBUTE_SEED).toInt());
     m_prg = new PRG(seed + m_id);
 
-    m_graph = dynamic_cast<AbstractGraph*>(m_exp->graphPlugin()->create());
-    if (!m_graph || !m_graph->setup(*this, *m_exp->inputs()->graph(), nodes)) {
+    m_graph = dynamic_cast<AbstractGraph*>(exp->graphPlugin()->create());
+    if (!m_graph || !m_graph->setup(*this, *exp->inputs()->graph(), nodes)) {
         qWarning() << "unable to create the trials."
                    << "The graph could not be initialized."
-                   << "Project:" << m_exp->project()->name()
-                   << "Experiment:" << m_exp->id();
+                   << "Experiment:" << exp->id();
         return false;
     }
 
-    m_model = dynamic_cast<AbstractModel*>(m_exp->modelPlugin()->create());
-    if (!m_model || !m_model->setup(*this, *m_exp->inputs()->model())) {
+    m_model = dynamic_cast<AbstractModel*>(exp->modelPlugin()->create());
+    if (!m_model || !m_model->setup(*this, *exp->inputs()->model())) {
         qWarning() << "unable to create the trials."
                    << "The model could not be initialized."
-                   << "Project:" << m_exp->project()->name()
-                   << "Experiment:" << m_exp->id();
+                   << "Experiment:" << exp->id();
         return false;
     }
 
-    if (!m_exp->inputs()->fileCaches().empty()) {
-        const QString fpath = m_exp->m_filePathPrefix + QString("%4.csv").arg(m_id);
+    if (!exp->inputs()->fileCaches().empty()) {
+        const QString fpath = exp->m_filePathPrefix + QString("%4.csv").arg(m_id);
         QFile file(fpath);
         if (file.open(QFile::WriteOnly | QFile::Truncate)) {
             QTextStream stream(&file);
-            stream << m_exp->m_fileHeader;
+            stream << exp->m_fileHeader;
             file.close();
         } else {
             qWarning() << "unable to create the trials. Could not write in " << fpath;
@@ -103,15 +101,15 @@ bool Trial::init()
         }
 
         // write this initial step to file
-        for (OutputPtr output : m_exp->m_outputs) {
+        for (OutputPtr output : exp->m_outputs) {
             output->doOperation(this);
         }
-        writeCachedSteps();
+        writeCachedSteps(exp);
     }
 
     // make the set of nodes available for other trials
-    if (m_exp->numTrials() > 1 && m_exp->m_clonableNodes.empty()) {
-        m_exp->m_clonableNodes = Utils::clone(nodes);
+    if (exp->numTrials() > 1 && exp->m_clonableNodes.empty()) {
+        exp->m_clonableNodes = Utils::clone(nodes);
     }
 
     m_step = 0; // important!
@@ -121,89 +119,85 @@ bool Trial::init()
 
 void Trial::run()
 {
-    if (!_run()) {
+    ExperimentPtr exp = m_exp.toStrongRef();
+    if (!exp || exp->expStatus() == Status::Invalid) {
         m_status = Status::Invalid;
-        m_exp->setExpStatus(Status::Invalid);
-        m_exp->pause();
-    }
-    m_exp->m_mainApp->expMgr()->finished(m_exp, m_id);
-}
-
-bool Trial::_run()
-{
-    if (m_exp->expStatus() == Status::Invalid) {
-        return false;
     }
 
-    if (m_status == Status::Unset) {
+    if (m_status == Status::Invalid || m_status == Status::Running
+            || m_status == Status::Finished) {
+        exp->trialFinished(this);
+        return;
+    }
+
+    if (m_status == Status::Disabled) {
         // Ensure we init one trial at a time.
         // Thus, if one trial fail, the others will be aborted earlier.
-        m_exp->m_mutex.lock();
-        if (!init()) {
-            m_exp->m_mutex.unlock();
-            return false;
+        exp->m_mutex.lock();
+        if (!init(exp)) {
+            exp->m_mutex.unlock();
+            m_status = Status::Invalid;
+            exp->trialFinished(this);
+            return;
         }
-        m_exp->m_mutex.unlock();
+        exp->m_mutex.unlock();
         m_graph->reset();
     }
 
     m_status = Status::Running;
-    emit (m_exp->trialCreated(m_id));
+    emit (exp->trialCreated(m_id));
 
-    if (!runSteps() || m_step >= m_exp->stopAt()) {
-        if (writeCachedSteps()) {
+    if (!runSteps(exp) || m_step >= exp->stopAt()) {
+        if (writeCachedSteps(exp)) {
             m_status = Status::Finished;
         } else {
-            return false;
+            m_status = Status::Invalid;
         }
     } else {
-        m_status = Status::Ready;
+        m_status = Status::Paused;
     }
 
-    return true;
+    exp->trialFinished(this);
 }
 
-bool Trial::runSteps()
+bool Trial::runSteps(const ExperimentPtr& exp)
 {
     QElapsedTimer t;
     t.start();
 
     bool hasNext = true;
-    while (m_step < m_exp->pauseAt() && hasNext) {
+    while (m_step < exp->pauseAt() && hasNext) {
         hasNext = m_model->algorithmStep();
         ++m_step;
 
-        for (const OutputPtr& output : m_exp->m_outputs) {
+        for (const OutputPtr& output : exp->m_outputs) {
             output->doOperation(this);
         }
 
-        if (m_step % m_exp->m_mainApp->stepsToFlush() == 0 && !writeCachedSteps()) {
+        if (m_step % exp->m_mainApp->stepsToFlush() == 0 && !writeCachedSteps(exp)) {
             m_status = Status::Invalid;
-            m_exp->setExpStatus(Status::Invalid);
-            m_exp->pause();
             return false;
         }
 
-        if (m_exp->delay() > 0) {
-            QThread::msleep(m_exp->delay());
+        if (exp->delay() > 0) {
+            QThread::msleep(exp->delay());
         }
     }
 
-    qDebug() << QString("%1 (E%2:T%3) - %4s")
-                .arg(m_exp->project()->name()).arg(m_exp->id()).arg(m_id)
-               .arg(t.elapsed() / 1000);
+    qDebug() << QString("[E%1:T%2] %3s").arg(exp->id())
+                .arg(m_id).arg(t.elapsed() / 1000);
 
     return hasNext;
 }
 
-bool Trial::writeCachedSteps()
+bool Trial::writeCachedSteps(const ExperimentPtr& exp) const
 {
-    if (m_exp->inputs()->fileCaches().empty() ||
-            m_exp->inputs()->fileCaches().front()->isEmpty(m_id)) {
+    if (exp->inputs()->fileCaches().empty() ||
+            exp->inputs()->fileCaches().front()->isEmpty(m_id)) {
         return true;
     }
 
-    const QString fpath = m_exp->m_filePathPrefix + QString("%1.csv").arg(m_id);
+    const QString fpath = exp->m_filePathPrefix + QString("%1.csv").arg(m_id);
     QFile file(fpath);
     if (!file.open(QFile::WriteOnly | QFile::Append)) {
         qWarning() << "unable to create the trials. Could not write in " << fpath;
@@ -213,7 +207,7 @@ bool Trial::writeCachedSteps()
     QTextStream stream(&file);
     do {
         QString row;
-        for (Cache* cache : m_exp->inputs()->fileCaches()) {
+        for (Cache* cache : exp->inputs()->fileCaches()) {
             Values vals = cache->readFrontRow(m_id).second;
             cache->flushFrontRow(m_id);
             for (Value val : vals) {
@@ -225,7 +219,7 @@ bool Trial::writeCachedSteps()
 
     // we synchronously flush all the io stuff. So, it's safe to say
     // that if the front Output is empty, then all others are also empty.
-    } while (!m_exp->inputs()->fileCaches().front()->isEmpty(m_id));
+    } while (!exp->inputs()->fileCaches().front()->isEmpty(m_id));
 
     file.close();
     return true;

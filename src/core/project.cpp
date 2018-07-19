@@ -30,13 +30,25 @@
 #include "experiment.h"
 #include "utils.h"
 
-namespace evoplex
-{
+namespace evoplex {
 
 Project::Project(MainApp* mainApp, int id)
-    : m_mainApp(mainApp)
-    , m_id(id)
+    : m_mainApp(mainApp),
+      m_id(id)
 {
+}
+
+Project::~Project()
+{
+    for (auto& e : m_experiments) {
+        m_mainApp->expMgr()->removeFromIdle(e.second);
+        m_mainApp->expMgr()->removeFromQueue(e.second);
+        e.second->setAutoDeleteTrials(true);
+        e.second->setExpStatus(Status::Invalid);
+        e.second->pause();
+        e.second.clear();
+    }
+    m_experiments.clear();
 }
 
 bool Project::init(QString& error, const QString& filepath)
@@ -44,20 +56,12 @@ bool Project::init(QString& error, const QString& filepath)
     Q_ASSERT_X(m_experiments.empty(), "Project", "a project cannot be initialized twice");
     setFilePath(filepath);
     if (!filepath.isEmpty()) {
-        this->blockSignals(true);
+        blockSignals(true);
         importExperiments(filepath, error);
-        this->blockSignals(false);
+        blockSignals(false);
     }
     m_hasUnsavedChanges = false;
     return !error.isEmpty();
-}
-
-void Project::destroyExperiments()
-{
-    for (auto& it : m_experiments) {
-        m_mainApp->expMgr()->destroy(it.second);
-    }
-    m_experiments.clear();
 }
 
 void Project::setFilePath(const QString& path)
@@ -78,7 +82,7 @@ int Project::generateExpId() const
     return m_experiments.empty() ? 0 : (--m_experiments.end())->first + 1;
 }
 
-Experiment* Project::newExperiment(ExpInputs* inputs, QString& error)
+ExperimentPtr Project::newExperiment(ExpInputs* inputs, QString& error)
 {
     if (!inputs) {
         error += "Null inputs!";
@@ -91,26 +95,26 @@ Experiment* Project::newExperiment(ExpInputs* inputs, QString& error)
         return nullptr;
     }
 
-    Experiment* exp = new Experiment(m_mainApp, expId, sharedFromThis());
+    ExperimentPtr exp = QSharedPointer<Experiment>::create(m_mainApp, expId, sharedFromThis());
     m_experiments.insert({expId, exp});
     exp->setInputs(inputs, error);
 
     m_hasUnsavedChanges = true;
     emit (hasUnsavedChanges(m_hasUnsavedChanges));
-    emit (expAdded(exp));
+    emit (expAdded(expId));
     return exp;
 }
 
 bool Project::editExperiment(int expId, ExpInputs* newInputs, QString& error)
 {
-    Experiment* exp = m_experiments.at(expId);
+    ExperimentPtr exp = m_experiments.at(expId);
     Q_ASSERT_X(exp, "Experiment", "tried to edit a nonexistent experiment");
     if (!exp->setInputs(newInputs, error)) {
         return false;
     }
     m_hasUnsavedChanges = true;
     emit (hasUnsavedChanges(m_hasUnsavedChanges));
-    emit (expEdited(exp));
+    emit (expEdited(expId));
     return true;
 }
 
@@ -218,7 +222,7 @@ bool Project::saveProject(QString& errMsg, std::function<void(int)>& progress)
 
     // write values to file
     for (auto const& i : m_experiments) {
-        const Experiment* exp = i.second;
+        const ExperimentPtr exp = i.second;
         const ExpInputs* inputs = exp->inputs();
         const QString modelId_ = exp->modelId() + "_";
         const QString graphId_ = exp->graphId() + "_";

@@ -23,6 +23,8 @@
 #include <QMessageBox>
 #include <QMutex>
 
+#include "core/trial.h"
+
 #include "graphwidget.h"
 #include "ui_graphwidget.h"
 #include "titlebar.h"
@@ -30,7 +32,7 @@
 namespace evoplex
 {
 
-GraphWidget::GraphWidget(MainGUI* mainGUI, Experiment* exp, ExperimentWidget* parent)
+GraphWidget::GraphWidget(MainGUI* mainGUI, ExperimentPtr exp, ExperimentWidget* parent)
     : QDockWidget(parent)
     , m_ui(new Ui_GraphWidget)
     , m_settingsDlg(new GraphSettings(mainGUI, exp, this))
@@ -52,7 +54,7 @@ GraphWidget::GraphWidget(MainGUI* mainGUI, Experiment* exp, ExperimentWidget* pa
     Q_ASSERT_X(!m_exp->autoDeleteTrials(), "GraphWidget",
                "tried to build a GraphWidget for a experiment that will be auto-deleted!");
 
-    connect(m_exp, SIGNAL(restarted()), SLOT(slotRestarted()));
+    connect(m_exp.data(), SIGNAL(restarted()), SLOT(slotRestarted()));
 
     QWidget* front = new QWidget(this);
     m_ui->setupUi(front);
@@ -66,7 +68,7 @@ GraphWidget::GraphWidget(MainGUI* mainGUI, Experiment* exp, ExperimentWidget* pa
 
     // setTrial() triggers a timer that needs to be exec in the main thread
     // thus, we need to use queuedconnection here
-    connect(exp, &Experiment::trialCreated, this,
+    connect(exp.data(), &Experiment::trialCreated, this,
             [this](int trialId) { if (trialId == m_currTrialId) setTrial(m_currTrialId); },
             Qt::QueuedConnection);
 
@@ -79,7 +81,7 @@ GraphWidget::GraphWidget(MainGUI* mainGUI, Experiment* exp, ExperimentWidget* pa
     connect(m_ui->bZoomOut, SIGNAL(clicked(bool)), SLOT(zoomOut()));
     connect(m_ui->bReset, SIGNAL(clicked(bool)), SLOT(resetView()));
 
-    m_attrs.resize(exp->modelPlugin()->nodeAttrsScope().size());
+    m_attrs.resize(static_cast<size_t>(exp->modelPlugin()->nodeAttrsScope().size()));
     for (const AttributeRange* attrRange : exp->modelPlugin()->nodeAttrsScope()) {
         QLineEdit* le = new QLineEdit();
         le->setToolTip(attrRange->attrRangeStr());
@@ -147,7 +149,7 @@ void GraphWidget::updateCache(bool force)
     QFuture<int> future = QtConcurrent::run(this, &GraphWidget::refreshCache);
     QFutureWatcher<int>* watcher = new QFutureWatcher<int>;
     connect(watcher, &QFutureWatcher<int>::finished, [this, watcher]() {
-        m_cacheStatus = (CacheStatus) watcher->result();
+        m_cacheStatus = static_cast<CacheStatus>(watcher->result());
         watcher->deleteLater();
         if (m_cacheStatus == Scheduled) {
             m_updateCacheTimer.start(10);

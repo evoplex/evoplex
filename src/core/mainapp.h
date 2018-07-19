@@ -40,7 +40,7 @@ class ModelPlugin;
 class Project;
 class Plugin;
 
-typedef QSharedPointer<Project> ProjectPtr;
+using ProjectPtr = QSharedPointer<Project>;
 
 class MainApp : public QObject
 {
@@ -97,7 +97,7 @@ private:
     // It removes failed plugins from the list
     void initUserPlugins();
 
-    ExperimentsMgr* m_experimentsMgr;
+    ExperimentsMgr* m_expMgr;
     QDir m_systemPluginsDir;
 
     QSettings m_userPrefs;
@@ -125,7 +125,7 @@ inline int MainApp::stepsToFlush() const
 { return m_stepsToFlush; }
 
 inline ExperimentsMgr* MainApp::expMgr() const
-{ return m_experimentsMgr; }
+{ return m_expMgr; }
 
 inline const QHash<QString, GraphPlugin*>& MainApp::graphs() const
 { return m_graphs; }

@@ -22,13 +22,15 @@
 #include <QtCharts/QChart>
 #include <QtCharts/QChartView>
 
+#include "core/trial.h"
+
 #include "linechart.h"
 #include "titlebar.h"
 #include "ui_linechartsettings.h"
 
 namespace evoplex {
 
-LineChart::LineChart(Experiment* exp, QWidget* parent)
+LineChart::LineChart(ExperimentPtr exp, QWidget* parent)
     : QDockWidget(parent)
     , m_settingsDlg(new Ui_LineChartSettings)
     , m_exp(exp)
@@ -45,19 +47,19 @@ LineChart::LineChart(Experiment* exp, QWidget* parent)
     Q_ASSERT_X(!m_exp->autoDeleteTrials(), "LineChart",
                "tried to build a LineChart for a experiment that will be auto-deleted!");
 
-    connect(m_exp, SIGNAL(restarted()), SLOT(slotRestarted()));
+    connect(m_exp.data(), SIGNAL(restarted()), SLOT(slotRestarted()));
 
     QDialog* dlg = new QDialog(this);
     m_settingsDlg->setupUi(dlg);
     connect(m_settingsDlg->bEditSeries, SIGNAL(clicked(bool)), SLOT(slotOutputWidget()));
 
-    TitleBar* titleBar = new TitleBar(exp, this);
+    TitleBar* titleBar = new TitleBar(m_exp, this);
     setTitleBarWidget(titleBar);
     setTrial(0); // init
     connect(titleBar, SIGNAL(trialSelected(int)), SLOT(setTrial(int)));
     connect(titleBar, SIGNAL(openSettingsDlg()), dlg, SLOT(show()));
 
-    connect(exp, &Experiment::trialCreated, [this](int trialId) {
+    connect(m_exp.data(), &Experiment::trialCreated, [this](int trialId) {
         if (trialId == m_currTrialId) {
             m_trial = m_exp->trial(trialId);
             m_currStep = 0;

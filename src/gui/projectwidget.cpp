@@ -46,8 +46,8 @@ ProjectWidget::ProjectWidget(ProjectPtr project, MainGUI* mainGUI, ProjectsPage*
 
     m_ui->labelExps->setFont(FontStyles::subtitle1());
 
-    connect(m_project.data(), SIGNAL(expAdded(Experiment*)), SLOT(slotInsertRow(Experiment*)));
-    connect(m_project.data(), SIGNAL(expEdited(const Experiment*)), SLOT(slotUpdateRow(const Experiment*)));
+    connect(m_project.data(), SIGNAL(expAdded(int)), SLOT(slotInsertRow(int)));
+    connect(m_project.data(), SIGNAL(expEdited(int)), SLOT(slotUpdateRow(int)));
 
     int col = 0;
     m_headerIdx.insert(TableWidget::H_BUTTON, col++);
@@ -58,6 +58,7 @@ ProjectWidget::ProjectWidget(ProjectPtr project, MainGUI* mainGUI, ProjectsPage*
     m_headerIdx.insert(TableWidget::H_GRAPH, col++);
     m_headerIdx.insert(TableWidget::H_TRIALS, col++);
     m_ui->table->insertColumns(m_headerIdx.keys());
+    m_ui->table->init(mainGUI->mainApp()->expMgr());
 
     connect(m_ui->playAll, &QPushButton::pressed, [this]() { m_project->playAll(); });
 
@@ -65,7 +66,7 @@ ProjectWidget::ProjectWidget(ProjectPtr project, MainGUI* mainGUI, ProjectsPage*
     connect(m_ui->table, SIGNAL(itemDoubleClicked(QTableWidgetItem*)),
             SLOT(onItemDoubleClicked(QTableWidgetItem*)));
 
-    connect(project.data(), SIGNAL(hasUnsavedChanges(bool)),
+    connect(m_project.data(), SIGNAL(hasUnsavedChanges(bool)),
             SLOT(slotHasUnsavedChanges(bool)));
 }
 
@@ -92,7 +93,7 @@ void ProjectWidget::closeEvent(QCloseEvent* event)
     QDockWidget::closeEvent(event);
 }
 
-void ProjectWidget::fillRow(int row, const Experiment* exp)
+void ProjectWidget::fillRow(int row, const ExperimentPtr& exp)
 {
     Q_ASSERT(exp && exp->inputs());
 
@@ -134,17 +135,18 @@ void ProjectWidget::fillRow(int row, const Experiment* exp)
     m_ui->table->setSortingEnabled(true);
 }
 
-void ProjectWidget::slotInsertRow(Experiment* exp)
+void ProjectWidget::slotInsertRow(int expId)
 {
-    fillRow(m_ui->table->insertRow(exp), exp);
+    ExperimentPtr exp = m_project->experiment(expId);
+    fillRow(m_ui->table->insertRow(exp.data()), exp);
 }
 
-void ProjectWidget::slotUpdateRow(const Experiment* exp)
+void ProjectWidget::slotUpdateRow(int expId)
 {
     const int expIdCol = m_headerIdx.value(TableWidget::H_EXPID);
     for (int row = 0; row < m_ui->table->rowCount(); ++row) {
-        if (exp->id() == m_ui->table->item(row, expIdCol)->text().toInt()) {
-            fillRow(row, exp);
+        if (expId == m_ui->table->item(row, expIdCol)->text().toInt()) {
+            fillRow(row, m_project->experiment(expId));
             return;
         }
     }
@@ -161,19 +163,20 @@ void ProjectWidget::insertItem(int row, TableWidget::Header header, QString labe
 
 void ProjectWidget::slotSelectionChanged()
 {
-    Experiment* exp = nullptr;
-    if (!m_ui->table->selectedItems().isEmpty()) {
-        int row = m_ui->table->selectedItems().first()->row();
-        int expId = m_ui->table->item(row, m_headerIdx.value(TableWidget::H_EXPID))->text().toInt();
-        exp = m_project->experiment(expId);
+    if (m_ui->table->selectedItems().isEmpty()) {
+        emit (expSelectionChanged(-1));
+    } else {
+        const int row = m_ui->table->selectedItems().first()->row();
+        const int expId = m_ui->table->item(row,
+                m_headerIdx.value(TableWidget::H_EXPID))->text().toInt();
+        emit (expSelectionChanged(expId));
     }
-    emit (expSelectionChanged(exp));
 }
 
 void ProjectWidget::onItemDoubleClicked(QTableWidgetItem* item)
 {
     int expId = m_ui->table->item(item->row(), m_headerIdx.value(TableWidget::H_EXPID))->text().toInt();
-    emit (openExperiment(m_project->experiment(expId)));
+    emit (openExperiment(expId));
 }
 
 void ProjectWidget::slotHasUnsavedChanges(bool b)

@@ -1,11 +1,13 @@
 * Unreleased - 0.1.0-alpha1
-- Fix packaging of all OSs
-- Fix logger on Windows
-- Improve plugins initialization
+- Fixes packaging of all OSs
+- Fixes logger on Windows
+- Improves plugins initialization
 - Value class now accepts utf8 string
-- Improve and unify plugins interfaces
+- Improves and unify plugins interfaces
 - Model plugins can now add and remove nodes and edges during the simulation
-- Increase unit-tests coverage of core components
+- Increases unit-tests coverage of core components
+- Improves threads management
+- Improves TableWidget performance
 
 * Thu Jun 21 2018 Marcos Cardinot <marcos@cardinot.net> - 0.1.0-alpha0
 - First public release

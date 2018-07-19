@@ -27,6 +27,7 @@
 #include <QWidget>
 
 #include "core/experiment.h"
+#include "core/experimentsmgr.h"
 
 namespace evoplex {
 
@@ -51,6 +52,9 @@ public:
     };
 
     explicit TableWidget(QWidget* parent);
+    ~TableWidget() {}
+
+    void init(ExperimentsMgr* expMgr);
 
     int insertRow(Experiment* exp);
     void insertColumns(const QList<Header> headers);
@@ -67,6 +71,8 @@ private:
     const QPixmap kIcon_x;
     const QPen kPen_blue;
 
+    ExperimentsMgr* m_expMgr;
+
     QMap<Header, QString> m_headerLabel; // map Header to column label
 };
 
@@ -78,19 +84,16 @@ class RowsDelegate : public QStyledItemDelegate
     Q_OBJECT
 
 public:
-    explicit RowsDelegate(const Experiment* exp, TableWidget* table);
-    ~RowsDelegate() {}
-
+    explicit RowsDelegate(Experiment* exp, TableWidget* table);
+    ~RowsDelegate();
     void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
 
-public slots:
-    void onItemEntered(int row, int col);
-
 private:
-    const Experiment* m_exp;
     TableWidget* m_table;
     int m_hoveredRow;
     int m_hoveredCol;
+    Status m_status;
+    quint16 m_progress;
 };
 }
 #endif // TABLEWIDGET_H

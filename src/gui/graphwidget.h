@@ -27,11 +27,12 @@
 #include <QTimer>
 #include <vector>
 
+#include "core/experiment.h"
+
 #include "colormap.h"
 #include "experimentwidget.h"
 #include "graphsettings.h"
 #include "maingui.h"
-#include "core/experiment.h"
 
 class Ui_GraphWidget;
 
@@ -40,6 +41,7 @@ namespace evoplex {
 class GraphWidgetInterface
 {
 protected:
+    virtual ~GraphWidgetInterface() = default;
     virtual void paintEvent(QPaintEvent*) = 0;
     virtual NodePtr selectNode(const QPoint& pos) const = 0;
     virtual int refreshCache() = 0;
@@ -49,14 +51,13 @@ class GraphWidget : public QDockWidget, public GraphWidgetInterface
 {
     Q_OBJECT
 
-public:
-    explicit GraphWidget(MainGUI* mainGUI, Experiment* exp, ExperimentWidget* parent);
+protected:
+    explicit GraphWidget(MainGUI* mainGUI, ExperimentPtr exp, ExperimentWidget* parent);
     ~GraphWidget();
 
-protected:
     Ui_GraphWidget* m_ui;
     GraphSettings* m_settingsDlg;
-    Experiment* m_exp;
+    ExperimentPtr m_exp;
     const Trial* m_trial;
 
     int m_currStep;

@@ -44,7 +44,7 @@ const char* MainApp::kPluginExtension = ".so";
 #endif
 
 MainApp::MainApp()
-    : m_experimentsMgr(new ExperimentsMgr())
+    : m_expMgr(new ExperimentsMgr())
 {
     qRegisterMetaType<Status>("Status"); // makes it available for signals/slots
 
@@ -87,13 +87,11 @@ MainApp::MainApp()
 
 MainApp::~MainApp()
 {
-    for (auto& p : m_projects) {
-        p.second->destroyExperiments();
-    }
+    m_projects.clear();
     Utils::deleteAndShrink(m_models);
     Utils::deleteAndShrink(m_graphs);
-    delete m_experimentsMgr;
-    m_experimentsMgr = nullptr;
+    delete m_expMgr;
+    m_expMgr = nullptr;
 }
 
 void MainApp::resetSettingsToDefault()
@@ -241,9 +239,8 @@ ProjectPtr MainApp::newProject(QString& error, const QString& filepath)
 
 void MainApp::closeProject(int projId)
 {
-    std::map<int, ProjectPtr>::iterator it = m_projects.find(projId);
+    auto it = m_projects.find(projId);
     if (it != m_projects.end()) {
-        (*it).second->destroyExperiments();
         (*it).second.clear();
         m_projects.erase(it);
     }

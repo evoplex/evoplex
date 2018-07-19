@@ -32,7 +32,7 @@
 
 namespace evoplex {
 
-ExperimentWidget::ExperimentWidget(Experiment* exp, MainGUI* mainGUI, ProjectsPage* ppage)
+ExperimentWidget::ExperimentWidget(ExperimentPtr exp, MainGUI* mainGUI, ProjectsPage* ppage)
     : PPageDockWidget(ppage)
     , m_kIcon_play(QIcon(":/icons/play.svg"))
     , m_kIcon_pause(QIcon(":/icons/pause.svg"))
@@ -89,12 +89,17 @@ ExperimentWidget::ExperimentWidget(Experiment* exp, MainGUI* mainGUI, ProjectsPa
     connect(m_aPlayPause, &QAction::triggered, [this]() { m_exp->toggle(); });
     connect(m_aNext, &QAction::triggered, [this]() { m_exp->playNext(); });
     connect(m_aStop, &QAction::triggered, [this]() { m_exp->stop(); });
-    connect(m_aReset, &QAction::triggered, [this]() { m_exp->reset(); });
+    connect(m_aReset, &QAction::triggered, [this]() {
+        QString error;
+        if (!m_exp->reset(&error)) {
+            QMessageBox::warning(this, "Experiment", error);
+        }
+    });
     connect(m_delay, &QSlider::valueChanged, [this](int v) {
         m_exp->setDelay(static_cast<quint16>(v));
     });
 
-    connect(m_exp, SIGNAL(statusChanged(Status)), SLOT(slotStatusChanged(Status)));
+    connect(m_exp.data(), SIGNAL(statusChanged(Status)), SLOT(slotStatusChanged(Status)));
     slotStatusChanged(exp->expStatus()); // just to init the controls
 
     QVBoxLayout* layout = new QVBoxLayout(new QWidget(this));
@@ -148,11 +153,11 @@ void ExperimentWidget::closeEvent(QCloseEvent* event)
 
 void ExperimentWidget::slotStatusChanged(Status status)
 {
-    if (status == Status::Ready || status == Status::Unset) {
+    if (status == Status::Paused || status == Status::Disabled) {
         m_aPlayPause->setIcon(m_kIcon_play);
         m_aPlayPause->setEnabled(true);
         m_aNext->setEnabled(true);
-        m_aStop->setEnabled(status != Status::Unset);
+        m_aStop->setEnabled(status != Status::Disabled);
         m_aReset->setEnabled(true);
     } else if (status == Status::Running || status == Status::Queued) {
         m_aPlayPause->setIcon(m_kIcon_pause);
