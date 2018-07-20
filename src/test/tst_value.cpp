@@ -67,8 +67,8 @@ void TestValue::tst_valueInvalid()
     // COMPARISONS
     // same invalid type
     Value i1, i2;
-    QVERIFY_EXCEPTION_THROWN(i1 == i2, std::invalid_argument);
-    QVERIFY_EXCEPTION_THROWN(i1 != i2, std::invalid_argument);
+    QCOMPARE(i1 == i2, true);
+    QCOMPARE(i1 != i2, false);
     QVERIFY_EXCEPTION_THROWN(i1 >= i2, std::invalid_argument);
     QVERIFY_EXCEPTION_THROWN(i1 <= i2, std::invalid_argument);
     QVERIFY_EXCEPTION_THROWN(i1 >  i2, std::invalid_argument);
@@ -86,7 +86,7 @@ void TestValue::tst_valueInvalid()
 
     // creating a Value from another Value
     Value vInvalid;
-    QVERIFY_EXCEPTION_THROWN(Value(vInvalid) == vInvalid, std::invalid_argument);
+    QCOMPARE(Value(vInvalid) == vInvalid, true);
     QCOMPARE(Value(vInvalid).isValid(), false);
 }
 
