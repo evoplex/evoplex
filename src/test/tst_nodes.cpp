@@ -86,7 +86,7 @@ void TestNodes::_tst_empty_nodes(const Nodes& a, int size){
 void TestNodes::_tst_attrs(NodePtr node, Attributes attrs)
 {
     QCOMPARE(node->attrs().names(), attrs.names());
-//    QCOMPARE(node->attrs().values(), attrs.values());
+    QCOMPARE(node->attrs().values(), attrs.values());
 
 
     QCOMPARE(node->attrs().size(), attrs.size());
@@ -99,7 +99,6 @@ void TestNodes::_tst_invalid(QString cmd, bool has_attrs, GraphType graphType){
 
     if(has_attrs){
         const QStringList names = { "test0", "test1", "test2" };
-        const Value values[] = { Value(123), Value(234), Value(456) };
 
         AttributeRange* col0 = AttributeRange::parse(0, names[0], "int[0,1000]");
         attrsScope.insert(col0->attrName(), col0);
@@ -148,7 +147,7 @@ void TestNodes::tst_fromCmd()
     attrsScope.insert(col2->attrName(), col2);
 
     for(int i = 0; i < 3; i++){
-       attrs.replace(i, names[i], values[i]);
+       attrs.replace(i, names[i], NULL);
     }
 
     nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
@@ -175,10 +174,6 @@ void TestNodes::tst_fromCmd()
     col2 = AttributeRange::parse(2, names[2], attrRangeStr);
     attrsScope.insert(col2->attrName(), col2);
 
-    for(int i = 0; i < 3; i++){
-       attrs.replace(i, names[i], values[i]);
-    }
-
     nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
     QVERIFY(nodesOfSameType<DNode>(nodes));
 
@@ -201,6 +196,8 @@ void TestNodes::tst_fromCmd()
     QCOMPARE(nodes.size(), 3);
     QCOMPARE(nodes.at(0)->attrs().value(names[0]), values[0]);
     node = nodes.at(0);
+
+    attrs.replace(0, names[0], values[0]);
     _tst_attrs(node, attrs);
 
     // Undirected with multiple attributes
