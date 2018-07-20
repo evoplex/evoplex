@@ -80,8 +80,7 @@ void TestNodes::_tst_empty_nodes(const Nodes& a, int size){
     QCOMPARE(a.at(i)->degree(), 0);
     QCOMPARE(a.at(i)->inDegree(), 0);
     QCOMPARE(a.at(i)->outDegree(), 0);
-}
-
+    }
 }
 
 void TestNodes::_tst_attrs(NodePtr node, Attributes attrs)
