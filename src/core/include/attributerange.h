@@ -36,8 +36,6 @@ class AttributeRangeInterface
 {
 public:
     virtual ~AttributeRangeInterface() = default;
-    virtual const Value& min() const = 0;
-    virtual const Value& max() const = 0;
     virtual Value rand(PRG* prg) const = 0;
 };
 
@@ -86,12 +84,16 @@ public:
     inline const QString& attrName() const;
     inline const QString& attrRangeStr() const;
     inline Type type() const;
+    inline const Value& min() const;
+    inline const Value& max() const;
 
 protected:
     const int m_id;
     const QString m_attrName;
     const Type m_type;
     QString m_attrRangeStr;
+    Value m_min;
+    Value m_max;
 
     explicit AttributeRange(int id, const QString& attrName, Type type);
 
@@ -109,17 +111,11 @@ class SingleValue : public AttributeRange
 {
 public:
     explicit SingleValue();
-    explicit SingleValue(int id, const QString& attrName, Type type,
-                         const Value& validValue);
+    explicit SingleValue(int id, const QString& attrName, Type type);
 
     ~SingleValue() override = default;
 
-    inline const Value& min() const override;
-    inline const Value& max() const override;
     inline Value rand(PRG*) const override;
-
-private:
-    Value m_validValue;
 };
 
 class IntervalOfValues : public AttributeRange
@@ -130,14 +126,9 @@ public:
 
     ~IntervalOfValues() override = default;
 
-    inline const Value& min() const override;
-    inline const Value& max() const override;
     inline Value rand(PRG* prg) const override;
 
 private:
-    Value m_min;
-    Value m_max;
-
     Value (evoplex::IntervalOfValues::*f_rand)(PRG*) const;
     inline Value randD(PRG* prg) const;
     inline Value randI(PRG* prg) const;
@@ -150,18 +141,12 @@ public:
 
     ~SetOfValues() override = default;
 
-    // returns the smallest element in the set
-    inline const Value& min() const override;
-    // returns the largest element in the set
-    inline const Value& max() const override;
     inline Value rand(PRG* prg) const override;
 
     inline const Values& values() const;
 
 private:
     Values m_values;
-    Value m_min;
-    Value m_max;
 };
 
 /***********************/
@@ -181,24 +166,18 @@ inline const QString& AttributeRange::attrRangeStr() const
 inline AttributeRange::Type AttributeRange::type() const
 { return m_type; }
 
-/***********************/
-
-inline const Value& SingleValue::min() const
-{ return m_validValue; }
-
-inline const Value& SingleValue::max() const
-{ return m_validValue; }
-
-inline Value SingleValue::rand(PRG*) const
-{ return m_validValue; }
-
-/***********************/
-
-inline const Value& IntervalOfValues::min() const
+inline const Value& AttributeRange::min() const
 { return m_min; }
 
-inline const Value& IntervalOfValues::max() const
+inline const Value& AttributeRange::max() const
 { return m_max; }
+
+/***********************/
+
+inline Value SingleValue::rand(PRG* prg) const
+{ return prg->randI(1) ? m_max : m_min; }
+
+/***********************/
 
 inline Value IntervalOfValues::rand(PRG* prg) const
 { return (this->*f_rand)(prg); }
@@ -210,12 +189,6 @@ inline Value IntervalOfValues::randI(PRG* prg) const
 { return prg->randI(m_min.toInt(), m_max.toInt()); }
 
 /***********************/
-
-inline const Value& SetOfValues::min() const
-{ return m_min; }
-
-inline const Value& SetOfValues::max() const
-{ return m_max; }
 
 inline Value SetOfValues::rand(PRG* prg) const
 { return m_values.at(prg->randI(m_values.size()-1)); }

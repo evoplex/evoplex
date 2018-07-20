@@ -29,6 +29,9 @@ class TestAttributeRange: public QObject
 {
     Q_OBJECT
 
+    using AttrRngPtr = std::unique_ptr<AttributeRange>;
+    using Validate = std::vector<std::pair<QString, Value>>;
+
 private slots:
     void initTestCase();
     void cleanupTestCase() {}
@@ -43,6 +46,12 @@ private slots:
     void tst_dirpath();
 
 private:
+    void _tst_parserInputs(AttributeRange* attrRge, const QString& attrName,
+            const QString& attrRangeStr, AttributeRange::Type type, const Validate& vals);
+
+    void _tst_validate(const std::vector<std::pair<QString, Value>>& values);
+
+private:
     std::unique_ptr<PRG> m_prg;
 };
 
@@ -51,24 +60,45 @@ void TestAttributeRange::initTestCase()
     m_prg = std::unique_ptr<PRG>(new PRG(123));
 }
 
-void TestAttributeRange::tst_bool()
+void TestAttributeRange::_tst_parserInputs(AttributeRange* attrRge, const QString& attrName,
+        const QString& attrRangeStr, AttributeRange::Type type, const Validate& vals)
 {
-    AttributeRange* attrRge = AttributeRange::parse(0, "test", "bool");
-
-    // Tests value returned by 'AttributeRange::validate()' for true
-    QCOMPARE(attrRge->validate("true"), Value(true));
-
-    // Tests value returned by 'AttributeRange::validate()' for false
-    QCOMPARE(attrRge->validate("false"), Value(false));
-
-    // Tests if functions work as expected
     QVERIFY(attrRge->isValid());
     QCOMPARE(attrRge->id(), 0);
-    QCOMPARE(attrRge->attrName(), QString("test"));
-    QCOMPARE(attrRge->attrRangeStr(), QString("bool"));
-
-    AttributeRange::Type type = AttributeRange::Bool;
+    QCOMPARE(attrRge->attrName(), attrName);
+    QCOMPARE(attrRge->attrRangeStr(), attrRangeStr);
     QCOMPARE(attrRge->type(), type);
+
+    for (auto const& v : vals) {
+        QCOMPARE(attrRge->validate(v.first), v.second);
+    }
+}
+
+void TestAttributeRange::tst_bool()
+{
+    const QString attrName("test");
+    const QString attrRangeStr("bool");
+    const AttributeRange::Type type = AttributeRange::Bool;
+    AttrRngPtr attrRgePtr(AttributeRange::parse(0, attrName, attrRangeStr));
+    AttributeRange* attrRge = attrRgePtr.get();
+
+    std::vector<std::pair<QString, Value>> values = {
+        { "True", Value(true) },
+        { "true", Value(true) },
+        { "TRUE", Value(true) },
+        { "TrUe", Value(true) },
+        { "false", Value(false) },
+        { "FalsE", Value(false) },
+        { "FALSE", Value(false) },
+        { "trrruuueee", Value() },
+        { "8.084", Value() },
+        { "falsr", Value() },
+        { "false ", Value() },
+        { "1", Value(true) },
+        { "0", Value(false) }
+    };
+
+    _tst_parserInputs(attrRge, attrName, attrRangeStr, type, values);
 
     // Tests min(), max() and rand() functions work as expected
     bool min = false;
@@ -83,10 +113,7 @@ void TestAttributeRange::tst_bool()
 
     // Tests 'AttributeRange::min()' and 'AttributeRange::max()'
     QCOMPARE(attrRge->min().toBool(), min);
-
-    // 'attrRge->max().toBool()' returns 0
-//    QCOMPARE(attrRge->max().toBool(), max);
-    QCOMPARE(attrRge->max().toBool(), false);
+    QCOMPARE(attrRge->max().toBool(), max);
 }
 
 void TestAttributeRange::tst_int_range()
@@ -321,110 +348,80 @@ void TestAttributeRange::tst_double_set()
 
 void TestAttributeRange::tst_string()
 {
-    AttributeRange* attrRge = AttributeRange::parse(0, "test", "string");
+    const QString attrName("test");
+    const QString attrRangeStr("string");
+    const AttributeRange::Type type = AttributeRange::String;
+    AttrRngPtr attrRgePtr(AttributeRange::parse(0, attrName, attrRangeStr));
+    AttributeRange* attrRge = attrRgePtr.get();
 
-    // Tests value returned by 'AttributeRange::validate()'
-    const char* test_str;
-    QString test_qstr;
+    // to tests value returned by 'AttributeRange::validate()'
+    QStringList _strs = {
+        // Case 1: normal string
+        "sample",
 
-    // Case 1: normal string
-    test_str = "sample";
-    test_qstr = "sample";
-    QCOMPARE(attrRge->validate(test_str), Value(test_str));
-    QCOMPARE(attrRge->validate(test_qstr), Value(test_qstr));
+        // Case 2: long string
+        "this sentence is a long string for testing purposes",
 
-    // Case 2: long string
-    test_str = "this sentence is a long string for testing purposes";
-    test_qstr = "this sentence is a long string for testing purposes";
-    QCOMPARE(attrRge->validate(test_str), Value(test_str));
-    QCOMPARE(attrRge->validate(test_qstr), Value(test_qstr));
+        // Case 3: single character
+        "a",
 
-    // Case 3: single character
-    test_str = "a";
-    test_qstr = "a";
-    QCOMPARE(attrRge->validate(test_str), Value(test_str));
-    QCOMPARE(attrRge->validate(test_qstr), Value(test_qstr));
+        // Case 4: unusual characters
+        "abc£ãã&!£$%^*(áéí)",
 
-    // Case 4: unusual characters
-    test_str = "abc£ãã&!£$%^*(áéí)";
-    test_qstr = "abc£ãã&!£$%^*(áéí)";
-    QCOMPARE(attrRge->validate(test_str), Value(test_str));
-    QCOMPARE(attrRge->validate(test_qstr), Value(test_qstr));
+        // Case 5: empty string
+        "",
 
-    // Case 5: empty string
-    test_str = "";
-    test_qstr = "";
-    QCOMPARE(attrRge->validate(test_str), Value(test_str));
-    QCOMPARE(attrRge->validate(test_qstr), Value(test_qstr));
+        // Case 6: number
+        "123",
+
+        // Case 7: boolean
+        "true",
+    };
+    Validate vals;
+    vals.reserve(static_cast<size_t>(_strs.size()));
+    for (const QString& v : _strs) {
+        vals.push_back({ v, Value(v) });
+    }
 
     // Tests if functions work as expected
-    QVERIFY(attrRge->isValid());
-    QCOMPARE(attrRge->id(), 0);
-    QCOMPARE(attrRge->attrName(), QString("test"));
-    QCOMPARE(attrRge->attrRangeStr(), QString("string"));
-
-    AttributeRange::Type type = AttributeRange::String;
-    QCOMPARE(attrRge->type(), type);
+    _tst_parserInputs(attrRge, attrName, attrRangeStr, type, vals);
 
     // Tests min(), max() and rand() functions -- all should return a empty string
     QCOMPARE(attrRge->rand(m_prg.get()).toString(), "");
     QCOMPARE(attrRge->min().toString(), "");
     QCOMPARE(attrRge->min().toString(), "");
+    QCOMPARE(attrRge->min().toQString(), QString());
+    QCOMPARE(attrRge->min().toQString(), QString());
 }
 
 void TestAttributeRange::tst_string_set()
 {
-    const char* attrName = "test";
     // Case 1: normal string
     // Case 2: long string
     // Case 3: single character
     // Case 4: unusual characters
-    const QString _values("sample,this sentence is a long string for testing purposes,a,abc£ãã&!£$%^*(áéí)");
+    // Case 5: number
+    const QString _values("sample,this sentence is a long string for testing purposes,a,abc£ãã&!£$%^*(áéí),123");
+
+    const QString attrName("test");
     const QString attrRangeStr = "string{" + _values + "}";
+    const AttributeRange::Type type = AttributeRange::String_Set;
+    AttrRngPtr attrRgePtr(AttributeRange::parse(0, attrName, attrRangeStr));
+    AttributeRange* attrRge = attrRgePtr.get();
+
+    Validate vals;
     QStringList values = _values.split(",");
-
-    AttributeRange* attrRge = AttributeRange::parse(0, attrName, attrRangeStr);
-
-    // Tests value returned by 'AttributeRange::validate()'
-    const char* test_str;
-    QString test_qstr;
-
-    // Case 1: normal string
-    test_str = "sample";
-    test_qstr = "sample";
-    QCOMPARE(attrRge->validate(test_str), Value(test_str));
-    QCOMPARE(attrRge->validate(test_qstr), Value(test_qstr));
-
-    // Case 2: long string
-    test_str = "this sentence is a long string for testing purposes";
-    test_qstr = "this sentence is a long string for testing purposes";
-    QCOMPARE(attrRge->validate(test_str), Value(test_str));
-    QCOMPARE(attrRge->validate(test_qstr), Value(test_qstr));
-
-    // Case 3: single character
-    test_str = "a";
-    test_qstr = "a";
-    QCOMPARE(attrRge->validate(test_str), Value(test_str));
-    QCOMPARE(attrRge->validate(test_qstr), Value(test_qstr));
-
-    // Case 4: unusual characters
-    test_str = "abc£ãã&!£$%^*(áéí)";
-    test_qstr = "abc£ãã&!£$%^*(áéí)";
-    QCOMPARE(attrRge->validate(test_str), Value(test_str));
-    QCOMPARE(attrRge->validate(test_qstr), Value(test_qstr));
+    vals.reserve(static_cast<size_t>(values.size()));
+    for (const QString& v : values) {
+        vals.push_back({v, Value(v)});
+    }
 
     // Tests if functions work as expected
-    QVERIFY(attrRge->isValid());
-    QCOMPARE(attrRge->id(), 0);
-    QCOMPARE(attrRge->attrName(), QString(attrName));
-    QCOMPARE(attrRge->attrRangeStr(), QString(attrRangeStr));
-
-    AttributeRange::Type type = AttributeRange::String_Set;
-    QCOMPARE(attrRge->type(), type);
+    _tst_parserInputs(attrRge, attrName, attrRangeStr, type, vals);
 
     // The min and max values are taken to be the value of the first character
     // of the string according to the ASCII table
-    const char* min = "a";
+    const char* min = "123";
     const char* max = "this sentence is a long string for testing purposes";
 
     QCOMPARE(attrRge->min().toString(), min);
@@ -436,22 +433,22 @@ void TestAttributeRange::tst_string_set()
 
 void TestAttributeRange::tst_filepath()
 {
-    AttributeRange* attrRge = AttributeRange::parse(9057, "test", "filepath");
+    const QString attrName("test");
+    const QString attrRangeStr("filepath");
+    const AttributeRange::Type type = AttributeRange::FilePath;
+    AttrRngPtr attrRgePtr(AttributeRange::parse(0, attrName, attrRangeStr));
+    AttributeRange* attrRge = attrRgePtr.get();
 
     const QString existing = QDir::current().absoluteFilePath("tst_attributerange");
     const QString missing = QDir::current().absoluteFilePath("none123");
 
-    QCOMPARE(attrRge->validate(existing), Value(existing));
-    QVERIFY(!attrRge->validate(missing).isValid());
+    std::vector<std::pair<QString, Value>> vals = {
+        { existing, Value(existing) },
+        { missing, Value() }
+    };
 
     // Tests if functions work as expected
-    QVERIFY(attrRge->isValid());
-    QCOMPARE(attrRge->id(), 9057);
-    QCOMPARE(attrRge->attrName(), QString("test"));
-    QCOMPARE(attrRge->attrRangeStr(), QString("filepath"));
-
-    AttributeRange::Type type = AttributeRange::FilePath;
-    QCOMPARE(attrRge->type(), type);
+    _tst_parserInputs(attrRge, attrName, attrRangeStr, type, vals);
 
     // Tests min(), max() and rand() functions -- all should return a empty string
     QCOMPARE(attrRge->rand(m_prg.get()).toString(), "");
@@ -461,19 +458,19 @@ void TestAttributeRange::tst_filepath()
 
 void TestAttributeRange::tst_dirpath()
 {
-    AttributeRange* attrRge = AttributeRange::parse(0, "test", "dirpath");
+    const QString attrName("test");
+    const QString attrRangeStr("dirpath");
+    const AttributeRange::Type type = AttributeRange::DirPath;
+    AttrRngPtr attrRgePtr(AttributeRange::parse(0, attrName, attrRangeStr));
+    AttributeRange* attrRge = attrRgePtr.get();
 
-    QCOMPARE(attrRge->validate(QDir::currentPath()), Value(QDir::currentPath()));
-    QVERIFY(!attrRge->validate("/invalid/").isValid());
+    std::vector<std::pair<QString, Value>> vals = {
+        { QDir::currentPath(), Value(QDir::currentPath())},
+        { "/invalid/", Value()}
+    };
 
     // Tests if functions work as expected
-    QVERIFY(attrRge->isValid());
-    QCOMPARE(attrRge->id(), 0);
-    QCOMPARE(attrRge->attrName(), QString("test"));
-    QCOMPARE(attrRge->attrRangeStr(), QString("dirpath"));
-
-    AttributeRange::Type type = AttributeRange::DirPath;
-    QCOMPARE(attrRge->type(), type);
+    _tst_parserInputs(attrRge, attrName, attrRangeStr, type, vals);
 
     // Tests min(), max() and rand() functions -- all should return a empty string
     QCOMPARE(attrRge->rand(m_prg.get()).toString(), "");

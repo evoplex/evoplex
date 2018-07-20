@@ -31,13 +31,13 @@ AttributeRange* AttributeRange::parse(int attrId, const QString& attrName, const
 {
     AttributeRange* vs = nullptr;
     if (attrRangeStr == "bool") {
-        vs = new SingleValue(attrId, attrName, Bool, Value(false));
+        vs = new SingleValue(attrId, attrName, Bool);
     } else if (attrRangeStr == "string") {
-        vs = new SingleValue(attrId, attrName, String, Value(QString()));
+        vs = new SingleValue(attrId, attrName, String);
     } else if (attrRangeStr == "dirpath") {
-        vs = new SingleValue(attrId, attrName, DirPath, Value(QString()));
+        vs = new SingleValue(attrId, attrName, DirPath);
     } else if (attrRangeStr == "filepath") {
-        vs = new SingleValue(attrId, attrName, FilePath, Value(QString()));
+        vs = new SingleValue(attrId, attrName, FilePath);
     } else if (attrRangeStr.contains('{') && attrRangeStr.endsWith('}')) {
         vs = setOfValues(attrRangeStr, attrId, attrName);
     } else if (attrRangeStr.contains('[') && attrRangeStr.endsWith(']')) {
@@ -146,8 +146,9 @@ Value AttributeRange::validate(const QString& valueStr) const
 
     switch (m_type) {
     case Bool: {
-        if (valueStr == "true" || valueStr == "1") return Value(true);
-        if (valueStr == "false" || valueStr == "0") return Value(false);
+        const QString v = valueStr.toLower();
+        if (v == "true" || v == "1") return Value(true);
+        if (v == "false" || v == "0") return Value(false);
         break;
     }
     case DirPath: {
@@ -216,8 +217,8 @@ Value AttributeRange::validate(const QString& valueStr) const
         break;
     }
 
-    qWarning() << "unable to validate value!\n"
-               << "Input:" << valueStr << "\nExpected:" << m_attrRangeStr;
+    qDebug() << "unable to validate value!\n"
+             << "Input:" << valueStr << "\nExpected:" << m_attrRangeStr;
     return Value();
 }
 
@@ -232,13 +233,17 @@ AttributeRange::AttributeRange(int id, const QString& attrName, Type type)
 
 /**********************************/
 
-SingleValue::SingleValue(int id, const QString& attrName, Type type, const Value& validValue)
+SingleValue::SingleValue(int id, const QString& attrName, Type type)
     : AttributeRange(id, attrName, type)
-    , m_validValue(validValue)
 {
+    m_min = Value(QString(""));
+    m_max = Value(QString(""));
+
     switch (m_type) {
     case Bool:
         m_attrRangeStr = "bool";
+        m_min = Value(false);
+        m_max = Value(true);
         break;
     case String:
         m_attrRangeStr = "string";
@@ -255,7 +260,7 @@ SingleValue::SingleValue(int id, const QString& attrName, Type type, const Value
 }
 
 SingleValue::SingleValue()
-    : SingleValue(-1, "", Invalid, Value())
+    : SingleValue(-1, "", Invalid)
 {
 }
 
@@ -263,9 +268,10 @@ SingleValue::SingleValue()
 
 IntervalOfValues::IntervalOfValues(int id, const QString& attrName, Type type, const Value& min, const Value& max)
     : AttributeRange(id, attrName, type)
-    , m_min(min)
-    , m_max(max)
 {
+    m_min = min;
+    m_max = max;
+
     switch (m_type) {
     case Double_Range:
         m_attrRangeStr = QString("double[%1,%2]").arg(min.toDouble()).arg(max.toDouble());
@@ -287,6 +293,9 @@ SetOfValues::SetOfValues(int id, const QString& attrName, Type type, Values valu
     : AttributeRange(id, attrName, type)
     , m_values(values)
 {
+    m_min = (*std::min_element(m_values.cbegin(), m_values.cend()));
+    m_max = (*std::max_element(m_values.cbegin(), m_values.cend()));
+
     m_attrRangeStr.clear();
     switch (m_type) {
     case Double_Set:
@@ -308,9 +317,6 @@ SetOfValues::SetOfValues(int id, const QString& attrName, Type type, Values valu
         m_attrRangeStr += "," + values.at(i).toQString();
     }
     m_attrRangeStr += "}";
-
-    m_min = (*std::min_element(m_values.cbegin(), m_values.cend()));
-    m_max = (*std::max_element(m_values.cbegin(), m_values.cend()));
 }
 
 } // evoplex
