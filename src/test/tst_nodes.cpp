@@ -528,11 +528,23 @@ void TestNodes::tst_fromFile_nodes_invalid_attrs() {
 
     // Nodes with values read from file
     Nodes nodesFromFile = Nodes::fromFile(filePath, attrsScope, graphType, errorMsg);
+    QVERIFY(nodesOfSameType<UNode>(nodesFromFile));
 
     // Nodes to test against
     Nodes nodes = Nodes::fromCmd("*2;min", attrsScope, graphType, errorMsg);
+    QVERIFY(nodesOfSameType<UNode>(nodesFromFile));
 
     QCOMPARE(nodesFromFile.size(), 0); // Confirms the nodes returned are empty
+
+    // Test type returned for directed graph type
+    graphType = GraphType::Directed;
+    // Nodes with values read from file
+    nodesFromFile = Nodes::fromFile(filePath, attrsScope, graphType, errorMsg);
+    QVERIFY(nodesOfSameType<DNode>(nodesFromFile));
+
+    // Nodes to test against
+    nodes = Nodes::fromCmd("*3;min", attrsScope, graphType, errorMsg);
+    QVERIFY(nodesOfSameType<DNode>(nodes));
 
     // Fails as expected:
 //    _compare_nodes(nodes, nodesFromFile);
