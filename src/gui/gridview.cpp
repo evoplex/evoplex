@@ -40,14 +40,14 @@ GridView::GridView(MainGUI* mainGUI, ExperimentPtr exp, ExperimentWidget* parent
     setTrial(0); // init at trial 0
 }
 
-int GridView::refreshCache()
+CacheStatus GridView::refreshCache()
 {
     if (paintingActive()) {
-        return Scheduled;
+        return CacheStatus::Scheduled;
     }
     Utils::deleteAndShrink(m_cache);
     if (!m_trial || !m_trial->graph()) {
-        return Ready;
+        return CacheStatus::Ready;
     }
 
     const Nodes& nodes = m_trial->graph()->nodes();
@@ -68,12 +68,12 @@ int GridView::refreshCache()
     }
     m_cache.shrink_to_fit();
 
-    return Ready;
+    return CacheStatus::Ready;
 }
 
 void GridView::paintEvent(QPaintEvent*)
 {
-    if (m_cacheStatus != Ready) {
+    if (m_cacheStatus != CacheStatus::Ready) {
         return;
     }
 
@@ -99,7 +99,7 @@ void GridView::paintEvent(QPaintEvent*)
 
 NodePtr GridView::selectNode(const QPoint& pos) const
 {
-    if (m_cacheStatus == Ready) {
+    if (m_cacheStatus == CacheStatus::Ready) {
         for (const Cache& cache : m_cache) {
             if (cache.rect.contains(pos)) {
                 return cache.node;

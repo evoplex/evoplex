@@ -36,7 +36,7 @@ public:
 protected:
     void paintEvent(QPaintEvent*) override;
     NodePtr selectNode(const QPoint& pos) const override;
-    int refreshCache() override;
+    CacheStatus refreshCache() override;
 
 private:
     struct Cache {

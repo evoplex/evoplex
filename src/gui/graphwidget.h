@@ -38,13 +38,19 @@ class Ui_GraphWidget;
 
 namespace evoplex {
 
+enum class CacheStatus {
+    Ready,
+    Updating,
+    Scheduled
+};
+
 class GraphWidgetInterface
 {
 protected:
     virtual ~GraphWidgetInterface() = default;
     virtual void paintEvent(QPaintEvent*) = 0;
     virtual NodePtr selectNode(const QPoint& pos) const = 0;
-    virtual int refreshCache() = 0;
+    virtual CacheStatus refreshCache() = 0;
 };
 
 class GraphWidget : public QDockWidget, public GraphWidgetInterface
@@ -70,18 +76,13 @@ protected:
     float m_nodeRadius;
     QPoint m_origin;
 
-    enum CacheStatus {
-        Ready,
-        Updating,
-        Scheduled
-    };
     CacheStatus m_cacheStatus;
 
     void mousePressEvent(QMouseEvent* e);
     void mouseReleaseEvent(QMouseEvent* e);
     void resizeEvent(QResizeEvent* e);
 
-    virtual int refreshCache() { return Ready; }
+    virtual CacheStatus refreshCache() { return CacheStatus::Ready; }
 
 public slots:
     void updateView(bool forceUpdate);

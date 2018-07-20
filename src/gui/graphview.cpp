@@ -53,14 +53,14 @@ GraphView::GraphView(MainGUI* mainGUI, ExperimentPtr exp, ExperimentWidget* pare
     setTrial(0); // init at trial 0
 }
 
-int GraphView::refreshCache()
+CacheStatus GraphView::refreshCache()
 {
     if (paintingActive()) {
-        return Scheduled;
+        return CacheStatus::Scheduled;
     }
     Utils::deleteAndShrink(m_cache);
     if (!m_trial || !m_trial->graph()) {
-        return Ready;
+        return CacheStatus::Ready;
     }
 
     float edgeSizeRate = m_edgeSizeRate * static_cast<float>(std::pow(1.25f, m_zoomLevel));
@@ -79,9 +79,9 @@ int GraphView::refreshCache()
         cache.xy = xy;
         cache.edges.reserve(np.second->outDegree());
 
-        for (const Edges::Pair& ep : np.second->outEdges()) {
-            QPointF xy2(m_origin.x() + edgeSizeRate * (1.0 + ep.edge()->neighbour()->x()),
-                        m_origin.y() + edgeSizeRate * (1.0 + ep.edge()->neighbour()->y()));
+        for (auto const& ep : np.second->outEdges()) {
+            QPointF xy2(m_origin.x() + edgeSizeRate * (1.0 + ep.second->neighbour()->x()),
+                        m_origin.y() + edgeSizeRate * (1.0 + ep.second->neighbour()->y()));
             cache.edges.emplace_back(QLineF(xy, xy2));
         }
 
@@ -89,12 +89,12 @@ int GraphView::refreshCache()
     }
     m_cache.shrink_to_fit();
 
-    return Ready;
+    return CacheStatus::Ready;
 }
 
 void GraphView::paintEvent(QPaintEvent*)
 {
-    if (m_cacheStatus != Ready) {
+    if (m_cacheStatus != CacheStatus::Ready) {
         return;
     }
 
@@ -141,7 +141,7 @@ void GraphView::paintEvent(QPaintEvent*)
 
 NodePtr GraphView::selectNode(const QPoint& pos) const
 {
-    if (m_cacheStatus == Ready) {
+    if (m_cacheStatus == CacheStatus::Ready) {
         for (const Cache& cache : m_cache) {
             if (pos.x() > cache.xy.x()-m_nodeRadius
                     && pos.x() < cache.xy.x()+m_nodeRadius

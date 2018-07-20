@@ -44,7 +44,7 @@ GraphWidget::GraphWidget(MainGUI* mainGUI, ExperimentPtr exp, ExperimentWidget* 
     , m_nodeSizeRate(10.f)
     , m_nodeRadius(m_nodeSizeRate)
     , m_origin(5,25)
-    , m_cacheStatus(Ready)
+    , m_cacheStatus(CacheStatus::Ready)
     , m_expWidget(parent)
     , m_posEntered(0,0)
 {
@@ -139,19 +139,19 @@ void GraphWidget::updateCache(bool force)
         return;
     }
 
-    if (m_cacheStatus == Updating) {
+    if (m_cacheStatus == CacheStatus::Updating) {
         return;
     }
 
     QMutex mutex;
     mutex.lock();
-    m_cacheStatus = Updating;
-    QFuture<int> future = QtConcurrent::run(this, &GraphWidget::refreshCache);
-    QFutureWatcher<int>* watcher = new QFutureWatcher<int>;
+    m_cacheStatus = CacheStatus::Updating;
+    QFuture<CacheStatus> future = QtConcurrent::run(this, &GraphWidget::refreshCache);
+    QFutureWatcher<CacheStatus>* watcher = new QFutureWatcher<CacheStatus>;
     connect(watcher, &QFutureWatcher<int>::finished, [this, watcher]() {
         m_cacheStatus = static_cast<CacheStatus>(watcher->result());
         watcher->deleteLater();
-        if (m_cacheStatus == Scheduled) {
+        if (m_cacheStatus == CacheStatus::Scheduled) {
             m_updateCacheTimer.start(10);
         }
         update();
