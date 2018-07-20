@@ -3,6 +3,7 @@
  *
  *  Evoplex is a multi-agent system for networks.
  *  Copyright (C) 2018 - Marcos Cardinot <marcos@cardinot.net>
+ *  Copyright (C) 2018 - Ethan Padden <e.padden1@nuigalway.ie>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
