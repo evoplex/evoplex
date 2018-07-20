@@ -60,6 +60,17 @@ private:
     void _tst_Node(Node *node, Attributes attrs);
     void _tst_attrs(NodePtr node, Attributes attrs);
     void _tst_invalid(QString cmd, bool has_attrs, GraphType graphType);
+
+    // checks if all nodes are of the same type
+    template <class T>
+    bool nodesOfSameType(const Nodes& nodes)
+    {
+        for (auto const& it : nodes) {
+            if (!dynamic_cast<T*>(it.second.get()))
+                return false;
+        }
+        return true;
+    }
 };
 
 void TestNodes::_tst_empty_nodes(const Nodes& a, int size){
@@ -106,6 +117,8 @@ void TestNodes::_tst_invalid(QString cmd, bool has_attrs, GraphType graphType){
     Nodes nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
     if(!has_attrs) _tst_empty_nodes(nodes, 0);
     QCOMPARE(nodes.size(), 0);
+    if(graphType == GraphType::Directed) QVERIFY(nodesOfSameType<DNode>(nodes));
+    else QVERIFY(nodesOfSameType<UNode>(nodes));
 }
 
 void TestNodes::tst_fromCmd()
@@ -129,6 +142,7 @@ void TestNodes::tst_fromCmd()
 
     nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
     _tst_empty_nodes(nodes, 3);
+    QVERIFY(nodesOfSameType<UNode>(nodes));
 
     // Undirected with non-empty attrsScope
     AttributeRange* col0 = AttributeRange::parse(0, names[0], attrRangeStr);
@@ -143,6 +157,7 @@ void TestNodes::tst_fromCmd()
     }
 
     nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
+    QVERIFY(nodesOfSameType<UNode>(nodes));
 
     for(int i = 0; i < 3; i++){
         node = nodes.at(i);
@@ -155,6 +170,7 @@ void TestNodes::tst_fromCmd()
 
     nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
     _tst_empty_nodes(nodes, 3);
+    QVERIFY(nodesOfSameType<DNode>(nodes));
 
     // Directed with non-empty attrsScope
     col0 = AttributeRange::parse(0, names[0], attrRangeStr);
@@ -169,6 +185,7 @@ void TestNodes::tst_fromCmd()
     }
 
     nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
+    QVERIFY(nodesOfSameType<DNode>(nodes));
 
     for(int i = 0; i < 3; i++){
         NodePtr node = nodes.at(i);
@@ -184,6 +201,7 @@ void TestNodes::tst_fromCmd()
 
     cmd = QString("#3;%1_value_%2").arg(names[0]).arg(values[0].toQString());
     nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
+    QVERIFY(nodesOfSameType<UNode>(nodes));
 
     QCOMPARE(nodes.size(), 3);
     QCOMPARE(nodes.at(0)->attrs().value(names[0]), values[0]);
@@ -200,6 +218,7 @@ void TestNodes::tst_fromCmd()
 
     cmd = QString("#3;%1_value_%2;%3_value_%4").arg(names[0]).arg(values[0].toQString()).arg(names[1]).arg(values[1].toQString());
     nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
+    QVERIFY(nodesOfSameType<UNode>(nodes));
 
     QCOMPARE(nodes.size(), 3);
     node = nodes.at(0);
@@ -213,6 +232,7 @@ void TestNodes::tst_fromCmd()
 
     cmd = QString("#3;%1_value_%2").arg(names[0]).arg(values[0].toQString());
     nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
+    QVERIFY(nodesOfSameType<DNode>(nodes));
 
     QCOMPARE(nodes.size(), 3);
     QCOMPARE(nodes.at(0)->attrs().value(names[0]), values[0]);
@@ -228,6 +248,7 @@ void TestNodes::tst_fromCmd()
     }
     cmd = QString("#3;%1_value_%2;%3_value_%4").arg(names[0]).arg(values[0].toQString()).arg(names[1]).arg(values[1].toQString());
     nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
+    QVERIFY(nodesOfSameType<DNode>(nodes));
 
     QCOMPARE(nodes.size(), 3);
     node = nodes.at(0);
@@ -272,10 +293,6 @@ void TestNodes::tst_fromCmd()
     cmd = "#3;myInt_value_123;myInt2_value_123";
     _tst_invalid(cmd, false, GraphType::Invalid); // Empty attrsScope
     _tst_invalid(cmd, true, GraphType::Invalid); // Non-empty attrsScope
-
-//     *  - Undirected graph: should return a set of UNodes
-//     *  - Directed graph: should return a set of DNodes
-
 
      /** IMPORTANT! The command validation is powered by another class, which we will be testing later.
       *    So, the main purpose of this test is to check if the returned Nodes are reflecting the command,
