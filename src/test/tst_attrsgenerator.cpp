@@ -37,12 +37,35 @@ private slots:
 };
 
 void TestAttrsGenerator::tst_parseStarCmd_min(){
-    QString error;
-
+    QString error, cmd;
     AttributesScope attrsScope;
-    QString cmd;
-    AttrsGenerator* agen = AttrsGenerator::parse(attrsScope,cmd, error);
+    AttrsGenerator* agen;
+    QStringList names = {"test0", "test1", "test2"};
+    SetOfAttributes res;
+    Attributes attrs;
 
+    // Valid * command with empty attrScope
+    cmd = "*3;min";
+    agen = AttrsGenerator::parse(attrsScope, cmd, error);
+
+    QCOMPARE(agen->command(), cmd);
+    QCOMPARE(agen->size(), 3);
+
+    res = agen->create();
+//    QCOMPARE(res.at(0), attrs);
+
+    // Valid * command with non-empty attrScope
+    AttributeRange* col0 = AttributeRange::parse(0, "int-zero-two", "int[0,2]");
+    attrsScope.insert(col0->attrName(), col0);
+    AttributeRange* col1 = AttributeRange::parse(1, "bool", "bool");
+    attrsScope.insert(col1->attrName(), col1);
+    AttributeRange* col2 = AttributeRange::parse(2, "any-string", "string");
+    attrsScope.insert(col2->attrName(), col2);
+
+    agen = AttrsGenerator::parse(attrsScope, cmd, error);
+
+    QCOMPARE(agen->command(), cmd);
+    QCOMPARE(agen->size(), 3);
 }
 
 void TestAttrsGenerator::tst_parseStarCmd()
@@ -51,11 +74,7 @@ void TestAttrsGenerator::tst_parseStarCmd()
 
     // - same mode for all attributes:
     //         '*integer;[min|max|rand_seed]'
-    /*
-    AttributesScope attrsScope =
-    QString cmd =
-    AttrsGenerator* agen = AttrsGenerator::parse(attrsScope,cmd, error);
-    */
+
     /** IMPORTANT: this function is likely to be very long,
      * if so, consider breaking into smaller functions
      * (perhaps tst_parseStarCmd_min(), tst_parseStarCmd_max() ...) **/
