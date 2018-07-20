@@ -18,8 +18,8 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef BASE_PLUGIN_H
-#define BASE_PLUGIN_H
+#ifndef ABSTRACT_PLUGIN_H
+#define ABSTRACT_PLUGIN_H
 
 #include <QString>
 
@@ -29,10 +29,27 @@
 
 namespace evoplex {
 
-class AbstractPlugin
+class Trial;
+
+class AbstractPluginInterface
 {
 public:
-    inline PRG* prg() const;
+    // Provide the destructor to keep compilers happy.
+    virtual ~AbstractPluginInterface() = default;
+
+    // Initializes the plugin.
+    // This method is called when the plugin is created and
+    // is mainly used to validate inputs and set the environment.
+    // Return false if anything goes wrong.
+    virtual bool init() = 0;
+};
+
+class AbstractPlugin : public AbstractPluginInterface
+{
+public:
+    inline bool init() override;
+
+    PRG* prg() const;
     inline const Attributes* attrs() const;
 
     inline const QString& attrName(int attrId) const;
@@ -47,14 +64,12 @@ public:
     inline bool attrExists(const QString& name) const;
 
 protected:
-    PRG* m_prg;
+    Trial* m_trial;
 
-    explicit AbstractPlugin() : m_prg(nullptr), m_attrs(nullptr) {}
-    ~AbstractPlugin() = default;
+    AbstractPlugin() = default;
+    ~AbstractPlugin() override = default;
 
-    // takes the ownership of the PRG
-    // cannot be called twice
-    inline bool setup(PRG* prg, const Attributes* attrs);
+    bool setup(Trial& trial, const Attributes& attrs);
 
 private:
     const Attributes* m_attrs;
@@ -64,8 +79,8 @@ private:
    AbstractPlugin: Inline member functions
  ************************************************************************/
 
-inline PRG* AbstractPlugin::prg() const
-{ return m_prg; }
+inline bool AbstractPlugin::init()
+{ return false; }
 
 inline const Attributes* AbstractPlugin::attrs() const
 { return m_attrs; }
@@ -94,14 +109,5 @@ inline bool AbstractPlugin::attrExists(const char* name) const
 inline bool AbstractPlugin::attrExists(const QString& name) const
 { return m_attrs->contains(name); }
 
-inline bool AbstractPlugin::setup(PRG* prg, const Attributes* attrs) {
-    Q_ASSERT_X(prg, "AbstractPlugin::setup", "PRG must not be null");
-    Q_ASSERT_X(!m_prg, "AbstractPlugin::setup", "tried to setup a plugin twice");
-    m_prg = prg;
-    m_attrs = attrs;
-    return m_prg != nullptr;
-}
-
-
 } // evoplex
-#endif // BASE_PLUGIN_H
+#endif // ABSTRACT_PLUGIN_H

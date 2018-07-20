@@ -23,8 +23,7 @@
 #include <edge.h>
 #include <node.h>
 
-using namespace evoplex;
-
+namespace evoplex {
 class TestEdge: public QObject
 {
     Q_OBJECT
@@ -37,14 +36,15 @@ private slots:
     void tst_edge3();
 
 private:
+    Node::constructor_key key;
     NodePtr m_nodeA;
     NodePtr m_nodeB;
 };
 
 void TestEdge::initTestCase()
 {
-    m_nodeA = std::make_shared<UNode>(0, Attributes());
-    m_nodeB = std::make_shared<UNode>(1, Attributes());
+    m_nodeA = std::make_shared<UNode>(key, 0, Attributes());
+    m_nodeB = std::make_shared<UNode>(key, 1, Attributes());
 }
 
 void TestEdge::tst_edge1()
@@ -173,5 +173,6 @@ void TestEdge::tst_edge3()
     QCOMPARE(edge.neighbour(), m_nodeB);
 }
 
-QTEST_MAIN(TestEdge)
+} // evoplex
+QTEST_MAIN(evoplex::TestEdge)
 #include "tst_edge.moc"

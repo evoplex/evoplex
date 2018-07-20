@@ -25,6 +25,7 @@
 #include <QTableWidgetItem>
 
 #include "projectwidget.h"
+#include "fontstyles.h"
 #include "savedialog.h"
 #include "ui_projectwidget.h"
 #include "core/experimentsmgr.h"
@@ -43,8 +44,10 @@ ProjectWidget::ProjectWidget(ProjectPtr project, MainGUI* mainGUI, ProjectsPage*
     setWindowTitle(objectName());
     setFocusPolicy(Qt::StrongFocus);
 
-    connect(m_project.data(), SIGNAL(expAdded(Experiment*)), SLOT(slotInsertRow(Experiment*)));
-    connect(m_project.data(), SIGNAL(expEdited(const Experiment*)), SLOT(slotUpdateRow(const Experiment*)));
+    m_ui->labelExps->setFont(FontStyles::subtitle1());
+
+    connect(m_project.data(), SIGNAL(expAdded(int)), SLOT(slotInsertRow(int)));
+    connect(m_project.data(), SIGNAL(expEdited(int)), SLOT(slotUpdateRow(int)));
 
     int col = 0;
     m_headerIdx.insert(TableWidget::H_BUTTON, col++);
@@ -55,6 +58,7 @@ ProjectWidget::ProjectWidget(ProjectPtr project, MainGUI* mainGUI, ProjectsPage*
     m_headerIdx.insert(TableWidget::H_GRAPH, col++);
     m_headerIdx.insert(TableWidget::H_TRIALS, col++);
     m_ui->table->insertColumns(m_headerIdx.keys());
+    m_ui->table->init(mainGUI->mainApp()->expMgr());
 
     connect(m_ui->playAll, &QPushButton::pressed, [this]() { m_project->playAll(); });
 
@@ -62,7 +66,7 @@ ProjectWidget::ProjectWidget(ProjectPtr project, MainGUI* mainGUI, ProjectsPage*
     connect(m_ui->table, SIGNAL(itemDoubleClicked(QTableWidgetItem*)),
             SLOT(onItemDoubleClicked(QTableWidgetItem*)));
 
-    connect(project.data(), SIGNAL(hasUnsavedChanges(bool)),
+    connect(m_project.data(), SIGNAL(hasUnsavedChanges(bool)),
             SLOT(slotHasUnsavedChanges(bool)));
 }
 
@@ -73,6 +77,16 @@ ProjectWidget::~ProjectWidget()
 
 void ProjectWidget::closeEvent(QCloseEvent* event)
 {
+    if (m_project->isRunning()) {
+        QMessageBox::StandardButton res = QMessageBox::question(this, "Evoplex",
+                tr("There are running experiments in this project!\n"
+                   "Would you like to close it anyway?"));
+        if (res == QMessageBox::No) {
+            event->ignore();
+            return ;
+        }
+    }
+
     if (m_project->hasUnsavedChanges()) {
         QMessageBox::StandardButton res = QMessageBox::question(this, "Evoplex",
                 tr("Do you want to save the changes you made to '%1'?\n"
@@ -84,14 +98,15 @@ void ProjectWidget::closeEvent(QCloseEvent* event)
             return;
         }
     }
+
     emit (closed());
     event->accept();
     QDockWidget::closeEvent(event);
 }
 
-void ProjectWidget::fillRow(int row, const Experiment* exp)
+void ProjectWidget::fillRow(int row, const ExperimentPtr& exp)
 {
-    Q_ASSERT(exp);
+    Q_ASSERT(exp && exp->inputs());
 
     m_ui->table->setSortingEnabled(false);
 
@@ -101,8 +116,13 @@ void ProjectWidget::fillRow(int row, const Experiment* exp)
     insertItem(row, TableWidget::H_STOPAT, exp->inputs()->general(GENERAL_ATTRIBUTE_STOPAT).toQString());
     insertItem(row, TableWidget::H_TRIALS, exp->inputs()->general(GENERAL_ATTRIBUTE_TRIALS).toQString());
 
+    if (exp->expStatus() == Status::Invalid) {
+        m_ui->table->setSortingEnabled(true);
+        return;
+    }
+
     // lambda function to add the attributes of a plugin (ie, model or graph)
-    auto pluginAtbs = [this, row](TableWidget::Header header, QString pluginId, const Attributes* attrs)
+    auto pluginAtbs = [this, row](TableWidget::Header header, const QString& pluginId, const Attributes* attrs)
     {
         QString pluginAttrs = pluginId;
         for (const Value& v : attrs->values()) {
@@ -126,17 +146,18 @@ void ProjectWidget::fillRow(int row, const Experiment* exp)
     m_ui->table->setSortingEnabled(true);
 }
 
-void ProjectWidget::slotInsertRow(Experiment* exp)
+void ProjectWidget::slotInsertRow(int expId)
 {
-    fillRow(m_ui->table->insertRow(exp), exp);
+    ExperimentPtr exp = m_project->experiment(expId);
+    fillRow(m_ui->table->insertRow(exp.data()), exp);
 }
 
-void ProjectWidget::slotUpdateRow(const Experiment* exp)
+void ProjectWidget::slotUpdateRow(int expId)
 {
     const int expIdCol = m_headerIdx.value(TableWidget::H_EXPID);
     for (int row = 0; row < m_ui->table->rowCount(); ++row) {
-        if (exp->id() == m_ui->table->item(row, expIdCol)->text().toInt()) {
-            fillRow(row, exp);
+        if (expId == m_ui->table->item(row, expIdCol)->text().toInt()) {
+            fillRow(row, m_project->experiment(expId));
             return;
         }
     }
@@ -153,19 +174,20 @@ void ProjectWidget::insertItem(int row, TableWidget::Header header, QString labe
 
 void ProjectWidget::slotSelectionChanged()
 {
-    Experiment* exp = nullptr;
-    if (!m_ui->table->selectedItems().isEmpty()) {
-        int row = m_ui->table->selectedItems().first()->row();
-        int expId = m_ui->table->item(row, m_headerIdx.value(TableWidget::H_EXPID))->text().toInt();
-        exp = m_project->experiment(expId);
+    if (m_ui->table->selectedItems().isEmpty()) {
+        emit (expSelectionChanged(-1));
+    } else {
+        const int row = m_ui->table->selectedItems().first()->row();
+        const int expId = m_ui->table->item(row,
+                m_headerIdx.value(TableWidget::H_EXPID))->text().toInt();
+        emit (expSelectionChanged(expId));
     }
-    emit (expSelectionChanged(exp));
 }
 
 void ProjectWidget::onItemDoubleClicked(QTableWidgetItem* item)
 {
     int expId = m_ui->table->item(item->row(), m_headerIdx.value(TableWidget::H_EXPID))->text().toInt();
-    emit (openExperiment(m_project->experiment(expId)));
+    emit (openExperiment(expId));
 }
 
 void ProjectWidget::slotHasUnsavedChanges(bool b)

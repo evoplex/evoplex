@@ -89,6 +89,12 @@ TableWidget::TableWidget(QWidget *parent)
 //    connect(m_contextMenu, SIGNAL(openView(int)), this, SLOT(slotOpenView(int)));
 }
 
+void TableWidget::init(ExperimentsMgr* expMgr)
+{
+    m_expMgr = expMgr;
+    connect(m_expMgr, SIGNAL(progressUpdated()), viewport(), SLOT(update()));
+}
+
 void TableWidget::insertColumns(const QList<Header> headers)
 {
     Q_ASSERT_X(headers.at(0) == H_BUTTON, "TableWidget::insertColumns",
@@ -108,6 +114,8 @@ void TableWidget::insertColumns(const QList<Header> headers)
 
 int TableWidget::insertRow(Experiment* exp)
 {
+    Q_ASSERT_X(m_expMgr, "TableWidget", "table must be initialized first");
+
     int row = rowCount();
     QTableWidget::insertRow(row);
 
@@ -121,13 +129,6 @@ int TableWidget::insertRow(Experiment* exp)
     horizontalHeader()->setSectionResizeMode(H_BUTTON, QHeaderView::Fixed);
 
     setItemDelegateForRow(row, new RowsDelegate(exp, this));
-    connect(exp, &Experiment::statusChanged, [this]() { viewport()->update(); });
-    connect(exp, &Experiment::progressUpdated, [this, row]() {
-        if (model()) { // model might be null, eg., tab was closed with running experiments
-            const QModelIndex& idx = model()->index(row, 0);
-            emit (model()->dataChanged(idx, idx));
-        }
-    });
 
     return row;
 }
@@ -145,30 +146,41 @@ void TableWidget::onItemClicked(QTableWidgetItem* item)
 /*********************************************************/
 /*********************************************************/
 
-RowsDelegate::RowsDelegate(const Experiment* exp, TableWidget* table)
+RowsDelegate::RowsDelegate(Experiment* exp, TableWidget* table)
     : QStyledItemDelegate(table)
-    , m_exp(exp)
     , m_table(table)
     , m_hoveredRow(-1)
     , m_hoveredCol(-1)
+    , m_status(exp->expStatus())
+    , m_progress(exp->progress())
 {
-    connect(m_table, &QTableWidget::viewportEntered, [this](){ m_hoveredRow=-1; m_hoveredCol=-1; });
-    connect(m_table, SIGNAL(cellEntered(int,int)), SLOT(onItemEntered(int,int)));
+    connect(m_table, &QTableWidget::viewportEntered,
+        [this]() {
+            m_hoveredRow=-1;
+            m_hoveredCol=-1;
+        });
+
+    connect(m_table, &QTableWidget::cellEntered,
+        [this](int row, int col) {
+            m_hoveredRow = row;
+            m_hoveredCol = col;
+            m_table->viewport()->update();
+        });
+
+    connect(exp, &Experiment::statusChanged,
+        [this](Status s) { m_status = s; });
+
+    connect(exp, &Experiment::progressUpdated,
+        [this](quint16 p) { m_progress = p; });
 }
 
-void RowsDelegate::onItemEntered(int row, int col)
+RowsDelegate::~RowsDelegate()
 {
-    m_hoveredRow = row;
-    m_hoveredCol = col;
-    m_table->viewport()->update();
 }
 
 void RowsDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option,
                              const QModelIndex& index) const
 {
-    if (m_table->rowCount() <= 0)
-        return;
-
     QStyleOptionViewItem opt = option;
 
     //
@@ -191,8 +203,9 @@ void RowsDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option,
     }
     QStyledItemDelegate::paint(painter, opt, index);
 
-    if (index.column() != 0)
+    if (index.column() != 0) {
         return;
+    }
 
     //
     // draw the toggle button in the first column
@@ -202,30 +215,29 @@ void RowsDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option,
     painter->save();
     painter->setRenderHint(QPainter::Antialiasing);
     QPoint center = opt.rect.center();
-    Experiment::Status status = m_exp->expStatus();
-    if (status == Experiment::READY) {
+    if (m_status == Status::Paused || m_status == Status::Disabled) {
         if (btnIsHovered) { //play (only when hovered)
             painter->drawPixmap(center.x()-14, center.y()-14, m_table->kIcon_playon);
         } else if (rowIsHovered) {
             painter->drawPixmap(center.x()-14, center.y()-14, m_table->kIcon_play);
         }
         // show progress
-        if (m_exp->progress() > 0) {
+        if (m_progress > 0) {
             painter->setPen(m_table->kPen_blue);
-            painter->drawArc(center.x()-14, center.y()-14, 28, 28, 90*16, -m_exp->progress()*16);
+            painter->drawArc(center.x()-14, center.y()-14, 28, 28, 90*16, -m_progress*16);
         }
-    } else if (status == Experiment::RUNNING || status == Experiment::QUEUED) {
+    } else if (m_status == Status::Running || m_status == Status::Queued) {
         if (btnIsHovered || rowIsHovered) { // pause (always show)
             painter->drawPixmap(center.x()-14, center.y()-14, m_table->kIcon_pauseon);
         } else {
             painter->drawPixmap(center.x()-14, center.y()-14, m_table->kIcon_pause);
         }
         // show progress
-        if (m_exp->progress() > 0) {
+        if (m_progress > 0) {
             painter->setPen(m_table->kPen_blue);
-            painter->drawArc(center.x()-14, center.y()-14, 28, 28, 90*16, -m_exp->progress()*16);
+            painter->drawArc(center.x()-14, center.y()-14, 28, 28, 90*16, -m_progress*16);
         }
-    } else if (status == Experiment::FINISHED) { // check (always)
+    } else if (m_status == Status::Finished) { // check (always)
         painter->drawPixmap(center.x()-7, center.y()-7, m_table->kIcon_check);
     } else {
         painter->drawPixmap(center.x()-7, center.y()-7, m_table->kIcon_x);

@@ -35,12 +35,12 @@ class ExperimentWidget : public PPageDockWidget
     Q_OBJECT
 
 public:
-    explicit ExperimentWidget(Experiment* exp, MainGUI* mainGUI, ProjectsPage* ppage);
+    explicit ExperimentWidget(ExperimentPtr exp, MainGUI* mainGUI, ProjectsPage* ppage);
     ~ExperimentWidget();
 
     virtual void clearSelection() { emit (clearSelections()); }
     virtual ProjectPtr project() const { return m_exp->project(); }
-    inline Experiment* exp() const { return m_exp; }
+    inline ExperimentPtr exp() const { return m_exp; }
 
 signals:
     void closed();
@@ -51,7 +51,7 @@ protected:
     void closeEvent(QCloseEvent *event);
 
 private slots:
-    void slotStatusChanged(Experiment::Status status);
+    void slotStatusChanged(Status status);
 
 private:
     const QIcon m_kIcon_play;
@@ -60,7 +60,7 @@ private:
     const QIcon m_kIcon_reset;
     const QIcon m_kIcon_stop;
 
-    Experiment* m_exp;
+    ExperimentPtr m_exp;
     QMainWindow* m_innerWindow;
     QTimer* m_timer;
 

@@ -24,15 +24,14 @@
 #include <QPair>
 #include <vector>
 
-#include <plugininterfaces.h>
+#include <plugininterface.h>
 
 namespace evoplex {
 class CustomGraph: public AbstractGraph
 {
 public:
-    CustomGraph(const QString &name);
-    bool init();
-    void reset();
+    bool init() override;
+    void reset() override;
 
 private:
     // graph parameters

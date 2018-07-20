@@ -18,13 +18,16 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <QMessageBox>
 #include <QStringList>
 #include <QThread>
 
+#include "core/experimentsmgr.h"
+#include "core/include/constants.h"
+
 #include "settingspage.h"
 #include "ui_settingspage.h"
-#include "core/experimentsmgr.h"
-#include "constants.h"
+#include "fontstyles.h"
 
 namespace evoplex
 {
@@ -36,20 +39,31 @@ SettingsPage::SettingsPage(MainGUI* mainGUI)
 {
     m_ui->setupUi(this);
 
-    connect(m_ui->reset, SIGNAL(pressed()), SLOT(resetDefaults()));
+    m_ui->labelSettings->setFont(FontStyles::subtitle1());
 
-    connect(m_ui->fontSize, SIGNAL(valueChanged(int)), mainGUI, SLOT(setFontSize(int)));
+    connect(m_ui->reset, SIGNAL(pressed()), SLOT(resetDefaults()));
 
     m_ui->threads->setMinimum(1);
     m_ui->threads->setMaximum(QThread::idealThreadCount());
     connect(m_ui->threads, static_cast<void(QSpinBox::*)(int)>(&QSpinBox::valueChanged),
-            [mainGUI](int newValue) { mainGUI->mainApp()->expMgr()->setMaxThreadCount(newValue); });
+    [this, mainGUI](int newValue) {
+        QString error;
+        mainGUI->mainApp()->expMgr()->setMaxThreadCount(newValue, &error);
+        if (!error.isEmpty()) {
+            QMessageBox::warning(this, "Evoplex", error);
+            m_ui->threads->blockSignals(true);
+            m_ui->threads->setValue(m_mainGUI->mainApp()->expMgr()->maxThreadsCount());
+            m_ui->threads->blockSignals(false);
+        }
+    });
 
     m_ui->colormaps->insertItems(0, m_mainGUI->colorMapMgr()->names());
     connect(m_ui->colormaps, SIGNAL(currentIndexChanged(QString)), SLOT(setDfCMapName(QString)));
     connect(m_ui->colormapsize, SIGNAL(currentTextChanged(QString)), SLOT(setDfCMapSize(QString)));
 
-    connect(m_ui->delay, &QSlider::valueChanged, [mainGUI](int v) { mainGUI->mainApp()->setDefaultStepDelay(v); });
+    connect(m_ui->delay, &QSlider::valueChanged, [mainGUI](int v) {
+        mainGUI->mainApp()->setDefaultStepDelay(static_cast<quint16>(v));
+    });
 
     m_ui->stepsToFlush->setMinimum(1);
     m_ui->stepsToFlush->setMaximum(EVOPLEX_MAX_STEPS);
@@ -66,8 +80,6 @@ SettingsPage::~SettingsPage()
 
 void SettingsPage::refreshFields()
 {
-    m_ui->fontSize->setValue(m_mainGUI->fontSize());
-
     m_ui->threads->setValue(m_mainGUI->mainApp()->expMgr()->maxThreadsCount());
 
     const CMapKey cmap = m_mainGUI->colorMapMgr()->defaultColorMap();
@@ -84,7 +96,6 @@ void SettingsPage::resetDefaults()
     m_mainGUI->mainApp()->expMgr()->resetSettingsToDefault();
     m_mainGUI->colorMapMgr()->resetSettingsToDefault();
     m_mainGUI->mainApp()->resetSettingsToDefault();
-    m_mainGUI->resetSettingsToDefault();
     refreshFields();
 }
 

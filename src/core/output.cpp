@@ -22,6 +22,7 @@
 #include <QStringList>
 
 #include "output.h"
+#include "trial.h"
 #include "utils.h"
 
 namespace evoplex
@@ -31,6 +32,7 @@ Cache::Cache(Values inputs, std::vector<int> trialIds, OutputPtr parent)
     : m_parent(parent)
     , m_inputs(inputs)
 {
+    Q_ASSERT_X(!m_inputs.empty(), "Cache", "inputs cannot be empty");
     for (int trialId : trialIds) {
         m_trials.insert({trialId, Data()});
     }
@@ -78,9 +80,9 @@ DefaultOutput::DefaultOutput(const Function f, const Entity e, const AttributeRa
             .arg(m_attrRange->attrName());
 }
 
-void DefaultOutput::doOperation(const int trialId, const AbstractModel* model)
+void DefaultOutput::doOperation(const Trial* trial)
 {
-    if (m_allTrialIds.find(trialId) == m_allTrialIds.end()) {
+    if (m_allTrialIds.find(trial->id()) == m_allTrialIds.end()) {
         return;
     }
 
@@ -88,16 +90,15 @@ void DefaultOutput::doOperation(const int trialId, const AbstractModel* model)
     switch (m_func) {
     case F_Count:
         if (m_entity == E_Nodes) {
-            allValues = Stats::count(model->graph()->nodes(), m_attrRange->id(), m_allInputs);
+            allValues = Stats::count(trial->graph()->nodes(), m_attrRange->id(), m_allInputs);
         } else {
-            allValues = Stats::count(model->graph()->edges(), m_attrRange->id(), m_allInputs);
+            allValues = Stats::count(trial->graph()->edges(), m_attrRange->id(), m_allInputs);
         }
         break;
     default:
         qFatal("invalid function!");
-        break;
     }
-    updateCaches(trialId, model->currStep(), allValues);
+    updateCaches(trial->id(), trial->step(), allValues);
 }
 
 bool DefaultOutput::operator==(const OutputPtr output) const
@@ -118,12 +119,12 @@ CustomOutput::CustomOutput() : Output()
     m_headerPrefix = "custom_";
 }
 
-void CustomOutput::doOperation(const int trialId, const AbstractModel* model)
+void CustomOutput::doOperation(const Trial* trial)
 {
-    if (m_allTrialIds.find(trialId) == m_allTrialIds.end()) {
+    if (m_allTrialIds.find(trial->id()) == m_allTrialIds.end()) {
         return;
     }
-    updateCaches(trialId, model->currStep(), model->customOutputs(m_allInputs));
+    updateCaches(trial->id(), trial->step(), trial->model()->customOutputs(m_allInputs));
 }
 
 bool CustomOutput::operator==(const OutputPtr output) const
@@ -211,7 +212,7 @@ void Output::updateCaches(const int trialId, const int currStep, const Values& a
         newRow.second.reserve(cache->m_inputs.size());
 
         for (Value input : cache->m_inputs) {
-            int col = std::find(m_allInputs.begin(), m_allInputs.end(), input) - m_allInputs.begin();
+            const size_t col = std::find(m_allInputs.begin(), m_allInputs.end(), input) - m_allInputs.begin();
             newRow.second.emplace_back(allValues.at(col));
         }
         if (data.rows.empty()) data.last = data.rows.before_begin();

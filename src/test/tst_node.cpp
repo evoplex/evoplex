@@ -20,10 +20,11 @@
  */
 
 #include <QtTest>
+#include <QStringList>
+
 #include <node.h>
 
-using namespace evoplex;
-
+namespace evoplex {
 class TestNode: public QObject
 {
     Q_OBJECT
@@ -31,37 +32,102 @@ class TestNode: public QObject
 private slots:
     void initTestCase() {}
     void cleanupTestCase() {}
+    void tst_Node();
 
+private:
+    Node::constructor_key key;
+    void _tst_attrs(Node* node, Attributes attrs);
+    void _tst_xy(Node* node, int x, int y);
+    void _tst_clone(const Node* node);
+    void _tst_degree(Node* node);
 };
 
-/* TO DO:
+void TestNode::_tst_attrs(Node* node, Attributes attrs)
+{
+    QCOMPARE(node->attrs().names(), attrs.names());
+    QCOMPARE(node->attrs().values(), attrs.values());
 
-This test should cover the functions below.
+    // Tests if 'Node::setAttr()' works as expected.
+    const Value newValue = "another-type";
+    node->setAttr(0, newValue);
 
-constructors:
-     UNode(int id, Attributes attrs, int x, int y)
-     DNode(int id, Attributes attrs, int x, int y)
+    QCOMPARE(node->attrs().name(0), attrs.name(0));
+    QCOMPARE(node->attr(attrs.name(0)), newValue);
+    QCOMPARE(node->attrs().value(0), newValue);
+    QCOMPARE(node->attr(0), newValue);
+    QCOMPARE(node->attrs().size(), attrs.size());
+}
 
-functions:
-    inline const Attributes& attrs() const;
-    inline const Value& attr(const char* name) const;
-    inline const Value& attr(const int id) const;
-    inline void setAttr(const int id, const Value& value);
+void TestNode::_tst_xy(Node* node, int x, int y)
+{
+    QCOMPARE(node->x(), x);
+    QCOMPARE(node->y(), y);
 
-    inline int id() const;
-    inline int x() const;
-    inline void setX(int x);
-    inline int y() const;
-    inline void setY(int y);
-    inline void setCoords(int x, int y);
+    // Tests if 'Node::setX()' works as expected
+    x = 2;
+    node->setX(x);
+    QCOMPARE(node->x(), x);
 
-    inline NodePtr clone() const override;
-    inline const Edges& inEdges() const override;
-    inline const Edges& outEdges() const override;
-    inline int degree() const override;
-    inline int inDegree() const override;
-    inline int outDegree() const override;
-*/
+    // Tests if 'Node::setY()' works as expected
+    y = 3;
+    node->setY(y);
+    QCOMPARE(node->y(), y);
 
-QTEST_MAIN(TestNode)
+    // Tests if 'Node::setYCoords()' works as expected
+    x = 3;
+    y = 4;
+    node->setCoords(x,y);
+    QCOMPARE(node->x(), x);
+    QCOMPARE(node->y(), y);
+}
+
+void TestNode::_tst_clone(const Node* node) {
+    // Tests if 'Node::clone()' works as expected.
+    NodePtr c = node->clone();
+    QCOMPARE(c->id(), node->id());
+    QCOMPARE(c->x(), node->x());
+    QCOMPARE(c->y(), node->y());
+    QCOMPARE(c->attrs().size(), node->attrs().size());
+    QCOMPARE(c->attrs().names(), node->attrs().names());
+    QCOMPARE(c->attrs().values(), node->attrs().values());
+    QCOMPARE(c->degree(), node->degree());
+    QCOMPARE(c->inDegree(), node->inDegree());
+    QCOMPARE(c->outDegree(), node->outDegree());
+}
+
+void TestNode::_tst_degree(Node* node)
+{
+    // Tests if degree functions return 0 with an empty node
+    QCOMPARE(node->degree(), 0);
+    QCOMPARE(node->inDegree(), 0);
+    QCOMPARE(node->outDegree(), 0);
+}
+
+void TestNode::tst_Node()
+{
+    int id = 0, x = 1, y = 2;
+    const QStringList names = { "test0", "test1", "test2" };
+    const Value values[] = { Value(123), Value(234), Value(456) };
+    Attributes attrs(names.size());
+    for(int i = 0; i < names.size(); ++i){
+        attrs.replace(i, names[i], values[i]);
+    }
+
+    auto tests = [this, id, x, y, attrs](Node* node) {
+        QCOMPARE(node->id(), id);
+        _tst_attrs(node, attrs);
+        _tst_xy(node, x, y);
+        _tst_clone(node);
+        _tst_degree(node);
+    };
+
+    UNode* unode = new UNode(key, id, attrs, x, y);
+    tests(unode);
+
+    DNode* dnode = new DNode(key, id, attrs, x, y);
+    tests(dnode);
+}
+
+} // evoplex
+QTEST_MAIN(evoplex::TestNode)
 #include "tst_node.moc"

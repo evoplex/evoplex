@@ -28,31 +28,32 @@
 #include "experiment.h"
 #include "mainapp.h"
 
-namespace evoplex
-{
+namespace evoplex {
+
+class Project;
+using ProjectPtr = QSharedPointer<Project>;
+using Experiments = std::map<int, ExperimentPtr>;
 
 class Project : public QObject, public QEnableSharedFromThis<Project>
 {
     Q_OBJECT
 
 public:
-    Project(MainApp* mainApp, int id);
-    ~Project() {}
+    explicit Project(MainApp* mainApp, int id);
+    ~Project();
 
     bool init(QString& error, const QString& filepath="");
 
-    void destroyExperiments();
-
     // Add a new experiment to this project.
     // @return nullptr if unsuccessful
-    Experiment* newExperiment(ExpInputs* inputs, QString& error);
+    ExperimentPtr newExperiment(ExpInputs* inputs, QString& error);
 
     // Edit an experiment of this project.
     bool editExperiment(int expId, ExpInputs* newInputs, QString& error);
 
     // Import a set of experiments from a csv file. It stops if an experiment fails.
     // return the number of experiments imported.
-    int importExperiments(const QString& filePath, QString& errorMsg);
+    int importExperiments(const QString& filePath, QString& error);
 
     // Save project into the dest directory.
     // A project is composed of plain csv files
@@ -61,22 +62,22 @@ public:
     // execute all experiments of this project.
     void playAll();
 
-    inline const QString& name() const { return m_name; }
-    inline const QString& filepath() const { return m_filepath; }
     void setFilePath(const QString& path);
-
-    inline Experiment* experiment(int expId) const { return m_experiments.at(expId); }
-    inline const std::map<int, Experiment*>& experiments() const { return m_experiments; }
-
-    inline int id() const { return m_id; }
-    inline bool hasUnsavedChanges() const { return m_hasUnsavedChanges; }
 
     // generate a valid experiment id
     int generateExpId() const;
 
+    inline int id() const;
+    inline const QString& name() const;
+    inline const QString& filepath() const;
+    inline ExperimentPtr experiment(int expId) const;
+    inline const Experiments& experiments() const;
+    inline bool hasUnsavedChanges() const;
+    inline bool isRunning() const;
+
 signals:
-    void expAdded(Experiment* exp);
-    void expEdited(const Experiment* exp);
+    void expAdded(int expId);
+    void expEdited(int expId);
     void hasUnsavedChanges(bool);
 
 private:
@@ -85,8 +86,39 @@ private:
     QString m_filepath;
     QString m_name;
     bool m_hasUnsavedChanges;
-    std::map<int, Experiment*> m_experiments;
+    Experiments m_experiments;
 };
+
+inline const QString& Project::name() const
+{ return m_name; }
+
+inline const QString& Project::filepath() const
+{ return m_filepath; }
+
+inline ExperimentPtr Project::experiment(int expId) const {
+    Experiments::const_iterator it = m_experiments.find(expId);
+    return (it != m_experiments.end()) ? m_experiments.at(expId) : nullptr;
 }
 
+inline const Experiments& Project::experiments() const
+{ return m_experiments; }
+
+inline int Project::id() const
+{ return m_id; }
+
+inline bool Project::hasUnsavedChanges() const
+{ return m_hasUnsavedChanges; }
+
+inline bool Project::isRunning() const
+{
+    for (auto const& e : m_experiments) {
+        if (e.second->expStatus() == Status::Running ||
+                e.second->expStatus() == Status::Queued) {
+            return true;
+        }
+    }
+    return false;
+}
+
+} //evoplex
 #endif // PROJECT_H

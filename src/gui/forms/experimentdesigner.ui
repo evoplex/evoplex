@@ -21,17 +21,7 @@
     <item>
      <widget class="QTreeWidget" name="treeWidget">
       <property name="styleSheet">
-       <string notr="true">QTreeWidget {
-	background-color: rgb(51, 51, 51);
-}
-QTreeWidget::item {
-	height: 26px;
-	margin-top: 4px;
-}
-QTreeWidget::item:has-children {
-	margin-top: 8px;
-	margin-bottom: -3px;
-}</string>
+       <string notr="true"/>
       </property>
       <property name="frameShape">
        <enum>QFrame::NoFrame</enum>
@@ -90,17 +80,11 @@ QTreeWidget::item:has-children {
       </item>
       <item>
        <widget class="QPushButton" name="bEdit">
-        <property name="styleSheet">
-         <string notr="true">QPushButton  {
-  border: 1px solid white;
-  border-radius: 8px;
-  background-color: transparent;
-  padding-left: 10px;
-  padding-right: 10px;
-}
-QPushButton::hover {
-  background-color: #4285f4;
-}</string>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
         </property>
         <property name="text">
          <string>Edit</string>
@@ -110,22 +94,10 @@ QPushButton::hover {
       <item>
        <widget class="QPushButton" name="bSubmit">
         <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">QPushButton  {
-  border: 1px solid white;
-  border-radius: 8px;
-  background-color: transparent;
-  padding-left: 10px;
-  padding-right: 10px;
-}
-QPushButton::hover {
-  background-color: #4285f4;
-}</string>
         </property>
         <property name="text">
          <string>Create</string>

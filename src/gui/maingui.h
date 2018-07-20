@@ -34,7 +34,7 @@ class SaveDialog;
 
 class PluginsPage;
 class ProjectsPage;
-class QueuePage;
+//class QueuePage;
 class SettingsPage;
 class WelcomePage;
 
@@ -43,23 +43,16 @@ class MainGUI: public QMainWindow
     Q_OBJECT
 
 public:
-    explicit MainGUI(MainApp* mainApp, QWidget* parent=0);
+    explicit MainGUI(MainApp* mainApp);
     ~MainGUI();
-
-    void resetSettingsToDefault();
 
     inline MainApp* mainApp() const { return m_mainApp; }
     inline ColorMapMgr* colorMapMgr() const { return m_colorMapMgr; }
     inline SaveDialog* saveDialog() const { return m_saveDialog; }
 
-    int fontSize();
-
 signals:
     void newProject();
     void openProject(QString path);
-
-public slots:
-    void setFontSize(int size);
 
 private slots:
     void updateSaveButtons(ProjectPtr proj);
@@ -84,13 +77,12 @@ private:
         PAGE_SETTINGS
     };
 
-    QSettings m_userPrefs;
     MainApp* m_mainApp;
     ColorMapMgr* m_colorMapMgr;
 
     SaveDialog* m_saveDialog;
     WelcomePage* m_welcome;
-    QueuePage* m_queue;
+    //QueuePage* m_queue;
     ProjectsPage* m_projectsPage;
     PluginsPage* m_plugins;
     SettingsPage* m_settings;

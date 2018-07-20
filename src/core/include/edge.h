@@ -34,17 +34,29 @@ class Node;
 typedef std::shared_ptr<Node> NodePtr;
 typedef std::shared_ptr<Edge> EdgePtr;
 
+/**
+ * @brief An Edge connects a node to itself or to another node.
+ * @attention An edge can only be created by an AbstractGraph derived object.
+ */
 class Edge
 {
+    friend class AbstractGraph;
+    friend class TestEdge;
+
+private:
+    struct constructor_key { /* this is a private key accessible only to friends */ };
+
 public:
-    explicit Edge(int id, const NodePtr& origin, const NodePtr& neighbour,
-                  Attributes* attrs=new Attributes(), bool ownsAttrs=true)
+    explicit Edge(const constructor_key&, int id, const NodePtr& origin,
+                  const NodePtr& neighbour, Attributes* attrs=new Attributes(),
+                  bool ownsAttrs=true)
         : m_id(id), m_origin(origin), m_neighbour(neighbour),
           m_attrs(attrs), m_ownsAttrs(ownsAttrs) {}
 
     ~Edge() { if (m_ownsAttrs) delete m_attrs; }
 
     inline const Attributes* attrs() const;
+    inline const Value& attr(const QString& name) const;
     inline const Value& attr(const char* name) const;
     inline const Value& attr(const int id) const;
     inline void setAttr(const int id, const Value& value);
@@ -59,7 +71,7 @@ private:
     const NodePtr& m_origin;
     const NodePtr& m_neighbour;
     Attributes* m_attrs;
-    bool m_ownsAttrs;
+    const bool m_ownsAttrs;
 };
 
 /************************************************************************
@@ -68,6 +80,9 @@ private:
 
 inline const Attributes* Edge::attrs() const
 { return m_attrs; }
+
+inline const Value& Edge::attr(const QString& name) const
+{ return m_attrs->value(name); }
 
 inline const Value& Edge::attr(const char* name) const
 { return m_attrs->value(name); }

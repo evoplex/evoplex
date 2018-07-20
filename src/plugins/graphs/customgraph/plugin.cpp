@@ -24,11 +24,6 @@
 
 namespace evoplex {
 
-CustomGraph::CustomGraph(const QString& name)
-    : AbstractGraph(name)
-{
-}
-
 bool CustomGraph::init()
 {
     m_filePath = attrs()->value(FilePath).toString();
@@ -108,5 +103,5 @@ void CustomGraph::reset()
 
 
 } // evoplex
-REGISTER_GRAPH(CustomGraph)
+REGISTER_PLUGIN(CustomGraph)
 #include "plugin.moc"

@@ -25,8 +25,9 @@
 #include <QDockWidget>
 #include <QtCharts/QLineSeries>
 
-#include "outputwidget.h"
 #include "core/experiment.h"
+
+#include "outputwidget.h"
 
 class Ui_LineChartSettings;
 
@@ -37,7 +38,7 @@ class LineChart : public QDockWidget
     Q_OBJECT
 
 public:
-    explicit LineChart(Experiment* exp, QWidget* parent);
+    explicit LineChart(ExperimentPtr exp, QWidget* parent);
     ~LineChart();
 
 public slots:
@@ -55,14 +56,14 @@ private:
     };
 
     Ui_LineChartSettings* m_settingsDlg;
-    Experiment* m_exp;
+    ExperimentPtr m_exp;
     QtCharts::QChart* m_chart;
     std::vector<Series> m_series;
     float m_maxY;
     bool m_finished;
-    int m_currTrialId;
+    quint16 m_currTrialId;
 
-    AbstractModel* m_model;
+    const Trial* m_trial;
     int m_currStep;
 
     void removeAllSeries();

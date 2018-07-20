@@ -41,26 +41,26 @@ class ProjectWidget : public PPageDockWidget
 
 public:
     explicit ProjectWidget(ProjectPtr project, MainGUI* mainGUI, ProjectsPage* ppage);
-    ~ProjectWidget();
+    ~ProjectWidget() override;
 
-    virtual ProjectPtr project() const { return m_project; }
+    inline ProjectPtr project() const override { return m_project; }
 
-    void clearSelection();
+    void clearSelection() override;
 
 signals:
     void closed();
 
 protected:
-    void closeEvent(QCloseEvent* event);
+    void closeEvent(QCloseEvent* event) override;
 
 signals:
-    void expSelectionChanged(Experiment* exp);
-    void openExperiment(Experiment* exp);
+    void expSelectionChanged(int expId);
+    void openExperiment(int expId);
     void hasUnsavedChanges(ProjectPtr project);
 
 public slots:
-    void slotInsertRow(Experiment* exp);
-    void slotUpdateRow(const Experiment* exp);
+    void slotInsertRow(int expId);
+    void slotUpdateRow(int expId);
     void slotHasUnsavedChanges(bool b);
 
 private slots:
@@ -74,7 +74,7 @@ private:
 
     QMap<TableWidget::Header, int> m_headerIdx; // map Header to column index
 
-    void fillRow(int row, const Experiment* exp);
+    void fillRow(int row, const ExperimentPtr& exp);
 
     void insertItem(int row, TableWidget::Header header, QString label, QString tooltip="");
 };

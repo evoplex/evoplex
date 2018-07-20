@@ -23,6 +23,8 @@
 #include <QMessageBox>
 #include <QMutex>
 
+#include "core/trial.h"
+
 #include "graphwidget.h"
 #include "ui_graphwidget.h"
 #include "titlebar.h"
@@ -30,19 +32,19 @@
 namespace evoplex
 {
 
-GraphWidget::GraphWidget(MainGUI* mainGUI, Experiment* exp, ExperimentWidget* parent)
+GraphWidget::GraphWidget(MainGUI* mainGUI, ExperimentPtr exp, ExperimentWidget* parent)
     : QDockWidget(parent)
     , m_ui(new Ui_GraphWidget)
     , m_settingsDlg(new GraphSettings(mainGUI, exp, this))
     , m_exp(exp)
-    , m_model(nullptr)
+    , m_trial(nullptr)
     , m_currStep(-1)
     , m_selectedNode(-1)
     , m_zoomLevel(0)
     , m_nodeSizeRate(10.f)
     , m_nodeRadius(m_nodeSizeRate)
     , m_origin(5,25)
-    , m_cacheStatus(Ready)
+    , m_cacheStatus(CacheStatus::Ready)
     , m_expWidget(parent)
     , m_posEntered(0,0)
 {
@@ -52,7 +54,7 @@ GraphWidget::GraphWidget(MainGUI* mainGUI, Experiment* exp, ExperimentWidget* pa
     Q_ASSERT_X(!m_exp->autoDeleteTrials(), "GraphWidget",
                "tried to build a GraphWidget for a experiment that will be auto-deleted!");
 
-    connect(m_exp, SIGNAL(restarted()), SLOT(slotRestarted()));
+    connect(m_exp.data(), SIGNAL(restarted()), SLOT(slotRestarted()));
 
     QWidget* front = new QWidget(this);
     m_ui->setupUi(front);
@@ -66,7 +68,7 @@ GraphWidget::GraphWidget(MainGUI* mainGUI, Experiment* exp, ExperimentWidget* pa
 
     // setTrial() triggers a timer that needs to be exec in the main thread
     // thus, we need to use queuedconnection here
-    connect(exp, &Experiment::trialCreated, this,
+    connect(exp.data(), &Experiment::trialCreated, this,
             [this](int trialId) { if (trialId == m_currTrialId) setTrial(m_currTrialId); },
             Qt::QueuedConnection);
 
@@ -79,17 +81,17 @@ GraphWidget::GraphWidget(MainGUI* mainGUI, Experiment* exp, ExperimentWidget* pa
     connect(m_ui->bZoomOut, SIGNAL(clicked(bool)), SLOT(zoomOut()));
     connect(m_ui->bReset, SIGNAL(clicked(bool)), SLOT(resetView()));
 
-    m_attrs.resize(exp->modelPlugin()->nodeAttrsScope().size());
+    m_attrs.resize(static_cast<size_t>(exp->modelPlugin()->nodeAttrsScope().size()));
     for (const AttributeRange* attrRange : exp->modelPlugin()->nodeAttrsScope()) {
         QLineEdit* le = new QLineEdit();
         le->setToolTip(attrRange->attrRangeStr());
         connect(le, &QLineEdit::editingFinished, [this, attrRange, le]() {
-            if (!m_model || !m_model->graph() || m_ui->nodeId->value() < 0) {
+            if (!m_trial || !m_trial->graph() || m_ui->nodeId->value() < 0) {
                 return;
             }
             QString err;
-            const NodePtr& node = m_model->node(m_ui->nodeId->value());
-            if (m_model->status() == Experiment::RUNNING) {
+            const NodePtr& node = m_trial->graph()->node(m_ui->nodeId->value());
+            if (m_trial->status() == Status::Running) {
                 err = "You cannot change things in a running experiment.\n"
                       "Please, pause it and try again.";
             } else {
@@ -124,7 +126,7 @@ GraphWidget::GraphWidget(MainGUI* mainGUI, Experiment* exp, ExperimentWidget* pa
 
 GraphWidget::~GraphWidget()
 {
-    m_model = nullptr;
+    m_trial = nullptr;
     m_exp = nullptr;
     delete m_ui;
     delete m_nodeCMap;
@@ -137,19 +139,19 @@ void GraphWidget::updateCache(bool force)
         return;
     }
 
-    if (m_cacheStatus == Updating) {
+    if (m_cacheStatus == CacheStatus::Updating) {
         return;
     }
 
     QMutex mutex;
     mutex.lock();
-    m_cacheStatus = Updating;
-    QFuture<int> future = QtConcurrent::run(this, &GraphWidget::refreshCache);
-    QFutureWatcher<int>* watcher = new QFutureWatcher<int>;
+    m_cacheStatus = CacheStatus::Updating;
+    QFuture<CacheStatus> future = QtConcurrent::run(this, &GraphWidget::refreshCache);
+    QFutureWatcher<CacheStatus>* watcher = new QFutureWatcher<CacheStatus>;
     connect(watcher, &QFutureWatcher<int>::finished, [this, watcher]() {
-        m_cacheStatus = (CacheStatus) watcher->result();
+        m_cacheStatus = static_cast<CacheStatus>(watcher->result());
         watcher->deleteLater();
-        if (m_cacheStatus == Scheduled) {
+        if (m_cacheStatus == CacheStatus::Scheduled) {
             m_updateCacheTimer.start(10);
         }
         update();
@@ -166,7 +168,7 @@ void GraphWidget::slotRestarted()
     }
     m_selectedNode = -1;
     m_ui->inspector->hide();
-    m_model = nullptr;
+    m_trial = nullptr;
     m_ui->currStep->setText("--");
     updateCache(true);
 }
@@ -181,9 +183,9 @@ void GraphWidget::setNodeCMap(ColorMap* cmap)
 void GraphWidget::setTrial(int trialId)
 {
     m_currTrialId = trialId;
-    m_model = m_exp->trial(trialId);
-    if (m_model) {
-        m_ui->currStep->setText(QString::number(m_model->currStep()));
+    m_trial = m_exp->trial(trialId);
+    if (m_trial && m_trial->model()) {
+        m_ui->currStep->setText(QString::number(m_trial->step()));
     } else {
         m_ui->currStep->setText("--");
     }
@@ -216,15 +218,15 @@ void GraphWidget::resetView()
 
 void GraphWidget::mousePressEvent(QMouseEvent* e)
 {
-    if (e->button() == Qt::LeftButton)
+    if (e->button() == Qt::LeftButton) {
         m_posEntered = e->pos();
+    }
 }
 
 void GraphWidget::mouseReleaseEvent(QMouseEvent *e)
 {
-    if (!m_model || e->button() != Qt::LeftButton
-            || (m_ui->inspector->isVisible()
-                && m_ui->inspector->geometry().contains(e->pos()))) {
+    if (!m_trial || !m_trial->model() || e->button() != Qt::LeftButton ||
+            (m_ui->inspector->isVisible() && m_ui->inspector->geometry().contains(e->pos()))) {
         return;
     }
 
@@ -263,10 +265,10 @@ void GraphWidget::updateInspector(const NodePtr& node)
 
 void GraphWidget::updateView(bool forceUpdate)
 {
-    if (!m_model || (!forceUpdate && m_model->currStep() == m_currStep)) {
+    if (!m_trial || !m_trial->model() || (!forceUpdate && m_trial->step() == m_currStep)) {
         return;
     }
-    m_currStep = m_model->currStep();
+    m_currStep = m_trial->step();
     m_ui->currStep->setText(QString::number(m_currStep));
     update();
 }

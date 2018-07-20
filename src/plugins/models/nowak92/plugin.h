@@ -21,14 +21,14 @@
 #ifndef NOWAK92_H
 #define NOWAK92_H
 
-#include <plugininterfaces.h>
+#include <plugininterface.h>
 
 namespace evoplex {
 class ModelNowak: public AbstractModel
 {
 public:
-    virtual bool init();
-    virtual bool algorithmStep();
+    bool init() override;
+    bool algorithmStep() override;
 
 private:
     enum NodeAttr { Strategy, Score };

@@ -41,7 +41,7 @@ ProjectsPage::ProjectsPage(MainGUI* mainGUI)
     setDockOptions(QMainWindow::AllowTabbedDocks | QMainWindow::GroupedDragging);
     setDockNestingEnabled(true);
     setAnimated(true);
-    setCentralWidget(0);
+    setCentralWidget(nullptr);
 
     connect(this, SIGNAL(tabifiedDockWidgetActivated(QDockWidget*)),
             SLOT(slotFocusChanged(QDockWidget*)));
@@ -105,9 +105,16 @@ void ProjectsPage::addProjectWidget(ProjectPtr project)
     emit (isEmpty(false));
 
     //connect(m_contextMenu, SIGNAL(openView(int)), wp, SLOT(slotOpenView(int)));
-    connect(pw, &ProjectWidget::expSelectionChanged, [this](Experiment* exp) { m_expDesigner->setExperiment(exp); });
-    connect(pw, SIGNAL(openExperiment(Experiment*)), this, SLOT(slotOpenExperiment(Experiment*)));
     connect(pw, SIGNAL(hasUnsavedChanges(ProjectPtr)), SIGNAL(hasUnsavedChanges(ProjectPtr)));
+
+    connect(pw, &ProjectWidget::openExperiment, [this, project](int expId) {
+        slotOpenExperiment(project->experiment(expId));
+    });
+
+    connect(pw, &ProjectWidget::expSelectionChanged, [this, project](int expId) {
+        m_expDesigner->setExperiment(project->experiment(expId));
+    });
+
     connect(pw, &ProjectWidget::closed, [this, pw, project]() {
         for (ExperimentWidget* expW : m_experiments) {
             if (expW->exp()->project() == project) {
@@ -126,7 +133,7 @@ void ProjectsPage::addProjectWidget(ProjectPtr project)
     });
 
     for (auto& i : project->experiments()) {
-        pw->slotInsertRow(i.second);
+        pw->slotInsertRow(i.second->id());
     }
 }
 
@@ -134,12 +141,11 @@ bool ProjectsPage::slotNewProject()
 {
     QString error;
     ProjectPtr p = m_mainApp->newProject(error);
-    if (p) {
-        addProjectWidget(p);
-    } else {
+    if (p.isNull()) {
         QMessageBox::warning(this, "Evoplex", error);
         return false;
     }
+    addProjectWidget(p);
     return true;
 }
 
@@ -154,19 +160,24 @@ bool ProjectsPage::slotOpenProject(QString path)
 
     QString error;
     ProjectPtr project = m_mainApp->newProject(error, path);
-    if (!project) {
-        QMessageBox::warning(this, "Evoplex", error);
+    if (project.isNull()) {
+        QMessageBox::critical(this, "Evoplex", error);
         return false;
+    } else if (!error.isEmpty()) {
+        error = QString("There are issues with this project.\n\n%1\n"
+                        "Would you like to open it anyway?").arg(error);
+        int res = QMessageBox::warning(this, "Evoplex", error, QMessageBox::No, QMessageBox::Yes);
+        if (res == QMessageBox::No) {
+            return false;
+        }
     }
     addProjectWidget(project);
     return true;
 }
 
-void ProjectsPage::slotOpenExperiment(Experiment* exp)
+void ProjectsPage::slotOpenExperiment(ExperimentPtr exp)
 {
-    if (!exp) {
-        return;
-    } else if (exp->expStatus() == Experiment::INVALID) {
+    if (!exp || exp->expStatus() == Status::Invalid) {
         QMessageBox::warning(this, "Experiment",
                 "This experiment is invalid.\n"
                 "It seems that something went wrong with its settings.\n"

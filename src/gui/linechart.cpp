@@ -22,13 +22,15 @@
 #include <QtCharts/QChart>
 #include <QtCharts/QChartView>
 
+#include "core/trial.h"
+
 #include "linechart.h"
 #include "titlebar.h"
 #include "ui_linechartsettings.h"
 
 namespace evoplex {
 
-LineChart::LineChart(Experiment* exp, QWidget* parent)
+LineChart::LineChart(ExperimentPtr exp, QWidget* parent)
     : QDockWidget(parent)
     , m_settingsDlg(new Ui_LineChartSettings)
     , m_exp(exp)
@@ -36,7 +38,7 @@ LineChart::LineChart(Experiment* exp, QWidget* parent)
     , m_maxY(0)
     , m_finished(false)
     , m_currTrialId(0)
-    , m_model(nullptr)
+    , m_trial(nullptr)
     , m_currStep(0)
 {
     setWindowTitle("Line Chart");
@@ -45,21 +47,21 @@ LineChart::LineChart(Experiment* exp, QWidget* parent)
     Q_ASSERT_X(!m_exp->autoDeleteTrials(), "LineChart",
                "tried to build a LineChart for a experiment that will be auto-deleted!");
 
-    connect(m_exp, SIGNAL(restarted()), SLOT(slotRestarted()));
+    connect(m_exp.data(), SIGNAL(restarted()), SLOT(slotRestarted()));
 
     QDialog* dlg = new QDialog(this);
     m_settingsDlg->setupUi(dlg);
     connect(m_settingsDlg->bEditSeries, SIGNAL(clicked(bool)), SLOT(slotOutputWidget()));
 
-    TitleBar* titleBar = new TitleBar(exp, this);
+    TitleBar* titleBar = new TitleBar(m_exp, this);
     setTitleBarWidget(titleBar);
     setTrial(0); // init
     connect(titleBar, SIGNAL(trialSelected(int)), SLOT(setTrial(int)));
     connect(titleBar, SIGNAL(openSettingsDlg()), dlg, SLOT(show()));
 
-    connect(exp, &Experiment::trialCreated, [this](int trialId) {
+    connect(m_exp.data(), &Experiment::trialCreated, [this](int trialId) {
         if (trialId == m_currTrialId) {
-            m_model = m_exp->trial(trialId);
+            m_trial = m_exp->trial(trialId);
             m_currStep = 0;
         }
     });
@@ -84,8 +86,7 @@ LineChart::~LineChart()
 
 void LineChart::slotOutputWidget()
 {
-    if (m_exp->expStatus() == Experiment::RUNNING
-            || m_exp->expStatus() == Experiment::QUEUED) {
+    if (m_exp->expStatus() == Status::Running || m_exp->expStatus() == Status::Queued) {
         QMessageBox::warning(this, "Line Chart",
                     "You cannot edit the series of a running experiment.\n"
                     "Please, pause it and try again.");
@@ -143,8 +144,7 @@ void LineChart::slotRestarted()
 
 void LineChart::setTrial(int trialId)
 {
-    if (m_exp->expStatus() == Experiment::RUNNING
-               || m_exp->expStatus() == Experiment::QUEUED) {
+    if (m_exp->expStatus() == Status::Running || m_exp->expStatus() == Status::Queued) {
         QMessageBox::warning(this, "Line Chart",
                 "Tried to change the trial in a running experiment.\n"
                 "Please, pause it and try again.");
@@ -163,7 +163,7 @@ void LineChart::setTrial(int trialId)
     }
 
     m_currTrialId = trialId;
-    m_model = m_exp->trial(trialId);
+    m_trial = m_exp->trial(trialId);
 
     for (Series& s : m_series) {
         s.series->clear(); // remove all points
@@ -189,7 +189,8 @@ void LineChart::removeAllSeries()
 
 void LineChart::updateSeries()
 {
-    if (!m_model || !m_chart->isVisible() || m_series.empty() || m_model->currStep() == m_currStep) {
+    if (!m_trial || !m_trial->model() || !m_chart->isVisible() ||
+            m_series.empty() || m_trial->step() == m_currStep) {
         return;
     }
 
@@ -259,7 +260,7 @@ void LineChart::updateSeries()
     }
 
     m_finished = m_series.front().cache->isEmpty(m_currTrialId)
-            && m_exp->expStatus() == Experiment::FINISHED;
+            && m_exp->expStatus() == Status::Finished;
 }
 
 } // evoplex

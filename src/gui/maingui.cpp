@@ -34,6 +34,7 @@
 #include <QVBoxLayout>
 
 #include "maingui.h"
+#include "fontstyles.h"
 #include "projectwidget.h"
 #include "savedialog.h"
 #include "pluginspage.h"
@@ -48,13 +49,13 @@
 
 namespace evoplex {
 
-MainGUI::MainGUI(MainApp* mainApp, QWidget* parent)
-    : QMainWindow(parent)
+MainGUI::MainGUI(MainApp* mainApp)
+    : QMainWindow(nullptr)
     , m_mainApp(mainApp)
     , m_colorMapMgr(new ColorMapMgr)
     , m_saveDialog(new SaveDialog(this))
     , m_welcome(new WelcomePage(this))
-    , m_queue(new QueuePage(this))
+    //, m_queue(new QueuePage(this))
     , m_projectsPage(new ProjectsPage(this))
     , m_plugins(new PluginsPage(this))
     , m_settings(new SettingsPage(this))
@@ -74,13 +75,13 @@ MainGUI::MainGUI(MainApp* mainApp, QWidget* parent)
     //
     QHBoxLayout* centralLayout = new QHBoxLayout(new QWidget(this));
     centralLayout->addWidget(m_welcome);
-    centralLayout->addWidget(m_queue);
+    //centralLayout->addWidget(m_queue);
     centralLayout->addWidget(m_projectsPage);
     centralLayout->addWidget(m_plugins);
     centralLayout->addWidget(m_settings);
     this->setCentralWidget(centralLayout->parentWidget());
     m_welcome->hide();
-    m_queue->hide();
+    //m_queue->hide();
     m_projectsPage->hide();
     m_plugins->hide();
     m_settings->hide();
@@ -116,9 +117,8 @@ MainGUI::MainGUI(MainApp* mainApp, QWidget* parent)
     acSettings->setData(PAGE_SETTINGS);
     toolbar->addAction(acSettings);
 
-    toolbar->setStyleSheet("font: 8pt;");
     toolbar->setIconSize(QSize(32, 32));
-    toolbar->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+    toolbar->setToolButtonStyle(Qt::ToolButtonIconOnly);
     toolbar->setMovable(false);
     toolbar->setFloatable(false);
     this->addToolBar(Qt::LeftToolBarArea, toolbar);
@@ -193,19 +193,14 @@ MainGUI::MainGUI(MainApp* mainApp, QWidget* parent)
     menuHelp->addAction(acAbout);
     this->menuBar()->addMenu(menuHelp);
 
-    restoreGeometry(m_userPrefs.value("gui/geometry").toByteArray());
-    restoreState(m_userPrefs.value("gui/windowState").toByteArray());
-    setFontSize(m_userPrefs.value("gui/fontSize", font().pointSize()).toInt());
+    QSettings userPrefs;
+    restoreGeometry(userPrefs.value("gui/geometry").toByteArray());
+    restoreState(userPrefs.value("gui/windowState").toByteArray());
 }
 
 MainGUI::~MainGUI()
 {
     delete m_colorMapMgr;
-}
-
-void MainGUI::resetSettingsToDefault()
-{
-    setFontSize(11);
 }
 
 bool MainGUI::eventFilter(QObject* o, QEvent* e)
@@ -225,31 +220,18 @@ void MainGUI::closeEvent(QCloseEvent* event)
         }
     }
 
-    m_userPrefs.setValue("gui/geometry", saveGeometry());
-    m_userPrefs.setValue("gui/windowState", saveState());
-    qDebug() << "user settings stored at " << m_userPrefs.fileName();
+    QSettings userPrefs;
+    userPrefs.setValue("gui/geometry", saveGeometry());
+    userPrefs.setValue("gui/windowState", saveState());
+    qDebug() << "user settings stored at " << userPrefs.fileName();
 
     event->accept();
     QMainWindow::closeEvent(event);
 }
 
-void MainGUI::setFontSize(int size)
-{
-    QFont f = font();
-    f.setPointSize(size);
-    setFont(f);
-    setStyleSheet(QString("%1 font:%2pt;").arg(styleSheet()).arg(size));
-    m_userPrefs.setValue("gui/fontSize", size);
-}
-
-int MainGUI::fontSize()
-{
-    return m_userPrefs.value("gui/fontSize", font().pointSize()).toInt();
-}
-
 void MainGUI::slotPage(QAction* action)
 {
-    Page page = (Page) action->data().toInt();
+    Page page = static_cast<Page>(action->data().toInt());
     action->setChecked(true);
     if (m_curPage != page) {
         setPageVisible(m_curPage, false);
@@ -262,7 +244,7 @@ void MainGUI::setPageVisible(Page page, bool visible)
 {
     switch (page) {
         case PAGE_QUEUE:
-            m_queue->setVisible(visible);
+            //m_queue->setVisible(visible);
             break;
         case PAGE_PROJECTS:
             m_projectsPage->setVisible(visible);
@@ -337,7 +319,7 @@ void MainGUI::slotShowLog()
     connect(copy, &QPushButton::pressed, [text](){ text->selectAll(); text->copy(); });
     bts->addWidget(copy);
     QPushButton* location = new QPushButton("Open Location");
-    connect(location, &QPushButton::pressed, [text](){
+    connect(location, &QPushButton::pressed, [](){
         QDesktopServices::openUrl(QUrl("file:///"+Logger::logDir(), QUrl::TolerantMode)); });
     bts->addWidget(location);
     QPushButton* close = new QPushButton("Close");

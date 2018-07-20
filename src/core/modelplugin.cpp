@@ -28,24 +28,22 @@
 
 namespace evoplex {
 
-ModelPlugin::ModelPlugin(const QObject* instance, const QJsonObject* metaData, const QString& libPath)
-    : Plugin(metaData, libPath)
+ModelPlugin::ModelPlugin(const QJsonObject* metaData, const QString& libPath)
+    : Plugin(PluginType::Model, metaData, libPath)
 {
-    if (!isValid()) {
+    if (m_type == PluginType::Invalid) {
         return;
     }
 
-    m_factory = qobject_cast<IPluginModel*>(instance);
-
-    if (!attrsScope(metaData, PLUGIN_ATTRIBUTE_NODESCOPE, m_nodeAttrsScope, m_nodeAttrNames)) {
+    if (!readAttrsScope(metaData, PLUGIN_ATTRIBUTE_NODESCOPE, m_nodeAttrsScope, m_nodeAttrNames)) {
         qWarning() << "failed to read the node's attributes!";
-        m_isValid = false;
+        m_type = PluginType::Invalid;
         return;
     }
 
-    if (!attrsScope(metaData, PLUGIN_ATTRIBUTE_EDGESCOPE, m_edgeAttrsScope, m_edgeAttrNames)) {
+    if (!readAttrsScope(metaData, PLUGIN_ATTRIBUTE_EDGESCOPE, m_edgeAttrsScope, m_edgeAttrNames)) {
         qWarning() << "failed to read the edge's attributes!";
-        m_isValid = false;
+        m_type = PluginType::Invalid;
         return;
     }
 
@@ -62,8 +60,6 @@ ModelPlugin::ModelPlugin(const QObject* instance, const QJsonObject* metaData, c
             m_customOutputs.push_back(function);
         }
     }
-
-    m_isValid = true;
 }
 
 ModelPlugin::~ModelPlugin()

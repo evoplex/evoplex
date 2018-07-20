@@ -19,49 +19,140 @@
  */
 
 #include <QDebug>
+#include <QFile>
 #include <QJsonArray>
+#include <QPluginLoader>
 #include <QVariantMap>
 
 #include "plugin.h"
+#include "graphplugin.h"
+#include "modelplugin.h"
 #include "constants.h"
 #include "utils.h"
 
 namespace evoplex {
 
-Plugin::Plugin(const QJsonObject* metaData, const QString& libPath)
-    : m_isValid(false)
-    , m_libPath(libPath)
+bool Plugin::checkMetaData(const QJsonObject& metaData, QString& error)
 {
-    QString t = metaData->value(PLUGIN_ATTRIBUTE_TYPE).toString();
-    if (t == "graph") {
-        m_type = GraphPlugin;
-    } else if (t == "model") {
-        m_type = ModelPlugin;
-    } else {
-        return;
+    if (metaData.isEmpty()) {
+        error = "Meta data is missing.";
+        return false;
     }
 
+    const QStringList reqFields = {
+        PLUGIN_ATTRIBUTE_TYPE, PLUGIN_ATTRIBUTE_UID, PLUGIN_ATTRIBUTE_NAME,
+        PLUGIN_ATTRIBUTE_AUTHOR, PLUGIN_ATTRIBUTE_DESCRIPTION
+    };
+
+    for (const QString& f : reqFields) {
+        if (!metaData.contains(f)) {
+            error = QString("The following fields cannot be empty: %1")
+                    .arg(reqFields.join(", "));
+            return false;
+        }
+    }
+
+    const PluginType type = _enumFromString<PluginType>(metaData[PLUGIN_ATTRIBUTE_TYPE].toString());
+    if (type == PluginType::Invalid) {
+        error = QString("'%1' must be equal to 'graph' or 'model'")
+                .arg(PLUGIN_ATTRIBUTE_TYPE);
+        return false;
+    }
+
+    const QString uid = metaData[PLUGIN_ATTRIBUTE_UID].toString();
+    if (uid.contains("_")) {
+        error = QString("The %1 '%2' should not have the underscore symbol.")
+                .arg(PLUGIN_ATTRIBUTE_UID).arg(uid);
+        return false;
+    }
+
+    return true;
+}
+
+Plugin* Plugin::load(const QString& path, QString& error)
+{
+    if (!QFile(path).exists()) {
+        error = "Unable to find the file. " + path;
+        qWarning() << error;
+        return nullptr;
+    }
+
+    QPluginLoader loader(path);
+    QJsonObject metaData = loader.metaData().value("MetaData").toObject();
+    if (!checkMetaData(metaData, error)) {
+        error += QString("\n+%1").arg(path);
+        qWarning() << error;
+        return nullptr;
+    }
+
+    QObject* instance = loader.instance(); // it'll load the plugin
+    if (!instance) {
+        error = QString("Unable to load the plugin.\n"
+                "Please, make sure it is a valid Evoplex plugin.\n %1").arg(path);
+        loader.unload();
+        qWarning() << error;
+        return nullptr;
+    }
+
+    Plugin* plugin = nullptr;
+    const PluginType type = _enumFromString<PluginType>(metaData[PLUGIN_ATTRIBUTE_TYPE].toString());
+    if (type == PluginType::Graph) {
+        plugin = new GraphPlugin(&metaData, path);
+    } else if (type == PluginType::Model) {
+        plugin = new ModelPlugin(&metaData, path);
+    }
+
+    if (!plugin || plugin->type() == PluginType::Invalid) {
+        error = QString("Unable to load the plugin.\n"
+                "Please, check the metaData.json file.\n %1").arg(path);
+        loader.unload();
+        delete plugin;
+        qWarning() << error;
+        return nullptr;
+    }
+
+    return plugin;
+}
+
+Plugin::Plugin(PluginType type, const QJsonObject* metaData, const QString& libPath)
+    : m_type(type),
+      m_libPath(libPath)
+{
     m_id = metaData->value(PLUGIN_ATTRIBUTE_UID).toString();
     m_author = metaData->value(PLUGIN_ATTRIBUTE_AUTHOR).toString();
     m_name = metaData->value(PLUGIN_ATTRIBUTE_NAME).toString();
     m_descr = metaData->value(PLUGIN_ATTRIBUTE_DESCRIPTION).toString();
 
-    if (m_id.isEmpty() || m_author.isEmpty() || m_name.isEmpty() || m_descr.isEmpty()
-            || !attrsScope(metaData, PLUGIN_ATTRIBUTES_SCOPE, m_pluginAttrsScope, m_pluginAttrsNames)) {
+    Q_ASSERT_X(!m_id.isEmpty() && !m_author.isEmpty() &&
+               !m_name.isEmpty() && !m_descr.isEmpty(),
+               "Plugin", "missing required fields! It should never happen!");
+
+    if (!readAttrsScope(metaData, PLUGIN_ATTRIBUTES_SCOPE,
+                        m_pluginAttrsScope, m_pluginAttrsNames)) {
         qWarning() << "failed to read the plugins's attributes!";
-        m_isValid = false;
+        m_type = PluginType::Invalid;
         return;
     }
 
-    m_isValid = true;
+    QPluginLoader loader(libPath);
+    QObject* instance = loader.instance();
+    Q_ASSERT(loader.isLoaded() && instance);
+    m_factory = qobject_cast<PluginInterface*>(instance);
+    if (!m_factory) {
+        qWarning() << QString("factory could not be created for '%1'").arg(m_name);
+        m_type = PluginType::Invalid;
+        return;
+    }
 }
 
 Plugin::~Plugin()
 {
+    QPluginLoader loader(m_libPath);
+    loader.unload();
     Utils::deleteAndShrink(m_pluginAttrsScope);
 }
 
-bool Plugin::attrsScope(const QJsonObject* metaData, const QString& name,
+bool Plugin::readAttrsScope(const QJsonObject* metaData, const QString& name,
         AttributesScope& attrsScope, std::vector<QString>& keys) const
 {
     if (metaData->contains(name)) {

@@ -21,22 +21,23 @@
 #ifndef EXPERIMENTMGR_H
 #define EXPERIMENTMGR_H
 
+#include <list>
+
 #include <QMutex>
 #include <QObject>
 #include <QTimer>
 #include <QSettings>
 #include <QThreadPool>
-#include <list>
 
 namespace evoplex {
 
+class Trial;
 class Experiment;
+using ExperimentPtr = QSharedPointer<Experiment>;
 
 class ExperimentsMgr: public QObject
 {
     Q_OBJECT
-
-    friend class TrialRunnable;
 
 public:
     explicit ExperimentsMgr();
@@ -44,58 +45,48 @@ public:
 
     void resetSettingsToDefault();
 
-    void play(Experiment* exp);
+    void play(ExperimentPtr exp);
 
     inline int maxThreadsCount() const { return m_threads; }
-    void setMaxThreadCount(const int newValue);
+    void setMaxThreadCount(const int newValue, QString* error=nullptr);
 
-signals:
-    void expFinished();
+    // trigged when a Trial ends
+    // also runs in a work thread
+    void trialFinished(Trial* trial);
 
 public slots:
     void clearQueue();
-    void clearIdle();
-    void removeFromQueue(Experiment* exp);
-    void destroy(Experiment* exp);
+    void removeFromQueue(const ExperimentPtr& exp);
+    void removeFromIdle(const ExperimentPtr& exp);
+
+signals:
+    void progressUpdated();
 
 private slots:
     void updateProgressValues();
-    void destroyExperiments();
 
 private:
     QThreadPool m_threadPool;
     QMutex m_mutex;
     QSettings m_userPrefs;
     int m_threads;
+    int m_lastThreadPriority;
 
     QTimer* m_timerProgress; // update the progress value of all running experiments
-    QTimer* m_timerDestroy;
 
-    std::list<std::pair<int,int>> m_runningTrials;
-    std::list<Experiment*> m_running;
-    std::list<Experiment*> m_queued;
-    std::list<Experiment*> m_idle;
-    std::list<Experiment*> m_toDestroy;
+    std::list<Trial*> m_runningTrials;
+    std::list<Trial*> m_queuedTrials;
 
-    // trigged when an experiment ends (TrialRunnable)
-    // also runs in a work thread
-    void finished(Experiment* exp, const int trialId);
+    std::list<ExperimentPtr> m_running;
+    std::list<ExperimentPtr> m_queued;
+    std::list<ExperimentPtr> m_idle;
+
+    void _play(ExperimentPtr exp);
+
+    void processQueue();
+
+    bool isTheLastTrial(const Trial* trial);
 };
 
-/********************************/
-
-class TrialRunnable: public QRunnable
-{
-public:
-    TrialRunnable(ExperimentsMgr* expMgr, Experiment* exp, quint16 trialId);
-    void run();
-
-private:
-    ExperimentsMgr* expMgr;
-    Experiment* m_exp;
-    const quint16 m_trialId;
-};
-
-}
-
+} // evoplex
 #endif // EXPERIMENTMGR_H

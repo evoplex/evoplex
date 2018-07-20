@@ -36,6 +36,7 @@
 #include "ui_experimentdesigner.h"
 
 #include "core/attrsgenerator.h"
+#include "core/include/enum.h"
 
 #define STRING_NULL_PLUGINID "--"
 
@@ -93,8 +94,8 @@ ExperimentDesigner::ExperimentDesigner(MainApp* mainApp, QWidget *parent)
     addTreeWidget(m_treeItemGraphs, GENERAL_ATTRIBUTE_GRAPHID, QVariant::fromValue(cb));
     // --  graph type
     cb = new QComboBox(m_ui->treeWidget);
-    cb->insertItem(0, "undirected", AbstractGraph::Undirected);
-    cb->insertItem(1, "directed", AbstractGraph::Directed);
+    cb->insertItem(0, "undirected", static_cast<int>(GraphType::Undirected));
+    cb->insertItem(1, "directed", static_cast<int>(GraphType::Directed));
     m_customGraphIdx = m_treeItemGraphs->childCount();
     addTreeWidget(m_treeItemGraphs, GENERAL_ATTRIBUTE_GRAPHTYPE, QVariant::fromValue(cb));
 
@@ -184,9 +185,10 @@ ExperimentDesigner::ExperimentDesigner(MainApp* mainApp, QWidget *parent)
 
     for (const GraphPlugin* g : m_mainApp->graphs()) { slotPluginAdded(g); }
     for (const ModelPlugin* m : m_mainApp->models()) { slotPluginAdded(m); }
-    connect(m_mainApp, SIGNAL(pluginAdded(const Plugin*)), SLOT(slotPluginAdded(const Plugin*)));
-    connect(m_mainApp, SIGNAL(pluginRemoved(QString,Plugin::Type)),
-            SLOT(slotPluginRemoved(QString,Plugin::Type)));
+    connect(m_mainApp, SIGNAL(pluginAdded(const Plugin*)),
+            SLOT(slotPluginAdded(const Plugin*)));
+    connect(m_mainApp, SIGNAL(pluginRemoved(QString, PluginType)),
+            SLOT(slotPluginRemoved(QString,PluginType)));
 }
 
 ExperimentDesigner::~ExperimentDesigner()
@@ -223,7 +225,7 @@ void ExperimentDesigner::setActiveWidget(PPageDockWidget* dw)
 void ExperimentDesigner::slotSetActiveWidget(int idx)
 {
     QVariant v = m_ui->cbWidgets->itemData(idx);
-    if (v.isValid()) {
+    if (v.isValid() && !v.isNull()) {
         PPageDockWidget* dw = v.value<PPageDockWidget*>();
         dw->show();
         dw->raise();
@@ -232,7 +234,7 @@ void ExperimentDesigner::slotSetActiveWidget(int idx)
     }
 }
 
-void ExperimentDesigner::setExperiment(Experiment* exp)
+void ExperimentDesigner::setExperiment(ExperimentPtr exp)
 {
     if (!exp) {
         m_exp = nullptr;
@@ -327,7 +329,7 @@ void ExperimentDesigner::slotOutputWidget()
 
     int numTrials = m_widgetFields.value(GENERAL_ATTRIBUTE_TRIALS).value<QSpinBox*>()->value();
     std::vector<int> trialIds;
-    trialIds.reserve(numTrials);
+    trialIds.reserve(static_cast<size_t>(numTrials));
     for (int id = 0; id < numTrials; ++id) {
         trialIds.emplace_back(id);
     }
@@ -448,10 +450,16 @@ void ExperimentDesigner::slotCreateExperiment()
 
 void ExperimentDesigner::slotEditExperiment()
 {
-    Q_ASSERT_X(m_exp, "ExperimentDesigner", "tried to edit a null experiment");
+    ExperimentPtr exp = m_exp ? m_exp.toStrongRef() : nullptr;
+    if (!exp) {
+        QMessageBox::warning(this, "Experiment",
+                "This experiment is no longer part of this project.");
+        setExperiment(nullptr);
+        return;
+    }
     QString error;
-    ExpInputs* inputs = readInputs(m_exp->id(), error);
-    if (!inputs || !m_project->editExperiment(m_exp->id(), inputs, error)) {
+    ExpInputs* inputs = readInputs(exp->id(), error);
+    if (!inputs || !m_project->editExperiment(exp->id(), inputs, error)) {
         QMessageBox::warning(this, "Experiment", error);
         delete inputs;
     }
@@ -494,11 +502,11 @@ void ExperimentDesigner::pluginSelected(QTreeWidgetItem* itemRoot, const QString
 void ExperimentDesigner::slotPluginAdded(const Plugin* plugin)
 {
     QComboBox* cb;
-    if (plugin->type() == Plugin::GraphPlugin) {
+    if (plugin->type() == PluginType::Graph) {
         addPluginAttrs(m_treeItemGraphs, plugin);
         slotGraphSelected(STRING_NULL_PLUGINID); // to hide all fields
         cb = m_widgetFields.value(GENERAL_ATTRIBUTE_GRAPHID).value<QComboBox*>();
-    } else if (plugin->type() == Plugin::ModelPlugin) {
+    } else if (plugin->type() == PluginType::Model) {
         addPluginAttrs(m_treeItemModels, plugin);
         slotModelSelected(STRING_NULL_PLUGINID); // to hide all fields
         cb = m_widgetFields.value(GENERAL_ATTRIBUTE_MODELID).value<QComboBox*>();
@@ -512,14 +520,14 @@ void ExperimentDesigner::slotPluginAdded(const Plugin* plugin)
     cb->blockSignals(false);
 }
 
-void ExperimentDesigner::slotPluginRemoved(const QString& id, Plugin::Type type)
+void ExperimentDesigner::slotPluginRemoved(const QString& id, PluginType type)
 {
     QTreeWidgetItem* tree;
     QComboBox* cb;
-    if (type == Plugin::GraphPlugin) {
+    if (type == PluginType::Graph) {
         tree = m_treeItemGraphs;
         cb = m_widgetFields.value(GENERAL_ATTRIBUTE_GRAPHID).value<QComboBox*>();
-    } else if (type == Plugin::ModelPlugin) {
+    } else if (type == PluginType::Model) {
         tree = m_treeItemModels;
         cb = m_widgetFields.value(GENERAL_ATTRIBUTE_MODELID).value<QComboBox*>();
     } else {

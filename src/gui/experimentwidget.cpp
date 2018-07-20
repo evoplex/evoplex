@@ -32,7 +32,7 @@
 
 namespace evoplex {
 
-ExperimentWidget::ExperimentWidget(Experiment* exp, MainGUI* mainGUI, ProjectsPage* ppage)
+ExperimentWidget::ExperimentWidget(ExperimentPtr exp, MainGUI* mainGUI, ProjectsPage* ppage)
     : PPageDockWidget(ppage)
     , m_kIcon_play(QIcon(":/icons/play.svg"))
     , m_kIcon_pause(QIcon(":/icons/pause.svg"))
@@ -52,7 +52,7 @@ ExperimentWidget::ExperimentWidget(Experiment* exp, MainGUI* mainGUI, ProjectsPa
     m_innerWindow->setDockNestingEnabled(true);
     m_innerWindow->setAnimated(true);
     m_innerWindow->setStyleSheet("QMainWindow { background-color: rgb(24,24,24); }");
-    m_innerWindow->setCentralWidget(0);
+    m_innerWindow->setCentralWidget(nullptr);
 
     QToolBar* tb = new QToolBar("Controls", this);
     m_aPlayPause = tb->addAction(m_kIcon_play, "Play/Pause");
@@ -83,18 +83,23 @@ ExperimentWidget::ExperimentWidget(Experiment* exp, MainGUI* mainGUI, ProjectsPa
     tb->setMovable(false);
     tb->setFloatable(false);
     tb->setIconSize(QSize(20,20));
-    tb->setStyleSheet("background: rgb(53,53,53);");
+    tb->setStyleSheet("padding: 0px; background: rgb(53,53,53);");
     tb->setFocusPolicy(Qt::StrongFocus);
 
     connect(m_aPlayPause, &QAction::triggered, [this]() { m_exp->toggle(); });
     connect(m_aNext, &QAction::triggered, [this]() { m_exp->playNext(); });
     connect(m_aStop, &QAction::triggered, [this]() { m_exp->stop(); });
-    connect(m_aReset, &QAction::triggered, [this]() { m_exp->reset(); });
-    connect(m_delay, &QSlider::valueChanged, [this](int v) { m_exp->setDelay(v); });
+    connect(m_aReset, &QAction::triggered, [this]() {
+        QString error;
+        if (!m_exp->reset(&error)) {
+            QMessageBox::warning(this, "Experiment", error);
+        }
+    });
+    connect(m_delay, &QSlider::valueChanged, [this](int v) {
+        m_exp->setDelay(static_cast<quint16>(v));
+    });
 
-    qRegisterMetaType<Experiment::Status>("Experiment::Status");
-    connect(m_exp, SIGNAL(statusChanged(Experiment::Status)),
-            SLOT(slotStatusChanged(Experiment::Status)));
+    connect(m_exp.data(), SIGNAL(statusChanged(Status)), SLOT(slotStatusChanged(Status)));
     slotStatusChanged(exp->expStatus()); // just to init the controls
 
     QVBoxLayout* layout = new QVBoxLayout(new QWidget(this));
@@ -128,7 +133,7 @@ ExperimentWidget::ExperimentWidget(Experiment* exp, MainGUI* mainGUI, ProjectsPa
     */
 
     connect(m_timer, &QTimer::timeout, [this]() {
-        if (m_exp->expStatus() != Experiment::INVALID)
+        if (m_exp->expStatus() != Status::Invalid)
             emit(updateWidgets(false));
     });
     m_timer->start(100);
@@ -146,29 +151,31 @@ void ExperimentWidget::closeEvent(QCloseEvent* event)
     QDockWidget::closeEvent(event);
 }
 
-void ExperimentWidget::slotStatusChanged(Experiment::Status status)
+void ExperimentWidget::slotStatusChanged(Status status)
 {
-    if (status == Experiment::READY) {
+    if (status == Status::Paused || status == Status::Disabled) {
         m_aPlayPause->setIcon(m_kIcon_play);
         m_aPlayPause->setEnabled(true);
         m_aNext->setEnabled(true);
-        m_aStop->setEnabled(!m_exp->trials().empty());
+        m_aStop->setEnabled(status != Status::Disabled);
         m_aReset->setEnabled(true);
-    } else if (status == Experiment::RUNNING || status == Experiment::QUEUED) {
+    } else if (status == Status::Running || status == Status::Queued) {
         m_aPlayPause->setIcon(m_kIcon_pause);
         m_aPlayPause->setEnabled(true);
         m_aNext->setEnabled(false);
         m_aStop->setEnabled(true);
         m_aReset->setEnabled(false);
-    } else if (status == Experiment::FINISHED || status == Experiment::INVALID) {
+    } else if (status == Status::Finished || status == Status::Invalid) {
         m_aPlayPause->setIcon(m_kIcon_play);
         m_aPlayPause->setEnabled(false);
         m_aNext->setEnabled(false);
         m_aStop->setEnabled(false);
         m_aReset->setEnabled(true);
+    } else {
+        qFatal("invalid status!");
     }
 
-    if (status == Experiment::INVALID) {
+    if (status == Status::Invalid) {
         QMessageBox::warning(this, "Experiment", "Something went wrong with your settings!");
     }
 }

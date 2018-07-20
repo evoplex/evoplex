@@ -30,33 +30,38 @@
 #include "experiment.h"
 #include "utils.h"
 
-namespace evoplex
-{
+namespace evoplex {
 
 Project::Project(MainApp* mainApp, int id)
-    : m_mainApp(mainApp)
-    , m_id(id)
+    : m_mainApp(mainApp),
+      m_id(id)
 {
+}
+
+Project::~Project()
+{
+    for (auto& e : m_experiments) {
+        m_mainApp->expMgr()->removeFromIdle(e.second);
+        m_mainApp->expMgr()->removeFromQueue(e.second);
+        e.second->setAutoDeleteTrials(true);
+        e.second->setExpStatus(Status::Invalid);
+        e.second->pause();
+        e.second.clear();
+    }
+    m_experiments.clear();
 }
 
 bool Project::init(QString& error, const QString& filepath)
 {
+    Q_ASSERT_X(m_experiments.empty(), "Project", "a project cannot be initialized twice");
     setFilePath(filepath);
     if (!filepath.isEmpty()) {
-        this->blockSignals(true);
+        blockSignals(true);
         importExperiments(filepath, error);
-        this->blockSignals(false);
+        blockSignals(false);
     }
     m_hasUnsavedChanges = false;
-    return error.isEmpty();
-}
-
-void Project::destroyExperiments()
-{
-    for (auto& it : m_experiments) {
-        m_mainApp->expMgr()->destroy(it.second);
-    }
-    m_experiments.clear();
+    return !error.isEmpty();
 }
 
 void Project::setFilePath(const QString& path)
@@ -77,7 +82,7 @@ int Project::generateExpId() const
     return m_experiments.empty() ? 0 : (--m_experiments.end())->first + 1;
 }
 
-Experiment* Project::newExperiment(ExpInputs* inputs, QString& error)
+ExperimentPtr Project::newExperiment(ExpInputs* inputs, QString& error)
 {
     if (!inputs) {
         error += "Null inputs!";
@@ -90,35 +95,36 @@ Experiment* Project::newExperiment(ExpInputs* inputs, QString& error)
         return nullptr;
     }
 
-    Experiment* exp = new Experiment(m_mainApp, inputs, sharedFromThis());
+    ExperimentPtr exp = QSharedPointer<Experiment>::create(m_mainApp, expId, sharedFromThis());
     m_experiments.insert({expId, exp});
+    exp->setInputs(inputs, error);
 
     m_hasUnsavedChanges = true;
     emit (hasUnsavedChanges(m_hasUnsavedChanges));
-    emit (expAdded(exp));
+    emit (expAdded(expId));
     return exp;
 }
 
 bool Project::editExperiment(int expId, ExpInputs* newInputs, QString& error)
 {
-    Experiment* exp = m_experiments.at(expId);
+    ExperimentPtr exp = m_experiments.at(expId);
     Q_ASSERT_X(exp, "Experiment", "tried to edit a nonexistent experiment");
-    if (!exp->init(newInputs, error)) {
+    if (!exp->setInputs(newInputs, error)) {
         return false;
     }
     m_hasUnsavedChanges = true;
     emit (hasUnsavedChanges(m_hasUnsavedChanges));
-    emit (expEdited(exp));
+    emit (expEdited(expId));
     return true;
 }
 
-int Project::importExperiments(const QString& filePath, QString& errorMsg)
+int Project::importExperiments(const QString& filePath, QString& error)
 {
     QFile file(filePath);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        errorMsg = "Couldn't read the experiments from:\n`" + filePath + "`"
-                 + "Please, make sure it is a readable csv file.";
-        qWarning() << errorMsg;
+        error += QString("Couldn't read the experiments from:\n'%1'\n"
+                 "Please, make sure it is a readable csv file.\n").arg(filePath);
+        qWarning() << error;
         return 0;
     }
 
@@ -127,9 +133,10 @@ int Project::importExperiments(const QString& filePath, QString& errorMsg)
     // read header
     const QStringList header = in.readLine().split(",");
     if (header.isEmpty()) {
-        errorMsg = "Couldn't read the experiments from:\n`" + filePath + "`"
-                 + "\nThe header must have: " + m_mainApp->generalAttrsScope().keys().join(", ");
-        qWarning() << errorMsg;
+        error += QString("Couldn't read the experiments from:\n'%1'\n"
+                 "The header must have the following columns: %2\n")
+                 .arg(filePath).arg(m_mainApp->generalAttrsScope().keys().join(", "));
+        qWarning() << error;
         return 0;
     }
 
@@ -139,22 +146,28 @@ int Project::importExperiments(const QString& filePath, QString& errorMsg)
         const QStringList values = in.readLine().split(",");
         QString expErrorMsg;
         ExpInputs* inputs = ExpInputs::parse(m_mainApp, header, values, expErrorMsg);
+        if (!expErrorMsg.isEmpty()) {
+            error += QString("Row %1 : Warning: %2\n").arg(row).arg(expErrorMsg);
+        }
+        expErrorMsg.clear();
         if (!inputs || !newExperiment(inputs, expErrorMsg)) {
-            errorMsg = QString("Couldn't read the experiment at line %1 from:\n`%2`\n"
-                               "Error: %3").arg(row).arg(filePath).arg(expErrorMsg);
-            qWarning() << errorMsg;
-            delete inputs;
-            file.close();
-            return row - 1;
+            error += QString("Row %1 (skipped): Critical error: %2\n").arg(row).arg(expErrorMsg);
+        }
+        if (!expErrorMsg.isEmpty()) {
+            error += QString("Row %1 : Warning: %2\n").arg(row).arg(expErrorMsg);
         }
         ++row;
     }
     file.close();
 
     if (row == 1) {
-        errorMsg = QString("This file is empty.\nThere were no experiments to be read.\n%1").arg(filePath);
-        qWarning() << errorMsg;
-        return 0;
+        error += QString("This file is empty.\n"
+                 "There were no experiments to be read.\n'%1'\n").arg(filePath);
+    }
+
+    if (!error.isEmpty()) {
+        error += QString("`%1`\n").arg(filePath);
+        qWarning() << error;
     }
 
     return row - 1;
@@ -209,7 +222,7 @@ bool Project::saveProject(QString& errMsg, std::function<void(int)>& progress)
 
     // write values to file
     for (auto const& i : m_experiments) {
-        const Experiment* exp = i.second;
+        const ExperimentPtr exp = i.second;
         const ExpInputs* inputs = exp->inputs();
         const QString modelId_ = exp->modelId() + "_";
         const QString graphId_ = exp->graphId() + "_";
@@ -226,7 +239,7 @@ bool Project::saveProject(QString& errMsg, std::function<void(int)>& progress)
             }
             values.append(v.toQString() + ","); // will leave empty if not found
         }
-        values.replace(values.size(), "\n");
+        values.remove(values.size()-1, 1); // remove last comma
         out << values << "\n";
 
         _progress += kProgress;

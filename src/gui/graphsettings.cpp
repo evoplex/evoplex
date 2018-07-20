@@ -24,7 +24,7 @@
 namespace evoplex
 {
 
-GraphSettings::GraphSettings(MainGUI* mainGUI, Experiment* exp, QWidget *parent)
+GraphSettings::GraphSettings(MainGUI* mainGUI, ExperimentPtr exp, QWidget *parent)
     : QDialog(parent)
     , m_ui(new Ui_GraphSettings)
     , m_exp(exp)
@@ -41,7 +41,7 @@ GraphSettings::GraphSettings(MainGUI* mainGUI, Experiment* exp, QWidget *parent)
     connect(m_ui->edgeCMapName, SIGNAL(currentIndexChanged(QString)), SLOT(slotEdgeCMapName(QString)));
     connect(m_ui->edgeCMapSize, SIGNAL(currentIndexChanged(int)), SLOT(updateEdgeCMap()));
 
-    connect(m_exp, SIGNAL(restarted()), SLOT(init()));
+    connect(m_exp.data(), SIGNAL(restarted()), SLOT(init()));
     init();
 }
 

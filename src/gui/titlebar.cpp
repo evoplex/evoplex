@@ -26,7 +26,7 @@
 
 namespace evoplex {
 
-TitleBar::TitleBar(Experiment* exp, QDockWidget* parent)
+TitleBar::TitleBar(ExperimentPtr exp, QDockWidget* parent)
     : QWidget(parent)
     , m_ui(new Ui_TitleBar)
     , m_exp(exp)
@@ -35,7 +35,7 @@ TitleBar::TitleBar(Experiment* exp, QDockWidget* parent)
     setFocusPolicy(Qt::StrongFocus);
     setStyleSheet("background-color:rgb(40,40,40);");
 
-    connect(m_exp, SIGNAL(restarted()), SLOT(slotRestarted()));
+    connect(m_exp.data(), SIGNAL(restarted()), SLOT(slotRestarted()));
     slotRestarted(); // init
 
     QStyle* style = qApp->style();

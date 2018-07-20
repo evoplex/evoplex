@@ -18,6 +18,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "fontstyles.h"
 #include "maingui.h"
 #include "welcomepage.h"
 #include "ui_welcomepage.h"
@@ -30,6 +31,10 @@ WelcomePage::WelcomePage(MainGUI* maingui)
     , m_maingui(maingui)
 {
     m_ui->setupUi(this);
+
+    m_ui->labelEvoplex->setFont(FontStyles::h4());
+    m_ui->labelStart->setFont(FontStyles::h6());
+    m_ui->labelRecent->setFont(FontStyles::h6());
 
     connect(m_ui->bNewProject, SIGNAL(pressed()), m_maingui, SIGNAL(newProject()));
     connect(m_ui->bOpenProject, &QPushButton::pressed, [this]() { m_maingui->openProject(""); });

@@ -18,8 +18,11 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##########################################################################
 
+set(TESTS_WITH_QRC
+  tst_nodes
+)
 
-set(TESTS
+set(TESTS_WITHOUT_QRC
   tst_attributes
   tst_attributerange
   tst_edge
@@ -28,9 +31,21 @@ set(TESTS
   tst_value
 )
 
-foreach(TEST ${TESTS})
-  add_executable(${TEST} ${TEST}.cpp)
+function(add_utest TEST ADD_QRC)
+  if(${ADD_QRC})
+    add_executable(${TEST} ${TEST}.cpp data.qrc)
+  else()
+    add_executable(${TEST} ${TEST}.cpp)
+  endif()
   target_link_libraries(${TEST} EvoplexCore Qt5::Test)
   target_include_directories(${TEST} PRIVATE ${CMAKE_SOURCE_DIR}/src)
   add_test(${TEST} ${TEST})
+endfunction()
+
+foreach(TEST ${TESTS_WITHOUT_QRC})
+  add_utest("${TEST}" FALSE)
+endforeach()
+
+foreach(TEST "${TESTS_WITH_QRC}")
+  add_utest("${TEST}" TRUE)
 endforeach()

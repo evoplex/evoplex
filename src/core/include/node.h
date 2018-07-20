@@ -35,7 +35,12 @@ typedef std::shared_ptr<Node> NodePtr;
 class NodeInterface
 {
     friend class AbstractGraph;
+    friend class Nodes;
+    friend class TestNode;
+    friend class TestEdge;
+
 public:
+    virtual ~NodeInterface() = default;
     virtual NodePtr clone() const = 0;
     virtual const Edges& inEdges() const = 0;
     virtual const Edges& outEdges() const = 0;
@@ -52,19 +57,33 @@ private:
     virtual void clearOutEdges() = 0;
 };
 
+/**
+ * @brief A node belongs to either a directed or undirected graph.
+ *        Directed graphs are composed of DNode objects, while an undirected
+ *        graph is composed of UNode objects.
+ *
+ * @attention A node can only be created by an AbstractGraph derived object
+ *            or from a Nodes container.
+ */
 class Node : public NodeInterface
 {
+    friend class AbstractGraph;
+    friend class Nodes;
+    friend class TestNode;
+    friend class TestEdge;
+
 public:
     inline const Attributes& attrs() const;
+    inline const Value& attr(const QString& name) const;
     inline const Value& attr(const char* name) const;
     inline const Value& attr(const int id) const;
     inline void setAttr(const int id, const Value& value);
 
     inline int id() const;
-
     inline int x() const;
-    inline void setX(int x);
     inline int y() const;
+
+    inline void setX(int x);    
     inline void setY(int y);
     inline void setCoords(int x, int y);
 
@@ -73,13 +92,11 @@ public:
 protected:
     Edges m_outEdges;
 
-    explicit Node(int id, Attributes attrs, int x, int y)
-        : m_id(id), m_attrs(attrs), m_x(x), m_y(y) {}
+    struct constructor_key { /* this is a private key accessible only to friends */ };
 
-    explicit Node(int id, Attributes attr)
-        : Node(id, attr, 0, id) {}
-
-    virtual ~Node() {}
+    explicit Node(const constructor_key&, int id, Attributes attrs, int x, int y);
+    explicit Node(const constructor_key& k, int id, Attributes attr);
+    ~Node() override;
 
 private:
     const int m_id;
@@ -91,9 +108,9 @@ private:
 class UNode : public Node
 {
 public:
-    explicit UNode(int id, Attributes attrs, int x, int y) : Node(id, attrs, x, y) {}
-    explicit UNode(int id, Attributes attrs) : Node(id, attrs) {}
-    virtual ~UNode() {}
+    explicit UNode(const constructor_key& k, int id, Attributes attrs, int x, int y);
+    explicit UNode(const constructor_key& k, int id, Attributes attrs);
+    ~UNode() override = default;
 
     inline NodePtr clone() const override;
     inline const Edges& inEdges() const override;
@@ -114,9 +131,9 @@ private:
 class DNode : public Node
 {
 public:
-    explicit DNode(int id, Attributes attrs, int x, int y) : Node(id, attrs, x, y) {}
-    explicit DNode(int id, Attributes attrs) : Node(id, attrs) {}
-    virtual ~DNode() {}
+    explicit DNode(const constructor_key& k, int id, Attributes attrs, int x, int y);
+    explicit DNode(const constructor_key& k, int id, Attributes attrs);
+    ~DNode() override = default;
 
     inline NodePtr clone() const override;
     inline const Edges& inEdges() const override;
@@ -142,6 +159,9 @@ private:
 
 inline const Attributes& Node::attrs() const
 { return m_attrs; }
+
+inline const Value& Node::attr(const QString& name) const
+{ return m_attrs.value(name); }
 
 inline const Value& Node::attr(const char* name) const
 { return m_attrs.value(name); }
@@ -171,14 +191,14 @@ inline void Node::setCoords(int x, int y)
 { setX(x); setY(y); }
 
 inline const NodePtr& Node::randNeighbour(PRG* prg) const
-{ return (*std::next(m_outEdges.cbegin(), prg->randI(m_outEdges.size()-1))).second->neighbour(); }
+{ return (*std::next(m_outEdges.cbegin(), prg->randI(outDegree()-1))).second->neighbour(); }
 
 /************************************************************************
    UNode: Inline member functions
  ************************************************************************/
 
 inline NodePtr UNode::clone() const
-{ return std::make_shared<UNode>(id(), attrs(), x(), y()); }
+{ return std::make_shared<UNode>(constructor_key(), id(), attrs(), x(), y()); }
 
 inline const Edges& UNode::inEdges() const
 { return m_outEdges; }
@@ -217,8 +237,8 @@ inline void UNode::clearOutEdges()
    DNode: Inline member functions
  ************************************************************************/
 
-inline NodePtr DNode::clone() const
-{ return std::make_shared<DNode>(id(), attrs(), x(), y()); }
+NodePtr DNode::clone() const
+{ return std::make_shared<DNode>(constructor_key(), id(), attrs(), x(), y()); }
 
 inline const Edges& DNode::inEdges() const
 { return m_inEdges; }

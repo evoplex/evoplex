@@ -19,379 +19,336 @@
  */
 
 #include <QDebug>
-#include <QElapsedTimer>
-#include <QFile>
-#include <QFileInfo>
-#include <QThread>
 
 #include "experiment.h"
-#include "attrsgenerator.h"
-#include "node.h"
+#include "nodes.h"
 #include "project.h"
+#include "trial.h"
+#include "utils.h"
 
-namespace evoplex
-{
+namespace evoplex {
 
-Experiment::Experiment(MainApp* mainApp, ExpInputs* inputs, ProjectPtr project)
-    : m_mainApp(mainApp)
-    , m_id(inputs->general(GENERAL_ATTRIBUTE_EXPID).toInt())
-    , m_project(project)
-    , m_inputs(nullptr)
-    , m_expStatus(INVALID)
+Experiment::Experiment(MainApp* mainApp, const int id, ProjectPtr project)
+    : m_mainApp(mainApp),
+      m_id(id),
+      m_project(project),
+      m_inputs(nullptr),
+      m_graphPlugin(nullptr),
+      m_modelPlugin(nullptr),
+      m_graphType(GraphType::Invalid),
+      m_numTrials(0),
+      m_autoDeleteTrials(true),
+      m_stopAt(-1),
+      m_pauseAt(-1),
+      m_progress(0),
+      m_delay(0),
+      m_expStatus(Status::Invalid)
 {
-    QString error;
-    init(inputs, error);
-    Q_ASSERT_X(m_project, "Experiment", "tried to create an experiment from a null project");
+    Q_ASSERT_X(project, "Experiment", "an experiment must belong to a valid project");
 }
 
 Experiment::~Experiment()
 {
-    Q_ASSERT_X(m_expStatus != RUNNING && m_expStatus != QUEUED,
-               "~Experiment", "tried to delete a running experiment");
+    Q_ASSERT_X(m_expStatus != Status::Running && m_expStatus != Status::Queued,
+               "Experiment", "tried to delete a running experiment");
     deleteTrials();
     m_outputs.clear();
     delete m_inputs;
     m_project.clear();
 }
 
-bool Experiment::init(ExpInputs* inputs, QString& error)
+void Experiment::deleteTrials()
 {
-    if (m_expStatus == RUNNING || m_expStatus == QUEUED) {
-        error = "Tried to initialize a running experiment.\n"
-                "Please, pause it and try again.";
-        qWarning() << error;
+    for (auto& trial : m_trials) {
+        delete trial.second;
+    }
+    m_trials.clear();
+    m_clonableNodes.clear();
+}
+
+bool Experiment::setInputs(ExpInputs* inputs, QString& error)
+{
+    if (!disable(&error)) {
         return false;
     }
 
-    m_outputs.clear();
+    QMutexLocker locker(&m_mutex);
+
+    Q_ASSERT(inputs != m_inputs);
     delete m_inputs;
     m_inputs = inputs;
-
-    m_filePathPrefix.clear();
-    m_fileHeader.clear();
-    if (!m_inputs->fileCaches().empty()) {
-        m_filePathPrefix = QString("%1/%2_e%3_t")
-                .arg(m_inputs->general(OUTPUT_DIR).toQString())
-                .arg(m_project->name())
-                .arg(m_id);
-
-        for (const Cache* cache : m_inputs->fileCaches()) {
-            Q_ASSERT_X(cache->inputs().size() > 0, "Experiment::init", "a file cache must have inputs");
-            m_fileHeader += cache->printableHeader(',', false) + ",";
-            m_outputs.insert(cache->output());
-        }
-        m_fileHeader.chop(1);
-        m_fileHeader += "\n";
-    }
-
-    m_numTrials = m_inputs->general(GENERAL_ATTRIBUTE_TRIALS).toInt();
-    m_autoDeleteTrials = m_inputs->general(GENERAL_ATTRIBUTE_AUTODELETE).toBool();
 
     m_graphPlugin = m_mainApp->graph(m_inputs->general(GENERAL_ATTRIBUTE_GRAPHID).toQString());
     m_modelPlugin = m_mainApp->model(m_inputs->general(GENERAL_ATTRIBUTE_MODELID).toQString());
 
-    reset();
+    // a few asserts for critical things that should never happen!
+    Q_ASSERT_X(this == m_project.data()->experiment(m_id),
+        "Experiment", "an experiment must be aware of its parent project!");
+    Q_ASSERT_X(m_id == inputs->general(GENERAL_ATTRIBUTE_EXPID).toInt(),
+        "Experiment", "mismatched experiment id!");
+    Q_ASSERT_X(m_graphPlugin && m_modelPlugin,
+        "Experiment", "tried to setup an experiment with invalid plugins!");
 
+    m_graphType = _enumFromString<GraphType>(m_inputs->general(GENERAL_ATTRIBUTE_GRAPHTYPE).toQString());
+    if (m_graphType == GraphType::Invalid) {
+        error += "the graph type is invalid!\n";
+        m_expStatus = Status::Invalid;
+    }
+
+    m_numTrials = m_inputs->general(GENERAL_ATTRIBUTE_TRIALS).toInt();
+    if (m_numTrials < 1 || m_numTrials > EVOPLEX_MAX_TRIALS) {
+        error += QString("number of trials should be >0 and <%1!\n").arg(EVOPLEX_MAX_TRIALS);
+        m_expStatus = Status::Invalid;
+    }
+
+    m_autoDeleteTrials = m_inputs->general(GENERAL_ATTRIBUTE_AUTODELETE).toBool();
+    setStopAt(m_inputs->general(GENERAL_ATTRIBUTE_STOPAT).toInt());
+    setPauseAt(m_stopAt);
+
+    if (!error.isEmpty()) {
+        qWarning() << error;
+    }
+
+    emit (statusChanged(m_expStatus));
+    emit (restarted());
+    return m_expStatus != Status::Invalid;
+}
+
+bool Experiment::disable(QString* error)
+{
+    QMutexLocker locker(&m_mutex);
+
+    if (m_expStatus == Status::Running || m_expStatus == Status::Queued) {
+        QString e("Tried to disable a running experiment.\n"
+                  "Please, pause it and try again.");
+        qWarning() << e;
+        if (error) *error = e;
+        return false;
+    }
+
+    m_mainApp->expMgr()->removeFromIdle(sharedFromThis());
+
+    deleteTrials();
+    m_outputs.clear();
+    m_filePathPrefix.clear();
+    m_fileHeader.clear();
+    m_expStatus = Status::Disabled;
+    setProgress(0);
     return true;
 }
 
-void Experiment::reset()
+bool Experiment::reset(QString* error)
 {
-    if (m_expStatus == RUNNING || m_expStatus == QUEUED) {
-        qWarning() << "tried to reset a running experiment. You should pause it first.";
-        return;
+    QMutexLocker locker(&m_mutex);
+
+    QString erroMsg;
+    if (!m_inputs || m_expStatus == Status::Invalid) {
+        erroMsg = "Tried to reset an invalid experiment.\n"
+                  "Please, check its inputs and try again.";
+    } else if (m_expStatus == Status::Running || m_expStatus == Status::Queued) {
+        erroMsg = "Tried to reset a running experiment.\n"
+                  "Please, pause it and try again.";
+    } else if (m_expStatus == Status::Disabled) {
+        enable();
     }
 
-    deleteTrials();
+    if (!erroMsg.isEmpty()) {
+        qWarning() << erroMsg;
+        if (error) *error = erroMsg;
+        return false;
+    }
 
-    QMutexLocker locker(&m_mutex);
+    m_delay = m_mainApp->defaultStepDelay();
+    m_stopAt = m_inputs->general(GENERAL_ATTRIBUTE_STOPAT).toInt();
+    setProgress(0);
 
     for (OutputPtr o : m_outputs) {
         o->flushAll();
     }
 
-    m_trials.reserve(m_numTrials);
-    m_delay = m_mainApp->defaultStepDelay();
-    m_stopAt = m_inputs->general(GENERAL_ATTRIBUTE_STOPAT).toInt();
-    m_pauseAt = m_stopAt;
-    m_progress = 0;
+    deleteTrials();
+    m_trials.reserve(static_cast<size_t>(m_numTrials));
+    for (quint16 trialId = 0; trialId < m_numTrials; ++trialId) {
+        m_trials.insert({trialId, new Trial(trialId, sharedFromThis())});
+    }
 
-    m_expStatus = READY;
+    m_expStatus = Status::Paused;
     emit (statusChanged(m_expStatus));
 
     emit (restarted());
+    return true;
 }
 
-void Experiment::deleteTrials()
+void Experiment::enable()
 {
-    QMutexLocker locker(&m_mutex);
+    Q_ASSERT(m_inputs && m_expStatus == Status::Disabled);
 
-    for (auto& trial : m_trials) {
-        delete trial.second;
+    if (m_inputs->fileCaches().empty()) {
+        return; // nothing to do
     }
-    m_trials.clear();
 
-    m_clonableNodes.clear();
+    m_filePathPrefix = QString("%1/%2_e%3_t")
+            .arg(m_inputs->general(OUTPUT_DIR).toQString())
+            .arg(m_project.data()->name())
+            .arg(m_id);
+
+    m_outputs.clear();
+    m_fileHeader.clear();
+    for (const Cache* cache : m_inputs->fileCaches()) {
+        m_fileHeader += cache->printableHeader(',', false) + ",";
+        m_outputs.insert(cache->output());
+    }
+    m_fileHeader.chop(1);
+    m_fileHeader += "\n";
 }
 
-void Experiment::updateProgressValue()
-{
-    quint16 lastProgress = m_progress;
-    if (m_expStatus == FINISHED) {
-        m_progress = 360;
-    } else if (m_expStatus == INVALID) {
-        m_progress = 0;
-    } else if (m_expStatus == RUNNING) {
-        float p = 0.f;
-        for (auto& trial : m_trials) {
-            p += static_cast<float>(trial.second->m_currStep / m_pauseAt);
-        }
-        m_progress = static_cast<quint16>(std::ceil(p * 360.f / m_numTrials));
-    }
-
-    if (lastProgress != m_progress) {
-        emit (progressUpdated());
-    }
-}
-
-void Experiment::toggle()
-{
-    if (m_expStatus == RUNNING) {
-        pause();
-    } else if (m_expStatus == READY) {
-        play();
-    } else if (m_expStatus == QUEUED) {
-        m_mainApp->expMgr()->removeFromQueue(this);
-    }
-}
-
-void Experiment::playNext()
-{
-    if (m_expStatus != READY) {
-        return;
-    } else if (m_trials.empty()) {
-        setPauseAt(-1); // just create and set the trials
-    } else {
-        int maxCurrStep = 0;
-        for (const auto& trial : m_trials) {
-            int currStep = trial.second->m_currStep;
-            if (currStep > maxCurrStep) maxCurrStep = currStep;
-        }
-        setPauseAt(maxCurrStep + 1);
-    }
-    m_mainApp->expMgr()->play(this);
-}
-
-void Experiment::processTrial(const quint16 trialId)
-{
-    if (m_expStatus == INVALID) {
-        return;
-    } else if (m_trials.find(trialId) == m_trials.end()) {
-        AbstractModel* trial = createTrial(trialId);
-        if (!trial) {
-            setExpStatus(INVALID);
-            pause();
-            return;
-        }
-        m_trials.insert({trialId, trial});
-        emit (trialCreated(trialId));
-    }
-
-    AbstractModel* trial = m_trials.at(trialId);
-    if (trial->m_status != READY) {
-        return;
-    }
-
-    trial->m_status = RUNNING;
-
-    QElapsedTimer t;
-    t.start();
-
-    bool algorithmConverged = false;
-    while (trial->m_currStep < m_pauseAt && !algorithmConverged) {
-        algorithmConverged = trial->algorithmStep();
-        ++trial->m_currStep;
-
-        for (const OutputPtr& output : m_outputs)
-            output->doOperation(trialId, trial);
-
-        if (m_inputs->fileCaches().size()
-                && trial->m_currStep % m_mainApp->stepsToFlush() == 0
-                && !writeCachedSteps(trialId)) {
-            trial->m_status = INVALID;
-            setExpStatus(INVALID);
-            pause();
-            return;
-        }
-
-        if (m_delay > 0)
-            QThread::msleep(m_delay);
-    }
-
-    qDebug() << QString("%1 (E%2:T%3) - %4s")
-                .arg(m_project->name()).arg(m_id).arg(trialId)
-                .arg(t.elapsed() / 1000);
-
-    if (trial->m_currStep >= m_stopAt || algorithmConverged) {
-        if (writeCachedSteps(trialId)) {
-            trial->m_status = FINISHED;
-        } else {
-            trial->m_status = INVALID;
-            setExpStatus(INVALID);
-            pause();
-        }
-    } else {
-        trial->m_status = READY;
-    }
-}
-
-AbstractModel* Experiment::createTrial(const quint16 trialId)
-{
-    // Make it thread-safe to make sure that we create one trial at a time.
-    // Thus, if one trial fail, then the other will be aborted earlier.
-    QMutexLocker locker(&m_mutex);
-
-    if (m_expStatus == INVALID || m_pauseAt == 0) {
-        return nullptr;
-    } if (static_cast<int>(m_trials.size()) == m_numTrials) {
-        QString e = QString("FATAL! all the trials for this experiment have already been created."
-                            "It should never happen!\n Project: %1; Exp: %2; Trial: %3 (max=%4)\n")
-                            .arg(m_project->name()).arg(m_id).arg(trialId).arg(m_numTrials);
-        qFatal("%s", qPrintable(e));
-    }
-
-    const QString& gType = m_inputs->general(GENERAL_ATTRIBUTE_GRAPHTYPE).toString();
-    Nodes nodes = createNodes(AbstractGraph::enumFromString(gType));
-    if (nodes.empty()) {
-        return nullptr;
-    }
-
-    const quint16 seed = static_cast<quint16>(m_inputs->general(GENERAL_ATTRIBUTE_SEED).toInt());
-    PRG* prg = new PRG(seed + trialId);
-
-    AbstractGraph* graphObj = m_graphPlugin->create();
-    if (!graphObj || !graphObj->setup(prg, m_inputs->graph(), nodes, gType) || !graphObj->init()) {
-        qWarning() << "unable to create the trials."
-                   << "The graph could not be initialized."
-                   << "Project:" << m_project->name() << "Experiment:" << m_id;
-        delete graphObj;
-        delete prg;
-        return nullptr;
-    }
-    graphObj->reset();
-
-    AbstractModel* modelObj = m_modelPlugin->create();
-    if (!modelObj || !modelObj->setup(prg, m_inputs->model(), graphObj) || !modelObj->init()) {
-        qWarning() << "unable to create the trials."
-                   << "The model could not be initialized."
-                   << "Project:" << m_project->name() << "Experiment:" << m_id;
-        delete modelObj;
-        return nullptr;
-    }
-
-    if (!m_inputs->fileCaches().empty()) {
-        const QString fpath = m_filePathPrefix + QString("%4.csv").arg(trialId);
-        QFile file(fpath);
-        if (file.open(QFile::WriteOnly | QFile::Truncate)) {
-            QTextStream stream(&file);
-            stream << m_fileHeader;
-            file.close();
-        } else {
-            qWarning() << "unable to create the trials. Could not write in " << fpath;
-            delete modelObj;
-            return nullptr;
-        }
-
-        // write this initial step to file
-        for (OutputPtr output : m_outputs) {
-            output->doOperation(trialId, modelObj);
-        }
-        writeCachedSteps(trialId);
-    }
-
-    modelObj->m_status = READY;
-    return modelObj;
-}
-
-Nodes Experiment::createNodes(const AbstractGraph::GraphType gType)
-{
-    if (m_expStatus == INVALID || gType == AbstractGraph::Invalid_Type) {
-        return Nodes();
-    } else if (!m_clonableNodes.empty()) {
-        if (static_cast<int>(m_trials.size()) == m_numTrials - 1) {
-            Nodes nodes = m_clonableNodes;
-            Nodes().swap(m_clonableNodes);
-            return nodes;
-        }
-        return Utils::clone(m_clonableNodes);
-    }
-
-    Q_ASSERT_X(m_trials.empty(), "Experiment::createNodes",
-               "if there is no trials to run, why is it trying to create nodes?");
-
-    QString errMsg;
-    const QString& cmd = m_inputs->general(GENERAL_ATTRIBUTE_NODES).toQString();
-    Nodes nodes = Nodes::fromCmd(cmd, m_modelPlugin->nodeAttrsScope(), gType, &errMsg);
-    if (!errMsg.isEmpty() || nodes.empty()) {
-        errMsg = QString("unable to create the trials."
-                         "The set of nodes could not be created.\n %1 \n"
-                         "Project: %2 Experiment: %3")
-                         .arg(errMsg).arg(m_project->name()).arg(m_id);
-        qWarning() << errMsg;
-        return Nodes();
-    }
-
-    if (m_numTrials > 1) {
-        m_clonableNodes = Utils::clone(nodes);
-    }
-    return nodes;
-}
-
-AbstractModel* Experiment::trial(int trialId) const
+const Trial* Experiment::trial(quint16 trialId) const
 {
     auto it = m_trials.find(trialId);
-    if (it == m_trials.end() || !it->second)
+    if (it == m_trials.end())
         return nullptr;
     return it->second;
 }
 
-bool Experiment::writeCachedSteps(const int trialId)
+void Experiment::updateProgressValue()
 {
-    if (m_inputs->fileCaches().empty() || m_inputs->fileCaches().front()->isEmpty(trialId)) {
-        return true;
+    if (m_expStatus != Status::Running) {
+        return;
     }
 
-    const QString fpath = m_filePathPrefix + QString("%1.csv").arg(trialId);
-    QFile file(fpath);
-    if (!file.open(QFile::WriteOnly | QFile::Append)) {
-        qWarning() << "unable to create the trials. Could not write in " << fpath;
+    float p = 0.f;
+    for (auto const& t : m_trials) {
+        p += (static_cast<float>(t.second->step()) / m_stopAt);
+    }
+    quint16 newProg = static_cast<quint16>(std::ceil(p * 360.f / m_numTrials));
+    if (newProg != m_progress) {
+        setProgress(newProg);
+    }
+}
+
+void Experiment::trialFinished(Trial* trial)
+{
+    QMutexLocker locker(&m_mutex);
+    if (m_expStatus != Status::Invalid && trial->status() == Status::Invalid) {
+        m_expStatus = Status::Invalid;
+        pause(); // pause all other trials asap
+        emit (statusChanged(m_expStatus));
+    }
+    locker.unlock();
+    m_mainApp->expMgr()->trialFinished(trial);
+}
+
+void Experiment::expFinished()
+{
+    QMutexLocker locker(&m_mutex);
+
+    if (m_expStatus == Status::Invalid) {
+        locker.unlock();
+        disable(); // delete everything to save memory
+        locker.relock();
+        m_expStatus = Status::Invalid; // keep it invalid
+        emit (statusChanged(m_expStatus));
+        return;
+    }
+
+    bool allTrialsFinished = true;
+    for (auto const& t : m_trials) {
+        if (t.second->status() != Status::Finished) {
+            allTrialsFinished = false;
+            break;
+        }
+    }
+
+    if (allTrialsFinished) {
+        m_expStatus = Status::Finished;
+        if (m_autoDeleteTrials) {
+            locker.unlock();
+            disable(); // sets to Status::Disabled
+            locker.relock();
+        }
+        setProgress(360);
+        // reset the stopAt flag to maximum
+        setStopAt(m_inputs->general(GENERAL_ATTRIBUTE_STOPAT).toInt());
+    } else { // all or some trials are paused
+        updateProgressValue();
+        m_expStatus = Status::Paused; // exp is still good for another step
+    }
+    setPauseAt(m_stopAt); // reset the pauseAt flag to maximum
+    emit (statusChanged(m_expStatus));
+}
+
+void Experiment::toggle()
+{
+    if (m_expStatus == Status::Running) {
+        pause();
+    } else if (m_expStatus == Status::Paused || m_expStatus == Status::Disabled) {
+        play();
+    } else if (m_expStatus == Status::Queued) {
+        m_mainApp->expMgr()->removeFromQueue(sharedFromThis());
+    }
+}
+
+void Experiment::play()
+{
+    m_mainApp->expMgr()->play(sharedFromThis());
+}
+
+void Experiment::playNext()
+{
+    if (m_expStatus != Status::Paused && m_expStatus != Status::Disabled) {
+        return;
+    }
+
+    int maxCurrStep = -1;
+    for (const auto& trial : m_trials) {
+        int currStep = trial.second->step();
+        if (currStep > maxCurrStep) maxCurrStep = currStep;
+    }
+    setPauseAt(maxCurrStep + 1);
+    play();
+}
+
+Nodes Experiment::cloneCachedNodes(const int trialId)
+{
+    if (m_clonableNodes.empty()) {
+        return Nodes();
+    }
+
+    // if it's not the last trial, just take a copy of the nodes
+    for (auto const& it : m_trials) {
+        if (it.first != trialId && it.second->status() == Status::Disabled) {
+            return Utils::clone(m_clonableNodes);
+        }
+    }
+
+    // it's the last trial, let's use the cloned nodes
+    Nodes nodes = m_clonableNodes;
+    Nodes().swap(m_clonableNodes);
+    return nodes;
+}
+
+bool Experiment::createNodes(Nodes& nodes) const
+{
+    const QString& cmd = m_inputs->general(GENERAL_ATTRIBUTE_NODES).toQString();
+
+    QString error;
+    nodes = Nodes::fromCmd(cmd, m_modelPlugin->nodeAttrsScope(), m_graphType, error);
+    if (nodes.empty() || !error.isEmpty()) {
+        error = QString("unable to create the trials."
+                         "The set of nodes could not be created.\n %1 \n"
+                         "Project: %2 Experiment: %3")
+                         .arg(error).arg(m_project.data()->name()).arg(m_id);
+        qWarning() << error;
         return false;
     }
 
-    QTextStream stream(&file);
-    do {
-        QString row;
-        for (Cache* cache : m_inputs->fileCaches()) {
-            Values vals = cache->readFrontRow(trialId).second;
-            cache->flushFrontRow(trialId);
-            for (Value val : vals) {
-                row += val.toQString() + ",";
-            }
-        }
-        row.chop(1);
-        stream << row << "\n";
-
-    // we synchronously flush all the io stuff. So, it's safe to say
-    // that if the front Output is empty, then all others are also empty.
-    } while (!m_inputs->fileCaches().front()->isEmpty(trialId));
-
-    file.close();
+    Q_ASSERT_X(nodes.size() <= EVOPLEX_MAX_NODES, "Experiment", "too many nodes to handle!");
     return true;
 }
 
 bool Experiment::removeOutput(OutputPtr output)
 {
-    if (m_expStatus != Experiment::READY) {
+    if (m_expStatus != Status::Paused) {
         qWarning() << "tried to remove an 'Output' from a running experiment. You should pause it first.";
         return false;
     }
@@ -401,7 +358,7 @@ bool Experiment::removeOutput(OutputPtr output)
         return false;
     }
 
-    std::unordered_set<OutputPtr>::iterator it = m_outputs.find(output);
+    auto it = m_outputs.find(output);
     if (it == m_outputs.end()) {
         qWarning() << "tried to remove a non-existent 'Output'.";
         return false;
@@ -426,6 +383,12 @@ void Experiment::setExpStatus(Status s)
     QMutexLocker locker(&m_mutex);
     m_expStatus = s;
     emit (statusChanged(m_expStatus));
+}
+
+void Experiment::setProgress(quint16 p)
+{
+    m_progress = p;
+    emit (progressUpdated(p));
 }
 
 } // evoplex

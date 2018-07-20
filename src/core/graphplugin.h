@@ -21,23 +21,37 @@
 #ifndef GRAPHPLUGIN_H
 #define GRAPHPLUGIN_H
 
+#include <vector>
+
+#include "enum.h"
 #include "plugin.h"
-#include "attributes.h"
-#include "plugininterfaces.h"
 
 namespace evoplex {
 class GraphPlugin : public Plugin
 {
-public:
-    GraphPlugin(const QObject* instance, const QJsonObject* metaData, const QString& libPath);
-    virtual ~GraphPlugin();
+    friend class Plugin;
+    friend class MainApp;
 
-    inline AbstractGraph* create() const { return m_factory->create(); }
+public:
+    using GraphTypes = std::vector<GraphType>;
+
+    virtual ~GraphPlugin() = default;
+
+    inline const GraphTypes& validGraphTypes() const;
+
+protected:
+    explicit GraphPlugin(const QJsonObject* metaData, const QString& libPath);
 
 private:
-    IPluginGraph* m_factory;
-    std::vector<AbstractGraph::GraphType> m_validGraphTypes;
+    std::vector<GraphType> m_validGraphTypes;
 };
-}
 
+/************************************************************************
+   GraphPlugin: Inline member functions
+ ************************************************************************/
+
+inline const GraphPlugin::GraphTypes& GraphPlugin::validGraphTypes() const
+{ return m_validGraphTypes; }
+
+} //evoplex
 #endif // GRAPHPLUGIN_H

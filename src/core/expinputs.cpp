@@ -20,14 +20,15 @@
 
 #include "expinputs.h"
 #include "constants.h"
+#include "graphplugin.h"
 
 namespace evoplex {
 
-ExpInputs::ExpInputs(Attributes* general, Attributes* model,
-                     Attributes* graph, std::vector<Cache*> caches)
+ExpInputs::ExpInputs(Attributes* general, Attributes* graph,
+                     Attributes* model, std::vector<Cache*> caches)
     : m_generalAttrs(general),
-      m_modelAttrs(model),
       m_graphAttrs(graph),
+      m_modelAttrs(model),
       m_fileCaches(caches)
 {
 }
@@ -48,10 +49,10 @@ std::vector<QString> ExpInputs::exportAttrNames() const
     const QString graphId = m_generalAttrs->value(GENERAL_ATTRIBUTE_GRAPHID, "").toQString();
     const QString modelId = m_generalAttrs->value(GENERAL_ATTRIBUTE_MODELID, "").toQString();
     for (const QString& attrName : m_graphAttrs->names()) {
-        names.emplace_back(graphId + "_" + attrName);
+        if (!attrName.isEmpty()) names.emplace_back(graphId + "_" + attrName);
     }
     for (const QString& attrName : m_modelAttrs->names()) {
-        names.emplace_back(modelId + "_" + attrName);
+        if (!attrName.isEmpty()) names.emplace_back(modelId + "_" + attrName);
     }
     return names;
 }
@@ -67,8 +68,11 @@ std::vector<Value> ExpInputs::exportAttrValues() const
 ExpInputs* ExpInputs::parse(const MainApp* mainApp, const QStringList& header,
                             const QStringList& values, QString& errMsg)
 {
-    if (header.isEmpty() || values.isEmpty() || header.size() != values.size()) {
-        errMsg = "The 'header' and 'values' cannot be empty and must have the same number of elements.";
+    if (header.isEmpty() || values.isEmpty()) {
+        errMsg += "The 'header' and 'values' cannot be empty.";
+        return nullptr;
+    } else if (header.size() != values.size()) {
+        errMsg += "The 'header' and 'values' must have the same number of elements.";
         return nullptr;
     }
 
@@ -78,8 +82,8 @@ ExpInputs* ExpInputs::parse(const MainApp* mainApp, const QStringList& header,
     }
 
     ExpInputs* ei = new ExpInputs(new Attributes(mainApp->generalAttrsScope().size()),
-                                  new Attributes(plugins.second->pluginAttrsScope().size()),
                                   new Attributes(plugins.first->pluginAttrsScope().size()),
+                                  new Attributes(plugins.second->pluginAttrsScope().size()),
                                   std::vector<Cache*>());
 
     QStringList failedAttrs;
@@ -99,13 +103,11 @@ ExpInputs* ExpInputs::parse(const MainApp* mainApp, const QStringList& header,
     checkAll(ei->m_modelAttrs, plugins.second->pluginAttrsScope());
 
     if (!failedAttrs.isEmpty()) {
+        failedAttrs.removeDuplicates();
         errMsg += QString("The following attributes are missing/invalid: %1").arg(failedAttrs.join(","));
-        delete ei;
-        return nullptr;
     }
 
-    // that's great! everything seems to be valid
-    return ei;
+    return ei; // return the object, even if it has invalid/missing attrs
 }
 
 ExpInputs::Plugins ExpInputs::findPlugins(const MainApp* mainApp,
@@ -124,14 +126,14 @@ ExpInputs::Plugins ExpInputs::findPlugins(const MainApp* mainApp,
                                      mainApp->model(values.at(headerModelId)));
     if (!plugins.first) {
         errMsg += QString("The graph plugin '%1' is not available."
-                          " Make sure to load it before trying to add this experiment.")
-                          .arg(values.at(headerGraphId)).arg(values.at(headerModelId));
+                          " Make sure you load it before trying to add this experiment.")
+                          .arg(values.at(headerGraphId));
         return Plugins();
     }
     if (!plugins.second) {
         errMsg += QString("The model plugin '%1' is not available."
-                          " Make sure to load it before trying to add this experiment.")
-                          .arg(values.at(headerGraphId)).arg(values.at(headerModelId));
+                          " Make sure you load it before trying to add this experiment.")
+                          .arg(values.at(headerModelId));
         return Plugins();
     }
 

@@ -101,21 +101,6 @@ namespace Utils
         }
     }
 
-    // convert a linear index to row and column
-    static inline void ind2sub(const int ind, const int cols, int &row, int &col) {
-        row = ind / cols;
-        col = ind % cols;
-    }
-
-    // return the linear index of an element in a matrix.
-    static inline int linearIdx(const int row, const int col, const int cols) {
-        return row * cols + col;
-    }
-
-    static inline int linearIdx(std::pair<int,int> rowCol, const int cols) {
-        return linearIdx(rowCol.first, rowCol.second, cols);
-    }
-
 } // utils
 } // evoplex
 #endif // UTILS_H

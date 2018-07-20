@@ -46,7 +46,7 @@ public:
     void removeWidgetFromList(PPageDockWidget* dw);
     void setActiveWidget(PPageDockWidget* dw);
 
-    void setExperiment(Experiment* exp);
+    void setExperiment(ExperimentPtr exp);
 
 private slots:
     void slotNodesWidget();
@@ -57,13 +57,13 @@ private slots:
     void slotModelSelected(const QString& modelId);
     void slotGraphSelected(const QString& graphId);
     void slotPluginAdded(const Plugin* plugin);
-    void slotPluginRemoved(const QString& id, Plugin::Type type);
+    void slotPluginRemoved(const QString& id, PluginType type);
     void slotSetActiveWidget(int idx);
 
 private:
     MainApp* m_mainApp;
     ProjectPtr m_project;
-    Experiment* m_exp;
+    QWeakPointer<Experiment> m_exp;
     QString m_selectedGraphId;
     QString m_selectedModelId;
 
