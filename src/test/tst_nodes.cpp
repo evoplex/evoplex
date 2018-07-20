@@ -80,10 +80,6 @@ void TestNodes::_tst_empty_nodes(const Nodes& a, int size){
     QCOMPARE(a.at(i)->degree(), 0);
     QCOMPARE(a.at(i)->inDegree(), 0);
     QCOMPARE(a.at(i)->outDegree(), 0);
-
-//    // Nodes are created at the origin
-//    QCOMPARE(a.at(i)->x(), 0);
-//    QCOMPARE(a.at(i)->y(), 1);
 }
 
 }
@@ -470,6 +466,8 @@ void TestNodes::tst_fromFile_nodes_with_x() {
         QCOMPARE(nA->attrs().values(), nB->attrs().values());
         QCOMPARE(nA->x(), nB->x());
     }
+
+    QVERIFY(nodesOfSameType<UNode>(nodesFromFile));
 }
 
 // valid attributes AND y coordinates (only)
@@ -511,6 +509,8 @@ void TestNodes::tst_fromFile_nodes_with_y() {
         QCOMPARE(nA->attrs().values(), nB->attrs().values());
         QCOMPARE(nA->y(), nB->y());
     }
+
+    QVERIFY(nodesOfSameType<UNode>(nodesFromFile));
 }
 
 // invalid attributes
