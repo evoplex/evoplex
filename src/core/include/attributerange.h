@@ -62,8 +62,8 @@ public:
 
     // an attrRangeStr can be:
     //   - "bool"               // a boolean
-    //   - "dirpath"            // a string containing a valid dirpath
-    //   - "filepath"           // a string containing a valid filepath
+    //   - "dirpath"            // a string containing a valid dirpath (use forward slashes)
+    //   - "filepath"           // a string containing a valid filepath (use forward slashes)
     //   - "string"             // a string
     //   - "string{aaa,bbb}"    // set of strings
     //   - "int[min,max]"       // integers from min to max (including min and max)
@@ -71,6 +71,7 @@ public:
     //   - "double[min,max]     // doubles from min to max (including min and max)
     //   - "double{1.1,1.2}     // set of doubles
     //   * you can use 'max' to take the maximum value for the type
+    //   * do NOT add spaces before/after the commas
     static AttributeRange* parse(int attrId, const QString& attrName,
                                  const QString& attrRangeStr);
 

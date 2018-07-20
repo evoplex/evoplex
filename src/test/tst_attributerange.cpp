@@ -19,6 +19,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <memory>
 #include <QtTest>
 #include <attributerange.h>
 
@@ -29,7 +30,7 @@ class TestAttributeRange: public QObject
     Q_OBJECT
 
 private slots:
-    void initTestCase() {}
+    void initTestCase();
     void cleanupTestCase() {}
     void tst_bool();
     void tst_int_range();
@@ -40,7 +41,15 @@ private slots:
     void tst_double_set();
     void tst_filepath();
     void tst_dirpath();
+
+private:
+    std::unique_ptr<PRG> m_prg;
 };
+
+void TestAttributeRange::initTestCase()
+{
+    m_prg = std::unique_ptr<PRG>(new PRG(123));
+}
 
 void TestAttributeRange::tst_bool()
 {
@@ -66,10 +75,7 @@ void TestAttributeRange::tst_bool()
     bool max = true;
 
     // Tests 'AttributeRange::rand()'
-    Value v;
-    PRG* prg = new PRG(123);
-    v = attrRge->rand(prg);
-
+    Value v = attrRge->rand(m_prg.get());
     QVERIFY((v == Value(true))||(v == Value(false)));
     QCOMPARE(v.type(), Value::BOOL);
     QVERIFY(v.toBool() >= min);
@@ -81,8 +87,6 @@ void TestAttributeRange::tst_bool()
     // 'attrRge->max().toBool()' returns 0
 //    QCOMPARE(attrRge->max().toBool(), max);
     QCOMPARE(attrRge->max().toBool(), false);
-
-    delete prg;
 }
 
 void TestAttributeRange::tst_int_range()
@@ -134,13 +138,12 @@ void TestAttributeRange::tst_int_range()
     // Tests min(), max() and rand() functions
     Value v;
     int min, max;
-    PRG* prg = new PRG(123);
 
     min = 0;
     max = 1;
     QCOMPARE(attrRge->min().toInt(), min);
     QCOMPARE(attrRge->max().toInt(), max);
-    v = attrRge->rand(prg);
+    v = attrRge->rand(m_prg.get());
     QCOMPARE(v.type(), Value::INT);
     QVERIFY(v.toInt() >= min);
     QVERIFY(v.toInt() <= max);
@@ -149,7 +152,7 @@ void TestAttributeRange::tst_int_range()
     max = -5;
     QCOMPARE(attrRge2->min().toInt(), min);
     QCOMPARE(attrRge2->max().toInt(), max);
-    v = attrRge2->rand(prg);
+    v = attrRge2->rand(m_prg.get());
     QCOMPARE(v.type(), Value::INT);
     QVERIFY(v.toInt() >= min);
     QVERIFY(v.toInt() <= max);
@@ -158,12 +161,10 @@ void TestAttributeRange::tst_int_range()
     max = 100;
     QCOMPARE(attrRge3->min().toInt(), min);
     QCOMPARE(attrRge3->max().toInt(), max);
-    v = attrRge3->rand(prg);
+    v = attrRge3->rand(m_prg.get());
     QCOMPARE(v.type(), Value::INT);
     QVERIFY(v.toInt() >= min);
     QVERIFY(v.toInt() <= max);
-
-    delete prg;
 }
 
 void TestAttributeRange::tst_double_range()
@@ -215,13 +216,12 @@ void TestAttributeRange::tst_double_range()
     // Tests min(), max() and rand() functions
     Value v;
     double min, max;
-    PRG* prg = new PRG(123);
 
     min = 1.1;
     max = 1.2;
     QCOMPARE(attrRge->min().toDouble(), min);
     QCOMPARE(attrRge->max().toDouble(), max);
-    v = attrRge->rand(prg);
+    v = attrRge->rand(m_prg.get());
     QCOMPARE(v.type(), Value::DOUBLE);
     QVERIFY(v.toDouble() >= min);
     QVERIFY(v.toDouble() <= max);
@@ -230,7 +230,7 @@ void TestAttributeRange::tst_double_range()
     max = -3.3;
     QCOMPARE(attrRge2->min().toDouble(), min);
     QCOMPARE(attrRge2->max().toDouble(), max);
-    v = attrRge2->rand(prg);
+    v = attrRge2->rand(m_prg.get());
     QCOMPARE(v.type(), Value::DOUBLE);
     QVERIFY(v.toDouble() >= min);
     QVERIFY(v.toDouble() <= max);
@@ -239,12 +239,10 @@ void TestAttributeRange::tst_double_range()
     max = 87.5;
     QCOMPARE(attrRge3->min().toDouble(), min);
     QCOMPARE(attrRge3->max().toDouble(), max);
-    v = attrRge3->rand(prg);
+    v = attrRge3->rand(m_prg.get());
     QCOMPARE(v.type(), Value::DOUBLE);
     QVERIFY(v.toDouble() >= min);
     QVERIFY(v.toDouble() <= max);
-
-    delete prg;
 }
 
 void TestAttributeRange::tst_int_set()
@@ -273,23 +271,16 @@ void TestAttributeRange::tst_int_set()
     AttributeRange::Type type = AttributeRange::Int_Set;
     QCOMPARE(attrRge->type(), type);
 
-    // Tests min(), max() and rand() functions
-    Value v;
-    PRG* prg = new PRG(123);
-
     // min() returns the first value in the set
     QCOMPARE(attrRge->min().toInt(), 0);
     // max() returns the last value in the set
     QCOMPARE(attrRge->max().toInt(), -100);
     // Provided the set is ordered, these are the min and max values
 
-    v = attrRge->rand(prg);
+    Value v = attrRge->rand(m_prg.get());
     QCOMPARE(v.type(), Value::INT);
-
     QVERIFY(v.toInt() >= min);
     QVERIFY(v.toInt() <= max);
-
-    delete prg;
 }
 
 void TestAttributeRange::tst_double_set()
@@ -318,22 +309,16 @@ void TestAttributeRange::tst_double_set()
     AttributeRange::Type type = AttributeRange::Double_Set;
     QCOMPARE(attrRge->type(), type);
 
-    // Tests min(), max() and rand() functions
-    Value v;
-    PRG* prg = new PRG(123);
-
     // min() returns the first value in the set
     QCOMPARE(attrRge->min().toDouble(), 0.0);
     // max() returns the last value in the set
     QCOMPARE(attrRge->max().toDouble(), 87.5);
     // Provided the set is ordered, these are the min and max values
 
-    v = attrRge->rand(prg);
+    Value v = attrRge->rand(m_prg.get());
     QCOMPARE(v.type(), Value::DOUBLE);
-    QVERIFY(v.toInt() >= min);
-    QVERIFY(v.toInt() <= max);
-
-    delete prg;
+    QVERIFY(v.toDouble() >= min);
+    QVERIFY(v.toDouble() <= max);
 }
 
 void TestAttributeRange::tst_string()
@@ -383,16 +368,10 @@ void TestAttributeRange::tst_string()
     AttributeRange::Type type = AttributeRange::String;
     QCOMPARE(attrRge->type(), type);
 
-    // Tests min(), max() and rand() functions
-
-    // Both 'AttributeRange::min()' and 'AttributeRange::max()' return <null> for a string type
-    Value v;
-    PRG* prg = new PRG(123);
-
-    v = attrRge->rand(prg);
-    QCOMPARE(v.type(), Value::STRING);
-
-    delete prg;
+    // Tests min(), max() and rand() functions -- all should return a empty string
+    QCOMPARE(attrRge->rand(m_prg.get()).toString(), "");
+    QCOMPARE(attrRge->min().toString(), "");
+    QCOMPARE(attrRge->min().toString(), "");
 }
 
 void TestAttributeRange::tst_string_set()
@@ -402,7 +381,8 @@ void TestAttributeRange::tst_string_set()
     // Case 2: long string
     // Case 3: single character
     // Case 4: unusual characters
-    const char* attrRangeStr = "string{sample,this sentence is a long string for testing purposes,a,abc£ãã&!£$%^*(áéí)}";
+    const QString attrRangeStr = "string{sample,this sentence is a long string for testing purposes,a,abc£ãã&!£$%^*(áéí)}";
+    QStringList values = QString("sample,this sentence is a long string for testing purposes,a,abc£ãã&!£$%^*(áéí)").split(",");
 
     AttributeRange* attrRge = AttributeRange::parse(0, attrName, attrRangeStr);
 
@@ -444,88 +424,50 @@ void TestAttributeRange::tst_string_set()
     QCOMPARE(attrRge->type(), type);
 
     // Tests min(), max() and rand() functions
-
-    // The min and max values are taken to be the value of the first character
-    // of the string according to the ASCII table
-    const char* min = "a";
-    const char* max = "this sentence is a long string for testing purposes";
     const char* min_of_set = "sample";
     const char* max_of_set = "abc£ãã&!£$%^*(áéí)";
-
-    Value v;
-    PRG* prg = new PRG(123);
 
     // min() returns the first value in the set
     // max() returns the last value in the set
     // Provided the set is ordered, these are the min and max values
-
     QCOMPARE(attrRge->min().toString(), min_of_set);
     QCOMPARE(attrRge->max().toString(), max_of_set);
     QCOMPARE(attrRge->min().toQString(), QString(min_of_set));
     QCOMPARE(attrRge->max().toQString(), QString(max_of_set));
-
-    v = attrRge->rand(prg);
-    QCOMPARE(v.type(), Value::STRING);
-
-    QVERIFY(strcmp(v.toString(), max) <= 0);
-    QVERIFY(strcmp(v.toString(), min) >= 0);
-
-    delete prg;
+    QVERIFY(values.contains(attrRge->rand(m_prg.get()).toString()));
 }
 
 void TestAttributeRange::tst_filepath()
 {
-    AttributeRange* attrRge = AttributeRange::parse(0, "test", "filepath");
+    AttributeRange* attrRge = AttributeRange::parse(9057, "test", "filepath");
 
-    // '\e' is recognised as an unknown escape sequence - causes warnings
-    const char* fp_fwd_slash = "C:/Users/experiment.csv";  // Case 1: .csv filepath with forward slashes
-    const char* fp_fwd_slash_no_ext = "C:/Users/experiment";  // Case 2: .csv filepath with forward slashes, no extension
-//    const char* fp_back_slash = "C:\Users\experiment.csv";  // Case 3: .csv filepath with backward slashes
-//    const char* fp_back_slash_no_ext = "C:\Users\experiment";  // Case 4: .csv filepath with backward slashes, no extension
+    const QString existing = QDir::current().absoluteFilePath("tst_attributerange");
+    const QString missing = QDir::current().absoluteFilePath("none123");
 
-    // Tests value returned by 'AttributeRange::validate()'
-    QCOMPARE(attrRge->validate(fp_fwd_slash), Value(fp_fwd_slash));
-
-    // FAIL - filepaths require extensions
-//    QCOMPARE(attrRge->validate(fp_fwd_slash_no_ext), Value(fp_fwd_slash_no_ext));
-
-    // FAIL - filepaths with backward slashes are not recognised as filepaths
-//    QCOMPARE(attrRge->validate(fp_back_slash), Value(fp_back_slash));
-//    QCOMPARE(attrRge->validate(fp_back_slash_no_ext), Value(fp_back_slash_no_ext));
+    QCOMPARE(attrRge->validate(existing), Value(existing));
+    QVERIFY(!attrRge->validate(missing).isValid());
 
     // Tests if functions work as expected
     QVERIFY(attrRge->isValid());
-    QCOMPARE(attrRge->id(), 0);
+    QCOMPARE(attrRge->id(), 9057);
     QCOMPARE(attrRge->attrName(), QString("test"));
     QCOMPARE(attrRge->attrRangeStr(), QString("filepath"));
 
     AttributeRange::Type type = AttributeRange::FilePath;
     QCOMPARE(attrRge->type(), type);
 
-    // Tests min(), max() and rand() functions
-
-    // Both 'AttributeRange::min()' and 'AttributeRange::max()' return <null> for a filepath type
-    Value v;
-    PRG* prg = new PRG(123);
-    v = attrRge->rand(prg);
-    QCOMPARE(v.type(), Value::STRING);
-
-    delete prg;
+    // Tests min(), max() and rand() functions -- all should return a empty string
+    QCOMPARE(attrRge->rand(m_prg.get()).toString(), "");
+    QCOMPARE(attrRge->min().toString(), "");
+    QCOMPARE(attrRge->min().toString(), "");
 }
 
 void TestAttributeRange::tst_dirpath()
 {
     AttributeRange* attrRge = AttributeRange::parse(0, "test", "dirpath");
 
-    // '\e' is recognised as an unknown escape sequence - causes warnings
-    const char* dp_fwd_slash = "C:/Users/ethan/Documents";  // Case 1: .csv filepath with forward slashes
-//    const char* dp_back_slash = "C:\Users\ethan\Documents";  // Case 2: .csv filepath with backward slashes
-
-    // Tests value returned by 'AttributeRange::validate()'
-    QCOMPARE(attrRge->validate(dp_fwd_slash), Value(dp_fwd_slash));
-
-    // FAIL - dirpaths with backward slashes are not recognised as dirpaths
-//     QCOMPARE(attrRge->validate(dp_back_slash), Value(dp_back_slash));
+    QCOMPARE(attrRge->validate(QDir::currentPath()), Value(QDir::currentPath()));
+    QVERIFY(!attrRge->validate("/invalid/").isValid());
 
     // Tests if functions work as expected
     QVERIFY(attrRge->isValid());
@@ -536,15 +478,10 @@ void TestAttributeRange::tst_dirpath()
     AttributeRange::Type type = AttributeRange::DirPath;
     QCOMPARE(attrRge->type(), type);
 
-    // Tests min(), max() and rand() functions
-
-    // Both 'AttributeRange::min()' and 'AttributeRange::max()' return <null> for a dirpath type
-    Value v;
-    PRG* prg = new PRG(123);
-    v = attrRge->rand(prg);
-    QCOMPARE(v.type(), Value::STRING);
-
-    delete prg;
+    // Tests min(), max() and rand() functions -- all should return a empty string
+    QCOMPARE(attrRge->rand(m_prg.get()).toString(), "");
+    QCOMPARE(attrRge->min().toString(), "");
+    QCOMPARE(attrRge->min().toString(), "");
 }
 
 QTEST_MAIN(TestAttributeRange)
