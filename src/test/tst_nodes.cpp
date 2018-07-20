@@ -607,7 +607,9 @@ void TestNodes::tst_saveToFile_with_attrs()
     QString errorMsg;
     const QString tempFilePath = QDir::temp().absoluteFilePath("nodes.csv");
     const QStringList names = { "test0", "test1", "test2" };
-    // saving a set of nodes without attributes
+
+    // saving a set of UNodes with attributes
+    GraphType graphType = GraphType::Undirected;
     AttributesScope attrsScope;
     AttributeRange* col0 = AttributeRange::parse(0, names[0], "int[0,1000]");
     attrsScope.insert(col0->attrName(), col0);
@@ -616,12 +618,24 @@ void TestNodes::tst_saveToFile_with_attrs()
     AttributeRange* col2 = AttributeRange::parse(2, names[2], "int[0,1000]");
     attrsScope.insert(col2->attrName(), col2);
 
-    Nodes nodes = Nodes::fromCmd("*3;min", attrsScope, GraphType::Undirected, errorMsg);
+    Nodes nodes = Nodes::fromCmd("*3;min", attrsScope, graphType, errorMsg);
     QVERIFY(nodes.saveToFile(tempFilePath));
 
     // retrieve saved file
-    Nodes nodesFromFile = Nodes::fromFile(tempFilePath, attrsScope, GraphType::Undirected, errorMsg);
+    Nodes nodesFromFile = Nodes::fromFile(tempFilePath, attrsScope, graphType, errorMsg);
     _compare_nodes(nodes, nodesFromFile);
+    QVERIFY(nodesOfSameType<UNode>(nodes));
+
+    // saving a set of DNodes with attributes
+    graphType = GraphType::Directed;
+
+    nodes = Nodes::fromCmd("*3;min", attrsScope, graphType, errorMsg);
+    QVERIFY(nodes.saveToFile(tempFilePath));
+
+    // retrieve saved file
+    nodesFromFile = Nodes::fromFile(tempFilePath, attrsScope, graphType, errorMsg);
+    _compare_nodes(nodes, nodesFromFile);
+    QVERIFY(nodesOfSameType<DNode>(nodes));
 }
 
 void TestNodes::_compare_nodes(const Nodes& a, const Nodes& b) const
