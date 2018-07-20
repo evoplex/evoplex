@@ -77,6 +77,16 @@ ProjectWidget::~ProjectWidget()
 
 void ProjectWidget::closeEvent(QCloseEvent* event)
 {
+    if (m_project->isRunning()) {
+        QMessageBox::StandardButton res = QMessageBox::question(this, "Evoplex",
+                tr("There are running experiments in this project!\n"
+                   "Would you like to close it anyway?"));
+        if (res == QMessageBox::No) {
+            event->ignore();
+            return ;
+        }
+    }
+
     if (m_project->hasUnsavedChanges()) {
         QMessageBox::StandardButton res = QMessageBox::question(this, "Evoplex",
                 tr("Do you want to save the changes you made to '%1'?\n"
@@ -88,6 +98,7 @@ void ProjectWidget::closeEvent(QCloseEvent* event)
             return;
         }
     }
+
     emit (closed());
     event->accept();
     QDockWidget::closeEvent(event);

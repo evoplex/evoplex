@@ -73,6 +73,7 @@ public:
     inline ExperimentPtr experiment(int expId) const;
     inline const Experiments& experiments() const;
     inline bool hasUnsavedChanges() const;
+    inline bool isRunning() const;
 
 signals:
     void expAdded(int expId);
@@ -107,6 +108,17 @@ inline int Project::id() const
 
 inline bool Project::hasUnsavedChanges() const
 { return m_hasUnsavedChanges; }
+
+inline bool Project::isRunning() const
+{
+    for (auto const& e : m_experiments) {
+        if (e.second->expStatus() == Status::Running ||
+                e.second->expStatus() == Status::Queued) {
+            return true;
+        }
+    }
+    return false;
+}
 
 } //evoplex
 #endif // PROJECT_H
