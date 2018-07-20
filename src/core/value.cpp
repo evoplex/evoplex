@@ -205,4 +205,16 @@ bool Value::operator>=(const Value& v) const
     }
 }
 
+std::logic_error Value::throwError() const
+{
+    switch (m_type) {
+    case INT: return std::logic_error("It is an integer. You must use toInt()");
+    case DOUBLE: return std::logic_error("It is a double. You must use toDouble()");
+    case BOOL: return std::logic_error("It is a boolean. You must use toBool()");
+    case CHAR: return std::logic_error("It is a char. You must use toChar()");
+    case STRING: return std::logic_error("It is a string. You must use toString()");
+    default: return std::logic_error("Value is invalid. Data cannot be retrieved.");
+    }
+}
+
 } // evoplex

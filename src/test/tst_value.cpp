@@ -58,6 +58,11 @@ void TestValue::tst_valueInvalid()
 
     // Testing value
     QCOMPARE(v.toQString(), QString());
+    QVERIFY_EXCEPTION_THROWN(v.toBool(), std::logic_error);
+    QVERIFY_EXCEPTION_THROWN(v.toChar(), std::logic_error);
+    QVERIFY_EXCEPTION_THROWN(v.toDouble(), std::logic_error);
+    QVERIFY_EXCEPTION_THROWN(v.toInt(), std::logic_error);
+    QVERIFY_EXCEPTION_THROWN(v.toString(), std::logic_error);
 
     // COMPARISONS
     // same invalid type
@@ -107,6 +112,10 @@ void TestValue::tst_valueBool()
     // Testing value
     QCOMPARE(v.toBool(), true);
     QCOMPARE(v.toQString(), QString("1"));
+    QVERIFY_EXCEPTION_THROWN(v.toChar(), std::logic_error);
+    QVERIFY_EXCEPTION_THROWN(v.toDouble(), std::logic_error);
+    QVERIFY_EXCEPTION_THROWN(v.toInt(), std::logic_error);
+    QVERIFY_EXCEPTION_THROWN(v.toString(), std::logic_error);
 
     // case where v is set to false
     v = Value(false);
@@ -159,6 +168,10 @@ void TestValue::tst_valueDouble()
     // Testing value
     QCOMPARE(v.toDouble(), 4.5123788);
     QCOMPARE(v.toQString(), QString("4.5123788"));
+    QVERIFY_EXCEPTION_THROWN(v.toBool(), std::logic_error);
+    QVERIFY_EXCEPTION_THROWN(v.toChar(), std::logic_error);
+    QVERIFY_EXCEPTION_THROWN(v.toInt(), std::logic_error);
+    QVERIFY_EXCEPTION_THROWN(v.toString(), std::logic_error);
 
     // COMPARISON TESTS
     const Value v1(103.200000008);
@@ -206,6 +219,10 @@ void TestValue::tst_valueInt()
     // Testing value
     QCOMPARE(v.toInt(), -10);
     QCOMPARE(v.toQString(), QString("-10"));
+    QVERIFY_EXCEPTION_THROWN(v.toBool(), std::logic_error);
+    QVERIFY_EXCEPTION_THROWN(v.toChar(), std::logic_error);
+    QVERIFY_EXCEPTION_THROWN(v.toDouble(), std::logic_error);
+    QVERIFY_EXCEPTION_THROWN(v.toString(), std::logic_error);
 
     // COMPARISON TESTS
     const Value v1(100);
@@ -247,6 +264,10 @@ void TestValue::tst_valueChar()
     // Testing value
     QCOMPARE(v.toChar(), chr);
     QCOMPARE(v.toQString(), QString("a"));
+    QVERIFY_EXCEPTION_THROWN(v.toBool(), std::logic_error);
+    QVERIFY_EXCEPTION_THROWN(v.toDouble(), std::logic_error);
+    QVERIFY_EXCEPTION_THROWN(v.toInt(), std::logic_error);
+    QVERIFY_EXCEPTION_THROWN(v.toString(), std::logic_error);
 
     // COMPARISON TESTS
     const Value v1('d');
@@ -288,6 +309,10 @@ void TestValue::tst_valueString()
     // Testing value
     QCOMPARE(v.toString(), chr);
     QCOMPARE(v.toQString(), str);
+    QVERIFY_EXCEPTION_THROWN(v.toBool(), std::logic_error);
+    QVERIFY_EXCEPTION_THROWN(v.toChar(), std::logic_error);
+    QVERIFY_EXCEPTION_THROWN(v.toDouble(), std::logic_error);
+    QVERIFY_EXCEPTION_THROWN(v.toInt(), std::logic_error);
 
     // COMPARISON TESTS
     const Value v1("abc$");

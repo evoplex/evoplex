@@ -32,6 +32,8 @@ typedef std::vector<Value> Values;
 
 class Value
 {
+    friend struct std::hash<Value>;
+
 public:
     enum Type { BOOL, CHAR, DOUBLE, INT, STRING, INVALID };
 
@@ -72,6 +74,8 @@ public:
 private:
     union { bool b; char c; double d; int i; const char* s; } m_data;
     Type m_type;
+
+    std::logic_error throwError() const;
 };
 
 /************************************************************************
@@ -100,19 +104,19 @@ inline bool Value::isString() const
 { return m_type == STRING; }
 
 inline bool Value::toBool() const
-{ return m_data.b; }
+{ if (m_type == BOOL) { return m_data.b; } throw throwError(); }
 
 inline char Value::toChar() const
-{ return m_data.c; }
+{ if (m_type == CHAR) { return m_data.c; } throw throwError(); }
 
 inline double Value::toDouble() const
-{ return m_data.d; }
+{ if (m_type == DOUBLE) { return m_data.d; } throw throwError(); }
 
 inline int Value::toInt() const
-{ return m_data.i; }
+{ if (m_type == INT) { return m_data.i; } throw throwError(); }
 
 inline const char* Value::toString() const
-{ return m_data.s; }
+{ if (m_type == STRING) { return m_data.s; } throw throwError(); }
 
 } // evoplex
 
@@ -138,11 +142,11 @@ struct hash<evoplex::Value>
 {
     size_t operator()(const evoplex::Value& v) const {
         switch (v.type()) {
-        case evoplex::Value::INT: return std::hash<int>()(v.toInt());
-        case evoplex::Value::DOUBLE: return std::hash<double>()(v.toDouble());
-        case evoplex::Value::BOOL: return std::hash<bool>()(v.toBool());
-        case evoplex::Value::CHAR: return std::hash<char>()(v.toChar());
-        case evoplex::Value::STRING: return std::hash<char*>()(v.toString());
+        case evoplex::Value::INT: return std::hash<int>()(v.m_data.i);
+        case evoplex::Value::DOUBLE: return std::hash<double>()(v.m_data.d);
+        case evoplex::Value::BOOL: return std::hash<bool>()(v.m_data.b);
+        case evoplex::Value::CHAR: return std::hash<char>()(v.m_data.c);
+        case evoplex::Value::STRING: return std::hash<char*>()(v.m_data.s);
         default: throw std::invalid_argument("invalid type of Value");
         }
     }
