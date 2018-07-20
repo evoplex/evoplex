@@ -592,14 +592,27 @@ void TestNodes::tst_saveToFile_no_attrs()
     QString errorMsg;
     const QString tempFilePath = QDir::temp().absoluteFilePath("nodes.csv");
 
-    // saving a set of nodes without attributes
+    // saving a set of UNodes without attributes
+    GraphType graphType = GraphType::Undirected;
     AttributesScope attrsScope;
-    Nodes nodes = Nodes::fromCmd("*5;min", attrsScope, GraphType::Undirected, errorMsg);
+    Nodes nodes = Nodes::fromCmd("*5;min", attrsScope, graphType, errorMsg);
     QVERIFY(nodes.saveToFile(tempFilePath));
 
     // retrieve saved file
-    Nodes nodesFromFile = Nodes::fromFile(tempFilePath, attrsScope, GraphType::Undirected, errorMsg);
+    Nodes nodesFromFile = Nodes::fromFile(tempFilePath, attrsScope, graphType, errorMsg);
     _compare_nodes(nodes, nodesFromFile);
+    QVERIFY(nodesOfSameType<UNode>(nodesFromFile));
+
+    // saving a set of DNodes without attributes
+    graphType = GraphType::Directed;
+
+    nodes = Nodes::fromCmd("*5;min", attrsScope, graphType, errorMsg);
+    QVERIFY(nodes.saveToFile(tempFilePath));
+
+    // retrieve saved file
+    nodesFromFile = Nodes::fromFile(tempFilePath, attrsScope, graphType, errorMsg);
+    _compare_nodes(nodes, nodesFromFile);
+    QVERIFY(nodesOfSameType<DNode>(nodesFromFile));
 }
 
 void TestNodes::tst_saveToFile_with_attrs()
@@ -624,7 +637,7 @@ void TestNodes::tst_saveToFile_with_attrs()
     // retrieve saved file
     Nodes nodesFromFile = Nodes::fromFile(tempFilePath, attrsScope, graphType, errorMsg);
     _compare_nodes(nodes, nodesFromFile);
-    QVERIFY(nodesOfSameType<UNode>(nodes));
+    QVERIFY(nodesOfSameType<UNode>(nodesFromFile));
 
     // saving a set of DNodes with attributes
     graphType = GraphType::Directed;
@@ -635,7 +648,7 @@ void TestNodes::tst_saveToFile_with_attrs()
     // retrieve saved file
     nodesFromFile = Nodes::fromFile(tempFilePath, attrsScope, graphType, errorMsg);
     _compare_nodes(nodes, nodesFromFile);
-    QVERIFY(nodesOfSameType<DNode>(nodes));
+    QVERIFY(nodesOfSameType<DNode>(nodesFromFile));
 }
 
 void TestNodes::_compare_nodes(const Nodes& a, const Nodes& b) const
