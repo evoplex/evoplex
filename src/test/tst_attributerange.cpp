@@ -323,7 +323,7 @@ void TestAttributeRange::tst_double_set()
     PRG* prg = new PRG(123);
 
     // min() returns the first value in the set
-    QCOMPARE(attrRge->min().toDouble(), 0);
+    QCOMPARE(attrRge->min().toDouble(), 0.0);
     // max() returns the last value in the set
     QCOMPARE(attrRge->max().toDouble(), 87.5);
     // Provided the set is ordered, these are the min and max values

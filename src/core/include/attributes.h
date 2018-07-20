@@ -67,6 +67,7 @@ public:
 
     inline int size() const;
     inline bool isEmpty() const;
+    inline bool empty() const;
 
     inline int indexOf(const char* name) const;
     inline int indexOf(const QString& name) const;
@@ -110,6 +111,9 @@ inline int Attributes::size() const
 { return static_cast<int>(m_values.size()); }
 
 inline bool Attributes::isEmpty() const
+{ return m_names.empty(); }
+
+inline bool Attributes::empty() const
 { return m_names.empty(); }
 
 inline int Attributes::indexOf(const char* name) const
