@@ -47,6 +47,7 @@ MainApp::MainApp()
     : m_expMgr(new ExperimentsMgr())
 {
     qRegisterMetaType<Status>("Status"); // makes it available for signals/slots
+    qRegisterMetaType<Function>("Function");
 
     resetSettingsToDefault();
     m_defaultStepDelay = static_cast<quint16>(m_userPrefs.value("settings/stepDelay", m_defaultStepDelay).toInt());

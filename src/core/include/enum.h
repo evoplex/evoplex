@@ -37,6 +37,8 @@ namespace evoplex {
  */
 template <typename T>
 T _enumFromString(const QString& str);
+template <typename T>
+QString _enumToString(T e);
 
 enum class Status {
     Invalid,   // something went wrong
@@ -69,6 +71,33 @@ inline GraphType _enumFromString<GraphType>(const QString& str) {
     if (str == "undirected") return GraphType::Undirected;
     if (str == "directed") return GraphType::Directed;
     return GraphType::Invalid;
+}
+
+enum class Function : unsigned char {
+    Invalid = 0,
+    Min = 1,
+    Max = 2,
+    Rand = 3,
+    Value = 4
+};
+template<>
+inline Function _enumFromString<Function>(const QString& str) {
+    if (str == "min") return Function::Min;
+    if (str == "max") return Function::Max;
+    if (str == "rand") return Function::Rand;
+    if (str == "value") return Function::Value;
+    return Function::Invalid;
+}
+template<>
+inline QString _enumToString<Function>(Function func)
+{
+    switch (func) {
+    case Function::Min: return "min";
+    case Function::Max: return "max";
+    case Function::Rand: return "rand";
+    case Function::Value: return "value";
+    default: return "invalid";
+    }
 }
 
 } // evoplex

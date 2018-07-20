@@ -25,6 +25,7 @@ set(TESTS_WITH_QRC
 set(TESTS_WITHOUT_QRC
   tst_attributes
   tst_attributerange
+  tst_attrsgenerator
   tst_edge
   tst_node
   tst_prg

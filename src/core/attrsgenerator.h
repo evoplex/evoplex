@@ -36,42 +36,32 @@ public:
     virtual SetOfAttributes create(std::function<void(int)> progress = [](int){}) = 0;
 };
 
+/**
+ * @brief Generates a set of Attributes
+ */
 class AttrsGenerator : public AttrsGeneratorInterface
 {
 public:
-    enum Mode {
-        M_Invalid,
-        M_FromFile,
-        M_SameFunctionForAll,
-        M_DifferentFunctions
-    };
-
-    enum Function {
-        F_Invalid,
-        F_Min,
-        F_Max,
-        F_Rand,
-        F_Value
-    };
-    static QString enumToString(Function func);
-    static Function enumFromString(const QString& funcStr);
-
     // Expected commands:
     //     - same mode for all attributes:
     //         '*integer;[min|max|rand_seed]'
     //     - specific mode for each attribute:
     //         '#integer;attrName_[min|max|rand_seed|value_val];...'
+    //     * the integer corresponds to the size of the set of attributes
     static AttrsGenerator* parse(const AttributesScope& attrsScope,
                                  const QString& cmd, QString& error);
 
     virtual ~AttrsGenerator();
 
+    // the source command for the AttrsGenerator object
     inline const QString& command() { return m_command; }
-    inline int numCopies() const { return m_numCopies; }
+
+    // the size of the set of attributes
+    inline int size() const { return m_size; }
 
 protected:
     const AttributesScope m_attrsScope;
-    const int m_numCopies;
+    const int m_size;
     QString m_command;
 
     explicit AttrsGenerator(const AttributesScope& attrsScope, const int numCopies);

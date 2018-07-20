@@ -18,15 +18,18 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <functional>
+
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QProgressDialog>
-#include <functional>
+
+#include "core/include/abstractgraph.h"
+#include "core/include/enum.h"
+#include "core/include/nodes.h"
 
 #include "nodesgeneratordlg.h"
 #include "ui_nodesgeneratordlg.h"
-#include "abstractgraph.h"
-#include "nodes.h"
 
 namespace evoplex
 {
@@ -59,14 +62,19 @@ NodesGeneratorDlg::NodesGeneratorDlg(QWidget* parent, const AttributesScope& nod
         }
     });
 
+    const auto MIN = static_cast<unsigned char>(Function::Min);
+    const auto MAX = static_cast<unsigned char>(Function::Max);
+    const auto RAND = static_cast<unsigned char>(Function::Rand);
+    const auto VALUE = static_cast<unsigned char>(Function::Value);
+
     connect(m_ui->func, &QComboBox::currentTextChanged, [this]() {
-        bool notRand = m_ui->func->currentData() != AttrsGenerator::F_Rand;
+        bool notRand = m_ui->func->currentData() != static_cast<unsigned char>(Function::Rand);
         m_ui->lseed->setHidden(notRand);
         m_ui->fseed->setHidden(notRand);
     });
-    m_ui->func->insertItem(0, AttrsGenerator::enumToString(AttrsGenerator::F_Min), AttrsGenerator::F_Min);
-    m_ui->func->insertItem(1, AttrsGenerator::enumToString(AttrsGenerator::F_Max), AttrsGenerator::F_Max);
-    m_ui->func->insertItem(2, AttrsGenerator::enumToString(AttrsGenerator::F_Rand), AttrsGenerator::F_Rand);
+    m_ui->func->insertItem(0, _enumToString<Function>(Function::Min), MIN);
+    m_ui->func->insertItem(1, _enumToString<Function>(Function::Max), MAX);
+    m_ui->func->insertItem(2, _enumToString<Function>(Function::Rand), RAND);
     m_ui->func->setCurrentIndex(0);
 
     m_ui->table->setRowCount(m_nodeAttrsScope.size());
@@ -74,22 +82,22 @@ NodesGeneratorDlg::NodesGeneratorDlg(QWidget* parent, const AttributesScope& nod
         m_ui->table->setItem(ar->id(), 0, new QTableWidgetItem(ar->attrName()));
 
         QComboBox* cb = new QComboBox(m_ui->table);
-        cb->insertItem(0, AttrsGenerator::enumToString(AttrsGenerator::F_Min), AttrsGenerator::F_Min);
-        cb->insertItem(1, AttrsGenerator::enumToString(AttrsGenerator::F_Max), AttrsGenerator::F_Max);
-        cb->insertItem(2, AttrsGenerator::enumToString(AttrsGenerator::F_Rand), AttrsGenerator::F_Rand);
-        cb->insertItem(3, AttrsGenerator::enumToString(AttrsGenerator::F_Value), AttrsGenerator::F_Value);
+        cb->insertItem(0, _enumToString<Function>(Function::Min), MIN);
+        cb->insertItem(1, _enumToString<Function>(Function::Max), MAX);
+        cb->insertItem(2, _enumToString<Function>(Function::Rand), RAND);
+        cb->insertItem(3, _enumToString<Function>(Function::Value), VALUE);
         m_ui->table->setCellWidget(ar->id(), 1, cb);
 
         QLineEdit* le = new QLineEdit();
         connect(cb, &QComboBox::currentTextChanged, [cb, le, ar](){
-            if (cb->currentData() == AttrsGenerator::F_Min
-                    || cb->currentData() == AttrsGenerator::F_Max) {
+            Function f = static_cast<Function>(cb->currentData().toInt());
+            if (f == Function::Min || f == Function::Max) {
                 le->setHidden(true);
                 return;
-            } else if (cb->currentData() == AttrsGenerator::F_Rand) {
+            } else if (f == Function::Rand) {
                 le->setToolTip("Type the PRG seed (integer).");
                 le->setFocus();
-            } else if (cb->currentData() == AttrsGenerator::F_Value) {
+            } else if (f == Function::Value) {
                 le->setToolTip("Type a valid value for this attribute.\n"
                                "Expected: " + ar->attrRangeStr());
                 le->setFocus();
@@ -184,8 +192,8 @@ void NodesGeneratorDlg::fill(const QString& cmd)
     AGSameFuncForAll* agsame = dynamic_cast<AGSameFuncForAll*>(ag);
     if (agsame) {
         m_ui->bSameData->setChecked(true);
-        m_ui->numNodes1->setValue(agsame->numCopies());
-        m_ui->func->setCurrentIndex(m_ui->func->findData(agsame->function()));
+        m_ui->numNodes1->setValue(agsame->size());
+        m_ui->func->setCurrentIndex(m_ui->func->findData(static_cast<int>(agsame->function())));
         Value v = agsame->functionInput();
         m_ui->fseed->setValue(v.type() == Value::INT ? v.toInt() : 0);
         return;
@@ -194,13 +202,13 @@ void NodesGeneratorDlg::fill(const QString& cmd)
     AGDiffFunctions* agdiff = dynamic_cast<AGDiffFunctions*>(ag);
     if (agdiff) {
         m_ui->bDiffData->setChecked(true);
-        m_ui->numNodes2->setValue(agdiff->numCopies());
+        m_ui->numNodes2->setValue(agdiff->size());
         for (const AGDiffFunctions::AttrCmd& ac : agdiff->attrCmds()) {
             Q_ASSERT_X(m_ui->table->item(ac.attrId, 0)->text() == ac.attrName,
                        "NodesGeneratorDlg::fill", "attribute name mismatch. It should never happen!");
             QComboBox* cb = dynamic_cast<QComboBox*>(m_ui->table->cellWidget(ac.attrId, 1));
-            cb->setCurrentIndex(cb->findData(ac.func));
-            if (ac.func == AttrsGenerator::F_Rand || ac.func == AttrsGenerator::F_Value) {
+            cb->setCurrentIndex(cb->findData(static_cast<int>(ac.func)));
+            if (ac.func == Function::Rand || ac.func == Function::Value) {
                 dynamic_cast<QLineEdit*>(m_ui->table->cellWidget(ac.attrId, 2))->setText(ac.funcInput.toQString());
             }
         }
@@ -219,7 +227,7 @@ QString NodesGeneratorDlg::readCommand()
         command = m_ui->filepath->text();
     } else if (m_ui->bSameData->isChecked()) {
         command = QString("*%1;%2").arg(m_ui->numNodes1->text()).arg(m_ui->func->currentText());
-        if (m_ui->func->currentData() == AttrsGenerator::F_Rand) {
+        if (m_ui->func->currentData() == static_cast<int>(Function::Rand)) {
             command += QString("_%1").arg(m_ui->fseed->value());
         }
     } else if (m_ui->bDiffData->isChecked()) {
@@ -232,7 +240,8 @@ QString NodesGeneratorDlg::readCommand()
             command += QString(";%1_%2").arg(ar->attrName()).arg(cb->currentText());
 
             QString valStr = dynamic_cast<QLineEdit*>(m_ui->table->cellWidget(ar->id(), 2))->text();
-            if (cb->currentData() == AttrsGenerator::F_Rand) {
+            Function f = static_cast<Function>(cb->currentData().toInt());
+            if (f == Function::Rand) {
                 bool isInt = false;
                 valStr.toInt(&isInt);
                 if (!isInt) {
@@ -241,7 +250,7 @@ QString NodesGeneratorDlg::readCommand()
                     return QString();
                 }
                 command += "_" + valStr;
-            } else if (cb->currentData() == AttrsGenerator::F_Value) {
+            } else if (f == Function::Value) {
                 if (!ar->validate(valStr).isValid()) {
                     QMessageBox::warning(this, "Nodes Generator",
                         "The value of '" + ar->attrName() + "' is invalid!\n"
