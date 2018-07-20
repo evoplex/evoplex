@@ -321,9 +321,11 @@ void TestNodes::tst_fromFile_nodes_no_xy()
 
     // Nodes with values read from file
     Nodes nodesFromFile = Nodes::fromFile(filePath, attrsScope, graphType, errorMsg);
+    QVERIFY(nodesOfSameType<UNode>(nodesFromFile));
 
     // Nodes to test against
     Nodes nodes = Nodes::fromCmd("*3;min", attrsScope, graphType, errorMsg);
+    QVERIFY(nodesOfSameType<UNode>(nodes));
 
     nodes.at(0)->setAttr(0, 0);
     nodes.at(0)->setAttr(1, true);
@@ -350,6 +352,16 @@ void TestNodes::tst_fromFile_nodes_no_xy()
 
     // Fails as expected:
 //    _compare_nodes(nodes, nodesFromFile);
+
+    // Test type returned for directed graph type
+    graphType = GraphType::Directed;
+    // Nodes with values read from file
+    nodesFromFile = Nodes::fromFile(filePath, attrsScope, graphType, errorMsg);
+    QVERIFY(nodesOfSameType<DNode>(nodesFromFile));
+
+    // Nodes to test against
+    nodes = Nodes::fromCmd("*3;min", attrsScope, graphType, errorMsg);
+    QVERIFY(nodesOfSameType<DNode>(nodes));
 }
 
 // valid attributes AND both xy coordinates
