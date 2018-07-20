@@ -308,6 +308,9 @@ SetOfValues::SetOfValues(int id, const QString& attrName, Type type, Values valu
         m_attrRangeStr += "," + values.at(i).toQString();
     }
     m_attrRangeStr += "}";
+
+    m_min = (*std::min_element(m_values.cbegin(), m_values.cend()));
+    m_max = (*std::max_element(m_values.cbegin(), m_values.cend()));
 }
 
 } // evoplex

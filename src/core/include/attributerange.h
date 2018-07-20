@@ -150,7 +150,9 @@ public:
 
     ~SetOfValues() override = default;
 
+    // returns the smallest element in the set
     inline const Value& min() const override;
+    // returns the largest element in the set
     inline const Value& max() const override;
     inline Value rand(PRG* prg) const override;
 
@@ -158,6 +160,8 @@ public:
 
 private:
     Values m_values;
+    Value m_min;
+    Value m_max;
 };
 
 /***********************/
@@ -208,10 +212,10 @@ inline Value IntervalOfValues::randI(PRG* prg) const
 /***********************/
 
 inline const Value& SetOfValues::min() const
-{ return m_values.front(); }
+{ return m_min; }
 
 inline const Value& SetOfValues::max() const
-{ return m_values.back(); }
+{ return m_max; }
 
 inline Value SetOfValues::rand(PRG* prg) const
 { return m_values.at(prg->randI(m_values.size()-1)); }

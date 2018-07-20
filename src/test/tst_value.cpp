@@ -315,14 +315,22 @@ void TestValue::tst_valueString()
     QVERIFY_EXCEPTION_THROWN(v.toInt(), std::logic_error);
 
     // COMPARISON TESTS
-    const Value v1("abc$");
-    const Value v2("iua^sd");
+    const Value v1("aaaabc$ iua^sa");
+    const Value v2("aaaabc$ iua^sd");
     QCOMPARE(v1 == v2, false);
     QCOMPARE(v1 != v2, true);
-    QVERIFY_EXCEPTION_THROWN(v1 >= v2, std::invalid_argument);
-    QVERIFY_EXCEPTION_THROWN(v1 <= v2, std::invalid_argument);
-    QVERIFY_EXCEPTION_THROWN(v1 > v2, std::invalid_argument);
-    QVERIFY_EXCEPTION_THROWN(v1 < v2, std::invalid_argument);
+    QCOMPARE(v1 >= v2, false);
+    QCOMPARE(v1 <= v2, true);
+    QCOMPARE(v1 > v2, false);
+    QCOMPARE(v1 < v2, true);
+    const Value v3("abcd efg");
+    const Value v4("abcd efg");
+    QCOMPARE(v3 == v4, true);
+    QCOMPARE(v3 != v4, false);
+    QCOMPARE(v3 >= v4, true);
+    QCOMPARE(v3 <= v4, true);
+    QCOMPARE(v3 > v4, false);
+    QCOMPARE(v3 < v4, false);
 
     // creating a Value from another Value
     Value vString("evoplex");

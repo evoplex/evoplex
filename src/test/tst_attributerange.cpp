@@ -271,11 +271,8 @@ void TestAttributeRange::tst_int_set()
     AttributeRange::Type type = AttributeRange::Int_Set;
     QCOMPARE(attrRge->type(), type);
 
-    // min() returns the first value in the set
-    QCOMPARE(attrRge->min().toInt(), 0);
-    // max() returns the last value in the set
-    QCOMPARE(attrRge->max().toInt(), -100);
-    // Provided the set is ordered, these are the min and max values
+    QCOMPARE(attrRge->min().toInt(), -100);
+    QCOMPARE(attrRge->max().toInt(), 100);
 
     Value v = attrRge->rand(m_prg.get());
     QCOMPARE(v.type(), Value::INT);
@@ -287,7 +284,7 @@ void TestAttributeRange::tst_double_set()
 {
     const char* attrName = "test";
     // Set with positive, negative and large numbers
-    const char* attrRangeStr = "double{0,1.2,-5.5,-95.7,87.5}";
+    const char* attrRangeStr = "double{0,1.2,-5.5,-95.7,87.5,12}";
     double min = -95.7;
     double max = 87.5;
 
@@ -299,6 +296,7 @@ void TestAttributeRange::tst_double_set()
     QCOMPARE(attrRge->validate("-5.5"), Value(-5.5));
     QCOMPARE(attrRge->validate("-95.7"), Value(-95.7));
     QCOMPARE(attrRge->validate("87.5"), Value(87.5));
+    QCOMPARE(attrRge->validate("12"), Value(12.0));
 
     // Tests if functions work as expected
     QVERIFY(attrRge->isValid());
@@ -310,7 +308,7 @@ void TestAttributeRange::tst_double_set()
     QCOMPARE(attrRge->type(), type);
 
     // min() returns the first value in the set
-    QCOMPARE(attrRge->min().toDouble(), 0.0);
+    QCOMPARE(attrRge->min().toDouble(), -95.7);
     // max() returns the last value in the set
     QCOMPARE(attrRge->max().toDouble(), 87.5);
     // Provided the set is ordered, these are the min and max values
@@ -381,8 +379,9 @@ void TestAttributeRange::tst_string_set()
     // Case 2: long string
     // Case 3: single character
     // Case 4: unusual characters
-    const QString attrRangeStr = "string{sample,this sentence is a long string for testing purposes,a,abc£ãã&!£$%^*(áéí)}";
-    QStringList values = QString("sample,this sentence is a long string for testing purposes,a,abc£ãã&!£$%^*(áéí)").split(",");
+    const QString _values("sample,this sentence is a long string for testing purposes,a,abc£ãã&!£$%^*(áéí)");
+    const QString attrRangeStr = "string{" + _values + "}";
+    QStringList values = _values.split(",");
 
     AttributeRange* attrRge = AttributeRange::parse(0, attrName, attrRangeStr);
 
@@ -423,17 +422,15 @@ void TestAttributeRange::tst_string_set()
     AttributeRange::Type type = AttributeRange::String_Set;
     QCOMPARE(attrRge->type(), type);
 
-    // Tests min(), max() and rand() functions
-    const char* min_of_set = "sample";
-    const char* max_of_set = "abc£ãã&!£$%^*(áéí)";
+    // The min and max values are taken to be the value of the first character
+    // of the string according to the ASCII table
+    const char* min = "a";
+    const char* max = "this sentence is a long string for testing purposes";
 
-    // min() returns the first value in the set
-    // max() returns the last value in the set
-    // Provided the set is ordered, these are the min and max values
-    QCOMPARE(attrRge->min().toString(), min_of_set);
-    QCOMPARE(attrRge->max().toString(), max_of_set);
-    QCOMPARE(attrRge->min().toQString(), QString(min_of_set));
-    QCOMPARE(attrRge->max().toQString(), QString(max_of_set));
+    QCOMPARE(attrRge->min().toString(), min);
+    QCOMPARE(attrRge->max().toString(), max);
+    QCOMPARE(attrRge->min().toQString(), QString(min));
+    QCOMPARE(attrRge->max().toQString(), QString(max));
     QVERIFY(values.contains(attrRge->rand(m_prg.get()).toString()));
 }
 
