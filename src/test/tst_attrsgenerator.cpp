@@ -33,7 +33,17 @@ private slots:
     void cleanupTestCase() {}
     void tst_parseStarCmd();
     void tst_parseHashCmd();
+    void tst_parseStarCmd_min();
 };
+
+void TestAttrsGenerator::tst_parseStarCmd_min(){
+    QString error;
+
+    AttributesScope attrsScope;
+    QString cmd;
+    AttrsGenerator* agen = AttrsGenerator::parse(attrsScope,cmd, error);
+
+}
 
 void TestAttrsGenerator::tst_parseStarCmd()
 {
