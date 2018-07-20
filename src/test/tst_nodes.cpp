@@ -87,8 +87,6 @@ void TestNodes::_tst_attrs(NodePtr node, Attributes attrs)
 {
     QCOMPARE(node->attrs().names(), attrs.names());
     QCOMPARE(node->attrs().values(), attrs.values());
-
-
     QCOMPARE(node->attrs().size(), attrs.size());
 }
 
@@ -194,7 +192,6 @@ void TestNodes::tst_fromCmd()
     QVERIFY(nodesOfSameType<UNode>(nodes));
 
     QCOMPARE(nodes.size(), 3);
-    QCOMPARE(nodes.at(0)->attrs().value(names[0]), values[0]);
     node = nodes.at(0);
 
     attrs.replace(0, names[0], values[0]);
@@ -227,7 +224,6 @@ void TestNodes::tst_fromCmd()
     QVERIFY(nodesOfSameType<DNode>(nodes));
 
     QCOMPARE(nodes.size(), 3);
-    QCOMPARE(nodes.at(0)->attrs().value(names[0]), values[0]);
     node = nodes.at(0);
     _tst_attrs(node, attrs);
 
