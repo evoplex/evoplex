@@ -49,15 +49,19 @@ void TestAttrsGenerator::_tst_attrs(SetOfAttributes res, Attributes attrs, bool 
 
 void TestAttrsGenerator::_tst_mode(SetOfAttributes res, QString mode, AttributeRange* attrRge[], int numOfAttrRges)
 {
-    for(int i = 0; i < res.size(); i++){
-        for(int j = 0; j < numOfAttrRges; j++){
-            QCOMPARE(res.at(i).value(j), attrRge[j]->min());
+    if(mode == "min"){
+        for(int i = 0; i < res.size(); i++){
+            for(int j = 0; j < numOfAttrRges; j++){
+                QCOMPARE(res.at(i).value(j), attrRge[j]->min());
+            }
+        }
+    } else if (mode == "max"){
+        for(int i = 0; i < res.size(); i++){
+            for(int j = 0; j < numOfAttrRges; j++){
+                QCOMPARE(res.at(i).value(j), attrRge[j]->max());
+            }
         }
     }
-//    QCOMPARE(attrRge[0]->min().toInt(), 3);
-//    QCOMPARE(res.at(0).value(0).toInt(), attrRge[0]->min().toInt());
-
-//    QCOMPARE(res.at(0).value(0).toInt(), 9);
 }
 
 void TestAttrsGenerator::tst_parseStarCmd_min(){
@@ -96,17 +100,13 @@ void TestAttrsGenerator::tst_parseStarCmd_min(){
         attrs.replace(i, names.at(i), NULL);
     }
 
-
     QCOMPARE(agen->command(), cmd);
     QCOMPARE(agen->size(), sizeOfAgen);
-//    QCOMPARE(col0->max().toInt(), 2);
 
     res = agen->create();
 
-//QCOMPARE(res.at(0).value(0), col0->max());
     _tst_attrs(res, attrs, false);
     _tst_mode(res, "min", attrRges, 3);
-
 }
 
 void TestAttrsGenerator::tst_parseStarCmd()
