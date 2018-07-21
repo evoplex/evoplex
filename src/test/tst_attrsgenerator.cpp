@@ -52,19 +52,24 @@ void TestAttrsGenerator::tst_parseStarCmd_min(){
     AttrsGenerator* agen;
     QStringList names = {"int-zero-two", "bool", "any-string"};
     QStringList attrRgeStrs = {"int[0,2]", "bool", "string"};
-    SetOfAttributes res;
+    SetOfAttributes res, res_sameFuncForAll;
     Attributes attrs;
     int sizeOfAgen = 3;
 
     // Valid * command with empty attrScope
     cmd = QString("*%1;min").arg(Value(sizeOfAgen).toQString());
     agen = AttrsGenerator::parse(attrsScope, cmd, error);
+    AGSameFuncForAll* agenPtr = &AGSameFuncForAll::AGSameFuncForAll(attrsScope, sizeOfAgen, Function::Min, "min");
 
     QCOMPARE(agen->command(), cmd);
     QCOMPARE(agen->size(), sizeOfAgen);
+    QCOMPARE(agenPtr->function(), Function::Min);
+    QCOMPARE(agenPtr->size(), sizeOfAgen);
 
     res = agen->create();
+    res_sameFuncForAll = agenPtr->create();
     _tst_attrs(res, attrs, true);
+    _tst_attrs(res_sameFuncForAll, attrs, true);
 
     // Valid * command with non-empty attrScope
     AttributeRange* col0 = AttributeRange::parse(0, names.at(0), attrRgeStrs.at(0));
@@ -75,6 +80,7 @@ void TestAttrsGenerator::tst_parseStarCmd_min(){
     attrsScope.insert(col2->attrName(), col2);
 
     agen = AttrsGenerator::parse(attrsScope, cmd, error);
+    agenPtr = &AGSameFuncForAll::AGSameFuncForAll(attrsScope, sizeOfAgen, Function::Min, "min");
 
     attrs.resize(3);
     for(int i = 0; i < attrs.size(); i++){
@@ -83,10 +89,14 @@ void TestAttrsGenerator::tst_parseStarCmd_min(){
 
     QCOMPARE(agen->command(), cmd);
     QCOMPARE(agen->size(), sizeOfAgen);
+    QCOMPARE(agenPtr->function(), Function::Min);
+    QCOMPARE(agenPtr->size(), sizeOfAgen);
 
     res = agen->create();
+    res_sameFuncForAll = agenPtr->create();
 
     _tst_attrs(res, attrs, false);
+    _tst_attrs(res_sameFuncForAll, attrs, true);
 }
 
 void TestAttrsGenerator::tst_parseStarCmd()
