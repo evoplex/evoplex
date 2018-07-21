@@ -51,9 +51,7 @@ void TestAttrsGenerator::_tst_attrs(SetOfAttributes res, Attributes attrs, bool 
 
 void TestAttrsGenerator::_tst_mode(SetOfAttributes res, QString mode, AttributeRange* attrRge[], int numOfAttrRges)
 {
-    PRG* prg = new PRG(123);
-
-    if(mode == "min"){
+   if(mode == "min"){
         for(int i = 0; i < res.size(); i++){
             for(int j = 0; j < numOfAttrRges; j++){
                 QCOMPARE(res.at(i).value(j), attrRge[j]->min());
@@ -68,7 +66,8 @@ void TestAttrsGenerator::_tst_mode(SetOfAttributes res, QString mode, AttributeR
     } else if(mode == "rand"){
         for(int i = 0; i < res.size(); i++){
             for(int j = 0; j < numOfAttrRges; j++){
-                QCOMPARE(res.at(i).value(j), attrRge[j]->rand(prg));
+                QVERIFY(res.at(i).value(j) >= attrRge[j]->min());
+                QVERIFY(res.at(i).value(j) <= attrRge[j]->max());
             }
         }
     }
