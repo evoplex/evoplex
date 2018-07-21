@@ -50,7 +50,8 @@ void TestAttrsGenerator::tst_parseStarCmd_min(){
     QString error, cmd;
     AttributesScope attrsScope;
     AttrsGenerator* agen;
-    QStringList names = {"test0", "test1", "test2"};
+    QStringList names = {"int-zero-two", "bool", "any-string"};
+    QStringList attrRgeStrs = {"int[0,2]", "bool", "string"};
     SetOfAttributes res;
     Attributes attrs;
     int sizeOfAgen = 3;
@@ -66,14 +67,18 @@ void TestAttrsGenerator::tst_parseStarCmd_min(){
     _tst_attrs(res, attrs);
 
     // Valid * command with non-empty attrScope
-    AttributeRange* col0 = AttributeRange::parse(0, "int-zero-two", "int[0,2]");
+    AttributeRange* col0 = AttributeRange::parse(0, names.at(0), attrRgeStrs.at(0));
     attrsScope.insert(col0->attrName(), col0);
-    AttributeRange* col1 = AttributeRange::parse(1, "bool", "bool");
+    AttributeRange* col1 = AttributeRange::parse(1, names.at(1), attrRgeStrs.at(1));
     attrsScope.insert(col1->attrName(), col1);
-    AttributeRange* col2 = AttributeRange::parse(2, "any-string", "string");
+    AttributeRange* col2 = AttributeRange::parse(2, names.at(2), attrRgeStrs.at(2));
     attrsScope.insert(col2->attrName(), col2);
 
     agen = AttrsGenerator::parse(attrsScope, cmd, error);
+
+    for(int i = 0; i < attrs.size(); i++){
+        attrs.replace(i, names.at(i), NULL);
+    }
 
     QCOMPARE(agen->command(), cmd);
     QCOMPARE(agen->size(), sizeOfAgen);
