@@ -41,7 +41,7 @@ GraphSettings::GraphSettings(MainGUI* mainGUI, ExperimentPtr exp, QWidget *paren
     connect(m_ui->edgeCMapName, SIGNAL(currentIndexChanged(QString)), SLOT(slotEdgeCMapName(QString)));
     connect(m_ui->edgeCMapSize, SIGNAL(currentIndexChanged(int)), SLOT(updateEdgeCMap()));
 
-    connect(m_exp.data(), SIGNAL(restarted()), SLOT(init()));
+    connect(m_exp.get(), SIGNAL(restarted()), SLOT(init()));
     init();
 }
 

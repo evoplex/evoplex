@@ -89,10 +89,10 @@ MainApp::MainApp()
 MainApp::~MainApp()
 {
     m_projects.clear();
-    Utils::deleteAndShrink(m_models);
-    Utils::deleteAndShrink(m_graphs);
     delete m_expMgr;
     m_expMgr = nullptr;
+    Utils::deleteAndShrink(m_models);
+    Utils::deleteAndShrink(m_graphs);
 }
 
 void MainApp::resetSettingsToDefault()

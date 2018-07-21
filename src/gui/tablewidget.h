@@ -59,6 +59,9 @@ public:
     int insertRow(Experiment* exp);
     void insertColumns(const QList<Header> headers);
 
+public slots:
+    void removeRow(int row);
+
 private slots:
     void onItemClicked(QTableWidgetItem* item);
 
@@ -85,8 +88,10 @@ class RowsDelegate : public QStyledItemDelegate
 
 public:
     explicit RowsDelegate(Experiment* exp, TableWidget* table);
-    ~RowsDelegate();
-    void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+    ~RowsDelegate() override;
+
+    void paint(QPainter *painter, const QStyleOptionViewItem &option,
+               const QModelIndex &index) const override;
 
 private:
     TableWidget* m_table;
@@ -95,5 +100,5 @@ private:
     Status m_status;
     quint16 m_progress;
 };
-}
+} // evoplex
 #endif // TABLEWIDGET_H

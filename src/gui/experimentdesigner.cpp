@@ -46,7 +46,6 @@ ExperimentDesigner::ExperimentDesigner(MainApp* mainApp, QWidget *parent)
     : QDockWidget(parent)
     , m_mainApp(mainApp)
     , m_project(nullptr)
-    , m_exp(nullptr)
     , m_selectedGraphId(STRING_NULL_PLUGINID)
     , m_selectedModelId(STRING_NULL_PLUGINID)
     , m_ui(new Ui_ExperimentDesigner)
@@ -55,8 +54,10 @@ ExperimentDesigner::ExperimentDesigner(MainApp* mainApp, QWidget *parent)
     m_ui->setupUi(this);
 
     m_ui->treeWidget->setFocusPolicy(Qt::NoFocus);
+    m_ui->bRemove->hide();
     m_ui->bEdit->hide();
     connect(m_ui->bSubmit, SIGNAL(clicked(bool)), SLOT(slotCreateExperiment()));
+    connect(m_ui->bRemove, SIGNAL(clicked(bool)), SLOT(slotRemoveExperiment()));
     connect(m_ui->bEdit, SIGNAL(clicked(bool)), SLOT(slotEditExperiment()));
     connect(m_ui->cbWidgets, SIGNAL(currentIndexChanged(int)), SLOT(slotSetActiveWidget(int)));
 
@@ -237,13 +238,14 @@ void ExperimentDesigner::slotSetActiveWidget(int idx)
 void ExperimentDesigner::setExperiment(ExperimentPtr exp)
 {
     if (!exp) {
-        m_exp = nullptr;
         m_ui->bEdit->hide();
+        m_ui->bRemove->hide();
         return;
     }
 
     m_exp = exp;
     m_ui->bEdit->show();
+    m_ui->bRemove->show();
     m_enableOutputs->setChecked(exp->hasOutputs());
 
     std::vector<QString> header = exp->inputs()->exportAttrNames();
@@ -448,9 +450,19 @@ void ExperimentDesigner::slotCreateExperiment()
     }
 }
 
+void ExperimentDesigner::slotRemoveExperiment()
+{
+    QString error;
+    ExperimentPtr exp = m_exp.lock();
+    if (exp && !m_project->removeExperiment(exp->id(), error)) {
+        QMessageBox::warning(this, "Experiment", error);
+    }
+    setExperiment(nullptr);
+}
+
 void ExperimentDesigner::slotEditExperiment()
 {
-    ExperimentPtr exp = m_exp ? m_exp.toStrongRef() : nullptr;
+    ExperimentPtr exp = m_exp.lock();
     if (!exp) {
         QMessageBox::warning(this, "Experiment",
                 "This experiment is no longer part of this project.");

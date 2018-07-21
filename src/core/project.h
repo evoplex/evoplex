@@ -21,6 +21,7 @@
 #ifndef PROJECT_H
 #define PROJECT_H
 
+#include <QMutex>
 #include <QObject>
 #include <QEnableSharedFromThis>
 
@@ -47,6 +48,10 @@ public:
     // Add a new experiment to this project.
     // @return nullptr if unsuccessful
     ExperimentPtr newExperiment(ExpInputs* inputs, QString& error);
+
+    // Remove an experiment from this project
+    // @return false if unsuccessful
+    bool removeExperiment(int expId, QString& error);
 
     // Edit an experiment of this project.
     bool editExperiment(int expId, ExpInputs* newInputs, QString& error);
@@ -78,9 +83,11 @@ public:
 signals:
     void expAdded(int expId);
     void expEdited(int expId);
+    void expRemoved(int expId);
     void hasUnsavedChanges(bool);
 
 private:
+    QMutex m_mutex;
     MainApp* m_mainApp;
     const int m_id;
     QString m_filepath;

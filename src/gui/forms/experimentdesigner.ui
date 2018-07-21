@@ -79,6 +79,13 @@
        </spacer>
       </item>
       <item>
+       <widget class="QPushButton" name="bRemove">
+        <property name="text">
+         <string>Remove</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QPushButton" name="bEdit">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Minimum" vsizetype="Fixed">

@@ -35,7 +35,7 @@ TitleBar::TitleBar(ExperimentPtr exp, QDockWidget* parent)
     setFocusPolicy(Qt::StrongFocus);
     setStyleSheet("background-color:rgb(40,40,40);");
 
-    connect(m_exp.data(), SIGNAL(restarted()), SLOT(slotRestarted()));
+    connect(m_exp.get(), SIGNAL(restarted()), SLOT(slotRestarted()));
     slotRestarted(); // init
 
     QStyle* style = qApp->style();

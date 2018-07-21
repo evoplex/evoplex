@@ -143,29 +143,36 @@ void TableWidget::onItemClicked(QTableWidgetItem* item)
         exp->toggle();
 }
 
+void TableWidget::removeRow(int row)
+{
+    // Item delegates are not updated automatically.
+    // For example, when we remove the row 2, the row 3 will become the row 2
+    // but will continue to use the delegate of the removed row 2. So, we need
+    // to reassign all delegates below the removed row.
+    const int lastRow = rowCount() - 1;
+    for (int r = row; r < lastRow; ++r) {
+        setItemDelegateForRow(r, itemDelegateForRow(r+1));
+    }
+    setItemDelegateForRow(lastRow, nullptr);
+    model()->removeRow(row);
+}
+
 /*********************************************************/
 /*********************************************************/
 
 RowsDelegate::RowsDelegate(Experiment* exp, TableWidget* table)
-    : QStyledItemDelegate(table)
-    , m_table(table)
-    , m_hoveredRow(-1)
-    , m_hoveredCol(-1)
-    , m_status(exp->expStatus())
-    , m_progress(exp->progress())
+    : QStyledItemDelegate(table),
+      m_table(table),
+      m_hoveredRow(-1),
+      m_hoveredCol(-1),
+      m_status(exp->expStatus()),
+      m_progress(exp->progress())
 {
     connect(m_table, &QTableWidget::viewportEntered,
-        [this]() {
-            m_hoveredRow=-1;
-            m_hoveredCol=-1;
-        });
+        [this]() { m_hoveredRow = -1; m_hoveredCol = -1; });
 
     connect(m_table, &QTableWidget::cellEntered,
-        [this](int row, int col) {
-            m_hoveredRow = row;
-            m_hoveredCol = col;
-            m_table->viewport()->update();
-        });
+        [this](int row, int col) { m_hoveredRow = row; m_hoveredCol = col; });
 
     connect(exp, &Experiment::statusChanged,
         [this](Status s) { m_status = s; });

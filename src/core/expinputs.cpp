@@ -116,7 +116,7 @@ ExpInputs::Plugins ExpInputs::findPlugins(const MainApp* mainApp,
     // find the model and graph for this experiment
     const int headerGraphId = header.indexOf(GENERAL_ATTRIBUTE_GRAPHID);
     const int headerModelId = header.indexOf(GENERAL_ATTRIBUTE_MODELID);
-    if (headerGraphId < 0 && headerModelId < 0) {
+    if (headerGraphId < 0 || headerModelId < 0) {
         errMsg += "The experiment should have both graphId and modelId.";
         return Plugins();
     }

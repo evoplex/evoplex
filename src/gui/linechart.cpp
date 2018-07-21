@@ -47,7 +47,7 @@ LineChart::LineChart(ExperimentPtr exp, QWidget* parent)
     Q_ASSERT_X(!m_exp->autoDeleteTrials(), "LineChart",
                "tried to build a LineChart for a experiment that will be auto-deleted!");
 
-    connect(m_exp.data(), SIGNAL(restarted()), SLOT(slotRestarted()));
+    connect(m_exp.get(), SIGNAL(restarted()), SLOT(slotRestarted()));
 
     QDialog* dlg = new QDialog(this);
     m_settingsDlg->setupUi(dlg);
@@ -59,7 +59,7 @@ LineChart::LineChart(ExperimentPtr exp, QWidget* parent)
     connect(titleBar, SIGNAL(trialSelected(int)), SLOT(setTrial(int)));
     connect(titleBar, SIGNAL(openSettingsDlg()), dlg, SLOT(show()));
 
-    connect(m_exp.data(), &Experiment::trialCreated, [this](int trialId) {
+    connect(m_exp.get(), &Experiment::trialCreated, [this](int trialId) {
         if (trialId == m_currTrialId) {
             m_trial = m_exp->trial(trialId);
             m_currStep = 0;

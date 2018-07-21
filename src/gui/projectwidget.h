@@ -61,6 +61,7 @@ signals:
 public slots:
     void slotInsertRow(int expId);
     void slotUpdateRow(int expId);
+    void slotRemoveRow(int expId);
     void slotHasUnsavedChanges(bool b);
 
 private slots:

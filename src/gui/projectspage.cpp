@@ -58,6 +58,8 @@ ProjectsPage::~ProjectsPage()
 {
     m_userPrefs.setValue("gui/projectsPageGeometry", saveGeometry());
     m_userPrefs.setValue("gui/projectsPageState", saveState());
+    m_expWidgets.clear();
+    m_projWidgets.clear();
 }
 
 void ProjectsPage::slotFocusChanged(QDockWidget* dw)
@@ -92,15 +94,15 @@ void ProjectsPage::slotFocusChanged(QWidget*, QWidget* now)
 void ProjectsPage::addProjectWidget(ProjectPtr project)
 {
     ProjectWidget* pw = new ProjectWidget(project, m_mainGUI, this);
-    if (m_projects.isEmpty()) {
+    if (m_projWidgets.isEmpty()) {
         addDockWidget(Qt::LeftDockWidgetArea, pw);
     } else {
-        tabifyDockWidget(m_projects.last(), pw);
+        tabifyDockWidget(m_projWidgets.last(), pw);
     }
     m_expDesigner->addWidgetToList(pw);
     pw->show();
     pw->raise();
-    m_projects.push_back(pw);
+    m_projWidgets.push_back(pw);
     slotFocusChanged(pw);
     emit (isEmpty(false));
 
@@ -115,18 +117,18 @@ void ProjectsPage::addProjectWidget(ProjectPtr project)
         m_expDesigner->setExperiment(project->experiment(expId));
     });
 
-    connect(pw, &ProjectWidget::closed, [this, pw, project]() {
-        for (ExperimentWidget* expW : m_experiments) {
-            if (expW->exp()->project() == project) {
-                expW->close();
+    connect(pw, &ProjectWidget::closed, [this, pw, project]() {       
+        for (ExperimentWidget* ew : m_expWidgets) {
+            if (ew->project() == project) {
+                ew->close();
             }
         }
         m_expDesigner->removeWidgetFromList(pw);
-        m_projects.removeOne(pw);
-        emit (isEmpty(m_projects.isEmpty()));
+        m_projWidgets.removeOne(pw);
+        emit (isEmpty(m_projWidgets.isEmpty()));
         m_mainApp->closeProject(project->id());
         pw->deleteLater();
-        if (m_projects.isEmpty()) {
+        if (m_projWidgets.isEmpty()) {
             m_activeProject.clear();
             emit (activeProjectChanged(m_activeProject));
         }
@@ -185,29 +187,38 @@ void ProjectsPage::slotOpenExperiment(ExperimentPtr exp)
         return;
     }
 
-    ExperimentWidget* ew = nullptr;
-    for (ExperimentWidget* e : m_experiments) {
-        if (exp == e->exp()) {
-            ew = e;
-            break;
+    auto findEW = [this](ExperimentPtr exp) {
+        ExperimentWidget* ret = nullptr;
+        for (ExperimentWidget* ew : m_expWidgets) {
+            if (ew->exp() == exp) { ret = ew; break; }
         }
-    }
+        return ret;
+    };
 
+    ExperimentWidget* ew = findEW(exp);
     if (!ew) {
         ew = new ExperimentWidget(exp, m_mainGUI, this);
+        std::weak_ptr<Experiment> wExp = exp;
+        connect(exp->project().data(), &Project::expRemoved, [findEW, wExp](int expId) {
+            ExperimentPtr exp = wExp.lock();
+            if (exp && expId == exp->id()) {
+                auto ew = findEW(exp);
+                if (ew) { ew->close(); }
+            }
+        });
         connect(ew, &ExperimentWidget::closed, [this, ew]() {
-            m_projects.last()->raise();
+            m_projWidgets.last()->raise();
             m_expDesigner->removeWidgetFromList(ew);
-            m_experiments.removeOne(ew);
+            m_expWidgets.removeOne(ew);
             ew->deleteLater();
         });
 
-        if (m_projects.isEmpty() && m_experiments.isEmpty()) {
+        if (m_projWidgets.isEmpty() && m_expWidgets.empty()) {
             addDockWidget(Qt::LeftDockWidgetArea, ew);
         } else {
-            tabifyDockWidget(m_projects.last(), ew);
+            tabifyDockWidget(m_projWidgets.last(), ew);
         }
-        m_experiments.append(ew);
+        m_expWidgets.push_back(ew);
     }
 
     m_expDesigner->addWidgetToList(ew);

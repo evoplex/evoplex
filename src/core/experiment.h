@@ -43,13 +43,13 @@ namespace evoplex {
 class Experiment;
 class Trial;
 
-using ExperimentPtr = QSharedPointer<Experiment>;
+using ExperimentPtr = std::shared_ptr<Experiment>;
 using Trials = std::unordered_map<quint16, Trial*>;
 
 /**
  * Evoplex assumes that any experiment belongs to a valid project.
  */
-class Experiment : public QObject, public QEnableSharedFromThis<Experiment>
+class Experiment : public QObject, public std::enable_shared_from_this<Experiment>
 {
     Q_OBJECT
 

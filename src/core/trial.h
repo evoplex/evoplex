@@ -23,20 +23,11 @@
 
 #include <unordered_map>
 #include <QRunnable>
-#include <QSharedPointer>
 
 #include "enum.h"
 #include "experiment.h"
 
 namespace evoplex {
-/*
-class AbstractGraph;
-class AbstractModel;
-class Experiment;
-class PRG;
-class Trial;
-
-using ExperimentPtr = QSharedPointer<Experiment>;*/
 
 /**
  * A trial is part of an experiment which might have several other trials.
@@ -73,7 +64,7 @@ public:
 
 private:
     const quint16 m_id;
-    QWeakPointer<Experiment> m_exp;
+    ExperimentPtr m_exp;
     int m_step;
     Status m_status;
 
@@ -84,14 +75,14 @@ private:
     // We can safely consider that all parameters are valid at this point.
     // However, some things might fail (eg, missing nodes, broken graph etc),
     // and, in that case, false is returned.
-    bool init(const ExperimentPtr& exp);
+    bool init();
 
     // The main loop for calling the model steps
     // Returns true if it has a next step
-    bool runSteps(const ExperimentPtr& exp);
+    bool runSteps();
 
     // If any file output is set, it'll write the cached steps to file.
-    bool writeCachedSteps(const ExperimentPtr& exp) const;
+    bool writeCachedSteps(const Experiment* exp) const;
 };
 
 /************************************************************************

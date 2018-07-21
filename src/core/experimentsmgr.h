@@ -22,6 +22,7 @@
 #define EXPERIMENTMGR_H
 
 #include <list>
+#include <memory>
 
 #include <QMutex>
 #include <QObject>
@@ -33,7 +34,7 @@ namespace evoplex {
 
 class Trial;
 class Experiment;
-using ExperimentPtr = QSharedPointer<Experiment>;
+using ExperimentPtr = std::shared_ptr<Experiment>;
 
 class ExperimentsMgr: public QObject
 {
@@ -54,10 +55,12 @@ public:
     // also runs in a work thread
     void trialFinished(Trial* trial);
 
-public slots:
-    void clearQueue();
+    void remove(const ExperimentPtr& exp);
     void removeFromQueue(const ExperimentPtr& exp);
     void removeFromIdle(const ExperimentPtr& exp);
+
+public slots:
+    void clearQueue();
 
 signals:
     void progressUpdated();

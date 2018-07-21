@@ -112,17 +112,16 @@ void ExperimentsMgr::trialFinished(Trial* trial)
 
     m_runningTrials.remove(trial);
     if (isTheLastTrial(trial)) {
-        ExperimentPtr exp = trial->m_exp;
         locker.unlock();
-        exp->expFinished();
+        trial->m_exp->expFinished();
         locker.relock();
 
-        m_running.remove(exp);
+        m_running.remove(trial->m_exp);
         emit (progressUpdated());
 
-        if (exp->expStatus() != Status::Invalid &&
-                exp->expStatus() != Status::Disabled) {
-            m_idle.emplace_back(exp);
+        if (trial->m_exp->expStatus() != Status::Invalid &&
+                trial->m_exp->expStatus() != Status::Disabled) {
+            m_idle.emplace_back(trial->m_exp);
         }
 
         if (m_running.empty() && m_queued.empty()) {
@@ -161,7 +160,7 @@ void ExperimentsMgr::processQueue()
             return;
         }
 
-        ExperimentPtr exp = trial->m_exp.toStrongRef();
+        Experiment* exp = trial->m_exp.get();
 
         // checks if we really need to run this trial
         if (!exp || exp->expStatus() == Status::Invalid ||
@@ -175,8 +174,8 @@ void ExperimentsMgr::processQueue()
         // checks if this is the first time we run this experiment
         if (exp->expStatus() != Status::Running) {
             exp->setExpStatus(Status::Running);
-            m_running.emplace_back(exp);
-            m_queued.remove(exp);
+            m_running.emplace_back(trial->m_exp);
+            m_queued.remove(trial->m_exp);
         }
 
         m_runningTrials.emplace_back(trial);
@@ -186,6 +185,13 @@ void ExperimentsMgr::processQueue()
         locker.unlock();
         processQueue();
     }
+}
+
+void ExperimentsMgr::remove(const ExperimentPtr& exp)
+{
+    removeFromQueue(exp);
+    QMutexLocker locker(&m_mutex);
+    m_idle.remove(exp);
 }
 
 void ExperimentsMgr::removeFromQueue(const ExperimentPtr& exp)

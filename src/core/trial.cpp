@@ -40,7 +40,7 @@ Trial::Trial(const quint16 id, ExperimentPtr exp)
       m_graph(nullptr),
       m_model(nullptr)
 {
-    Q_ASSERT_X(m_exp, "Trial", "a trial must belong to a valid experiment");
+    Q_ASSERT_X(exp, "Trial", "a trial must belong to a valid experiment");
     // important! Trials are deleted by the Experiment class,
     // let's turn off the autoDelete from QRunnable by default
     setAutoDelete(false);
@@ -55,45 +55,45 @@ Trial::~Trial()
 
 GraphType Trial::graphType() const
 {
-    return  m_exp.data()->graphType();
+    return  m_exp->graphType();
 }
 
-bool Trial::init(const ExperimentPtr& exp)
+bool Trial::init()
 {
-    if (!exp || exp->expStatus() == Status::Invalid || exp->pauseAt() < 0) {
+    if (m_exp->expStatus() == Status::Invalid || m_exp->pauseAt() < 0) {
         return false;
     }
 
-    Nodes nodes = exp->cloneCachedNodes(m_id);
-    if (nodes.empty() && !exp->createNodes(nodes)) {
+    Nodes nodes = m_exp->cloneCachedNodes(m_id);
+    if (nodes.empty() && !m_exp->createNodes(nodes)) {
         return false;
     }
 
-    const quint16 seed = static_cast<quint16>(exp->inputs()->general(GENERAL_ATTRIBUTE_SEED).toInt());
+    const quint16 seed = static_cast<quint16>(m_exp->inputs()->general(GENERAL_ATTRIBUTE_SEED).toInt());
     m_prg = new PRG(seed + m_id);
 
-    m_graph = dynamic_cast<AbstractGraph*>(exp->graphPlugin()->create());
-    if (!m_graph || !m_graph->setup(*this, *exp->inputs()->graph(), nodes)) {
+    m_graph = dynamic_cast<AbstractGraph*>(m_exp->graphPlugin()->create());
+    if (!m_graph || !m_graph->setup(*this, *m_exp->inputs()->graph(), nodes)) {
         qWarning() << "unable to create the trials."
                    << "The graph could not be initialized."
-                   << "Experiment:" << exp->id();
+                   << "Experiment:" << m_exp->id();
         return false;
     }
 
-    m_model = dynamic_cast<AbstractModel*>(exp->modelPlugin()->create());
-    if (!m_model || !m_model->setup(*this, *exp->inputs()->model())) {
+    m_model = dynamic_cast<AbstractModel*>(m_exp->modelPlugin()->create());
+    if (!m_model || !m_model->setup(*this, *m_exp->inputs()->model())) {
         qWarning() << "unable to create the trials."
                    << "The model could not be initialized."
-                   << "Experiment:" << exp->id();
+                   << "Experiment:" << m_exp->id();
         return false;
     }
 
-    if (!exp->inputs()->fileCaches().empty()) {
-        const QString fpath = exp->m_filePathPrefix + QString("%4.csv").arg(m_id);
+    if (!m_exp->inputs()->fileCaches().empty()) {
+        const QString fpath = m_exp->m_filePathPrefix + QString("%4.csv").arg(m_id);
         QFile file(fpath);
         if (file.open(QFile::WriteOnly | QFile::Truncate)) {
             QTextStream stream(&file);
-            stream << exp->m_fileHeader;
+            stream << m_exp->m_fileHeader;
             file.close();
         } else {
             qWarning() << "unable to create the trials. Could not write in " << fpath;
@@ -101,15 +101,15 @@ bool Trial::init(const ExperimentPtr& exp)
         }
 
         // write this initial step to file
-        for (OutputPtr output : exp->m_outputs) {
+        for (OutputPtr output : m_exp->m_outputs) {
             output->doOperation(this);
         }
-        writeCachedSteps(exp);
+        writeCachedSteps(m_exp.get());
     }
 
     // make the set of nodes available for other trials
-    if (exp->numTrials() > 1 && exp->m_clonableNodes.empty()) {
-        exp->m_clonableNodes = Utils::clone(nodes);
+    if (m_exp->numTrials() > 1 && m_exp->m_clonableNodes.empty()) {
+        m_exp->m_clonableNodes = Utils::clone(nodes);
     }
 
     m_step = 0; // important!
@@ -119,36 +119,35 @@ bool Trial::init(const ExperimentPtr& exp)
 
 void Trial::run()
 {
-    ExperimentPtr exp = m_exp.toStrongRef();
-    if (!exp || exp->expStatus() == Status::Invalid) {
+    if (m_exp->expStatus() == Status::Invalid) {
         m_status = Status::Invalid;
     }
 
     if (m_status == Status::Invalid || m_status == Status::Running
             || m_status == Status::Finished) {
-        exp->trialFinished(this);
+        m_exp->trialFinished(this);
         return;
     }
 
     if (m_status == Status::Disabled) {
         // Ensure we init one trial at a time.
         // Thus, if one trial fail, the others will be aborted earlier.
-        exp->m_mutex.lock();
-        if (!init(exp)) {
-            exp->m_mutex.unlock();
+        m_exp->m_mutex.lock();
+        if (!init()) {
+            m_exp->m_mutex.unlock();
             m_status = Status::Invalid;
-            exp->trialFinished(this);
+            m_exp->trialFinished(this);
             return;
         }
-        exp->m_mutex.unlock();
+        m_exp->m_mutex.unlock();
         m_graph->reset();
     }
 
     m_status = Status::Running;
-    emit (exp->trialCreated(m_id));
+    emit (m_exp->trialCreated(m_id));
 
-    if (!runSteps(exp) || m_step >= exp->stopAt()) {
-        if (writeCachedSteps(exp)) {
+    if (!runSteps() || m_step >= m_exp->stopAt()) {
+        if (writeCachedSteps(m_exp.get())) {
             m_status = Status::Finished;
         } else {
             m_status = Status::Invalid;
@@ -157,11 +156,13 @@ void Trial::run()
         m_status = Status::Paused;
     }
 
-    exp->trialFinished(this);
+    m_exp->trialFinished(this);
 }
 
-bool Trial::runSteps(const ExperimentPtr& exp)
+bool Trial::runSteps()
 {
+    const Experiment* exp = m_exp.get();
+
     QElapsedTimer t;
     t.start();
 
@@ -190,7 +191,7 @@ bool Trial::runSteps(const ExperimentPtr& exp)
     return hasNext;
 }
 
-bool Trial::writeCachedSteps(const ExperimentPtr& exp) const
+bool Trial::writeCachedSteps(const Experiment* exp) const
 {
     if (exp->inputs()->fileCaches().empty() ||
             exp->inputs()->fileCaches().front()->isEmpty(m_id)) {

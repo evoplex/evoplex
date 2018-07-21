@@ -99,7 +99,7 @@ ExperimentWidget::ExperimentWidget(ExperimentPtr exp, MainGUI* mainGUI, Projects
         m_exp->setDelay(static_cast<quint16>(v));
     });
 
-    connect(m_exp.data(), SIGNAL(statusChanged(Status)), SLOT(slotStatusChanged(Status)));
+    connect(m_exp.get(), SIGNAL(statusChanged(Status)), SLOT(slotStatusChanged(Status)));
     slotStatusChanged(exp->expStatus()); // just to init the controls
 
     QVBoxLayout* layout = new QVBoxLayout(new QWidget(this));

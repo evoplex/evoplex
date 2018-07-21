@@ -51,7 +51,6 @@ Experiment::~Experiment()
 {
     Q_ASSERT_X(m_expStatus != Status::Running && m_expStatus != Status::Queued,
                "Experiment", "tried to delete a running experiment");
-    deleteTrials();
     m_outputs.clear();
     delete m_inputs;
     m_project.clear();
@@ -82,7 +81,7 @@ bool Experiment::setInputs(ExpInputs* inputs, QString& error)
     m_modelPlugin = m_mainApp->model(m_inputs->general(GENERAL_ATTRIBUTE_MODELID).toQString());
 
     // a few asserts for critical things that should never happen!
-    Q_ASSERT_X(this == m_project.data()->experiment(m_id),
+    Q_ASSERT_X(this == m_project.data()->experiment(m_id).get(),
         "Experiment", "an experiment must be aware of its parent project!");
     Q_ASSERT_X(m_id == inputs->general(GENERAL_ATTRIBUTE_EXPID).toInt(),
         "Experiment", "mismatched experiment id!");
@@ -126,7 +125,7 @@ bool Experiment::disable(QString* error)
         return false;
     }
 
-    m_mainApp->expMgr()->removeFromIdle(sharedFromThis());
+    m_mainApp->expMgr()->removeFromIdle(shared_from_this());
 
     deleteTrials();
     m_outputs.clear();
@@ -169,7 +168,7 @@ bool Experiment::reset(QString* error)
     deleteTrials();
     m_trials.reserve(static_cast<size_t>(m_numTrials));
     for (quint16 trialId = 0; trialId < m_numTrials; ++trialId) {
-        m_trials.insert({trialId, new Trial(trialId, sharedFromThis())});
+        m_trials.insert({trialId, new Trial(trialId, shared_from_this())});
     }
 
     m_expStatus = Status::Paused;
@@ -284,13 +283,13 @@ void Experiment::toggle()
     } else if (m_expStatus == Status::Paused || m_expStatus == Status::Disabled) {
         play();
     } else if (m_expStatus == Status::Queued) {
-        m_mainApp->expMgr()->removeFromQueue(sharedFromThis());
+        m_mainApp->expMgr()->removeFromQueue(shared_from_this());
     }
 }
 
 void Experiment::play()
 {
-    m_mainApp->expMgr()->play(sharedFromThis());
+    m_mainApp->expMgr()->play(shared_from_this());
 }
 
 void Experiment::playNext()

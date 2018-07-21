@@ -54,7 +54,7 @@ GraphWidget::GraphWidget(MainGUI* mainGUI, ExperimentPtr exp, ExperimentWidget* 
     Q_ASSERT_X(!m_exp->autoDeleteTrials(), "GraphWidget",
                "tried to build a GraphWidget for a experiment that will be auto-deleted!");
 
-    connect(m_exp.data(), SIGNAL(restarted()), SLOT(slotRestarted()));
+    connect(m_exp.get(), SIGNAL(restarted()), SLOT(slotRestarted()));
 
     QWidget* front = new QWidget(this);
     m_ui->setupUi(front);
@@ -68,7 +68,7 @@ GraphWidget::GraphWidget(MainGUI* mainGUI, ExperimentPtr exp, ExperimentWidget* 
 
     // setTrial() triggers a timer that needs to be exec in the main thread
     // thus, we need to use queuedconnection here
-    connect(exp.data(), &Experiment::trialCreated, this,
+    connect(exp.get(), &Experiment::trialCreated, this,
             [this](int trialId) { if (trialId == m_currTrialId) setTrial(m_currTrialId); },
             Qt::QueuedConnection);
 

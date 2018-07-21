@@ -42,7 +42,7 @@ public:
     ~ProjectsPage();
 
     inline ProjectPtr activeProject() const { return m_activeProject; }
-    inline const QVector<ProjectWidget*> projects() const { return m_projects; }
+    inline const QVector<ProjectWidget*> projWidgets() const { return m_projWidgets; }
 
 signals:
     void activeProjectChanged(ProjectPtr);
@@ -64,8 +64,8 @@ private:
     MainApp* m_mainApp;
     ExperimentDesigner* m_expDesigner;
     ProjectPtr m_activeProject;
-    QVector<ProjectWidget*> m_projects; // opened projects
-    QVector<ExperimentWidget*> m_experiments; // opened experiments
+    QVector<ProjectWidget*> m_projWidgets; // opened projects
+    QVector<ExperimentWidget*> m_expWidgets; // opened experiments
 
     void addProjectWidget(ProjectPtr project);
 };

@@ -213,7 +213,7 @@ bool MainGUI::eventFilter(QObject* o, QEvent* e)
 
 void MainGUI::closeEvent(QCloseEvent* event)
 {
-    for (ProjectWidget* pw : m_projectsPage->projects()) {
+    for (ProjectWidget* pw : m_projectsPage->projWidgets()) {
         if (!pw->close()) {
             event->ignore();
             return;

@@ -21,6 +21,7 @@
 #include <QDebug>
 #include <QDir>
 #include <QFile>
+#include <QMutexLocker>
 #include <QVector>
 #include <QStringList>
 #include <QTextStream>
@@ -41,12 +42,10 @@ Project::Project(MainApp* mainApp, int id)
 Project::~Project()
 {
     for (auto& e : m_experiments) {
-        m_mainApp->expMgr()->removeFromIdle(e.second);
-        m_mainApp->expMgr()->removeFromQueue(e.second);
+        m_mainApp->expMgr()->remove(e.second);
         e.second->setAutoDeleteTrials(true);
         e.second->setExpStatus(Status::Invalid);
         e.second->pause();
-        e.second.clear();
     }
     m_experiments.clear();
 }
@@ -84,6 +83,8 @@ int Project::generateExpId() const
 
 ExperimentPtr Project::newExperiment(ExpInputs* inputs, QString& error)
 {
+    QMutexLocker locker(&m_mutex);
+
     if (!inputs) {
         error += "Null inputs!";
         return nullptr;
@@ -95,7 +96,7 @@ ExperimentPtr Project::newExperiment(ExpInputs* inputs, QString& error)
         return nullptr;
     }
 
-    ExperimentPtr exp = QSharedPointer<Experiment>::create(m_mainApp, expId, sharedFromThis());
+    ExperimentPtr exp = std::make_shared<Experiment>(m_mainApp, expId, sharedFromThis());
     m_experiments.insert({expId, exp});
     exp->setInputs(inputs, error);
 
@@ -105,11 +106,43 @@ ExperimentPtr Project::newExperiment(ExpInputs* inputs, QString& error)
     return exp;
 }
 
+bool Project::removeExperiment(int expId, QString& error)
+{
+    QMutexLocker locker(&m_mutex);
+
+    auto it = m_experiments.find(expId);
+    if (it == m_experiments.cend()) {
+        error += "tried to remove a nonexistent experiment";
+        return false;
+    }
+
+    ExperimentPtr exp = (*it).second;
+    if (m_experiments.erase(exp->id()) < 1) {
+        error += "failed to remove the experiment";
+        return false;
+    }
+
+    emit (expRemoved(expId));
+    m_mainApp->expMgr()->remove(exp);
+    exp->setAutoDeleteTrials(true);
+    exp->setExpStatus(Status::Invalid);
+    exp->pause();
+
+    m_hasUnsavedChanges = true;
+    emit (hasUnsavedChanges(m_hasUnsavedChanges));
+    return true;
+}
+
 bool Project::editExperiment(int expId, ExpInputs* newInputs, QString& error)
 {
-    ExperimentPtr exp = m_experiments.at(expId);
-    Q_ASSERT_X(exp, "Experiment", "tried to edit a nonexistent experiment");
-    if (!exp->setInputs(newInputs, error)) {
+    QMutexLocker locker(&m_mutex);
+
+    auto it = m_experiments.find(expId);
+    if (it == m_experiments.cend()) {
+        error += "tried to edit a nonexistent experiment";
+        return false;
+    }
+    if (!(*it).second->setInputs(newInputs, error)) {
         return false;
     }
     m_hasUnsavedChanges = true;

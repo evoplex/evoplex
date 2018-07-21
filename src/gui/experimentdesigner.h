@@ -53,6 +53,7 @@ private slots:
     void slotOutputDir();
     void slotOutputWidget();
     void slotCreateExperiment();
+    void slotRemoveExperiment();
     void slotEditExperiment();
     void slotModelSelected(const QString& modelId);
     void slotGraphSelected(const QString& graphId);
@@ -63,7 +64,7 @@ private slots:
 private:
     MainApp* m_mainApp;
     ProjectPtr m_project;
-    QWeakPointer<Experiment> m_exp;
+    std::weak_ptr<Experiment> m_exp;
     QString m_selectedGraphId;
     QString m_selectedModelId;
 

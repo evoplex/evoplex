@@ -24,11 +24,12 @@
 #include <QMessageBox>
 #include <QTableWidgetItem>
 
+#include "core/experimentsmgr.h"
+
 #include "projectwidget.h"
 #include "fontstyles.h"
 #include "savedialog.h"
 #include "ui_projectwidget.h"
-#include "core/experimentsmgr.h"
 
 namespace evoplex {
 
@@ -48,6 +49,7 @@ ProjectWidget::ProjectWidget(ProjectPtr project, MainGUI* mainGUI, ProjectsPage*
 
     connect(m_project.data(), SIGNAL(expAdded(int)), SLOT(slotInsertRow(int)));
     connect(m_project.data(), SIGNAL(expEdited(int)), SLOT(slotUpdateRow(int)));
+    connect(m_project.data(), SIGNAL(expRemoved(int)), SLOT(slotRemoveRow(int)));
 
     int col = 0;
     m_headerIdx.insert(TableWidget::H_BUTTON, col++);
@@ -149,7 +151,7 @@ void ProjectWidget::fillRow(int row, const ExperimentPtr& exp)
 void ProjectWidget::slotInsertRow(int expId)
 {
     ExperimentPtr exp = m_project->experiment(expId);
-    fillRow(m_ui->table->insertRow(exp.data()), exp);
+    fillRow(m_ui->table->insertRow(exp.get()), exp);
 }
 
 void ProjectWidget::slotUpdateRow(int expId)
@@ -162,6 +164,17 @@ void ProjectWidget::slotUpdateRow(int expId)
         }
     }
     qFatal("failed to update row! It should never happen.");
+}
+
+void ProjectWidget::slotRemoveRow(int expId)
+{
+    const int expIdCol = m_headerIdx.value(TableWidget::H_EXPID);
+    for (int row = 0; row < m_ui->table->rowCount(); ++row) {
+        if (expId == m_ui->table->item(row, expIdCol)->text().toInt()) {
+            m_ui->table->removeRow(row);
+            return;
+        }
+    }
 }
 
 void ProjectWidget::insertItem(int row, TableWidget::Header header, QString label, QString tooltip)
