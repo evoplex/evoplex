@@ -36,6 +36,7 @@ private slots:
     void tst_parseStarCmd_min();
     void tst_parseStarCmd_max();
     void tst_parseStarCmd_rand();
+    void tst_parseHashCmd_min();
     void _tst_attrs(SetOfAttributes res, Attributes attrs,  bool testValues);
     void _tst_mode(SetOfAttributes res, QString mode, AttributeRange* attrRge[], int numOfAttrRges);
 };
@@ -227,6 +228,51 @@ void TestAttrsGenerator::tst_parseStarCmd()
     // our aim is to check if 'cmd' is able to generate a SetOfAttributes with the correct data
     // SetOfAttributes res = agen->create();
 
+}
+
+void TestAttrsGenerator::tst_parseHashCmd_min(){
+//    QString error, cmd;
+//    AttributesScope attrsScope;
+//    AttrsGenerator* agen;
+//    QStringList names = {"test0", "test1", "test2"};
+//    QStringList attrRgeStrs = {"int[0,2]", "double[2.3,7.8]", "int{-2,0,2,4,6}"};
+//    SetOfAttributes res, res_sameFuncForAll;
+//    Attributes attrs;
+//    int sizeOfAgen = 3;
+
+//    // Valid * command with empty attrScope
+//    cmd = QString("*%1;min").arg(Value(sizeOfAgen).toQString());
+//    agen = AttrsGenerator::parse(attrsScope, cmd, error);
+
+//    QCOMPARE(agen->command(), cmd);
+//    QCOMPARE(agen->size(), sizeOfAgen);
+
+//    res = agen->create();
+
+//    _tst_attrs(res, attrs, true);
+
+//    // Valid * command with non-empty attrScope
+//    AttributeRange* col0 = AttributeRange::parse(0, names.at(0), attrRgeStrs.at(0));
+//    attrsScope.insert(col0->attrName(), col0);
+//    AttributeRange* col1 = AttributeRange::parse(1, names.at(1), attrRgeStrs.at(1));
+//    attrsScope.insert(col1->attrName(), col1);
+//    AttributeRange* col2 = AttributeRange::parse(2, names.at(2), attrRgeStrs.at(2));
+//    attrsScope.insert(col2->attrName(), col2);
+//    AttributeRange* attrRges[3] = {col0, col1, col2};
+//    agen = AttrsGenerator::parse(attrsScope, cmd, error);
+
+//    attrs.resize(3);
+//    for(int i = 0; i < attrs.size(); i++){
+//        attrs.replace(i, names.at(i), NULL);
+//    }
+
+//    QCOMPARE(agen->command(), cmd);
+//    QCOMPARE(agen->size(), sizeOfAgen);
+
+//    res = agen->create();
+
+//    _tst_attrs(res, attrs, false);
+//    _tst_mode(res, "min", attrRges, 3);
 }
 
 void TestAttrsGenerator::tst_parseHashCmd()
