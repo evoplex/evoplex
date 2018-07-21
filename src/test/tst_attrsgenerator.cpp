@@ -41,7 +41,7 @@ void TestAttrsGenerator::_tst_attrs(SetOfAttributes res, Attributes attrs, bool 
 {
     for(int i = 0; i < res.size(); i++){
         QCOMPARE(res.at(i).names(), attrs.names());
-        QCOMPARE(res.at(i).values(), attrs.values());
+        if(testValues) QCOMPARE(res.at(i).values(), attrs.values());
         QCOMPARE(res.at(i).size(), attrs.size());
     }
 }
@@ -64,7 +64,7 @@ void TestAttrsGenerator::tst_parseStarCmd_min(){
     QCOMPARE(agen->size(), sizeOfAgen);
 
     res = agen->create();
-    _tst_attrs(res, attrs, false);
+    _tst_attrs(res, attrs, true);
 
     // Valid * command with non-empty attrScope
     AttributeRange* col0 = AttributeRange::parse(0, names.at(0), attrRgeStrs.at(0));
@@ -86,7 +86,7 @@ void TestAttrsGenerator::tst_parseStarCmd_min(){
 
     res = agen->create();
 
-//    _tst_attrs(res, attrs, false);
+    _tst_attrs(res, attrs, false);
 }
 
 void TestAttrsGenerator::tst_parseStarCmd()
