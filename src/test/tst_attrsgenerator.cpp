@@ -35,7 +35,7 @@ private slots:
     void tst_parseHashCmd();
     void tst_parseStarCmd_min();
     void _tst_attrs(SetOfAttributes res, Attributes attrs,  bool testValues);
-    void _tst_mode(SetOfAttributes res, QString mode, AttributeRange* attrRge[]);
+    void _tst_mode(SetOfAttributes res, QString mode, AttributeRange* attrRge[], int numOfAttrRges);
 };
 
 void TestAttrsGenerator::_tst_attrs(SetOfAttributes res, Attributes attrs, bool testValues)
@@ -47,19 +47,25 @@ void TestAttrsGenerator::_tst_attrs(SetOfAttributes res, Attributes attrs, bool 
     }
 }
 
-void TestAttrsGenerator::_tst_mode(SetOfAttributes res, QString mode, AttributeRange* attrRge[])
+void TestAttrsGenerator::_tst_mode(SetOfAttributes res, QString mode, AttributeRange* attrRge[], int numOfAttrRges)
 {
     for(int i = 0; i < res.size(); i++){
-
+        for(int j = 0; j < numOfAttrRges; j++){
+            QCOMPARE(res.at(i).value(j), attrRge[j]->min());
+        }
     }
+//    QCOMPARE(attrRge[0]->min().toInt(), 3);
+//    QCOMPARE(res.at(0).value(0).toInt(), attrRge[0]->min().toInt());
+
+//    QCOMPARE(res.at(0).value(0).toInt(), 9);
 }
 
 void TestAttrsGenerator::tst_parseStarCmd_min(){
     QString error, cmd;
     AttributesScope attrsScope;
     AttrsGenerator* agen;
-    QStringList names = {"int-zero-two", "bool", "any-string"};
-    QStringList attrRgeStrs = {"int[0,2]", "bool", "string"};
+    QStringList names = {"test0", "test1", "test2"};
+    QStringList attrRgeStrs = {"int[0,2]", "double[2.3,7.8]", "int{-2,0,2,4,6}"};
     SetOfAttributes res, res_sameFuncForAll;
     Attributes attrs;
     int sizeOfAgen = 3;
@@ -91,15 +97,15 @@ void TestAttrsGenerator::tst_parseStarCmd_min(){
     }
 
 
-
     QCOMPARE(agen->command(), cmd);
     QCOMPARE(agen->size(), sizeOfAgen);
-
+//    QCOMPARE(col0->max().toInt(), 2);
 
     res = agen->create();
 
 //QCOMPARE(res.at(0).value(0), col0->max());
     _tst_attrs(res, attrs, false);
+    _tst_mode(res, "min", attrRges, 3);
 
 }
 
