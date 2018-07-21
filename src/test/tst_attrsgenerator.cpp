@@ -44,6 +44,12 @@ void TestAttrsGenerator::_tst_attrs(SetOfAttributes res, Attributes attrs, bool 
         if(testValues) QCOMPARE(res.at(i).values(), attrs.values());
         QCOMPARE(res.at(i).size(), attrs.size());
     }
+
+    if(testValues){
+        for(int i = 0; i < res.size(); i++){
+
+        }
+    }
 }
 
 void TestAttrsGenerator::tst_parseStarCmd_min(){
@@ -82,13 +88,15 @@ void TestAttrsGenerator::tst_parseStarCmd_min(){
         attrs.replace(i, names.at(i), NULL);
     }
 
+
+
     QCOMPARE(agen->command(), cmd);
     QCOMPARE(agen->size(), sizeOfAgen);
 
 
     res = agen->create();
 
-
+QCOMPARE(res.at(0).value(0), col0->max());
     _tst_attrs(res, attrs, false);
 
 }
