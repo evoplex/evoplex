@@ -177,7 +177,8 @@ void ProjectWidget::slotRemoveRow(int expId)
     }
 }
 
-void ProjectWidget::insertItem(int row, TableWidget::Header header, QString label, QString tooltip)
+void ProjectWidget::insertItem(int row, TableWidget::Header header,
+                               const QString& label, const QString& tooltip)
 {
     QTableWidgetItem* item = new QTableWidgetItem(label);
     item->setTextAlignment(Qt::AlignCenter);

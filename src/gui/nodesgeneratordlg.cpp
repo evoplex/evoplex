@@ -34,7 +34,7 @@
 namespace evoplex
 {
 
-NodesGeneratorDlg::NodesGeneratorDlg(QWidget* parent, const AttributesScope& nodeAttrsScope, QString cmd)
+NodesGeneratorDlg::NodesGeneratorDlg(QWidget* parent, const AttributesScope& nodeAttrsScope, const QString& cmd)
     : QDialog(parent),
       m_ui(new Ui_NodesGeneratorDlg),
       m_nodeAttrsScope(nodeAttrsScope)
@@ -194,7 +194,7 @@ void NodesGeneratorDlg::fill(const QString& cmd)
         m_ui->bSameData->setChecked(true);
         m_ui->numNodes1->setValue(agsame->size());
         m_ui->func->setCurrentIndex(m_ui->func->findData(static_cast<int>(agsame->function())));
-        Value v = agsame->functionInput();
+        const Value& v = agsame->functionInput();
         m_ui->fseed->setValue(v.type() == Value::INT ? v.toInt() : 0);
         return;
     }
@@ -226,7 +226,7 @@ QString NodesGeneratorDlg::readCommand()
         }
         command = m_ui->filepath->text();
     } else if (m_ui->bSameData->isChecked()) {
-        command = QString("*%1;%2").arg(m_ui->numNodes1->text()).arg(m_ui->func->currentText());
+        command = QString("*%1;%2").arg(m_ui->numNodes1->text(), m_ui->func->currentText());
         if (m_ui->func->currentData() == static_cast<int>(Function::Rand)) {
             command += QString("_%1").arg(m_ui->fseed->value());
         }
@@ -237,7 +237,7 @@ QString NodesGeneratorDlg::readCommand()
                        "NodesGeneratorDlg::fill", "attribute name mismatch. It should never happen!");
 
             QComboBox* cb = dynamic_cast<QComboBox*>(m_ui->table->cellWidget(ar->id(), 1));
-            command += QString(";%1_%2").arg(ar->attrName()).arg(cb->currentText());
+            command += QString(";%1_%2").arg(ar->attrName(), cb->currentText());
 
             QString valStr = dynamic_cast<QLineEdit*>(m_ui->table->cellWidget(ar->id(), 2))->text();
             Function f = static_cast<Function>(cb->currentData().toInt());

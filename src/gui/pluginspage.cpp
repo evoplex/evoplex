@@ -42,7 +42,7 @@ PluginsPage::PluginsPage(MainGUI* mainGUI)
 
     m_innerWindow->setStyleSheet("QMainWindow { background-color: rgb(24,24,24); }");
     m_innerWindow->setCentralWidget(m_ui->table);
-    m_ui->dockBrowser->setTitleBarWidget(0);
+    m_ui->dockBrowser->setTitleBarWidget(nullptr);
     m_innerWindow->addDockWidget(Qt::RightDockWidgetArea, m_ui->dockBrowser);
     m_ui->iwLayout->addWidget(m_innerWindow);
 
@@ -184,7 +184,7 @@ void PluginsPage::insertRow(const Plugin* plugin)
 
 bool ButtonHoverWatcher::eventFilter(QObject* watched, QEvent* event)
 {
-    QPushButton * button = qobject_cast<QPushButton*>(watched);
+    auto button = qobject_cast<QPushButton*>(watched);
     if (!button) {
         return false;
     } else if (event->type() == QEvent::Enter) { // hovered

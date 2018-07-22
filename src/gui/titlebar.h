@@ -35,7 +35,7 @@ class TitleBar : public QWidget
     Q_OBJECT
 
 public:
-    explicit TitleBar(ExperimentPtr exp, QDockWidget* parent);
+    explicit TitleBar(const Experiment* exp, QDockWidget* parent);
     ~TitleBar();
 
 signals:

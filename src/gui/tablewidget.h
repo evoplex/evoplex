@@ -57,7 +57,7 @@ public:
     void init(ExperimentsMgr* expMgr);
 
     int insertRow(Experiment* exp);
-    void insertColumns(const QList<Header> headers);
+    void insertColumns(const QList<Header>& headers);
 
 public slots:
     void removeRow(int row);

@@ -36,7 +36,7 @@ class NodesGeneratorDlg : public QDialog
     Q_OBJECT
 
 public:
-    explicit NodesGeneratorDlg(QWidget* parent, const AttributesScope& nodeAttrsScope, QString cmd = "");
+    explicit NodesGeneratorDlg(QWidget* parent, const AttributesScope& nodeAttrsScope, const QString& cmd = "");
     ~NodesGeneratorDlg();
 
     QString readCommand();

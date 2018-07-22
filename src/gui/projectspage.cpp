@@ -108,7 +108,7 @@ void ProjectsPage::addProjectWidget(ProjectPtr project)
     slotFocusChanged(pw);
     emit (isEmpty(false));
 
-    std::weak_ptr<Project> wProj = project;
+    ProjectWPtr wProj = project;
 
     //connect(m_contextMenu, SIGNAL(openView(int)), wp, SLOT(slotOpenView(int)));
     connect(pw, SIGNAL(hasUnsavedChanges(int)), SIGNAL(hasUnsavedChanges(int)));

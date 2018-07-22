@@ -29,14 +29,15 @@
 namespace evoplex {
 
 TableWidget::TableWidget(QWidget *parent)
-    : QTableWidget(parent)
-    , kIcon_check(QPixmap(":/icons/check.svg").scaledToWidth(14, Qt::SmoothTransformation))
-    , kIcon_play(QPixmap(":/icons/play-circle.svg").scaledToWidth(28, Qt::SmoothTransformation))
-    , kIcon_playon(QPixmap(":/icons/play-circle-on.svg").scaledToWidth(28, Qt::SmoothTransformation))
-    , kIcon_pause(QPixmap(":/icons/pause-circle.svg").scaledToWidth(28, Qt::SmoothTransformation))
-    , kIcon_pauseon(QPixmap(":/icons/pause-circle-on.svg").scaledToWidth(28, Qt::SmoothTransformation))
-    , kIcon_x(QPixmap(":/icons/x.svg").scaledToWidth(14, Qt::SmoothTransformation))
-    , kPen_blue(QPen(QBrush(QColor(66,133,244)), 3))
+    : QTableWidget(parent),
+      kIcon_check(QPixmap(":/icons/check.svg").scaledToWidth(14, Qt::SmoothTransformation)),
+      kIcon_play(QPixmap(":/icons/play-circle.svg").scaledToWidth(28, Qt::SmoothTransformation)),
+      kIcon_playon(QPixmap(":/icons/play-circle-on.svg").scaledToWidth(28, Qt::SmoothTransformation)),
+      kIcon_pause(QPixmap(":/icons/pause-circle.svg").scaledToWidth(28, Qt::SmoothTransformation)),
+      kIcon_pauseon(QPixmap(":/icons/pause-circle-on.svg").scaledToWidth(28, Qt::SmoothTransformation)),
+      kIcon_x(QPixmap(":/icons/x.svg").scaledToWidth(14, Qt::SmoothTransformation)),
+      kPen_blue(QPen(QBrush(QColor(66,133,244)), 3)),
+      m_expMgr(nullptr)
 {
     setMouseTracking(true);
 
@@ -95,7 +96,7 @@ void TableWidget::init(ExperimentsMgr* expMgr)
     connect(m_expMgr, SIGNAL(progressUpdated()), viewport(), SLOT(update()));
 }
 
-void TableWidget::insertColumns(const QList<Header> headers)
+void TableWidget::insertColumns(const QList<Header>& headers)
 {
     Q_ASSERT_X(headers.at(0) == H_BUTTON, "TableWidget::insertColumns",
              "the toggle button MUST be in the first column");
@@ -138,9 +139,8 @@ void TableWidget::onItemClicked(QTableWidgetItem* item)
     if (!item || item->column() != 0)
         return; // it's not the button
 
-    Experiment* exp = item->data(Qt::UserRole).value<Experiment*>();
-    if (exp)
-        exp->toggle();
+    auto exp = item->data(Qt::UserRole).value<Experiment*>();
+    if (exp) exp->toggle();
 }
 
 void TableWidget::removeRow(int row)

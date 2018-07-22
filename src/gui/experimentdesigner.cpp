@@ -188,7 +188,7 @@ ExperimentDesigner::ExperimentDesigner(MainApp* mainApp, QWidget *parent)
     for (const ModelPlugin* m : m_mainApp->models()) { slotPluginAdded(m); }
     connect(m_mainApp, SIGNAL(pluginAdded(const Plugin*)),
             SLOT(slotPluginAdded(const Plugin*)));
-    connect(m_mainApp, SIGNAL(pluginRemoved(QString, PluginType)),
+    connect(m_mainApp, SIGNAL(pluginRemoved(QString,PluginType)),
             SLOT(slotPluginRemoved(QString,PluginType)));
 }
 
@@ -354,7 +354,9 @@ void ExperimentDesigner::slotOutputWidget()
         for (auto& it : ow->caches()) outputs.insert(it.second->output());
 
         QString outputStr;
-        for (OutputPtr o : outputs) outputStr += o->printableHeader('_', true) + ";";
+        for (auto const& o : outputs) {
+            outputStr += o->printableHeader('_', true) + ";";
+        }
         outputStr.chop(1);
 
         m_widgetFields.value(OUTPUT_HEADER).value<QLineEdit*>()->setText(outputStr);
@@ -603,7 +605,7 @@ void ExperimentDesigner::addPluginAttrs(QTreeWidgetItem* tree, const Plugin* plu
         case AttributeRange::String_Set: {
             const SetOfValues* sov = dynamic_cast<const SetOfValues*>(attrRange);
             QComboBox* cb = new QComboBox();
-            for (Value v : sov->values()) {
+            for (const Value& v : sov->values()) {
                 cb->addItem(v.toQString());
             }
             widget = cb;

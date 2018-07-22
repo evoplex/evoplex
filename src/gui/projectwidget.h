@@ -77,7 +77,8 @@ private:
 
     void fillRow(int row, const ExperimentPtr& exp);
 
-    void insertItem(int row, TableWidget::Header header, QString label, QString tooltip="");
+    void insertItem(int row, TableWidget::Header header,
+                    const QString& label, const QString& tooltip="");
 };
 }
 #endif // PROJECTWIDGET_H

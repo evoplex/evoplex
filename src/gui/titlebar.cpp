@@ -26,19 +26,18 @@
 
 namespace evoplex {
 
-TitleBar::TitleBar(ExperimentPtr exp, QDockWidget* parent)
+TitleBar::TitleBar(const Experiment* exp, QDockWidget* parent)
     : QWidget(parent)
     , m_ui(new Ui_TitleBar)
-    , m_exp(exp)
 {
     m_ui->setupUi(this);
     setFocusPolicy(Qt::StrongFocus);
     setStyleSheet("background-color:rgb(40,40,40);");
 
-    connect(m_exp.get(), SIGNAL(restarted()), SLOT(slotRestarted()));
+    connect(exp, SIGNAL(restarted()), SLOT(slotRestarted()));
     slotRestarted(); // init
 
-    QStyle* style = qApp->style();
+    QStyle* style = QApplication::style();
     m_ui->bClose->setIcon(style->standardIcon(QStyle::SP_TitleBarCloseButton));
     m_ui->bFloat->setIcon(style->standardIcon(QStyle::SP_TitleBarNormalButton));
     connect(m_ui->bClose, SIGNAL(clicked(bool)), parent, SLOT(close()));

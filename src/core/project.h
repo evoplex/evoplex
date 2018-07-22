@@ -34,6 +34,7 @@ namespace evoplex {
 
 class Project;
 using ProjectPtr = std::shared_ptr<Project>;
+using ProjectWPtr = std::weak_ptr<Project>;
 using Experiments = std::map<int, ExperimentPtr>;
 
 class Project : public QObject, public std::enable_shared_from_this<Project>

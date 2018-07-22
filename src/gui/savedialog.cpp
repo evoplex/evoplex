@@ -41,7 +41,7 @@ SaveDialog::SaveDialog(QWidget *parent)
         ProjectPtr p = m_currProject.lock();
         if (p) {
             p->setFilePath(QString("%1/%2.csv")
-                    .arg(m_ui->dest->text()).arg(m_ui->pname->text()));
+                    .arg(m_ui->dest->text(), m_ui->pname->text()));
             save(p);
         }
     });

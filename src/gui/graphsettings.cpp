@@ -62,7 +62,7 @@ void GraphSettings::init()
     // node stuff
     m_ui->nodeAttr->clear();
     m_ui->nodeCMapName->clear();
-    for (QString attrName : m_modelPlugin->nodeAttrNames()) {
+    for (const QString& attrName : m_modelPlugin->nodeAttrNames()) {
         m_ui->nodeAttr->addItem(attrName);
     }
     m_ui->nodeCMapName->insertItems(0, m_cmMgr->names());
@@ -74,7 +74,7 @@ void GraphSettings::init()
     // edge stuff
     m_ui->edgeAttr->clear();
     m_ui->edgeCMapName->clear();
-    for (QString attrName : m_modelPlugin->edgeAttrNames()) {
+    for (const QString& attrName : m_modelPlugin->edgeAttrNames()) {
         m_ui->edgeAttr->addItem(attrName);
     }
     m_ui->edgeCMapName->insertItems(0, m_cmMgr->names());

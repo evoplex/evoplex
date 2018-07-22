@@ -40,10 +40,10 @@ OutputWidget::OutputWidget(const ModelPlugin* modelPlugin, const std::vector<int
     connect(m_ui->bBox, &QDialogButtonBox::accepted, [this]() { slotClose(false); });
     connect(m_ui->bBox, &QDialogButtonBox::rejected, [this]() { slotClose(true); });
 
-    for (QString funcName : DefaultOutput::availableFunctions()) {
+    for (const QString& funcName : DefaultOutput::availableFunctions()) {
         m_ui->func->addItem(funcName, DefaultFunc);
     }
-    for (QString funcName : m_modelPlugin->customOutputs()) {
+    for (const QString& funcName : m_modelPlugin->customOutputs()) {
         m_ui->func->addItem(funcName, CustomFunc);
     }
 
@@ -69,7 +69,7 @@ OutputWidget::OutputWidget(const ModelPlugin* modelPlugin, const std::vector<int
             const QString entityStr = df->entity() == DefaultOutput::E_Nodes
                                     ? m_ui->entityNode->text() : m_ui->entityEdge->text();
 
-            for (Value input : cache->inputs()) {
+            for (const Value& input : cache->inputs()) {
                 RowInfo rowInfo;
                 rowInfo.id = m_ui->table->rowCount();
                 rowInfo.equalToId = rowInfo.id == rootId ? -1 : rootId;
@@ -77,7 +77,7 @@ OutputWidget::OutputWidget(const ModelPlugin* modelPlugin, const std::vector<int
                           df->attrRange()->attrName(), input.toQString());
             }
         } else if (std::dynamic_pointer_cast<CustomOutput>(cache->output())) {
-            for (Value func : cache->inputs()) {
+            for (const Value& func : cache->inputs()) {
                 RowInfo rowInfo;
                 rowInfo.id = m_ui->table->rowCount();
                 rowInfo.equalToId = rowInfo.id == rootId ? -1 : rootId;
@@ -180,13 +180,13 @@ void OutputWidget::slotEntityChanged(bool isNode)
     if (isNode) {
         m_currEntity = DefaultOutput::E_Nodes;
         m_currEntityStr = m_ui->entityNode->text();
-        for (QString n : m_modelPlugin->nodeAttrNames()) {
+        for (const QString& n : m_modelPlugin->nodeAttrNames()) {
             m_ui->attr->addItem(n);
         }
     } else {
         m_currEntity = DefaultOutput::E_Edges;
         m_currEntityStr = m_ui->entityEdge->text();
-        for (QString n : m_modelPlugin->edgeAttrNames()) {
+        for (const QString& n : m_modelPlugin->edgeAttrNames()) {
             m_ui->attr->addItem(n);
         }
     }

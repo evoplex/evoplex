@@ -61,7 +61,7 @@ GraphWidget::GraphWidget(MainGUI* mainGUI, ExperimentPtr exp, ExperimentWidget* 
     front->setFocusPolicy(Qt::StrongFocus);
     setWidget(front);
 
-    TitleBar* titleBar = new TitleBar(exp, this);
+    TitleBar* titleBar = new TitleBar(exp.get(), this);
     setTitleBarWidget(titleBar);
     connect(titleBar, SIGNAL(openSettingsDlg()), m_settingsDlg, SLOT(show()));
     connect(titleBar, SIGNAL(trialSelected(int)), SLOT(setTrial(int)));

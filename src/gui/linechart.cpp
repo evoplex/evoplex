@@ -53,7 +53,7 @@ LineChart::LineChart(ExperimentPtr exp, QWidget* parent)
     m_settingsDlg->setupUi(dlg);
     connect(m_settingsDlg->bEditSeries, SIGNAL(clicked(bool)), SLOT(slotOutputWidget()));
 
-    TitleBar* titleBar = new TitleBar(m_exp, this);
+    TitleBar* titleBar = new TitleBar(m_exp.get(), this);
     setTitleBarWidget(titleBar);
     setTrial(0); // init
     connect(titleBar, SIGNAL(trialSelected(int)), SLOT(setTrial(int)));
