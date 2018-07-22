@@ -236,8 +236,8 @@ AttributeRange::AttributeRange(int id, const QString& attrName, Type type)
 SingleValue::SingleValue(int id, const QString& attrName, Type type)
     : AttributeRange(id, attrName, type)
 {
-    m_min = Value(QString(""));
-    m_max = Value(QString(""));
+    m_min = Value("");
+    m_max = Value("");
 
     switch (m_type) {
     case Bool:

@@ -96,13 +96,14 @@ QString Value::toQString(char format, int precision) const
 Value& Value::operator=(const Value& v)
 {
     if(this != &v) { // check for self-assignment
+        if (m_type == STRING) { delete [] m_data.s; }
         m_type = v.m_type;
         switch (m_type) {
         case INT: m_data.i = v.m_data.i; break;
         case DOUBLE: m_data.d = v.m_data.d; break;
         case BOOL: m_data.b = v.m_data.b; break;
         case CHAR: m_data.c = v.m_data.c; break;
-        case STRING: m_data.s = qstrdup(v.toString()); break;
+        case STRING: m_data.s = qstrdup(v.m_data.s); break;
         case INVALID: /* nothing-to-copy */ break;
         }
     }

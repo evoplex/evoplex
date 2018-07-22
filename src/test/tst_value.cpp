@@ -337,6 +337,13 @@ void TestValue::tst_valueString()
     QCOMPARE(Value(vString), vString);
     QCOMPARE(Value(vString).isString(), true);
     QCOMPARE(Value(vString).toString(), "evoplex");
+    Value vCopy = v3;
+    QCOMPARE(vCopy, v3);
+    Value vCopy2 = Value("");
+    QCOMPARE(vCopy2, Value(""));
+    Value vCopy3("aaaa");
+    vCopy3 = Value("");
+    QCOMPARE(vCopy3, Value(""));
 }
 
 QTEST_MAIN(TestValue)
