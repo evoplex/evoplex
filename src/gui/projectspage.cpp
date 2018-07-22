@@ -64,14 +64,16 @@ ProjectsPage::~ProjectsPage()
 
 void ProjectsPage::slotFocusChanged(QDockWidget* dw)
 {
-    m_activeProject.clear();
     PPageDockWidget* pdw = qobject_cast<PPageDockWidget*>(dw);
     if (pdw) {
         pdw->clearSelection();
         m_activeProject = pdw->project();
         m_expDesigner->setActiveWidget(pdw);
+        emit (activeProjectChanged(m_activeProject->id()));
+    } else {
+        m_activeProject = nullptr;
+        emit (activeProjectChanged(-1));
     }
-    emit (activeProjectChanged(m_activeProject));
 }
 
 void ProjectsPage::slotFocusChanged(QWidget*, QWidget* now)
@@ -106,18 +108,23 @@ void ProjectsPage::addProjectWidget(ProjectPtr project)
     slotFocusChanged(pw);
     emit (isEmpty(false));
 
+    std::weak_ptr<Project> wProj = project;
+
     //connect(m_contextMenu, SIGNAL(openView(int)), wp, SLOT(slotOpenView(int)));
-    connect(pw, SIGNAL(hasUnsavedChanges(ProjectPtr)), SIGNAL(hasUnsavedChanges(ProjectPtr)));
+    connect(pw, SIGNAL(hasUnsavedChanges(int)), SIGNAL(hasUnsavedChanges(int)));
 
-    connect(pw, &ProjectWidget::openExperiment, [this, project](int expId) {
-        slotOpenExperiment(project->experiment(expId));
+    connect(pw, &ProjectWidget::openExperiment, [this, wProj](int expId) {
+        ProjectPtr proj = wProj.lock();
+        if (proj) slotOpenExperiment(proj->experiment(expId));
     });
 
-    connect(pw, &ProjectWidget::expSelectionChanged, [this, project](int expId) {
-        m_expDesigner->setExperiment(project->experiment(expId));
+    connect(pw, &ProjectWidget::expSelectionChanged, [this, wProj](int expId) {
+        ProjectPtr proj = wProj.lock();
+        if (proj) m_expDesigner->setExperiment(proj->experiment(expId));
     });
 
-    connect(pw, &ProjectWidget::closed, [this, pw, project]() {       
+    connect(pw, &ProjectWidget::closed, [this, pw]() {
+        ProjectPtr project = pw->project();
         for (ExperimentWidget* ew : m_expWidgets) {
             if (ew->project() == project) {
                 ew->close();
@@ -129,8 +136,8 @@ void ProjectsPage::addProjectWidget(ProjectPtr project)
         m_mainApp->closeProject(project->id());
         pw->deleteLater();
         if (m_projWidgets.isEmpty()) {
-            m_activeProject.clear();
-            emit (activeProjectChanged(m_activeProject));
+            m_activeProject = nullptr;
+            emit (activeProjectChanged(-1));
         }
     });
 
@@ -143,7 +150,7 @@ bool ProjectsPage::slotNewProject()
 {
     QString error;
     ProjectPtr p = m_mainApp->newProject(error);
-    if (p.isNull()) {
+    if (p) {
         QMessageBox::warning(this, "Evoplex", error);
         return false;
     }
@@ -162,7 +169,7 @@ bool ProjectsPage::slotOpenProject(QString path)
 
     QString error;
     ProjectPtr project = m_mainApp->newProject(error, path);
-    if (project.isNull()) {
+    if (!project) {
         QMessageBox::critical(this, "Evoplex", error);
         return false;
     } else if (!error.isEmpty()) {
@@ -199,7 +206,7 @@ void ProjectsPage::slotOpenExperiment(ExperimentPtr exp)
     if (!ew) {
         ew = new ExperimentWidget(exp, m_mainGUI, this);
         std::weak_ptr<Experiment> wExp = exp;
-        connect(exp->project().data(), &Project::expRemoved, [findEW, wExp](int expId) {
+        connect(exp->project().get(), &Project::expRemoved, [findEW, wExp](int expId) {
             ExperimentPtr exp = wExp.lock();
             if (exp && expId == exp->id()) {
                 auto ew = findEW(exp);

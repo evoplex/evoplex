@@ -21,9 +21,10 @@
 #ifndef PROJECT_H
 #define PROJECT_H
 
+#include <memory>
+
 #include <QMutex>
 #include <QObject>
-#include <QEnableSharedFromThis>
 
 #include "abstractmodel.h"
 #include "experiment.h"
@@ -32,10 +33,10 @@
 namespace evoplex {
 
 class Project;
-using ProjectPtr = QSharedPointer<Project>;
+using ProjectPtr = std::shared_ptr<Project>;
 using Experiments = std::map<int, ExperimentPtr>;
 
-class Project : public QObject, public QEnableSharedFromThis<Project>
+class Project : public QObject, public std::enable_shared_from_this<Project>
 {
     Q_OBJECT
 

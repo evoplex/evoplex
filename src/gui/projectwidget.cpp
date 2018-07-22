@@ -47,9 +47,9 @@ ProjectWidget::ProjectWidget(ProjectPtr project, MainGUI* mainGUI, ProjectsPage*
 
     m_ui->labelExps->setFont(FontStyles::subtitle1());
 
-    connect(m_project.data(), SIGNAL(expAdded(int)), SLOT(slotInsertRow(int)));
-    connect(m_project.data(), SIGNAL(expEdited(int)), SLOT(slotUpdateRow(int)));
-    connect(m_project.data(), SIGNAL(expRemoved(int)), SLOT(slotRemoveRow(int)));
+    connect(m_project.get(), SIGNAL(expAdded(int)), SLOT(slotInsertRow(int)));
+    connect(m_project.get(), SIGNAL(expEdited(int)), SLOT(slotUpdateRow(int)));
+    connect(m_project.get(), SIGNAL(expRemoved(int)), SLOT(slotRemoveRow(int)));
 
     int col = 0;
     m_headerIdx.insert(TableWidget::H_BUTTON, col++);
@@ -68,7 +68,7 @@ ProjectWidget::ProjectWidget(ProjectPtr project, MainGUI* mainGUI, ProjectsPage*
     connect(m_ui->table, SIGNAL(itemDoubleClicked(QTableWidgetItem*)),
             SLOT(onItemDoubleClicked(QTableWidgetItem*)));
 
-    connect(m_project.data(), SIGNAL(hasUnsavedChanges(bool)),
+    connect(m_project.get(), SIGNAL(hasUnsavedChanges(bool)),
             SLOT(slotHasUnsavedChanges(bool)));
 }
 
@@ -207,7 +207,7 @@ void ProjectWidget::slotHasUnsavedChanges(bool b)
 {
     setObjectName(m_project->name());
     setWindowTitle(objectName() + (b ? "*" : ""));
-    emit (hasUnsavedChanges(m_project));
+    emit (hasUnsavedChanges(m_project->id()));
 }
 
 void ProjectWidget::clearSelection()

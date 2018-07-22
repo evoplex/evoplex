@@ -231,7 +231,7 @@ void ExperimentDesigner::slotSetActiveWidget(int idx)
         dw->show();
         dw->raise();
     } else {
-        m_project.clear();
+        m_project = nullptr;
     }
 }
 

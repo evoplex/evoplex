@@ -30,18 +30,20 @@
 namespace evoplex {
 
 SaveDialog::SaveDialog(QWidget *parent)
-    : QDialog(parent)
-    , m_ui(new Ui::SaveDialog)
-    , m_currProject(nullptr)
+    : QDialog(parent),
+      m_ui(new Ui::SaveDialog)
 {
     m_ui->setupUi(this);
 
     connect(m_ui->browse, SIGNAL(clicked(bool)), SLOT(browseDir()));
     connect(m_ui->btn, SIGNAL(rejected()), SLOT(hide()));
     connect(m_ui->btn, &QDialogButtonBox::accepted, [this]() {
-        m_currProject->setFilePath(QString("%1/%2.csv")
-                .arg(m_ui->dest->text()).arg(m_ui->pname->text()));
-        save(m_currProject);
+        ProjectPtr p = m_currProject.lock();
+        if (p) {
+            p->setFilePath(QString("%1/%2.csv")
+                    .arg(m_ui->dest->text()).arg(m_ui->pname->text()));
+            save(p);
+        }
     });
 }
 

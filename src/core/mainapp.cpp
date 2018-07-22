@@ -93,6 +93,7 @@ MainApp::~MainApp()
     m_expMgr = nullptr;
     Utils::deleteAndShrink(m_models);
     Utils::deleteAndShrink(m_graphs);
+    Utils::deleteAndShrink(m_generalAttrsScope);
 }
 
 void MainApp::resetSettingsToDefault()
@@ -232,7 +233,7 @@ ProjectPtr MainApp::newProject(QString& error, const QString& filepath)
     }
 
     const int projectId = static_cast<int>(m_projects.size());
-    ProjectPtr project = ProjectPtr::create(this, projectId);
+    ProjectPtr project = std::make_shared<Project>(this, projectId);
     project->init(error, filepath);
     m_projects.insert({projectId, project});
     return project;
@@ -242,7 +243,6 @@ void MainApp::closeProject(int projId)
 {
     auto it = m_projects.find(projId);
     if (it != m_projects.end()) {
-        (*it).second.clear();
         m_projects.erase(it);
     }
 }
@@ -259,8 +259,10 @@ void MainApp::addPathToRecentProjects(const QString& projectFilePath)
     emit (listOfRecentProjectsUpdated());
 }
 
-ProjectPtr MainApp::project(int projId) const {
-    return m_projects.at(projId);
+ProjectPtr MainApp::project(int projId) const
+{
+    auto it = m_projects.find(projId);
+    return (it != m_projects.end()) ? (*it).second : nullptr;
 }
 
 } // evoplex

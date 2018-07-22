@@ -53,7 +53,6 @@ Experiment::~Experiment()
                "Experiment", "tried to delete a running experiment");
     m_outputs.clear();
     delete m_inputs;
-    m_project.clear();
 }
 
 void Experiment::deleteTrials()
@@ -81,7 +80,7 @@ bool Experiment::setInputs(ExpInputs* inputs, QString& error)
     m_modelPlugin = m_mainApp->model(m_inputs->general(GENERAL_ATTRIBUTE_MODELID).toQString());
 
     // a few asserts for critical things that should never happen!
-    Q_ASSERT_X(this == m_project.data()->experiment(m_id).get(),
+    Q_ASSERT_X(this == m_project.lock()->experiment(m_id).get(),
         "Experiment", "an experiment must be aware of its parent project!");
     Q_ASSERT_X(m_id == inputs->general(GENERAL_ATTRIBUTE_EXPID).toInt(),
         "Experiment", "mismatched experiment id!");
@@ -148,7 +147,7 @@ bool Experiment::reset(QString* error)
         erroMsg = "Tried to reset a running experiment.\n"
                   "Please, pause it and try again.";
     } else if (m_expStatus == Status::Disabled) {
-        enable();
+        enable(erroMsg);
     }
 
     if (!erroMsg.isEmpty()) {
@@ -178,9 +177,17 @@ bool Experiment::reset(QString* error)
     return true;
 }
 
-void Experiment::enable()
+void Experiment::enable(QString& error)
 {
     Q_ASSERT(m_inputs && m_expStatus == Status::Disabled);
+
+    ProjectPtr project = m_project.lock();
+    if (!project) {
+        error += "experiment does not belong to a valid project";
+        m_expStatus = Status::Invalid;
+        emit (statusChanged(m_expStatus));
+        return;
+    }
 
     if (m_inputs->fileCaches().empty()) {
         return; // nothing to do
@@ -188,7 +195,7 @@ void Experiment::enable()
 
     m_filePathPrefix = QString("%1/%2_e%3_t")
             .arg(m_inputs->general(OUTPUT_DIR).toQString())
-            .arg(m_project.data()->name())
+            .arg(project->name())
             .arg(m_id);
 
     m_outputs.clear();
@@ -336,7 +343,7 @@ bool Experiment::createNodes(Nodes& nodes) const
         error = QString("unable to create the trials."
                          "The set of nodes could not be created.\n %1 \n"
                          "Project: %2 Experiment: %3")
-                         .arg(error).arg(m_project.data()->name()).arg(m_id);
+                         .arg(error).arg(m_project.lock()->name()).arg(m_id);
         qWarning() << error;
         return false;
     }

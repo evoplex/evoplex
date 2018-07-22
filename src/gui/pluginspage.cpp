@@ -66,6 +66,7 @@ PluginsPage::~PluginsPage()
     QSettings s;
     s.setValue("gui/pluginsPageGeometry", m_innerWindow->saveGeometry());
     s.setValue("gui/pluginsPageState", m_innerWindow->saveState());
+    delete m_ui;
 }
 
 void PluginsPage::rowSelectionChanged()

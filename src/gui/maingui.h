@@ -55,7 +55,7 @@ signals:
     void openProject(QString path);
 
 private slots:
-    void updateSaveButtons(ProjectPtr proj);
+    void updateSaveButtons(int projId);
     void slotPage(QAction* action);
     void slotSave();
     void slotSaveAs();

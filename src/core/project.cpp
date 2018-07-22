@@ -96,7 +96,7 @@ ExperimentPtr Project::newExperiment(ExpInputs* inputs, QString& error)
         return nullptr;
     }
 
-    ExperimentPtr exp = std::make_shared<Experiment>(m_mainApp, expId, sharedFromThis());
+    ExperimentPtr exp = std::make_shared<Experiment>(m_mainApp, expId, shared_from_this());
     m_experiments.insert({expId, exp});
     exp->setInputs(inputs, error);
 

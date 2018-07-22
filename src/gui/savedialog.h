@@ -45,7 +45,7 @@ private slots:
 
 private:
     Ui_SaveDialog* m_ui;
-    ProjectPtr m_currProject;
+    std::weak_ptr<Project> m_currProject;
 };
 }
 #endif // SAVEDIALOG_H

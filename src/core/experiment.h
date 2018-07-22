@@ -21,12 +21,12 @@
 #ifndef EXPERIMENT_H
 #define EXPERIMENT_H
 
+#include <memory>
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
 
 #include <QMutex>
-#include <QEnableSharedFromThis>
 
 #include "constants.h"
 #include "enum.h"
@@ -135,7 +135,7 @@ private:
     QMutex m_mutex;
     MainApp* m_mainApp;
     const int m_id;
-    QWeakPointer<Project> m_project;
+    std::weak_ptr<Project> m_project;
 
     const ExpInputs* m_inputs;
     const GraphPlugin* m_graphPlugin;
@@ -179,7 +179,7 @@ private:
     void expFinished();
 
     // auxiliary method to initialize the experiment
-    void enable();
+    void enable(QString& error);
 
     // set experiment status and emit statusChanged()
     // this IS thread-safe
@@ -236,7 +236,7 @@ inline int Experiment::id() const
 { return m_id; }
 
 inline ProjectPtr Experiment::project() const
-{ return m_project.toStrongRef(); }
+{ return m_project.lock(); }
 
 inline int Experiment::numTrials() const
 { return m_numTrials; }

@@ -56,7 +56,7 @@ protected:
 signals:
     void expSelectionChanged(int expId);
     void openExperiment(int expId);
-    void hasUnsavedChanges(ProjectPtr project);
+    void hasUnsavedChanges(int projId);
 
 public slots:
     void slotInsertRow(int expId);

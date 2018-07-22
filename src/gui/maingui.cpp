@@ -168,8 +168,8 @@ MainGUI::MainGUI(MainApp* mainApp)
     m_actSaveAs = new QAction("Save as", this);
     m_actSaveAs->setEnabled(false);
     connect(m_actSaveAs, SIGNAL(triggered(bool)), this, SLOT(slotSaveAs()));
-    connect(m_projectsPage, SIGNAL(activeProjectChanged(ProjectPtr)), SLOT(updateSaveButtons(ProjectPtr)));
-    connect(m_projectsPage, SIGNAL(hasUnsavedChanges(ProjectPtr)), SLOT(updateSaveButtons(ProjectPtr)));
+    connect(m_projectsPage, SIGNAL(activeProjectChanged(int)), SLOT(updateSaveButtons(int)));
+    connect(m_projectsPage, SIGNAL(hasUnsavedChanges(int)), SLOT(updateSaveButtons(int)));
 
     QAction* actQuit = new QAction("Quit", this);
     connect(actQuit, SIGNAL(triggered(bool)), this, SLOT(close()));
@@ -261,8 +261,9 @@ void MainGUI::setPageVisible(Page page, bool visible)
     }
 }
 
-void MainGUI::updateSaveButtons(ProjectPtr proj)
+void MainGUI::updateSaveButtons(int projId)
 {
+    ProjectPtr proj = m_mainApp->project(projId);
     if (proj) {
         m_actSave->setEnabled(proj->hasUnsavedChanges());
         m_actSaveAs->setEnabled(true);

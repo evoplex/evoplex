@@ -40,7 +40,7 @@ class ModelPlugin;
 class Project;
 class Plugin;
 
-using ProjectPtr = QSharedPointer<Project>;
+using ProjectPtr = std::shared_ptr<Project>;
 
 class MainApp : public QObject
 {

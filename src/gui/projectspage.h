@@ -45,9 +45,9 @@ public:
     inline const QVector<ProjectWidget*> projWidgets() const { return m_projWidgets; }
 
 signals:
-    void activeProjectChanged(ProjectPtr);
+    void activeProjectChanged(int);
     void isEmpty(bool empty);
-    void hasUnsavedChanges(ProjectPtr);
+    void hasUnsavedChanges(int);
 
 public slots:
     bool slotNewProject();
