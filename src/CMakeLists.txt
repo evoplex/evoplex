@@ -57,7 +57,7 @@ else()
   )
 endif()
 
-target_link_libraries(${PROJECT_NAME} PUBLIC EvoplexCore EvoplexGUI)
+target_link_libraries(${PROJECT_NAME} PRIVATE EvoplexCore EvoplexGUI Qt5::Widgets)
 
 install(TARGETS ${PROJECT_NAME}
   RUNTIME DESTINATION "${EVOPLEX_INSTALL_RUNTIME}"

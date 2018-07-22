@@ -121,11 +121,11 @@ void TestNode::tst_Node()
         _tst_degree(node);
     };
 
-    UNode* unode = new UNode(key, id, attrs, x, y);
-    tests(unode);
+    std::unique_ptr<UNode> unode(new UNode(key, id, attrs, x, y));
+    tests(unode.get());
 
-    DNode* dnode = new DNode(key, id, attrs, x, y);
-    tests(dnode);
+    std::unique_ptr<DNode> dnode(new DNode(key, id, attrs, x, y));
+    tests(dnode.get());
 }
 
 } // evoplex

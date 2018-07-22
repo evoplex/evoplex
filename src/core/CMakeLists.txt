@@ -77,7 +77,7 @@ set(EVOPLEX_CORE_CXX
 )
 
 add_library(EvoplexCore STATIC ${EVOPLEX_CORE_CXX})
-target_link_libraries(EvoplexCore Qt5::Core Qt5::Concurrent)
+target_link_libraries(EvoplexCore PRIVATE Qt5::Core Qt5::Concurrent)
 
 set_target_properties(EvoplexCore PROPERTIES
   ARCHIVE_OUTPUT_DIRECTORY ${EVOPLEX_OUTPUT_ARCHIVE}

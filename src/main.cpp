@@ -82,11 +82,11 @@ int main(int argc, char* argv[])
     int result = -1;
     QApplication* app = qobject_cast<QApplication*>(coreApp.data());
     if (app) {
-        QFontDatabase::addApplicationFont(":/fonts/fonts/Roboto/Roboto-Regular.ttf");
-        QFontDatabase::addApplicationFont(":/fonts/fonts/Roboto/Roboto-Bold.ttf");
-        QFontDatabase::addApplicationFont(":/fonts/fonts/Roboto/Roboto-Italic.ttf");
-        QFontDatabase::addApplicationFont(":/fonts/fonts/Roboto/Roboto-Light.ttf");
-        QFontDatabase::addApplicationFont(":/fonts/fonts/Roboto/Roboto-Medium.ttf");
+        QStringList roboto = { "Regular", "Bold", "Italic", "Light", "Medium" };
+        for (const QString& f : roboto) {
+            int r = QFontDatabase::addApplicationFont(":/fonts/fonts/Roboto/Roboto-"+f+".ttf");
+            if (r < 0) { qWarning() << "unable to add font: Roboto-" + f; }
+        };
         QFont font("Roboto Regular");
         font.setPixelSize(14); // body 2
         font.setLetterSpacing(QFont::AbsoluteSpacing, 0.25);
@@ -94,15 +94,15 @@ int main(int argc, char* argv[])
         app->setFont(font);
 
         QPixmap pixmap(":icons/splash.svg");
-        QSplashScreen* splash = new QSplashScreen(pixmap, Qt::WindowStaysOnTopHint);
+        QSplashScreen splash(pixmap, Qt::WindowStaysOnTopHint);
         QFont splashFont = qApp->font();
         splashFont.setPixelSize(12);
-        splash->setFont(splashFont);
+        splash.setFont(splashFont);
 
-        splash->show();
+        splash.show();
         app->processEvents();
 
-        splash->showMessage(QString("%1\n%2").arg(copyright).arg(authors),
+        splash.showMessage(QString("%1\n%2").arg(copyright).arg(authors),
                             Qt::AlignHCenter | Qt::AlignBottom, QColor(66,133,244));
 
         // start GUI application
@@ -132,7 +132,7 @@ int main(int argc, char* argv[])
         }
 
         evoplex::MainGUI gui(&mainApp);
-        splash->finish(&gui);
+        splash.finish(&gui);
         gui.show();
         result = app->exec();
     } else {

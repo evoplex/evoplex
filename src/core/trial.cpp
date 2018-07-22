@@ -65,8 +65,11 @@ bool Trial::init()
     }
 
     Nodes nodes = m_exp->cloneCachedNodes(m_id);
-    if (nodes.empty() && !m_exp->createNodes(nodes)) {
-        return false;
+    if (nodes.empty()) {
+        nodes = m_exp->createNodes();
+        if (nodes.empty()) {
+            return false;
+        }
     }
 
     const quint16 seed = static_cast<quint16>(m_exp->inputs()->general(GENERAL_ATTRIBUTE_SEED).toInt());

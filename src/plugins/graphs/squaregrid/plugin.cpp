@@ -92,7 +92,7 @@ void SquareGrid::createPeriodicEdges(const int id, edgesFunc func)
 
         int nId = linearIdx(neighbor, m_width);
         Q_ASSERT_X(nId < numNodes(), "SquareGrid::createEdges", "neighbor must exist");
-        addEdge(node(id), node(nId), new Attributes());
+        addEdge(id, nId, new Attributes());
     }
 }
 
@@ -106,7 +106,7 @@ void SquareGrid::createFixedEdges(const int id, edgesFunc func)
         }
         int nId = linearIdx(neighbor, m_width);
         Q_ASSERT_X(nId < numNodes(), "SquareGrid::createEdges", "neighbor must exist");
-        addEdge(node(id), node(nId), new Attributes());
+        addEdge(id, nId, new Attributes());
     }
 }
 

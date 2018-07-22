@@ -66,7 +66,15 @@ public:
     // this method IS thread-safe
     bool setInputs(ExpInputs* inputs, QString& error);
 
+    // It disables the experiment, ie, removes all trials and
+    // cached outputs, and sets the status to Disabled.
+    // It only has effect if the experiment is not runnning.
+    // Returns true if successfull.
     bool disable(QString* error=nullptr);
+
+    // It invalidates the experiment, ie, it pauses the experiment,
+    // disable it and set the status to Invalid.
+    void invalidate();
 
     bool reset(QString*error=nullptr);
 
@@ -78,7 +86,7 @@ public:
     void playNext();
 
     // create a set of nodes for the current inputs
-    bool createNodes(Nodes& nodes) const;
+    Nodes createNodes() const;
 
     bool removeOutput(OutputPtr output);
     OutputPtr searchOutput(const OutputPtr find);

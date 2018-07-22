@@ -24,7 +24,7 @@ function(add_plugins ROOT_DIR PLUGINS)
     set(ARCHIVE_DEST "${EVOPLEX_OUTPUT_ARCHIVE}plugins")
     set(LIBRARY_DEST "${EVOPLEX_OUTPUT_LIBRARY}plugins")
     add_library(${PLUGIN_NAME} SHARED ${ROOT_DIR}/${PLUGIN}/plugin.cpp)
-    target_link_libraries(${PLUGIN_NAME} EvoplexCore Qt5::Core)
+    target_link_libraries(${PLUGIN_NAME} PRIVATE EvoplexCore Qt5::Core)
     set_target_properties(${PLUGIN_NAME} PROPERTIES
         ARCHIVE_OUTPUT_DIRECTORY ${ARCHIVE_DEST}
         ARCHIVE_OUTPUT_DIRECTORY_DEBUG ${ARCHIVE_DEST}

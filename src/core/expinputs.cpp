@@ -77,7 +77,7 @@ ExpInputs* ExpInputs::parse(const MainApp* mainApp, const QStringList& header,
     }
 
     Plugins plugins = findPlugins(mainApp, header, values, errMsg);
-    if (!errMsg.isEmpty()) {
+    if (!plugins.first || !plugins.second || !errMsg.isEmpty()) {
         return nullptr;
     }
 
@@ -182,11 +182,7 @@ void ExpInputs::parseAttrs(const MainApp* mainApp, Plugins plugins,
             }
 
             if (pluginAttrs) {
-                Value value;
-                if (attrRange) {
-                    value = attrRange->validate(vStr);
-                }
-
+                Value value = attrRange ? attrRange->validate(vStr) : Value();
                 if (value.isValid()) {
                     pluginAttrs->replace(attrRange->id(), attrName, value);
                 } else {

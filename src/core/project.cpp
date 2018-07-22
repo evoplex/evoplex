@@ -42,10 +42,7 @@ Project::Project(MainApp* mainApp, int id)
 Project::~Project()
 {
     for (auto& e : m_experiments) {
-        m_mainApp->expMgr()->remove(e.second);
-        e.second->setAutoDeleteTrials(true);
-        e.second->setExpStatus(Status::Invalid);
-        e.second->pause();
+        e.second->invalidate();
     }
     m_experiments.clear();
 }
@@ -123,10 +120,7 @@ bool Project::removeExperiment(int expId, QString& error)
     }
 
     emit (expRemoved(expId));
-    m_mainApp->expMgr()->remove(exp);
-    exp->setAutoDeleteTrials(true);
-    exp->setExpStatus(Status::Invalid);
-    exp->pause();
+    exp->invalidate();
 
     m_hasUnsavedChanges = true;
     emit (hasUnsavedChanges(m_hasUnsavedChanges));

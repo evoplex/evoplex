@@ -55,6 +55,16 @@ Experiment::~Experiment()
     delete m_inputs;
 }
 
+void Experiment::invalidate()
+{
+    if (!disable()) {
+        m_mainApp->expMgr()->remove(shared_from_this());
+        setAutoDeleteTrials(true);
+        pause();
+    }
+    setExpStatus(Status::Invalid);
+}
+
 void Experiment::deleteTrials()
 {
     for (auto& trial : m_trials) {
@@ -124,7 +134,7 @@ bool Experiment::disable(QString* error)
         return false;
     }
 
-    m_mainApp->expMgr()->removeFromIdle(shared_from_this());
+    m_mainApp->expMgr()->remove(shared_from_this());
 
     deleteTrials();
     m_outputs.clear();
@@ -333,23 +343,22 @@ Nodes Experiment::cloneCachedNodes(const int trialId)
     return nodes;
 }
 
-bool Experiment::createNodes(Nodes& nodes) const
+Nodes Experiment::createNodes() const
 {
     const QString& cmd = m_inputs->general(GENERAL_ATTRIBUTE_NODES).toQString();
 
     QString error;
-    nodes = Nodes::fromCmd(cmd, m_modelPlugin->nodeAttrsScope(), m_graphType, error);
+    Nodes nodes = Nodes::fromCmd(cmd, m_modelPlugin->nodeAttrsScope(), m_graphType, error);
     if (nodes.empty() || !error.isEmpty()) {
         error = QString("unable to create the trials."
                          "The set of nodes could not be created.\n %1 \n"
                          "Project: %2 Experiment: %3")
                          .arg(error).arg(m_project.lock()->name()).arg(m_id);
         qWarning() << error;
-        return false;
     }
 
     Q_ASSERT_X(nodes.size() <= EVOPLEX_MAX_NODES, "Experiment", "too many nodes to handle!");
-    return true;
+    return nodes;
 }
 
 bool Experiment::removeOutput(OutputPtr output)
