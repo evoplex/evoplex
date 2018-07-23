@@ -106,7 +106,7 @@ ExpInputs* ExpInputs::parse(const MainApp* mainApp, const QStringList& header,
 
     if (!failedAttrs.isEmpty()) {
         failedAttrs.removeDuplicates();
-        errMsg += QString("The following attributes are missing/invalid: %1").arg(failedAttrs.join(","));
+        errMsg += QString("The following attributes are missing or invalid: %1").arg(failedAttrs.join(","));
     }
 
     return ei; // return the object, even if it has invalid/missing attrs

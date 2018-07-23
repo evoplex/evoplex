@@ -150,7 +150,7 @@ bool ProjectsPage::slotNewProject()
 {
     QString error;
     ProjectPtr p = m_mainApp->newProject(error);
-    if (p) {
+    if (!p) {
         QMessageBox::warning(this, "Evoplex", error);
         return false;
     }

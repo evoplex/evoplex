@@ -36,9 +36,12 @@ class ModelPlugin : public Plugin
 public:
     virtual ~ModelPlugin();
 
-    inline const QVector<QString>& customOutputs() const;
+    // the supported graphIds for this model
+    // if empty, any graph is supported
     inline const QVector<QString>& supportedGraphs() const;
     inline bool graphIsSupported(const QString& graphId) const;
+
+    inline const QVector<QString>& customOutputs() const;
 
     inline const std::vector<QString>& nodeAttrNames() const;
     inline const AttributesScope& nodeAttrsScope() const;

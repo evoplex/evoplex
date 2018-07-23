@@ -173,11 +173,11 @@ bool Trial::runSteps()
     while (m_step < exp->pauseAt() && hasNext) {
         hasNext = m_model->algorithmStep();
         ++m_step;
-/*
+
         for (const OutputPtr& output : exp->m_outputs) {
             output->doOperation(this);
         }
-*/
+
         if (m_step % exp->m_mainApp->stepsToFlush() == 0 && !writeCachedSteps(exp)) {
             m_status = Status::Invalid;
             return false;

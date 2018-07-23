@@ -47,14 +47,18 @@ ModelPlugin::ModelPlugin(const QJsonObject* metaData, const QString& libPath)
         return;
     }
 
-    for (QJsonValueRef v : metaData->value(PLUGIN_ATTRIBUTE_SUPPORTEDGRAPHS).toArray()) {
+    QJsonArray supportedGraphs = metaData->value(PLUGIN_ATTRIBUTE_SUPPORTEDGRAPHS).toArray();
+    m_supportedGraphs.reserve(supportedGraphs.size());
+    for (QJsonValueRef v : supportedGraphs) {
         QString graphId = v.toString();
         if(!graphId.isEmpty()) {
             m_supportedGraphs.push_back(graphId);
         }
     }
 
-    for (QJsonValueRef v : metaData->value(PLUGIN_ATTRIBUTE_CUSTOMOUTPUTS).toArray()) {
+    QJsonArray customOutputs = metaData->value(PLUGIN_ATTRIBUTE_CUSTOMOUTPUTS).toArray();
+    m_customOutputs.reserve(customOutputs.size());
+    for (QJsonValueRef v : customOutputs) {
         QString function = v.toString();
         if(!function.isEmpty()) {
             m_customOutputs.push_back(function);

@@ -124,6 +124,7 @@ bool Value::operator==(const Value& v) const
     case STRING: return strcmp (m_data.s, v.m_data.s) == 0;
     case INVALID: return m_type == v.m_type;
     }
+    throw std::invalid_argument("invalid type of Value");
 }
 
 bool Value::operator!=(const Value& v) const
@@ -140,6 +141,7 @@ bool Value::operator!=(const Value& v) const
     case STRING: return strcmp (m_data.s, v.m_data.s) != 0;
     case INVALID: return m_type != v.m_type;
     }
+    throw std::invalid_argument("invalid type of Value");
 }
 
 bool Value::operator<(const Value& v) const

@@ -60,56 +60,8 @@
 #define PLUGIN_ATTRIBUTE_NODESCOPE "nodeAttributesScope"    // domain of the node's attributes
 #define PLUGIN_ATTRIBUTE_EDGESCOPE "edgeAttributesScope"    // domain of the edge's attributes
 #define PLUGIN_ATTRIBUTE_CUSTOMOUTPUTS "customOutputs"      // custom outputs defined in the model
-#define PLUGIN_ATTRIBUTE_SUPPORTEDGRAPHS "supportedGraphs"  // graphIds allowed in the model
+#define PLUGIN_ATTRIBUTE_SUPPORTEDGRAPHS "supportedGraphs"  // graphIds allowed in the model; empty to allow all graphs
 // graph (only)
 #define PLUGIN_ATTRIBUTE_VALIDGRAPHTYPES "validGraphTypes"  // valid graph types of a graph generator
-
-/******************************************************************************
-    Compiler version and architecture
-******************************************************************************/
-// stringfy intergers
-#define STR_HELPER(x) #x
-#define STR(x) STR_HELPER(x)
-// version
-#if defined __clang__
-    #define COMPILER_VERSION "Clang " STR(__clang_major__) "." STR(__clang_minor__) "." STR(__clang_patchlevel__)
-# elif defined __GNUC__
-    #ifdef __MINGW32__
-        #define COMPILER_NAME "MinGW GCC "
-    #else
-        #define COMPILER_NAME "GCC "
-    #endif
-    #define COMPILER_VERSION COMPILER_NAME STR(__GNUC__) "." STR(__GNUC_MINOR__) "." STR(__GNUC_PATCHLEVEL__)
-#elif defined _MSC_VER
-    #if _MSC_VER == 1600
-        #define COMPILER_VERSION "MSVC++ 10.0 (Visual Studio 2010)"
-    #elif _MSC_VER == 1700
-        #define COMPILER_VERSION "MSVC++ 11.0 (Visual Studio 2012)"
-    #elif _MSC_VER == 1800
-        #define COMPILER_VERSION "MSVC++ 12.0 (Visual Studio 2013)"
-    #elif _MSC_VER == 1900
-        #define COMPILER_VERSION "MSVC++ 14.0 (Visual Studio 2015)"
-    #elif _MSC_VER == 1910
-        #define COMPILER_VERSION "MSVC++ 14.1 (Visual Studio 2017 v15.0)"
-    #elif _MSC_VER == 1911
-        #define COMPILER_VERSION "MSVC++ 14.11 (Visual Studio 2017 v15.3)"
-    #elif _MSC_VER == 1912
-        #define COMPILER_VERSION "MSVC++ 14.12 (Visual Studio 2017 v15.5)"
-    #elif _MSC_VER == 1913
-        #define COMPILER_VERSION "MSVC++ 14.13 (Visual Studio 2017 v15.6)"
-    #elif _MSC_VER == 1914
-        #define COMPILER_VERSION "MSVC++ 14.14 (Visual Studio 2017 v15.7)"
-    #else
-        #define COMPILER_VERSION "Unknown MSVC++ version " STR(_MSC_VER)
-    #endif
-#else
-    #define COMPILER_VERSION "Unknown"
-#endif
-// architecture
-#if defined(__LP64__) || defined(_WIN64)
-    #define COMPILER_ARCHITECTURE "64-bit"
-#else
-    #define COMPILER_ARCHITECTURE "32-bit"
-#endif
 
 #endif // CONSTANTS_H

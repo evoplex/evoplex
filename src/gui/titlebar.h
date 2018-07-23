@@ -50,7 +50,7 @@ protected:
 
 private:
     Ui_TitleBar* m_ui;
-    ExperimentPtr m_exp;
+    const Experiment* m_exp;
 };
 }
 

@@ -9,6 +9,7 @@
 - Improves threads management
 - Improves TableWidget performance
 - Fixes #7 - Checks for running experiments before closing a project
+- Fixes #8 - Allows deleting an experiment
 
 * Thu Jun 21 2018 Marcos Cardinot <marcos@cardinot.net> - 0.1.0-alpha0
 - First public release
