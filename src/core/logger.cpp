@@ -138,7 +138,7 @@ void Logger::init()
         writeLog("Windows version too old to get memory info.");
     }
 
-    HKEY hKey = NULL;
+    HKEY hKey = nullptr;
     DWORD dwType = REG_DWORD;
     DWORD numVal = 0;
     DWORD dwSize = sizeof(numVal);
@@ -153,7 +153,7 @@ void Logger::init()
                     0, KEY_QUERY_VALUE, &hKey);
 
         if(lRet == ERROR_SUCCESS) {
-            if(RegQueryValueExA(hKey, "~MHz", NULL, &dwType, (LPBYTE)&numVal, &dwSize) == ERROR_SUCCESS) {
+            if(RegQueryValueExA(hKey, "~MHz", nullptr, &dwType, (LPBYTE)&numVal, &dwSize) == ERROR_SUCCESS) {
                 writeLog(QString("Processor speed: %1 MHz").arg(numVal));
             } else {
                 writeLog("Could not get processor speed.");
@@ -166,8 +166,8 @@ void Logger::init()
         DWORD nameSize = sizeof(nameStr);
 
         if (lRet == ERROR_SUCCESS) {
-            if (RegQueryValueExA(hKey, "ProcessorNameString", NULL, &dwType, (LPBYTE)&nameStr, &nameSize) == ERROR_SUCCESS) {
-                writeLog("Processor name: " % nameStr);
+            if (RegQueryValueExA(hKey, "ProcessorNameString", nullptr, &dwType, (LPBYTE)&nameStr, &nameSize) == ERROR_SUCCESS) {
+                writeLog(QString("Processor name: %1").arg(nameStr));
             } else {
                 writeLog("Could not get processor name.");
             }

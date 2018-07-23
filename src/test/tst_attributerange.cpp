@@ -438,8 +438,11 @@ void TestAttributeRange::tst_filepath()
     const AttributeRange::Type type = AttributeRange::FilePath;
     AttrRngPtr attrRgePtr(AttributeRange::parse(0, attrName, attrRangeStr));
     AttributeRange* attrRge = attrRgePtr.get();
-
+#ifdef Q_OS_WIN
+    const QString existing = QDir::current().absoluteFilePath("tst_attributerange.exe");
+#else
     const QString existing = QDir::current().absoluteFilePath("tst_attributerange");
+#endif
     const QString missing = QDir::current().absoluteFilePath("none123");
 
     std::vector<std::pair<QString, Value>> vals = {
