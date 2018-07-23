@@ -376,15 +376,14 @@ void TestAttrsGenerator::tst_parseHashCmd_setValue(){
     AttributeRange* attrRges[4] = {col0, col1, col2, col3};
 
     // To shorten line:
-    QStringList x = {
+    QStringList cmdList = {
         Value(sizeOfAgen).toQString(),
-        names.at(0),
-        names.at(1),
-        names.at(2),
-        names.at(3)
+        QString("%1_value_%2").arg(names.at(0)).arg(values[0].toQString()),
+        QString("%1_value_%2").arg(names.at(1)).arg(values[1].toQString()),
+        QString("%1_value_%2").arg(names.at(2)).arg(values[2].toQString()),
+        QString("%1_value_%2").arg(names.at(3)).arg(values[3].toQString())
     };
-
-    cmd = QString("#%1;%2_value_%3;%4_value_%5;%6_value_%7;%8_value_%9").arg(x[0]).arg(x[1]).arg(values[0].toQString()).arg(x[2]).arg(values[1].toQString()).arg(x[3]).arg(values[2].toQString()).arg(x[4]).arg(values[3].toQString());
+    cmd = QString("#%1;%2;%3;%4;%5").arg(cmdList.at(0)).arg(cmdList.at(1)).arg(cmdList.at(2)).arg(cmdList.at(3)).arg(cmdList.at(4));
     agen = AttrsGenerator::parse(attrsScope, cmd, error);
 
     attrs.resize(4);
@@ -398,9 +397,6 @@ void TestAttrsGenerator::tst_parseHashCmd_setValue(){
     res = agen->create();
 
     _tst_attrs(res, attrs, true);
-    for(int i = 0; i < res.size(); i++){
-
-    }
 }
 
 void TestAttrsGenerator::tst_parseHashCmd_mixedFunc(){
