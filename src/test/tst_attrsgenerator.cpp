@@ -31,8 +31,6 @@ class TestAttrsGenerator: public QObject
 private slots:
     void initTestCase() {}
     void cleanupTestCase() {}
-    void tst_parseStarCmd();
-    void tst_parseHashCmd();
     void tst_parseStarCmd_min();
     void tst_parseStarCmd_max();
     void tst_parseStarCmd_rand();
@@ -49,8 +47,14 @@ void TestAttrsGenerator::_tst_attrs(SetOfAttributes res, Attributes attrs, bool 
 {
     for(int i = 0; i < res.size(); i++){
         QCOMPARE(res.at(i).names(), attrs.names());
-        if(testValues) QCOMPARE(res.at(i).values(), attrs.values());
         QCOMPARE(res.at(i).size(), attrs.size());
+
+        if(testValues){
+            QCOMPARE(res.at(i).values(), attrs.values());
+            for(int j = 0; j < attrs.size(); j++){
+                QCOMPARE(res.at(i).value(j), attrs.value(j));
+            }
+        }
     }
 }
 
@@ -84,7 +88,7 @@ void TestAttrsGenerator::tst_parseStarCmd_min(){
     AttrsGenerator* agen;
     QStringList names = {"test0", "test1", "test2"};
     QStringList attrRgeStrs = {"int[0,2]", "double[2.3,7.8]", "int{-2,0,2,4,6}"};
-    SetOfAttributes res, res_sameFuncForAll;
+    SetOfAttributes res;
     Attributes attrs;
     int sizeOfAgen = 3;
 
@@ -129,7 +133,7 @@ void TestAttrsGenerator::tst_parseStarCmd_max(){
     AttrsGenerator* agen;
     QStringList names = {"test0", "test1", "test2"};
     QStringList attrRgeStrs = {"int[0,2]", "double[2.3,7.8]", "int{-2,0,2,4,6}"};
-    SetOfAttributes res, res_sameFuncForAll;
+    SetOfAttributes res;
     Attributes attrs;
     int sizeOfAgen = 3;
 
@@ -174,7 +178,7 @@ void TestAttrsGenerator::tst_parseStarCmd_rand(){
     AttrsGenerator* agen;
     QStringList names = {"test0", "test1", "test2"};
     QStringList attrRgeStrs = {"int[0,2]", "double[2.3,7.8]", "int{-2,0,2,4,6}"};
-    SetOfAttributes res, res_sameFuncForAll;
+    SetOfAttributes res;
     Attributes attrs;
     int sizeOfAgen = 3;
 
@@ -213,34 +217,13 @@ void TestAttrsGenerator::tst_parseStarCmd_rand(){
     _tst_mode(res, "rand", attrRges, 3);
 }
 
-void TestAttrsGenerator::tst_parseStarCmd()
-{
-
-
-    // - same mode for all attributes:
-    //         '*integer;[min|max|rand_seed]'
-
-
-
-    // Potential cases:
-    // - agen->command() should return the same 'cmd' string passed through the parser()
-    // - agen->size() should return the same number of 'cmd'
-
-
-    // use the create() function to create the set of attributes.
-    // Each element is an 'Attributes' object
-    // our aim is to check if 'cmd' is able to generate a SetOfAttributes with the correct data
-    // SetOfAttributes res = agen->create();
-
-}
-
 void TestAttrsGenerator::tst_parseHashCmd_min(){
     QString error, cmd;
     AttributesScope attrsScope;
     AttrsGenerator* agen;
     QStringList names = {"test0", "test1", "test2", "test3"};
     QStringList attrRgeStrs = {"int[0,2]", "double[2.3,7.8]", "int{-2,0,2,4,6}", "double{-2.2, -1.1, 0, 2.3}"};
-    SetOfAttributes res, res_sameFuncForAll;
+    SetOfAttributes res;
     Attributes attrs;
     int sizeOfAgen = 3;
 
@@ -256,19 +239,19 @@ void TestAttrsGenerator::tst_parseHashCmd_min(){
     AttributeRange* attrRges[4] = {col0, col1, col2, col3};
 
     // To shorten line:
-    QStringList x = {
+    QStringList cmdList = {
         Value(sizeOfAgen).toQString(),
-        names.at(0),
-        names.at(1),
-        names.at(2),
-        names.at(3)
+        QString("%1_min").arg(names.at(0)),
+        QString("%1_min").arg(names.at(1)),
+        QString("%1_min").arg(names.at(2)),
+        QString("%1_min").arg(names.at(3))
     };
-    cmd = QString("#%1;%2_min;%3_min;%4_min;%5_min").arg(x[0]).arg(x[1]).arg(x[2]).arg(x[3]).arg(x[4]);
+    cmd = QString("#%1;%2;%3;%4;%5").arg(cmdList.at(0)).arg(cmdList.at(1)).arg(cmdList.at(2)).arg(cmdList.at(3)).arg(cmdList.at(4));
     agen = AttrsGenerator::parse(attrsScope, cmd, error);
 
     attrs.resize(4);
     for(int i = 0; i < attrs.size(); i++){
-        attrs.replace(i, names.at(i), NULL);
+        attrs.replace(i, names.at(i), attrRges[i]->min());
     }
 
     QCOMPARE(agen->command(), cmd);
@@ -276,8 +259,7 @@ void TestAttrsGenerator::tst_parseHashCmd_min(){
 
     res = agen->create();
 
-    _tst_attrs(res, attrs, false);
-    _tst_mode(res, "min", attrRges, 4);
+    _tst_attrs(res, attrs, true);
 }
 
 void TestAttrsGenerator::tst_parseHashCmd_max(){
@@ -416,11 +398,9 @@ void TestAttrsGenerator::tst_parseHashCmd_setValue(){
 
     res = agen->create();
 
-    _tst_attrs(res, attrs, false);
+    _tst_attrs(res, attrs, true);
     for(int i = 0; i < res.size(); i++){
-        for(int j = 0; j < 4; j++){
-            QCOMPARE(res.at(i).value(j), attrs.value(j));
-        }
+
     }
 }
 
@@ -476,31 +456,6 @@ void TestAttrsGenerator::tst_parseHashCmd_mixedFunc(){
         QVERIFY(res.at(i).value(2) >= attrRges[2]->min());
         QCOMPARE(res.at(i).value(3), attrs.value(3));
     }
-}
-
-void TestAttrsGenerator::tst_parseHashCmd()
-{
-    QString error;
-
-    // - specific mode for each attribute:
-    //       '#integer;attrName_[min|max|rand_seed|value_val];...'
-    /*
-    AttributesScope attrsScope =
-    QString cmd =
-    AttrsGenerator* AttrsGenerator::parse(attrsScope,cmd, error);
-    */
-    /** IMPORTANT: this function is likely to be very long,
-     * if so, consider breaking into smaller functions
-     * (perhaps tst_parseStarHash_min(), tst_parseHashCmd_max() ...) **/
-
-    // Potential cases:
-    // - AttrsGenerator::command() should return the same 'cmd' string passed through the parser()
-    // - AttrsGenerator::size() should return the same number of 'cmd'
-
-    // use the create() function to create the set of attributes.
-    // Each element is an Attributes object
-    // our aim is to check if 'cmd' is able to generate a SetOfAttributes with the correct data
-    // SetOfAttributes res = agen->create();
 }
 
 } // evoplex
