@@ -82,7 +82,8 @@ void TestAttrsGenerator::_tst_mode(SetOfAttributes res, QString mode, AttributeR
     }
 }
 
-void TestAttrsGenerator::tst_parseStarCmd_min(){
+void TestAttrsGenerator::tst_parseStarCmd_min()
+{
     QString error, cmd;
     AttributesScope attrsScope;
     AttrsGenerator* agen;
@@ -127,7 +128,8 @@ void TestAttrsGenerator::tst_parseStarCmd_min(){
     _tst_mode(res, "min", attrRges, 3);
 }
 
-void TestAttrsGenerator::tst_parseStarCmd_max(){
+void TestAttrsGenerator::tst_parseStarCmd_max()
+{
     QString error, cmd;
     AttributesScope attrsScope;
     AttrsGenerator* agen;
@@ -172,7 +174,8 @@ void TestAttrsGenerator::tst_parseStarCmd_max(){
     _tst_mode(res, "max", attrRges, 3);
 }
 
-void TestAttrsGenerator::tst_parseStarCmd_rand(){
+void TestAttrsGenerator::tst_parseStarCmd_rand()
+{
     QString error, cmd;
     AttributesScope attrsScope;
     AttrsGenerator* agen;
@@ -217,7 +220,8 @@ void TestAttrsGenerator::tst_parseStarCmd_rand(){
     _tst_mode(res, "rand", attrRges, 3);
 }
 
-void TestAttrsGenerator::tst_parseHashCmd_min(){
+void TestAttrsGenerator::tst_parseHashCmd_min()
+{
     QString error, cmd;
     AttributesScope attrsScope;
     AttrsGenerator* agen;
@@ -262,7 +266,8 @@ void TestAttrsGenerator::tst_parseHashCmd_min(){
     _tst_attrs(res, attrs, true);
 }
 
-void TestAttrsGenerator::tst_parseHashCmd_max(){
+void TestAttrsGenerator::tst_parseHashCmd_max()
+{
     QString error, cmd;
     AttributesScope attrsScope;
     AttrsGenerator* agen;
@@ -307,7 +312,8 @@ void TestAttrsGenerator::tst_parseHashCmd_max(){
     _tst_attrs(res, attrs, true);
 }
 
-void TestAttrsGenerator::tst_parseHashCmd_rand(){
+void TestAttrsGenerator::tst_parseHashCmd_rand()
+{
     QString error, cmd;
     AttributesScope attrsScope;
     AttrsGenerator* agen;
@@ -353,7 +359,8 @@ void TestAttrsGenerator::tst_parseHashCmd_rand(){
     _tst_mode(res, "rand", attrRges, 4);
 }
 
-void TestAttrsGenerator::tst_parseHashCmd_setValue(){
+void TestAttrsGenerator::tst_parseHashCmd_setValue()
+{
     QString error, cmd;
     AttributesScope attrsScope;
     AttrsGenerator* agen;
@@ -399,7 +406,8 @@ void TestAttrsGenerator::tst_parseHashCmd_setValue(){
     _tst_attrs(res, attrs, true);
 }
 
-void TestAttrsGenerator::tst_parseHashCmd_mixedFunc(){
+void TestAttrsGenerator::tst_parseHashCmd_mixedFunc()
+{
     QString error, cmd;
     AttributesScope attrsScope;
     AttrsGenerator* agen;
