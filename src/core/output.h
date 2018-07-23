@@ -72,14 +72,14 @@ private:
     std::unordered_map<int, Data> m_trials;
 
     // let's keep it private to ensure that only Output can create a Cache
-    explicit Cache(Values inputs, std::vector<int> trialIds, OutputPtr parent);
+    explicit Cache(const Values& inputs, const std::vector<int>& trialIds, OutputPtr parent);
 };
 
 class Output : public std::enable_shared_from_this<Output>
 {
 public:
     static std::vector<Cache*> parseHeader(const QStringList& header,
-        const std::vector<int> trialIds, const ModelPlugin* model, QString& errorMsg);
+        const std::vector<int>& trialIds, const ModelPlugin* model, QString& errorMsg);
 
     static QString printableHeader(const QString& prefix, const Values& inputs,
                                    const char sep, const bool joinInputs);
@@ -99,7 +99,7 @@ public:
 
     virtual bool operator==(const OutputPtr output) const = 0;
 
-    Cache* addCache(Values inputs, const std::vector<int> trialIds);
+    Cache* addCache(const Values& inputs, const std::vector<int>& trialIds);
 
     // CAUTION! We trust it will NEVER be called in a running experiment.
     // Make sure it is paused first.

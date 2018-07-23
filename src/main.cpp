@@ -25,6 +25,7 @@
 #include <QDir>
 #include <QFontDatabase>
 #include <QScopedPointer>
+#include <QStringBuilder>
 #include <QSplashScreen>
 #include <QStyleFactory>
 
@@ -62,25 +63,26 @@ int main(int argc, char* argv[])
 
     evoplex::Logger::init();
 
-    const QString copyright = "Copyright (C) 2016-" + QDate::currentDate().toString("yyyy");
+    const QString copyright = "Copyright (C) 2016-" % QDate::currentDate().toString("yyyy");
     const QString authors = "Marcos Cardinot et al.";
-    const QString copyrightLine = copyright + " - " + authors;
-    const QString versionLine = QString("%1 %2 - %3").arg(QCoreApplication::applicationName())
-                                                     .arg(QCoreApplication::applicationVersion())
-                                                     .arg(QCoreApplication::organizationDomain());
 
-    int maxLength = qMax(versionLine.size(), copyrightLine.size());
-    qInfo() << qPrintable(QString(" %1").arg(QString().fill('-', maxLength+2)));
+    const QString copyrightLine = copyright % " - " % authors;
+    const QString versionLine = QCoreApplication::applicationName() % " " %
+                                QCoreApplication::applicationVersion() % " - " %
+                                QCoreApplication::organizationDomain();
+
+    const int maxLength = qMax(versionLine.size(), copyrightLine.size());
+    qInfo() << qPrintable(" " % QString().fill('-', maxLength+2));
     qInfo() << qPrintable(QString("[ %1 ]").arg(versionLine.leftJustified(maxLength, ' ')));
     qInfo() << qPrintable(QString("[ %1 ]").arg(copyrightLine.leftJustified(maxLength, ' ')));
-    qInfo() << qPrintable(QString(" %1").arg(QString().fill('-', maxLength+2)));
+    qInfo() << qPrintable(" " % QString().fill('-', maxLength+2));
     qInfo() << "Writing log file to:" << QDir::toNativeSeparators(evoplex::Logger::logFileName());
 
     // init application
     evoplex::MainApp mainApp;
 
     int result = -1;
-    QApplication* app = qobject_cast<QApplication*>(coreApp.data());
+    auto app = qobject_cast<QApplication*>(coreApp.data());
     if (app) {
         QStringList roboto = { "Regular", "Bold", "Italic", "Light", "Medium" };
         for (const QString& f : roboto) {
@@ -95,15 +97,12 @@ int main(int argc, char* argv[])
 
         QPixmap pixmap(":icons/splash.svg");
         QSplashScreen splash(pixmap, Qt::WindowStaysOnTopHint);
-        QFont splashFont = qApp->font();
-        splashFont.setPixelSize(12);
-        splash.setFont(splashFont);
 
         splash.show();
         app->processEvents();
 
-        splash.showMessage(QString("%1\n%2").arg(copyright).arg(authors),
-                            Qt::AlignHCenter | Qt::AlignBottom, QColor(66,133,244));
+        splash.showMessage(copyright % "\n" % authors,
+            Qt::AlignHCenter | Qt::AlignBottom, QColor(66,133,244));
 
         // start GUI application
         app->setStyle(QStyleFactory::create("Fusion"));
@@ -134,6 +133,7 @@ int main(int argc, char* argv[])
         evoplex::MainGUI gui(&mainApp);
         splash.finish(&gui);
         gui.show();
+        splash.close();
         result = app->exec();
     } else {
         // start console application

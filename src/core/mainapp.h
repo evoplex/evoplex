@@ -41,6 +41,7 @@ class Project;
 class Plugin;
 
 using ProjectPtr = std::shared_ptr<Project>;
+using ProjectWPtr = std::weak_ptr<Project>;
 
 class MainApp : public QObject
 {

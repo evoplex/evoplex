@@ -104,7 +104,7 @@ bool Trial::init()
         }
 
         // write this initial step to file
-        for (OutputPtr output : m_exp->m_outputs) {
+        for (auto const& output : m_exp->m_outputs) {
             output->doOperation(this);
         }
         writeCachedSteps(m_exp.get());
@@ -173,11 +173,11 @@ bool Trial::runSteps()
     while (m_step < exp->pauseAt() && hasNext) {
         hasNext = m_model->algorithmStep();
         ++m_step;
-
+/*
         for (const OutputPtr& output : exp->m_outputs) {
             output->doOperation(this);
         }
-
+*/
         if (m_step % exp->m_mainApp->stepsToFlush() == 0 && !writeCachedSteps(exp)) {
             m_status = Status::Invalid;
             return false;
@@ -214,7 +214,7 @@ bool Trial::writeCachedSteps(const Experiment* exp) const
         for (Cache* cache : exp->inputs()->fileCaches()) {
             Values vals = cache->readFrontRow(m_id).second;
             cache->flushFrontRow(m_id);
-            for (Value val : vals) {
+            for (auto const& val : vals) {
                 row += val.toQString() + ",";
             }
         }

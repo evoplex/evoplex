@@ -25,7 +25,7 @@
 namespace evoplex {
 
 ExpInputs::ExpInputs(Attributes* general, Attributes* graph,
-                     Attributes* model, std::vector<Cache*> caches)
+                     Attributes* model, const std::vector<Cache*>& caches)
     : m_generalAttrs(general),
       m_graphAttrs(graph),
       m_modelAttrs(model),
@@ -71,7 +71,9 @@ ExpInputs* ExpInputs::parse(const MainApp* mainApp, const QStringList& header,
     if (header.isEmpty() || values.isEmpty()) {
         errMsg += "The 'header' and 'values' cannot be empty.";
         return nullptr;
-    } else if (header.size() != values.size()) {
+    }
+
+    if (header.size() != values.size()) {
         errMsg += "The 'header' and 'values' must have the same number of elements.";
         return nullptr;
     }
@@ -118,7 +120,7 @@ ExpInputs::Plugins ExpInputs::findPlugins(const MainApp* mainApp,
     const int headerModelId = header.indexOf(GENERAL_ATTRIBUTE_MODELID);
     if (headerGraphId < 0 || headerModelId < 0) {
         errMsg += "The experiment should have both graphId and modelId.";
-        return Plugins();
+        return {};
     }
 
     // check if the model and graph are available
@@ -128,21 +130,21 @@ ExpInputs::Plugins ExpInputs::findPlugins(const MainApp* mainApp,
         errMsg += QString("The graph plugin '%1' is not available."
                           " Make sure you load it before trying to add this experiment.")
                           .arg(values.at(headerGraphId));
-        return Plugins();
+        return {};
     }
     if (!plugins.second) {
         errMsg += QString("The model plugin '%1' is not available."
                           " Make sure you load it before trying to add this experiment.")
                           .arg(values.at(headerModelId));
-        return Plugins();
+        return {};
     }
 
     // make sure that the chosen graphId is allowed in this model
     if (!plugins.second->graphIsSupported(plugins.first->id())) {
         QString supportedGraphs = plugins.second->supportedGraphs().toList().join(", ");
         errMsg = QString("The graph plugin '%1' cannot be used in this model (%2). The allowed ones are: %3")
-                         .arg(plugins.first->id()).arg(plugins.second->id()).arg(supportedGraphs);
-        return Plugins();
+                         .arg(plugins.first->id(), plugins.second->id(), supportedGraphs);
+        return {};
     }
     return plugins;
 }
@@ -201,6 +203,7 @@ void ExpInputs::parseFileCache(const ModelPlugin* mPlugin, ExpInputs* ei,
         const int numTrials = ei->m_generalAttrs->value(GENERAL_ATTRIBUTE_TRIALS).toInt();
         Q_ASSERT_X(numTrials > 0, "ExpInputs", "what? an experiment without trials?");
         std::vector<int> trialIds;
+        trialIds.reserve(static_cast<size_t>(numTrials));
         for (int i = 0; i < numTrials; ++i) {
             trialIds.emplace_back(i);
         }

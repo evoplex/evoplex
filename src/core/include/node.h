@@ -94,8 +94,8 @@ protected:
 
     struct constructor_key { /* this is a private key accessible only to friends */ };
 
-    explicit Node(const constructor_key&, int id, Attributes attrs, int x, int y);
-    explicit Node(const constructor_key& k, int id, Attributes attr);
+    explicit Node(const constructor_key&, int id, const Attributes& attrs, int x, int y);
+    explicit Node(const constructor_key& k, int id, const Attributes& attr);
     ~Node() override;
 
 private:
@@ -108,8 +108,8 @@ private:
 class UNode : public Node
 {
 public:
-    explicit UNode(const constructor_key& k, int id, Attributes attrs, int x, int y);
-    explicit UNode(const constructor_key& k, int id, Attributes attrs);
+    explicit UNode(const constructor_key& k, int id, const Attributes& attrs, int x, int y);
+    explicit UNode(const constructor_key& k, int id, const Attributes& attrs);
     ~UNode() override = default;
 
     inline NodePtr clone() const override;
@@ -131,8 +131,8 @@ private:
 class DNode : public Node
 {
 public:
-    explicit DNode(const constructor_key& k, int id, Attributes attrs, int x, int y);
-    explicit DNode(const constructor_key& k, int id, Attributes attrs);
+    explicit DNode(const constructor_key& k, int id, const Attributes& attrs, int x, int y);
+    explicit DNode(const constructor_key& k, int id, const Attributes& attrs);
     ~DNode() override = default;
 
     inline NodePtr clone() const override;

@@ -58,7 +58,7 @@ public:
 
 protected:
     explicit ExpInputs(Attributes* general, Attributes* graph,
-                       Attributes* model, std::vector<Cache*> caches);
+                       Attributes* model, const std::vector<Cache*>& caches);
 
 private:
     using Plugins = std::pair<const GraphPlugin*, const ModelPlugin*>;

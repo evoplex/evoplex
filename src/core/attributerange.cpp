@@ -19,7 +19,7 @@
  */
 
 #include <cfloat>
-#include <QDebug>
+#include <QtDebug>
 #include <QFileInfo>
 
 #include "attributerange.h"
@@ -45,7 +45,7 @@ AttributeRange* AttributeRange::parse(int attrId, const QString& attrName, const
     }
 
     if (!vs || !vs->isValid()) {
-        qWarning() << "unable to parse " << attrRangeStr;
+        qWarning() << "unable to parse" << attrRangeStr;
         delete vs;
         vs = new SingleValue();
     }
@@ -57,6 +57,7 @@ AttributeRange* AttributeRange::setOfValues(QString attrRangeStr, const int id, 
     QStringList valuesStr = attrRangeStr.remove("{").remove("}").split(",");
     Type type;
     Values values;
+    values.reserve(static_cast<size_t>(valuesStr.size()));
     bool ok = false;
     if (attrRangeStr.startsWith("int")) {
         type = AttributeRange::Int_Set;

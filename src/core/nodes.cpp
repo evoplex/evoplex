@@ -177,8 +177,9 @@ QStringList Nodes::validateHeader(const QString& header,
 
     for (const auto* attrRange : attrsScope) {
         if (!header.contains(attrRange->attrName())) {
+            const QStringList expectedAttrs = attrsScope.keys();
             error = QString("the header is imcompatible for the model.\n"
-                              "Expected attributes: %1").arg(attrsScope.keys().join(", "));
+                            "Expected attributes: %1").arg(expectedAttrs.join(", "));
             return QStringList();
         }
     }

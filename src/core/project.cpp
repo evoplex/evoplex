@@ -35,7 +35,8 @@ namespace evoplex {
 
 Project::Project(MainApp* mainApp, int id)
     : m_mainApp(mainApp),
-      m_id(id)
+      m_id(id),
+      m_hasUnsavedChanges(false)
 {
 }
 
@@ -162,7 +163,7 @@ int Project::importExperiments(const QString& filePath, QString& error)
     if (header.isEmpty()) {
         error += QString("Couldn't read the experiments from:\n'%1'\n"
                  "The header must have the following columns: %2\n")
-                 .arg(filePath).arg(m_mainApp->generalAttrsScope().keys().join(", "));
+                 .arg(filePath, m_mainApp->generalAttrsScope().keys().join(", "));
         qWarning() << error;
         return 0;
     }
@@ -214,7 +215,7 @@ bool Project::saveProject(QString& errMsg, std::function<void(int)>& progress)
     if (fi.suffix() != "csv" || !file.open(QFile::WriteOnly | QFile::Truncate)) {
         errMsg = QString("Unable to save the project '%1'.\n"
                 "Please, make sure the path below corresponds to a writable csv file!\n%2")
-                .arg(name()).arg(m_filepath);
+                .arg(name(), m_filepath);
         qWarning() << errMsg;
         return false;
     }

@@ -151,7 +151,7 @@ const Plugin* MainApp::loadPlugin(const QString& path, QString& error, const boo
     if (m_models.contains(plugin->id()) || m_graphs.contains(plugin->id())) {
         error = QString("Unable to load the plugin (%1).\n"
                     "The %2 '%3' is already being used by another plugin.")
-                    .arg(path).arg(PLUGIN_ATTRIBUTE_UID).arg(plugin->id());
+                    .arg(path, PLUGIN_ATTRIBUTE_UID, plugin->id());
         qWarning() << error;
         return nullptr;
     }
@@ -206,16 +206,15 @@ ProjectPtr MainApp::newProject(QString& error, const QString& filepath)
 {
     if (m_projects.size() > EVOPLEX_MAX_PROJECTS) {
         error = "There are too many opened projects already!";
-        qWarning() << error;
-        return nullptr;
     } else if (m_models.isEmpty()) {
         error = "There are no models available in the software.\n"
                 "Please, make sure you import the plugins you need first!";
-        qWarning() << error;
-        return nullptr;
     } else if (m_graphs.isEmpty()) {
         error = "There are no graphs available in the software.\n"
                 "Please, make sure you import the plugins you need first!";
+    }
+
+    if (!error.isEmpty()) {
         qWarning() << error;
         return nullptr;
     }
@@ -227,13 +226,12 @@ ProjectPtr MainApp::newProject(QString& error, const QString& filepath)
                     "Please, make sure it's a readable csv file!\n" + filepath;
             qWarning() << error;
             return nullptr;
-        } else {
-            addPathToRecentProjects(filepath);
         }
+        addPathToRecentProjects(filepath);
     }
 
     const int projectId = static_cast<int>(m_projects.size());
-    ProjectPtr project = std::make_shared<Project>(this, projectId);
+    auto project = std::make_shared<Project>(this, projectId);
     project->init(error, filepath);
     m_projects.insert({projectId, project});
     return project;

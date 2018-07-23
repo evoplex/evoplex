@@ -23,6 +23,7 @@
 #include <QDebug>
 #include <QProcess>
 #include <QStandardPaths>
+#include <QStringBuilder>
 #include <QSysInfo>
 #ifdef Q_OS_WIN
   #include <windows.h>
@@ -50,7 +51,7 @@ void Logger::init()
 
     m_logDateFormat = "yyyy-MM-dd_HHmmss";
     const QString currDate = QDateTime::currentDateTime().toString(m_logDateFormat);
-    const QString logFilename = m_logDir.absoluteFilePath("log_" + currDate + ".txt");
+    const QString logFilename = m_logDir.absoluteFilePath("log_" % currDate % ".txt");
     m_logFile.setFileName(logFilename);
     if (!m_logFile.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text | QIODevice::Unbuffered)) {
         qWarning() << "ERROR! Unable to write the log file." << logFilename;
@@ -60,9 +61,9 @@ void Logger::init()
     qInstallMessageHandler(Logger::debugLogHandler);
 
     writeLog(currDate);
-    writeLog(QString("Evoplex version: %1-%2").arg(EVOPLEX_VERSION).arg(EVOPLEX_RELEASE));
+    writeLog(QString("Evoplex version: %1-%2").arg(EVOPLEX_VERSION, EVOPLEX_RELEASE));
     writeLog(QString("Built on %1 (branch: %2 commit: %3)")
-            .arg(EVOPLEX_BUILDDATE).arg(EVOPLEX_GIT_BRANCH).arg(EVOPLEX_GIT_COMMIT_HASH));
+             .arg(EVOPLEX_BUILDDATE, EVOPLEX_GIT_BRANCH, EVOPLEX_GIT_COMMIT_HASH));
 
     writeLog(QString("Operating System: %1").arg(QSysInfo::prettyProductName()));
     writeLog(QString("Built with %1").arg(COMPILER_VERSION));
@@ -166,7 +167,7 @@ void Logger::init()
 
         if (lRet == ERROR_SUCCESS) {
             if (RegQueryValueExA(hKey, "ProcessorNameString", NULL, &dwType, (LPBYTE)&nameStr, &nameSize) == ERROR_SUCCESS) {
-                writeLog(QString("Processor name: %1").arg(nameStr));
+                writeLog("Processor name: " % nameStr);
             } else {
                 writeLog("Could not get processor name.");
             }
@@ -236,7 +237,7 @@ void Logger::deinit()
         }
     }
 
-    qInstallMessageHandler(0);
+    qInstallMessageHandler(nullptr);
     m_logFile.close();
 }
 
@@ -252,12 +253,12 @@ void Logger::debugLogHandler(QtMsgType type, const QMessageLogContext& ctx, cons
         classFunc.remove(0, classFunc.lastIndexOf("evoplex::") + 9);
         classFunc.remove(classFunc.lastIndexOf("("), classFunc.lastIndexOf(")"));
 
-        formattedMsg = QString("[%1] %2").arg(classFunc).arg(formattedMsg);
+        formattedMsg = "[" % classFunc  % "] " % formattedMsg;
         if (type == QtWarningMsg) {
             color = 35; // magenta
         } else if (type == QtCriticalMsg || type == QtFatalMsg) {
             color = 31; // red
-            formattedMsg = QString("%1 (%2:%3)").arg(formattedMsg).arg(ctx.file).arg(ctx.line);
+            formattedMsg = formattedMsg % " (" % ctx.file % ":" % QString::number(ctx.line) % ")";
         }
     }
 
@@ -275,7 +276,7 @@ void Logger::writeLog(QString msg)
 
     m_fileMutex.lock();
     m_logFile.write(qPrintable(msg), msg.size());
-    m_log += msg;
+    m_log = m_log % msg;
     m_fileMutex.unlock();
 }
 

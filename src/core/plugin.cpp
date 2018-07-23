@@ -62,7 +62,7 @@ bool Plugin::checkMetaData(const QJsonObject& metaData, QString& error)
     const QString uid = metaData[PLUGIN_ATTRIBUTE_UID].toString();
     if (uid.contains("_")) {
         error = QString("The %1 '%2' should not have the underscore symbol.")
-                .arg(PLUGIN_ATTRIBUTE_UID).arg(uid);
+                .arg(PLUGIN_ATTRIBUTE_UID, uid);
         return false;
     }
 

@@ -23,10 +23,6 @@
 
 namespace evoplex {
 
-AbstractModel::~AbstractModel()
-{
-}
-
 AbstractGraph* AbstractModel::graph() const
 {
     return m_trial->graph();

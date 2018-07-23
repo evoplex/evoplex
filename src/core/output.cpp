@@ -28,7 +28,7 @@
 namespace evoplex
 {
 
-Cache::Cache(Values inputs, std::vector<int> trialIds, OutputPtr parent)
+Cache::Cache(const Values& inputs, const std::vector<int>& trialIds, OutputPtr parent)
     : m_parent(parent)
     , m_inputs(inputs)
 {
@@ -74,10 +74,10 @@ DefaultOutput::DefaultOutput(const Function f, const Entity e, const AttributeRa
     , m_entity(e)
     , m_attrRange(attrRange)
 {
-    m_headerPrefix = QString("%1_%2_%3_")
-            .arg(stringFromFunc(m_func))
-            .arg((m_entity == E_Nodes ? "nodes" : "edges"))
-            .arg(m_attrRange->attrName());
+    m_headerPrefix = QString("%1_%2_%3_").arg(
+                        stringFromFunc(m_func),
+                        m_entity == E_Nodes ? "nodes" : "edges",
+                        m_attrRange->attrName());
 }
 
 void DefaultOutput::doOperation(const Trial* trial)
@@ -156,7 +156,7 @@ void Output::flushAll()
     }
 }
 
-Cache* Output::addCache(Values inputs, const std::vector<int> trialIds)
+Cache* Output::addCache(const Values& inputs, const std::vector<int>& trialIds)
 {
     Cache* cache = new Cache(inputs, trialIds, shared_from_this());
     for (int trialId : trialIds) {
@@ -211,7 +211,7 @@ void Output::updateCaches(const int trialId, const int currStep, const Values& a
         newRow.first = currStep;
         newRow.second.reserve(cache->m_inputs.size());
 
-        for (Value input : cache->m_inputs) {
+        for (const Value& input : cache->m_inputs) {
             const size_t col = std::find(m_allInputs.begin(), m_allInputs.end(), input) - m_allInputs.begin();
             newRow.second.emplace_back(allValues.at(col));
         }
@@ -231,11 +231,11 @@ QString Output::printableHeader(const QString& prefix, const Values& inputs,
     QString ret;
     if (joinInputs) {
         ret = prefix;
-        for (Value val : inputs) {
+        for (const Value& val : inputs) {
             ret += val.toQString() + sep;
         }
     } else {
-        for (Value val : inputs) {
+        for (const Value& val : inputs) {
             ret += prefix + val.toQString() + sep;
         }
     }
@@ -243,7 +243,7 @@ QString Output::printableHeader(const QString& prefix, const Values& inputs,
     return ret;
 }
 
-std::vector<Cache*> Output::parseHeader(const QStringList& header, const std::vector<int> trialIds,
+std::vector<Cache*> Output::parseHeader(const QStringList& header, const std::vector<int>& trialIds,
                                         const ModelPlugin* model, QString& errorMsg)
 {
     std::vector<Cache*> caches;
@@ -300,7 +300,7 @@ std::vector<Cache*> Output::parseHeader(const QStringList& header, const std::ve
 
         std::vector<Value> attrHeader; //inputs
         attrHeaderStr.removeFirst();
-        for (QString valStr : attrHeaderStr) {
+        for (const QString& valStr : attrHeaderStr) {
             Value val = attrRange->validate(valStr);
             if (!val.isValid()) {
                 errorMsg = QString("invalid header! Value of attribute is invalid. (%1)\n").arg(valStr);

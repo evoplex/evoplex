@@ -28,7 +28,7 @@
 
 namespace evoplex {
 
-Experiment::Experiment(MainApp* mainApp, const int id, ProjectPtr project)
+Experiment::Experiment(MainApp* mainApp, const int id, ProjectWPtr project)
     : m_mainApp(mainApp),
       m_id(id),
       m_project(project),
@@ -44,7 +44,7 @@ Experiment::Experiment(MainApp* mainApp, const int id, ProjectPtr project)
       m_delay(0),
       m_expStatus(Status::Invalid)
 {
-    Q_ASSERT_X(project, "Experiment", "an experiment must belong to a valid project");
+    Q_ASSERT_X(project.lock(), "Experiment", "an experiment must belong to a valid project");
 }
 
 Experiment::~Experiment()
@@ -170,7 +170,7 @@ bool Experiment::reset(QString* error)
     m_stopAt = m_inputs->general(GENERAL_ATTRIBUTE_STOPAT).toInt();
     setProgress(0);
 
-    for (OutputPtr o : m_outputs) {
+    for (auto const& o : m_outputs) {
         o->flushAll();
     }
 
@@ -204,8 +204,7 @@ void Experiment::enable(QString& error)
     }
 
     m_filePathPrefix = QString("%1/%2_e%3_t")
-            .arg(m_inputs->general(OUTPUT_DIR).toQString())
-            .arg(project->name())
+            .arg(m_inputs->general(OUTPUT_DIR).toQString(), project->name())
             .arg(m_id);
 
     m_outputs.clear();
@@ -236,7 +235,7 @@ void Experiment::updateProgressValue()
     for (auto const& t : m_trials) {
         p += (static_cast<float>(t.second->step()) / m_stopAt);
     }
-    quint16 newProg = static_cast<quint16>(std::ceil(p * 360.f / m_numTrials));
+    auto newProg = static_cast<quint16>(std::ceil(p * 360.f / m_numTrials));
     if (newProg != m_progress) {
         setProgress(newProg);
     }
@@ -351,9 +350,8 @@ Nodes Experiment::createNodes() const
     Nodes nodes = Nodes::fromCmd(cmd, m_modelPlugin->nodeAttrsScope(), m_graphType, error);
     if (nodes.empty() || !error.isEmpty()) {
         error = QString("unable to create the trials."
-                         "The set of nodes could not be created.\n %1 \n"
-                         "Project: %2 Experiment: %3")
-                         .arg(error).arg(m_project.lock()->name()).arg(m_id);
+                        "The set of nodes could not be created.\n %1 \n"
+                        "Experiment: %2").arg(error).arg(m_id);
         qWarning() << error;
     }
 
@@ -361,7 +359,7 @@ Nodes Experiment::createNodes() const
     return nodes;
 }
 
-bool Experiment::removeOutput(OutputPtr output)
+bool Experiment::removeOutput(const OutputPtr& output)
 {
     if (m_expStatus != Status::Paused) {
         qWarning() << "tried to remove an 'Output' from a running experiment. You should pause it first.";
@@ -383,9 +381,9 @@ bool Experiment::removeOutput(OutputPtr output)
     return true;
 }
 
-OutputPtr Experiment::searchOutput(const OutputPtr find)
+OutputPtr Experiment::searchOutput(const OutputPtr& find)
 {
-    for (OutputPtr output : m_outputs) {
+    for (auto const& output : m_outputs) {
         if (output->operator==(find)) {
             return output;
         }

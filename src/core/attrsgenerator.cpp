@@ -48,7 +48,7 @@ AttrsGenerator* AttrsGenerator::parse(const AttributesScope& attrsScope,
     if (!ok) {
         error = QString("Unable to parse '%1'.\n"
                       "'%2' should be an integer representing the size of the attributes set.")
-                      .arg(cmd).arg(sizeStr);
+                      .arg(cmd, sizeStr);
         qWarning() << error;
         return nullptr;
     }
@@ -115,10 +115,11 @@ AGDiffFunctions* AttrsGenerator::parseHashCmd(const AttributesScope& attrsScope,
         const int size, const QStringList& cmds, QString& error)
 {
     if (cmds.size() != attrsScope.size()) {
+        const QStringList expectedAttrs = attrsScope.keys();
         error = QString("Unable to parse '#%1;%2'."
                 "It should look like: '#integer;attrName_[min|max|rand_seed|value_value]'"
                 "and must contain all attributes of the current model (i.e., '%3')")
-                .arg(size).arg(cmds.join(";")).arg(attrsScope.keys().join(", "));
+                .arg(size).arg(cmds.join(";"), expectedAttrs.join(", "));
         qWarning() << error;
         return nullptr;
     }
@@ -137,7 +138,7 @@ AGDiffFunctions* AttrsGenerator::parseHashCmd(const AttributesScope& attrsScope,
         } else {
             error = QString("Unable to parse '#%1;%2'.\n"
                     "The attribute '%3' does not belong to the current model.")
-                    .arg(size).arg(cmds.join(";")).arg(attrCmd.attrName);
+                    .arg(size).arg(cmds.join(";"), attrCmd.attrName);
             qWarning() << error;
             return nullptr;
         }
@@ -145,7 +146,7 @@ AGDiffFunctions* AttrsGenerator::parseHashCmd(const AttributesScope& attrsScope,
         attrCmd.func = _enumFromString<Function>(attrCmdStr.at(1));
         if (attrCmd.func == Function::Invalid) {
             error = QString("Unable to parse '#%1;%2'.\n The function '%2' is invalid.")
-                        .arg(size).arg(cmds.join(";")).arg(attrCmdStr.at(1));
+                        .arg(size).arg(cmds.join(";"), attrCmdStr.at(1));
             qWarning() << error;
             return nullptr;
         } else if (attrCmd.func == Function::Rand) {
@@ -181,10 +182,6 @@ AttrsGenerator::AttrsGenerator(const AttributesScope& attrsScope, const int size
       m_size(size)
 {
     Q_ASSERT_X(m_size > 0, "AttrsGenerator", "number of copies must be >0");
-}
-
-AttrsGenerator::~AttrsGenerator()
-{
 }
 
 /****************************************************/
@@ -243,13 +240,13 @@ SetOfAttributes AGSameFuncForAll::create(std::function<void(int)> progress)
 /****************************************************/
 
 AGDiffFunctions::AGDiffFunctions(const AttributesScope& attrsScope, const int size,
-                                 std::vector<AttrCmd> attrCmds)
+                                 const std::vector<AttrCmd>& attrCmds)
     : AttrsGenerator(attrsScope, size),
       m_attrCmds(attrCmds)
 {
     m_command = QString("#%1").arg(m_size);
     for (const AttrCmd& cmd : m_attrCmds) {
-        m_command += QString(";%1_%2").arg(cmd.attrName).arg(_enumToString<Function>(cmd.func));
+        m_command += QString(";%1_%2").arg(cmd.attrName, _enumToString<Function>(cmd.func));
         if (cmd.funcInput.isValid()) {
             m_command += "_" + cmd.funcInput.toQString();
         }

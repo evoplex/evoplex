@@ -51,7 +51,7 @@ public:
     static AttrsGenerator* parse(const AttributesScope& attrsScope,
                                  const QString& cmd, QString& error);
 
-    virtual ~AttrsGenerator();
+    virtual ~AttrsGenerator() = default;
 
     // the source command for the AttrsGenerator object
     inline const QString& command() { return m_command; }
@@ -110,7 +110,7 @@ public:
     };
 
     explicit AGDiffFunctions(const AttributesScope& attrsScope, const int numCopies,
-                             std::vector<AttrCmd> attrCmds);
+                             const std::vector<AttrCmd>& attrCmds);
     ~AGDiffFunctions() override = default;
 
     SetOfAttributes create(std::function<void(int)> progress = [](int){}) override;

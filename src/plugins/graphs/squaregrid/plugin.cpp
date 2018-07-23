@@ -74,7 +74,7 @@ void SquareGrid::reset()
     }
 }
 
-void SquareGrid::createPeriodicEdges(const int id, edgesFunc func)
+void SquareGrid::createPeriodicEdges(const int id, const edgesFunc& func)
 {
     edges2d neighbors = func(id, m_width);
     for (std::pair<int,int> neighbor : neighbors) {
@@ -96,7 +96,7 @@ void SquareGrid::createPeriodicEdges(const int id, edgesFunc func)
     }
 }
 
-void SquareGrid::createFixedEdges(const int id, edgesFunc func)
+void SquareGrid::createFixedEdges(const int id, const edgesFunc& func)
 {
     edges2d neighbors = func(id, m_width);
     for (std::pair<int,int> neighbor : neighbors) {

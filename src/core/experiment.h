@@ -58,7 +58,7 @@ class Experiment : public QObject, public std::enable_shared_from_this<Experimen
     friend class Trial;
 
 public:
-    explicit Experiment(MainApp* mainApp, const int id, ProjectPtr project);
+    explicit Experiment(MainApp* mainApp, const int id, ProjectWPtr project);
     ~Experiment();
 
     // set the experiment inputs
@@ -88,8 +88,8 @@ public:
     // create a set of nodes for the current inputs
     Nodes createNodes() const;
 
-    bool removeOutput(OutputPtr output);
-    OutputPtr searchOutput(const OutputPtr find);
+    bool removeOutput(const OutputPtr& output);
+    OutputPtr searchOutput(const OutputPtr& find);
     inline bool hasOutputs() const;
     inline void addOutput(OutputPtr output);
 
@@ -143,7 +143,7 @@ private:
     QMutex m_mutex;
     MainApp* m_mainApp;
     const int m_id;
-    std::weak_ptr<Project> m_project;
+    ProjectWPtr m_project;
 
     const ExpInputs* m_inputs;
     const GraphPlugin* m_graphPlugin;

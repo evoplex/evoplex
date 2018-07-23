@@ -68,7 +68,7 @@ public:
 
 protected:
     AbstractModel() = default;
-    ~AbstractModel() override;
+    ~AbstractModel() override = default;
 };
 
 /************************************************************************
