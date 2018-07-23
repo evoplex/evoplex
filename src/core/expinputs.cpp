@@ -93,9 +93,10 @@ ExpInputs* ExpInputs::parse(const MainApp* mainApp, const QStringList& header,
     parseFileCache(plugins.second, ei, failedAttrs, errMsg);
 
     // make sure all attributes exist
-    auto checkAll = [&failedAttrs](const Attributes* attrs, const AttributesScope& attrsScope) {
+    auto checkAll = [&failedAttrs](Attributes* attrs, const AttributesScope& attrsScope) {
         for (const AttributeRange* attrRange : attrsScope) {
             if (!attrs->contains(attrRange->attrName())) {
+                attrs->replace(attrRange->id(), attrRange->attrName(), Value());
                 failedAttrs.append(attrRange->attrName());
             }
         }
