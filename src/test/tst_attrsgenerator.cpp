@@ -268,7 +268,7 @@ void TestAttrsGenerator::tst_parseHashCmd_max(){
     AttrsGenerator* agen;
     QStringList names = {"test0", "test1", "test2", "test3"};
     QStringList attrRgeStrs = {"int[0,2]", "double[2.3,7.8]", "int{-2,0,2,4,6}", "double{-2.2, -1.1, 0, 2.3}"};
-    SetOfAttributes res, res_sameFuncForAll;
+    SetOfAttributes res;
     Attributes attrs;
     int sizeOfAgen = 3;
 
@@ -284,19 +284,19 @@ void TestAttrsGenerator::tst_parseHashCmd_max(){
     AttributeRange* attrRges[4] = {col0, col1, col2, col3};
 
     // To shorten line:
-    QStringList x = {
+    QStringList cmdList = {
         Value(sizeOfAgen).toQString(),
-        names.at(0),
-        names.at(1),
-        names.at(2),
-        names.at(3)
+        QString("%1_max").arg(names.at(0)),
+        QString("%1_max").arg(names.at(1)),
+        QString("%1_max").arg(names.at(2)),
+        QString("%1_max").arg(names.at(3))
     };
-    cmd = QString("#%1;%2_max;%3_max;%4_max;%5_max").arg(x[0]).arg(x[1]).arg(x[2]).arg(x[3]).arg(x[4]);
+    cmd = QString("#%1;%2;%3;%4;%5").arg(cmdList.at(0)).arg(cmdList.at(1)).arg(cmdList.at(2)).arg(cmdList.at(3)).arg(cmdList.at(4));
     agen = AttrsGenerator::parse(attrsScope, cmd, error);
 
     attrs.resize(4);
     for(int i = 0; i < attrs.size(); i++){
-        attrs.replace(i, names.at(i), NULL);
+        attrs.replace(i, names.at(i), attrRges[i]->max());
     }
 
     QCOMPARE(agen->command(), cmd);
@@ -304,8 +304,7 @@ void TestAttrsGenerator::tst_parseHashCmd_max(){
 
     res = agen->create();
 
-    _tst_attrs(res, attrs, false);
-    _tst_mode(res, "max", attrRges, 4);
+    _tst_attrs(res, attrs, true);
 }
 
 void TestAttrsGenerator::tst_parseHashCmd_rand(){
