@@ -313,7 +313,7 @@ void TestAttrsGenerator::tst_parseHashCmd_rand(){
     AttrsGenerator* agen;
     QStringList names = {"test0", "test1", "test2", "test3"};
     QStringList attrRgeStrs = {"int[0,2]", "double[2.3,7.8]", "int{-2,0,2,4,6}", "double{-2.2, -1.1, 0, 2.3}"};
-    SetOfAttributes res, res_sameFuncForAll;
+    SetOfAttributes res;
     Attributes attrs;
     int sizeOfAgen = 3;
 
@@ -329,17 +329,17 @@ void TestAttrsGenerator::tst_parseHashCmd_rand(){
     AttributeRange* attrRges[4] = {col0, col1, col2, col3};
 
     // To shorten line:
-    QStringList x = {
+    QStringList cmdList = {
         Value(sizeOfAgen).toQString(),
-        names.at(0),
-        names.at(1),
-        names.at(2),
-        names.at(3)
+        QString("%1_rand_123").arg(names.at(0)),
+        QString("%1_rand_123").arg(names.at(1)),
+        QString("%1_rand_123").arg(names.at(2)),
+        QString("%1_rand_123").arg(names.at(3))
     };
-    cmd = QString("#%1;%2_rand_123;%3_rand_123;%4_rand_123;%5_rand_123").arg(x[0]).arg(x[1]).arg(x[2]).arg(x[3]).arg(x[4]);
+    cmd = QString("#%1;%2;%3;%4;%5").arg(cmdList.at(0)).arg(cmdList.at(1)).arg(cmdList.at(2)).arg(cmdList.at(3)).arg(cmdList.at(4));
+    attrs.resize(4);
     agen = AttrsGenerator::parse(attrsScope, cmd, error);
 
-    attrs.resize(4);
     for(int i = 0; i < attrs.size(); i++){
         attrs.replace(i, names.at(i), NULL);
     }
