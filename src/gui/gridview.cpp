@@ -85,9 +85,11 @@ void GridView::paintEvent(QPaintEvent*)
         QColor color;
         if (m_selectedNode == cache.node->id()) {
             color = QColor(10,10,10,100);
-        } else {
+        } else if (m_nodeAttr >= 0) {
             const Value& value = cache.node->attr(m_nodeAttr);
             color = m_nodeCMap->colorFromValue(value);
+        } else {
+            color = m_nodeCMap->colors().front();
         }
         painter.setBrush(color);
         painter.setPen(color);

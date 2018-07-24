@@ -41,7 +41,7 @@ GraphWidget::GraphWidget(MainGUI* mainGUI, ExperimentPtr exp, ExperimentWidget* 
     , m_currStep(-1)
     , m_selectedNode(-1)
     , m_zoomLevel(0)
-    , m_nodeSizeRate(10.f)
+    , m_nodeSizeRate(10.)
     , m_nodeRadius(m_nodeSizeRate)
     , m_origin(5,25)
     , m_cacheStatus(CacheStatus::Ready)
@@ -180,7 +180,7 @@ void GraphWidget::setNodeCMap(ColorMap* cmap)
     update();
 }
 
-void GraphWidget::setTrial(int trialId)
+void GraphWidget::setTrial(quint16 trialId)
 {
     m_currTrialId = trialId;
     m_trial = m_exp->trial(trialId);
@@ -258,7 +258,7 @@ void GraphWidget::updateInspector(const NodePtr& node)
 {
     m_ui->nodeId->setValue(node->id());
     m_ui->neighbors->setText(QString::number(node->outDegree()));
-    for (int id = 0; id < node->attrs().size(); ++id) {
+    for (quint16 id = 0; id < node->attrs().size(); ++id) {
         m_attrs.at(id)->setText(node->attr(id).toQString());
     }
 }

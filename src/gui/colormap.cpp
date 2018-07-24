@@ -189,8 +189,8 @@ ColorMapSet::ColorMapSet(const Colors& colors, const SetOfValues* attrRange)
 
 const QColor ColorMapSet::colorFromValue(const Value& val) const
 {
-    std::unordered_map<Value, QColor>::const_iterator i = m_cmap.find(val);
-    if (i == m_cmap.end()) {
+    const auto i = m_cmap.find(val);
+    if (i == m_cmap.cend()) {
         // qWarning() << "invalid value!" << val.toQString();
         return Qt::black;
     }

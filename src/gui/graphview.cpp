@@ -129,8 +129,12 @@ void GraphView::paintEvent(QPaintEvent*)
                 painter.drawEllipse(cache.xy, m_nodeRadius*1.5f, m_nodeRadius*1.5f);
             }
 
-            const Value& value = cache.node->attr(m_nodeAttr);
-            painter.setBrush(m_nodeCMap->colorFromValue(value));
+            if (m_nodeAttr >= 0) {
+                const Value& value = cache.node->attr(m_nodeAttr);
+                painter.setBrush(m_nodeCMap->colorFromValue(value));
+            } else {
+                painter.setBrush(m_nodeCMap->colors().front());
+            }
             painter.setPen(Qt::black);
             painter.drawEllipse(cache.xy, m_nodeRadius, m_nodeRadius);
         }

@@ -72,8 +72,8 @@ protected:
     ColorMap* m_nodeCMap;
 
     int m_zoomLevel;
-    float m_nodeSizeRate;
-    float m_nodeRadius;
+    qreal m_nodeSizeRate;
+    qreal m_nodeRadius;
     QPoint m_origin;
 
     CacheStatus m_cacheStatus;
@@ -86,7 +86,7 @@ protected:
 
 public slots:
     void updateView(bool forceUpdate);
-    void setTrial(int trialId);
+    void setTrial(quint16 trialId);
     void clearSelection();
 
 private slots:
@@ -100,7 +100,7 @@ private:
     ExperimentWidget* m_expWidget; // parent
     QTimer m_updateCacheTimer;
     QPoint m_posEntered;
-    int m_currTrialId;
+    quint16 m_currTrialId;
 
     std::vector<QLineEdit*> m_attrs;
 

@@ -68,6 +68,7 @@ public:
 
     virtual ~ColorMap();
     virtual const QColor colorFromValue(const Value& val) const = 0;
+    inline const Colors& colors() const { return m_colors; }
 
 protected:
     explicit ColorMap(const Colors& colors);
