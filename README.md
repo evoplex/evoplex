@@ -19,24 +19,37 @@ You do not need to touch the `CMakeLists.txt` file. Also, you must NOT rename an
     * [Instructions for Windows](https://github.com/evoplex/evoplex/wiki/Building-on-Windows#installing-dependencies)
 
 ### Compiling this plugin
+
+:point_right: if you compiled Evoplex from source in Debug mode, you should also compile your plugin in Debug mode.
+
+:point_right: the plugin must be compiled with the same architecture (32/64 bits) of Evoplex.
+
+#### from QtCreator
+* Open the `CMakeLists.txt`
+* In the projects page, make sure the `EvoplexCore_DIR` is set. If it shows `EvoplexCore_DIR-NOTFOUND` and you compiled Evoplex from source (eg., at `~/evoplex/build`), set it to `~/evoplex/build/src/core/EvoplexCore/` as shown [here](https://i.imgur.com/hyKuFR3.png).
+* Build
+
+#### from command line
 Assuming you placed this repository at `~/evoplex/minimal-model` and you are at `~/evoplex`, just run the commands below:
 ``` bash
 mkdir build-plugin
 cd build-plugin
 cmake ../minimal-model
-make
+cmake --build .
 ```
-:point_right: if you compiled Evoplex from source in Debug mode, you should also compile your plugin in Debug mode.
-
-#### Troubleshooting
 When you run the `cmake` command, you might get an **error** like `FindEvoplexCore.cmake` not found. If you compiled Evoplex from source (eg., at `~/evoplex/build`), just run the command below:
 ``` bash
 export EvoplexCore_DIR=~/evoplex/build/src/core/EvoplexCore/
 ```
-If you are using QtCreator, just set the variable `EvoplexCore_DIR` variable in the `Projects` page as shown [here](https://i.imgur.com/hyKuFR3.png).
+
 
 ## Running this plugin
-After compiling the plugin, open Evoplex, go to the `Plugins` page, click on `import` and select the `libplugin_minimal-model` file at `~/evoplex/minimal-model/build/lib/evoplex/plugins/`. The plugin will now be available in the `Projects` page.
+After compiling the plugin, open Evoplex, go to the `Plugins` page, click on `import` and select the `plugin_minimal-model` file at `~/evoplex/minimal-model/build/plugin/`. The plugin will now be available in the `Projects` page.
+
+## Support
+- Ask a question in the [mailing list](https://groups.google.com/group/evoplex) (or send it directly to evoplex@googlegroups.com)
+- Follow us on [Twitter](https://twitter.com/EvoplexMAS)
+- Join us on our [Gitter chat channel](https://gitter.im/EvoplexMAS/evoplex)
 
 ## Licensing
-This plugin is available freely under the MIT license.
+This plugin is available freely under the [MIT license](https://opensource.org/licenses/MIT).

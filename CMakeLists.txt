@@ -24,14 +24,11 @@ find_package(Qt5Concurrent REQUIRED)
 
 # set compilation and installation directories
 if(APPLE)
-  set(PLUGIN_INSTALL_PREFIX "evoplex.app/Contents/MacOS")
-  set(PLUGIN_OUTPUT_LIBRARY "${CMAKE_BINARY_DIR}/bin/evoplex.app/Contents/MacOS/lib/evoplex/plugins")
-elseif(WIN32)
-  set(PLUGIN_OUTPUT_LIBRARY "${CMAKE_BINARY_DIR}/releases/lib/evoplex/plugins")
+  set(PLUGIN_INSTALL_LIBRARY "evoplex.app/Contents/MacOS/lib/evoplex/plugins")
 else()
-  set(PLUGIN_OUTPUT_LIBRARY "${CMAKE_BINARY_DIR}/lib/evoplex/plugins")
+  set(PLUGIN_INSTALL_LIBRARY "lib/evoplex/plugins")
 endif()
-set(PLUGIN_INSTALL_LIBRARY "${EVOPLEX_INSTALL_PREFIX}/lib/evoplex/plugins")
+set(PLUGIN_OUTPUT_LIBRARY "${CMAKE_BINARY_DIR}/plugin")
 
 # https://cmake.org/Wiki/CMake_RPATH_handling
 # use, i.e. don't skip the full RPATH for the build tree
