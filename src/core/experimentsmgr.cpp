@@ -112,16 +112,17 @@ void ExperimentsMgr::trialFinished(Trial* trial)
 
     m_runningTrials.remove(trial);
     if (isTheLastTrial(trial)) {
+        ExperimentPtr exp = trial->m_exp;
+
         locker.unlock();
-        trial->m_exp->expFinished();
+        exp->expFinished(); // might delete all trials
         locker.relock();
 
-        m_running.remove(trial->m_exp);
+        m_running.remove(exp);
         emit (progressUpdated());
 
-        if (trial->m_exp->expStatus() != Status::Invalid &&
-                trial->m_exp->expStatus() != Status::Disabled) {
-            m_idle.emplace_back(trial->m_exp);
+        if (exp->expStatus() != Status::Invalid && exp->expStatus() != Status::Disabled) {
+            m_idle.emplace_back(exp);
         }
 
         if (m_running.empty() && m_queued.empty()) {
