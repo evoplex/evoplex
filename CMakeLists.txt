@@ -1,13 +1,15 @@
-#=============================================================================
+##########################################################################
+#
 #  Evoplex <evoplex.github.io>
-#  Copyright (C) 2016-2018 by Marcos Cardinot <mcardinot@gmail.com>
-#=============================================================================
+#  Copyright (C) 2016-present
+#
+##########################################################################
 
 cmake_minimum_required(VERSION 3.1.0 FATAL_ERROR)
 
-get_filename_component(MODEL_NAME ${CMAKE_CURRENT_SOURCE_DIR} NAME)
-set(MODEL_NAME EvoplexModel_${MODEL_NAME})
-project(${MODEL_NAME})
+get_filename_component(PLUGIN_NAME ${CMAKE_CURRENT_SOURCE_DIR} NAME)
+set(PLUGIN_NAME plugin_${PLUGIN_NAME})
+project(${PLUGIN_NAME})
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -16,14 +18,20 @@ if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Release)
 endif()
 
-find_package(EvoplexCore 0.0.0 REQUIRED)
+find_package(EvoplexCore 0.1.0 REQUIRED)
 find_package(Qt5Core REQUIRED)
 find_package(Qt5Concurrent REQUIRED)
 
-if(NOT Evoplex_SRC)
-  set(Evoplex_SRC ${CMAKE_INSTALL_PREFIX}/include/evoplex)
+# set compilation and installation directories
+if(APPLE)
+  set(PLUGIN_INSTALL_PREFIX "evoplex.app/Contents/MacOS")
+  set(PLUGIN_OUTPUT_LIBRARY "${CMAKE_BINARY_DIR}/bin/evoplex.app/Contents/MacOS/lib/evoplex/plugins")
+elseif(WIN32)
+  set(PLUGIN_OUTPUT_LIBRARY "${CMAKE_BINARY_DIR}/releases/lib/evoplex/plugins")
+else()
+  set(PLUGIN_OUTPUT_LIBRARY "${CMAKE_BINARY_DIR}/lib/evoplex/plugins")
 endif()
-MESSAGE("Evoplex_SRC :" ${Evoplex_SRC})
+set(PLUGIN_INSTALL_LIBRARY "${EVOPLEX_INSTALL_PREFIX}/lib/evoplex/plugins")
 
 # https://cmake.org/Wiki/CMake_RPATH_handling
 # use, i.e. don't skip the full RPATH for the build tree
@@ -40,10 +48,29 @@ if("${isSystemDir}" STREQUAL "-1")
    set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib/evoplex")
 endif("${isSystemDir}" STREQUAL "-1")
 
-add_library(${MODEL_NAME} SHARED model.cpp)
-target_link_libraries(${MODEL_NAME} Evoplex::EvoplexCore Qt5::Core)
-target_include_directories(${MODEL_NAME} PUBLIC ${Evoplex_SRC})
-set_target_properties(${MODEL_NAME} PROPERTIES
-  LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib/evoplex/plugins)
+add_library(${PLUGIN_NAME} SHARED plugin.cpp)
+target_link_libraries(${PLUGIN_NAME} PRIVATE Evoplex::EvoplexCore Qt5::Core)
+set_target_properties(${PLUGIN_NAME} PROPERTIES
+  ARCHIVE_OUTPUT_DIRECTORY ${PLUGIN_OUTPUT_LIBRARY}
+  ARCHIVE_OUTPUT_DIRECTORY_DEBUG ${PLUGIN_OUTPUT_LIBRARY}
+  ARCHIVE_OUTPUT_DIRECTORY_RELEASE ${PLUGIN_OUTPUT_LIBRARY}
+  ARCHIVE_OUTPUT_DIRECTORY_MINSIZEREL ${PLUGIN_OUTPUT_LIBRARY}
+  ARCHIVE_OUTPUT_DIRECTORY_RELWITHDEBINFO ${PLUGIN_OUTPUT_LIBRARY}
+  LIBRARY_OUTPUT_DIRECTORY ${PLUGIN_OUTPUT_LIBRARY}
+  LIBRARY_OUTPUT_DIRECTORY_DEBUG ${PLUGIN_OUTPUT_LIBRARY}
+  LIBRARY_OUTPUT_DIRECTORY_RELEASE ${PLUGIN_OUTPUT_LIBRARY}
+  LIBRARY_OUTPUT_DIRECTORY_MINSIZEREL ${PLUGIN_OUTPUT_LIBRARY}
+  LIBRARY_OUTPUT_DIRECTORY_RELWITHDEBINFO ${PLUGIN_OUTPUT_LIBRARY}
+  RUNTIME_OUTPUT_DIRECTORY ${PLUGIN_OUTPUT_LIBRARY}
+  RUNTIME_OUTPUT_DIRECTORY_DEBUG ${PLUGIN_OUTPUT_LIBRARY}
+  RUNTIME_OUTPUT_DIRECTORY_RELEASE ${PLUGIN_OUTPUT_LIBRARY}
+  RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL ${PLUGIN_OUTPUT_LIBRARY}
+  RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO ${PLUGIN_OUTPUT_LIBRARY})
 
-install(TARGETS ${MODEL_NAME} LIBRARY DESTINATION lib/evoplex/plugins)
+# Qt Object macro is hidden in another macro; let's add them here
+set_property(TARGET ${PLUGIN_NAME} APPEND PROPERTY
+  AUTOMOC_MACRO_NAMES "REGISTER_PLUGIN")
+
+install(TARGETS ${PLUGIN_NAME}
+  LIBRARY DESTINATION "${PLUGIN_INSTALL_LIBRARY}"
+  ARCHIVE DESTINATION "${PLUGIN_INSTALL_LIBRARY}")
