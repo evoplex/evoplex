@@ -124,7 +124,7 @@ void CustomOutput::doOperation(const Trial* trial)
     if (m_allTrialIds.find(trial->id()) == m_allTrialIds.end()) {
         return;
     }
-    updateCaches(trial->id(), trial->step(), trial->model()->customOutputs(m_allInputs));
+    //updateCaches(trial->id(), trial->step(), trial->model()->customOutputs(m_allInputs));
 }
 
 bool CustomOutput::operator==(const OutputPtr output) const

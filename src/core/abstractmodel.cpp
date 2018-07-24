@@ -33,9 +33,9 @@ int AbstractModel::step() const
     return m_trial->step();
 }
 
-Values AbstractModel::customOutputs(const Values& inputs) const
+Values AbstractModel::customOutputs(const std::vector<int>& inputsIds) const
 {
-    Q_UNUSED(inputs);
+    Q_UNUSED(inputsIds);
     return Values();
 }
 

@@ -42,10 +42,12 @@ public:
     // Return true if algorithm is good for another step or false to stop asap.
     virtual bool algorithmStep() = 0;
 
-    // This method allows you to custom outputs which, for example,
-    // might be used by the GUI to generate custom plots or to be stored in a file.
-    // The requested "header" must be defined in the modelMetaData.json file.
-    virtual Values customOutputs(const Values& inputs) const = 0;
+    // It allows implementing custom outputs which can be plotted or stored
+    // in a file. The "inputs" must be defined in the metaData.json file.
+    // If an experiment requests some custom output, this method will be called
+    // once at each time step, receiving the requested ids (from zero, following
+    // the order of the definitions in metaData.json).
+    virtual Values customOutputs(const std::vector<int>& inputsIds) const = 0;
 };
 
 class AbstractModel : public AbstractPlugin, public AbstractModelInterface
@@ -64,7 +66,7 @@ public:
 
     inline bool init() override;
     inline bool algorithmStep() override;
-    Values customOutputs(const Values& inputs) const override;
+    Values customOutputs(const std::vector<int>& inputsIds) const override;
 
 protected:
     AbstractModel() = default;
