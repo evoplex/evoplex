@@ -5,10 +5,10 @@
   "author": "Evoplex",
   "description": "This is a mininal example of a model plugin for Evoplex.",
 
-  "supportedGraphs": [],
-  "customOutputs": [],
-
   "pluginAttributesScope": [],
   "nodeAttributesScope": [],
-  "edgeAttributesScope": []
+  "edgeAttributesScope": [],
+
+  "supportedGraphs": [],
+  "customOutputs": []
 }
