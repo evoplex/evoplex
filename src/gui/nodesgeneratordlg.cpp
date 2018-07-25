@@ -35,7 +35,7 @@ namespace evoplex
 {
 
 NodesGeneratorDlg::NodesGeneratorDlg(QWidget* parent, const AttributesScope& nodeAttrsScope, const QString& cmd)
-    : QDialog(parent),
+    : QDialog(parent, Qt::WindowSystemMenuHint | Qt::WindowTitleHint), // removes ?
       m_ui(new Ui_NodesGeneratorDlg),
       m_nodeAttrsScope(nodeAttrsScope)
 {

@@ -49,7 +49,7 @@ LineChart::LineChart(ExperimentPtr exp, QWidget* parent)
 
     connect(m_exp.get(), SIGNAL(restarted()), SLOT(slotRestarted()));
 
-    QDialog* dlg = new QDialog(this);
+    QDialog* dlg = new QDialog(this, Qt::WindowSystemMenuHint | Qt::WindowTitleHint); // removes ?
     m_settingsDlg->setupUi(dlg);
     connect(m_settingsDlg->bEditSeries, SIGNAL(clicked(bool)), SLOT(slotOutputWidget()));
 

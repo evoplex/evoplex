@@ -30,7 +30,7 @@
 namespace evoplex {
 
 SaveDialog::SaveDialog(QWidget *parent)
-    : QDialog(parent),
+    : QDialog(parent, Qt::WindowSystemMenuHint | Qt::WindowTitleHint), // removes ?
       m_ui(new Ui::SaveDialog)
 {
     m_ui->setupUi(this);
@@ -80,7 +80,7 @@ bool SaveDialog::save(ProjectPtr project)
     project->saveProject(errMsg, f);
     m_currProject = project;
     if (!errMsg.isEmpty()) {
-        QMessageBox::warning(this, "Saving project...", errMsg);
+        QMessageBox::warning(this, "Error", errMsg);
         return false;
     }
     return true;

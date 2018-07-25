@@ -300,7 +300,7 @@ void MainGUI::slotSaveAll()
 
 void MainGUI::slotShowLog()
 {
-    QDialog* d = new QDialog(this);
+    QDialog* d = new QDialog(this, Qt::WindowSystemMenuHint | Qt::WindowTitleHint); // removes ?
     QVBoxLayout* l = new QVBoxLayout(d);
     l->addWidget(new QLabel("Use the following to provide more detailed information about your system to bug reports:"));
 

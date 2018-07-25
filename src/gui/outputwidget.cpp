@@ -28,11 +28,11 @@ namespace evoplex {
 
 OutputWidget::OutputWidget(const ModelPlugin* modelPlugin, const std::vector<int>& trialIds,
                            QWidget *parent, const std::vector<Cache*>& init)
-    : QDialog(parent)
-    , m_ui(new Ui_OutputWidget)
-    , m_modelPlugin(modelPlugin)
-    , m_trialIds(trialIds)
-    , m_hasChanges(false)
+    : QDialog(parent, Qt::WindowSystemMenuHint | Qt::WindowTitleHint), // removes ?
+      m_ui(new Ui_OutputWidget),
+      m_modelPlugin(modelPlugin),
+      m_trialIds(trialIds),
+      m_hasChanges(false),
 {
     setWindowModality(Qt::ApplicationModal);
     m_ui->setupUi(this);

@@ -12,6 +12,7 @@
 - Fixes #6 - Don't overwrite projects by default
 - Fixes #7 - Checks for running experiments before closing a project
 - Fixes #8 - Allows deleting an experiment
+- Fixes #9 - Removes question mark from titlebar on Windows
 
 * Thu Jun 21 2018 Marcos Cardinot <marcos@cardinot.net> - 0.1.0-alpha0
 - First public release

@@ -25,7 +25,7 @@ namespace evoplex
 {
 
 GraphSettings::GraphSettings(MainGUI* mainGUI, ExperimentPtr exp, QWidget *parent)
-    : QDialog(parent)
+    : QDialog(parent, Qt::WindowSystemMenuHint | Qt::WindowTitleHint) // removes ?
     , m_ui(new Ui_GraphSettings)
     , m_exp(exp)
     , m_modelPlugin(nullptr)
