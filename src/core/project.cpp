@@ -212,7 +212,7 @@ bool Project::saveProject(QString& errMsg, std::function<void(int)>& progress)
 
     QFile file(m_filepath);
     QFileInfo fi(file);
-    if (fi.suffix() != "csv" || !file.open(QFile::WriteOnly | QFile::Truncate)) {
+    if (fi.suffix() != "csv" || !file.open(QFile::WriteOnly | QFile::Text | QFile::Truncate)) {
         errMsg = QString("Unable to save the project '%1'.\n"
                 "Please, make sure the path below corresponds to a writable csv file!\n%2")
                 .arg(name(), m_filepath);

@@ -9,6 +9,7 @@
 - Increases unit-tests coverage of core components
 - Improves threads management
 - Improves TableWidget performance
+- Fixes #6 - Don't overwrite projects by default
 - Fixes #7 - Checks for running experiments before closing a project
 - Fixes #8 - Allows deleting an experiment
 

@@ -38,11 +38,21 @@ SaveDialog::SaveDialog(QWidget *parent)
     connect(m_ui->browse, SIGNAL(clicked(bool)), SLOT(browseDir()));
     connect(m_ui->btn, SIGNAL(rejected()), SLOT(hide()));
     connect(m_ui->btn, &QDialogButtonBox::accepted, [this]() {
+        QString f = QString("%1/%2.csv").arg(m_ui->dest->text(), m_ui->pname->text());
+        if (QFileInfo::exists(f)) {
+            QMessageBox::StandardButton r = QMessageBox::question(this,
+                    "Overwrite?", "A project named \"" + f + "\" already exists"
+                    " at this location. Do you want to overwrite it?");
+            if (r == QMessageBox::NoButton) {
+                return;
+            }
+        }
         ProjectPtr p = m_currProject.lock();
         if (p) {
-            p->setFilePath(QString("%1/%2.csv")
-                    .arg(m_ui->dest->text(), m_ui->pname->text()));
+            p->setFilePath(f);
             save(p);
+        } else {
+            QMessageBox::warning(this, "Error", "This project cannot be saved!");
         }
     });
 }
@@ -61,7 +71,7 @@ bool SaveDialog::save(ProjectPtr project)
     }
 
     hide();
-    QProgressDialog progress("Saving project...", QString(), 0, 100, this);
+    QProgressDialog progress("Saving project...", QString(), 0, 100, parentWidget());
     progress.setWindowModality(Qt::ApplicationModal);
     progress.show();
 
