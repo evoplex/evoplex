@@ -56,7 +56,7 @@ private slots:
 private:
     // checks if sets of nodes have the same content
     void _compare_nodes(const Nodes& a, const Nodes& b) const;
-    void _tst_empty_nodes(const Nodes& a, int size);
+    void _tst_empty_nodes(const Nodes& a, size_t size);
     void _tst_Node(Node *node, Attributes attrs);
     void _tst_attrs(NodePtr node, Attributes attrs);
     void _tst_invalid(QString cmd, bool has_attrs, GraphType graphType);
@@ -74,9 +74,9 @@ private:
     }
 };
 
-void TestNodes::_tst_empty_nodes(const Nodes& a, int size){
-    QCOMPARE(a.size(), size);
-    for(int i = 0; i < a.size(); i++){
+void TestNodes::_tst_empty_nodes(const Nodes& a, size_t size){
+    QVERIFY(a.size() == size);
+    for(int i = 0; i < static_cast<int>(size); i++){
     QVERIFY(a.at(i)->attrs().isEmpty());
     QCOMPARE(a.at(i)->degree(), 0);
     QCOMPARE(a.at(i)->inDegree(), 0);
@@ -109,7 +109,7 @@ void TestNodes::_tst_invalid(QString cmd, bool has_attrs, GraphType graphType){
 
     Nodes nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
     if(!has_attrs) _tst_empty_nodes(nodes, 0);
-    QCOMPARE(nodes.size(), 0);
+    QVERIFY(nodes.empty());
     if(graphType == GraphType::Directed) QVERIFY(nodesOfSameType<DNode>(nodes));
     else QVERIFY(nodesOfSameType<UNode>(nodes));
 }
@@ -191,7 +191,7 @@ void TestNodes::tst_fromCmd()
     nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
     QVERIFY(nodesOfSameType<UNode>(nodes));
 
-    QCOMPARE(nodes.size(), 3);
+    QVERIFY(nodes.size() == 3);
     node = nodes.at(0);
 
     attrs.replace(0, names[0], values[0]);
@@ -209,7 +209,7 @@ void TestNodes::tst_fromCmd()
     nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
     QVERIFY(nodesOfSameType<UNode>(nodes));
 
-    QCOMPARE(nodes.size(), 3);
+    QVERIFY(nodes.size() == 3);
     node = nodes.at(0);
     _tst_attrs(node, attrs);
 
@@ -223,7 +223,7 @@ void TestNodes::tst_fromCmd()
     nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
     QVERIFY(nodesOfSameType<DNode>(nodes));
 
-    QCOMPARE(nodes.size(), 3);
+    QVERIFY(nodes.size() == 3);
     node = nodes.at(0);
     _tst_attrs(node, attrs);
 
@@ -238,7 +238,7 @@ void TestNodes::tst_fromCmd()
     nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
     QVERIFY(nodesOfSameType<DNode>(nodes));
 
-    QCOMPARE(nodes.size(), 3);
+    QVERIFY(nodes.size() == 3);
     node = nodes.at(0);
     _tst_attrs(node, attrs);
 
@@ -445,7 +445,7 @@ void TestNodes::tst_fromFile_nodes_invalid_attrs() {
     Nodes nodes = Nodes::fromCmd("*2;min", attrsScope, graphType, errorMsg);
     QVERIFY(nodesOfSameType<UNode>(nodesFromFile));
 
-    QCOMPARE(nodesFromFile.size(), 0); // Confirms the nodes returned are empty
+    QVERIFY(nodesFromFile.empty()); // Confirms the nodes returned are empty
 
     // Test type returned for directed graph type
     graphType = GraphType::Directed;
@@ -482,7 +482,7 @@ void TestNodes::tst_fromFile_nodes_invalid_file() {
     Nodes nodes = Nodes::fromCmd("*2;min", attrsScope, graphType, errorMsg);
     QVERIFY(nodesOfSameType<UNode>(nodesFromFile));
 
-    QCOMPARE(nodesFromFile.size(), 0); // Confirms the nodes returned are empty
+    QVERIFY(nodesFromFile.empty()); // Confirms the nodes returned are empty
 
     // Test type returned for directed graph type
     graphType = GraphType::Directed;
