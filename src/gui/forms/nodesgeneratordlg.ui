@@ -27,6 +27,13 @@
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_3">
       <item>
+       <widget class="QRadioButton" name="bCreateNodes">
+        <property name="text">
+         <string>Create nodes</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QRadioButton" name="bSameData">
         <property name="sizePolicy">
          <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
@@ -35,7 +42,7 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>Same data for all attributes.</string>
+         <string>Same function for all attributes</string>
         </property>
        </widget>
       </item>
@@ -48,7 +55,7 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>Different data for each attribute.</string>
+         <string>Different function for each attribute</string>
         </property>
        </widget>
       </item>

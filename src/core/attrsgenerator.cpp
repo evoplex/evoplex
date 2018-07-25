@@ -35,31 +35,48 @@ namespace evoplex {
 AttrsGenerator* AttrsGenerator::parse(const AttributesScope& attrsScope,
                                       const QString& cmd, QString& error)
 {
-    QStringList cmds = cmd.split(";");
-    if (cmds.size() < 2) {
-        error = QString("The command %1 is invalid!").arg(cmd);
+    if (cmd.isEmpty()) {
+        error = "The command cannot be empty!";
         qWarning() << error;
         return nullptr;
     }
 
+    QStringList cmds = cmd.split(";");
     QString sizeStr = cmds.takeFirst();
-    bool ok = false;
-    const int size = sizeStr.remove(0,1).toInt(&ok);
-    if (!ok) {
-        error = QString("Unable to parse '%1'.\n"
-                      "'%2' should be an integer representing the size of the attributes set.")
-                      .arg(cmd, sizeStr);
+
+    if (attrsScope.empty() && !cmds.empty()) {
+        error = "The command '" + cmd + "' is invalid!\n"
+                "It should be a positive integer only.";
+        qWarning() << error;
+        return nullptr;
+    }
+
+    QString _cmd;
+    int size = -1;
+    bool sizeIsValid = false;
+    if (cmds.empty()) { // '*int;min' alias
+        size = sizeStr.toInt(&sizeIsValid);
+        _cmd = QString("*%1;min").arg(size);
+        cmds.push_back("min");
+    } else {
+        size = sizeStr.remove(0,1).toInt(&sizeIsValid);
+        _cmd = cmd;
+    }
+
+    if (!sizeIsValid || size < 1) {
+        error = "Unable to parse '" + cmd + "'.\nIt should start with a positive"
+                " integer representing the size of the attributes set.";
         qWarning() << error;
         return nullptr;
     }
 
     AttrsGenerator* ag = nullptr;
-    if (cmd.startsWith("*")) {
+    if (_cmd.startsWith("*")) {
         ag = parseStarCmd(attrsScope, size, cmds, error);
-    } else if (cmd.startsWith("#")) {
+    } else if (_cmd.startsWith("#")) {
         ag = parseHashCmd(attrsScope, size, cmds, error);
     } else {
-        error = QString("the command '%1'. is invalid!").arg(cmd);
+        error = "the command '" + cmd + "'. is invalid!";
     }
 
     if (!ag) {
@@ -67,7 +84,7 @@ AttrsGenerator* AttrsGenerator::parse(const AttributesScope& attrsScope,
         return nullptr;
     }
 
-    Q_ASSERT_X(cmd == ag->command(), "AttrsGenerator",
+    Q_ASSERT_X(_cmd == ag->command(), "AttrsGenerator",
                "something went extremely wrong with the command string!");
     return ag;
 }

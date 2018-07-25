@@ -43,13 +43,15 @@ class AttrsGenerator : public AttrsGeneratorInterface
 {
 public:
     // Expected commands:
+    //     - integer
+    //         '*integer;min' alias
     //     - same mode for all attributes:
     //         '*integer;[min|max|rand_seed]'
     //     - specific mode for each attribute:
     //         '#integer;attrName_[min|max|rand_seed|value_val];...'
     //     * the integer corresponds to the size of the set of attributes
     static AttrsGenerator* parse(const AttributesScope& attrsScope,
-                                 const QString& cmd, QString& error);
+                                 const QString &cmd, QString& error);
 
     virtual ~AttrsGenerator() = default;
 

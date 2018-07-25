@@ -42,16 +42,25 @@ NodesGeneratorDlg::NodesGeneratorDlg(QWidget* parent, const AttributesScope& nod
     setWindowModality(Qt::ApplicationModal);
     m_ui->setupUi(this);
 
-    connect(m_ui->bFromFile, SIGNAL(toggled(bool)), m_ui->wFromFile, SLOT(setVisible(bool)));
-    connect(m_ui->bSameData, SIGNAL(toggled(bool)), m_ui->wSameData, SLOT(setVisible(bool)));
-    connect(m_ui->bSameData, SIGNAL(toggled(bool)), m_ui->wNumNodes, SLOT(setVisible(bool)));
-    connect(m_ui->bDiffData, SIGNAL(toggled(bool)), m_ui->wDiffData, SLOT(setVisible(bool)));
-    connect(m_ui->bDiffData, SIGNAL(toggled(bool)), m_ui->wNumNodes, SLOT(setVisible(bool)));
     m_ui->wFromFile->setVisible(false);
     m_ui->wSameData->setVisible(false);
     m_ui->wDiffData->setVisible(false);
     m_ui->wNumNodes->setVisible(false);
-    m_ui->bSameData->setChecked(true);
+    connect(m_ui->bFromFile, SIGNAL(toggled(bool)), m_ui->wFromFile, SLOT(setVisible(bool)));
+
+    if (m_nodeAttrsScope.empty()) {
+        connect(m_ui->bCreateNodes, SIGNAL(toggled(bool)), m_ui->wNumNodes, SLOT(setVisible(bool)));
+        m_ui->bSameData->setVisible(false);
+        m_ui->bDiffData->setVisible(false);
+        m_ui->bCreateNodes->setChecked(true);
+    } else {
+        connect(m_ui->bSameData, SIGNAL(toggled(bool)), m_ui->wSameData, SLOT(setVisible(bool)));
+        connect(m_ui->bSameData, SIGNAL(toggled(bool)), m_ui->wNumNodes, SLOT(setVisible(bool)));
+        connect(m_ui->bDiffData, SIGNAL(toggled(bool)), m_ui->wDiffData, SLOT(setVisible(bool)));
+        connect(m_ui->bDiffData, SIGNAL(toggled(bool)), m_ui->wNumNodes, SLOT(setVisible(bool)));
+        m_ui->bCreateNodes->setVisible(false);
+        m_ui->bSameData->setChecked(true);
+    }
 
     connect(m_ui->saveAs, SIGNAL(pressed()), SLOT(slotSaveAs()));
     connect(m_ui->cancel, SIGNAL(pressed()), SLOT(reject()));
@@ -191,7 +200,8 @@ void NodesGeneratorDlg::fill(const QString& cmd)
 
     AGSameFuncForAll* agsame = dynamic_cast<AGSameFuncForAll*>(ag);
     if (agsame) {
-        m_ui->bSameData->setChecked(true);
+        m_ui->bSameData->setChecked(!m_nodeAttrsScope.empty());
+        m_ui->bCreateNodes->setChecked(m_nodeAttrsScope.empty());
         m_ui->numNodes->setValue(agsame->size());
         m_ui->func->setCurrentIndex(m_ui->func->findData(static_cast<int>(agsame->function())));
         const Value& v = agsame->functionInput();
@@ -230,6 +240,8 @@ QString NodesGeneratorDlg::readCommand()
             return QString();
         }
         command = m_ui->filepath->text();
+    } else if (m_ui->bCreateNodes->isChecked()) {
+        command = m_ui->numNodes->text();
     } else if (m_ui->bSameData->isChecked()) {
         command = QString("*%1;%2").arg(m_ui->numNodes->text(), m_ui->func->currentText());
         if (m_ui->func->currentData() == static_cast<int>(Function::Rand)) {
