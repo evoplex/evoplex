@@ -241,6 +241,15 @@ bool Project::saveProject(QString& errMsg, std::function<void(int)>& progress)
     std::set<QString> s(header.begin(), header.end());
     header.assign(s.begin(), s.end());
 
+    // for convenience, we move the 'id' to the first column
+    for (auto it = header.begin(); it != header.end(); ++it) {
+        if (*it == GENERAL_ATTRIBUTE_EXPID) {
+            header.erase(it);
+            break;
+        }
+    }
+    header.insert(header.begin(), GENERAL_ATTRIBUTE_EXPID);
+
     // write header to file
     QTextStream out(&file);
     for (size_t h = 0; h < header.size()-1; ++h) {
