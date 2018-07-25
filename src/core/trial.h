@@ -55,8 +55,9 @@ public:
     GraphType graphType() const;
 
     inline quint16 id() const;
-    inline int step() const;
     inline Status status() const;
+    inline int step() const;
+    inline int stopAt() const;
 
     inline PRG* prg() const;
     inline const AbstractModel* model() const;
@@ -94,6 +95,9 @@ inline quint16 Trial::id() const
 
 inline int Trial::step() const
 { return m_step; }
+
+inline int Trial::stopAt() const
+{ return m_exp->stopAt(); }
 
 inline Status Trial::status() const
 { return m_status; }

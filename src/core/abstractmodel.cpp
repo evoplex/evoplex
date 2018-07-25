@@ -33,6 +33,11 @@ int AbstractModel::step() const
     return m_trial->step();
 }
 
+int AbstractModel::lastStep() const
+{
+    return m_trial->stopAt();
+}
+
 Values AbstractModel::customOutputs(const Values& inputs) const
 {
     Q_UNUSED(inputs);

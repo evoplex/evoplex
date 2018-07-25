@@ -169,6 +169,8 @@ bool Trial::runSteps()
     QElapsedTimer t;
     t.start();
 
+    m_model->beforeLoop();
+
     bool hasNext = true;
     while (m_step < exp->pauseAt() && hasNext) {
         hasNext = m_model->algorithmStep();
@@ -187,6 +189,8 @@ bool Trial::runSteps()
             QThread::msleep(exp->delay());
         }
     }
+
+    m_model->afterLoop();
 
     qDebug() << QString("[E%1:T%2] %3s").arg(exp->id())
                 .arg(m_id).arg(t.elapsed() / 1000);

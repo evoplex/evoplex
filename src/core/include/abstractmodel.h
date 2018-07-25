@@ -37,14 +37,23 @@ public:
     // destructor
     virtual ~AbstractModelInterface() = default;
 
-    // Implements the metaheuristic.
-    // That is, it contains all the logic to perform ONE step.
+    // It is executed before the algorithmStep() loop
+    // The default implementation of this method does nothing.
+    virtual void beforeLoop() = 0;
+
+    // It is executed in a loop and must contain all the logic to perform ONE step.
     // Return true if algorithm is good for another step or false to stop asap.
     virtual bool algorithmStep() = 0;
 
-    // This method allows you to custom outputs which, for example,
-    // might be used by the GUI to generate custom plots or to be stored in a file.
-    // The requested "header" must be defined in the modelMetaData.json file.
+    // It is executed after the algorithmStep() loop ends.
+    // The default implementation of this method does nothing.
+    virtual void afterLoop() = 0;
+
+    // It allows implementing custom outputs which can be plotted or stored
+    // in a file through Evoplex. The "inputs" must be defined in the
+    // metaData.json file. If an experiment requests some custom output,
+    // this method will be called once at each time step, receiving the
+    // requested inputs.
     virtual Values customOutputs(const Values& inputs) const = 0;
 };
 
@@ -54,7 +63,12 @@ class AbstractModel : public AbstractPlugin, public AbstractModelInterface
 
 public:
     AbstractGraph* graph() const;
+
+    // current time step
     int step() const;
+
+    // last time step
+    int lastStep() const;
 
     inline const Nodes& nodes() const;
     inline const NodePtr& node(const int nodeId) const;
@@ -63,7 +77,9 @@ public:
     inline const EdgePtr& edge(const int originId, const int neighbourId) const;
 
     inline bool init() override;
+    inline void beforeLoop() override {}
     inline bool algorithmStep() override;
+    inline void afterLoop() override {}
     Values customOutputs(const Values& inputs) const override;
 
 protected:
