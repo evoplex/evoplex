@@ -71,7 +71,7 @@ Nodes Nodes::fromFile(const QString& filePath, const AttributesScope& attrsScope
 
     QFile file(filePath);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        error = "unable to read csv file with the set of nodes.\n" + filePath;
+        error += "unable to read csv file with the set of nodes.\n" + filePath;
         qWarning() << error;
         return Nodes();
     }
@@ -83,7 +83,7 @@ Nodes Nodes::fromFile(const QString& filePath, const AttributesScope& attrsScope
     if (!in.atEnd()) {
         header = validateHeader(in.readLine(), attrsScope, error);
         if (header.isEmpty()) {
-            error = "failed to read attributes from file.\n" + filePath;
+            error += " failed to read attributes from file.\n" + filePath;
             qWarning() << error;
             return Nodes();
         }

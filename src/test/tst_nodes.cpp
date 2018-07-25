@@ -60,6 +60,7 @@ private:
     void _tst_Node(Node *node, Attributes attrs);
     void _tst_attrs(NodePtr node, Attributes attrs);
     void _tst_invalid(QString cmd, bool has_attrs, GraphType graphType);
+    void _tst_fromFile_nodes_with_oneCoord(const QString& filePath);
 
     // checks if all nodes are of the same type
     template <class T>
@@ -116,7 +117,7 @@ void TestNodes::_tst_invalid(QString cmd, bool has_attrs, GraphType graphType){
 void TestNodes::tst_fromCmd()
 {
     QString errorMsg, cmd;
-    const char* attrRangeStr = "int[0,1000]";
+    QString attrRangeStr = "int[0,1000]";
     Nodes nodes;
     NodePtr node;
     GraphType graphType;
@@ -145,15 +146,14 @@ void TestNodes::tst_fromCmd()
     attrsScope.insert(col2->attrName(), col2);
 
     for(int i = 0; i < 3; i++){
-       attrs.replace(i, names[i], NULL);
+       attrs.replace(i, names[i], Value(0));
     }
 
     nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
     QVERIFY(nodesOfSameType<UNode>(nodes));
 
     for(int i = 0; i < 3; i++){
-        node = nodes.at(i);
-        _tst_attrs(node, attrs);
+        _tst_attrs(nodes.at(i), attrs);
     }
 
     // Directed with empty attrsScope
@@ -281,13 +281,6 @@ void TestNodes::tst_fromCmd()
     cmd = "#3;myInt_value_123;myInt2_value_123";
     _tst_invalid(cmd, false, GraphType::Invalid); // Empty attrsScope
     _tst_invalid(cmd, true, GraphType::Invalid); // Non-empty attrsScope
-
-     /** IMPORTANT! The command validation is powered by another class, which we will be testing later.
-      *    So, the main purpose of this test is to check if the returned Nodes are reflecting the command,
-      *    that's the number of nodes is right, the attrs are there etc.
-      *    There's no need to extend it to the point of testing all possible combinations of commands
-      *    NOR testing if all possible functions (eg., min, max, rand ...) work as expected -- it'll be done later for another class.
-     */
 }
 
 void TestNodes::tst_fromFile_nodes_no_xy()
@@ -347,9 +340,6 @@ void TestNodes::tst_fromFile_nodes_no_xy()
     nodesFromFile = Nodes::fromFile(filePath, attrsScope, graphType, errorMsg);
 
     _tst_empty_nodes(nodesFromFile, 0); // Confirms the nodes returned are empty
-
-    // Fails as expected:
-//    _compare_nodes(nodes, nodesFromFile);
 }
 
 // valid attributes AND both xy coordinates
@@ -405,104 +395,33 @@ void TestNodes::tst_fromFile_nodes_with_xy() {
     nodesFromFile = Nodes::fromFile(filePath, attrsScope, graphType, errorMsg);
 
     _tst_empty_nodes(nodesFromFile, 0); // Confirms the nodes returned are empty
-
-    // Fails as expected:
-//    _compare_nodes(nodes, nodesFromFile);
 }
 
-// valid attributes AND x coordinates (only)
-void TestNodes::tst_fromFile_nodes_with_x() {
-    QString errorMsg;
-    GraphType graphType = GraphType::Undirected;
-
-    // valid attrsScope for the existing file
-    const QString filePath(":/data/data/nodes_with_x.csv");
-    AttributesScope attrsScope;
-
+void TestNodes::_tst_fromFile_nodes_with_oneCoord(const QString& filePath) {
     // Attribute Range to be used for both sets of nodes
     AttributeRange* col0 = AttributeRange::parse(0, "double-zero-one", "double[0,3]");
+    AttributesScope attrsScope;
     attrsScope.insert(col0->attrName(), col0);
 
     // Nodes with values read from file
-    Nodes nodesFromFile = Nodes::fromFile(filePath, attrsScope, graphType, errorMsg);
-
-    // 'Nodes::fromFile gives a warning 'failed to read attributes from file' because
-    // 'Nodes::validateHeader' returns an empty QStringList
-    // This is because if can find a column with an x value, but no y value:
-//    if ((xIdx != -1 && yIdx == -1) || (xIdx == -1 && yIdx != -1)) {
-//        error = "missing 'x' or 'y' columns. It should have both or none.";
-//        return QStringList();
-//    }
-    // This is similar to the case for 'TestNodes::tst_fromFile_nodes_with_y'
-    // The error is not outputted, however.
-
-    // Nodes to test against ones from file
-    Nodes nodes = Nodes::fromCmd("*3;min", attrsScope, graphType, errorMsg);
-
-    nodes.at(0)->setAttr(0, 0.12345678);
-    nodes.at(0)->setX(123);
-
-    nodes.at(1)->setAttr(0, 1.49999999);
-    nodes.at(1)->setX(789);
-
-    nodes.at(2)->setAttr(0, 2);
-    nodes.at(2)->setX(456);
-
-    // equivalent to _compare_nodes without the y value test
-    QCOMPARE(nodes.size(), nodesFromFile.size());
-    for (int id = 0; id < static_cast<int>(nodes.size()); ++id) {
-        NodePtr nA = nodes.at(id);
-        NodePtr nB = nodesFromFile.at(id);
-        QCOMPARE(nA->id(), nB->id());
-        QCOMPARE(nA->attrs().names(), nB->attrs().names());
-        QCOMPARE(nA->attrs().values(), nB->attrs().values());
-        QCOMPARE(nA->x(), nB->x());
-    }
-
-    QVERIFY(nodesOfSameType<UNode>(nodesFromFile));
-}
-
-// valid attributes AND y coordinates (only)
-void TestNodes::tst_fromFile_nodes_with_y() {
     QString errorMsg;
     GraphType graphType = GraphType::Undirected;
-
-    // valid attrsScope for the existing file
-    // Fails - see 'TestNodes::tst_fromFile_nodes_with_x()'
-    const QString filePath(":/data/data/nodes_with_y.csv");
-    AttributesScope attrsScope;
-
-    // Attribute Range to be used for both sets of nodes
-    AttributeRange* col0 = AttributeRange::parse(0, "double-zero-one", "double[0,2]");
-    attrsScope.insert(col0->attrName(), col0);
-
-    // Nodes with values read from file
     Nodes nodesFromFile = Nodes::fromFile(filePath, attrsScope, graphType, errorMsg);
 
-    // Nodes to test against ones from file
-    Nodes nodes = Nodes::fromCmd("*3;min", attrsScope, graphType, errorMsg);
+    QVERIFY(nodesFromFile.empty());
+    QVERIFY(!errorMsg.isEmpty());
 
-    nodes.at(0)->setAttr(0, 1.49999999);
-    nodes.at(0)->setX(123);
+    delete col0;
+}
 
-    nodes.at(1)->setAttr(0, 1.49999999);
-    nodes.at(1)->setX(789);
+// valid attributes AND x coordinates (only) -- should fail
+void TestNodes::tst_fromFile_nodes_with_x() {
+    _tst_fromFile_nodes_with_oneCoord(":/data/data/nodes_with_x.csv");
+}
 
-    nodes.at(2)->setAttr(0, 2);
-    nodes.at(2)->setX(456);
-
-    // equivalent to _compare_nodes without the x value test
-    QCOMPARE(nodes.size(), nodesFromFile.size());
-    for (int id = 0; id < static_cast<int>(nodes.size()); ++id) {
-        NodePtr nA = nodes.at(id);
-        NodePtr nB = nodesFromFile.at(id);
-        QCOMPARE(nA->id(), nB->id());
-        QCOMPARE(nA->attrs().names(), nB->attrs().names());
-        QCOMPARE(nA->attrs().values(), nB->attrs().values());
-        QCOMPARE(nA->y(), nB->y());
-    }
-
-    QVERIFY(nodesOfSameType<UNode>(nodesFromFile));
+// valid attributes AND y coordinates (only) -- should fail
+void TestNodes::tst_fromFile_nodes_with_y() {
+    _tst_fromFile_nodes_with_oneCoord(":/data/data/nodes_with_y.csv");
 }
 
 // invalid attributes

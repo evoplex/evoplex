@@ -32,7 +32,7 @@ OutputWidget::OutputWidget(const ModelPlugin* modelPlugin, const std::vector<int
       m_ui(new Ui_OutputWidget),
       m_modelPlugin(modelPlugin),
       m_trialIds(trialIds),
-      m_hasChanges(false),
+      m_hasChanges(false)
 {
     setWindowModality(Qt::ApplicationModal);
     m_ui->setupUi(this);
