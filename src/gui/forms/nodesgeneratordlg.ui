@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>525</width>
-    <height>675</height>
+    <height>658</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -80,6 +80,9 @@
       <item>
        <widget class="QWidget" name="wFromFile" native="true">
         <layout class="QHBoxLayout" name="horizontalLayout">
+         <property name="spacing">
+          <number>8</number>
+         </property>
          <item>
           <widget class="QLabel" name="label">
            <property name="text">
@@ -119,27 +122,20 @@
        </widget>
       </item>
       <item>
-       <widget class="QWidget" name="wSameData" native="true">
-        <layout class="QGridLayout" name="gridLayout_2">
-         <item row="1" column="2">
-          <widget class="QLabel" name="lseed">
-           <property name="text">
-            <string>PRG seed:</string>
-           </property>
-           <property name="indent">
-            <number>20</number>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="0">
+       <widget class="QWidget" name="wNumNodes" native="true">
+        <layout class="QHBoxLayout" name="horizontalLayout_3">
+         <property name="spacing">
+          <number>8</number>
+         </property>
+         <item>
           <widget class="QLabel" name="label_5">
            <property name="text">
             <string>Number of nodes:</string>
            </property>
           </widget>
          </item>
-         <item row="0" column="1">
-          <widget class="QSpinBox" name="numNodes1">
+         <item>
+          <widget class="QSpinBox" name="numNodes">
            <property name="minimum">
             <number>1</number>
            </property>
@@ -148,15 +144,37 @@
            </property>
           </widget>
          </item>
+         <item>
+          <spacer name="horizontalSpacer_4">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QWidget" name="wSameData" native="true">
+        <layout class="QGridLayout" name="gridLayout_2">
+         <property name="horizontalSpacing">
+          <number>8</number>
+         </property>
+         <item row="1" column="1">
+          <widget class="QComboBox" name="func"/>
+         </item>
          <item row="1" column="0">
           <widget class="QLabel" name="label_2">
            <property name="text">
             <string>Function:</string>
            </property>
           </widget>
-         </item>
-         <item row="1" column="1">
-          <widget class="QComboBox" name="func"/>
          </item>
          <item row="1" column="3">
           <widget class="QSpinBox" name="fseed">
@@ -168,8 +186,18 @@
            </property>
           </widget>
          </item>
-         <item row="0" column="2" colspan="2">
-          <spacer name="horizontalSpacer_4">
+         <item row="1" column="2">
+          <widget class="QLabel" name="lseed">
+           <property name="text">
+            <string>PRG seed:</string>
+           </property>
+           <property name="indent">
+            <number>20</number>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="4">
+          <spacer name="horizontalSpacer">
            <property name="orientation">
             <enum>Qt::Horizontal</enum>
            </property>
@@ -187,7 +215,7 @@
       <item>
        <widget class="QWidget" name="wDiffData" native="true">
         <layout class="QGridLayout" name="gridLayout">
-         <item row="1" column="0" colspan="3">
+         <item row="0" column="0" colspan="2">
           <widget class="QTableWidget" name="table">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Expanding" vsizetype="MinimumExpanding">
@@ -195,8 +223,14 @@
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
+           <property name="focusPolicy">
+            <enum>Qt::NoFocus</enum>
+           </property>
            <property name="frameShape">
             <enum>QFrame::NoFrame</enum>
+           </property>
+           <property name="frameShadow">
+            <enum>QFrame::Plain</enum>
            </property>
            <property name="lineWidth">
             <number>0</number>
@@ -206,6 +240,18 @@
            </property>
            <property name="selectionMode">
             <enum>QAbstractItemView::NoSelection</enum>
+           </property>
+           <property name="selectionBehavior">
+            <enum>QAbstractItemView::SelectRows</enum>
+           </property>
+           <property name="showGrid">
+            <bool>false</bool>
+           </property>
+           <property name="gridStyle">
+            <enum>Qt::NoPen</enum>
+           </property>
+           <property name="cornerButtonEnabled">
+            <bool>false</bool>
            </property>
            <attribute name="horizontalHeaderStretchLastSection">
             <bool>true</bool>
@@ -222,39 +268,14 @@
            </column>
            <column>
             <property name="text">
+             <string>Input</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
              <string/>
             </property>
            </column>
-          </widget>
-         </item>
-         <item row="0" column="1">
-          <widget class="QSpinBox" name="numNodes2">
-           <property name="minimum">
-            <number>1</number>
-           </property>
-           <property name="maximum">
-            <number>100000000</number>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="2">
-          <spacer name="horizontalSpacer">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>40</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-         <item row="0" column="0">
-          <widget class="QLabel" name="label_3">
-           <property name="text">
-            <string>Number of nodes:</string>
-           </property>
           </widget>
          </item>
         </layout>

@@ -44,10 +44,13 @@ NodesGeneratorDlg::NodesGeneratorDlg(QWidget* parent, const AttributesScope& nod
 
     connect(m_ui->bFromFile, SIGNAL(toggled(bool)), m_ui->wFromFile, SLOT(setVisible(bool)));
     connect(m_ui->bSameData, SIGNAL(toggled(bool)), m_ui->wSameData, SLOT(setVisible(bool)));
+    connect(m_ui->bSameData, SIGNAL(toggled(bool)), m_ui->wNumNodes, SLOT(setVisible(bool)));
     connect(m_ui->bDiffData, SIGNAL(toggled(bool)), m_ui->wDiffData, SLOT(setVisible(bool)));
+    connect(m_ui->bDiffData, SIGNAL(toggled(bool)), m_ui->wNumNodes, SLOT(setVisible(bool)));
     m_ui->wFromFile->setVisible(false);
     m_ui->wSameData->setVisible(false);
     m_ui->wDiffData->setVisible(false);
+    m_ui->wNumNodes->setVisible(false);
     m_ui->bSameData->setChecked(true);
 
     connect(m_ui->saveAs, SIGNAL(pressed()), SLOT(slotSaveAs()));
@@ -67,15 +70,17 @@ NodesGeneratorDlg::NodesGeneratorDlg(QWidget* parent, const AttributesScope& nod
     const auto RAND = static_cast<unsigned char>(Function::Rand);
     const auto VALUE = static_cast<unsigned char>(Function::Value);
 
-    connect(m_ui->func, &QComboBox::currentTextChanged, [this]() {
+    auto slotHideRand = [this]() {
         bool notRand = m_ui->func->currentData() != static_cast<unsigned char>(Function::Rand);
         m_ui->lseed->setHidden(notRand);
         m_ui->fseed->setHidden(notRand);
-    });
+    };
+    connect(m_ui->func, &QComboBox::currentTextChanged, slotHideRand);
     m_ui->func->insertItem(0, _enumToString<Function>(Function::Min), MIN);
     m_ui->func->insertItem(1, _enumToString<Function>(Function::Max), MAX);
     m_ui->func->insertItem(2, _enumToString<Function>(Function::Rand), RAND);
     m_ui->func->setCurrentIndex(0);
+    slotHideRand();
 
     m_ui->table->setRowCount(m_nodeAttrsScope.size());
     for (const AttributeRange* ar : m_nodeAttrsScope) {
@@ -88,26 +93,23 @@ NodesGeneratorDlg::NodesGeneratorDlg(QWidget* parent, const AttributesScope& nod
         cb->insertItem(3, _enumToString<Function>(Function::Value), VALUE);
         m_ui->table->setCellWidget(ar->id(), 1, cb);
 
-        QLineEdit* le = new QLineEdit();
-        connect(cb, &QComboBox::currentTextChanged, [cb, le, ar](){
+        QLineEdit* le = new QLineEdit(m_ui->table);
+        connect(cb, &QComboBox::currentTextChanged, [this, cb, le, ar]() {
             Function f = static_cast<Function>(cb->currentData().toInt());
-            if (f == Function::Min || f == Function::Max) {
-                le->setHidden(true);
-                return;
-            } else if (f == Function::Rand) {
-                le->setToolTip("Type the PRG seed (integer).");
-                le->setFocus();
+            QString tt;
+            if (f == Function::Rand) {
+                tt = "Type the PRG seed (integer).";
             } else if (f == Function::Value) {
-                le->setToolTip("Type a valid value for this attribute.\n"
-                               "Expected: " + ar->attrRangeStr());
-                le->setFocus();
-            } else {
-                qFatal("invalid function!");
+                tt = "Type a valid value for this attribute.\n"
+                     "Expected: " + ar->attrRangeStr();
             }
-            le->setHidden(false);
+            le->setToolTip(tt);
+            le->setFocus();
+            m_ui->table->setColumnHidden(2, tt.isEmpty());
         });
         m_ui->table->setCellWidget(ar->id(), 2, le);
-        le->setHidden(true);
+        cb->setCurrentIndex(0);
+        m_ui->table->setColumnHidden(2, true);
     }
 
     resize(width(), 250);
@@ -138,9 +140,7 @@ void NodesGeneratorDlg::slotSaveAs()
             return;
         }
 
-        const int numNodes = m_ui->bSameData->isChecked() ? m_ui->numNodes1->value()
-                                                          : m_ui->numNodes2->value();
-
+        const int numNodes = m_ui->numNodes->value();
         QProgressDialog progressDlg("Exporting Nodes...", QString(), 0, 2 * numNodes, this);
         progressDlg.setWindowModality(Qt::WindowModal);
         progressDlg.setValue(0);
@@ -192,7 +192,7 @@ void NodesGeneratorDlg::fill(const QString& cmd)
     AGSameFuncForAll* agsame = dynamic_cast<AGSameFuncForAll*>(ag);
     if (agsame) {
         m_ui->bSameData->setChecked(true);
-        m_ui->numNodes1->setValue(agsame->size());
+        m_ui->numNodes->setValue(agsame->size());
         m_ui->func->setCurrentIndex(m_ui->func->findData(static_cast<int>(agsame->function())));
         const Value& v = agsame->functionInput();
         m_ui->fseed->setValue(v.type() == Value::INT ? v.toInt() : 0);
@@ -202,14 +202,19 @@ void NodesGeneratorDlg::fill(const QString& cmd)
     AGDiffFunctions* agdiff = dynamic_cast<AGDiffFunctions*>(ag);
     if (agdiff) {
         m_ui->bDiffData->setChecked(true);
-        m_ui->numNodes2->setValue(agdiff->size());
+        m_ui->numNodes->setValue(agdiff->size());
         for (const AGDiffFunctions::AttrCmd& ac : agdiff->attrCmds()) {
             Q_ASSERT_X(m_ui->table->item(ac.attrId, 0)->text() == ac.attrName,
                        "NodesGeneratorDlg::fill", "attribute name mismatch. It should never happen!");
-            QComboBox* cb = dynamic_cast<QComboBox*>(m_ui->table->cellWidget(ac.attrId, 1));
+            QComboBox* cb = qobject_cast<QComboBox*>(m_ui->table->cellWidget(ac.attrId, 1));
+            QLineEdit* le = qobject_cast<QLineEdit*>(m_ui->table->cellWidget(ac.attrId, 2));
             cb->setCurrentIndex(cb->findData(static_cast<int>(ac.func)));
             if (ac.func == Function::Rand || ac.func == Function::Value) {
-                dynamic_cast<QLineEdit*>(m_ui->table->cellWidget(ac.attrId, 2))->setText(ac.funcInput.toQString());
+                le->setText(ac.funcInput.toQString());
+                le->setHidden(false);
+            } else {
+                le->setText("");
+                le->setHidden(true);
             }
         }
     }
@@ -226,20 +231,20 @@ QString NodesGeneratorDlg::readCommand()
         }
         command = m_ui->filepath->text();
     } else if (m_ui->bSameData->isChecked()) {
-        command = QString("*%1;%2").arg(m_ui->numNodes1->text(), m_ui->func->currentText());
+        command = QString("*%1;%2").arg(m_ui->numNodes->text(), m_ui->func->currentText());
         if (m_ui->func->currentData() == static_cast<int>(Function::Rand)) {
             command += QString("_%1").arg(m_ui->fseed->value());
         }
     } else if (m_ui->bDiffData->isChecked()) {
-        command = QString("#%1").arg(m_ui->numNodes2->text());
+        command = QString("#%1").arg(m_ui->numNodes->text());
         for (const AttributeRange* ar : m_nodeAttrsScope) {
             Q_ASSERT_X(m_ui->table->item(ar->id(), 0)->text() == ar->attrName(),
                        "NodesGeneratorDlg::fill", "attribute name mismatch. It should never happen!");
 
-            QComboBox* cb = dynamic_cast<QComboBox*>(m_ui->table->cellWidget(ar->id(), 1));
+            QComboBox* cb = qobject_cast<QComboBox*>(m_ui->table->cellWidget(ar->id(), 1));
             command += QString(";%1_%2").arg(ar->attrName(), cb->currentText());
 
-            QString valStr = dynamic_cast<QLineEdit*>(m_ui->table->cellWidget(ar->id(), 2))->text();
+            QString valStr = qobject_cast<QLineEdit*>(m_ui->table->cellWidget(ar->id(), 2))->text();
             Function f = static_cast<Function>(cb->currentData().toInt());
             if (f == Function::Rand) {
                 bool isInt = false;
