@@ -43,16 +43,9 @@ AttrsGenerator* AttrsGenerator::parse(const AttributesScope& attrsScope,
 
     QStringList cmds = cmd.split(";");
     QString sizeStr = cmds.takeFirst();
-
-    if (attrsScope.empty() && !cmds.empty()) {
-        error = "The command '" + cmd + "' is invalid!\n"
-                "It should be a positive integer only.";
-        qWarning() << error;
-        return nullptr;
-    }
-
     QString _cmd;
     int size = -1;
+
     bool sizeIsValid = false;
     if (cmds.empty()) { // '*int;min' alias
         size = sizeStr.toInt(&sizeIsValid);
@@ -73,7 +66,7 @@ AttrsGenerator* AttrsGenerator::parse(const AttributesScope& attrsScope,
     AttrsGenerator* ag = nullptr;
     if (_cmd.startsWith("*")) {
         ag = parseStarCmd(attrsScope, size, cmds, error);
-    } else if (_cmd.startsWith("#")) {
+    } else if (_cmd.startsWith("#") && !attrsScope.empty()) {
         ag = parseHashCmd(attrsScope, size, cmds, error);
     } else {
         error = "the command '" + cmd + "'. is invalid!";
