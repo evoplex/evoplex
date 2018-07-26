@@ -39,7 +39,7 @@ public:
     ~TitleBar();
 
 signals:
-    void trialSelected(int);
+    void trialSelected(quint16);
     void openSettingsDlg();
 
 private slots:

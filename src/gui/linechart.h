@@ -47,7 +47,7 @@ public slots:
 private slots:
     void slotOutputWidget();
     void slotRestarted();
-    void setTrial(int trialId);
+    void setTrial(quint16 trialId);
 
 private:
     struct Series {

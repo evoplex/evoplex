@@ -64,7 +64,7 @@ GraphWidget::GraphWidget(MainGUI* mainGUI, ExperimentPtr exp, ExperimentWidget* 
     TitleBar* titleBar = new TitleBar(exp.get(), this);
     setTitleBarWidget(titleBar);
     connect(titleBar, SIGNAL(openSettingsDlg()), m_settingsDlg, SLOT(show()));
-    connect(titleBar, SIGNAL(trialSelected(int)), SLOT(setTrial(int)));
+    connect(titleBar, SIGNAL(trialSelected(quint16)), SLOT(setTrial(quint16)));
 
     // setTrial() triggers a timer that needs to be exec in the main thread
     // thus, we need to use queuedconnection here

@@ -45,8 +45,14 @@ TitleBar::TitleBar(const Experiment* exp, QDockWidget* parent)
     connect(m_ui->bFloat, &QPushButton::clicked,
             [parent]() { parent->setFloating(!parent->isFloating()); });
 
-    connect(m_ui->cbTrial, SIGNAL(currentIndexChanged(int)), SIGNAL(trialSelected(int)));
     connect(m_ui->bSettings, SIGNAL(clicked(bool)), SIGNAL(openSettingsDlg()));
+
+    connect(m_ui->cbTrial, QOverload<int>::of(&QComboBox::currentIndexChanged),
+        [this](int t) {
+            Q_ASSERT(t >= 0 && t < UINT16_MAX);
+            emit(trialSelected(static_cast<quint16>(t)));
+        }
+    );
 }
 
 TitleBar::~TitleBar()
@@ -65,17 +71,18 @@ void TitleBar::paintEvent(QPaintEvent* pe)
 
 void TitleBar::slotRestarted()
 {
-    int currTrial = m_ui->cbTrial->currentText().toInt();
+    const quint16 currTrial = m_ui->cbTrial->currentText().toUShort();
     m_ui->cbTrial->blockSignals(true);
     m_ui->cbTrial->clear();
-    for (int trialId = 0; trialId < m_exp->numTrials(); ++trialId) {
+    for (quint16 trialId = 0; trialId < m_exp->numTrials(); ++trialId) {
         m_ui->cbTrial->insertItem(trialId, QString::number(trialId));
     }
     m_ui->cbTrial->setCurrentText(QString::number(currTrial)); // try to keep the same id
     m_ui->cbTrial->blockSignals(false);
 
-    if (currTrial != m_ui->cbTrial->currentText().toInt()) {
-        emit (trialSelected(m_ui->cbTrial->currentText().toInt()));
+    const quint16 _currTrial = m_ui->cbTrial->currentText().toUShort();
+    if (currTrial != _currTrial) {
+        emit(trialSelected(_currTrial));
     }
 }
 

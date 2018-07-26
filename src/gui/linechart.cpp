@@ -56,7 +56,7 @@ LineChart::LineChart(ExperimentPtr exp, QWidget* parent)
     TitleBar* titleBar = new TitleBar(m_exp.get(), this);
     setTitleBarWidget(titleBar);
     setTrial(0); // init
-    connect(titleBar, SIGNAL(trialSelected(int)), SLOT(setTrial(int)));
+    connect(titleBar, SIGNAL(trialSelected(quint16)), SLOT(setTrial(quint16)));
     connect(titleBar, SIGNAL(openSettingsDlg()), dlg, SLOT(show()));
 
     connect(m_exp.get(), &Experiment::trialCreated, [this](int trialId) {
@@ -142,7 +142,7 @@ void LineChart::slotRestarted()
     m_finished = false;
 }
 
-void LineChart::setTrial(int trialId)
+void LineChart::setTrial(quint16 trialId)
 {
     if (m_exp->expStatus() == Status::Running || m_exp->expStatus() == Status::Queued) {
         QMessageBox::warning(this, "Line Chart",
