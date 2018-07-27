@@ -28,6 +28,7 @@
 #include <vector>
 
 #include "value.h"
+#include "utils.h"
 
 namespace evoplex {
 
@@ -101,11 +102,17 @@ private:
    Attributes: Inline member functions
  ************************************************************************/
 
-inline void Attributes::resize(int size)
-{ m_names.resize(size); m_values.resize(size); }
+inline void Attributes::resize(int size) {
+    size_t s = size < 0 ? 0 : static_cast<size_t>(size);
+    m_names.resize(s);
+    m_values.resize(s);
+}
 
-inline void Attributes::reserve(int size)
-{ m_names.reserve(size); m_values.reserve(size); }
+inline void Attributes::reserve(int size) {
+    size_t s = size < 0 ? 0 : static_cast<size_t>(size);
+    m_names.reserve(s);
+    m_values.reserve(s);
+}
 
 inline int Attributes::size() const
 { return static_cast<int>(m_values.size()); }
@@ -119,10 +126,8 @@ inline bool Attributes::empty() const
 inline int Attributes::indexOf(const char* name) const
 { return indexOf(QString::fromLocal8Bit(name)); }
 
-inline int Attributes::indexOf(const QString& name) const {
-    int idx = std::find(m_names.begin(), m_names.end(), name) - m_names.begin();
-    return idx == static_cast<int>(m_names.size()) ? -1 : idx;
-}
+inline int Attributes::indexOf(const QString& name) const
+{ return Utils::indexOf(m_names, name); }
 
 inline bool Attributes::contains(const char* name) const
 { return indexOf(name) > -1; }

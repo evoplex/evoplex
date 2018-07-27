@@ -73,6 +73,19 @@ namespace Utils
         s.clear();
     }
 
+    // Find index of value in range.
+    // Returns the index of the first element in the range that compares equal to val
+    // If no such element is found, the function returns -1
+    template <class C, class T>
+    int indexOf(const C& container, const T& val) {
+        Q_ASSERT(container.size() < INT32_MAX);
+        const int s = static_cast<int>(container.size());
+        for (int idx = 0; idx < s; ++idx) {
+            if (container.at(idx) == val) return idx;
+        }
+        return -1;
+    }
+
     // clone a population of nodes
     template <class C>
     C clone(const C& container) {
