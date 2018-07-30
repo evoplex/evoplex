@@ -57,7 +57,7 @@ private:
     // checks if sets of nodes have the same content
     void _compare_nodes(const Nodes& a, const Nodes& b) const;
     void _tst_empty_nodes(const Nodes& a, size_t size);
-    void _tst_Node(Node *node, Attributes attrs);
+    void _tst_Node(BaseNode* node, Attributes attrs);
     void _tst_attrs(NodePtr node, Attributes attrs);
     void _tst_invalid(QString cmd, bool has_attrs, GraphType graphType);
     void _tst_fromFile_nodes_with_oneCoord(const QString& filePath);

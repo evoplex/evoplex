@@ -23,7 +23,7 @@
 // we need this cpp file to avoi weak-vtable issues
 namespace evoplex {
 
-Node::Node(const constructor_key&, int id, const Attributes& attrs, int x, int y)
+BaseNode::BaseNode(const constructor_key&, int id, const Attributes& attrs, int x, int y)
     : m_id(id),
       m_attrs(attrs),
       m_x(x),
@@ -31,34 +31,34 @@ Node::Node(const constructor_key&, int id, const Attributes& attrs, int x, int y
 {
 }
 
-Node::Node(const constructor_key& k, int id, const Attributes& attr)
-    : Node(k, id, attr, 0, id) {}
+BaseNode::BaseNode(const constructor_key& k, int id, const Attributes& attr)
+    : BaseNode(k, id, attr, 0, id) {}
 
-Node::~Node()
+BaseNode::~BaseNode()
 {
 }
 
 /*******************/
 
 UNode::UNode(const constructor_key& k, int id, const Attributes& attrs, int x, int y)
-    : Node(k, id, attrs, x, y)
+    : BaseNode(k, id, attrs, x, y)
 {
 }
 
 UNode::UNode(const constructor_key& k, int id, const Attributes& attrs)
-    : Node(k, id, attrs)
+    : BaseNode(k, id, attrs)
 {
 }
 
 /*******************/
 
 DNode::DNode(const constructor_key& k, int id, const Attributes& attrs, int x, int y)
-    : Node(k, id, attrs, x, y)
+    : BaseNode(k, id, attrs, x, y)
 {
 }
 
 DNode::DNode(const constructor_key& k, int id, const Attributes& attrs)
-    : Node(k, id, attrs)
+    : BaseNode(k, id, attrs)
 {
 }
 

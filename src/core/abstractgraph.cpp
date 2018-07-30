@@ -50,7 +50,7 @@ NodePtr AbstractGraph::addNode(Attributes attr, int x, int y)
     QMutexLocker locker(&m_mutex);
     ++m_lastNodeId;
     NodePtr node;
-    Node::constructor_key k;
+    BaseNode::constructor_key k;
     if (isDirected()) {
         node = std::make_shared<DNode>(k, m_lastNodeId, attr, x, y);
     } else {

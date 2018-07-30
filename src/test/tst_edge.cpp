@@ -42,7 +42,7 @@ private:
 
 void TestEdge::initTestCase()
 {
-    Node::constructor_key key;
+    BaseNode::constructor_key key;
     m_nodeA = std::make_shared<UNode>(key, 0, Attributes());
     m_nodeB = std::make_shared<UNode>(key, 1, Attributes());
 }

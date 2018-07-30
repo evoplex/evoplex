@@ -35,19 +35,19 @@ private slots:
     void tst_Node();
 
 private:
-    Node::constructor_key key;
-    void _tst_attrs(Node* node, Attributes attrs);
-    void _tst_xy(Node* node, int x, int y);
-    void _tst_clone(const Node* node);
-    void _tst_degree(Node* node);
+    BaseNode::constructor_key key;
+    void _tst_attrs(BaseNode* node, Attributes attrs);
+    void _tst_xy(BaseNode* node, int x, int y);
+    void _tst_clone(const BaseNode* node);
+    void _tst_degree(BaseNode* node);
 };
 
-void TestNode::_tst_attrs(Node* node, Attributes attrs)
+void TestNode::_tst_attrs(BaseNode* node, Attributes attrs)
 {
     QCOMPARE(node->attrs().names(), attrs.names());
     QCOMPARE(node->attrs().values(), attrs.values());
 
-    // Tests if 'Node::setAttr()' works as expected.
+    // Tests if 'BaseNode::setAttr()' works as expected.
     const Value newValue = "another-type";
     node->setAttr(0, newValue);
 
@@ -58,22 +58,22 @@ void TestNode::_tst_attrs(Node* node, Attributes attrs)
     QCOMPARE(node->attrs().size(), attrs.size());
 }
 
-void TestNode::_tst_xy(Node* node, int x, int y)
+void TestNode::_tst_xy(BaseNode* node, int x, int y)
 {
     QCOMPARE(node->x(), x);
     QCOMPARE(node->y(), y);
 
-    // Tests if 'Node::setX()' works as expected
+    // Tests if 'BaseNode::setX()' works as expected
     x = 2;
     node->setX(x);
     QCOMPARE(node->x(), x);
 
-    // Tests if 'Node::setY()' works as expected
+    // Tests if 'BaseNode::setY()' works as expected
     y = 3;
     node->setY(y);
     QCOMPARE(node->y(), y);
 
-    // Tests if 'Node::setYCoords()' works as expected
+    // Tests if 'BaseNode::setYCoords()' works as expected
     x = 3;
     y = 4;
     node->setCoords(x,y);
@@ -81,8 +81,8 @@ void TestNode::_tst_xy(Node* node, int x, int y)
     QCOMPARE(node->y(), y);
 }
 
-void TestNode::_tst_clone(const Node* node) {
-    // Tests if 'Node::clone()' works as expected.
+void TestNode::_tst_clone(const BaseNode* node) {
+    // Tests if 'BaseNode::clone()' works as expected.
     NodePtr c = node->clone();
     QCOMPARE(c->id(), node->id());
     QCOMPARE(c->x(), node->x());
@@ -95,7 +95,7 @@ void TestNode::_tst_clone(const Node* node) {
     QCOMPARE(c->outDegree(), node->outDegree());
 }
 
-void TestNode::_tst_degree(Node* node)
+void TestNode::_tst_degree(BaseNode* node)
 {
     // Tests if degree functions return 0 with an empty node
     QCOMPARE(node->degree(), 0);
@@ -113,7 +113,7 @@ void TestNode::tst_Node()
         attrs.replace(i, names[i], values[i]);
     }
 
-    auto tests = [this, id, x, y, attrs](Node* node) {
+    auto tests = [this, id, x, y, attrs](BaseNode* node) {
         QCOMPARE(node->id(), id);
         _tst_attrs(node, attrs);
         _tst_xy(node, x, y);

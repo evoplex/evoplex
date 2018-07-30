@@ -44,7 +44,7 @@ Nodes Nodes::fromCmd(const QString& cmd, const AttributesScope& attrsScope,
     SetOfAttributes setOfAttrs = ag->create();
     delete ag;
 
-    Node::constructor_key k;
+    BaseNode::constructor_key k;
     Nodes nodes;
     int id = 0;
     if (graphType == GraphType::Directed) {
@@ -220,7 +220,7 @@ NodePtr Nodes::readRow(const int row, const QStringList& header, const QStringLi
         }
     }
 
-    Node::constructor_key k;
+    BaseNode::constructor_key k;
     if (isDirected) {
         return std::make_shared<DNode>(k, row, attrs, coordX, coordY);
     }

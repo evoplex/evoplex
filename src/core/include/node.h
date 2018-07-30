@@ -29,8 +29,8 @@
 
 namespace evoplex {
 
-class Node;
-typedef std::shared_ptr<Node> NodePtr;
+class BaseNode;
+typedef std::shared_ptr<BaseNode> NodePtr;
 
 class NodeInterface
 {
@@ -65,7 +65,7 @@ private:
  * @attention A node can only be created by an AbstractGraph derived object
  *            or from a Nodes container.
  */
-class Node : public NodeInterface
+class BaseNode : public NodeInterface
 {
     friend class AbstractGraph;
     friend class Nodes;
@@ -94,9 +94,9 @@ protected:
 
     struct constructor_key { /* this is a private key accessible only to friends */ };
 
-    explicit Node(const constructor_key&, int id, const Attributes& attrs, int x, int y);
-    explicit Node(const constructor_key& k, int id, const Attributes& attr);
-    ~Node() override;
+    explicit BaseNode(const constructor_key&, int id, const Attributes& attrs, int x, int y);
+    explicit BaseNode(const constructor_key& k, int id, const Attributes& attr);
+    ~BaseNode() override;
 
 private:
     const int m_id;
@@ -105,7 +105,7 @@ private:
     int m_y;
 };
 
-class UNode : public Node
+class UNode : public BaseNode
 {
 public:
     explicit UNode(const constructor_key& k, int id, const Attributes& attrs, int x, int y);
@@ -128,7 +128,7 @@ private:
     inline void clearOutEdges() override;
 };
 
-class DNode : public Node
+class DNode : public BaseNode
 {
 public:
     explicit DNode(const constructor_key& k, int id, const Attributes& attrs, int x, int y);
@@ -154,43 +154,43 @@ private:
 };
 
 /************************************************************************
-   Node: Inline member functions
+   BaseNode: Inline member functions
  ************************************************************************/
 
-inline const Attributes& Node::attrs() const
+inline const Attributes& BaseNode::attrs() const
 { return m_attrs; }
 
-inline const Value& Node::attr(const QString& name) const
+inline const Value& BaseNode::attr(const QString& name) const
 { return m_attrs.value(name); }
 
-inline const Value& Node::attr(const char* name) const
+inline const Value& BaseNode::attr(const char* name) const
 { return m_attrs.value(name); }
 
-inline const Value& Node::attr(const int id) const
+inline const Value& BaseNode::attr(const int id) const
 { return m_attrs.value(id); }
 
-inline void Node::setAttr(const int id, const Value& value)
+inline void BaseNode::setAttr(const int id, const Value& value)
 { m_attrs.setValue(id, value); }
 
-inline int Node::id() const
+inline int BaseNode::id() const
 { return m_id; }
 
-inline int Node::x() const
+inline int BaseNode::x() const
 { return m_x; }
 
-inline void Node::setX(int x)
+inline void BaseNode::setX(int x)
 { m_x = x; }
 
-inline int Node::y() const
+inline int BaseNode::y() const
 { return m_y; }
 
-inline void Node::setY(int y)
+inline void BaseNode::setY(int y)
 { m_y = y; }
 
-inline void Node::setCoords(int x, int y)
+inline void BaseNode::setCoords(int x, int y)
 { setX(x); setY(y); }
 
-inline const NodePtr& Node::randNeighbour(PRG* prg) const
+inline const NodePtr& BaseNode::randNeighbour(PRG* prg) const
 { return (*std::next(m_outEdges.cbegin(), prg->randI(outDegree()-1))).second->neighbour(); }
 
 /************************************************************************

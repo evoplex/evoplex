@@ -29,10 +29,10 @@
 namespace evoplex {
 
 class Edge;
-class Node;
+class BaseNode;
 
-typedef std::shared_ptr<Node> NodePtr;
-typedef std::shared_ptr<Edge> EdgePtr;
+using NodePtr = std::shared_ptr<BaseNode>;
+using EdgePtr = std::shared_ptr<Edge>;
 
 /**
  * @brief An Edge connects a node to itself or to another node.
