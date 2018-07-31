@@ -45,13 +45,13 @@ private slots:
 
 void TestAttrsGenerator::_tst_attrs(SetOfAttributes res, Attributes attrs, bool testValues)
 {
-    for(int i = 0; i < res.size(); i++){
+    for (int i = 0; i < res.size(); ++i) {
         QCOMPARE(res.at(i).names(), attrs.names());
         QCOMPARE(res.at(i).size(), attrs.size());
 
         if(testValues){
             QCOMPARE(res.at(i).values(), attrs.values());
-            for(int j = 0; j < attrs.size(); j++){
+            for (int j = 0; j < attrs.size(); ++j) {
                 QCOMPARE(res.at(i).value(j), attrs.value(j));
             }
         }
@@ -61,20 +61,20 @@ void TestAttrsGenerator::_tst_attrs(SetOfAttributes res, Attributes attrs, bool 
 void TestAttrsGenerator::_tst_mode(SetOfAttributes res, QString mode, AttributeRange* attrRge[], int numOfAttrRges)
 {
    if(mode == "min"){
-        for(int i = 0; i < res.size(); i++){
-            for(int j = 0; j < numOfAttrRges; j++){
+        for (int i = 0; i < res.size(); ++i) {
+            for (int j = 0; j < numOfAttrRges; ++j) {
                 QCOMPARE(res.at(i).value(j), attrRge[j]->min());
             }
         }
     } else if (mode == "max"){
-        for(int i = 0; i < res.size(); i++){
-            for(int j = 0; j < numOfAttrRges; j++){
+        for (int i = 0; i < res.size(); ++i) {
+            for (int j = 0; j < numOfAttrRges; ++j) {
                 QCOMPARE(res.at(i).value(j), attrRge[j]->max());
             }
         }
     } else if(mode == "rand"){
-        for(int i = 0; i < res.size(); i++){
-            for(int j = 0; j < numOfAttrRges; j++){
+        for (int i = 0; i < res.size(); ++i) {
+            for (int j = 0; j < numOfAttrRges; ++j) {
                 QVERIFY(res.at(i).value(j) >= attrRge[j]->min());
                 QVERIFY(res.at(i).value(j) <= attrRge[j]->max());
             }
@@ -115,7 +115,7 @@ void TestAttrsGenerator::tst_parseStarCmd_min()
     agen = AttrsGenerator::parse(attrsScope, cmd, error);
 
     attrs.resize(3);
-    for(int i = 0; i < attrs.size(); i++){
+    for (int i = 0; i < attrs.size(); ++i) {
         attrs.replace(i, names.at(i), NULL);
     }
 
@@ -161,7 +161,7 @@ void TestAttrsGenerator::tst_parseStarCmd_max()
     agen = AttrsGenerator::parse(attrsScope, cmd, error);
 
     attrs.resize(3);
-    for(int i = 0; i < attrs.size(); i++){
+    for (int i = 0; i < attrs.size(); ++i) {
         attrs.replace(i, names.at(i), NULL);
     }
 
@@ -207,7 +207,7 @@ void TestAttrsGenerator::tst_parseStarCmd_rand()
     agen = AttrsGenerator::parse(attrsScope, cmd, error);
 
     attrs.resize(3);
-    for(int i = 0; i < attrs.size(); i++){
+    for (int i = 0; i < attrs.size(); ++i) {
         attrs.replace(i, names.at(i), NULL);
     }
 
@@ -254,7 +254,7 @@ void TestAttrsGenerator::tst_parseHashCmd_min()
     agen = AttrsGenerator::parse(attrsScope, cmd, error);
 
     attrs.resize(4);
-    for(int i = 0; i < attrs.size(); i++){
+    for (int i = 0; i < attrs.size(); ++i) {
         attrs.replace(i, names.at(i), attrRges[i]->min());
     }
 
@@ -300,7 +300,7 @@ void TestAttrsGenerator::tst_parseHashCmd_max()
     agen = AttrsGenerator::parse(attrsScope, cmd, error);
 
     attrs.resize(4);
-    for(int i = 0; i < attrs.size(); i++){
+    for (int i = 0; i < attrs.size(); ++i) {
         attrs.replace(i, names.at(i), attrRges[i]->max());
     }
 
@@ -346,7 +346,7 @@ void TestAttrsGenerator::tst_parseHashCmd_rand()
     attrs.resize(4);
     agen = AttrsGenerator::parse(attrsScope, cmd, error);
 
-    for(int i = 0; i < attrs.size(); i++){
+    for (int i = 0; i < attrs.size(); ++i) {
         attrs.replace(i, names.at(i), NULL);
     }
 
@@ -394,7 +394,7 @@ void TestAttrsGenerator::tst_parseHashCmd_setValue()
     agen = AttrsGenerator::parse(attrsScope, cmd, error);
 
     attrs.resize(4);
-    for(int i = 0; i < attrs.size(); i++){
+    for (int i = 0; i < attrs.size(); ++i) {
         attrs.replace(i, names.at(i), values[i]);
     }
 
@@ -441,7 +441,7 @@ void TestAttrsGenerator::tst_parseHashCmd_mixedFunc()
     agen = AttrsGenerator::parse(attrsScope, cmd, error);
 
     attrs.resize(4);
-    for(int i = 0; i < (attrs.size()-1); i++){
+    for (int i = 0; i < (attrs.size()-1); ++i) {
         attrs.replace(i, names.at(i), NULL);
     }
      attrs.replace(3, names.at(3), value);
@@ -452,7 +452,7 @@ void TestAttrsGenerator::tst_parseHashCmd_mixedFunc()
     res = agen->create();
 
     _tst_attrs(res, attrs, false);
-    for(int i = 0; i < res.size(); i++){
+    for (int i = 0; i < res.size(); ++i) {
         QCOMPARE(res.at(i).value(0), attrRges[0]->min());
         QCOMPARE(res.at(i).value(1), attrRges[1]->max());
         QVERIFY(res.at(i).value(2) <= attrRges[2]->max());
