@@ -40,6 +40,7 @@ private slots:
     void _tst_attrs(SetOfAttributes res, Attributes attrs,  bool testValues);
     void _tst_mode(SetOfAttributes res, QString mode, AttributesScope attrsScope, int numOfAttrRges);
     void _tst_parseStarCmd(QString mode);
+    AttributesScope _newAttrsScope(const QStringList& names, const QStringList& attrRges);
 };
 
 void TestAttrsGenerator::_tst_attrs(SetOfAttributes res, Attributes attrs, bool testValues)
@@ -81,6 +82,18 @@ void TestAttrsGenerator::_tst_mode(SetOfAttributes res, QString mode, Attributes
     }
 }
 
+AttributesScope TestAttrsGenerator::_newAttrsScope(const QStringList& names, const QStringList& attrRges)
+{
+    Q_ASSERT(names.size() == attrRges.size());
+    AttributesScope attrsScope;
+    attrsScope.reserve(names.size());
+    for (int i = 0; i  < names.size(); ++i) {
+        AttributeRange* a = AttributeRange::parse(i, names.at(i), attrRges.at(i));
+        attrsScope.insert(a->attrName(), a);
+    }
+    return attrsScope;
+}
+
 void TestAttrsGenerator::_tst_parseStarCmd(QString mode)
 {
     AttributesScope attrsScope;
@@ -110,13 +123,7 @@ void TestAttrsGenerator::_tst_parseStarCmd(QString mode)
     _tst_attrs(res, attrs, true);
 
     // Valid * command with non-empty attrScope
-    AttributeRange* col0 = AttributeRange::parse(0, names.at(0), attrRgeStrs.at(0));
-    attrsScope.insert(col0->attrName(), col0);
-    AttributeRange* col1 = AttributeRange::parse(1, names.at(1), attrRgeStrs.at(1));
-    attrsScope.insert(col1->attrName(), col1);
-    AttributeRange* col2 = AttributeRange::parse(2, names.at(2), attrRgeStrs.at(2));
-    attrsScope.insert(col2->attrName(), col2);
-    AttributeRange* attrRges[3] = {col0, col1, col2};
+    attrsScope = _newAttrsScope(names, attrRgeStrs);
     agen = AttrsGenerator::parse(attrsScope, cmd, error);
 
     attrs.resize(3);
@@ -142,7 +149,6 @@ void TestAttrsGenerator::tst_parseStarCmd()
 
 void TestAttrsGenerator::tst_parseHashCmd_min()
 {
-    AttributesScope attrsScope;
     AttrsGenerator* agen;
     SetOfAttributes res;
     Attributes attrs;
@@ -162,21 +168,13 @@ void TestAttrsGenerator::tst_parseHashCmd_min()
     const QString cmd = QString("#%1;%2;%3;%4;%5").arg(cmdList.at(0)).arg(cmdList.at(1)).arg(cmdList.at(2)).arg(cmdList.at(3)).arg(cmdList.at(4));
 
     // Valid # command with non-empty attrScope
-    AttributeRange* col0 = AttributeRange::parse(0, names.at(0), attrRgeStrs.at(0));
-    attrsScope.insert(col0->attrName(), col0);
-    AttributeRange* col1 = AttributeRange::parse(1, names.at(1), attrRgeStrs.at(1));
-    attrsScope.insert(col1->attrName(), col1);
-    AttributeRange* col2 = AttributeRange::parse(2, names.at(2), attrRgeStrs.at(2));
-    attrsScope.insert(col2->attrName(), col2);
-    AttributeRange* col3 = AttributeRange::parse(3, names.at(3), attrRgeStrs.at(3));
-    attrsScope.insert(col3->attrName(), col3);
-    AttributeRange* attrRges[4] = {col0, col1, col2, col3};
+    const AttributesScope attrsScope = _newAttrsScope(names, attrRgeStrs);
 
     agen = AttrsGenerator::parse(attrsScope, cmd, error);
 
     attrs.resize(4);
     for (int i = 0; i < attrs.size(); ++i) {
-        attrs.replace(i, names.at(i), attrRges[i]->min());
+        attrs.replace(i, names.at(i), attrsScope.value(names.at(i))->min());
     }
 
     QCOMPARE(agen->command(), cmd);
@@ -185,12 +183,10 @@ void TestAttrsGenerator::tst_parseHashCmd_min()
     res = agen->create();
 
     _tst_attrs(res, attrs, true);
-    _tst_mode(res, "min", attrsScope, 4);
 }
 
 void TestAttrsGenerator::tst_parseHashCmd_max()
 {
-    AttributesScope attrsScope;
     AttrsGenerator* agen;
     SetOfAttributes res;
     Attributes attrs;
@@ -210,21 +206,13 @@ void TestAttrsGenerator::tst_parseHashCmd_max()
     const QString cmd = QString("#%1;%2;%3;%4;%5").arg(cmdList.at(0)).arg(cmdList.at(1)).arg(cmdList.at(2)).arg(cmdList.at(3)).arg(cmdList.at(4));
 
     // Valid # command with non-empty attrScope
-    AttributeRange* col0 = AttributeRange::parse(0, names.at(0), attrRgeStrs.at(0));
-    attrsScope.insert(col0->attrName(), col0);
-    AttributeRange* col1 = AttributeRange::parse(1, names.at(1), attrRgeStrs.at(1));
-    attrsScope.insert(col1->attrName(), col1);
-    AttributeRange* col2 = AttributeRange::parse(2, names.at(2), attrRgeStrs.at(2));
-    attrsScope.insert(col2->attrName(), col2);
-    AttributeRange* col3 = AttributeRange::parse(3, names.at(3), attrRgeStrs.at(3));
-    attrsScope.insert(col3->attrName(), col3);
-    AttributeRange* attrRges[4] = {col0, col1, col2, col3};
+    const AttributesScope attrsScope = _newAttrsScope(names, attrRgeStrs);
 
     agen = AttrsGenerator::parse(attrsScope, cmd, error);
 
     attrs.resize(4);
     for (int i = 0; i < attrs.size(); ++i) {
-        attrs.replace(i, names.at(i), attrRges[i]->max());
+        attrs.replace(i, names.at(i), attrsScope.value(names.at(i))->max());
     }
 
     QCOMPARE(agen->command(), cmd);
@@ -233,12 +221,10 @@ void TestAttrsGenerator::tst_parseHashCmd_max()
     res = agen->create();
 
     _tst_attrs(res, attrs, true);
-    _tst_mode(res, "max", attrsScope, 4);
 }
 
 void TestAttrsGenerator::tst_parseHashCmd_rand()
 {
-    AttributesScope attrsScope;
     AttrsGenerator* agen;
     SetOfAttributes res;
     Attributes attrs;
@@ -258,15 +244,7 @@ void TestAttrsGenerator::tst_parseHashCmd_rand()
     const QString cmd = QString("#%1;%2;%3;%4;%5").arg(cmdList.at(0)).arg(cmdList.at(1)).arg(cmdList.at(2)).arg(cmdList.at(3)).arg(cmdList.at(4));
 
     // Valid # command with non-empty attrScope
-    AttributeRange* col0 = AttributeRange::parse(0, names.at(0), attrRgeStrs.at(0));
-    attrsScope.insert(col0->attrName(), col0);
-    AttributeRange* col1 = AttributeRange::parse(1, names.at(1), attrRgeStrs.at(1));
-    attrsScope.insert(col1->attrName(), col1);
-    AttributeRange* col2 = AttributeRange::parse(2, names.at(2), attrRgeStrs.at(2));
-    attrsScope.insert(col2->attrName(), col2);
-    AttributeRange* col3 = AttributeRange::parse(3, names.at(3), attrRgeStrs.at(3));
-    attrsScope.insert(col3->attrName(), col3);
-    AttributeRange* attrRges[4] = {col0, col1, col2, col3};
+    AttributesScope attrsScope = _newAttrsScope(names, attrRgeStrs);
 
     attrs.resize(4);
     agen = AttrsGenerator::parse(attrsScope, cmd, error);
@@ -286,7 +264,6 @@ void TestAttrsGenerator::tst_parseHashCmd_rand()
 
 void TestAttrsGenerator::tst_parseHashCmd_setValue()
 {
-    AttributesScope attrsScope;
     AttrsGenerator* agen;
     SetOfAttributes res;
     Attributes attrs;
@@ -307,15 +284,7 @@ void TestAttrsGenerator::tst_parseHashCmd_setValue()
     const QString cmd = QString("#%1;%2;%3;%4;%5").arg(cmdList.at(0)).arg(cmdList.at(1)).arg(cmdList.at(2)).arg(cmdList.at(3)).arg(cmdList.at(4));
 
     // Valid # command with non-empty attrScope
-    AttributeRange* col0 = AttributeRange::parse(0, names.at(0), attrRgeStrs.at(0));
-    attrsScope.insert(col0->attrName(), col0);
-    AttributeRange* col1 = AttributeRange::parse(1, names.at(1), attrRgeStrs.at(1));
-    attrsScope.insert(col1->attrName(), col1);
-    AttributeRange* col2 = AttributeRange::parse(2, names.at(2), attrRgeStrs.at(2));
-    attrsScope.insert(col2->attrName(), col2);
-    AttributeRange* col3 = AttributeRange::parse(3, names.at(3), attrRgeStrs.at(3));
-    attrsScope.insert(col3->attrName(), col3);
-    AttributeRange* attrRges[4] = {col0, col1, col2, col3};
+    AttributesScope attrsScope = _newAttrsScope(names, attrRgeStrs);
 
     agen = AttrsGenerator::parse(attrsScope, cmd, error);
 
@@ -334,7 +303,6 @@ void TestAttrsGenerator::tst_parseHashCmd_setValue()
 
 void TestAttrsGenerator::tst_parseHashCmd_mixedFunc()
 {
-    AttributesScope attrsScope;
     AttrsGenerator* agen;
     SetOfAttributes res;
     Attributes attrs;
@@ -355,15 +323,7 @@ void TestAttrsGenerator::tst_parseHashCmd_mixedFunc()
     const QString cmd = QString("#%1;%2;%3;%4;%5").arg(cmdList.at(0)).arg(cmdList.at(1)).arg(cmdList.at(2)).arg(cmdList.at(3)).arg(cmdList.at(4));
 
     // Valid # command with non-empty attrScope
-    AttributeRange* col0 = AttributeRange::parse(0, names.at(0), attrRgeStrs.at(0));
-    attrsScope.insert(col0->attrName(), col0);
-    AttributeRange* col1 = AttributeRange::parse(1, names.at(1), attrRgeStrs.at(1));
-    attrsScope.insert(col1->attrName(), col1);
-    AttributeRange* col2 = AttributeRange::parse(2, names.at(2), attrRgeStrs.at(2));
-    attrsScope.insert(col2->attrName(), col2);
-    AttributeRange* col3 = AttributeRange::parse(3, names.at(3), attrRgeStrs.at(3));
-    attrsScope.insert(col3->attrName(), col3);
-    AttributeRange* attrRges[4] = {col0, col1, col2, col3};
+    AttributesScope attrsScope = _newAttrsScope(names, attrRgeStrs);
 
     agen = AttrsGenerator::parse(attrsScope, cmd, error);
 
@@ -380,10 +340,10 @@ void TestAttrsGenerator::tst_parseHashCmd_mixedFunc()
 
     _tst_attrs(res, attrs, false);
     for (int i = 0; i < res.size(); ++i) {
-        QCOMPARE(res.at(i).value(0), attrRges[0]->min());
-        QCOMPARE(res.at(i).value(1), attrRges[1]->max());
-        QVERIFY(res.at(i).value(2) <= attrRges[2]->max());
-        QVERIFY(res.at(i).value(2) >= attrRges[2]->min());
+        QCOMPARE(res.at(i).value(0), attrsScope.value(names.at(0))->min());
+        QCOMPARE(res.at(i).value(1), attrsScope.value(names.at(1))->max());
+        QVERIFY(res.at(i).value(2) <= attrsScope.value(names.at(2))->max());
+        QVERIFY(res.at(i).value(2) >= attrsScope.value(names.at(2))->min());
         QCOMPARE(res.at(i).value(3), value);
     }
 }
