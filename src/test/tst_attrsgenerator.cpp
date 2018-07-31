@@ -185,6 +185,7 @@ void TestAttrsGenerator::tst_parseHashCmd_min()
     res = agen->create();
 
     _tst_attrs(res, attrs, true);
+    _tst_mode(res, "min", attrsScope, 4);
 }
 
 void TestAttrsGenerator::tst_parseHashCmd_max()
@@ -232,6 +233,7 @@ void TestAttrsGenerator::tst_parseHashCmd_max()
     res = agen->create();
 
     _tst_attrs(res, attrs, true);
+    _tst_mode(res, "max", attrsScope, 4);
 }
 
 void TestAttrsGenerator::tst_parseHashCmd_rand()
