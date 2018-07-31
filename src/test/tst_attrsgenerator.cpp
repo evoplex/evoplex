@@ -37,13 +37,13 @@ private slots:
     void tst_parseHashCmd_rand();
     void tst_parseHashCmd_setValue();
     void tst_parseHashCmd_mixedFunc();
-    void _tst_attrs(const SetOfAttributes& res, const Attributes& attrs,  bool testValues);
+    void _tst_attrs(const SetOfAttributes& res, const Attributes& attrs,  const bool testValues);
     void _tst_mode(const SetOfAttributes& res, const QString& mode, const AttributesScope& ascope, const int numOfAttrRges);
-    void _tst_parseStarCmd(QString mode);
+    void _tst_parseStarCmd(const QString mode);
     AttributesScope _newAttrsScope(const QStringList& names, const QStringList& attrRges);
 };
 
-void TestAttrsGenerator::_tst_attrs(const SetOfAttributes& res, const Attributes& attrs,  bool testValues)
+void TestAttrsGenerator::_tst_attrs(const SetOfAttributes& res, const Attributes& attrs,  const bool testValues)
 {
     for (int i = 0; i < res.size(); ++i) {
         QCOMPARE(res.at(i).names(), attrs.names());
@@ -267,7 +267,7 @@ void TestAttrsGenerator::tst_parseHashCmd_setValue()
     AttrsGenerator* agen;
     SetOfAttributes res;
     Attributes attrs;
-    Values values = {Value(1), Value(3.6), Value(4), Value(-1.1)};
+    const Values values = {Value(1), Value(3.6), Value(4), Value(-1.1)};
     const int sizeOfAgen = 3;
     const QStringList names = {"test0", "test1", "test2", "test3"};
     const QStringList attrRgeStrs = {"int[0,2]", "double[2.3,7.8]", "int{-2,0,2,4,6}", "double{-2.2, -1.1, 0, 2.3}"};
@@ -306,7 +306,7 @@ void TestAttrsGenerator::tst_parseHashCmd_mixedFunc()
     AttrsGenerator* agen;
     SetOfAttributes res;
     Attributes attrs;
-    Value value = Value(-1.1);
+    const Value value = Value(-1.1);
     const int sizeOfAgen = 3;
     const QStringList names = {"test0", "test1", "test2", "test3"};
     const QStringList attrRgeStrs = {"int[0,2]", "double[2.3,7.8]", "int{-2,0,2,4,6}", "double{-2.2, -1.1, 0, 2.3}"};
