@@ -68,14 +68,14 @@ void TestAttrsGenerator::_tst_mode(SetOfAttributes res, QString mode, Attributes
     } else if (mode == "max"){
         for (int i = 0; i < res.size(); ++i) {
             for (int j = 0; j < numOfAttrRges; ++j) {
-                QCOMPARE(res.at(i).value(j), attrsScope.values().at(j)->max());
+                QCOMPARE(res.at(i).value(j), attrsScope.value(res.at(i).name(j))->max());
             }
         }
     } else if(mode == "rand"){
         for (int i = 0; i < res.size(); ++i) {
             for (int j = 0; j < numOfAttrRges; ++j) {
-                QVERIFY(res.at(i).value(j) >= attrsScope.values().at(j)->min());
-                QVERIFY(res.at(i).value(j) <= attrsScope.values().at(j)->max());
+                QVERIFY(res.at(i).value(j) >= attrsScope.value(res.at(i).name(j))->min());
+                QVERIFY(res.at(i).value(j) <= attrsScope.value(res.at(i).name(j))->max());
             }
         }
     }
