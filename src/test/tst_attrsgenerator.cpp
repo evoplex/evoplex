@@ -37,13 +37,13 @@ private slots:
     void tst_parseHashCmd_rand();
     void tst_parseHashCmd_setValue();
     void tst_parseHashCmd_mixedFunc();
-    void _tst_attrs(SetOfAttributes res, Attributes attrs,  bool testValues);
-    void _tst_mode(SetOfAttributes res, QString mode, AttributesScope attrsScope, int numOfAttrRges);
+    void _tst_attrs(const SetOfAttributes& res, const Attributes& attrs,  bool testValues);
+    void _tst_mode(const SetOfAttributes& res, const QString& mode, const AttributesScope& ascope, const int numOfAttrRges);
     void _tst_parseStarCmd(QString mode);
     AttributesScope _newAttrsScope(const QStringList& names, const QStringList& attrRges);
 };
 
-void TestAttrsGenerator::_tst_attrs(SetOfAttributes res, Attributes attrs, bool testValues)
+void TestAttrsGenerator::_tst_attrs(const SetOfAttributes& res, const Attributes& attrs,  bool testValues)
 {
     for (int i = 0; i < res.size(); ++i) {
         QCOMPARE(res.at(i).names(), attrs.names());
@@ -58,25 +58,25 @@ void TestAttrsGenerator::_tst_attrs(SetOfAttributes res, Attributes attrs, bool 
     }
 }
 
-void TestAttrsGenerator::_tst_mode(SetOfAttributes res, QString mode, AttributesScope attrsScope, int numOfAttrRges)
+void TestAttrsGenerator::_tst_mode(const SetOfAttributes& res, const QString& mode, const AttributesScope& ascope, const int numOfAttrRges)
 {
    if(mode == "min"){
         for (int i = 0; i < res.size(); ++i) {
             for (int j = 0; j < numOfAttrRges; ++j) {
-                QCOMPARE(res.at(i).value(j), attrsScope.value(res.at(i).name(j))->min());
+                QCOMPARE(res.at(i).value(j), ascope.value(res.at(i).name(j))->min());
             }
         }
     } else if (mode == "max"){
         for (int i = 0; i < res.size(); ++i) {
             for (int j = 0; j < numOfAttrRges; ++j) {
-                QCOMPARE(res.at(i).value(j), attrsScope.value(res.at(i).name(j))->max());
+                QCOMPARE(res.at(i).value(j), ascope.value(res.at(i).name(j))->max());
             }
         }
     } else if(mode == "rand"){
         for (int i = 0; i < res.size(); ++i) {
             for (int j = 0; j < numOfAttrRges; ++j) {
-                QVERIFY(res.at(i).value(j) >= attrsScope.value(res.at(i).name(j))->min());
-                QVERIFY(res.at(i).value(j) <= attrsScope.value(res.at(i).name(j))->max());
+                QVERIFY(res.at(i).value(j) >= ascope.value(res.at(i).name(j))->min());
+                QVERIFY(res.at(i).value(j) <= ascope.value(res.at(i).name(j))->max());
             }
         }
     }
