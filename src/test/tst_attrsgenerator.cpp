@@ -339,6 +339,7 @@ void TestAttrsGenerator::tst_parseHashCmd_mixedFunc()
     res = agen->create();
 
     _tst_attrs(res, attrs, false);
+
     for (int i = 0; i < res.size(); ++i) {
         QCOMPARE(res.at(i).value(0), attrsScope.value(names.at(0))->min());
         QCOMPARE(res.at(i).value(1), attrsScope.value(names.at(1))->max());
