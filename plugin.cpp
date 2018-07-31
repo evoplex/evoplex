@@ -27,23 +27,23 @@ bool MinimalModel::algorithmStep()
     bool next_state_infection;
 
     // For each node
-    for(int i = 0; i < m_number_of_nodes; i++){
+    for (int i = 0; i < m_number_of_nodes; ++i) {
         currentNode = AbstractModel::nodes().at(i);
 
         // Check if the current node is currently healthy
-        if(!currentNode->attrs().value(m_infected).toBool()){
+        if (!currentNode->attrs().value(m_infected).toBool()) {
             // Select a random neighbour
             neighbour = currentNode->randNeighbour(prg);
 
             // Check if the neighbour is currently infected
-            if(neighbour->attrs().value(m_infected).toBool()){
+            if (neighbour->attrs().value(m_infected).toBool()) {
                 // Generate a random double in the range [0,1]
                 randTest = prg->randD(0,1);
 
                 // Test if the number is less than or equal to the probablilty
                 // (The probablity of this being true is the same as the probability itself)
                 // Infect the next state of the current node if true
-                if(randTest <= m_prob){
+                if (randTest <= m_prob) {
                     currentNode->setAttr(m_infected_next_state, true);
                 }
             }
@@ -51,7 +51,7 @@ bool MinimalModel::algorithmStep()
     }
 
     // For each node, load the next state into the current state
-    for(int i = 0; i < m_number_of_nodes; i++){
+    for (int i = 0; i < m_number_of_nodes; ++i) {
         currentNode = AbstractModel::nodes().at(i);
         next_state_infection = currentNode->attrs().value(m_infected_next_state).toBool();
         currentNode->setAttr(m_infected, next_state_infection);
