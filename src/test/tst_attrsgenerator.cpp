@@ -38,7 +38,7 @@ private slots:
     void tst_parseHashCmd_setValue();
     void tst_parseHashCmd_mixedFunc();
     void _tst_attrs(SetOfAttributes res, Attributes attrs,  bool testValues);
-    void _tst_mode(SetOfAttributes res, QString mode, AttributeRange* attrRge[], int numOfAttrRges);
+    void _tst_mode(SetOfAttributes res, QString mode, AttributesScope attrsScope, int numOfAttrRges);
     void _tst_parseStarCmd(QString mode);
 };
 
@@ -57,25 +57,25 @@ void TestAttrsGenerator::_tst_attrs(SetOfAttributes res, Attributes attrs, bool 
     }
 }
 
-void TestAttrsGenerator::_tst_mode(SetOfAttributes res, QString mode, AttributeRange* attrRge[], int numOfAttrRges)
+void TestAttrsGenerator::_tst_mode(SetOfAttributes res, QString mode, AttributesScope attrsScope, int numOfAttrRges)
 {
    if(mode == "min"){
         for (int i = 0; i < res.size(); ++i) {
             for (int j = 0; j < numOfAttrRges; ++j) {
-                QCOMPARE(res.at(i).value(j), attrRge[j]->min());
+                QCOMPARE(res.at(i).value(j), attrsScope.value(res.at(i).name(j))->min());
             }
         }
     } else if (mode == "max"){
         for (int i = 0; i < res.size(); ++i) {
             for (int j = 0; j < numOfAttrRges; ++j) {
-                QCOMPARE(res.at(i).value(j), attrRge[j]->max());
+                QCOMPARE(res.at(i).value(j), attrsScope.values().at(j)->max());
             }
         }
     } else if(mode == "rand"){
         for (int i = 0; i < res.size(); ++i) {
             for (int j = 0; j < numOfAttrRges; ++j) {
-                QVERIFY(res.at(i).value(j) >= attrRge[j]->min());
-                QVERIFY(res.at(i).value(j) <= attrRge[j]->max());
+                QVERIFY(res.at(i).value(j) >= attrsScope.values().at(j)->min());
+                QVERIFY(res.at(i).value(j) <= attrsScope.values().at(j)->max());
             }
         }
     }
@@ -83,7 +83,6 @@ void TestAttrsGenerator::_tst_mode(SetOfAttributes res, QString mode, AttributeR
 
 void TestAttrsGenerator::_tst_parseStarCmd(QString mode)
 {
-    QString error, cmd;
     AttributesScope attrsScope;
     AttrsGenerator* agen;
     SetOfAttributes res;
@@ -92,6 +91,7 @@ void TestAttrsGenerator::_tst_parseStarCmd(QString mode)
     const QStringList names = {"test0", "test1", "test2"};
     const QStringList attrRgeStrs = {"int[0,2]", "double[2.3,7.8]", "int{-2,0,2,4,6}"};
     const QString seed("_123");
+    QString error, cmd;
 
     // Valid * command with empty attrScope
     if(!strcmp(Value(mode).toString(), "rand")){
@@ -130,7 +130,7 @@ void TestAttrsGenerator::_tst_parseStarCmd(QString mode)
     res = agen->create();
 
     _tst_attrs(res, attrs, false);
-    _tst_mode(res, mode, attrRges, 3);
+    _tst_mode(res, mode, attrsScope, 3);
 }
 
 void TestAttrsGenerator::tst_parseStarCmd()
@@ -279,7 +279,7 @@ void TestAttrsGenerator::tst_parseHashCmd_rand()
     res = agen->create();
 
     _tst_attrs(res, attrs, false);
-    _tst_mode(res, "rand", attrRges, 4);
+//    _tst_mode(res, "rand", attrRges, 4);
 }
 
 void TestAttrsGenerator::tst_parseHashCmd_setValue()
