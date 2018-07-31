@@ -1,9 +1,9 @@
 {
   "type": "model",
-  "uid": "minimalModel",
-  "name": "Mininal Model",
+  "uid": "populationGrowthModel",
+  "name": "Population Growth Model",
   "author": "Evoplex",
-  "description": "This is a mininal example of a model plugin for Evoplex.",
+  "description": "This model simulates the spread of infection across a population.",
 
   "nodeAttributesScope": [ {"infected": "bool"}, {"infected_next_state": "bool"} ],
   "pluginAttributesScope": [ {"prob": "double[0,1]"} ]
