@@ -49,7 +49,7 @@ void TestAttrsGenerator::_tst_attrs(const SetOfAttributes& res, const Attributes
         QCOMPARE(res.at(i).names(), attrs.names());
         QCOMPARE(res.at(i).size(), attrs.size());
 
-        if(testValues){
+        if (testValues) {
             QCOMPARE(res.at(i).values(), attrs.values());
             for (int j = 0; j < attrs.size(); ++j) {
                 QCOMPARE(res.at(i).value(j), attrs.value(j));
@@ -60,19 +60,19 @@ void TestAttrsGenerator::_tst_attrs(const SetOfAttributes& res, const Attributes
 
 void TestAttrsGenerator::_tst_mode(const SetOfAttributes& res, const QString& mode, const AttributesScope& ascope, const int numOfAttrRges)
 {
-   if(mode == "min"){
+   if (mode == "min") {
         for (int i = 0; i < res.size(); ++i) {
             for (int j = 0; j < numOfAttrRges; ++j) {
                 QCOMPARE(res.at(i).value(j), ascope.value(res.at(i).name(j))->min());
             }
         }
-    } else if (mode == "max"){
+    } else if (mode == "max") {
         for (int i = 0; i < res.size(); ++i) {
             for (int j = 0; j < numOfAttrRges; ++j) {
                 QCOMPARE(res.at(i).value(j), ascope.value(res.at(i).name(j))->max());
             }
         }
-    } else if(mode == "rand"){
+    } else if (mode == "rand") {
         for (int i = 0; i < res.size(); ++i) {
             for (int j = 0; j < numOfAttrRges; ++j) {
                 QVERIFY(res.at(i).value(j) >= ascope.value(res.at(i).name(j))->min());
@@ -107,7 +107,7 @@ void TestAttrsGenerator::_tst_parseStarCmd(QString mode)
     QString error, cmd;
 
     // Valid * command with empty attrScope
-    if(!strcmp(Value(mode).toString(), "rand")){
+    if (!strcmp(Value(mode).toString(), "rand")) {
         cmd = QString("*%1;%2%3").arg(Value(sizeOfAgen).toQString()).arg(mode).arg(seed);
     } else {
         cmd = QString("*%1;%2").arg(Value(sizeOfAgen).toQString()).arg(mode);
