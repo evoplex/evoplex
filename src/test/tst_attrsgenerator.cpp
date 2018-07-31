@@ -86,12 +86,12 @@ void TestAttrsGenerator::_tst_parseStarCmd(QString mode)
     QString error, cmd;
     AttributesScope attrsScope;
     AttrsGenerator* agen;
-    QStringList names = {"test0", "test1", "test2"};
-    QStringList attrRgeStrs = {"int[0,2]", "double[2.3,7.8]", "int{-2,0,2,4,6}"};
     SetOfAttributes res;
     Attributes attrs;
-    int sizeOfAgen = 3;
-    QString seed = "_123";
+    const int sizeOfAgen = 3;
+    const QStringList names = {"test0", "test1", "test2"};
+    const QStringList attrRgeStrs = {"int[0,2]", "double[2.3,7.8]", "int{-2,0,2,4,6}"};
+    const QString seed("_123");
 
     // Valid * command with empty attrScope
     if(!strcmp(Value(mode).toString(), "rand")){
