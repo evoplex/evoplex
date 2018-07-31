@@ -279,7 +279,7 @@ void TestAttrsGenerator::tst_parseHashCmd_rand()
     res = agen->create();
 
     _tst_attrs(res, attrs, false);
-//    _tst_mode(res, "rand", attrRges, 4);
+    _tst_mode(res, "rand", attrsScope, 4);
 }
 
 void TestAttrsGenerator::tst_parseHashCmd_setValue()
