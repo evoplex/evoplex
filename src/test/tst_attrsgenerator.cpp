@@ -149,7 +149,7 @@ void TestAttrsGenerator::tst_parseHashCmd_min()
     const int sizeOfAgen = 3;
     const QStringList names = {"test0", "test1", "test2", "test3"};
     const QStringList attrRgeStrs = {"int[0,2]", "double[2.3,7.8]", "int{-2,0,2,4,6}", "double{-2.2, -1.1, 0, 2.3}"};
-    const QString error;
+    QString error;
 
     // To shorten line:
     const QStringList cmdList = {
@@ -196,7 +196,7 @@ void TestAttrsGenerator::tst_parseHashCmd_max()
     const int sizeOfAgen = 3;
     const QStringList names = {"test0", "test1", "test2", "test3"};
     const QStringList attrRgeStrs = {"int[0,2]", "double[2.3,7.8]", "int{-2,0,2,4,6}", "double{-2.2, -1.1, 0, 2.3}"};
-    const QString error;
+    QString error;
 
     // To shorten line:
     const QStringList cmdList = {
@@ -243,7 +243,7 @@ void TestAttrsGenerator::tst_parseHashCmd_rand()
     const int sizeOfAgen = 3;
     const QStringList names = {"test0", "test1", "test2", "test3"};
     const QStringList attrRgeStrs = {"int[0,2]", "double[2.3,7.8]", "int{-2,0,2,4,6}", "double{-2.2, -1.1, 0, 2.3}"};
-    const QString error;
+    QString error;
 
     // To shorten line:
     const QStringList cmdList = {
@@ -284,15 +284,25 @@ void TestAttrsGenerator::tst_parseHashCmd_rand()
 
 void TestAttrsGenerator::tst_parseHashCmd_setValue()
 {
-    QString error, cmd;
     AttributesScope attrsScope;
     AttrsGenerator* agen;
-    QStringList names = {"test0", "test1", "test2", "test3"};
-    QStringList attrRgeStrs = {"int[0,2]", "double[2.3,7.8]", "int{-2,0,2,4,6}", "double{-2.2, -1.1, 0, 2.3}"};
     SetOfAttributes res;
     Attributes attrs;
     Values values = {Value(1), Value(3.6), Value(4), Value(-1.1)};
-    int sizeOfAgen = 3;
+    const int sizeOfAgen = 3;
+    const QStringList names = {"test0", "test1", "test2", "test3"};
+    const QStringList attrRgeStrs = {"int[0,2]", "double[2.3,7.8]", "int{-2,0,2,4,6}", "double{-2.2, -1.1, 0, 2.3}"};
+    QString error;
+
+    // To shorten line:
+    const QStringList cmdList = {
+        Value(sizeOfAgen).toQString(),
+        QString("%1_value_%2").arg(names.at(0)).arg(values[0].toQString()),
+        QString("%1_value_%2").arg(names.at(1)).arg(values[1].toQString()),
+        QString("%1_value_%2").arg(names.at(2)).arg(values[2].toQString()),
+        QString("%1_value_%2").arg(names.at(3)).arg(values[3].toQString())
+    };
+    const QString cmd = QString("#%1;%2;%3;%4;%5").arg(cmdList.at(0)).arg(cmdList.at(1)).arg(cmdList.at(2)).arg(cmdList.at(3)).arg(cmdList.at(4));
 
     // Valid # command with non-empty attrScope
     AttributeRange* col0 = AttributeRange::parse(0, names.at(0), attrRgeStrs.at(0));
@@ -305,15 +315,6 @@ void TestAttrsGenerator::tst_parseHashCmd_setValue()
     attrsScope.insert(col3->attrName(), col3);
     AttributeRange* attrRges[4] = {col0, col1, col2, col3};
 
-    // To shorten line:
-    QStringList cmdList = {
-        Value(sizeOfAgen).toQString(),
-        QString("%1_value_%2").arg(names.at(0)).arg(values[0].toQString()),
-        QString("%1_value_%2").arg(names.at(1)).arg(values[1].toQString()),
-        QString("%1_value_%2").arg(names.at(2)).arg(values[2].toQString()),
-        QString("%1_value_%2").arg(names.at(3)).arg(values[3].toQString())
-    };
-    cmd = QString("#%1;%2;%3;%4;%5").arg(cmdList.at(0)).arg(cmdList.at(1)).arg(cmdList.at(2)).arg(cmdList.at(3)).arg(cmdList.at(4));
     agen = AttrsGenerator::parse(attrsScope, cmd, error);
 
     attrs.resize(4);
