@@ -13,8 +13,8 @@ bool MinimalModel::init()
     m_infected_next_state = AbstractModel::nodes().at(0)->attrs().indexOf("infected_next_state");
 
     // Initializing global variables
-    prob = attr("prob").toDouble();
-    numberOfNodes = AbstractModel::nodes().size();
+    m_prob = attr("prob").toDouble();
+    m_number_of_nodes = AbstractModel::nodes().size();
 
     return m_infected >= 0;
 }
@@ -27,7 +27,7 @@ bool MinimalModel::algorithmStep()
     bool next_state_infection;
 
     // For each node
-    for(int i = 0; i < numberOfNodes; i++){
+    for(int i = 0; i < m_number_of_nodes; i++){
         currentNode = AbstractModel::nodes().at(i);
 
         // Check if the current node is currently healthy
@@ -43,7 +43,7 @@ bool MinimalModel::algorithmStep()
                 // Test if the number is less than or equal to the probablilty
                 // (The probablity of this being true is the same as the probability itself)
                 // Infect the next state of the current node if true
-                if(randTest <= prob){
+                if(randTest <= m_prob){
                     currentNode->setAttr(m_infected_next_state, true);
                 }
             }
@@ -51,7 +51,7 @@ bool MinimalModel::algorithmStep()
     }
 
     // For each node, load the next state into the current state
-    for(int i = 0; i < numberOfNodes; i++){
+    for(int i = 0; i < m_number_of_nodes; i++){
         currentNode = AbstractModel::nodes().at(i);
         next_state_infection = currentNode->attrs().value(m_infected_next_state).toBool();
         currentNode->setAttr(m_infected, next_state_infection);
