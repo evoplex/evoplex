@@ -1,14 +1,10 @@
 {
   "type": "model",
-  "uid": "minimalModel",
-  "name": "Mininal Model",
+  "uid": "gameOfLife",
+  "name": "Game Of Life",
   "author": "Evoplex",
-  "description": "This is a mininal example of a model plugin for Evoplex.",
+  "description": "This implements Conway's Game Of Life cellular automaton",
+  "supportedGraphs": ["squareGrid","customGraph"],
 
-  "pluginAttributesScope": [],
-  "nodeAttributesScope": [],
-  "edgeAttributesScope": [],
-
-  "supportedGraphs": [],
-  "customOutputs": []
+  "nodeAttributesScope": [ {"live": "bool"}, {"live_next_state": "bool"} ]
 }
