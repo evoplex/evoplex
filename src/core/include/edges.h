@@ -21,37 +21,28 @@
 #ifndef EDGES_H
 #define EDGES_H
 
-#include <memory>
 #include <unordered_map>
 
 #include "edge.h"
 
 namespace evoplex {
 
-struct Edges : public std::unordered_map<int, EdgePtr>
+class Edges : private std::unordered_map<int, Edge>
 {
+    friend class AbstractGraph;
+    friend class DNode;
+    friend class UNode;
+
 public:
-    struct Iterator : public iterator {
-        Iterator() {}
-        Iterator(const iterator& _a) : iterator(_a) {}
-        const int& id() const { return (*this)->first; }
-        EdgePtr& edge() const { return (*this)->second; }
-    };
-
-    struct ConstIterator : public const_iterator {
-        ConstIterator() {}
-        ConstIterator(const const_iterator& _a) : const_iterator(_a) {}
-        const int& id() const { return (*this)->first; }
-        const EdgePtr& edge() const { return (*this)->second; }
-    };
-
-    struct Pair {
-        const std::pair<const int, EdgePtr>& _p;
-        Pair(const std::pair<const int, EdgePtr>& _a) : _p(_a) {}
-        const int& id() const { return _p.first; }
-        const EdgePtr& edge() const { return _p.second; }
-        const Node& neighbour() const { return _p.second->neighbour(); }
-    };
+    using std::unordered_map<int, Edge>::at;
+    using std::unordered_map<int, Edge>::begin;
+    using std::unordered_map<int, Edge>::cbegin;
+    using std::unordered_map<int, Edge>::end;
+    using std::unordered_map<int, Edge>::cend;
+    using std::unordered_map<int, Edge>::iterator;
+    using std::unordered_map<int, Edge>::const_iterator;
+    using std::unordered_map<int, Edge>::empty;
+    using std::unordered_map<int, Edge>::size;
 };
 
 } // evoplex

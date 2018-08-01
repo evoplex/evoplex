@@ -80,8 +80,8 @@ CacheStatus GraphView::refreshCache()
         cache.edges.reserve(np.second.outEdges().size());
 
         for (auto const& ep : np.second.outEdges()) {
-            QPointF xy2(m_origin.x() + edgeSizeRate * (1.0 + ep.second->neighbour().x()),
-                        m_origin.y() + edgeSizeRate * (1.0 + ep.second->neighbour().y()));
+            QPointF xy2(m_origin.x() + edgeSizeRate * (1.0 + ep.second.neighbour().x()),
+                        m_origin.y() + edgeSizeRate * (1.0 + ep.second.neighbour().y()));
             cache.edges.emplace_back(QLineF(xy, xy2));
         }
 

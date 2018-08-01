@@ -34,9 +34,8 @@ bool ModelNowak::algorithmStep()
     for (Node node : nodes()) {
         const int sX = node.attr(STRATEGY).toInt();
         double score = playGame(sX, sX);
-        for (Edges::Pair edge : node.outEdges()) {
-            const int sY = edge.neighbour().attr(STRATEGY).toInt();
-            score += playGame(sX, sY);
+        for (const Node& neighbour : node.outEdges()) {
+            score += playGame(sX, neighbour.attr(STRATEGY).toInt());
         }
         node.setAttr(SCORE, score);
     }
@@ -48,11 +47,11 @@ bool ModelNowak::algorithmStep()
     for (const Node& node : nodes()) {
         int bestStrategy = node.attr(STRATEGY).toInt();
         double highestScore = node.attr(SCORE).toDouble();
-        for (Edges::Pair edge : node.outEdges()) {
-            const double neighbourScore = edge.neighbour().attr(SCORE).toDouble();
+        for (const Node& neighbour : node.outEdges()) {
+            const double neighbourScore = neighbour.attr(SCORE).toDouble();
             if (neighbourScore > highestScore) {
                 highestScore = neighbourScore;
-                bestStrategy = edge.neighbour().attr(STRATEGY).toInt();
+                bestStrategy = neighbour.attr(STRATEGY).toInt();
             }
         }
         bestStrategies.emplace_back(binarize(bestStrategy));

@@ -45,6 +45,7 @@ set(EVOPLEX_CORE_H
   plugin.h
 
   trial.h
+  edge_p.h
   experiment.h
   expinputs.h
   experimentsmgr.h
@@ -68,6 +69,7 @@ set(EVOPLEX_CORE_CXX
   attributerange.cpp
   attrsgenerator.cpp
   trial.cpp
+  edge_p.cpp
   experiment.cpp
   expinputs.cpp
   experimentsmgr.cpp

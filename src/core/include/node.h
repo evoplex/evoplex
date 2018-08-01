@@ -42,6 +42,7 @@ public:
     Node();
     Node(NodePtr node);
     Node(const std::pair<const int, Node>& p);
+    Node(const std::pair<const int, Edge>& p);
 
     bool isNull() const;
     NodePtr clone() const;

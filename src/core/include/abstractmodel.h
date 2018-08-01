@@ -73,8 +73,8 @@ public:
     inline const Nodes& nodes() const;
     inline Node node(int nodeId) const;
     inline const Edges& edges() const;
-    inline const EdgePtr& edge(int edgeId) const;
-    inline const EdgePtr& edge(int originId, int neighbourId) const;
+    inline const Edge& edge(int edgeId) const;
+    inline const Edge& edge(int originId, int neighbourId) const;
 
     inline bool init() override;
     inline void beforeLoop() override {}
@@ -100,10 +100,10 @@ inline Node AbstractModel::node(int nodeId) const
 inline const Edges& AbstractModel::edges() const
 { return graph()->edges(); }
 
-inline const EdgePtr& AbstractModel::edge(int edgeId) const
+inline const Edge& AbstractModel::edge(int edgeId) const
 { return graph()->edge(edgeId); }
 
-inline const EdgePtr& AbstractModel::edge(int originId, int neighbourId) const
+inline const Edge &AbstractModel::edge(int originId, int neighbourId) const
 { return node(originId).outEdges().at(neighbourId); }
 
 inline bool AbstractModel::init()

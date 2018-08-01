@@ -43,7 +43,6 @@ public:
     using std::unordered_map<int, Node>::const_iterator;
     using std::unordered_map<int, Node>::empty;
     using std::unordered_map<int, Node>::size;
-
 };
 
 } // evoplex

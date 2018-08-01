@@ -35,6 +35,10 @@ Node::Node(const std::pair<const int, Node>& p)
     : m_ptr(p.second.m_ptr)
 {}
 
+Node::Node(const std::pair<const int, Edge>& p)
+    : m_ptr(p.second.neighbour().m_ptr)
+{}
+
 bool Node::isNull() const
 { return m_ptr ? false : true; }
 

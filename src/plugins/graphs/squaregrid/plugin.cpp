@@ -48,7 +48,7 @@ bool SquareGrid::init()
 
 void SquareGrid::reset()
 {
-    m_edges.clear();
+    removeAllEdges();
 
     edgesFunc func;
     if (m_numNeighbours == 4) {

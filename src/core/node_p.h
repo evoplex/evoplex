@@ -49,8 +49,8 @@ public:
     virtual int outDegree() const = 0;
 
 private:
-    virtual void addInEdge(const EdgePtr& inEdge) = 0;
-    virtual void addOutEdge(const EdgePtr& outEdge) = 0;
+    virtual void addInEdge(const Edge& inEdge) = 0;
+    virtual void addOutEdge(const Edge& outEdge) = 0;
     virtual void removeInEdge(const int edgeId) = 0;
     virtual void removeOutEdge(const int edgeId) = 0;
     virtual void clearInEdges() = 0;
@@ -120,8 +120,8 @@ public:
     inline int outDegree() const override;
 
 private:
-    inline void addInEdge(const EdgePtr& inEdge) override;
-    inline void addOutEdge(const EdgePtr& outEdge) override;
+    inline void addInEdge(const Edge& inEdge) override;
+    inline void addOutEdge(const Edge& outEdge) override;
     inline void removeInEdge(const int edgeId) override;
     inline void removeOutEdge(const int edgeId) override;
     inline void clearInEdges() override;
@@ -145,8 +145,8 @@ public:
 private:
     Edges m_inEdges;
 
-    inline void addInEdge(const EdgePtr& inEdge) override;
-    inline void addOutEdge(const EdgePtr& outEdge) override;
+    inline void addInEdge(const Edge& inEdge) override;
+    inline void addOutEdge(const Edge& outEdge) override;
     inline void removeInEdge(const int edgeId) override;
     inline void removeOutEdge(const int edgeId) override;
     inline void clearInEdges() override;
@@ -191,7 +191,7 @@ inline void BaseNode::setCoords(int x, int y)
 { setX(x); setY(y); }
 
 inline const Node& BaseNode::randNeighbour(PRG* prg) const
-{ return (*std::next(m_outEdges.cbegin(), prg->randI(outDegree()-1))).second->neighbour(); }
+{ return std::next(m_outEdges.cbegin(), prg->randI(outDegree()-1))->second.neighbour(); }
 
 /************************************************************************
    UNode: Inline member functions
@@ -215,11 +215,11 @@ inline int UNode::inDegree() const
 inline int UNode::outDegree() const
 { return degree(); }
 
-inline void UNode::addInEdge(const EdgePtr& inEdge)
+inline void UNode::addInEdge(const Edge& inEdge)
 { addOutEdge(inEdge); }
 
-inline void UNode::addOutEdge(const EdgePtr& outEdge)
-{ m_outEdges.insert({outEdge->id(), outEdge}); }
+inline void UNode::addOutEdge(const Edge& outEdge)
+{ m_outEdges.insert({outEdge.id(), outEdge}); }
 
 inline void UNode::removeInEdge(const int edgeId)
 { removeOutEdge(edgeId); }
@@ -255,11 +255,11 @@ inline int DNode::inDegree() const
 inline int DNode::outDegree() const
 { return static_cast<int>(m_outEdges.size()); }
 
-inline void DNode::addInEdge(const EdgePtr& inEdge)
-{ m_inEdges.insert({inEdge->id(), inEdge}); }
+inline void DNode::addInEdge(const Edge& inEdge)
+{ m_inEdges.insert({inEdge.id(), inEdge}); }
 
-inline void DNode::addOutEdge(const EdgePtr& outEdge)
-{ m_outEdges.insert({outEdge->id(), outEdge}); }
+inline void DNode::addOutEdge(const Edge& outEdge)
+{ m_outEdges.insert({outEdge.id(), outEdge}); }
 
 inline void DNode::removeInEdge(const int edgeId)
 { m_inEdges.erase(edgeId); }

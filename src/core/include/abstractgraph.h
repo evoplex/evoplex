@@ -55,7 +55,7 @@ public:
     inline bool isUndirected() const;
 
     inline const Edges& edges() const;
-    inline const EdgePtr& edge(int id) const;
+    inline const Edge &edge(int id) const;
     inline const Nodes& nodes() const;
     inline Node node(int id) const;
     inline Node randNode() const;
@@ -67,8 +67,8 @@ public:
     Node addNode(Attributes attr, int x, int y);
 
     // nodes must belong to the graph
-    inline EdgePtr addEdge(const int originId, const int neighbourId, Attributes* attrs=new Attributes());
-    EdgePtr addEdge(const Node& origin, const Node& neighbour, Attributes* attrs=new Attributes());
+    inline Edge addEdge(const int originId, const int neighbourId, Attributes* attrs=new Attributes());
+    Edge addEdge(const Node& origin, const Node& neighbour, Attributes* attrs=new Attributes());
 
     void removeAllEdges();
     void removeAllEdges(const Node& node);
@@ -76,7 +76,7 @@ public:
     void removeNode(const Node& node);
     Nodes::iterator removeNode(Nodes::iterator it);
 
-    void removeEdge(const EdgePtr& edge);
+    void removeEdge(const Edge& edge);
     Edges::iterator removeEdge(Edges::iterator it);
 
 protected:
@@ -117,7 +117,7 @@ inline const Edges& AbstractGraph::edges() const
 inline const Nodes& AbstractGraph::nodes() const
 { return m_nodes; }
 
-inline const EdgePtr& AbstractGraph::edge(int id) const
+inline const Edge& AbstractGraph::edge(int id) const
 { return m_edges.at(id); }
 
 inline Node AbstractGraph::node(int id) const
@@ -135,7 +135,7 @@ inline int AbstractGraph::numNodes() const
 inline Node AbstractGraph::addNode(Attributes attr)
 { return addNode(attr, 0, m_lastNodeId+1); }
 
-inline EdgePtr AbstractGraph::addEdge(const int originId, const int neighbourId, Attributes* attrs)
+inline Edge AbstractGraph::addEdge(const int originId, const int neighbourId, Attributes* attrs)
 {  return addEdge(m_nodes.at(originId), m_nodes.at(neighbourId), attrs); }
 
 } // evoplex

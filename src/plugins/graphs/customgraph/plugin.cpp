@@ -36,7 +36,7 @@ bool CustomGraph::init()
 
 void CustomGraph::reset()
 {
-    m_edges.clear();
+    removeAllEdges();
 
     QFile file(m_filePath);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
@@ -97,7 +97,7 @@ void CustomGraph::reset()
     file.close();
 
     if (!isValid) {
-        m_edges.clear();
+        removeAllEdges();
     }
 }
 

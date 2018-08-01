@@ -41,7 +41,7 @@ public:
     {
         std::vector<Value> ret(header.size(), 0);
         while (entityBegin != entityEnd) {
-            const size_t i = std::find(header.begin(), header.end(), (*entityBegin).second->attr(attrIdx)) - header.begin();
+            const size_t i = std::find(header.begin(), header.end(), entityBegin->second.attr(attrIdx)) - header.begin();
             if (i != header.size()) {
                 ret[i] = ret[i].toInt() + 1;
             }

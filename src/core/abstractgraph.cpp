@@ -20,6 +20,7 @@
 
 #include "abstractgraph.h"
 #include "constants.h"
+#include "edge_p.h"
 #include "node_p.h"
 #include "trial.h"
 #include "utils.h"
@@ -61,13 +62,14 @@ Node AbstractGraph::addNode(Attributes attr, int x, int y)
     return node;
 }
 
-EdgePtr AbstractGraph::addEdge(const Node& origin, const Node& neighbour, Attributes* attrs)
+Edge AbstractGraph::addEdge(const Node& origin, const Node& neighbour, Attributes* attrs)
 {
     QMutexLocker locker(&m_mutex);
     ++m_lastEdgeId;
-    Edge::constructor_key k;
-    EdgePtr edgeOut = std::make_shared<Edge>(k, m_lastEdgeId, origin, neighbour, attrs, true);
-    EdgePtr edgeIn = std::make_shared<Edge>(k, m_lastEdgeId, neighbour, origin, attrs, false);
+    Edge edgeOut, edgeIn;
+    BaseEdge::constructor_key k;
+    edgeOut.m_ptr = std::make_shared<BaseEdge>(k, m_lastEdgeId, origin, neighbour, attrs, true);
+    edgeIn.m_ptr = std::make_shared<BaseEdge>(k, m_lastEdgeId, neighbour, origin, attrs, false);
     origin.m_ptr->addOutEdge(edgeOut);
     neighbour.m_ptr->addInEdge(edgeIn); // neighbour must be aware of the in-connection
     m_edges.insert({m_lastEdgeId, edgeOut}); // store only the original direction
@@ -89,17 +91,17 @@ void AbstractGraph::removeAllEdges(const Node& node)
     QMutexLocker locker(&m_mutex);
     if (isUndirected()) {
         for (auto const& p : node.outEdges()) {
-            p.second->neighbour().m_ptr->removeInEdge(p.first);
+            p.second.neighbour().m_ptr->removeInEdge(p.first);
             m_edges.erase(p.first);
         }
         node.m_ptr->clearOutEdges();
     } else if (isDirected()) {
         for (auto const& p : node.outEdges()) {
-            p.second->neighbour().m_ptr->removeInEdge(p.first);
+            p.second.neighbour().m_ptr->removeInEdge(p.first);
             m_edges.erase(p.first);
         }
         for (auto const& p : node.inEdges()) {
-            p.second->neighbour().m_ptr->removeOutEdge(p.first);
+            p.second.neighbour().m_ptr->removeOutEdge(p.first);
             m_edges.erase(p.first);
         }
         node.m_ptr->clearInEdges();
@@ -123,20 +125,20 @@ Nodes::iterator AbstractGraph::removeNode(Nodes::iterator it)
     return m_nodes.erase(it);
 }
 
-void AbstractGraph::removeEdge(const EdgePtr& edge)
+void AbstractGraph::removeEdge(const Edge& edge)
 {
     QMutexLocker locker(&m_mutex);
-    edge->origin().m_ptr->removeOutEdge(edge->id());
-    edge->neighbour().m_ptr->removeInEdge(edge->id());
-    m_edges.erase(edge->id());
+    edge.origin().m_ptr->removeOutEdge(edge.id());
+    edge.neighbour().m_ptr->removeInEdge(edge.id());
+    m_edges.erase(edge.id());
 }
 
 Edges::iterator AbstractGraph::removeEdge(Edges::iterator it)
 {
     QMutexLocker locker(&m_mutex);
-    const EdgePtr& edge = it->second;
-    edge->origin().m_ptr->removeOutEdge(edge->id());
-    edge->neighbour().m_ptr->removeInEdge(edge->id());
+    const Edge& edge = it->second;
+    edge.origin().m_ptr->removeOutEdge(edge.id());
+    edge.neighbour().m_ptr->removeInEdge(edge.id());
     return m_edges.erase(it);
 }
 

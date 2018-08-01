@@ -22,6 +22,7 @@
 #include <QtTest>
 #include <core/include/edge.h>
 #include <core/include/node.h>
+#include <core/edge_p.h>
 #include <core/node_p.h>
 
 namespace evoplex {
@@ -51,8 +52,8 @@ void TestEdge::initTestCase()
 void TestEdge::tst_edge1()
 {
     // Tests method 1: adding attributes after edge is constructed
-    Edge::constructor_key key;
-    Edge edge(key, 0, m_nodeA, m_nodeB);
+    BaseEdge::constructor_key key;
+    BaseEdge edge(key, 0, m_nodeA, m_nodeB);
 
     // Tests if the attributes of a node is empty on creation
     QVERIFY(edge.attrs()->empty());
@@ -100,8 +101,8 @@ void TestEdge::tst_edge2()
     // Tests method 2: adding attributes in constructor
     Attributes* attrs = new Attributes();
     attrs->push_back("test0", Value(123));
-    Edge::constructor_key key;
-    Edge edge(key, 1, m_nodeA, m_nodeB, attrs);
+    BaseEdge::constructor_key key;
+    BaseEdge edge(key, 1, m_nodeA, m_nodeB, attrs);
 
     QVERIFY(!edge.attrs()->isEmpty());
     QVERIFY(edge.attrs()->size() == 1);
@@ -141,8 +142,8 @@ void TestEdge::tst_edge3()
     // Tests method 3: adding attributes in constructor, with ownsAttrs = true
     Attributes* attrs = new Attributes();
     attrs->push_back("test0", Value(123));
-    Edge::constructor_key key;
-    Edge edge(key, 1, m_nodeA, m_nodeB, attrs, true);
+    BaseEdge::constructor_key key;
+    BaseEdge edge(key, 1, m_nodeA, m_nodeB, attrs, true);
 
     QVERIFY(!edge.attrs()->isEmpty());
     QVERIFY(edge.attrs()->size() == 1);
