@@ -31,38 +31,39 @@ bool ModelNowak::init()
 bool ModelNowak::algorithmStep()
 {
     // 1. each agent accumulates the payoff obtained by playing the game with all its neighbours and itself
-    for (Nodes::Pair np : nodes()) {
-        const int sX = np.node()->attr(Strategy).toInt();
+    for (Node node : nodes()) {
+        const int sX = node.attr(STRATEGY).toInt();
         double score = playGame(sX, sX);
-        for (Edges::Pair ep : np.node()->outEdges()) {
-            score += playGame(sX, ep.edge()->neighbour()->attr(Strategy).toInt());
+        for (Edges::Pair edge : node.outEdges()) {
+            const int sY = edge.neighbour().attr(STRATEGY).toInt();
+            score += playGame(sX, sY);
         }
-        np.node()->setAttr(Score, score);
+        node.setAttr(SCORE, score);
     }
 
     std::vector<char> bestStrategies;
     bestStrategies.reserve(nodes().size());
 
     // 2. the best agent in the neighbourhood is selected to reproduce
-    for (Nodes::Pair np : nodes()) {
-        int bestStrategy = np.node()->attr(Strategy).toInt();
-        double highestScore = np.node()->attr(Score).toDouble();
-        for (Edges::Pair ep : np.node()->outEdges()) {
-            const double neighbourScore = ep.edge()->neighbour()->attr(Score).toDouble();
+    for (const Node& node : nodes()) {
+        int bestStrategy = node.attr(STRATEGY).toInt();
+        double highestScore = node.attr(SCORE).toDouble();
+        for (Edges::Pair edge : node.outEdges()) {
+            const double neighbourScore = edge.neighbour().attr(SCORE).toDouble();
             if (neighbourScore > highestScore) {
                 highestScore = neighbourScore;
-                bestStrategy = ep.edge()->neighbour()->attr(Strategy).toInt();
+                bestStrategy = edge.neighbour().attr(STRATEGY).toInt();
             }
         }
         bestStrategies.emplace_back(binarize(bestStrategy));
     }
 
     // 3. prepare the next generation
-    int i = 0;
-    for (Nodes::Pair np : nodes()) {
-        int s = binarize(np.node()->attr(Strategy).toInt());
+    size_t i = 0;
+    for (Node node : nodes()) {
+        int s = binarize(node.attr(STRATEGY).toInt());
         s = (s == bestStrategies.at(i)) ? s : bestStrategies.at(i) + 2;
-        np.node()->setAttr(Strategy, s);
+        node.setAttr(STRATEGY, s);
         ++i;
     }
 
@@ -78,9 +79,7 @@ double ModelNowak::playGame(const int sX, const int sY) const
     case 1: return 0.0;             // CD : Sucker's payoff
     case 2: return m_temptation;    // DC : Temptation to defect
     case 3: return 0.0;             // DD : Punishment for mutual defection
-    default:
-        qFatal("Error! strategy should be 0 or 1!");
-        return 0.0; // supress compiler warning
+    default: qFatal("Error! strategy should be 0 or 1!");
     }
 }
 
@@ -92,6 +91,5 @@ int ModelNowak::binarize(const int strategy) const
 }
 
 } // evoplex
-
 REGISTER_PLUGIN(ModelNowak)
 #include "plugin.moc"

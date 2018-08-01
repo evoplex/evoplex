@@ -18,48 +18,75 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "node.h"
+#include "include/node.h"
+#include "node_p.h"
 
-// we need this cpp file to avoi weak-vtable issues
 namespace evoplex {
 
-BaseNode::BaseNode(const constructor_key&, int id, const Attributes& attrs, int x, int y)
-    : m_id(id),
-      m_attrs(attrs),
-      m_x(x),
-      m_y(y)
-{
-}
+Node::Node()
+    : m_ptr(nullptr)
+{}
 
-BaseNode::BaseNode(const constructor_key& k, int id, const Attributes& attr)
-    : BaseNode(k, id, attr, 0, id) {}
+Node::Node(NodePtr node)
+    : m_ptr(node)
+{}
 
-BaseNode::~BaseNode()
-{
-}
+Node::Node(const std::pair<const int, Node>& p)
+    : m_ptr(p.second.m_ptr)
+{}
 
-/*******************/
+bool Node::isNull() const
+{ return m_ptr ? false : true; }
 
-UNode::UNode(const constructor_key& k, int id, const Attributes& attrs, int x, int y)
-    : BaseNode(k, id, attrs, x, y)
-{
-}
+NodePtr Node::clone() const
+{ return m_ptr->clone(); }
 
-UNode::UNode(const constructor_key& k, int id, const Attributes& attrs)
-    : BaseNode(k, id, attrs)
-{
-}
+int Node::id() const
+{ return m_ptr->id(); }
 
-/*******************/
+int Node::x() const
+{ return m_ptr->x(); }
 
-DNode::DNode(const constructor_key& k, int id, const Attributes& attrs, int x, int y)
-    : BaseNode(k, id, attrs, x, y)
-{
-}
+int Node::y() const
+{ return m_ptr->y(); }
 
-DNode::DNode(const constructor_key& k, int id, const Attributes& attrs)
-    : BaseNode(k, id, attrs)
-{
-}
+const Attributes& Node::attrs() const
+{ return m_ptr->attrs(); }
+
+const Value& Node::attr(const int& id) const
+{ return m_ptr->attr(id); }
+
+const Value& Node::attr(const QString& name) const
+{ return m_ptr->attr(name); }
+
+const Node& Node::randNeighbour(PRG* prg) const
+{ return m_ptr->randNeighbour(prg); }
+
+const Edges& Node::inEdges() const
+{ return m_ptr->inEdges(); }
+
+const Edges& Node::outEdges() const
+{ return m_ptr->outEdges(); }
+
+int Node::degree() const
+{ return m_ptr->degree(); }
+
+int Node::inDegree() const
+{ return m_ptr->inDegree(); }
+
+int Node::outDegree() const
+{ return m_ptr->outDegree(); }
+
+void Node::setAttr(const int id, const Value& value)
+{ m_ptr->setAttr(id, value); }
+
+void Node::setX(int x)
+{ m_ptr->setX(x); }
+
+void Node::setY(int y)
+{ m_ptr->setY(y); }
+
+void Node::setCoords(int x, int y)
+{ m_ptr->setCoords(x, y); }
 
 } // evoplex

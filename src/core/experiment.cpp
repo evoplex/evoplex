@@ -22,6 +22,7 @@
 
 #include "experiment.h"
 #include "nodes.h"
+#include "nodes_p.h"
 #include "project.h"
 #include "trial.h"
 #include "utils.h"
@@ -332,7 +333,7 @@ Nodes Experiment::cloneCachedNodes(const int trialId)
     // if it's not the last trial, just take a copy of the nodes
     for (auto const& it : m_trials) {
         if (it.first != trialId && it.second->status() == Status::Disabled) {
-            return Utils::clone(m_clonableNodes);
+            return NodesPrivate::clone(m_clonableNodes);
         }
     }
 
@@ -347,7 +348,7 @@ Nodes Experiment::createNodes() const
     const QString& cmd = m_inputs->general(GENERAL_ATTRIBUTE_NODES).toQString();
 
     QString error;
-    Nodes nodes = Nodes::fromCmd(cmd, m_modelPlugin->nodeAttrsScope(), m_graphType, error);
+    Nodes nodes = NodesPrivate::fromCmd(cmd, m_modelPlugin->nodeAttrsScope(), m_graphType, error);
     if (nodes.empty() || !error.isEmpty()) {
         error = QString("unable to create the trials."
                         "The set of nodes could not be created.\n %1 \n"

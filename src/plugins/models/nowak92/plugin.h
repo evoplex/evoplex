@@ -31,13 +31,12 @@ public:
     bool algorithmStep() override;
 
 private:
-    enum NodeAttr { Strategy, Score };
+    enum NodeAttr { STRATEGY, SCORE };
 
     double m_temptation;
 
     double playGame(const int sX, const int sY) const;
     int binarize(const int strategy) const;
 };
-}
-
+} // evoplex
 #endif

@@ -22,7 +22,8 @@
 #include <QtTest>
 #include <QStringList>
 
-#include <node.h>
+#include <core/include/node.h>
+#include <core/node_p.h>
 
 namespace evoplex {
 class TestNode: public QObject

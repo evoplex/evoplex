@@ -20,8 +20,9 @@
  */
 
 #include <QtTest>
-#include <edge.h>
-#include <node.h>
+#include <core/include/edge.h>
+#include <core/include/node.h>
+#include <core/node_p.h>
 
 namespace evoplex {
 class TestEdge: public QObject
@@ -36,15 +37,15 @@ private slots:
     void tst_edge3();
 
 private:
-    NodePtr m_nodeA;
-    NodePtr m_nodeB;
+    Node m_nodeA;
+    Node m_nodeB;
 };
 
 void TestEdge::initTestCase()
 {
     BaseNode::constructor_key key;
-    m_nodeA = std::make_shared<UNode>(key, 0, Attributes());
-    m_nodeB = std::make_shared<UNode>(key, 1, Attributes());
+    m_nodeA = Node(std::make_shared<UNode>(key, 123, Attributes()));
+    m_nodeB = Node(std::make_shared<UNode>(key, 55558, Attributes()));
 }
 
 void TestEdge::tst_edge1()
@@ -90,8 +91,8 @@ void TestEdge::tst_edge1()
 
     // Tests if 'Edge::id()' works as expected
     QCOMPARE(edge.id(), 0);
-    QCOMPARE(edge.origin(), m_nodeA);
-    QCOMPARE(edge.neighbour(), m_nodeB);
+    QCOMPARE(edge.origin().id(), m_nodeA.id());
+    QCOMPARE(edge.neighbour().id(), m_nodeB.id());
 }
 
 void TestEdge::tst_edge2()
@@ -131,8 +132,8 @@ void TestEdge::tst_edge2()
 
     // Tests if 'Edge::id()' works as expected
     QCOMPARE(edge.id(), 1);
-    QCOMPARE(edge.origin(), m_nodeA);
-    QCOMPARE(edge.neighbour(), m_nodeB);
+    QCOMPARE(edge.origin().id(), m_nodeA.id());
+    QCOMPARE(edge.neighbour().id(), m_nodeB.id());
 }
 
 void TestEdge::tst_edge3()
@@ -172,8 +173,8 @@ void TestEdge::tst_edge3()
 
     // Tests if 'Edge::id()' works as expected
     QCOMPARE(edge.id(), 1);
-    QCOMPARE(edge.origin(), m_nodeA);
-    QCOMPARE(edge.neighbour(), m_nodeB);
+    QCOMPARE(edge.origin().id(), m_nodeA.id());
+    QCOMPARE(edge.neighbour().id(), m_nodeB.id());
 }
 
 } // evoplex

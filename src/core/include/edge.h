@@ -28,10 +28,8 @@
 
 namespace evoplex {
 
+class Node;
 class Edge;
-class BaseNode;
-
-using NodePtr = std::shared_ptr<BaseNode>;
 using EdgePtr = std::shared_ptr<Edge>;
 
 /**
@@ -47,8 +45,8 @@ private:
     struct constructor_key { /* this is a private key accessible only to friends */ };
 
 public:
-    explicit Edge(const constructor_key&, int id, const NodePtr& origin,
-                  const NodePtr& neighbour, Attributes* attrs=new Attributes(),
+    explicit Edge(const constructor_key&, int id, const Node& origin,
+                  const Node& neighbour, Attributes* attrs=new Attributes(),
                   bool ownsAttrs=true)
         : m_id(id), m_origin(origin), m_neighbour(neighbour),
           m_attrs(attrs), m_ownsAttrs(ownsAttrs) {}
@@ -63,13 +61,13 @@ public:
     inline void addAttr(QString name, Value value);
 
     inline int id() const;
-    inline const NodePtr& origin() const;
-    inline const NodePtr& neighbour() const;
+    inline const Node& origin() const;
+    inline const Node& neighbour() const;
 
 private:
     const int m_id;
-    const NodePtr& m_origin;
-    const NodePtr& m_neighbour;
+    const Node& m_origin;
+    const Node& m_neighbour;
     Attributes* m_attrs;
     const bool m_ownsAttrs;
 };
@@ -99,10 +97,10 @@ inline void Edge::addAttr(QString name, Value value)
 inline int Edge::id() const
 { return m_id; }
 
-inline const NodePtr& Edge::origin() const
+inline const Node& Edge::origin() const
 { return m_origin; }
 
-inline const NodePtr& Edge::neighbour() const
+inline const Node& Edge::neighbour() const
 { return m_neighbour; }
 
 

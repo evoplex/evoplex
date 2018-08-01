@@ -49,7 +49,7 @@ class GraphWidgetInterface
 protected:
     virtual ~GraphWidgetInterface() = default;
     virtual void paintEvent(QPaintEvent*) = 0;
-    virtual NodePtr selectNode(const QPoint& pos) const = 0;
+    virtual Node selectNode(const QPoint& pos) const = 0;
     virtual CacheStatus refreshCache() = 0;
 };
 
@@ -104,7 +104,7 @@ private:
 
     std::vector<QLineEdit*> m_attrs;
 
-    void updateInspector(const NodePtr& node);
+    void updateInspector(const Node& node);
 
     void updateCache(bool force=false);
 };

@@ -50,6 +50,7 @@ public:
         Pair(const std::pair<const int, EdgePtr>& _a) : _p(_a) {}
         const int& id() const { return _p.first; }
         const EdgePtr& edge() const { return _p.second; }
+        const Node& neighbour() const { return _p.second->neighbour(); }
     };
 };
 

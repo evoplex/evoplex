@@ -58,18 +58,18 @@ void SquareGrid::reset()
     }
 
     if (m_periodic) {
-        for (auto const& node : m_nodes) {
+        for (Node node : m_nodes) {
             int x, y;
-            ind2sub(node.first, m_width, y, x);
-            node.second->setCoords(x, y);
-            createPeriodicEdges(node.first, func);
+            ind2sub(node.id(), m_width, y, x);
+            node.setCoords(x, y);
+            createPeriodicEdges(node.id(), func);
         }
     } else {
-        for (auto const& node : m_nodes) {
+        for (Node node : m_nodes) {
             int x, y;
-            ind2sub(node.first, m_width, y, x);
-            node.second->setCoords(x, y);
-            createFixedEdges(node.first, func);
+            ind2sub(node.id(), m_width, y, x);
+            node.setCoords(x, y);
+            createFixedEdges(node.id(), func);
         }
     }
 }

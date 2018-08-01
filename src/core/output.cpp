@@ -90,7 +90,8 @@ void DefaultOutput::doOperation(const Trial* trial)
     switch (m_func) {
     case F_Count:
         if (m_entity == E_Nodes) {
-            allValues = Stats::count(trial->graph()->nodes(), m_attrRange->id(), m_allInputs);
+            // FIXME
+            // allValues = Stats::count(trial->graph()->nodes(), m_attrRange->id(), m_allInputs);
         } else {
             allValues = Stats::count(trial->graph()->edges(), m_attrRange->id(), m_allInputs);
         }

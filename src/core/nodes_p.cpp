@@ -24,16 +24,27 @@
 #include <QtDebug>
 #include <QStringList>
 
-#include "nodes.h"
+#include "nodes_p.h"
 #include "attrsgenerator.h"
+#include "node_p.h"
 
 namespace evoplex {
 
-Nodes Nodes::fromCmd(const QString& cmd, const AttributesScope& attrsScope,
+Nodes NodesPrivate::clone(const Nodes& nodes)
+{
+    Nodes ret;
+    ret.reserve(nodes.size());
+    for (auto const& pair : nodes) {
+        ret.insert({pair.first, pair.second.clone()});
+    }
+    return ret;
+}
+
+Nodes NodesPrivate::fromCmd(const QString& cmd, const AttributesScope& attrsScope,
         const GraphType& graphType, QString& error, std::function<void(int)> progress)
 {
     if (QFileInfo::exists(cmd)) {
-        return Nodes::fromFile(cmd, attrsScope, graphType, error, progress);
+        return fromFile(cmd, attrsScope, graphType, error, progress);
     }
 
     AttrsGenerator* ag = AttrsGenerator::parse(attrsScope, cmd, error);
@@ -49,12 +60,16 @@ Nodes Nodes::fromCmd(const QString& cmd, const AttributesScope& attrsScope,
     int id = 0;
     if (graphType == GraphType::Directed) {
         for (Attributes attrs : setOfAttrs) {
-            nodes.insert({id, std::make_shared<DNode>(k, id, attrs)});
+            Node node;
+            node.m_ptr = std::make_shared<DNode>(k, id, attrs);
+            nodes.insert({id, node});
             ++id;
         }
     } else if (graphType == GraphType::Undirected) {
         for (Attributes attrs : setOfAttrs) {
-            nodes.insert({id, std::make_shared<UNode>(k, id, attrs)});
+            Node node;
+            node.m_ptr = std::make_shared<UNode>(k, id, attrs);
+            nodes.insert({id, node});
             ++id;
         }
     }
@@ -62,7 +77,7 @@ Nodes Nodes::fromCmd(const QString& cmd, const AttributesScope& attrsScope,
     return nodes;
 }
 
-Nodes Nodes::fromFile(const QString& filePath, const AttributesScope& attrsScope,
+Nodes NodesPrivate::fromFile(const QString& filePath, const AttributesScope& attrsScope,
         const GraphType& graphType, QString& error, std::function<void(int)> progress)
 {
     bool isDirected = graphType == GraphType::Directed;
@@ -94,8 +109,8 @@ Nodes Nodes::fromFile(const QString& filePath, const AttributesScope& attrsScope
     Nodes nodes;
     while (!in.atEnd()) {
         QStringList values = in.readLine().split(",");
-        NodePtr node = readRow(row, header, values, attrsScope, isDirected, error);
-        if (!node) {
+        Node node = readRow(row, header, values, attrsScope, isDirected, error);
+        if (node.isNull()) {
             error = QString("%1\n row: %2").arg(error).arg(row);
             qWarning() << error;
             return Nodes();
@@ -109,9 +124,9 @@ Nodes Nodes::fromFile(const QString& filePath, const AttributesScope& attrsScope
     return nodes;
 }
 
-bool Nodes::saveToFile(QString filePath, std::function<void(int)> progress) const
+bool NodesPrivate::saveToFile(const Nodes& nodes, QString filePath, std::function<void(int)> progress)
 {
-    if (empty()) {
+    if (nodes.empty()) {
         qWarning() << "tried to save an empty set of nodes.";
         return false;
     }
@@ -127,35 +142,35 @@ bool Nodes::saveToFile(QString filePath, std::function<void(int)> progress) cons
     }
 
     QTextStream out(&file);
-    const std::vector<QString>& header = (*begin()).second->attrs().names();
+    const std::vector<QString>& header = nodes.begin()->second.attrs().names();
     for (const QString& col : header) {
         out << col << ",";
     }
     out << "x,y\n";
 
     std::vector<int> orderedIds;
-    for (auto const& pair : (*this)) {
+    for (auto const& pair : nodes) {
         orderedIds.emplace_back(pair.first);
     }
     std::sort(orderedIds.begin(), orderedIds.end());
 
     for (const int id : orderedIds) {
-        const NodePtr& node = this->at(id);
-        for (const Value& value : node->attrs().values()) {
+        const Node& node = nodes.at(id);
+        for (const Value& value : node.attrs().values()) {
             out << value.toQString() << ",";
         }
-        out << node->x() << ",";
-        out << node->y() << "\n";
+        out << node.x() << ",";
+        out << node.y() << "\n";
 
         out.flush();
-        progress(node->id());
+        progress(node.id());
     }
 
     file.close();
     return true;
 }
 
-QStringList Nodes::validateHeader(const QString& header,
+QStringList NodesPrivate::validateHeader(const QString& header,
         const AttributesScope& attrsScope, QString& error)
 {
     QStringList headerList = header.split(",");
@@ -186,12 +201,12 @@ QStringList Nodes::validateHeader(const QString& header,
     return headerList;
 }
 
-NodePtr Nodes::readRow(const int row, const QStringList& header, const QStringList& values,
-                       const AttributesScope& attrsScope, const bool isDirected, QString& error)
+Node NodesPrivate::readRow(const int row, const QStringList& header, const QStringList& values,
+        const AttributesScope& attrsScope, const bool isDirected, QString& error)
 {
     if (values.size() != header.size()) {
         error = "rows must have the same number of columns!";
-        return nullptr;
+        return Node();
     }
 
     int coordX = 0;
@@ -216,15 +231,18 @@ NodePtr Nodes::readRow(const int row, const QStringList& header, const QStringLi
 
         if (!isValid) {
             error = QString("invalid value at column: %1").arg(col);
-            return nullptr;
+            return Node();
         }
     }
 
+    Node node;
     BaseNode::constructor_key k;
     if (isDirected) {
-        return std::make_shared<DNode>(k, row, attrs, coordX, coordY);
+        node.m_ptr = std::make_shared<DNode>(k, row, attrs, coordX, coordY);
+    } else {
+        node.m_ptr = std::make_shared<UNode>(k, row, attrs, coordX, coordY);
     }
-    return std::make_shared<UNode>(k, row, attrs, coordX, coordY);
+    return node;
 }
 
 } // evoplex

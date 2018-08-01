@@ -33,12 +33,12 @@ public:
 
 protected:
     void paintEvent(QPaintEvent*) override;
-    NodePtr selectNode(const QPoint& pos) const override;
+    Node selectNode(const QPoint& pos) const override;
     CacheStatus refreshCache() override;
 
 private:
     struct Cache {
-        NodePtr node = nullptr;
+        Node node;
         QPointF xy;
         std::vector<QLineF> edges;
     };

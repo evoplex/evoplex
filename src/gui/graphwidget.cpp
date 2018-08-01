@@ -90,14 +90,14 @@ GraphWidget::GraphWidget(MainGUI* mainGUI, ExperimentPtr exp, ExperimentWidget* 
                 return;
             }
             QString err;
-            const NodePtr& node = m_trial->graph()->node(m_ui->nodeId->value());
+            Node node = m_trial->graph()->node(m_ui->nodeId->value());
             if (m_trial->status() == Status::Running) {
                 err = "You cannot change things in a running experiment.\n"
                       "Please, pause it and try again.";
             } else {
                 Value v = attrRange->validate(le->text());
                 if (v.isValid()) {
-                    node->setAttr(attrRange->id(), v);
+                    node.setAttr(attrRange->id(), v);
                     // let the other widgets aware that they all need to be updated
                     emit (m_expWidget->updateWidgets(true));
                     return;
@@ -107,7 +107,7 @@ GraphWidget::GraphWidget(MainGUI* mainGUI, ExperimentPtr exp, ExperimentWidget* 
                 }
             }
             QMessageBox::warning(this, "Graph", err);
-            le->setText(node->attr(attrRange->id()).toQString());
+            le->setText(node.attr(attrRange->id()).toQString());
         });
         m_attrs[attrRange->id()] = le;
         m_ui->inspectorLayout->addRow(attrRange->attrName(), le);
@@ -232,13 +232,13 @@ void GraphWidget::mouseReleaseEvent(QMouseEvent *e)
 
     m_selectedNode = -1;
     if (e->pos() == m_posEntered) {
-        const NodePtr& node = selectNode(e->pos());
-        if (node) {
-            m_selectedNode = node->id();
+        const Node& node = selectNode(e->pos());
+        if (node.isNull()) {
+            m_ui->inspector->hide();
+        } else {
+            m_selectedNode = node.id();
             updateInspector(node);
             m_ui->inspector->show();
-        } else {
-            m_ui->inspector->hide();
         }
         update();
     } else {
@@ -254,12 +254,12 @@ void GraphWidget::resizeEvent(QResizeEvent* e)
     QWidget::resizeEvent(e);
 }
 
-void GraphWidget::updateInspector(const NodePtr& node)
+void GraphWidget::updateInspector(const Node& node)
 {
-    m_ui->nodeId->setValue(node->id());
-    m_ui->neighbors->setText(QString::number(node->outDegree()));
-    for (quint16 id = 0; id < node->attrs().size(); ++id) {
-        m_attrs.at(id)->setText(node->attr(id).toQString());
+    m_ui->nodeId->setValue(node.id());
+    m_ui->neighbors->setText(QString::number(node.outDegree()));
+    for (quint16 id = 0; id < node.attrs().size(); ++id) {
+        m_attrs.at(id)->setText(node.attr(id).toQString());
     }
 }
 

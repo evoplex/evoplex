@@ -25,6 +25,7 @@
 
 #include "abstractgraph.h"
 #include "abstractmodel.h"
+#include "nodes_p.h"
 #include "trial.h"
 #include "project.h"
 #include "utils.h"
@@ -112,7 +113,7 @@ bool Trial::init()
 
     // make the set of nodes available for other trials
     if (m_exp->numTrials() > 1 && m_exp->m_clonableNodes.empty()) {
-        m_exp->m_clonableNodes = Utils::clone(nodes);
+        m_exp->m_clonableNodes = NodesPrivate::clone(nodes);
     }
 
     m_step = 0; // important!

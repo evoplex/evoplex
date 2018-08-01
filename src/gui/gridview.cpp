@@ -54,8 +54,8 @@ CacheStatus GridView::refreshCache()
     m_cache.reserve(nodes.size());
 
     for (auto const& np : nodes) {
-        QRectF r(m_origin.x() + np.second->x() * m_nodeRadius,
-                 m_origin.y() + np.second->y() * m_nodeRadius,
+        QRectF r(m_origin.x() + np.second.x() * m_nodeRadius,
+                 m_origin.y() + np.second.y() * m_nodeRadius,
                  m_nodeRadius, m_nodeRadius);
 
         if (!rect().contains(r.x(), r.y()))
@@ -83,10 +83,10 @@ void GridView::paintEvent(QPaintEvent*)
 
     for (const Cache& cache : m_cache) {
         QColor color;
-        if (m_selectedNode == cache.node->id()) {
+        if (m_selectedNode == cache.node.id()) {
             color = QColor(10,10,10,100);
         } else if (m_nodeAttr >= 0) {
-            const Value& value = cache.node->attr(m_nodeAttr);
+            const Value& value = cache.node.attr(m_nodeAttr);
             color = m_nodeCMap->colorFromValue(value);
         } else {
             color = m_nodeCMap->colors().front();
@@ -99,7 +99,7 @@ void GridView::paintEvent(QPaintEvent*)
     painter.end();
 }
 
-NodePtr GridView::selectNode(const QPoint& pos) const
+Node GridView::selectNode(const QPoint& pos) const
 {
     if (m_cacheStatus == CacheStatus::Ready) {
         for (const Cache& cache : m_cache) {
@@ -108,7 +108,7 @@ NodePtr GridView::selectNode(const QPoint& pos) const
             }
         }
     }
-    return nullptr;
+    return Node();
 }
 
 }

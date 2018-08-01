@@ -26,6 +26,7 @@
 
 #include "abstractplugin.h"
 #include "edges.h"
+#include "enum.h"
 #include "nodes.h"
 
 namespace evoplex {
@@ -56,23 +57,23 @@ public:
     inline const Edges& edges() const;
     inline const EdgePtr& edge(int id) const;
     inline const Nodes& nodes() const;
-    inline const NodePtr& node(int id) const;
-    inline const NodePtr& randNode() const;
+    inline Node node(int id) const;
+    inline Node randNode() const;
 
     inline int numNodes() const;
     inline int numEdges() const;
 
-    inline NodePtr addNode(Attributes attr);
-    NodePtr addNode(Attributes attr, int x, int y);
+    inline Node addNode(Attributes attr);
+    Node addNode(Attributes attr, int x, int y);
 
     // nodes must belong to the graph
     inline EdgePtr addEdge(const int originId, const int neighbourId, Attributes* attrs=new Attributes());
-    EdgePtr addEdge(const NodePtr& origin, const NodePtr& neighbour, Attributes* attrs=new Attributes());
+    EdgePtr addEdge(const Node& origin, const Node& neighbour, Attributes* attrs=new Attributes());
 
     void removeAllEdges();
-    void removeAllEdges(const NodePtr& node);
+    void removeAllEdges(const Node& node);
 
-    void removeNode(const NodePtr& node);
+    void removeNode(const Node& node);
     Nodes::iterator removeNode(Nodes::iterator it);
 
     void removeEdge(const EdgePtr& edge);
@@ -119,10 +120,10 @@ inline const Nodes& AbstractGraph::nodes() const
 inline const EdgePtr& AbstractGraph::edge(int id) const
 { return m_edges.at(id); }
 
-inline const NodePtr& AbstractGraph::node(int id) const
+inline Node AbstractGraph::node(int id) const
 { return m_nodes.at(id); }
 
-inline const NodePtr& AbstractGraph::randNode() const
+inline Node AbstractGraph::randNode() const
 { return m_nodes.at(prg()->randI(numNodes()-1)); }
 
 inline int AbstractGraph::numEdges() const
@@ -131,7 +132,7 @@ inline int AbstractGraph::numEdges() const
 inline int AbstractGraph::numNodes() const
 { return static_cast<int>(m_nodes.size()); }
 
-inline NodePtr AbstractGraph::addNode(Attributes attr)
+inline Node AbstractGraph::addNode(Attributes attr)
 { return addNode(attr, 0, m_lastNodeId+1); }
 
 inline EdgePtr AbstractGraph::addEdge(const int originId, const int neighbourId, Attributes* attrs)

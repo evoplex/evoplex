@@ -48,6 +48,8 @@ set(EVOPLEX_CORE_H
   experiment.h
   expinputs.h
   experimentsmgr.h
+  node_p.h
+  nodes_p.h
   project.h
   logger.h
   mainapp.h
@@ -60,7 +62,7 @@ set(EVOPLEX_CORE_CXX
   graphplugin.cpp
   modelplugin.cpp
   node.cpp
-  nodes.cpp
+  nodes_p.cpp
   prg.cpp
 
   attributerange.cpp
@@ -69,6 +71,7 @@ set(EVOPLEX_CORE_CXX
   experiment.cpp
   expinputs.cpp
   experimentsmgr.cpp
+  node_p.cpp
   output.cpp
   project.cpp
   value.cpp

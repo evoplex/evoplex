@@ -67,8 +67,8 @@ CacheStatus GraphView::refreshCache()
     m_cache.reserve(m_trial->graph()->nodes().size());
 
     for (auto const& np : m_trial->graph()->nodes()) {
-        QPointF xy(m_origin.x() + edgeSizeRate * (1.f + np.second->x()),
-                   m_origin.y() + edgeSizeRate * (1.f + np.second->y()));
+        QPointF xy(m_origin.x() + edgeSizeRate * (1.f + np.second.x()),
+                   m_origin.y() + edgeSizeRate * (1.f + np.second.y()));
 
         if (!rect().contains(xy.toPoint())) {
             continue;
@@ -77,11 +77,11 @@ CacheStatus GraphView::refreshCache()
         Cache cache;
         cache.node = np.second;
         cache.xy = xy;
-        cache.edges.reserve(np.second->outDegree());
+        cache.edges.reserve(np.second.outEdges().size());
 
-        for (auto const& ep : np.second->outEdges()) {
-            QPointF xy2(m_origin.x() + edgeSizeRate * (1.0 + ep.second->neighbour()->x()),
-                        m_origin.y() + edgeSizeRate * (1.0 + ep.second->neighbour()->y()));
+        for (auto const& ep : np.second.outEdges()) {
+            QPointF xy2(m_origin.x() + edgeSizeRate * (1.0 + ep.second->neighbour().x()),
+                        m_origin.y() + edgeSizeRate * (1.0 + ep.second->neighbour().y()));
             cache.edges.emplace_back(QLineF(xy, xy2));
         }
 
@@ -105,7 +105,7 @@ void GraphView::paintEvent(QPaintEvent*)
     if (m_showEdges) {
         Cache cacheSelected;
         for (const Cache& cache : m_cache) {
-            if (m_selectedNode == cache.node->id()) {
+            if (m_selectedNode == cache.node.id()) {
                 cacheSelected = cache;
             }
             for (const QLineF& edge : cache.edges) {
@@ -114,7 +114,7 @@ void GraphView::paintEvent(QPaintEvent*)
             }
         }
 
-        if (cacheSelected.node) {
+        if (!cacheSelected.node.isNull()) {
             for (const QLineF& edge : cacheSelected.edges) {
                 painter.setPen(QPen(Qt::black, 3));
                 painter.drawLine(edge);
@@ -124,13 +124,13 @@ void GraphView::paintEvent(QPaintEvent*)
 
     if (m_showNodes) {
         for (const Cache& cache : m_cache) {
-            if (m_selectedNode == cache.node->id()) {
+            if (m_selectedNode == cache.node.id()) {
                 painter.setBrush(QColor(10,10,10,100));
                 painter.drawEllipse(cache.xy, m_nodeRadius*1.5f, m_nodeRadius*1.5f);
             }
 
             if (m_nodeAttr >= 0) {
-                const Value& value = cache.node->attr(m_nodeAttr);
+                const Value& value = cache.node.attr(m_nodeAttr);
                 painter.setBrush(m_nodeCMap->colorFromValue(value));
             } else {
                 painter.setBrush(m_nodeCMap->colors().front());
@@ -143,7 +143,7 @@ void GraphView::paintEvent(QPaintEvent*)
     painter.end();
 }
 
-NodePtr GraphView::selectNode(const QPoint& pos) const
+Node GraphView::selectNode(const QPoint& pos) const
 {
     if (m_cacheStatus == CacheStatus::Ready) {
         for (const Cache& cache : m_cache) {
@@ -155,7 +155,7 @@ NodePtr GraphView::selectNode(const QPoint& pos) const
             }
         }
     }
-    return nullptr;
+    return Node();
 }
 
 } // evoplex

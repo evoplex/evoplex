@@ -22,8 +22,11 @@
 #include <QDir>
 #include <QStringList>
 
-#include <attributerange.h>
-#include <nodes.h>
+#include <core/include/attributerange.h>
+#include <core/include/enum.h>
+#include <core/include/nodes.h>
+#include <core/node_p.h>
+#include <core/nodes_p.h>
 
 namespace evoplex {
 class TestNodes: public QObject
@@ -58,7 +61,7 @@ private:
     void _compare_nodes(const Nodes& a, const Nodes& b) const;
     void _tst_empty_nodes(const Nodes& a, size_t size);
     void _tst_Node(BaseNode* node, Attributes attrs);
-    void _tst_attrs(NodePtr node, Attributes attrs);
+    void _tst_attrs(Node node, Attributes attrs);
     void _tst_invalid(QString cmd, bool has_attrs, GraphType graphType);
     void _tst_fromFile_nodes_with_oneCoord(const QString& filePath);
 
@@ -67,7 +70,7 @@ private:
     bool nodesOfSameType(const Nodes& nodes)
     {
         for (auto const& it : nodes) {
-            if (!dynamic_cast<T*>(it.second.get()))
+            if (!dynamic_cast<T*>(it.second.m_ptr.get()))
                 return false;
         }
         return true;
@@ -77,23 +80,22 @@ private:
 void TestNodes::_tst_empty_nodes(const Nodes& a, size_t size){
     QVERIFY(a.size() == size);
     for(int i = 0; i < static_cast<int>(size); i++){
-    QVERIFY(a.at(i)->attrs().isEmpty());
-    QCOMPARE(a.at(i)->degree(), 0);
-    QCOMPARE(a.at(i)->inDegree(), 0);
-    QCOMPARE(a.at(i)->outDegree(), 0);
+    QVERIFY(a.at(i).attrs().isEmpty());
+    QCOMPARE(a.at(i).degree(), 0);
+    QCOMPARE(a.at(i).inDegree(), 0);
+    QCOMPARE(a.at(i).outDegree(), 0);
     }
 }
 
-void TestNodes::_tst_attrs(NodePtr node, Attributes attrs)
+void TestNodes::_tst_attrs(Node node, Attributes attrs)
 {
-    QCOMPARE(node->attrs().names(), attrs.names());
-    QCOMPARE(node->attrs().values(), attrs.values());
-    QCOMPARE(node->attrs().size(), attrs.size());
+    QCOMPARE(node.attrs().names(), attrs.names());
+    QCOMPARE(node.attrs().values(), attrs.values());
+    QCOMPARE(node.attrs().size(), attrs.size());
 }
 
 void TestNodes::_tst_invalid(QString cmd, bool has_attrs, GraphType graphType){
     QString errorMsg;
-    NodePtr node;
     AttributesScope attrsScope;
 
     if(has_attrs){
@@ -107,7 +109,7 @@ void TestNodes::_tst_invalid(QString cmd, bool has_attrs, GraphType graphType){
         attrsScope.insert(col2->attrName(), col2);
     }
 
-    Nodes nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
+    Nodes nodes = NodesPrivate::fromCmd(cmd, attrsScope, graphType, errorMsg);
     if(!has_attrs) _tst_empty_nodes(nodes, 0);
     QVERIFY(nodes.empty());
     if(graphType == GraphType::Directed) QVERIFY(nodesOfSameType<DNode>(nodes));
@@ -119,7 +121,6 @@ void TestNodes::tst_fromCmd()
     QString errorMsg, cmd;
     QString attrRangeStr = "int[0,1000]";
     Nodes nodes;
-    NodePtr node;
     GraphType graphType;
 
     const QStringList names = { "test0", "test1", "test2" };
@@ -133,7 +134,7 @@ void TestNodes::tst_fromCmd()
     graphType = GraphType::Undirected;
     cmd = "*3;min";
 
-    nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
+    nodes = NodesPrivate::fromCmd(cmd, attrsScope, graphType, errorMsg);
     _tst_empty_nodes(nodes, 3);
     QVERIFY(nodesOfSameType<UNode>(nodes));
 
@@ -149,7 +150,7 @@ void TestNodes::tst_fromCmd()
        attrs.replace(i, names[i], Value(0));
     }
 
-    nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
+    nodes = NodesPrivate::fromCmd(cmd, attrsScope, graphType, errorMsg);
     QVERIFY(nodesOfSameType<UNode>(nodes));
 
     for(int i = 0; i < 3; i++){
@@ -160,7 +161,7 @@ void TestNodes::tst_fromCmd()
     graphType = GraphType::Directed;
     attrsScope.clear();
 
-    nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
+    nodes = NodesPrivate::fromCmd(cmd, attrsScope, graphType, errorMsg);
     _tst_empty_nodes(nodes, 3);
     QVERIFY(nodesOfSameType<DNode>(nodes));
 
@@ -172,12 +173,11 @@ void TestNodes::tst_fromCmd()
     col2 = AttributeRange::parse(2, names[2], attrRangeStr);
     attrsScope.insert(col2->attrName(), col2);
 
-    nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
+    nodes = NodesPrivate::fromCmd(cmd, attrsScope, graphType, errorMsg);
     QVERIFY(nodesOfSameType<DNode>(nodes));
 
     for(int i = 0; i < 3; i++){
-        NodePtr node = nodes.at(i);
-        _tst_attrs(node, attrs);
+        _tst_attrs(nodes.at(i), attrs);
     }
 
     // Valid # command cases
@@ -188,14 +188,13 @@ void TestNodes::tst_fromCmd()
     attrs.resize(1);
 
     cmd = QString("#3;%1_value_%2").arg(names[0]).arg(values[0].toQString());
-    nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
+    nodes = NodesPrivate::fromCmd(cmd, attrsScope, graphType, errorMsg);
     QVERIFY(nodesOfSameType<UNode>(nodes));
 
     QVERIFY(nodes.size() == 3);
-    node = nodes.at(0);
 
     attrs.replace(0, names[0], values[0]);
-    _tst_attrs(node, attrs);
+    _tst_attrs(nodes.at(0), attrs);
 
     // Undirected with multiple attributes
     attrsScope.insert(col1->attrName(), col1);
@@ -206,12 +205,11 @@ void TestNodes::tst_fromCmd()
     }
 
     cmd = QString("#3;%1_value_%2;%3_value_%4").arg(names[0]).arg(values[0].toQString()).arg(names[1]).arg(values[1].toQString());
-    nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
+    nodes = NodesPrivate::fromCmd(cmd, attrsScope, graphType, errorMsg);
     QVERIFY(nodesOfSameType<UNode>(nodes));
 
     QVERIFY(nodes.size() == 3);
-    node = nodes.at(0);
-    _tst_attrs(node, attrs);
+    _tst_attrs(nodes.at(0), attrs);
 
     // Directed with single attribute
     graphType = GraphType::Directed;
@@ -220,12 +218,11 @@ void TestNodes::tst_fromCmd()
     attrs.resize(1);
 
     cmd = QString("#3;%1_value_%2").arg(names[0]).arg(values[0].toQString());
-    nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
+    nodes = NodesPrivate::fromCmd(cmd, attrsScope, graphType, errorMsg);
     QVERIFY(nodesOfSameType<DNode>(nodes));
 
     QVERIFY(nodes.size() == 3);
-    node = nodes.at(0);
-    _tst_attrs(node, attrs);
+    _tst_attrs(nodes.at(0), attrs);
 
     // Directed with multiple attributes
     attrsScope.insert(col1->attrName(), col1);
@@ -235,12 +232,11 @@ void TestNodes::tst_fromCmd()
        attrs.replace(i, names[i], values[i]);
     }
     cmd = QString("#3;%1_value_%2;%3_value_%4").arg(names[0]).arg(values[0].toQString()).arg(names[1]).arg(values[1].toQString());
-    nodes = Nodes::fromCmd(cmd, attrsScope, graphType, errorMsg);
+    nodes = NodesPrivate::fromCmd(cmd, attrsScope, graphType, errorMsg);
     QVERIFY(nodesOfSameType<DNode>(nodes));
 
     QVERIFY(nodes.size() == 3);
-    node = nodes.at(0);
-    _tst_attrs(node, attrs);
+    _tst_attrs(nodes.at(0), attrs);
 
     // Empty commands
     cmd = "";
@@ -301,35 +297,35 @@ void TestNodes::tst_fromFile_nodes_no_xy()
     attrsScope.insert(col2->attrName(), col2);
 
     // Nodes with values read from file
-    Nodes nodesFromFile = Nodes::fromFile(filePath, attrsScope, graphType, errorMsg);
+    Nodes nodesFromFile = NodesPrivate::fromFile(filePath, attrsScope, graphType, errorMsg);
     QVERIFY(nodesOfSameType<UNode>(nodesFromFile));
 
     // Nodes to test against
-    Nodes nodes = Nodes::fromCmd("*3;min", attrsScope, graphType, errorMsg);
+    Nodes nodes = NodesPrivate::fromCmd("*3;min", attrsScope, graphType, errorMsg);
     QVERIFY(nodesOfSameType<UNode>(nodes));
 
-    nodes.at(0)->setAttr(0, 0);
-    nodes.at(0)->setAttr(1, true);
-    nodes.at(0)->setAttr(2, "row1");
+    nodes.at(0).setAttr(0, 0);
+    nodes.at(0).setAttr(1, true);
+    nodes.at(0).setAttr(2, "row1");
 
-    nodes.at(1)->setAttr(0, 1);
-    nodes.at(1)->setAttr(1, false);
-    nodes.at(1)->setAttr(2, "row2");
+    nodes.at(1).setAttr(0, 1);
+    nodes.at(1).setAttr(1, false);
+    nodes.at(1).setAttr(2, "row2");
 
-    nodes.at(2)->setAttr(0, 2);
-    nodes.at(2)->setAttr(1, true);
-    nodes.at(2)->setAttr(2, "row3");
+    nodes.at(2).setAttr(0, 2);
+    nodes.at(2).setAttr(1, true);
+    nodes.at(2).setAttr(2, "row3");
 
     _compare_nodes(nodes, nodesFromFile);
 
     // Test type returned for directed graph type
     graphType = GraphType::Directed;
     // Nodes with values read from file
-    nodesFromFile = Nodes::fromFile(filePath, attrsScope, graphType, errorMsg);
+    nodesFromFile = NodesPrivate::fromFile(filePath, attrsScope, graphType, errorMsg);
     QVERIFY(nodesOfSameType<DNode>(nodesFromFile));
 
     // Nodes to test against
-    nodes = Nodes::fromCmd("*3;min", attrsScope, graphType, errorMsg);
+    nodes = NodesPrivate::fromCmd("*3;min", attrsScope, graphType, errorMsg);
     QVERIFY(nodesOfSameType<DNode>(nodes));
 
     // Add attribute that is not in file
@@ -337,7 +333,7 @@ void TestNodes::tst_fromFile_nodes_no_xy()
     attrsScope.insert(col3->attrName(), col3);
 
     // Nodes with values read from file
-    nodesFromFile = Nodes::fromFile(filePath, attrsScope, graphType, errorMsg);
+    nodesFromFile = NodesPrivate::fromFile(filePath, attrsScope, graphType, errorMsg);
 
     _tst_empty_nodes(nodesFromFile, 0); // Confirms the nodes returned are empty
 }
@@ -356,35 +352,35 @@ void TestNodes::tst_fromFile_nodes_with_xy() {
     attrsScope.insert(col0->attrName(), col0);
 
     // Nodes with values read from file
-    Nodes nodesFromFile = Nodes::fromFile(filePath, attrsScope, graphType, errorMsg);
+    Nodes nodesFromFile = NodesPrivate::fromFile(filePath, attrsScope, graphType, errorMsg);
     QVERIFY(nodesOfSameType<UNode>(nodesFromFile));
 
     // Nodes to test against
-    Nodes nodes = Nodes::fromCmd("*3;min", attrsScope, graphType, errorMsg);
+    Nodes nodes = NodesPrivate::fromCmd("*3;min", attrsScope, graphType, errorMsg);
     QVERIFY(nodesOfSameType<UNode>(nodesFromFile));
 
-    nodes.at(0)->setAttr(0, true);
-    nodes.at(0)->setX(123);
-    nodes.at(0)->setY(456);
+    nodes.at(0).setAttr(0, true);
+    nodes.at(0).setX(123);
+    nodes.at(0).setY(456);
 
-    nodes.at(1)->setAttr(0, false);
-    nodes.at(1)->setX(456);
-    nodes.at(1)->setY(-789);
+    nodes.at(1).setAttr(0, false);
+    nodes.at(1).setX(456);
+    nodes.at(1).setY(-789);
 
-    nodes.at(2)->setAttr(0, true);
-    nodes.at(2)->setX(-789);
-    nodes.at(2)->setY(789);
+    nodes.at(2).setAttr(0, true);
+    nodes.at(2).setX(-789);
+    nodes.at(2).setY(789);
 
     _compare_nodes(nodes,nodesFromFile);
 
     // Test type returned for directed graph type
     graphType = GraphType::Directed;
     // Nodes with values read from file
-    nodesFromFile = Nodes::fromFile(filePath, attrsScope, graphType, errorMsg);
+    nodesFromFile = NodesPrivate::fromFile(filePath, attrsScope, graphType, errorMsg);
     QVERIFY(nodesOfSameType<DNode>(nodesFromFile));
 
     // Nodes to test against
-    nodes = Nodes::fromCmd("*3;min", attrsScope, graphType, errorMsg);
+    nodes = NodesPrivate::fromCmd("*3;min", attrsScope, graphType, errorMsg);
     QVERIFY(nodesOfSameType<DNode>(nodes));
 
     // Add attribute that is not in file
@@ -392,7 +388,7 @@ void TestNodes::tst_fromFile_nodes_with_xy() {
     attrsScope.insert(col3->attrName(), col3);
 
     // Nodes with values read from file
-    nodesFromFile = Nodes::fromFile(filePath, attrsScope, graphType, errorMsg);
+    nodesFromFile = NodesPrivate::fromFile(filePath, attrsScope, graphType, errorMsg);
 
     _tst_empty_nodes(nodesFromFile, 0); // Confirms the nodes returned are empty
 }
@@ -406,7 +402,7 @@ void TestNodes::_tst_fromFile_nodes_with_oneCoord(const QString& filePath) {
     // Nodes with values read from file
     QString errorMsg;
     GraphType graphType = GraphType::Undirected;
-    Nodes nodesFromFile = Nodes::fromFile(filePath, attrsScope, graphType, errorMsg);
+    Nodes nodesFromFile = NodesPrivate::fromFile(filePath, attrsScope, graphType, errorMsg);
 
     QVERIFY(nodesFromFile.empty());
     QVERIFY(!errorMsg.isEmpty());
@@ -438,11 +434,11 @@ void TestNodes::tst_fromFile_nodes_invalid_attrs() {
     attrsScope.insert(col0->attrName(), col0);
 
     // Nodes with values read from file
-    Nodes nodesFromFile = Nodes::fromFile(filePath, attrsScope, graphType, errorMsg);
+    Nodes nodesFromFile = NodesPrivate::fromFile(filePath, attrsScope, graphType, errorMsg);
     QVERIFY(nodesOfSameType<UNode>(nodesFromFile));
 
     // Nodes to test against
-    Nodes nodes = Nodes::fromCmd("*2;min", attrsScope, graphType, errorMsg);
+    Nodes nodes = NodesPrivate::fromCmd("*2;min", attrsScope, graphType, errorMsg);
     QVERIFY(nodesOfSameType<UNode>(nodesFromFile));
 
     QVERIFY(nodesFromFile.empty()); // Confirms the nodes returned are empty
@@ -450,11 +446,11 @@ void TestNodes::tst_fromFile_nodes_invalid_attrs() {
     // Test type returned for directed graph type
     graphType = GraphType::Directed;
     // Nodes with values read from file
-    nodesFromFile = Nodes::fromFile(filePath, attrsScope, graphType, errorMsg);
+    nodesFromFile = NodesPrivate::fromFile(filePath, attrsScope, graphType, errorMsg);
     QVERIFY(nodesOfSameType<DNode>(nodesFromFile));
 
     // Nodes to test against
-    nodes = Nodes::fromCmd("*3;min", attrsScope, graphType, errorMsg);
+    nodes = NodesPrivate::fromCmd("*3;min", attrsScope, graphType, errorMsg);
     QVERIFY(nodesOfSameType<DNode>(nodes));
 
     // Fails as expected:
@@ -475,11 +471,11 @@ void TestNodes::tst_fromFile_nodes_invalid_file() {
     attrsScope.insert(col0->attrName(), col0);
 
     // Nodes with values read from file
-    Nodes nodesFromFile = Nodes::fromFile(filePath, attrsScope, graphType, errorMsg);
+    Nodes nodesFromFile = NodesPrivate::fromFile(filePath, attrsScope, graphType, errorMsg);
     QVERIFY(nodesOfSameType<UNode>(nodesFromFile));
 
     // Nodes to test against
-    Nodes nodes = Nodes::fromCmd("*2;min", attrsScope, graphType, errorMsg);
+    Nodes nodes = NodesPrivate::fromCmd("*2;min", attrsScope, graphType, errorMsg);
     QVERIFY(nodesOfSameType<UNode>(nodesFromFile));
 
     QVERIFY(nodesFromFile.empty()); // Confirms the nodes returned are empty
@@ -487,11 +483,11 @@ void TestNodes::tst_fromFile_nodes_invalid_file() {
     // Test type returned for directed graph type
     graphType = GraphType::Directed;
     // Nodes with values read from file
-    nodesFromFile = Nodes::fromFile(filePath, attrsScope, graphType, errorMsg);
+    nodesFromFile = NodesPrivate::fromFile(filePath, attrsScope, graphType, errorMsg);
     QVERIFY(nodesOfSameType<DNode>(nodesFromFile));
 
     // Nodes to test against
-    nodes = Nodes::fromCmd("*3;min", attrsScope, graphType, errorMsg);
+    nodes = NodesPrivate::fromCmd("*3;min", attrsScope, graphType, errorMsg);
     QVERIFY(nodesOfSameType<DNode>(nodes));
 
     // Fails as expected:
@@ -506,22 +502,22 @@ void TestNodes::tst_saveToFile_no_attrs()
     // saving a set of UNodes without attributes
     GraphType graphType = GraphType::Undirected;
     AttributesScope attrsScope;
-    Nodes nodes = Nodes::fromCmd("*5;min", attrsScope, graphType, errorMsg);
-    QVERIFY(nodes.saveToFile(tempFilePath));
+    Nodes nodes = NodesPrivate::fromCmd("*5;min", attrsScope, graphType, errorMsg);
+    QVERIFY(NodesPrivate::saveToFile(nodes, tempFilePath));
 
     // retrieve saved file
-    Nodes nodesFromFile = Nodes::fromFile(tempFilePath, attrsScope, graphType, errorMsg);
+    Nodes nodesFromFile = NodesPrivate::fromFile(tempFilePath, attrsScope, graphType, errorMsg);
     _compare_nodes(nodes, nodesFromFile);
     QVERIFY(nodesOfSameType<UNode>(nodesFromFile));
 
     // saving a set of DNodes without attributes
     graphType = GraphType::Directed;
 
-    nodes = Nodes::fromCmd("*5;min", attrsScope, graphType, errorMsg);
-    QVERIFY(nodes.saveToFile(tempFilePath));
+    nodes = NodesPrivate::fromCmd("*5;min", attrsScope, graphType, errorMsg);
+    QVERIFY(NodesPrivate::saveToFile(nodes, tempFilePath));
 
     // retrieve saved file
-    nodesFromFile = Nodes::fromFile(tempFilePath, attrsScope, graphType, errorMsg);
+    nodesFromFile = NodesPrivate::fromFile(tempFilePath, attrsScope, graphType, errorMsg);
     _compare_nodes(nodes, nodesFromFile);
     QVERIFY(nodesOfSameType<DNode>(nodesFromFile));
 }
@@ -542,22 +538,22 @@ void TestNodes::tst_saveToFile_with_attrs()
     AttributeRange* col2 = AttributeRange::parse(2, names[2], "int[0,1000]");
     attrsScope.insert(col2->attrName(), col2);
 
-    Nodes nodes = Nodes::fromCmd("*3;min", attrsScope, graphType, errorMsg);
-    QVERIFY(nodes.saveToFile(tempFilePath));
+    Nodes nodes = NodesPrivate::fromCmd("*3;min", attrsScope, graphType, errorMsg);
+    QVERIFY(NodesPrivate::saveToFile(nodes, tempFilePath));
 
     // retrieve saved file
-    Nodes nodesFromFile = Nodes::fromFile(tempFilePath, attrsScope, graphType, errorMsg);
+    Nodes nodesFromFile = NodesPrivate::fromFile(tempFilePath, attrsScope, graphType, errorMsg);
     _compare_nodes(nodes, nodesFromFile);
     QVERIFY(nodesOfSameType<UNode>(nodesFromFile));
 
     // saving a set of DNodes with attributes
     graphType = GraphType::Directed;
 
-    nodes = Nodes::fromCmd("*3;min", attrsScope, graphType, errorMsg);
-    QVERIFY(nodes.saveToFile(tempFilePath));
+    nodes = NodesPrivate::fromCmd("*3;min", attrsScope, graphType, errorMsg);
+    QVERIFY(NodesPrivate::saveToFile(nodes, tempFilePath));
 
     // retrieve saved file
-    nodesFromFile = Nodes::fromFile(tempFilePath, attrsScope, graphType, errorMsg);
+    nodesFromFile = NodesPrivate::fromFile(tempFilePath, attrsScope, graphType, errorMsg);
     _compare_nodes(nodes, nodesFromFile);
     QVERIFY(nodesOfSameType<DNode>(nodesFromFile));
 }
@@ -566,13 +562,13 @@ void TestNodes::_compare_nodes(const Nodes& a, const Nodes& b) const
 {
     QCOMPARE(a.size(), b.size());
     for (int id = 0; id < static_cast<int>(a.size()); ++id) {
-        NodePtr nA = a.at(id);
-        NodePtr nB = b.at(id);
-        QCOMPARE(nA->id(), nB->id());
-        QCOMPARE(nA->attrs().names(), nB->attrs().names());
-        QCOMPARE(nA->attrs().values(), nB->attrs().values());
-        QCOMPARE(nA->x(), nB->x());
-        QCOMPARE(nA->y(), nB->y());
+        const Node& nA = a.at(id);
+        const Node& nB = b.at(id);
+        QCOMPARE(nA.id(), nB.id());
+        QCOMPARE(nA.attrs().names(), nB.attrs().names());
+        QCOMPARE(nA.attrs().values(), nB.attrs().values());
+        QCOMPARE(nA.x(), nB.x());
+        QCOMPARE(nA.y(), nB.y());
     }
 }
 

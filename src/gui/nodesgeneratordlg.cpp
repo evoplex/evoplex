@@ -27,6 +27,7 @@
 #include "core/include/abstractgraph.h"
 #include "core/include/enum.h"
 #include "core/include/nodes.h"
+#include "core/nodes_p.h"
 
 #include "nodesgeneratordlg.h"
 #include "ui_nodesgeneratordlg.h"
@@ -158,14 +159,12 @@ void NodesGeneratorDlg::slotSaveAs()
         std::function<void(int)> progress = [&progressDlg, &pValue](int p) { progressDlg.setValue(pValue + p); };
 
         QString errMsg;
-        Nodes nodes = Nodes::fromCmd(cmd, m_nodeAttrsScope, GraphType::Undirected, errMsg, progress);
+        Nodes nodes = NodesPrivate::fromCmd(cmd, m_nodeAttrsScope, GraphType::Undirected, errMsg, progress);
         Q_ASSERT_X(errMsg.isEmpty(), "NodesGeneratorDlg::slotSaveAs", "the command should be free of erros here");
         Q_ASSERT_X(!nodes.empty(), "NodesGeneratorDlg::slotSaveAs", "nodes size must be >0");
 
         pValue = numNodes;
-        saved = nodes.saveToFile(path, progress);
-
-        nodes.clear();
+        saved = NodesPrivate::saveToFile(nodes, path, progress);
     }
 
     if (saved) {
