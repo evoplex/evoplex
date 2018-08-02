@@ -49,7 +49,9 @@ endif()
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/src/cmake)
 
 option(TESTS "Turn on tests" OFF)
-if(TESTS)
+option(CODE_COVERAGE "Turn on code coverage" OFF)
+if(CODE_COVERAGE)
+  set(TESTS ON)
   if(CMAKE_COMPILER_IS_GNUCXX)
     set(CMAKE_BUILD_TYPE Debug) # coverage must be in debug mode
     include(CodeCoverage) # codecov.io
@@ -57,7 +59,13 @@ if(TESTS)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pedantic -Wextra")
     append_coverage_compiler_flags()
     setup_target_for_coverage(NAME "${PROJECT_NAME}_coverage" EXECUTABLE ctest --parallel 4)
+  else()
+    message("CODE_COVERAGE cannot be ON for this compiler!")
+    set(CODE_COVERAGE OFF)
   endif()
+endif()
+
+if(TESTS)
   enable_testing() # Tests must be enabled from root
 endif()
 

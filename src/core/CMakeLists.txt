@@ -155,7 +155,7 @@ install(
 )
 
 # add sources to coveralls
-if(TESTS AND CMAKE_COMPILER_IS_GNUCXX)
+if(CODE_COVERAGE)
   foreach(src ${EVOPLEX_CORE_CXX} ${EVOPLEX_CORE_H})
     set(EVOPLEX_CORE_SRC ${EVOPLEX_CORE_SRC} ${PROJECT_SOURCE_DIR}/src/core/${src})
   endforeach(src)

@@ -2,7 +2,7 @@ language: cpp
 
 env:
   global:
-    - secure: "mkkT4GBTzW2uMbJna42tdk3+wL/TQLbiVqeSHJyMlL62JPLM3U0KDD52woZElGaraW/PxWuIAeylfDS5NOi7Nwd0137PoHaqfTavdoDGRqrpmHZiyxrgiihUI1nqU1vXaCOoOFxigMnOIr64ynTPwY8otaOm1sxcOVU+p63yLdkg82mYw3SoJiPAOM7YhC2UKsz0kppkEEniBREtYWFZJopMdrHjYkbMHK31maiDDAOeT8FPwaeOuCKOchCa7oX2EsqPLupJ0mZ/ESJlWyJgQ3aFdpCtFcVRyFRTdtsKG97fQo49sRdLOyciqxU/LADm/OlEVGPUsuKNIT/6IO5n9M4qR/PaKSK6DrydDu72pSEq8KfCGbtdTw9LxcQFe0+QDkQWG3wVPwbnClbleXxNzMt1pEHerFStBzjxJHMChhqk2Glo5DCQ8jpNtsXguioY4XT1cPj2BGp4zPTyOAhOdsxqS039l51XdU/vYy30sNR3rUJKVPCtONmOd+0dGmS4kfHaFLa8foo1NuZ0vRkFcYZuKFRK6CZFxwtPQvhJN52YvLrAiyCUv9wlqH5zUeD0sUqSbZ0/p9XUZn8jop+DiFcpBkZFTUkbS+Z3nO16E7wEGdFrWAeBTLPJWF5K32XUPGlhjeONYObEkpKFRn+hCdr4NwE8h1SmJNSutI4R68I="
+   - secure: "JfkHOBs3SJhVfcIueTkKH+++OFyvAINuQSyV4R8g1NjZVN0IxGpriZAkh1BiubJwGWzPczZKaRtb5C+oOFPnDRIugWVGw6rKbREUu4lqeyFjebGZQ+FurRrzaaq4VoiQR7D3/zub2WrKNNbU4wAzOm9QPKBBmBBmOhG8rBFY0ZTA16J9jKj2Ip2AWUf3jUDHaPAKjsgCi9Wi4jtsCJKWD+EroY0TrV1q6wGONxpBMWniPOmukcnc8jJJxh1GBCWo9PDjxv2ykm4YkAatoIORW9fpXpO043rw1AGm3/ab73Yzj+aqiYxi14+nbwPFIU2RyYGDgZYFVOnyOfo315Vk7ycbHA2hSbjoyfB7wJWjtrvbAmX663ASXg72p8Ryt97VYt/GzJlW0PgXeW+4df/x6jTBcHx/ywM9AKH249oE/8QKxM2YM9e9qWxkkz9qgGaZXfZZid3hjs5tzUg4ccxP5fGn7Be+Cg0JgJI50xgEEFjJFg4HQrfCofpBxLpSEEcK4TgsPQ2yXB5dC5JQPt9f25uR04kV9i65WSSuj04o7KiUBkd22u1i531Wf0ni2DhWicCCIdl5DGaqrji+9IaKY79e1K5cmTnqqNNARDTU/BBqZETiTFExtBF0ACNGe8jbnDMzQo21rxP9jNpluXDNNifJfuDJtE26O5MelL1HIuM="
 
 matrix:
   include:
@@ -233,7 +233,7 @@ before_script:
       if [[ "$COVERAGE_ENABLED" == true ]]; then
         export COVERALLS_SERVICE_NAME=travis-ci;
         export COVERALLS_REPO_TOKEN=vLsFADbYfaOddNs4afYumdHwwxOWC129z;
-        cmake -DTESTS=ON .. ;
+        cmake -DCODE_COVERAGE=ON .. ;
       else
         cmake .. ;
       fi
