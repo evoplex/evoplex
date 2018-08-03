@@ -57,11 +57,11 @@ int Node::y() const
 const Attributes& Node::attrs() const
 { return m_ptr->attrs(); }
 
-const Value& Node::attr(const int& id) const
+const Value& Node::attr(size_t id) const
 { return m_ptr->attr(id); }
 
-const Value& Node::attr(const QString& name) const
-{ return m_ptr->attr(name); }
+Value Node::attr(const QString& name, Value defaultValue) const
+{ return m_ptr->attr(name, defaultValue); }
 
 const Node& Node::randNeighbour(PRG* prg) const
 { return m_ptr->randNeighbour(prg); }

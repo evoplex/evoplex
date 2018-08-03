@@ -39,7 +39,7 @@ private slots:
 
 private: // auxiliary functions
     void _tst_empty(Attributes a);
-    void _tst_resize(Attributes a, const int kSize);
+    void _tst_resize(Attributes a, const size_t kSize);
     void _tst_replace(Attributes a, int id, QString newName, Value newValue, int origSize);
     void _tst_replace_invalid(Attributes a, int id, QString newName, Value newValue);
     void _tst_push_back(Attributes a, QString newName, Value newValue, int origSize);
@@ -66,10 +66,9 @@ void TestAttributes::_tst_empty(Attributes a)
     QVERIFY(a.values().empty());
     QVERIFY_EXCEPTION_THROWN(a.setValue(0, 'a'), std::out_of_range);
     QVERIFY_EXCEPTION_THROWN(a.value(0), std::out_of_range);
-    QVERIFY_EXCEPTION_THROWN(a.value("a"), std::out_of_range);
-    QVERIFY_EXCEPTION_THROWN(a.value(QString("a")), std::out_of_range);
 
-    QCOMPARE(a.value(0, 123), Value(123));
+    QCOMPARE(a.value("a"), Value());
+    QCOMPARE(a.value(QString("a")), Value());
     QCOMPARE(a.value("abc", 123), Value(123));
     QCOMPARE(a.value(QString('a'), 123), Value(123));
 }
@@ -83,7 +82,7 @@ void TestAttributes::tst_empty()
     _tst_empty(a2);
 }
 
-void TestAttributes::_tst_resize(Attributes a, const int kSize)
+void TestAttributes::_tst_resize(Attributes a, const size_t kSize)
 {
     QCOMPARE(a.size(), kSize);
     QVERIFY(!a.isEmpty());
@@ -100,8 +99,7 @@ void TestAttributes::_tst_resize(Attributes a, const int kSize)
 
     QVERIFY_EXCEPTION_THROWN(a.value(kSize), std::out_of_range);
     QVERIFY_EXCEPTION_THROWN(a.value(-1), std::out_of_range);
-    QVERIFY_EXCEPTION_THROWN(a.value("a"), std::out_of_range);
-    QVERIFY_EXCEPTION_THROWN(a.value(QString("a")), std::out_of_range);
+    QCOMPARE(a.value("a", 789), Value(789));
     QCOMPARE(a.values().size(), size_t(kSize));
     for (const Value& value : a.values()) {
         QVERIFY(!value.isValid());
@@ -137,9 +135,7 @@ void TestAttributes::_tst_replace(Attributes a, int id, QString newName, Value n
 
      QCOMPARE(a.names().size(), size_t(origSize));
      QCOMPARE(a.values().size(), size_t(origSize));
-
-     QVERIFY_EXCEPTION_THROWN(a.value("a"), std::out_of_range);
-     QVERIFY_EXCEPTION_THROWN(a.value(QString("a")), std::out_of_range);
+     QCOMPARE(a.value("a", 852), Value(852));
 
     // test position of name
      QVERIFY(!a.names().empty());
@@ -157,7 +153,6 @@ void TestAttributes::_tst_replace(Attributes a, int id, QString newName, Value n
      QVERIFY(!a.values().empty());
      QVERIFY(newValue.isValid());
      QCOMPARE(a.value(id), newValue);
-     QCOMPARE(a.value(id, newValue), newValue);
 
     // test name against value
      QCOMPARE(a.value(newName), newValue);
@@ -216,9 +211,7 @@ void TestAttributes::_tst_push_back(Attributes a, QString newName, Value newValu
 
     QCOMPARE(a.names().size(), size_t(origSize+1));
     QCOMPARE(a.values().size(), size_t(origSize+1));
-
-    QVERIFY_EXCEPTION_THROWN(a.value("a"), std::out_of_range);
-    QVERIFY_EXCEPTION_THROWN(a.value(QString("a")), std::out_of_range);
+    QCOMPARE(a.value("a", 874), Value(874));
 
     // test position of name
     QVERIFY(!a.names().empty());
@@ -236,7 +229,6 @@ void TestAttributes::_tst_push_back(Attributes a, QString newName, Value newValu
     QVERIFY(!a.values().empty());
     QVERIFY(newValue.isValid());
     QCOMPARE(a.value(origSize), newValue);
-    QCOMPARE(a.value(origSize, newValue), newValue);
 
     // test name against value
     QCOMPARE(a.value(newName), newValue);
@@ -327,15 +319,12 @@ void TestAttributes::_tst_setValue(Attributes a, int id, Value newValue, int ori
 
     QCOMPARE(a.names().size(), size_t(origSize));
     QCOMPARE(a.values().size(), size_t(origSize));
-
-    QVERIFY_EXCEPTION_THROWN(a.value("a"), std::out_of_range);
-    QVERIFY_EXCEPTION_THROWN(a.value(QString("a")), std::out_of_range);
+    QCOMPARE(a.value("a", 852), Value(852));
 
     // test position of value
     QVERIFY(!a.values().empty());
     QVERIFY(newValue.isValid());
     QCOMPARE(a.value(id), newValue);
-    QCOMPARE(a.value(id, newValue), newValue);
 }
 
 // Tests if 'Attributes::setValue()' works as expected.

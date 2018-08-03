@@ -51,9 +51,8 @@ public:
     const Node& neighbour() const;
 
     const Attributes* attrs() const;
-    const Value& attr(const int id) const;
-    const Value& attr(const QString& name) const;
-    const Value& attr(const char* name) const;
+    const Value& attr(size_t id) const;
+    Value attr(const QString& name, Value defaultValue=Value()) const;
 
     void setAttr(const int id, const Value& value);
     void addAttr(QString name, Value value);

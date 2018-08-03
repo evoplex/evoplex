@@ -51,9 +51,8 @@ public:
     ~BaseEdge();
 
     inline const Attributes* attrs() const;
-    inline const Value& attr(const QString& name) const;
-    inline const Value& attr(const char* name) const;
-    inline const Value& attr(const int id) const;
+    inline const Value& attr(size_t id) const;
+    inline Value attr(const QString& name, Value defaultValue=Value()) const;
     inline void setAttr(const int id, const Value& value);
     inline void addAttr(QString name, Value value);
 
@@ -85,14 +84,11 @@ inline const Node& BaseEdge::neighbour() const
 inline const Attributes* BaseEdge::attrs() const
 { return m_attrs; }
 
-inline const Value& BaseEdge::attr(const QString& name) const
-{ return m_attrs->value(name); }
-
-inline const Value& BaseEdge::attr(const char* name) const
-{ return m_attrs->value(name); }
-
-inline const Value& BaseEdge::attr(const int id) const
+inline const Value& BaseEdge::attr(size_t id) const
 { return m_attrs->value(id); }
+
+inline Value BaseEdge::attr(const QString& name, Value defaultValue) const
+{ return m_attrs->value(name, defaultValue); }
 
 inline void BaseEdge::setAttr(const int id, const Value& value)
 { m_attrs->setValue(id, value); }

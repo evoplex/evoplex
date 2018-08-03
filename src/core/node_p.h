@@ -74,9 +74,8 @@ class BaseNode : public NodeInterface
 
 public:
     inline const Attributes& attrs() const;
-    inline const Value& attr(const QString& name) const;
-    inline const Value& attr(const char* name) const;
-    inline const Value& attr(const int id) const;
+    inline const Value& attr(size_t id) const;
+    inline Value attr(const QString& name, Value defaultValue=Value()) const;
     inline void setAttr(const int id, const Value& value);
 
     inline int id() const;
@@ -160,14 +159,11 @@ private:
 inline const Attributes& BaseNode::attrs() const
 { return m_attrs; }
 
-inline const Value& BaseNode::attr(const QString& name) const
-{ return m_attrs.value(name); }
-
-inline const Value& BaseNode::attr(const char* name) const
-{ return m_attrs.value(name); }
-
-inline const Value& BaseNode::attr(const int id) const
+inline const Value& BaseNode::attr(size_t id) const
 { return m_attrs.value(id); }
+
+inline Value BaseNode::attr(const QString& name, Value defaultValue) const
+{ return m_attrs.value(name, defaultValue); }
 
 inline void BaseNode::setAttr(const int id, const Value& value)
 { m_attrs.setValue(id, value); }

@@ -52,13 +52,10 @@ public:
     PRG* prg() const;
     inline const Attributes* attrs() const;
 
-    inline const QString& attrName(int attrId) const;
+    inline const QString& attrName(size_t attrId) const;
 
-    inline const Value& attr(int attrId) const;
-    inline const Value& attr(const char* name) const;
-    inline const Value& attr(const QString& name) const;
-    inline const Value& attr(const char* name, const Value& defaultValue) const;
-    inline const Value& attr(const QString& name, const Value& defaultValue) const;
+    inline const Value& attr(size_t attrId) const;
+    inline Value attr(const QString& name, Value defaultValue=Value()) const;
 
     inline bool attrExists(const char* name) const;
     inline bool attrExists(const QString& name) const;
@@ -85,22 +82,13 @@ inline bool AbstractPlugin::init()
 inline const Attributes* AbstractPlugin::attrs() const
 { return m_attrs; }
 
-inline const QString& AbstractPlugin::attrName(int attrId) const
+inline const QString& AbstractPlugin::attrName(size_t attrId) const
 { return m_attrs->name(attrId); }
 
-inline const Value& AbstractPlugin::attr(int attrId) const
+inline const Value& AbstractPlugin::attr(size_t attrId) const
 { return m_attrs->value(attrId);  }
 
-inline const Value& AbstractPlugin::attr(const char* name) const
-{ return m_attrs->value(name); }
-
-inline const Value& AbstractPlugin::attr(const QString& name) const
-{ return m_attrs->value(name); }
-
-inline const Value& AbstractPlugin::attr(const char* name, const Value& defaultValue) const
-{ return m_attrs->value(name, defaultValue); }
-
-inline const Value& AbstractPlugin::attr(const QString& name, const Value& defaultValue) const
+inline Value AbstractPlugin::attr(const QString& name, Value defaultValue) const
 { return m_attrs->value(name, defaultValue); }
 
 inline bool AbstractPlugin::attrExists(const char* name) const
