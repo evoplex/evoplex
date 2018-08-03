@@ -73,7 +73,7 @@ bool Trial::init()
         }
     }
 
-    const uint seed = m_exp->inputs()->general(GENERAL_ATTRIBUTE_SEED).toUInt();
+    const quint32 seed = m_exp->inputs()->general(GENERAL_ATTRIBUTE_SEED).toUInt();
     m_prg = new PRG(seed + m_id);
 
     m_graph = dynamic_cast<AbstractGraph*>(m_exp->graphPlugin()->create());

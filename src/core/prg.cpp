@@ -22,7 +22,7 @@
 
 namespace evoplex {
 
-PRG::PRG(uint seed)
+PRG::PRG(unsigned int seed)
     : m_seed(seed),
       m_mteng(seed),
       m_doubleZeroOne(0.0, 1.0),

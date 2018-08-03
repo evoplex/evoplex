@@ -32,10 +32,10 @@ namespace evoplex {
 class PRG
 {
 public:
-    explicit PRG(uint seed);
+    explicit PRG(unsigned int seed);
 
     // Returns the PRG seed
-    inline uint seed() const;
+    inline unsigned int seed() const;
 
     // Generate a random double [0, 1)
     inline double randD();
@@ -62,7 +62,7 @@ public:
     size_t randS(size_t min, size_t max);
 
 private:
-    const uint m_seed;
+    const unsigned int m_seed;
     std::mt19937 m_mteng; //  Mersenne Twister engine
     std::uniform_real_distribution<double> m_doubleZeroOne;
     std::uniform_real_distribution<float> m_floatZeroOne;
@@ -72,7 +72,7 @@ private:
    PRG: Inline member functions
  ************************************************************************/
 
-inline uint PRG::seed() const
+inline unsigned int PRG::seed() const
 { return m_seed; }
 
 inline double PRG::randD()
