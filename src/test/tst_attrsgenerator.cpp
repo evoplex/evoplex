@@ -39,7 +39,7 @@ private slots:
     void tst_parseHashCmd_mixedFunc();
     void _tst_attrs(const SetOfAttributes& res, const Attributes& attrs,  const bool testValues);
     void _tst_mode(const SetOfAttributes& res, const QString& mode, const AttributesScope& ascope, const int numOfAttrRges);
-    void _tst_parseStarCmd(const QString mode);
+    void _tst_parseStarCmd(const QString& mode);
     AttributesScope _newAttrsScope(const QStringList& names, const QStringList& attrRges);
 };
 
@@ -94,7 +94,7 @@ AttributesScope TestAttrsGenerator::_newAttrsScope(const QStringList& names, con
     return attrsScope;
 }
 
-void TestAttrsGenerator::_tst_parseStarCmd(QString mode)
+void TestAttrsGenerator::_tst_parseStarCmd(QString& mode)
 {
     AttributesScope attrsScope;
     AttrsGenerator* agen;
