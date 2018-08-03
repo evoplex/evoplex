@@ -96,6 +96,37 @@ AttributesScope TestAttrsGenerator::_newAttrsScope(const QStringList& names, con
     return attrsScope;
 }
 
+QString TestAttrsGenerator::_makeCmd(const QString& func, const Values& values, const QStringList& names, const int sizeOfAG)
+{
+    if (func == "value") {
+        QString cmd = QString("#%1").arg(Value(sizeOfAG).toQString());
+
+        for (int i = 0; i < values.size(); i++) {
+            cmd += QString(";s%1_%2_%3").arg(names.at(i)).arg(func).arg(values[i].toQString());
+        }
+        return cmd;
+    } else if (func == "mixed") {
+        QStringList cmdList = {
+            Value(sizeOfAG).toQString(),
+            QString("%1_min").arg(names.at(0)),
+            QString("%1_max").arg(names.at(1)),
+            QString("%1_rand_123").arg(names.at(2)),
+            QString("%1_value_%2").arg(names.at(3)).arg(values[3].toQString())
+        };
+        return QString("#%1;%2;%3;%4;%5").arg(cmdList.at(0)).arg(cmdList.at(1)).arg(cmdList.at(2)).arg(cmdList.at(3)).arg(cmdList.at(4));
+    } else if (func == "min" || func == "max" || func.split("_").startsWith("rand")) {
+        QString cmd = QString("#%1").arg(Value(sizeOfAG).toQString());
+
+        for (const QString& name : names) {
+            cmd += QString(";%1_%2").arg(name).arg(func);
+        }
+        return cmd;
+    } else {
+        qFatal("the function is invalid!");
+        return nullptr;
+    }
+}
+
 void TestAttrsGenerator::_tst_parseStarCmd(const QString& func, const AttributesScope& attrsScope, const int& sizeOfAG, const Attributes& attrs)
 {
     const Attributes emptyAttrs;
@@ -120,41 +151,6 @@ void TestAttrsGenerator::_tst_parseStarCmd(const QString& func, const Attributes
                 _tst_attrs(res, attrs, false);
             }
         }
-    }
-}
-
-QString TestAttrsGenerator::_makeCmd(const QString& func, const Values& values, const QStringList& names, const int sizeOfAG)
-{
-    if (func == "value") {
-      QStringList cmdList = {
-            Value(sizeOfAG).toQString(),
-            QString("%1_value_%2").arg(names.at(0)).arg(values[0].toQString()),
-            QString("%1_value_%2").arg(names.at(1)).arg(values[1].toQString()),
-            QString("%1_value_%2").arg(names.at(2)).arg(values[2].toQString()),
-            QString("%1_value_%2").arg(names.at(3)).arg(values[3].toQString())
-       };
-      return QString("#%1;%2;%3;%4;%5").arg(cmdList.at(0)).arg(cmdList.at(1)).arg(cmdList.at(2)).arg(cmdList.at(3)).arg(cmdList.at(4));
-    } else if (func == "mixed") {
-        QStringList cmdList = {
-            Value(sizeOfAG).toQString(),
-            QString("%1_min").arg(names.at(0)),
-            QString("%1_max").arg(names.at(1)),
-            QString("%1_rand_123").arg(names.at(2)),
-            QString("%1_value_%2").arg(names.at(3)).arg(values[3].toQString())
-        };
-        return QString("#%1;%2;%3;%4;%5").arg(cmdList.at(0)).arg(cmdList.at(1)).arg(cmdList.at(2)).arg(cmdList.at(3)).arg(cmdList.at(4));
-    } else if (func == "min" || func == "max" || func.split("_").startsWith("rand")){
-        QStringList cmdList = {
-            Value(sizeOfAG).toQString(),
-            QString("%1_%2").arg(names.at(0)).arg(func),
-            QString("%1_%2").arg(names.at(1)).arg(func),
-            QString("%1_%2").arg(names.at(2)).arg(func),
-            QString("%1_%2").arg(names.at(3)).arg(func)
-        };
-        return QString("#%1;%2;%3;%4;%5").arg(cmdList.at(0)).arg(cmdList.at(1)).arg(cmdList.at(2)).arg(cmdList.at(3)).arg(cmdList.at(4));
-    } else {
-        qFatal("the function is invalid!");
-        return nullptr;
     }
 }
 
