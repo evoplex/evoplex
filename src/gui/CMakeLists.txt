@@ -26,7 +26,7 @@ set(EVOPLEX_GUI_H
   experimentdesigner.h
   experimentwidget.h
   fontstyles.h
-  linechart.h
+  #linechart.h
   outputwidget.h
   graphview.h
   gridview.h
@@ -52,7 +52,7 @@ set(EVOPLEX_GUI_CXX
   #contextmenutable.cpp
   experimentwidget.cpp
   fontstyles.cpp
-  linechart.cpp
+  #linechart.cpp
   outputwidget.cpp
   graphview.cpp
   gridview.cpp
@@ -75,7 +75,7 @@ set(EVOPLEX_GUI_UIFORM
   experimentdesigner
   graphwidget
   graphsettings
-  linechartsettings
+  #linechartsettings
   outputwidget
   pluginspage
   projectwidget
