@@ -82,6 +82,8 @@ void TestAttrsGenerator::_tst_mode(const SetOfAttributes& res, const QString& mo
                 QVERIFY(attrs.value(i) <= attrRge->max());
             }
         }
+    } else {
+        qFatal("the mode is invalid!");
     }
 
 
