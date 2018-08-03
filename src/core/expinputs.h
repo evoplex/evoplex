@@ -43,9 +43,9 @@ public:
     inline const Attributes* model() const;
     inline const Attributes* graph() const;
 
-    inline const Value& general(const QString& name) const;
-    inline const Value& model(const QString& name) const;
-    inline const Value& graph(const QString& name) const;
+    inline Value general(const QString& name) const;
+    inline Value model(const QString& name) const;
+    inline Value graph(const QString& name) const;
     inline const std::vector<Cache*>& fileCaches() const;
 
     // Export all the attributes' names to a vector.
@@ -88,14 +88,14 @@ inline const Attributes* ExpInputs::model() const
 inline const Attributes* ExpInputs::graph() const
 { return m_graphAttrs; }
 
-inline const Value& ExpInputs::general(const QString& name) const
-{ return m_generalAttrs->value(name, Value()); }
+inline Value ExpInputs::general(const QString& name) const
+{ return m_generalAttrs->value(name); }
 
-inline const Value& ExpInputs::model(const QString& name) const
-{ return m_modelAttrs->value(name, Value()); }
+inline Value ExpInputs::model(const QString& name) const
+{ return m_modelAttrs->value(name); }
 
-inline const Value& ExpInputs::graph(const QString& name) const
-{ return m_graphAttrs->value(name, Value()); }
+inline Value ExpInputs::graph(const QString& name) const
+{ return m_graphAttrs->value(name); }
 
 inline const std::vector<Cache*>& ExpInputs::fileCaches() const
 { return m_fileCaches; }

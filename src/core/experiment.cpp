@@ -161,7 +161,7 @@ bool Experiment::reset(QString* error)
         enable(erroMsg);
     }
 
-    if (!erroMsg.isEmpty()) {
+    if (!m_inputs || !erroMsg.isEmpty()) {
         qWarning() << erroMsg;
         if (error) *error = erroMsg;
         return false;

@@ -105,9 +105,8 @@ Plugin* Plugin::load(const QString& path, QString& error)
     if (!plugin || plugin->type() == PluginType::Invalid) {
         error = QString("Unable to load the plugin.\n"
                 "Please, check the metaData.json file.\n %1").arg(path);
-        loader.unload();
-        delete plugin;
         qWarning() << error;
+        delete  plugin;
         return nullptr;
     }
 
@@ -116,6 +115,7 @@ Plugin* Plugin::load(const QString& path, QString& error)
 
 Plugin::Plugin(PluginType type, const QJsonObject* metaData, const QString& libPath)
     : m_type(type),
+      m_factory(nullptr),
       m_libPath(libPath)
 {
     m_id = metaData->value(PLUGIN_ATTRIBUTE_UID).toString();

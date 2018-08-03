@@ -192,14 +192,13 @@ void NodesGeneratorDlg::fill(const QString& cmd)
     }
 
     QString errMsg;
-    AttrsGenerator* ag = AttrsGenerator::parse(m_nodeAttrsScope, cmd, errMsg);
+    std::unique_ptr<AttrsGenerator> ag(AttrsGenerator::parse(m_nodeAttrsScope, cmd, errMsg));
     if (!errMsg.isEmpty() || !ag) {
         QMessageBox::warning(parentWidget(), "Nodes Generator", errMsg);
-        delete ag;
         return;
     }
 
-    AGSameFuncForAll* agsame = dynamic_cast<AGSameFuncForAll*>(ag);
+    AGSameFuncForAll* agsame = dynamic_cast<AGSameFuncForAll*>(ag.get());
     if (agsame) {
         m_ui->bSameData->setChecked(!m_nodeAttrsScope.empty());
         m_ui->bCreateNodes->setChecked(m_nodeAttrsScope.empty());
@@ -210,7 +209,7 @@ void NodesGeneratorDlg::fill(const QString& cmd)
         return;
     }
 
-    AGDiffFunctions* agdiff = dynamic_cast<AGDiffFunctions*>(ag);
+    AGDiffFunctions* agdiff = dynamic_cast<AGDiffFunctions*>(ag.get());
     if (agdiff) {
         m_ui->bDiffData->setChecked(true);
         m_ui->numNodes->setValue(agdiff->size());

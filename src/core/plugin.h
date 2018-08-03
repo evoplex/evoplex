@@ -32,9 +32,12 @@
 #include "plugininterface.h"
 
 namespace evoplex {
+
 class Plugin
 {
 public:
+    virtual ~Plugin();
+
     static Plugin* load(const QString& path, QString& error);
 
     inline AbstractPlugin* create() const { return m_factory->create(); }
@@ -54,7 +57,6 @@ protected:
     PluginType m_type;
 
     explicit Plugin(PluginType type, const QJsonObject* metaData, const QString& libPath);
-    virtual ~Plugin();
 
     bool readAttrsScope(const QJsonObject* metaData, const QString& name,
             AttributesScope& attrsScope, std::vector<QString>& keys) const;

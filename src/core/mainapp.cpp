@@ -153,6 +153,7 @@ const Plugin* MainApp::loadPlugin(const QString& path, QString& error, const boo
                     "The %2 '%3' is already being used by another plugin.")
                     .arg(path, PLUGIN_ATTRIBUTE_UID, plugin->id());
         qWarning() << error;
+        delete plugin;
         return nullptr;
     }
 

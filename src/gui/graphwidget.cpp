@@ -47,6 +47,7 @@ GraphWidget::GraphWidget(MainGUI* mainGUI, ExperimentPtr exp, ExperimentWidget* 
     , m_cacheStatus(CacheStatus::Ready)
     , m_expWidget(parent)
     , m_posEntered(0,0)
+    , m_currTrialId(0)
 {
     setAttribute(Qt::WA_DeleteOnClose, true);
     setFocusPolicy(Qt::StrongFocus);
