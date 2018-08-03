@@ -39,7 +39,7 @@ private slots:
     void tst_parseHashCmd_mixedFunc();
     void _tst_attrs(const SetOfAttributes& res, const Attributes& attrs,  const bool testValues);
     void _tst_mode(const SetOfAttributes& res, const QString& mode, const AttributesScope& ascope, const int numOfAttrRges);
-    void _tst_parseStarCmd(const QString& mode);
+    void _tst_parseStarCmd(QString func, const AttributesScope& attrsScope, const int sizeOfAG, Attributes a);
     AttributesScope _newAttrsScope(const QStringList& names, const QStringList& attrRges);
 };
 
@@ -101,57 +101,72 @@ AttributesScope TestAttrsGenerator::_newAttrsScope(const QStringList& names, con
     return attrsScope;
 }
 
-void TestAttrsGenerator::_tst_parseStarCmd(const QString& mode)
+//void TestAttrsGenerator::_tst_parseStarCmd(const QString& mode)
+void TestAttrsGenerator::_tst_parseStarCmd(QString func, const AttributesScope& attrsScope, const int sizeOfAG, Attributes a)
 {
-    AttributesScope attrsScope;
     AttrsGenerator* agen;
     SetOfAttributes res;
     Attributes attrs;
-    const int sizeOfAgen = 3;
-    const QStringList names = {"test0", "test1", "test2"};
-    const QStringList attrRgeStrs = {"int[0,2]", "double[2.3,7.8]", "int{-2,0,2,4,6}"};
-    const QString seed("_123");
     QString error, cmd;
 
-    // Valid * command with empty attrScope
-    if (!strcmp(Value(mode).toString(), "rand")) {
-        cmd = QString("*%1;%2%3").arg(Value(sizeOfAgen).toQString()).arg(mode).arg(seed);
-    } else {
-        cmd = QString("*%1;%2").arg(Value(sizeOfAgen).toQString()).arg(mode);
+    cmd = QString("*%1;%2").arg(Value(sizeOfAG).toQString()).arg(func);
+    agen = AttrsGenerator::parse(attrsScope, cmd, error);
+
+    if(agen){
+        QCOMPARE(agen->command(), cmd);
+        QCOMPARE(agen->size(), sizeOfAG);
+
+        res = agen->create();
+
+        // Valid * command with empty attrScope
+        if(attrsScope.isEmpty()){
+            _tst_attrs(res, attrs, true);
+        } else { // Valid * command with non-empty attrScope
+            QString mode;
+            if(func == "min"||func == "max"){
+                mode = func;
+                _tst_mode(res, mode, attrsScope, 3);
+            }
+            else if(func.split("_").startsWith("rand")){
+                mode = "rand";
+                _tst_mode(res, mode, attrsScope, 3);
+                _tst_attrs(res, a, false);
+            }
+
+        }
     }
+}
 
-    agen = AttrsGenerator::parse(attrsScope, cmd, error);
+void TestAttrsGenerator::tst_parseStarCmd()
+{
+    const QStringList names = {"test0", "test1", "test2"};
+    const QStringList attrRgeStrs = {"int[0,2]", "double[2.3,7.8]", "int{-2,0,2,4,6}"};
+    const AttributesScope validAScope = _newAttrsScope(names, attrRgeStrs);
+    const AttributesScope emptyAScope;
 
-    QCOMPARE(agen->command(), cmd);
-    QCOMPARE(agen->size(), sizeOfAgen);
-
-    res = agen->create();
-
-    _tst_attrs(res, attrs, true);
-
-    // Valid * command with non-empty attrScope
-    attrsScope = _newAttrsScope(names, attrRgeStrs);
-    agen = AttrsGenerator::parse(attrsScope, cmd, error);
-
+    Attributes attrs;
     attrs.resize(3);
     for (int i = 0; i < attrs.size(); ++i) {
         attrs.replace(i, names.at(i), NULL);
     }
 
-    QCOMPARE(agen->command(), cmd);
-    QCOMPARE(agen->size(), sizeOfAgen);
+    const QStringList funcs = {
+        // valid functions
+        "min", "max", "rand_0", "rand_10",
+        // invalid functions
+        "mim", "mn", "", "rand_-10", "_10", "rand_notInt", "invalid"
+    };
 
-    res = agen->create();
+    // Sizes <= 0 cause ASSERT failures
+//    const int sizes[] = {-100, -1, 0, 1, 3};
+    const int sizes[] = {1, 3, 100};
 
-    _tst_attrs(res, attrs, false);
-    _tst_mode(res, mode, attrsScope, 3);
-}
-
-void TestAttrsGenerator::tst_parseStarCmd()
-{
-    _tst_parseStarCmd("min");
-    _tst_parseStarCmd("max");
-    _tst_parseStarCmd("rand");
+    for (const auto& func : funcs) {
+        for (int size : sizes) {
+            _tst_parseStarCmd(func, validAScope, size, attrs);
+            _tst_parseStarCmd(func, emptyAScope, size, attrs);
+        }
+    }
 }
 
 void TestAttrsGenerator::tst_parseHashCmd_min()
