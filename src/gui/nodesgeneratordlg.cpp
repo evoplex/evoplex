@@ -258,11 +258,10 @@ QString NodesGeneratorDlg::readCommand()
             QString valStr = qobject_cast<QLineEdit*>(m_ui->table->cellWidget(ar->id(), 2))->text();
             Function f = static_cast<Function>(cb->currentData().toInt());
             if (f == Function::Rand) {
-                bool isInt = false;
-                valStr.toInt(&isInt);
-                if (!isInt) {
+                Value seed = AttrsGenerator::parseRandSeed("rand_" + valStr);
+                if (!seed.isValid()) {
                     QMessageBox::warning(this, "Nodes Generator",
-                        "The PRG seed for '" + ar->attrName() + "' should be an integer!\n");
+                        "The PRG seed for '" + ar->attrName() + "' should be a positive integer!\n");
                     return QString();
                 }
                 command += "_" + valStr;

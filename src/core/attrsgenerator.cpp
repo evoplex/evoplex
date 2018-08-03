@@ -99,13 +99,10 @@ AGSameFuncForAll* AttrsGenerator::parseStarCmd(const AttributesScope& attrsScope
 
     if (cmd.startsWith("rand_")) {
         func = Function::Rand;
-        QString seedStr = cmd;
-
-        bool ok = false;
-        value = Value(seedStr.remove("rand_").toInt(&ok)); // seed
-        if (!ok) {
+        value = parseRandSeed(cmd);
+        if (!value.isValid()) {
             error = QString("Unable to parse '*%1;%2'."
-                    "It should look like: '*integer;rand_seed'")
+                    "It should look like: '*%1;rand_seed', where seed is a positive integer!")
                     .arg(size).arg(cmds.first());
             qWarning() << error;
             return nullptr;
@@ -160,10 +157,9 @@ AGDiffFunctions* AttrsGenerator::parseHashCmd(const AttributesScope& attrsScope,
             qWarning() << error;
             return nullptr;
         } else if (attrCmd.func == Function::Rand) {
-            bool ok = false;
-            attrCmd.funcInput = Value(attrCmdStr.at(2).toInt(&ok)); // seed
-            if (!ok) {
-                error = QString("Unable to parse '#%1;%2'.. The PRG seed should be an integer!")
+            attrCmd.funcInput = parseRandSeed(attrCmdStr.at(2));
+            if (!attrCmd.funcInput.isValid()) {
+                error = QString("Unable to parse '#%1;%2'.. The PRG seed should be a positive integer!")
                             .arg(size).arg(cmds.join(";"));
                 qWarning() << error;
                 return nullptr;
@@ -182,6 +178,17 @@ AGDiffFunctions* AttrsGenerator::parseHashCmd(const AttributesScope& attrsScope,
     }
 
     return new AGDiffFunctions(attrsScope, size, attrCmds);
+}
+
+Value AttrsGenerator::parseRandSeed(QString seedStr)
+{
+    bool ok = false;
+    int seed = seedStr.remove("rand_").toInt(&ok);
+    // also avoid things like '-0' and '01'
+    if (!ok || seed < 0 || seedStr != QString::number(seed)) {
+        return Value();
+    }
+    return Value(seed);
 }
 
 /****************************************************/
@@ -218,7 +225,7 @@ AGSameFuncForAll::AGSameFuncForAll(const AttributesScope& attrsScope, const int 
     case Function::Rand:
         Q_ASSERT_X(funcInput.type() == Value::INT, "AGSameFuncForAll", "rand function expects an integer seed.");
         m_command = QString("*%1;rand_%2").arg(m_size).arg(funcInput.toQString());
-        m_prg = new PRG(funcInput.toInt());
+        m_prg = new PRG(funcInput.toUInt());
         f_value = [this](const AttributeRange* attrRange) { return attrRange->rand(m_prg); };
         break;
     default:
@@ -286,7 +293,7 @@ SetOfAttributes AGDiffFunctions::create(std::function<void(int)> progress)
             value = [attrRange]() { return attrRange->max(); };
             break;
         case Function::Rand:
-            prg = new PRG(cmd.funcInput.toInt());
+            prg = new PRG(cmd.funcInput.toUInt());
             value = [attrRange, prg]() { return attrRange->rand(prg); };
             break;
         case Function::Value:
@@ -305,7 +312,7 @@ SetOfAttributes AGDiffFunctions::create(std::function<void(int)> progress)
     SetOfAttributes ret;
     ret.reserve(static_cast<size_t>(m_size));
     for (int id = 0; id < m_size; ++id) {
-        ret.emplace_back(setOfAttrs.at(id));
+        ret.emplace_back(setOfAttrs.at(static_cast<size_t>(id)));
         progress(id);
     }
     return ret;

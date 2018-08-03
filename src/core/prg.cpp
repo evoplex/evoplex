@@ -20,13 +20,13 @@
 
 #include "prg.h"
 
-namespace evoplex
-{
+namespace evoplex {
 
-PRG::PRG(unsigned int seed)
-    : m_mteng(seed)
-    , m_doubleZeroOne(0.,1.)
-    , m_floatZeroOne(0.f,1.f)
+PRG::PRG(uint seed)
+    : m_seed(seed),
+      m_mteng(seed),
+      m_doubleZeroOne(0.0, 1.0),
+      m_floatZeroOne(0.f, 1.f)
 {
 }
 

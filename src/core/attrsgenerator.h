@@ -61,6 +61,10 @@ public:
     // the size of the set of attributes
     inline int size() const { return m_size; }
 
+    // given a 'rand_seed', if seed is a positive int, return Value(seed)
+    // else, it returns an invalid Value
+    static Value parseRandSeed(QString seedStr);
+
 protected:
     const AttributesScope m_attrsScope;
     const int m_size;

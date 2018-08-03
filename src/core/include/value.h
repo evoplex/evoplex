@@ -60,6 +60,7 @@ public:
     inline char toChar() const;
     inline double toDouble() const;
     inline int toInt() const;
+    inline uint toUInt() const;
     inline const char* toString() const;
     QString toQString(char format = 'g', int precision = 8) const;
 
@@ -117,6 +118,11 @@ inline int Value::toInt() const
 
 inline const char* Value::toString() const
 { if (m_type == STRING) { return m_data.s; } throw throwError(); }
+
+inline uint Value::toUInt() const {
+    if (m_type == INT && m_data.i >= 0) { return static_cast<uint>(m_data.i); }
+    throw throwError();
+}
 
 } // evoplex
 

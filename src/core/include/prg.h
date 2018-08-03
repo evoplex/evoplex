@@ -23,12 +23,19 @@
 
 #include <random>
 
-namespace evoplex
-{
+namespace evoplex {
+
+/**
+ * @brief Pseudo-random number generator.
+ *        Based on the classic Mersenne Twister (std::mt19937)
+ */
 class PRG
 {
 public:
-    explicit PRG(unsigned int seed);
+    explicit PRG(uint seed);
+
+    // Returns the PRG seed
+    inline uint seed() const;
 
     // Generate a random double [0, 1)
     inline double randD();
@@ -55,6 +62,7 @@ public:
     size_t randS(size_t min, size_t max);
 
 private:
+    const uint m_seed;
     std::mt19937 m_mteng; //  Mersenne Twister engine
     std::uniform_real_distribution<double> m_doubleZeroOne;
     std::uniform_real_distribution<float> m_floatZeroOne;
@@ -63,6 +71,9 @@ private:
 /************************************************************************
    PRG: Inline member functions
  ************************************************************************/
+
+inline uint PRG::seed() const
+{ return m_seed; }
 
 inline double PRG::randD()
 { return m_doubleZeroOne(m_mteng); }
