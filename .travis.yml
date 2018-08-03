@@ -243,6 +243,8 @@ script:
   # split the ifs to make it looks better on travis-ci webpage
   - if [[ "$SKIP_BUILD" != true ]]; then make -j5 ; fi
 
+  - if [[ "$SKIP_BUILD" != true ]]; then make install -j5 ; fi
+
   - if [[ "$SKIP_BUILD" != true && "$COVERAGE_ENABLED" == true ]]; then
       make -j5 evoplex_coverage ;
     fi
