@@ -40,6 +40,7 @@ private slots:
     void _tst_attrs(const SetOfAttributes& res, const Attributes& attrs,  const bool testValues);
     void _tst_mode(const SetOfAttributes& res, const QString& mode, const AttributesScope& ascope, const int numOfAttrRges);
     void _tst_parseStarCmd(QString func, const AttributesScope& attrsScope, const int sizeOfAG, Attributes a);
+    void _tst_parseHashCmd(QString func, const AttributesScope& attrsScope, const int sizeOfAG, Attributes a);
     AttributesScope _newAttrsScope(const QStringList& names, const QStringList& attrRges);
 };
 
@@ -167,6 +168,11 @@ void TestAttrsGenerator::tst_parseStarCmd()
             _tst_parseStarCmd(func, emptyAScope, size, attrs);
         }
     }
+}
+
+void TestAttrsGenerator::_tst_parseHashCmd(QString func, const AttributesScope& attrsScope, const int sizeOfAG, Attributes a)
+{
+
 }
 
 void TestAttrsGenerator::tst_parseHashCmd_min()
