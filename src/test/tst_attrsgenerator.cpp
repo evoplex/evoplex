@@ -60,26 +60,31 @@ void TestAttrsGenerator::_tst_attrs(const SetOfAttributes& res, const Attributes
 
 void TestAttrsGenerator::_tst_mode(const SetOfAttributes& res, const QString& mode, const AttributesScope& ascope, const int numOfAttrRges)
 {
-   if (mode == "min") {
-        for (int i = 0; i < res.size(); ++i) {
-            for (int j = 0; j < numOfAttrRges; ++j) {
-                QCOMPARE(res.at(i).value(j), ascope.value(res.at(i).name(j))->min());
+    if (mode == "min") {
+        for (const auto& attrs : res) {
+            for (int i = 0; i < attrs.size(); ++i) {
+                auto attrRge = ascope.value(attrs.name(i));
+                QCOMPARE(attrs.value(i), attrRge->min());
             }
         }
     } else if (mode == "max") {
-        for (int i = 0; i < res.size(); ++i) {
-            for (int j = 0; j < numOfAttrRges; ++j) {
-                QCOMPARE(res.at(i).value(j), ascope.value(res.at(i).name(j))->max());
+        for (const auto& attrs : res) {
+            for (int i = 0; i < attrs.size(); ++i) {
+                auto attrRge = ascope.value(attrs.name(i));
+                QCOMPARE(attrs.value(i), attrRge->max());
             }
         }
     } else if (mode == "rand") {
-        for (int i = 0; i < res.size(); ++i) {
-            for (int j = 0; j < numOfAttrRges; ++j) {
-                QVERIFY(res.at(i).value(j) >= ascope.value(res.at(i).name(j))->min());
-                QVERIFY(res.at(i).value(j) <= ascope.value(res.at(i).name(j))->max());
+        for (const auto& attrs : res) {
+            for (int i = 0; i < attrs.size(); ++i) {
+                auto attrRge = ascope.value(attrs.name(i));
+                QVERIFY(attrs.value(i) >= attrRge->min());
+                QVERIFY(attrs.value(i) <= attrRge->max());
             }
         }
     }
+
+
 }
 
 AttributesScope TestAttrsGenerator::_newAttrsScope(const QStringList& names, const QStringList& attrRges)
@@ -94,7 +99,7 @@ AttributesScope TestAttrsGenerator::_newAttrsScope(const QStringList& names, con
     return attrsScope;
 }
 
-void TestAttrsGenerator::_tst_parseStarCmd(QString& mode)
+void TestAttrsGenerator::_tst_parseStarCmd(const QString& mode)
 {
     AttributesScope attrsScope;
     AttrsGenerator* agen;
