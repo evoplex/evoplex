@@ -1,11 +1,15 @@
 # Evoplex
 
-[![travis-ci](https://travis-ci.org/evoplex/evoplex.svg?branch=master)](https://travis-ci.org/evoplex/evoplex)
-[![appveyor](https://ci.appveyor.com/api/projects/status/ulck2seq9rqgawbr/branch/master?svg=true)](https://ci.appveyor.com/project/cardinot/evoplex/branch/master)
-[![coveralls](https://coveralls.io/repos/github/evoplex/evoplex/badge.svg)](https://coveralls.io/github/evoplex/evoplex)
-[![codecov](https://codecov.io/gh/evoplex/evoplex/branch/master/graph/badge.svg)](https://codecov.io/gh/evoplex/evoplex)
-[![gitter](https://badges.gitter.im/EvoplexMAS/evoplex.svg)](https://gitter.im/EvoplexMAS/evoplex?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+[![gitter](https://badges.gitter.im/EvoplexMAS/evoplex.svg)](https://gitter.im/EvoplexMAS/evoplex)
+[![coverity](https://scan.coverity.com/projects/16076/badge.svg)](https://scan.coverity.com/projects/evoplex-evoplex)
 [![awesome](https://img.shields.io/badge/awesome-yes-green.svg)](https://github.com/evoplex/evoplex/blob/master/README.md#evoplex)
+
+Linux & MacOS [![travis-ci](https://travis-ci.org/evoplex/evoplex.svg?branch=master)](https://travis-ci.org/evoplex/evoplex)
+
+Windows [![appveyor](https://ci.appveyor.com/api/projects/status/ulck2seq9rqgawbr/branch/master?svg=true)](https://ci.appveyor.com/project/cardinot/evoplex/branch/master)
+
+Tests [![coveralls](https://coveralls.io/repos/github/evoplex/evoplex/badge.svg)](https://coveralls.io/github/evoplex/evoplex)
+[![codecov](https://codecov.io/gh/evoplex/evoplex/branch/master/graph/badge.svg)](https://codecov.io/gh/evoplex/evoplex)
 
 Evoplex is a multi-agent system for [networks (graphs)](https://en.wikipedia.org/wiki/Graph_theory). Here, each agent is represented as a node in the network and is constrained to interact only with its neighbours, which are linked by edges in the network.
 

@@ -39,7 +39,7 @@ private slots:
 
 private: // auxiliary functions
     void _tst_empty(Attributes a);
-    void _tst_resize(Attributes a, const size_t kSize);
+    void _tst_resize(Attributes a, const int kSize);
     void _tst_replace(Attributes a, int id, QString newName, Value newValue, int origSize);
     void _tst_replace_invalid(Attributes a, int id, QString newName, Value newValue);
     void _tst_push_back(Attributes a, QString newName, Value newValue, int origSize);
@@ -82,7 +82,7 @@ void TestAttributes::tst_empty()
     _tst_empty(a2);
 }
 
-void TestAttributes::_tst_resize(Attributes a, const size_t kSize)
+void TestAttributes::_tst_resize(Attributes a, const int kSize)
 {
     QCOMPARE(a.size(), kSize);
     QVERIFY(!a.isEmpty());
