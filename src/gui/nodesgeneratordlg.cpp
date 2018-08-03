@@ -32,8 +32,7 @@
 #include "nodesgeneratordlg.h"
 #include "ui_nodesgeneratordlg.h"
 
-namespace evoplex
-{
+namespace evoplex {
 
 NodesGeneratorDlg::NodesGeneratorDlg(QWidget* parent, const AttributesScope& nodeAttrsScope, const QString& cmd)
     : QDialog(parent, Qt::WindowSystemMenuHint | Qt::WindowTitleHint), // removes ?
@@ -104,22 +103,25 @@ NodesGeneratorDlg::NodesGeneratorDlg(QWidget* parent, const AttributesScope& nod
         m_ui->table->setCellWidget(ar->id(), 1, cb);
 
         QLineEdit* le = new QLineEdit(m_ui->table);
-        connect(cb, &QComboBox::currentTextChanged, [this, cb, le, ar]() {
+        le->setAlignment(Qt::AlignHCenter);
+        auto slotInput = [cb, le, ar]() {
             Function f = static_cast<Function>(cb->currentData().toInt());
             QString tt;
             if (f == Function::Rand) {
+                le->setFocus();
                 tt = "Type the PRG seed (integer).";
             } else if (f == Function::Value) {
+                le->setFocus();
                 tt = "Type a valid value for this attribute.\n"
                      "Expected: " + ar->attrRangeStr();
             }
             le->setToolTip(tt);
-            le->setFocus();
-            m_ui->table->setColumnHidden(2, tt.isEmpty());
-        });
+            le->setDisabled(tt.isEmpty());
+        };
+        connect(cb, &QComboBox::currentTextChanged, slotInput);
         m_ui->table->setCellWidget(ar->id(), 2, le);
         cb->setCurrentIndex(0);
-        m_ui->table->setColumnHidden(2, true);
+        slotInput();
     }
 
     resize(width(), 250);
