@@ -47,7 +47,7 @@ QCoreApplication* createApp(int& argc, char* argv[])
 int main(int argc, char* argv[])
 {
     if (!qstrcmp(argv[1], "-version")) {
-        printf("%s-%s\n", EVOPLEX_VERSION, EVOPLEX_RELEASE);
+        printf("%s\n", EVOPLEX_VERSION_RELEASE);
         return 0;
     }
 
@@ -56,7 +56,7 @@ int main(int argc, char* argv[])
     QCoreApplication::setOrganizationName("Evoplex");
     QCoreApplication::setOrganizationDomain("https://evoplex.org");
     QCoreApplication::setApplicationName("Evoplex");
-    QCoreApplication::setApplicationVersion(EVOPLEX_VERSION "-" EVOPLEX_RELEASE);
+    QCoreApplication::setApplicationVersion(EVOPLEX_VERSION_RELEASE);
 
     // Enables high-DPI scaling in Qt on supported platforms
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling, true);

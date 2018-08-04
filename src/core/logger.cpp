@@ -61,7 +61,7 @@ void Logger::init()
     qInstallMessageHandler(Logger::debugLogHandler);
 
     writeLog(currDate);
-    writeLog(QString("Evoplex version: %1-%2").arg(EVOPLEX_VERSION, EVOPLEX_RELEASE));
+    writeLog(QString("Evoplex version: %1").arg(qApp->applicationVersion()));
     writeLog(QString("Built on %1 (branch: %2 commit: %3)")
              .arg(EVOPLEX_BUILDDATE, EVOPLEX_GIT_BRANCH, EVOPLEX_GIT_COMMIT_HASH));
 
