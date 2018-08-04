@@ -4,7 +4,7 @@
     <Version></Version>
     <Title></Title>
     <Publisher>Evoplex</Publisher>
-    <ProductUrl>https://evoplex.github.io</ProductUrl>
+    <ProductUrl>https://evoplex.org</ProductUrl>
     <Logo>evoplex.png</Logo>
     <StartMenuDir>Evoplex</StartMenuDir>
     <TargetDir>@ApplicationsDirX64@/evoplex</TargetDir>

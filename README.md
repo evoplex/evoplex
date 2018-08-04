@@ -14,7 +14,7 @@ Tests [![coveralls](https://coveralls.io/repos/github/evoplex/evoplex/badge.svg)
 Evoplex is a multi-agent system for [networks (graphs)](https://en.wikipedia.org/wiki/Graph_theory). Here, each agent is represented as a node in the network and is constrained to interact only with its neighbours, which are linked by edges in the network.
 
 <p align="center">
-  <img alt="Evoplex 0.0.1" src="https://evoplex.github.io/assets/img/evoplex2018-06-17.gif" width="70%">
+  <img alt="Evoplex 0.0.1" src="https://evoplex.org/assets/img/evoplex2018-06-17.gif" width="70%">
 </p>
 
 **Wait, another multi-agent system?** Why not using something like [MASON](https://cs.gmu.edu/~eclab/projects/mason/) or [NetLogo](https://ccl.northwestern.edu/netlogo/)?

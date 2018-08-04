@@ -54,7 +54,7 @@ int main(int argc, char* argv[])
     QScopedPointer<QCoreApplication> coreApp(createApp(argc, argv));
 
     QCoreApplication::setOrganizationName("Evoplex");
-    QCoreApplication::setOrganizationDomain("https://evoplex.github.io");
+    QCoreApplication::setOrganizationDomain("https://evoplex.org");
     QCoreApplication::setApplicationName("Evoplex");
     QCoreApplication::setApplicationVersion(EVOPLEX_VERSION "-" EVOPLEX_RELEASE);
 
