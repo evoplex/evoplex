@@ -60,6 +60,15 @@ inline PluginType _enumFromString<PluginType>(const QString& str) {
     if (str == "model") return PluginType::Model;
     return PluginType::Invalid;
 }
+template<>
+inline QString _enumToString<PluginType>(PluginType type)
+{
+    switch (type) {
+    case PluginType::Graph: return "Graph";
+    case PluginType::Model: return "Model";
+    default: return "invalid";
+    }
+}
 
 enum class GraphType : int {
     Invalid = 0,

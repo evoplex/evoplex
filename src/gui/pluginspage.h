@@ -54,8 +54,7 @@ private:
     MainApp* m_mainApp;
     QMainWindow* m_innerWindow;
 
-    void loadHtml(const GraphPlugin* plugin);
-    void loadHtml(const ModelPlugin* plugin);
+    void loadHtml(const Plugin* plugin);
 };
 
 class ButtonHoverWatcher : public QObject

@@ -76,17 +76,14 @@ void PluginsPage::rowSelectionChanged()
         return;
     }
 
-    PluginType type = static_cast<PluginType>(m_ui->table->item(row, TYPE)->data(Qt::UserRole).toInt());
-    if (type == PluginType::Graph) {
-        loadHtml(m_mainApp->graph(m_ui->table->item(row, UID)->text()));
-    } else if (type == PluginType::Model) {
-        loadHtml(m_mainApp->model(m_ui->table->item(row, UID)->text()));
-    } else {
-        qFatal("invalid plugin type! It should never happen.");
+    const Plugin* plugin = m_mainApp->graph(m_ui->table->item(row, UID)->text());
+    if (!plugin) {
+        plugin = m_mainApp->model(m_ui->table->item(row, UID)->text());
     }
+    loadHtml(plugin);
 }
 
-void PluginsPage::loadHtml(const GraphPlugin* plugin)
+void PluginsPage::loadHtml(const Plugin* plugin)
 {
     if (!plugin) {
         m_ui->browser->clear();
@@ -95,22 +92,7 @@ void PluginsPage::loadHtml(const GraphPlugin* plugin)
 
     QString html = "<h2>" + plugin->name() + "</h2><br>"
                  + "<b>Author:</b> " + plugin->author() + "<br>"
-                 + "<b>Plugin Type:</b> Graph<br>"
-                 + "<b>Description:</b> " + plugin->description() + "<br>";
-
-    m_ui->browser->setHtml(html);
-}
-
-void PluginsPage::loadHtml(const ModelPlugin* plugin)
-{
-    if (!plugin) {
-        m_ui->browser->clear();
-        return;
-    }
-
-    QString html = "<h2>" + plugin->name() + "</h2><br>"
-                 + "<b>Author:</b> " + plugin->author() + "<br>"
-                 + "<b>Plugin Type:</b> Model<br>"
+                 + "<b>Plugin type:</b> " + _enumToString<PluginType>(plugin->type()) + "<br>"
                  + "<b>Description:</b> " + plugin->description() + "<br>";
 
     m_ui->browser->setHtml(html);
