@@ -126,6 +126,7 @@ matrix:
             - llvm-toolchain-precise-3.8
           packages:
             - clang-3.8
+            - libc++-dev
           update:
             - true
       env:
@@ -140,6 +141,7 @@ matrix:
             - llvm-toolchain-trusty-3.9
           packages:
             - clang-3.9
+            - libc++-dev
           update:
             - true
       env:
