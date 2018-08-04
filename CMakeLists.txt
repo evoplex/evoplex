@@ -44,7 +44,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 # clang-3.8 and 3.9 need to be linked against libc++ to make c++14 work
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" AND
      (${CMAKE_CXX_COMPILER_VERSION} VERSION_EQUAL 3.8 OR
-      ${CMAKE_CXX_COMPILER_VERSION} VERSION_EQUAL 3.9)
+      ${CMAKE_CXX_COMPILER_VERSION} VERSION_EQUAL 3.9))
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
 endif()
 
