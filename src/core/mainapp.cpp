@@ -58,15 +58,15 @@ MainApp::MainApp()
         m_generalAttrsScope.insert(name, AttributeRange::parse(id++, name, attrRangeStr));
     };
 
-    addAttrScope(id, GENERAL_ATTRIBUTE_EXPID, QString("int[0,%1]").arg(INT32_MAX));
-    addAttrScope(id, GENERAL_ATTRIBUTE_NODES, "string");
-    addAttrScope(id, GENERAL_ATTRIBUTE_GRAPHID, "string");
-    addAttrScope(id, GENERAL_ATTRIBUTE_MODELID, "string");
-    addAttrScope(id, GENERAL_ATTRIBUTE_SEED, QString("int[0,%1]").arg(INT32_MAX));
-    addAttrScope(id, GENERAL_ATTRIBUTE_STOPAT, QString("int[1,%1]").arg(EVOPLEX_MAX_STEPS));
-    addAttrScope(id, GENERAL_ATTRIBUTE_TRIALS, QString("int[1,%1]").arg(EVOPLEX_MAX_TRIALS));
-    addAttrScope(id, GENERAL_ATTRIBUTE_AUTODELETE, "bool");
-    addAttrScope(id, GENERAL_ATTRIBUTE_GRAPHTYPE, "string");
+    addAttrScope(id, GENERAL_ATTR_EXPID, QString("int[0,%1]").arg(INT32_MAX));
+    addAttrScope(id, GENERAL_ATTR_NODES, "string");
+    addAttrScope(id, GENERAL_ATTR_GRAPHID, "string");
+    addAttrScope(id, GENERAL_ATTR_MODELID, "string");
+    addAttrScope(id, GENERAL_ATTR_SEED, QString("int[0,%1]").arg(INT32_MAX));
+    addAttrScope(id, GENERAL_ATTR_STOPAT, QString("int[1,%1]").arg(EVOPLEX_MAX_STEPS));
+    addAttrScope(id, GENERAL_ATTR_TRIALS, QString("int[1,%1]").arg(EVOPLEX_MAX_TRIALS));
+    addAttrScope(id, GENERAL_ATTR_AUTODELETE, "bool");
+    addAttrScope(id, GENERAL_ATTR_GRAPHTYPE, "string");
 
     addAttrScope(id, OUTPUT_DIR, "string");
     addAttrScope(id, OUTPUT_HEADER, "string");
@@ -151,7 +151,7 @@ const Plugin* MainApp::loadPlugin(const QString& path, QString& error, const boo
     if (m_models.contains(plugin->id()) || m_graphs.contains(plugin->id())) {
         error = QString("Unable to load the plugin (%1).\n"
                     "The %2 '%3' is already being used by another plugin.")
-                    .arg(path, PLUGIN_ATTRIBUTE_UID, plugin->id());
+                    .arg(path, PLUGIN_ATTR_UID, plugin->id());
         qWarning() << error;
         delete plugin;
         return nullptr;

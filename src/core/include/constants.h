@@ -32,15 +32,15 @@
 /******************************************************************************
     These constants hold the name of the properties common to any experiment.
 ******************************************************************************/
-#define GENERAL_ATTRIBUTE_EXPID "id"                    // the experiment id
-#define GENERAL_ATTRIBUTE_NODES "nodes"                 // a path to a csv file OR a command to AttrsGenerator
-#define GENERAL_ATTRIBUTE_GRAPHID "graphId"             // uid of the graph used
-#define GENERAL_ATTRIBUTE_MODELID "modelId"             // uid of the model used
-#define GENERAL_ATTRIBUTE_SEED "seed"                   // seed of the PRG
-#define GENERAL_ATTRIBUTE_STOPAT "stopAt"               // hard stop condition, ie., last simulation step
-#define GENERAL_ATTRIBUTE_TRIALS "trials"               // number of times the experiment has to be repeated
-#define GENERAL_ATTRIBUTE_AUTODELETE "autoDelete"       // automatically deletes the experiment from memory
-#define GENERAL_ATTRIBUTE_GRAPHTYPE "graphType"         // graph type of a graph generator
+#define GENERAL_ATTR_EXPID "id"                    // the experiment id
+#define GENERAL_ATTR_NODES "nodes"                 // a path to a csv file OR a command to AttrsGenerator
+#define GENERAL_ATTR_GRAPHID "graphId"             // uid of the graph used
+#define GENERAL_ATTR_MODELID "modelId"             // uid of the model used
+#define GENERAL_ATTR_SEED "seed"                   // seed of the PRG
+#define GENERAL_ATTR_STOPAT "stopAt"               // hard stop condition, ie., last simulation step
+#define GENERAL_ATTR_TRIALS "trials"               // number of times the experiment has to be repeated
+#define GENERAL_ATTR_AUTODELETE "autoDelete"       // automatically deletes the experiment from memory
+#define GENERAL_ATTR_GRAPHTYPE "graphType"         // graph type of a graph generator
 
 #define OUTPUT_DIR "directory"              // path to the directory in which the file will be saved
 #define OUTPUT_AVGTRIALS "avgTrials"        // 1 to indicate if the output should be done across all trials; 0 otherwise
@@ -50,18 +50,18 @@
 /******************************************************************************
     Plugin stuff
 ******************************************************************************/
-#define PLUGIN_ATTRIBUTE_TYPE "type"                    // plugin's type (graph or model)
-#define PLUGIN_ATTRIBUTE_UID "uid"                      // plugin's unique id
-#define PLUGIN_ATTRIBUTE_AUTHOR "author"                // authors' name
-#define PLUGIN_ATTRIBUTE_NAME "name"                    // plugin's name
-#define PLUGIN_ATTRIBUTE_DESCRIPTION "description"      // plugin's description
-#define PLUGIN_ATTRIBUTES_SCOPE "pluginAttributesScope" // domain of the plugin's attributes
+#define PLUGIN_ATTR_TYPE "type"                    // plugin's type (graph or model)
+#define PLUGIN_ATTR_UID "uid"                      // plugin's unique id
+#define PLUGIN_ATTR_AUTHOR "author"                // authors' name
+#define PLUGIN_ATTR_NAME "name"                    // plugin's name
+#define PLUGIN_ATTR_DESCRIPTION "description"      // plugin's description
+#define PLUGIN_ATTR_ATTRSSCOPE "pluginAttributesScope" // domain of the plugin's attributes
 // model (only)
-#define PLUGIN_ATTRIBUTE_NODESCOPE "nodeAttributesScope"    // domain of the node's attributes
-#define PLUGIN_ATTRIBUTE_EDGESCOPE "edgeAttributesScope"    // domain of the edge's attributes
-#define PLUGIN_ATTRIBUTE_CUSTOMOUTPUTS "customOutputs"      // custom outputs defined in the model
-#define PLUGIN_ATTRIBUTE_SUPPORTEDGRAPHS "supportedGraphs"  // graphIds allowed in the model; empty to allow all graphs
+#define PLUGIN_ATTR_NODESCOPE "nodeAttributesScope"    // domain of the node's attributes
+#define PLUGIN_ATTR_EDGESCOPE "edgeAttributesScope"    // domain of the edge's attributes
+#define PLUGIN_ATTR_CUSTOMOUTPUTS "customOutputs"      // custom outputs defined in the model
+#define PLUGIN_ATTR_SUPPORTEDGRAPHS "supportedGraphs"  // graphIds allowed in the model; empty to allow all graphs
 // graph (only)
-#define PLUGIN_ATTRIBUTE_VALIDGRAPHTYPES "validGraphTypes"  // valid graph types of a graph generator
+#define PLUGIN_ATTR_VALIDGRAPHTYPES "validGraphTypes"  // valid graph types of a graph generator
 
 #endif // CONSTANTS_H

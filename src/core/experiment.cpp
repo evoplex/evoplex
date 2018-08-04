@@ -87,31 +87,31 @@ bool Experiment::setInputs(ExpInputs* inputs, QString& error)
     delete m_inputs;
     m_inputs = inputs;
 
-    m_graphPlugin = m_mainApp->graph(m_inputs->general(GENERAL_ATTRIBUTE_GRAPHID).toQString());
-    m_modelPlugin = m_mainApp->model(m_inputs->general(GENERAL_ATTRIBUTE_MODELID).toQString());
+    m_graphPlugin = m_mainApp->graph(m_inputs->general(GENERAL_ATTR_GRAPHID).toQString());
+    m_modelPlugin = m_mainApp->model(m_inputs->general(GENERAL_ATTR_MODELID).toQString());
 
     // a few asserts for critical things that should never happen!
     Q_ASSERT_X(this == m_project.lock()->experiment(m_id).get(),
         "Experiment", "an experiment must be aware of its parent project!");
-    Q_ASSERT_X(m_id == inputs->general(GENERAL_ATTRIBUTE_EXPID).toInt(),
+    Q_ASSERT_X(m_id == inputs->general(GENERAL_ATTR_EXPID).toInt(),
         "Experiment", "mismatched experiment id!");
     Q_ASSERT_X(m_graphPlugin && m_modelPlugin,
         "Experiment", "tried to setup an experiment with invalid plugins!");
 
-    m_graphType = _enumFromString<GraphType>(m_inputs->general(GENERAL_ATTRIBUTE_GRAPHTYPE).toQString());
+    m_graphType = _enumFromString<GraphType>(m_inputs->general(GENERAL_ATTR_GRAPHTYPE).toQString());
     if (m_graphType == GraphType::Invalid) {
         error += "the graph type is invalid!\n";
         m_expStatus = Status::Invalid;
     }
 
-    m_numTrials = m_inputs->general(GENERAL_ATTRIBUTE_TRIALS).toInt();
+    m_numTrials = m_inputs->general(GENERAL_ATTR_TRIALS).toInt();
     if (m_numTrials < 1 || m_numTrials > EVOPLEX_MAX_TRIALS) {
         error += QString("number of trials should be >0 and <%1!\n").arg(EVOPLEX_MAX_TRIALS);
         m_expStatus = Status::Invalid;
     }
 
-    m_autoDeleteTrials = m_inputs->general(GENERAL_ATTRIBUTE_AUTODELETE).toBool();
-    setStopAt(m_inputs->general(GENERAL_ATTRIBUTE_STOPAT).toInt());
+    m_autoDeleteTrials = m_inputs->general(GENERAL_ATTR_AUTODELETE).toBool();
+    setStopAt(m_inputs->general(GENERAL_ATTR_STOPAT).toInt());
     setPauseAt(m_stopAt);
 
     if (!error.isEmpty()) {
@@ -168,7 +168,7 @@ bool Experiment::reset(QString* error)
     }
 
     m_delay = m_mainApp->defaultStepDelay();
-    m_stopAt = m_inputs->general(GENERAL_ATTRIBUTE_STOPAT).toInt();
+    m_stopAt = m_inputs->general(GENERAL_ATTR_STOPAT).toInt();
     setProgress(0);
 
     for (auto const& o : m_outputs) {
@@ -284,7 +284,7 @@ void Experiment::expFinished()
         }
         setProgress(360);
         // reset the stopAt flag to maximum
-        setStopAt(m_inputs->general(GENERAL_ATTRIBUTE_STOPAT).toInt());
+        setStopAt(m_inputs->general(GENERAL_ATTR_STOPAT).toInt());
     } else { // all or some trials are paused
         updateProgressValue();
         m_expStatus = Status::Paused; // exp is still good for another step
@@ -345,7 +345,7 @@ Nodes Experiment::cloneCachedNodes(const int trialId)
 
 Nodes Experiment::createNodes() const
 {
-    const QString& cmd = m_inputs->general(GENERAL_ATTRIBUTE_NODES).toQString();
+    const QString& cmd = m_inputs->general(GENERAL_ATTR_NODES).toQString();
 
     QString error;
     Nodes nodes = NodesPrivate::fromCmd(cmd, m_modelPlugin->nodeAttrsScope(), m_graphType, error);

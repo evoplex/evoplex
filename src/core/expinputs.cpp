@@ -46,8 +46,8 @@ ExpInputs::~ExpInputs()
 std::vector<QString> ExpInputs::exportAttrNames() const
 {
     std::vector<QString> names = m_generalAttrs->names();
-    const QString graphId = m_generalAttrs->value(GENERAL_ATTRIBUTE_GRAPHID, "").toQString();
-    const QString modelId = m_generalAttrs->value(GENERAL_ATTRIBUTE_MODELID, "").toQString();
+    const QString graphId = m_generalAttrs->value(GENERAL_ATTR_GRAPHID, "").toQString();
+    const QString modelId = m_generalAttrs->value(GENERAL_ATTR_MODELID, "").toQString();
     for (const QString& attrName : m_graphAttrs->names()) {
         if (!attrName.isEmpty()) names.emplace_back(graphId + "_" + attrName);
     }
@@ -117,8 +117,8 @@ ExpInputs::Plugins ExpInputs::findPlugins(const MainApp* mainApp,
         const QStringList& header, const QStringList& values, QString& errMsg)
 {
     // find the model and graph for this experiment
-    const int headerGraphId = header.indexOf(GENERAL_ATTRIBUTE_GRAPHID);
-    const int headerModelId = header.indexOf(GENERAL_ATTRIBUTE_MODELID);
+    const int headerGraphId = header.indexOf(GENERAL_ATTR_GRAPHID);
+    const int headerModelId = header.indexOf(GENERAL_ATTR_MODELID);
     if (headerGraphId < 0 || headerModelId < 0) {
         errMsg += "The experiment should have both graphId and modelId.";
         return {};
@@ -201,7 +201,7 @@ void ExpInputs::parseFileCache(const ModelPlugin* mPlugin, ExpInputs* ei,
 {
     QString outHeader = ei->m_generalAttrs->value(OUTPUT_HEADER, Value("")).toQString();
     if (failedAttrs.isEmpty() && !outHeader.isEmpty()) {
-        const int numTrials = ei->m_generalAttrs->value(GENERAL_ATTRIBUTE_TRIALS).toInt();
+        const int numTrials = ei->m_generalAttrs->value(GENERAL_ATTR_TRIALS).toInt();
         Q_ASSERT_X(numTrials > 0, "ExpInputs", "what? an experiment without trials?");
         std::vector<int> trialIds;
         trialIds.reserve(static_cast<size_t>(numTrials));

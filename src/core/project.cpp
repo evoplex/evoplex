@@ -88,7 +88,7 @@ ExperimentPtr Project::newExperiment(ExpInputs* inputs, QString& error)
         return nullptr;
     }
 
-    int expId = inputs->general(GENERAL_ATTRIBUTE_EXPID).toInt();
+    int expId = inputs->general(GENERAL_ATTR_EXPID).toInt();
     if (m_experiments.count(expId)) {
         error += "The Experiment Id must be unique!";
         return nullptr;
@@ -243,12 +243,12 @@ bool Project::saveProject(QString& errMsg, std::function<void(int)>& progress)
 
     // for convenience, we move the 'id' to the first column
     for (auto it = header.begin(); it != header.end(); ++it) {
-        if (*it == GENERAL_ATTRIBUTE_EXPID) {
+        if (*it == GENERAL_ATTR_EXPID) {
             header.erase(it);
             break;
         }
     }
-    header.insert(header.begin(), GENERAL_ATTRIBUTE_EXPID);
+    header.insert(header.begin(), GENERAL_ATTR_EXPID);
 
     // write header to file
     QTextStream out(&file);

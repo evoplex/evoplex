@@ -33,13 +33,13 @@ GraphPlugin::GraphPlugin(const QJsonObject* metaData, const QString& libPath)
         return;
     }
 
-    if (!metaData->contains(PLUGIN_ATTRIBUTE_VALIDGRAPHTYPES)) {
+    if (!metaData->contains(PLUGIN_ATTR_VALIDGRAPHTYPES)) {
         qWarning() << "missing 'validGraphTypes'.";
         m_type = PluginType::Invalid;
         return;
     }
 
-    QJsonArray array = metaData->value(PLUGIN_ATTRIBUTE_VALIDGRAPHTYPES).toArray();
+    QJsonArray array = metaData->value(PLUGIN_ATTR_VALIDGRAPHTYPES).toArray();
     for (auto it : array) {
         GraphType type = _enumFromString<GraphType>(it.toString());
         if (type == GraphType::Invalid) {

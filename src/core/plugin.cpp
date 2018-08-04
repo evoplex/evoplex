@@ -40,8 +40,8 @@ bool Plugin::checkMetaData(const QJsonObject& metaData, QString& error)
     }
 
     const QStringList reqFields = {
-        PLUGIN_ATTRIBUTE_TYPE, PLUGIN_ATTRIBUTE_UID, PLUGIN_ATTRIBUTE_NAME,
-        PLUGIN_ATTRIBUTE_AUTHOR, PLUGIN_ATTRIBUTE_DESCRIPTION
+        PLUGIN_ATTR_TYPE, PLUGIN_ATTR_UID, PLUGIN_ATTR_NAME,
+        PLUGIN_ATTR_AUTHOR, PLUGIN_ATTR_DESCRIPTION
     };
 
     for (const QString& f : reqFields) {
@@ -52,17 +52,17 @@ bool Plugin::checkMetaData(const QJsonObject& metaData, QString& error)
         }
     }
 
-    const PluginType type = _enumFromString<PluginType>(metaData[PLUGIN_ATTRIBUTE_TYPE].toString());
+    const PluginType type = _enumFromString<PluginType>(metaData[PLUGIN_ATTR_TYPE].toString());
     if (type == PluginType::Invalid) {
         error = QString("'%1' must be equal to 'graph' or 'model'")
-                .arg(PLUGIN_ATTRIBUTE_TYPE);
+                .arg(PLUGIN_ATTR_TYPE);
         return false;
     }
 
-    const QString uid = metaData[PLUGIN_ATTRIBUTE_UID].toString();
+    const QString uid = metaData[PLUGIN_ATTR_UID].toString();
     if (uid.contains("_")) {
         error = QString("The %1 '%2' should not have the underscore symbol.")
-                .arg(PLUGIN_ATTRIBUTE_UID, uid);
+                .arg(PLUGIN_ATTR_UID, uid);
         return false;
     }
 
@@ -95,7 +95,7 @@ Plugin* Plugin::load(const QString& path, QString& error)
     }
 
     Plugin* plugin = nullptr;
-    const PluginType type = _enumFromString<PluginType>(metaData[PLUGIN_ATTRIBUTE_TYPE].toString());
+    const PluginType type = _enumFromString<PluginType>(metaData[PLUGIN_ATTR_TYPE].toString());
     if (type == PluginType::Graph) {
         plugin = new GraphPlugin(&metaData, path);
     } else if (type == PluginType::Model) {
@@ -118,16 +118,16 @@ Plugin::Plugin(PluginType type, const QJsonObject* metaData, const QString& libP
       m_factory(nullptr),
       m_libPath(libPath)
 {
-    m_id = metaData->value(PLUGIN_ATTRIBUTE_UID).toString();
-    m_author = metaData->value(PLUGIN_ATTRIBUTE_AUTHOR).toString();
-    m_name = metaData->value(PLUGIN_ATTRIBUTE_NAME).toString();
-    m_descr = metaData->value(PLUGIN_ATTRIBUTE_DESCRIPTION).toString();
+    m_id = metaData->value(PLUGIN_ATTR_UID).toString();
+    m_author = metaData->value(PLUGIN_ATTR_AUTHOR).toString();
+    m_name = metaData->value(PLUGIN_ATTR_NAME).toString();
+    m_descr = metaData->value(PLUGIN_ATTR_DESCRIPTION).toString();
 
     Q_ASSERT_X(!m_id.isEmpty() && !m_author.isEmpty() &&
                !m_name.isEmpty() && !m_descr.isEmpty(),
                "Plugin", "missing required fields! It should never happen!");
 
-    if (!readAttrsScope(metaData, PLUGIN_ATTRIBUTES_SCOPE,
+    if (!readAttrsScope(metaData, PLUGIN_ATTR_ATTRSSCOPE,
                         m_pluginAttrsScope, m_pluginAttrsNames)) {
         qWarning() << "failed to read the plugins's attributes!";
         m_type = PluginType::Invalid;

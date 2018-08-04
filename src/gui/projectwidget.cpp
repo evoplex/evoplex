@@ -114,9 +114,9 @@ void ProjectWidget::fillRow(int row, const ExperimentPtr& exp)
 
     // general stuff
     insertItem(row, TableWidget::H_EXPID, QString::number(exp->id()));
-    insertItem(row, TableWidget::H_SEED, exp->inputs()->general(GENERAL_ATTRIBUTE_SEED).toQString());
-    insertItem(row, TableWidget::H_STOPAT, exp->inputs()->general(GENERAL_ATTRIBUTE_STOPAT).toQString());
-    insertItem(row, TableWidget::H_TRIALS, exp->inputs()->general(GENERAL_ATTRIBUTE_TRIALS).toQString());
+    insertItem(row, TableWidget::H_SEED, exp->inputs()->general(GENERAL_ATTR_SEED).toQString());
+    insertItem(row, TableWidget::H_STOPAT, exp->inputs()->general(GENERAL_ATTR_STOPAT).toQString());
+    insertItem(row, TableWidget::H_TRIALS, exp->inputs()->general(GENERAL_ATTR_TRIALS).toQString());
 
     if (exp->expStatus() == Status::Invalid) {
         m_ui->table->setSortingEnabled(true);
