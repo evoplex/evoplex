@@ -259,7 +259,8 @@ void ExperimentDesigner::setExperiment(ExperimentPtr exp)
 
     for (size_t i = 0; i < header.size(); ++i) {
         // we don't have a field for the expId, modelVersion and grapVersion
-        if (header.at(i) == GENERAL_ATTR_EXPID ||
+        if (!values.at(i).isValid() ||
+                header.at(i) == GENERAL_ATTR_EXPID ||
                 header.at(i) == GENERAL_ATTR_GRAPHVS ||
                 header.at(i) == GENERAL_ATTR_MODELVS) {
             continue;
@@ -278,7 +279,9 @@ void ExperimentDesigner::setExperiment(ExperimentPtr exp)
             } else {
                 idx = cb->findText(values.at(i).toQString());
             }
-            Q_ASSERT_X(idx >= 0, "ExperimentDesigner", "unable to find the field. It should never happen!");
+            // when opening an experiment with errors, the value might be invalid,
+            // then idx might be equal to -1 (item not found).
+            // passing -1 will show an empty combobox, which is fine here
             cb->setCurrentIndex(idx);
             continue;
         }
@@ -468,6 +471,8 @@ ExpInputs* ExperimentDesigner::readInputs(const int expId, QString& error) const
     ExpInputs* inputs = ExpInputs::parse(m_mainApp, header, values, errorMsg);
     if (!inputs || !errorMsg.isEmpty()) {
         error += "Unable to create the experiment.\nError: \"" + errorMsg + "\"";
+        delete inputs; // this GUI should never create experiments with errors
+        return nullptr;
     }
     return inputs;
 }
@@ -475,15 +480,12 @@ ExpInputs* ExperimentDesigner::readInputs(const int expId, QString& error) const
 void ExperimentDesigner::slotCreateExperiment()
 {
     QString error;
+    ExperimentPtr exp = nullptr;
     ExpInputs* inputs = readInputs(m_project->generateExpId(), error);
-    if (inputs) {
-        setExperiment(m_project->newExperiment(inputs, error));
-    }
-
-    if (!error.isEmpty()) {
-        QMessageBox::warning(this, "Experiment", error);
-        delete inputs;
-    }
+    if (inputs) { exp = m_project->newExperiment(inputs, error); }
+    if (!error.isEmpty()) { QMessageBox::warning(this, "Experiment", error); }
+    if (!exp) { delete inputs; }
+    setExperiment(exp);
 }
 
 void ExperimentDesigner::slotRemoveExperiment()
