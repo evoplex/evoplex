@@ -173,10 +173,13 @@ bool ProjectsPage::slotOpenProject(QString path)
         QMessageBox::critical(this, "Evoplex", error);
         return false;
     } else if (!error.isEmpty()) {
-        error = QString("There are issues with this project.\n\n%1\n"
-                        "Would you like to open it anyway?").arg(error);
-        int res = QMessageBox::warning(this, "Evoplex", error, QMessageBox::No, QMessageBox::Yes);
-        if (res == QMessageBox::No) {
+        QString msg = "A few experiments could not be loaded correctly.\n"
+                      "Would you like to open it anyway?\n"
+                      "Note: experiments with critical errors won't be opened anyway.";
+        QMessageBox box(QMessageBox::Warning, "Opening project...", msg,
+                        QMessageBox::No | QMessageBox::Yes, this);
+        box.setDetailedText(error);
+        if (box.exec() == QMessageBox::No) {
             return false;
         }
     }

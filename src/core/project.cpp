@@ -175,14 +175,14 @@ int Project::importExperiments(const QString& filePath, QString& error)
         QString expErrorMsg;
         ExpInputs* inputs = ExpInputs::parse(m_mainApp, header, values, expErrorMsg);
         if (!expErrorMsg.isEmpty()) {
-            error += QString("Row %1 : Warning: %2\n").arg(row).arg(expErrorMsg);
+            error += QString("Row %1 : Warning: %2\n\n").arg(row).arg(expErrorMsg);
         }
         expErrorMsg.clear();
         if (!inputs || !newExperiment(inputs, expErrorMsg)) {
-            error += QString("Row %1 (skipped): Critical error: %2\n").arg(row).arg(expErrorMsg);
+            error += QString("Row %1 (skipped): Critical error: %2\n\n").arg(row).arg(expErrorMsg);
         }
         if (!expErrorMsg.isEmpty()) {
-            error += QString("Row %1 : Warning: %2\n").arg(row).arg(expErrorMsg);
+            error += QString("Row %1 : Warning: %2\n\n").arg(row).arg(expErrorMsg);
         }
         ++row;
     }
