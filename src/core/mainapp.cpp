@@ -75,7 +75,7 @@ MainApp::MainApp()
 
     addAttrScope(id, OUTPUT_DIR, "string");
     addAttrScope(id, OUTPUT_HEADER, "string");
-    addAttrScope(id, OUTPUT_AVGTRIALS, "bool");
+    // FIXME: addAttrScope(id, OUTPUT_AVGTRIALS, "bool");
 
     QStringList searchPaths;
     searchPaths << qApp->applicationDirPath() + "/lib/evoplex/plugins";
