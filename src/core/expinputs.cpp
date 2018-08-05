@@ -129,8 +129,8 @@ ExpInputs* ExpInputs::parse(const MainApp* mainApp, const QStringList& header,
     // Thus, to avoid incosistency between the plugin objects and the value of
     // the attributes in the ExpInputs, here we ensure that those fields
     // correspond to the same thing.
-    auto fixVs = [ei](auto const& attr, auto const& val) mutable {
-        ei->m_generalAttrs->replace(ei->m_generalAttrs->indexOf(attr), attr, val);
+    auto fixVs = [ei](const QString& attr, quint16 vs) mutable {
+        ei->m_generalAttrs->replace(ei->m_generalAttrs->indexOf(attr), attr, vs);
     };
     fixVs(GENERAL_ATTR_GRAPHVS, ei->graphPlugin()->version());
     fixVs(GENERAL_ATTR_MODELVS, ei->modelPlugin()->version());

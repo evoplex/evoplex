@@ -87,6 +87,6 @@ private:
 } // evoplex
 
 // makes PluginType available to QMetaType system
-Q_DECLARE_METATYPE(evoplex::PluginKey);
+Q_DECLARE_METATYPE(evoplex::PluginKey)
 
 #endif // PLUGIN_H
