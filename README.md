@@ -12,6 +12,8 @@
 <a href="https://github.com/evoplex/evoplex/blob/master/README.md#evoplex"><img src="https://img.shields.io/badge/awesome-yes-green.svg" alt=""></a>
 </p>
 
+--------------------------------------------------------------------------------
+
 Evoplex is a multi-agent system for [networks (graphs)](https://en.wikipedia.org/wiki/Graph_theory). Here, each agent is represented as a node in the network and is constrained to interact only with its neighbours, which are linked by edges in the network.
 
 <p align="center">
