@@ -212,7 +212,7 @@ bool MainApp::unloadPlugin(const Plugin* plugin, QString& error)
 ProjectPtr MainApp::newProject(QString& error, const QString& filepath)
 {
     if (m_projects.size() > EVOPLEX_MAX_PROJECTS) {
-        error = "There are too many opened projects already!";
+        error = "There are too many projects opened already!";
     } else if (m_models.isEmpty()) {
         error = "There are no models available in the software.\n"
                 "Please, make sure you import the plugins you need first!";

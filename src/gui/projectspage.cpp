@@ -180,6 +180,7 @@ bool ProjectsPage::slotOpenProject(QString path)
                         QMessageBox::No | QMessageBox::Yes, this);
         box.setDetailedText(error);
         if (box.exec() == QMessageBox::No) {
+            m_mainApp->closeProject(project->id());
             return false;
         }
     }
