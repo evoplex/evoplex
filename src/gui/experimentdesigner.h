@@ -55,18 +55,18 @@ private slots:
     void slotCreateExperiment();
     void slotRemoveExperiment();
     void slotEditExperiment();
-    void slotModelSelected(const QString& modelId);
-    void slotGraphSelected(const QString& graphId);
+    void slotModelSelected(int cbIdx);
+    void slotGraphSelected(int cbIdx);
     void slotPluginAdded(const Plugin* plugin);
-    void slotPluginRemoved(const QString& id, PluginType type);
+    void slotPluginRemoved(PluginKey key, PluginType type);
     void slotSetActiveWidget(int idx);
 
 private:
     MainApp* m_mainApp;
     ProjectPtr m_project;
     std::weak_ptr<Experiment> m_exp;
-    QString m_selectedGraphId;
-    QString m_selectedModelId;
+    PluginKey m_selectedGraphKey;
+    PluginKey m_selectedModelKey;
 
     Ui_ExperimentDesigner* m_ui;
     QTreeWidgetItem* m_treeItemGeneral;
@@ -75,7 +75,7 @@ private:
     QTreeWidgetItem* m_treeItemGraphs;
     QVariantHash m_widgetFields;
     QCheckBox* m_enableOutputs;
-    int m_customGraphIdx; // position of combobox in the graph tree
+    int m_graphTypeIdx; // position of the graphtype combobox in the graph tree
 
     void addPluginAttrs(QTreeWidgetItem* tree, const Plugin* plugin);
 
@@ -85,7 +85,7 @@ private:
 
     ExpInputs* readInputs(const int expId, QString& error) const;
 
-    void pluginSelected(QTreeWidgetItem* itemRoot, const QString& pluginId);
+    void pluginSelected(QTreeWidgetItem* itemRoot, const PluginKey& key);
 };
 }
 

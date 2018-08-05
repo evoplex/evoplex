@@ -33,14 +33,22 @@
 
 namespace evoplex {
 
+using PluginKey = std::pair<QString, quint16>;  // <id, version>
+
 class Plugin
 {
 public:
     virtual ~Plugin();
 
+    // converts a key pair to a formated string
+    static QString keyStr(const PluginKey& key);
+
     static Plugin* load(const QString& path, QString& error);
 
     inline AbstractPlugin* create() const { return m_factory->create(); }
+
+    // The plugin's key is used to identify this plugin internally
+    inline const PluginKey& key() const { return m_key; }
 
     inline const QString& path() const { return m_libPath; }
     inline PluginType type() const { return m_type; }
@@ -48,6 +56,7 @@ public:
     inline const QString& author() const { return m_author; }
     inline const QString& name() const { return m_name; }
     inline const QString& description() const { return m_descr; }
+    inline quint16 version() const { return m_version; }
 
     inline const std::vector<QString>& pluginAttrsNames() const { return m_pluginAttrsNames; }
     inline const AttributesScope& pluginAttrsScope() const { return m_pluginAttrsScope; }
@@ -64,14 +73,20 @@ protected:
 private:
     PluginInterface* m_factory;
     const QString m_libPath;
+    PluginKey m_key;
     QString m_id;
     QString m_author;
     QString m_name;
     QString m_descr;
+    quint16 m_version;
     AttributesScope m_pluginAttrsScope;
     std::vector<QString> m_pluginAttrsNames;
 
     static bool checkMetaData(const QJsonObject& metaData, QString& error);
 };
 } // evoplex
+
+// makes PluginType available to QMetaType system
+Q_DECLARE_METATYPE(evoplex::PluginKey);
+
 #endif // PLUGIN_H

@@ -115,6 +115,11 @@ QPushButton::hover {
        </column>
        <column>
         <property name="text">
+         <string>version</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
          <string>name</string>
         </property>
        </column>

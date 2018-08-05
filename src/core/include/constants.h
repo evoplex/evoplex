@@ -34,8 +34,10 @@
 ******************************************************************************/
 #define GENERAL_ATTR_EXPID "id"                    // the experiment id
 #define GENERAL_ATTR_NODES "nodes"                 // a path to a csv file OR a command to AttrsGenerator
-#define GENERAL_ATTR_GRAPHID "graphId"             // uid of the graph used
-#define GENERAL_ATTR_MODELID "modelId"             // uid of the model used
+#define GENERAL_ATTR_GRAPHID "graphId"             // graph's id
+#define GENERAL_ATTR_MODELID "modelId"             // model's id
+#define GENERAL_ATTR_GRAPHVS "graphVersion"        // graph's version
+#define GENERAL_ATTR_MODELVS "modelVersion"        // model's version
 #define GENERAL_ATTR_SEED "seed"                   // seed of the PRG
 #define GENERAL_ATTR_STOPAT "stopAt"               // hard stop condition, ie., last simulation step
 #define GENERAL_ATTR_TRIALS "trials"               // number of times the experiment has to be repeated
@@ -55,6 +57,7 @@
 #define PLUGIN_ATTR_AUTHOR "author"                // authors' name
 #define PLUGIN_ATTR_NAME "name"                    // plugin's name
 #define PLUGIN_ATTR_DESCRIPTION "description"      // plugin's description
+#define PLUGIN_ATTR_VERSION "version"              // plugin's version [0,UINT16_MAX]
 #define PLUGIN_ATTR_ATTRSSCOPE "pluginAttributesScope" // domain of the plugin's attributes
 // model (only)
 #define PLUGIN_ATTR_NODESCOPE "nodeAttributesScope"    // domain of the node's attributes

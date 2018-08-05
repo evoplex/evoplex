@@ -39,6 +39,9 @@ public:
 
     ~ExpInputs();
 
+    inline const GraphPlugin* graphPlugin() const;
+    inline const ModelPlugin* modelPlugin() const;
+
     inline const Attributes* general() const;
     inline const Attributes* model() const;
     inline const Attributes* graph() const;
@@ -51,33 +54,37 @@ public:
     // Export all the attributes' names to a vector.
     // prefix all model's attributes with the modelId
     // prefix all graph's attributes with the graphId
-    std::vector<QString> exportAttrNames() const;
+    std::vector<QString> exportAttrNames(bool appendVersion) const;
 
     // Export all the attributes' values to a vector.
     std::vector<Value> exportAttrValues() const;
 
-protected:
-    explicit ExpInputs(Attributes* general, Attributes* graph,
-                       Attributes* model, const std::vector<Cache*>& caches);
-
 private:
-    using Plugins = std::pair<const GraphPlugin*, const ModelPlugin*>;
+    explicit ExpInputs(const GraphPlugin* g, const ModelPlugin* m,
+                       Attributes* general, Attributes* graph, Attributes* model,
+                       const std::vector<Cache*>& caches);
 
+    const GraphPlugin* m_graphPlugin;
+    const ModelPlugin* m_modelPlugin;
     Attributes* m_generalAttrs;
     Attributes* m_graphAttrs;
     Attributes* m_modelAttrs;
     std::vector<Cache*> m_fileCaches;
 
-    static Plugins findPlugins(const MainApp* mainApp, const QStringList& header,
-                               const QStringList& values, QString& errMsg);
+    static Plugin* findPlugin(PluginType type, const MainApp* mainApp,
+            const QStringList& header, const QStringList& values, QString& errMsg);
 
-    static void parseAttrs(const MainApp* mainApp, Plugins plugins,
-                           const QStringList& header, const QStringList& values,
-                           ExpInputs* ei, QStringList& failedAttrs);
+    static void parseAttrs(ExpInputs* ei, const MainApp* mainApp,
+            const QStringList& header, const QStringList& values, QStringList& failedAttrs);
 
-    static void parseFileCache(const ModelPlugin* mPlugin, ExpInputs* ei,
-                               QStringList& failedAttrs, QString& errMsg);
+    static void parseFileCache(ExpInputs* ei, QStringList& failedAttrs, QString& errMsg);
 };
+
+inline const GraphPlugin* ExpInputs::graphPlugin() const
+{ return m_graphPlugin; }
+
+inline const ModelPlugin* ExpInputs::modelPlugin() const
+{ return m_modelPlugin; }
 
 inline const Attributes* ExpInputs::general() const
 { return m_generalAttrs; }

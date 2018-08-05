@@ -40,6 +40,7 @@ class ModelPlugin;
 class Project;
 class Plugin;
 
+using PluginKey = std::pair<QString, quint16>;  // <id, version>
 using ProjectPtr = std::shared_ptr<Project>;
 using ProjectWPtr = std::weak_ptr<Project>;
 
@@ -73,12 +74,13 @@ public:
     void setStepsToFlush(int steps);
 
     inline ExperimentsMgr* expMgr() const;
-    inline const QHash<QString, GraphPlugin*>& graphs() const;
-    inline const QHash<QString, ModelPlugin*>& models() const;
+    inline const QHash<PluginKey, Plugin*>& plugins() const;
+    inline const QMultiHash<QString, quint16>& graphs() const;
+    inline const QMultiHash<QString, quint16>& models() const;
     inline const std::map<int, ProjectPtr>& projects() const;
 
-    inline const GraphPlugin* graph(const QString& graphId) const;
-    inline const ModelPlugin* model(const QString& modelId) const;
+    const GraphPlugin* graph(const PluginKey &key) const;
+    const ModelPlugin* model(const PluginKey& key) const;
     ProjectPtr project(int projId) const;
 
     inline const AttributesScope& generalAttrsScope() const;
@@ -87,7 +89,7 @@ public:
 
 signals:
     void pluginAdded(const Plugin* plugin);
-    void pluginRemoved(const QString& id, PluginType t);
+    void pluginRemoved(PluginKey key, PluginType t);
     void listOfRecentProjectsUpdated();
 
 private:
@@ -107,8 +109,9 @@ private:
 
     std::map<int, ProjectPtr> m_projects; // opened projects.
 
-    QHash<QString, GraphPlugin*> m_graphs;  // loaded graphs
-    QHash<QString, ModelPlugin*> m_models;  // loaded models
+    QHash<PluginKey, Plugin*> m_plugins;   // loaded plugins
+    QMultiHash<QString, quint16> m_graphs; // versions of each loaded graphIds (each key can have multiple values)
+    QMultiHash<QString, quint16> m_models; // versions of each loaded modelIds (each key can have multiple values)
 
     // let's build a hash with the name and attrRange of the essential attributes
     // it is important to validate the contents of csv files
@@ -128,20 +131,17 @@ inline int MainApp::stepsToFlush() const
 inline ExperimentsMgr* MainApp::expMgr() const
 { return m_expMgr; }
 
-inline const QHash<QString, GraphPlugin*>& MainApp::graphs() const
+inline const QHash<PluginKey, Plugin*>& MainApp::plugins() const
+{ return m_plugins; }
+
+inline const QMultiHash<QString, quint16>& MainApp::graphs() const
 { return m_graphs; }
 
-inline const QHash<QString, ModelPlugin*>& MainApp::models() const
+inline const QMultiHash<QString, quint16>& MainApp::models() const
 { return m_models; }
 
 inline const std::map<int, ProjectPtr>& MainApp::projects() const
 { return m_projects; }
-
-inline const GraphPlugin* MainApp::graph(const QString& graphId) const
-{ return m_graphs.value(graphId, nullptr); }
-
-inline const ModelPlugin* MainApp::model(const QString& modelId) const
-{ return m_models.value(modelId, nullptr); }
 
 inline const AttributesScope& MainApp::generalAttrsScope() const
 { return m_generalAttrsScope; }

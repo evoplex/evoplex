@@ -24,9 +24,11 @@
 
 namespace evoplex {
 
-ExpInputs::ExpInputs(Attributes* general, Attributes* graph,
-                     Attributes* model, const std::vector<Cache*>& caches)
-    : m_generalAttrs(general),
+ExpInputs::ExpInputs(const GraphPlugin* g, const ModelPlugin* m, Attributes* general,
+                     Attributes* graph, Attributes* model, const std::vector<Cache*>& caches)
+    : m_graphPlugin(g),
+      m_modelPlugin(m),
+      m_generalAttrs(general),
       m_graphAttrs(graph),
       m_modelAttrs(model),
       m_fileCaches(caches)
@@ -43,16 +45,18 @@ ExpInputs::~ExpInputs()
     }
 }
 
-std::vector<QString> ExpInputs::exportAttrNames() const
+std::vector<QString> ExpInputs::exportAttrNames(bool appendVersion) const
 {
     std::vector<QString> names = m_generalAttrs->names();
     const QString graphId = m_generalAttrs->value(GENERAL_ATTR_GRAPHID, "").toQString();
     const QString modelId = m_generalAttrs->value(GENERAL_ATTR_MODELID, "").toQString();
+    const QString graphVs = appendVersion ? "-" + m_generalAttrs->value(GENERAL_ATTR_GRAPHVS, "").toQString() : "";
+    const QString modelVs = appendVersion ? "-" + m_generalAttrs->value(GENERAL_ATTR_MODELVS, "").toQString() : "";
     for (const QString& attrName : m_graphAttrs->names()) {
-        if (!attrName.isEmpty()) names.emplace_back(graphId + "_" + attrName);
+        if (!attrName.isEmpty()) names.emplace_back(graphId + graphVs + "_" + attrName);
     }
     for (const QString& attrName : m_modelAttrs->names()) {
-        if (!attrName.isEmpty()) names.emplace_back(modelId + "_" + attrName);
+        if (!attrName.isEmpty()) names.emplace_back(modelId + modelVs + "_" + attrName);
     }
     return names;
 }
@@ -78,19 +82,33 @@ ExpInputs* ExpInputs::parse(const MainApp* mainApp, const QStringList& header,
         return nullptr;
     }
 
-    Plugins plugins = findPlugins(mainApp, header, values, errMsg);
-    if (!plugins.first || !plugins.second || !errMsg.isEmpty()) {
+    auto model = dynamic_cast<ModelPlugin*>(findPlugin(PluginType::Model, mainApp, header, values, errMsg));
+    if (!model) {
+        return nullptr; // cannot do anything without a model
+    }
+
+    auto graph = dynamic_cast<GraphPlugin*>(findPlugin(PluginType::Graph, mainApp, header, values, errMsg));
+    if (!graph) {
+        return nullptr; // cannot do anything without a graph
+    }
+
+    // make sure that the chosen graphId is allowed in this model
+    if (!model->graphIsSupported(graph->id())) {
+        QString supportedGraphs = model->supportedGraphs().toList().join(", ");
+        errMsg = QString("The graph plugin '%1' cannot be used in this model (%2). "
+                "The allowed ones are: %3").arg(graph->id(), model->id(), supportedGraphs);
         return nullptr;
     }
 
-    ExpInputs* ei = new ExpInputs(new Attributes(mainApp->generalAttrsScope().size()),
-                                  new Attributes(plugins.first->pluginAttrsScope().size()),
-                                  new Attributes(plugins.second->pluginAttrsScope().size()),
-                                  std::vector<Cache*>());
+    ExpInputs* ei = new ExpInputs(graph, model,
+        new Attributes(mainApp->generalAttrsScope().size()),
+        new Attributes(graph->pluginAttrsScope().size()),
+        new Attributes(model->pluginAttrsScope().size()),
+        std::vector<Cache*>());
 
     QStringList failedAttrs;
-    parseAttrs(mainApp, plugins, header, values, ei, failedAttrs);
-    parseFileCache(plugins.second, ei, failedAttrs, errMsg);
+    parseAttrs(ei, mainApp, header, values, failedAttrs);
+    parseFileCache(ei, failedAttrs, errMsg);
 
     // make sure all attributes exist
     auto checkAll = [&failedAttrs](Attributes* attrs, const AttributesScope& attrsScope) {
@@ -102,8 +120,20 @@ ExpInputs* ExpInputs::parse(const MainApp* mainApp, const QStringList& header,
         }
     };
     checkAll(ei->m_generalAttrs, mainApp->generalAttrsScope());
-    checkAll(ei->m_graphAttrs, plugins.first->pluginAttrsScope());
-    checkAll(ei->m_modelAttrs, plugins.second->pluginAttrsScope());
+    checkAll(ei->m_graphAttrs, graph->pluginAttrsScope());
+    checkAll(ei->m_modelAttrs, model->pluginAttrsScope());
+
+    // even when something goes wrong, if the experiment has found a valid model
+    // and graph, it can be opened by the user. In those cases, the modelVersion
+    // and graphVersion might be empty or not the same as the loaded plugins.
+    // Thus, to avoid incosistency between the plugin objects and the value of
+    // the attributes in the ExpInputs, here we ensure that those fields
+    // correspond to the same thing.
+    auto fixVs = [ei](auto const& attr, auto const& val) mutable {
+        ei->m_generalAttrs->replace(ei->m_generalAttrs->indexOf(attr), attr, val);
+    };
+    fixVs(GENERAL_ATTR_GRAPHVS, ei->graphPlugin()->version());
+    fixVs(GENERAL_ATTR_MODELVS, ei->modelPlugin()->version());
 
     if (!failedAttrs.isEmpty()) {
         failedAttrs.removeDuplicates();
@@ -113,50 +143,60 @@ ExpInputs* ExpInputs::parse(const MainApp* mainApp, const QStringList& header,
     return ei; // return the object, even if it has invalid/missing attrs
 }
 
-ExpInputs::Plugins ExpInputs::findPlugins(const MainApp* mainApp,
+Plugin* ExpInputs::findPlugin(PluginType type, const MainApp* mainApp,
         const QStringList& header, const QStringList& values, QString& errMsg)
 {
-    // find the model and graph for this experiment
-    const int headerGraphId = header.indexOf(GENERAL_ATTR_GRAPHID);
-    const int headerModelId = header.indexOf(GENERAL_ATTR_MODELID);
-    if (headerGraphId < 0 || headerModelId < 0) {
-        errMsg += "The experiment should have both graphId and modelId.";
-        return {};
+    QString GENERAL_ATTR_PLUGINID, GENERAL_ATTR_PLUGINVS;
+    if (type == PluginType::Graph) {
+        GENERAL_ATTR_PLUGINID = GENERAL_ATTR_GRAPHID;
+        GENERAL_ATTR_PLUGINVS = GENERAL_ATTR_GRAPHVS;
+    } else if (type == PluginType::Model) {
+        GENERAL_ATTR_PLUGINID = GENERAL_ATTR_MODELID;
+        GENERAL_ATTR_PLUGINVS = GENERAL_ATTR_MODELVS;
+    } else {
+        return nullptr;
     }
 
-    // check if the model and graph are available
-    Plugins plugins = std::make_pair(mainApp->graph(values.at(headerGraphId)),
-                                     mainApp->model(values.at(headerModelId)));
-    if (!plugins.first) {
-        errMsg += QString("The graph plugin '%1' is not available."
-                          " Make sure you load it before trying to add this experiment.")
-                          .arg(values.at(headerGraphId));
-        return {};
+    if (!header.contains(GENERAL_ATTR_PLUGINID)) {
+        errMsg += " missing:" + GENERAL_ATTR_PLUGINID;
+        return nullptr;
     }
-    if (!plugins.second) {
-        errMsg += QString("The model plugin '%1' is not available."
-                          " Make sure you load it before trying to add this experiment.")
-                          .arg(values.at(headerModelId));
-        return {};
+    const QString pluginId = values.at(header.indexOf(GENERAL_ATTR_PLUGINID));
+
+    // get all versions available for this plugin
+    QList<quint16> availableVs = type == PluginType::Graph
+            ? mainApp->graphs().values(pluginId)
+            : mainApp->models().values(pluginId);
+
+    if (availableVs.empty()) {
+        errMsg += QString(" The plugin '%1' is not available."
+                " Make sure you load it before trying to add this experiment.")
+                .arg(pluginId);
+        return nullptr;
     }
 
-    // make sure that the chosen graphId is allowed in this model
-    if (!plugins.second->graphIsSupported(plugins.first->id())) {
-        QString supportedGraphs = plugins.second->supportedGraphs().toList().join(", ");
-        errMsg = QString("The graph plugin '%1' cannot be used in this model (%2). The allowed ones are: %3")
-                         .arg(plugins.first->id(), plugins.second->id(), supportedGraphs);
-        return {};
+    bool vsIsInt = false;
+    const int hPluginVs = header.indexOf(GENERAL_ATTR_PLUGINVS);
+    quint16 validVs = hPluginVs < 0 ? 0 : values.at(hPluginVs).toUShort(&vsIsInt);
+    if (!vsIsInt || !availableVs.contains(validVs)) {
+        // select the newest version
+        validVs = *std::max_element(availableVs.cbegin(), availableVs.cend());
+        errMsg += QString(" The '%1' is missing/invalid, trying to load it with '%2 - v%3'.")
+                .arg(GENERAL_ATTR_PLUGINVS, pluginId).arg(validVs);
     }
-    return plugins;
+
+    Plugin* plugin = mainApp->plugins().value({pluginId, validVs}, nullptr);
+    Q_ASSERT(plugin);
+
+    return plugin;
 }
 
-void ExpInputs::parseAttrs(const MainApp* mainApp, Plugins plugins,
-                           const QStringList& header, const QStringList& values,
-                           ExpInputs* ei, QStringList& failedAttrs)
+void ExpInputs::parseAttrs(ExpInputs* ei, const MainApp* mainApp, const QStringList& header,
+                           const QStringList& values, QStringList& failedAttrs)
 {
     // we assume that all graph/model attributes start with 'uid_'
-    const QString& graphId_ = plugins.first->id() + "_";
-    const QString& modelId_ = plugins.second->id() + "_";
+    const QString& graphId_ = ei->graphPlugin()->id() + "_";
+    const QString& modelId_ = ei->modelPlugin()->id() + "_";
 
     // get the value of each attribute and make sure they are valid
     for (int i = 0; i < values.size(); ++i) {
@@ -176,11 +216,11 @@ void ExpInputs::parseAttrs(const MainApp* mainApp, Plugins plugins,
             Attributes* pluginAttrs = nullptr;
             if (attrName.startsWith(modelId_)) {
                 attrName = attrName.remove(modelId_);
-                attrRange = plugins.second->pluginAttrRange(attrName);
+                attrRange = ei->modelPlugin()->pluginAttrRange(attrName);
                 pluginAttrs = ei->m_modelAttrs;
             } else if (attrName.startsWith(graphId_)) {
                 attrName = attrName.remove(graphId_);
-                attrRange = plugins.first->pluginAttrRange(attrName);
+                attrRange = ei->graphPlugin()->pluginAttrRange(attrName);
                 pluginAttrs = ei->m_graphAttrs;
             }
 
@@ -196,8 +236,7 @@ void ExpInputs::parseAttrs(const MainApp* mainApp, Plugins plugins,
     }
 }
 
-void ExpInputs::parseFileCache(const ModelPlugin* mPlugin, ExpInputs* ei,
-                               QStringList& failedAttrs, QString& errMsg)
+void ExpInputs::parseFileCache(ExpInputs* ei, QStringList& failedAttrs, QString& errMsg)
 {
     QString outHeader = ei->m_generalAttrs->value(OUTPUT_HEADER, Value("")).toQString();
     if (failedAttrs.isEmpty() && !outHeader.isEmpty()) {
@@ -210,7 +249,7 @@ void ExpInputs::parseFileCache(const ModelPlugin* mPlugin, ExpInputs* ei,
         }
 
         QStringList _outHeader = outHeader.split(";", QString::SkipEmptyParts);
-        ei->m_fileCaches = Output::parseHeader(_outHeader, trialIds, mPlugin, errMsg);
+        ei->m_fileCaches = Output::parseHeader(_outHeader, trialIds, ei->modelPlugin(), errMsg);
         if (ei->m_fileCaches.empty()) {
             failedAttrs.append(OUTPUT_HEADER);
         }

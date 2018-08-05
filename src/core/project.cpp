@@ -232,7 +232,7 @@ bool Project::saveProject(QString& errMsg, std::function<void(int)>& progress)
         }
         lModelId = i.second->modelId();
         lGraphId = i.second->graphId();
-        std::vector<QString> h = i.second->inputs()->exportAttrNames();
+        std::vector<QString> h = i.second->inputs()->exportAttrNames(false);
         header.insert(header.end(), h.begin(), h.end());
         _progress += kProgress;
         progress(_progress);

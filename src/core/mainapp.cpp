@@ -49,6 +49,9 @@ MainApp::MainApp()
     qRegisterMetaType<Status>("Status"); // makes it available for signals/slots
     qRegisterMetaType<Function>("Function");
 
+    qRegisterMetaType<PluginKey>("PluginKey");
+    QMetaType::registerComparators<PluginKey>(); // allows comparing two QVariant(PluginKey)
+
     resetSettingsToDefault();
     m_defaultStepDelay = static_cast<quint16>(m_userPrefs.value("settings/stepDelay", m_defaultStepDelay).toInt());
     m_stepsToFlush = m_userPrefs.value("settings/stepsToFlush", m_stepsToFlush).toInt();
@@ -62,6 +65,8 @@ MainApp::MainApp()
     addAttrScope(id, GENERAL_ATTR_NODES, "string");
     addAttrScope(id, GENERAL_ATTR_GRAPHID, "string");
     addAttrScope(id, GENERAL_ATTR_MODELID, "string");
+    addAttrScope(id, GENERAL_ATTR_GRAPHVS, QString("int[0,%1]").arg(UINT16_MAX));
+    addAttrScope(id, GENERAL_ATTR_MODELVS, QString("int[0,%1]").arg(UINT16_MAX));
     addAttrScope(id, GENERAL_ATTR_SEED, QString("int[0,%1]").arg(INT32_MAX));
     addAttrScope(id, GENERAL_ATTR_STOPAT, QString("int[1,%1]").arg(EVOPLEX_MAX_STEPS));
     addAttrScope(id, GENERAL_ATTR_TRIALS, QString("int[1,%1]").arg(EVOPLEX_MAX_TRIALS));
@@ -91,8 +96,7 @@ MainApp::~MainApp()
     m_projects.clear();
     delete m_expMgr;
     m_expMgr = nullptr;
-    Utils::deleteAndShrink(m_models);
-    Utils::deleteAndShrink(m_graphs);
+    Utils::deleteAndShrink(m_plugins);
     Utils::deleteAndShrink(m_generalAttrsScope);
 }
 
@@ -144,23 +148,24 @@ void MainApp::initUserPlugins()
 const Plugin* MainApp::loadPlugin(const QString& path, QString& error, const bool addToUserPrefs)
 {
     Plugin* plugin = Plugin::load(path, error);
-    if (!plugin) {
+    if (!plugin || plugin->type() == PluginType::Invalid) {
         return nullptr;
     }
 
-    if (m_models.contains(plugin->id()) || m_graphs.contains(plugin->id())) {
+    if (m_plugins.contains(plugin->key())) {
         error = QString("Unable to load the plugin (%1).\n"
-                    "The %2 '%3' is already being used by another plugin.")
-                    .arg(path, PLUGIN_ATTR_UID, plugin->id());
+                    "A plugin called '%2' (version %3) is already loaded.")
+                    .arg(path, plugin->id()).arg(plugin->version());
         qWarning() << error;
         delete plugin;
         return nullptr;
     }
 
+    m_plugins.insert(plugin->key(), plugin);
     if (plugin->type() == PluginType::Graph) {
-        m_graphs.insert(plugin->id(), dynamic_cast<GraphPlugin*>(plugin));
+        m_graphs.insert(plugin->id(), plugin->version());
     } else {
-        m_models.insert(plugin->id(), dynamic_cast<ModelPlugin*>(plugin));
+        m_models.insert(plugin->id(), plugin->version());
     }
 
     if (addToUserPrefs) {
@@ -188,18 +193,19 @@ bool MainApp::unloadPlugin(const Plugin* plugin, QString& error)
     paths.removeOne(plugin->path());
     m_userPrefs.setValue("plugins", paths);
 
-    QString id = plugin->id();
+    PluginKey key = plugin->key();
     PluginType type = plugin->type();
-    if (type == PluginType::Graph && m_graphs.contains(id)) {
-        delete m_graphs.take(id);
-    } else if (type == PluginType::Model && m_models.contains(id)) {
-        delete m_models.take(id);
+    if (type == PluginType::Graph && m_graphs.contains(key.first)) {
+        m_graphs.remove(key.first, key.second);
+    } else if (type == PluginType::Model && m_models.contains(key.first)) {
+        m_models.remove(key.first, key.second);
     } else {
-        qFatal("Tried to unload a plugin (%s) which has not been loaded before.", qPrintable(id));
+        qFatal("Tried to unload a plugin (%s) which has not been loaded before.", qPrintable(key.first));
     }
 
-    emit (pluginRemoved(id, type));
-    qDebug() << "a plugin has been unloaded." << id;
+    delete m_plugins.take(key);
+    emit (pluginRemoved(key, type));
+    qDebug() << "a plugin has been unloaded." << key;
     return true;
 }
 
@@ -262,6 +268,16 @@ ProjectPtr MainApp::project(int projId) const
 {
     auto it = m_projects.find(projId);
     return (it != m_projects.end()) ? (*it).second : nullptr;
+}
+
+const GraphPlugin* MainApp::graph(const PluginKey& key) const
+{
+    return dynamic_cast<GraphPlugin*>(m_plugins.value(key, nullptr));
+}
+
+const ModelPlugin* MainApp::model(const PluginKey &key) const
+{
+    return dynamic_cast<ModelPlugin*>(m_plugins.value(key, nullptr));
 }
 
 } // evoplex

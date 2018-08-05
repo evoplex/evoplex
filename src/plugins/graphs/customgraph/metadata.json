@@ -1,10 +1,11 @@
 {
   "type": "graph",
   "uid": "customGraph",
+  "version": 1,
   "name": "Custom Graph",
   "author": "Marcos Cardinot",
   "description": "Custom graph.",
-  "validGraphTypes": [ "undirected", "directed" ],
+  "validGraphTypes": [],
   "pluginAttributesScope": [
     {"filePath": "filepath"}
   ]

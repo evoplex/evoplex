@@ -146,8 +146,6 @@ private:
     ProjectWPtr m_project;
 
     const ExpInputs* m_inputs;
-    const GraphPlugin* m_graphPlugin;
-    const ModelPlugin* m_modelPlugin;
     GraphType m_graphType;
     int m_numTrials;
     bool m_autoDeleteTrials;
@@ -259,16 +257,16 @@ inline const ExpInputs* Experiment::inputs() const
 { return m_inputs; }
 
 inline const QString& Experiment::modelId() const
-{ return m_modelPlugin->id(); }
+{ return m_inputs->modelPlugin()->id(); }
 
 inline const QString& Experiment::graphId() const
-{ return m_graphPlugin->id(); }
+{ return m_inputs->graphPlugin()->id(); }
 
 inline const ModelPlugin* Experiment::modelPlugin() const
-{ return m_modelPlugin; }
+{ return m_inputs->modelPlugin(); }
 
 inline const GraphPlugin* Experiment::graphPlugin() const
-{ return m_graphPlugin; }
+{ return m_inputs->graphPlugin(); }
 
 inline GraphType Experiment::graphType() const
 { return m_graphType; }

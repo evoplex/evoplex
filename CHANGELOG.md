@@ -6,6 +6,7 @@
 - Improves and unify plugins interfaces
 - Model plugins can now add and remove nodes and edges during the simulation
 - Model plugins: added beforeLoop() and afterLoop() methods
+- Plugins can now be versioned
 - Increases unit-tests coverage of core components
 - Improves threads management
 - Improves TableWidget performance

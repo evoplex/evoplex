@@ -46,8 +46,8 @@ ExperimentDesigner::ExperimentDesigner(MainApp* mainApp, QWidget *parent)
     : QDockWidget(parent)
     , m_mainApp(mainApp)
     , m_project(nullptr)
-    , m_selectedGraphId(STRING_NULL_PLUGINID)
-    , m_selectedModelId(STRING_NULL_PLUGINID)
+    , m_selectedGraphKey(STRING_NULL_PLUGINID, 0)
+    , m_selectedModelKey(STRING_NULL_PLUGINID, 0)
     , m_ui(new Ui_ExperimentDesigner)
 {
     setObjectName("ExperimentDesigner");
@@ -68,7 +68,7 @@ ExperimentDesigner::ExperimentDesigner(MainApp* mainApp, QWidget *parent)
     // --  models available
     QComboBox* cb = new QComboBox(m_ui->treeWidget);
     cb->insertItem(0, STRING_NULL_PLUGINID);
-    connect(cb, SIGNAL(currentIndexChanged(QString)), SLOT(slotModelSelected(QString)));
+    connect(cb, SIGNAL(currentIndexChanged(int)), SLOT(slotModelSelected(int)));
     addTreeWidget(m_treeItemModels, GENERAL_ATTR_MODELID, QVariant::fromValue(cb));
 
     // setup the tree widget: graph
@@ -91,13 +91,13 @@ ExperimentDesigner::ExperimentDesigner(MainApp* mainApp, QWidget *parent)
     // --  graphs available
     cb = new QComboBox(m_ui->treeWidget);
     cb->insertItem(0, STRING_NULL_PLUGINID);
-    connect(cb, SIGNAL(currentIndexChanged(QString)), SLOT(slotGraphSelected(QString)));
+    connect(cb, SIGNAL(currentIndexChanged(int)), SLOT(slotGraphSelected(int)));
     addTreeWidget(m_treeItemGraphs, GENERAL_ATTR_GRAPHID, QVariant::fromValue(cb));
     // --  graph type
     cb = new QComboBox(m_ui->treeWidget);
     cb->insertItem(0, "undirected", static_cast<int>(GraphType::Undirected));
     cb->insertItem(1, "directed", static_cast<int>(GraphType::Directed));
-    m_customGraphIdx = m_treeItemGraphs->childCount();
+    m_graphTypeIdx = m_treeItemGraphs->childCount();
     addTreeWidget(m_treeItemGraphs, GENERAL_ATTR_GRAPHTYPE, QVariant::fromValue(cb));
 
     // setup the tree widget: general attributes
@@ -184,12 +184,11 @@ ExperimentDesigner::ExperimentDesigner(MainApp* mainApp, QWidget *parent)
     m_enableOutputs->setChecked(true);
     m_enableOutputs->setChecked(false);
 
-    for (const GraphPlugin* g : m_mainApp->graphs()) { slotPluginAdded(g); }
-    for (const ModelPlugin* m : m_mainApp->models()) { slotPluginAdded(m); }
+    for (const Plugin* p : m_mainApp->plugins()) { slotPluginAdded(p); }
     connect(m_mainApp, SIGNAL(pluginAdded(const Plugin*)),
             SLOT(slotPluginAdded(const Plugin*)));
-    connect(m_mainApp, SIGNAL(pluginRemoved(QString,PluginType)),
-            SLOT(slotPluginRemoved(QString,PluginType)));
+    connect(m_mainApp, SIGNAL(pluginRemoved(PluginKey,PluginType)),
+            SLOT(slotPluginRemoved(PluginKey,PluginType)));
 }
 
 ExperimentDesigner::~ExperimentDesigner()
@@ -248,7 +247,7 @@ void ExperimentDesigner::setExperiment(ExperimentPtr exp)
     m_ui->bRemove->show();
     m_enableOutputs->setChecked(exp->hasOutputs());
 
-    std::vector<QString> header = exp->inputs()->exportAttrNames();
+    std::vector<QString> header = exp->inputs()->exportAttrNames(true);
     std::vector<Value> values = exp->inputs()->exportAttrValues();
 
     // ensure graphId will be filled at the end
@@ -259,13 +258,30 @@ void ExperimentDesigner::setExperiment(ExperimentPtr exp)
     values.shrink_to_fit();
 
     for (size_t i = 0; i < header.size(); ++i) {
-        // we don't have a field for the expId
-        if (header.at(i) == GENERAL_ATTR_EXPID) {
+        // we don't have a field for the expId, modelVersion and grapVersion
+        if (header.at(i) == GENERAL_ATTR_EXPID ||
+                header.at(i) == GENERAL_ATTR_GRAPHVS ||
+                header.at(i) == GENERAL_ATTR_MODELVS) {
             continue;
         }
 
         QWidget* widget = m_widgetFields.value(header.at(i)).value<QWidget*>();
         Q_ASSERT_X(widget, "ExperimentDesigner", "unable to find the field. It should never happen!");
+
+        QComboBox* cb = qobject_cast<QComboBox*>(widget);
+        if (cb) {
+            int idx = -1;
+            if (header.at(i) == GENERAL_ATTR_GRAPHID) {
+                idx = cb->findData(QVariant::fromValue(exp->graphPlugin()->key()));
+            } else if (header.at(i) == GENERAL_ATTR_MODELID) {
+                idx = cb->findData(QVariant::fromValue(exp->modelPlugin()->key()));
+            } else {
+                idx = cb->findText(values.at(i).toQString());
+            }
+            Q_ASSERT_X(idx >= 0, "ExperimentDesigner", "unable to find the field. It should never happen!");
+            cb->setCurrentIndex(idx);
+            continue;
+        }
 
         QSpinBox* sp = qobject_cast<QSpinBox*>(widget);
         if (sp) {
@@ -275,11 +291,6 @@ void ExperimentDesigner::setExperiment(ExperimentPtr exp)
         QDoubleSpinBox* dsp = qobject_cast<QDoubleSpinBox*>(widget);
         if (dsp) {
             dsp->setValue(values.at(i).toDouble());
-            continue;
-        }
-        QComboBox* cb = qobject_cast<QComboBox*>(widget);
-        if (cb) {
-            cb->setCurrentIndex(cb->findText(values.at(i).toQString()));
             continue;
         }
         QCheckBox* chb = qobject_cast<QCheckBox*>(widget);
@@ -298,12 +309,12 @@ void ExperimentDesigner::setExperiment(ExperimentPtr exp)
 
 void ExperimentDesigner::slotNodesWidget()
 {
-    if (m_selectedModelId == STRING_NULL_PLUGINID) {
+    if (m_selectedModelKey.first == STRING_NULL_PLUGINID) {
         QMessageBox::warning(this, "Experiment", "Please, select a valid 'modelId' first.");
         return;
     }
 
-    const ModelPlugin* model = m_mainApp->models().value(m_selectedModelId);
+    const ModelPlugin* model = m_mainApp->model(m_selectedModelKey);
     const QString& cmd = m_widgetFields.value(GENERAL_ATTR_NODES).value<QLineEdit*>()->text();
 
     NodesGeneratorDlg* adlg = new NodesGeneratorDlg(this, model->nodeAttrsScope(), cmd);
@@ -324,7 +335,7 @@ void ExperimentDesigner::slotOutputDir()
 
 void ExperimentDesigner::slotOutputWidget()
 {
-    if (m_selectedModelId == STRING_NULL_PLUGINID) {
+    if (m_selectedModelKey.first == STRING_NULL_PLUGINID) {
         QMessageBox::warning(this, "Experiment", "Please, select a valid 'modelId' first.");
         return;
     }
@@ -337,7 +348,7 @@ void ExperimentDesigner::slotOutputWidget()
     }
 
     std::vector<Cache*> currFileCaches;
-    const ModelPlugin* model = m_mainApp->models().value(m_selectedModelId);
+    const ModelPlugin* model = m_mainApp->model(m_selectedModelKey);
     QString currentHeader = m_widgetFields.value(OUTPUT_HEADER).value<QLineEdit*>()->text();
     if (!currentHeader.isEmpty()) {
         QString errorMsg;
@@ -367,10 +378,10 @@ void ExperimentDesigner::slotOutputWidget()
 
 ExpInputs* ExperimentDesigner::readInputs(const int expId, QString& error) const
 {
-    if (m_selectedModelId == STRING_NULL_PLUGINID) {
+    if (m_selectedModelKey.first == STRING_NULL_PLUGINID) {
         error = "Please, select a valid 'modelId'.";
         return nullptr;
-    } else if (m_selectedGraphId == STRING_NULL_PLUGINID) {
+    } else if (m_selectedGraphKey.first == STRING_NULL_PLUGINID) {
         error = "Please, select a valid 'graphId'.";
         return nullptr;
     } else if (m_enableOutputs->isChecked()
@@ -386,6 +397,8 @@ ExpInputs* ExperimentDesigner::readInputs(const int expId, QString& error) const
     header << GENERAL_ATTR_EXPID;
     values << QString::number(expId);
 
+    const QString modelKey_ = Plugin::keyStr(m_selectedModelKey) + "_";
+    const QString graphKey_ = Plugin::keyStr(m_selectedGraphKey) + "_";
     QVariantHash::const_iterator it;
     for (it = m_widgetFields.constBegin(); it != m_widgetFields.constEnd(); ++it) {
         QWidget* widget = it.value().value<QWidget*>();
@@ -394,7 +407,22 @@ ExpInputs* ExperimentDesigner::readInputs(const int expId, QString& error) const
             continue;
         }
 
-        header << it.key();
+        // modelId and graphId are added later
+        if (it.key() == GENERAL_ATTR_GRAPHID || it.key() == GENERAL_ATTR_MODELID) {
+            continue;
+        }
+
+        // if it's a plugin field, we need to remove the
+        // version number from the key
+        if (it.key().startsWith(modelKey_)) {
+            QString key = it.key();
+            header << m_selectedModelKey.first + "_" + key.remove(modelKey_);
+        } else if (it.key().startsWith(graphKey_)) {
+            QString key = it.key();
+            header << m_selectedGraphKey.first + "_" + key.remove(graphKey_);
+        } else {
+            header << it.key();
+        }
 
         QSpinBox* sp = qobject_cast<QSpinBox*>(widget);
         if (sp) {
@@ -430,10 +458,16 @@ ExpInputs* ExperimentDesigner::readInputs(const int expId, QString& error) const
         values << "" << "";
     }
 
+    header << GENERAL_ATTR_GRAPHID << GENERAL_ATTR_GRAPHVS;
+    values << m_selectedGraphKey.first << QString::number(m_selectedGraphKey.second);
+
+    header << GENERAL_ATTR_MODELID << GENERAL_ATTR_MODELVS;
+    values << m_selectedModelKey.first << QString::number(m_selectedModelKey.second);
+
     QString errorMsg;
     ExpInputs* inputs = ExpInputs::parse(m_mainApp, header, values, errorMsg);
-    if (!inputs) {
-        error = "Unable to create the experiment.\nError: \"" + errorMsg + "\"";
+    if (!inputs || !errorMsg.isEmpty()) {
+        error += "Unable to create the experiment.\nError: \"" + errorMsg + "\"";
     }
     return inputs;
 }
@@ -479,35 +513,38 @@ void ExperimentDesigner::slotEditExperiment()
     }
 }
 
-void ExperimentDesigner::slotGraphSelected(const QString& graphId)
+void ExperimentDesigner::slotGraphSelected(int cbIdx)
 {
-    m_selectedGraphId = graphId;
-    pluginSelected(m_treeItemGraphs, graphId);
+    QComboBox* cb = m_widgetFields.value(GENERAL_ATTR_GRAPHID).value<QComboBox*>();
+    m_selectedGraphKey = cb->itemData(cbIdx).value<PluginKey>();
+    pluginSelected(m_treeItemGraphs, m_selectedGraphKey);
 
-    bool validGraph = graphId != STRING_NULL_PLUGINID;
-    m_treeItemGraphs->child(m_customGraphIdx)->setHidden(!validGraph || graphId == "customGraph");
-    m_treeItemGeneral->setExpanded(validGraph);
-    m_treeItemOutputs->setExpanded(validGraph);
+    const GraphPlugin* plugin = m_mainApp->graph(m_selectedGraphKey);
+    m_treeItemGeneral->setExpanded(plugin);
+    m_treeItemOutputs->setExpanded(plugin);
+    m_treeItemGraphs->child(m_graphTypeIdx)->setHidden(
+            !plugin || plugin->validGraphTypes().size() < 2);
 }
 
-void ExperimentDesigner::slotModelSelected(const QString& modelId)
+void ExperimentDesigner::slotModelSelected(int cbIdx)
 {
-    m_selectedModelId = modelId;
-    pluginSelected(m_treeItemModels, modelId);
+    QComboBox* cb = m_widgetFields.value(GENERAL_ATTR_MODELID).value<QComboBox*>();
+    m_selectedModelKey = cb->itemData(cbIdx).value<PluginKey>();
+    pluginSelected(m_treeItemModels, m_selectedModelKey);
 
-    bool nullModel = modelId == STRING_NULL_PLUGINID;
-    m_treeItemGeneral->setHidden(nullModel);
-    m_treeItemOutputs->setHidden(nullModel);
-    m_treeItemGraphs->setHidden(nullModel);
-    m_treeItemGraphs->setExpanded(!nullModel);
+    const ModelPlugin* model = m_mainApp->model(m_selectedModelKey);
+    m_treeItemGeneral->setHidden(!model);
+    m_treeItemOutputs->setHidden(!model);
+    m_treeItemGraphs->setHidden(!model);
+    m_treeItemGraphs->setExpanded(model);
 }
 
-void ExperimentDesigner::pluginSelected(QTreeWidgetItem* itemRoot, const QString& pluginId)
+void ExperimentDesigner::pluginSelected(QTreeWidgetItem* itemRoot, const PluginKey& key)
 {
     for (int i = 0; i < itemRoot->childCount(); ++i) {
         QTreeWidgetItem* row = itemRoot->child(i);
-        QString pId = row->data(0, Qt::UserRole).toString();
-        bool hide = !pId.isEmpty() && pId != pluginId;
+        PluginKey _key = row->data(0, Qt::UserRole).value<PluginKey>();
+        bool hide = !_key.first.isEmpty() && _key != key;
         row->setHidden(hide);
         m_ui->treeWidget->itemWidget(row, 1)->setDisabled(hide);
     }
@@ -515,26 +552,48 @@ void ExperimentDesigner::pluginSelected(QTreeWidgetItem* itemRoot, const QString
 
 void ExperimentDesigner::slotPluginAdded(const Plugin* plugin)
 {
+    int numVersions = 0;
     QComboBox* cb;
     if (plugin->type() == PluginType::Graph) {
         addPluginAttrs(m_treeItemGraphs, plugin);
-        slotGraphSelected(STRING_NULL_PLUGINID); // to hide all fields
+        slotGraphSelected(0); // to hide all fields
         cb = m_widgetFields.value(GENERAL_ATTR_GRAPHID).value<QComboBox*>();
+        numVersions = m_mainApp->graphs().values(plugin->id()).size();
     } else if (plugin->type() == PluginType::Model) {
         addPluginAttrs(m_treeItemModels, plugin);
-        slotModelSelected(STRING_NULL_PLUGINID); // to hide all fields
+        slotModelSelected(0); // to hide all fields
         cb = m_widgetFields.value(GENERAL_ATTR_MODELID).value<QComboBox*>();
+        numVersions = m_mainApp->models().values(plugin->id()).size();
     } else {
         qFatal("invalid plugin type!");
     }
 
+    // let's append the version number only when there's
+    // more than one version available
+    QString label;
+    if (numVersions == 1) {
+        label = plugin->id();
+    } else if (numVersions == 2) {
+        // this is the first time we have 2 versions of the same plugin
+        // so, we must fix the label of the existing plugin as well
+        int existingIdx = cb->findText(plugin->id());
+        PluginKey existing = cb->itemData(existingIdx).value<PluginKey>();
+        Q_ASSERT(existingIdx >= 0 && existing.first == plugin->id());
+        cb->setItemText(existingIdx, Plugin::keyStr(existing));
+        label = Plugin::keyStr(plugin->key());
+    } else if (numVersions > 2) {
+        label = Plugin::keyStr(plugin->key());
+    } else {
+        qFatal("the plugin was not loaded correctly! It should never happen!");
+    }
+
     cb->blockSignals(true);
-    cb->insertItem(cb->count(), plugin->id());
+    cb->insertItem(cb->count(), label, QVariant::fromValue(plugin->key()));
     cb->setCurrentIndex(0); // moves to --
     cb->blockSignals(false);
 }
 
-void ExperimentDesigner::slotPluginRemoved(const QString& id, PluginType type)
+void ExperimentDesigner::slotPluginRemoved(PluginKey key, PluginType type)
 {
     QTreeWidgetItem* tree;
     QComboBox* cb;
@@ -549,20 +608,21 @@ void ExperimentDesigner::slotPluginRemoved(const QString& id, PluginType type)
     }
 
     cb->blockSignals(true);
-    cb->removeItem(cb->findText(id));
+    cb->removeItem(cb->findData(QVariant::fromValue(key)));
     cb->blockSignals(false);
 
     // remove all fields which belog to this plugin
+    const QString keyStr_ = Plugin::keyStr(key) + "_";
     QVariantHash::iterator i = m_widgetFields.begin();
     while (i != m_widgetFields.end()) {
-        if (i.key().startsWith(id + "_")) {
+        if (i.key().startsWith(keyStr_)) {
             i = m_widgetFields.erase(i);
         } else {
             ++i;
         }
     }
     for (int i = 0; i < tree->childCount(); ++i) {
-        if (tree->child(i)->data(0, Qt::UserRole).toString() == id) {
+        if (tree->child(i)->data(0, Qt::UserRole).value<PluginKey>() == key) {
             delete tree->takeChild(i);
             --i;
         }
@@ -577,17 +637,18 @@ void ExperimentDesigner::addPluginAttrs(QTreeWidgetItem* tree, const Plugin* plu
 
     QTreeWidgetItemIterator it(m_ui->treeWidget);
     while (*it) {
-        if ((*it)->parent() == tree && (*it)->data(0, Qt::UserRole).toString() == plugin->id()) {
+        if ((*it)->parent() == tree &&
+            (*it)->data(0, Qt::UserRole).value<PluginKey>() == plugin->key()) {
             return; // plugins already exists
         }
         ++it;
     }
 
-    const QString uid_ = plugin->id() + "_";
+    const QString key_ = Plugin::keyStr(plugin->key()) + "_";
     for (const QString& attrName : plugin->pluginAttrsNames()) {
         QTreeWidgetItem* item = new QTreeWidgetItem(tree);
         item->setText(0, attrName);
-        item->setData(0, Qt::UserRole, plugin->id());
+        item->setData(0, Qt::UserRole, QVariant::fromValue(plugin->key()));
 
         const AttributeRange* attrRange = plugin->pluginAttrRange(attrName);
         QWidget* widget = nullptr;
@@ -625,7 +686,7 @@ void ExperimentDesigner::addPluginAttrs(QTreeWidgetItem* tree, const Plugin* plu
         item->setHidden(true);
         m_ui->treeWidget->setItemWidget(item, 1, widget);
         // add the uid as prefix to avoid clashes.
-        m_widgetFields.insert(uid_ + attrRange->attrName(), QVariant::fromValue(widget));
+        m_widgetFields.insert(key_ + attrRange->attrName(), QVariant::fromValue(widget));
     }
 }
 

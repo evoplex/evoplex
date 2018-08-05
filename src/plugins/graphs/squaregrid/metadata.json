@@ -1,6 +1,7 @@
 {
   "type": "graph",
   "uid": "squareGrid",
+  "version": 1,
   "name": "Square Grid",
   "author": "Marcos Cardinot",
   "description": "Regular lattice grid with four or eight neighbours. It's able to generate graphs with either fixed or periodic boundary conditions. It expects that the total number of nodes is equal to 'height'*'width'.",

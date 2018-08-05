@@ -46,8 +46,9 @@ private:
     enum TableCols {
         TYPE = 0,
         UID = 1,
-        NAME = 2,
-        UNLOAD = 3
+        VERSION = 2,
+        NAME = 3,
+        UNLOAD = 4
     };
 
     Ui_PluginsPage* m_ui;

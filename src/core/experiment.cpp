@@ -34,8 +34,6 @@ Experiment::Experiment(MainApp* mainApp, const int id, ProjectWPtr project)
       m_id(id),
       m_project(project),
       m_inputs(nullptr),
-      m_graphPlugin(nullptr),
-      m_modelPlugin(nullptr),
       m_graphType(GraphType::Invalid),
       m_numTrials(0),
       m_autoDeleteTrials(true),
@@ -87,15 +85,12 @@ bool Experiment::setInputs(ExpInputs* inputs, QString& error)
     delete m_inputs;
     m_inputs = inputs;
 
-    m_graphPlugin = m_mainApp->graph(m_inputs->general(GENERAL_ATTR_GRAPHID).toQString());
-    m_modelPlugin = m_mainApp->model(m_inputs->general(GENERAL_ATTR_MODELID).toQString());
-
     // a few asserts for critical things that should never happen!
     Q_ASSERT_X(this == m_project.lock()->experiment(m_id).get(),
         "Experiment", "an experiment must be aware of its parent project!");
     Q_ASSERT_X(m_id == inputs->general(GENERAL_ATTR_EXPID).toInt(),
         "Experiment", "mismatched experiment id!");
-    Q_ASSERT_X(m_graphPlugin && m_modelPlugin,
+    Q_ASSERT_X(m_inputs->graphPlugin() && m_inputs->modelPlugin(),
         "Experiment", "tried to setup an experiment with invalid plugins!");
 
     m_graphType = _enumFromString<GraphType>(m_inputs->general(GENERAL_ATTR_GRAPHTYPE).toQString());
@@ -348,7 +343,7 @@ Nodes Experiment::createNodes() const
     const QString& cmd = m_inputs->general(GENERAL_ATTR_NODES).toQString();
 
     QString error;
-    Nodes nodes = NodesPrivate::fromCmd(cmd, m_modelPlugin->nodeAttrsScope(), m_graphType, error);
+    Nodes nodes = NodesPrivate::fromCmd(cmd, m_inputs->modelPlugin()->nodeAttrsScope(), m_graphType, error);
     if (nodes.empty() || !error.isEmpty()) {
         error = QString("unable to create the trials."
                         "The set of nodes could not be created.\n %1 \n"

@@ -32,6 +32,11 @@
 
 namespace evoplex {
 
+QString Plugin::keyStr(const PluginKey& key)
+{
+    return QString("%1-%2").arg(key.first).arg(key.second);
+}
+
 bool Plugin::checkMetaData(const QJsonObject& metaData, QString& error)
 {
     if (metaData.isEmpty()) {
@@ -41,7 +46,7 @@ bool Plugin::checkMetaData(const QJsonObject& metaData, QString& error)
 
     const QStringList reqFields = {
         PLUGIN_ATTR_TYPE, PLUGIN_ATTR_UID, PLUGIN_ATTR_NAME,
-        PLUGIN_ATTR_AUTHOR, PLUGIN_ATTR_DESCRIPTION
+        PLUGIN_ATTR_AUTHOR, PLUGIN_ATTR_DESCRIPTION, PLUGIN_ATTR_VERSION
     };
 
     for (const QString& f : reqFields) {
@@ -122,10 +127,21 @@ Plugin::Plugin(PluginType type, const QJsonObject* metaData, const QString& libP
     m_author = metaData->value(PLUGIN_ATTR_AUTHOR).toString();
     m_name = metaData->value(PLUGIN_ATTR_NAME).toString();
     m_descr = metaData->value(PLUGIN_ATTR_DESCRIPTION).toString();
+    if (m_id.isEmpty() || m_author.isEmpty() || m_name.isEmpty() || m_descr.isEmpty()) {
+        qWarning() << "missing required fields!";
+        m_type = PluginType::Invalid;
+        return;
+    }
 
-    Q_ASSERT_X(!m_id.isEmpty() && !m_author.isEmpty() &&
-               !m_name.isEmpty() && !m_descr.isEmpty(),
-               "Plugin", "missing required fields! It should never happen!");
+    int version = metaData->value(PLUGIN_ATTR_VERSION).toInt(-1);
+    if (version < 0 || version >= UINT16_MAX) {
+        qWarning() << QString("plugin's version must be an int >=0 and <%1").arg(UINT16_MAX);
+        m_type = PluginType::Invalid;
+        return;
+    }
+    m_version = static_cast<quint16>(version);
+
+    m_key = {m_id, m_version};
 
     if (!readAttrsScope(metaData, PLUGIN_ATTR_ATTRSSCOPE,
                         m_pluginAttrsScope, m_pluginAttrsNames)) {

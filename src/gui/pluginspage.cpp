@@ -51,8 +51,7 @@ PluginsPage::PluginsPage(MainGUI* mainGUI)
     connect(m_ui->bImport, SIGNAL(pressed()), SLOT(importPlugin()));
     connect(m_ui->table, SIGNAL(itemSelectionChanged()), SLOT(rowSelectionChanged()));
 
-    for (GraphPlugin* g : m_mainApp->graphs()) { insertRow(g); }
-    for (ModelPlugin* m : m_mainApp->models()) { insertRow(m); }
+    for (Plugin* p : m_mainApp->plugins()) { insertRow(p); }
     connect(m_mainApp, SIGNAL(pluginAdded(const Plugin*)),
             SLOT(insertRow(const Plugin*)));
 
@@ -76,10 +75,13 @@ void PluginsPage::rowSelectionChanged()
         return;
     }
 
-    const Plugin* plugin = m_mainApp->graph(m_ui->table->item(row, UID)->text());
+    PluginKey k(m_ui->table->item(row, UID)->text(),
+                m_ui->table->item(row, VERSION)->text().toInt());
+    const Plugin* plugin = m_mainApp->graph(k);
     if (!plugin) {
-        plugin = m_mainApp->model(m_ui->table->item(row, UID)->text());
+        plugin = m_mainApp->model(k);
     }
+
     loadHtml(plugin);
 }
 
@@ -93,6 +95,7 @@ void PluginsPage::loadHtml(const Plugin* plugin)
     QString html = "<h2>" + plugin->name() + "</h2><br>"
                  + "<b>Author:</b> " + plugin->author() + "<br>"
                  + "<b>Plugin type:</b> " + _enumToString<PluginType>(plugin->type()) + "<br>"
+                 + "<b>Version:</b> " + QString::number(plugin->version()) + "<br>"
                  + "<b>Description:</b> " + plugin->description() + "<br>";
 
     m_ui->browser->setHtml(html);
@@ -137,12 +140,16 @@ void PluginsPage::insertRow(const Plugin* plugin)
     int row = m_ui->table->rowCount();
     m_ui->table->insertRow(row);
     m_ui->table->setItem(row, UID, new QTableWidgetItem(plugin->id()));
+    m_ui->table->setItem(row, VERSION, new QTableWidgetItem(QString::number(plugin->version())));
     m_ui->table->setItem(row, NAME, new QTableWidgetItem(plugin->name()));
     m_ui->table->setItem(row, TYPE, typeItem);
     m_ui->table->setCellWidget(row, UNLOAD, bUnload);
     m_ui->table->setSortingEnabled(true);
 
+    m_ui->table->item(row, VERSION)->setTextAlignment(Qt::AlignHCenter);
+
     m_ui->table->horizontalHeader()->setSectionResizeMode(UID, QHeaderView::ResizeToContents);
+    m_ui->table->horizontalHeader()->setSectionResizeMode(VERSION, QHeaderView::ResizeToContents);
     m_ui->table->horizontalHeader()->setSectionResizeMode(TYPE, QHeaderView::ResizeToContents);
     m_ui->table->horizontalHeader()->setSectionResizeMode(NAME, QHeaderView::ResizeToContents);
     m_ui->table->horizontalHeader()->setSectionResizeMode(UNLOAD, QHeaderView::ResizeToContents);
