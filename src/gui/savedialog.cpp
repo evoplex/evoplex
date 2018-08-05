@@ -43,7 +43,7 @@ SaveDialog::SaveDialog(QWidget *parent)
             QMessageBox::StandardButton r = QMessageBox::question(this,
                     "Overwrite?", "A project named \"" + f + "\" already exists"
                     " at this location. Do you want to overwrite it?");
-            if (r == QMessageBox::NoButton) {
+            if (r == QMessageBox::No) {
                 return;
             }
         }
