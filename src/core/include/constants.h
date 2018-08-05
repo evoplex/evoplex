@@ -55,7 +55,7 @@
 #define PLUGIN_ATTR_TYPE "type"                    // plugin's type (graph or model)
 #define PLUGIN_ATTR_UID "uid"                      // plugin's unique id
 #define PLUGIN_ATTR_AUTHOR "author"                // authors' name
-#define PLUGIN_ATTR_NAME "name"                    // plugin's name
+#define PLUGIN_ATTR_TITLE "title"                  // plugin's title
 #define PLUGIN_ATTR_DESCRIPTION "description"      // plugin's description
 #define PLUGIN_ATTR_VERSION "version"              // plugin's version [0,UINT16_MAX]
 #define PLUGIN_ATTR_ATTRSSCOPE "pluginAttributesScope" // domain of the plugin's attributes

@@ -2,7 +2,7 @@
   "type": "graph",
   "uid": "customGraph",
   "version": 1,
-  "name": "Custom Graph",
+  "title": "Custom Graph",
   "author": "Marcos Cardinot",
   "description": "Custom graph.",
   "validGraphTypes": [],

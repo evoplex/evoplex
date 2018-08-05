@@ -45,7 +45,7 @@ bool Plugin::checkMetaData(const QJsonObject& metaData, QString& error)
     }
 
     const QStringList reqFields = {
-        PLUGIN_ATTR_TYPE, PLUGIN_ATTR_UID, PLUGIN_ATTR_NAME,
+        PLUGIN_ATTR_TYPE, PLUGIN_ATTR_UID, PLUGIN_ATTR_TITLE,
         PLUGIN_ATTR_AUTHOR, PLUGIN_ATTR_DESCRIPTION, PLUGIN_ATTR_VERSION
     };
 
@@ -125,7 +125,7 @@ Plugin::Plugin(PluginType type, const QJsonObject* metaData, const QString& libP
 {
     m_id = metaData->value(PLUGIN_ATTR_UID).toString();
     m_author = metaData->value(PLUGIN_ATTR_AUTHOR).toString();
-    m_name = metaData->value(PLUGIN_ATTR_NAME).toString();
+    m_name = metaData->value(PLUGIN_ATTR_TITLE).toString();
     m_descr = metaData->value(PLUGIN_ATTR_DESCRIPTION).toString();
     if (m_id.isEmpty() || m_author.isEmpty() || m_name.isEmpty() || m_descr.isEmpty()) {
         qWarning() << "missing required fields!";
