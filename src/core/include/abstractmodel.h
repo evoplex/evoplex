@@ -76,11 +76,12 @@ public:
     inline const Edge& edge(int edgeId) const;
     inline const Edge& edge(int originId, int neighbourId) const;
 
-    inline bool init() override;
+    // AbstractModelInterface stuff
+    // the default implementation of the methods below do nothing
     inline void beforeLoop() override {}
-    inline bool algorithmStep() override;
     inline void afterLoop() override {}
-    Values customOutputs(const Values& inputs) const override;
+    inline Values customOutputs(const Values& inputs) const override
+    { Q_UNUSED(inputs); return Values(); }
 
 protected:
     AbstractModel() = default;
@@ -105,12 +106,6 @@ inline const Edge& AbstractModel::edge(int edgeId) const
 
 inline const Edge &AbstractModel::edge(int originId, int neighbourId) const
 { return node(originId).outEdges().at(neighbourId); }
-
-inline bool AbstractModel::init()
-{ return false; }
-
-inline bool AbstractModel::algorithmStep()
-{ return false; }
 
 } // evoplex
 #endif // ABSTRACT_MODEL_H

@@ -24,24 +24,12 @@
 namespace evoplex {
 
 AbstractGraph* AbstractModel::graph() const
-{
-    return m_trial->graph();
-}
+{ return m_trial->graph(); }
 
 int AbstractModel::step() const
-{
-    return m_trial->step();
-}
+{ return m_trial->step(); }
 
 int AbstractModel::lastStep() const
-{
-    return m_trial->stopAt();
-}
-
-Values AbstractModel::customOutputs(const Values& inputs) const
-{
-    Q_UNUSED(inputs);
-    return Values();
-}
+{ return m_trial->stopAt(); }
 
 } // evoplex

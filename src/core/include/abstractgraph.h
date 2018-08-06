@@ -48,9 +48,6 @@ class AbstractGraph : public AbstractPlugin, public AbstractGraphInterface
     friend class Trial;
 
 public:
-    inline bool init() override;
-    inline bool reset() override;
-
     GraphType type() const;
     inline bool isDirected() const;
     inline bool isUndirected() const;
@@ -99,12 +96,6 @@ private:
 /************************************************************************
    AbstractGraph: Inline member functions
  ************************************************************************/
-
-inline bool AbstractGraph::init()
-{ return false; }
-
-inline bool AbstractGraph::reset()
-{ return false; }
 
 inline bool AbstractGraph::isDirected() const
 { return type() == GraphType::Directed; }
