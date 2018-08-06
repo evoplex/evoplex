@@ -31,11 +31,12 @@
 
 #include "nodesgeneratordlg.h"
 #include "ui_nodesgeneratordlg.h"
+#include "maingui.h"
 
 namespace evoplex {
 
 NodesGeneratorDlg::NodesGeneratorDlg(QWidget* parent, const AttributesScope& nodeAttrsScope, const QString& cmd)
-    : QDialog(parent, Qt::WindowSystemMenuHint | Qt::WindowTitleHint), // removes ?
+    : QDialog(parent, MainGUI::kDefaultDlgFlags),
       m_ui(new Ui_NodesGeneratorDlg),
       m_nodeAttrsScope(nodeAttrsScope)
 {

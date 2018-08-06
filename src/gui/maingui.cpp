@@ -49,6 +49,10 @@
 
 namespace evoplex {
 
+// By default, a QDialog should have only the close button
+// It also ensures that the '?' button is not shown on Windows
+const QFlags<Qt::WindowType> MainGUI::kDefaultDlgFlags = Qt::CustomizeWindowHint | Qt::WindowCloseButtonHint | Qt::WindowSystemMenuHint | Qt::WindowTitleHint;
+
 MainGUI::MainGUI(MainApp* mainApp)
     : QMainWindow(nullptr)
     , m_mainApp(mainApp)
@@ -300,7 +304,7 @@ void MainGUI::slotSaveAll()
 
 void MainGUI::slotShowLog()
 {
-    QDialog* d = new QDialog(this, Qt::WindowSystemMenuHint | Qt::WindowTitleHint); // removes ?
+    QDialog* d = new QDialog(this, MainGUI::kDefaultDlgFlags);
     QVBoxLayout* l = new QVBoxLayout(d);
     l->addWidget(new QLabel("Use the following to provide more detailed information about your system to bug reports:"));
 

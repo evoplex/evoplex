@@ -26,11 +26,12 @@
 
 #include "savedialog.h"
 #include "ui_savedialog.h"
+#include "maingui.h"
 
 namespace evoplex {
 
 SaveDialog::SaveDialog(QWidget *parent)
-    : QDialog(parent, Qt::WindowSystemMenuHint | Qt::WindowTitleHint), // removes ?
+    : QDialog(parent, MainGUI::kDefaultDlgFlags), // removes ?
       m_ui(new Ui::SaveDialog)
 {
     m_ui->setupUi(this);

@@ -23,12 +23,13 @@
 
 #include "outputwidget.h"
 #include "ui_outputwidget.h"
+#include "maingui.h"
 
 namespace evoplex {
 
 OutputWidget::OutputWidget(const ModelPlugin* modelPlugin, const std::vector<int>& trialIds,
                            QWidget *parent, const std::vector<Cache*>& init)
-    : QDialog(parent, Qt::WindowSystemMenuHint | Qt::WindowTitleHint), // removes ?
+    : QDialog(parent, MainGUI::kDefaultDlgFlags),
       m_ui(new Ui_OutputWidget),
       m_modelPlugin(modelPlugin),
       m_trialIds(trialIds),

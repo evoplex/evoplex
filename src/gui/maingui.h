@@ -43,6 +43,8 @@ class MainGUI: public QMainWindow
     Q_OBJECT
 
 public:
+    static const QFlags<Qt::WindowType> kDefaultDlgFlags;
+
     explicit MainGUI(MainApp* mainApp);
     ~MainGUI();
 
