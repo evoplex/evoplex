@@ -45,6 +45,7 @@ public:
     void addWidgetToList(PPageDockWidget* dw);
     void removeWidgetFromList(PPageDockWidget* dw);
     void setActiveWidget(PPageDockWidget* dw);
+    PPageDockWidget* activeWidget() const;
 
     void setExperiment(ExperimentPtr exp);
 

@@ -198,7 +198,10 @@ ExperimentDesigner::~ExperimentDesigner()
 
 void ExperimentDesigner::addWidgetToList(PPageDockWidget* dw)
 {
-    m_ui->cbWidgets->addItem(dw->objectName(), QVariant::fromValue(dw));
+    int id = m_ui->cbWidgets->findData(QVariant::fromValue(dw));
+    if (id == -1) {
+        m_ui->cbWidgets->addItem(dw->objectName(), QVariant::fromValue(dw));
+    }
 }
 
 void ExperimentDesigner::removeWidgetFromList(PPageDockWidget *dw)
@@ -209,6 +212,11 @@ void ExperimentDesigner::removeWidgetFromList(PPageDockWidget *dw)
     }
 }
 
+PPageDockWidget* ExperimentDesigner::activeWidget() const
+{
+    return m_ui->cbWidgets->currentData().value<PPageDockWidget*>();
+}
+
 void ExperimentDesigner::setActiveWidget(PPageDockWidget* dw)
 {
     int id = m_ui->cbWidgets->findData(QVariant::fromValue(dw));
@@ -216,10 +224,6 @@ void ExperimentDesigner::setActiveWidget(PPageDockWidget* dw)
         qFatal("project is null or qdockwidget is not in the list!");
     }
     m_ui->cbWidgets->setCurrentIndex(id);
-    m_project = dw->project();
-    ExperimentWidget* ew = qobject_cast<ExperimentWidget*>(dw);
-    m_ui->bSubmit->setVisible(!ew);
-    setExperiment(ew ? ew->exp() : nullptr);
 }
 
 void ExperimentDesigner::slotSetActiveWidget(int idx)
@@ -229,6 +233,10 @@ void ExperimentDesigner::slotSetActiveWidget(int idx)
         PPageDockWidget* dw = v.value<PPageDockWidget*>();
         dw->show();
         dw->raise();
+        m_project = dw->project();
+        ExperimentWidget* ew = qobject_cast<ExperimentWidget*>(dw);
+        m_ui->bSubmit->setVisible(!ew);
+        setExperiment(ew ? ew->exp() : nullptr);
     } else {
         m_project = nullptr;
     }
@@ -257,12 +265,17 @@ void ExperimentDesigner::setExperiment(ExperimentPtr exp)
     header.shrink_to_fit();
     values.shrink_to_fit();
 
+    QString invalidFields;
     for (size_t i = 0; i < header.size(); ++i) {
         // we don't have a field for the expId, modelVersion and grapVersion
-        if (!values.at(i).isValid() ||
-                header.at(i) == GENERAL_ATTR_EXPID ||
+        if (header.at(i) == GENERAL_ATTR_EXPID ||
                 header.at(i) == GENERAL_ATTR_GRAPHVS ||
                 header.at(i) == GENERAL_ATTR_MODELVS) {
+            continue;
+        }
+
+        if (!values.at(i).isValid()) {
+            invalidFields += "  - " + header.at(i) + "\n";
             continue;
         }
 
@@ -283,6 +296,7 @@ void ExperimentDesigner::setExperiment(ExperimentPtr exp)
             // then idx might be equal to -1 (item not found).
             // passing -1 will show an empty combobox, which is fine here
             cb->setCurrentIndex(idx);
+            if (idx < 0) invalidFields += "  - " + header.at(i) + "\n";
             continue;
         }
 
@@ -307,6 +321,14 @@ void ExperimentDesigner::setExperiment(ExperimentPtr exp)
             continue;
         }
         qFatal("unable to know the widget type.");
+    }
+
+    if (!invalidFields.isEmpty()) {
+        parentWidget()->blockSignals(true);
+        QMessageBox::information(this, "Experiment",
+            "Could not find a valid value for the attributes below:\n" + invalidFields +
+            "\nPlease, use the Experiment Designer to fix them, click on Edit and try again!");
+        parentWidget()->blockSignals(false);
     }
 }
 

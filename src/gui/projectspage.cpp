@@ -65,20 +65,25 @@ ProjectsPage::~ProjectsPage()
 void ProjectsPage::slotFocusChanged(QDockWidget* dw)
 {
     PPageDockWidget* pdw = qobject_cast<PPageDockWidget*>(dw);
-    if (pdw) {
-        pdw->clearSelection();
-        m_activeProject = pdw->project();
-        m_expDesigner->setActiveWidget(pdw);
-        emit (activeProjectChanged(m_activeProject->id()));
-    } else {
+    if (!pdw) {
         m_activeProject = nullptr;
         emit (activeProjectChanged(-1));
+        return;
     }
+
+    if (pdw == m_expDesigner->activeWidget() &&
+            pdw->project() == m_activeProject) {
+        return; // nothing changed
+    }
+    pdw->clearSelection();
+    m_activeProject = pdw->project();
+    m_expDesigner->setActiveWidget(pdw);
+    emit (activeProjectChanged(m_activeProject->id()));
 }
 
-void ProjectsPage::slotFocusChanged(QWidget*, QWidget* now)
+void ProjectsPage::slotFocusChanged(QWidget* old, QWidget* now)
 {
-    if (!isVisible()) {
+    if (!isVisible() || !old) {
         return;
     }
 

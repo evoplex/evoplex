@@ -55,7 +55,7 @@ public slots:
     void slotOpenExperiment(ExperimentPtr exp);
 
 private slots:
-    void slotFocusChanged(QWidget*, QWidget* now);
+    void slotFocusChanged(QWidget* old, QWidget* now);
     void slotFocusChanged(QDockWidget* dw);
 
 private:
