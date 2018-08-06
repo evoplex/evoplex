@@ -120,7 +120,7 @@ QPushButton::hover {
        </column>
        <column>
         <property name="text">
-         <string>name</string>
+         <string>title</string>
         </property>
        </column>
        <column>

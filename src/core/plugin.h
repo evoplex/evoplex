@@ -54,7 +54,7 @@ public:
     inline PluginType type() const { return m_type; }
     inline const QString& id() const { return m_id; }
     inline const QString& author() const { return m_author; }
-    inline const QString& name() const { return m_name; }
+    inline const QString& title() const { return m_title; }
     inline const QString& description() const { return m_descr; }
     inline quint16 version() const { return m_version; }
 
@@ -67,7 +67,7 @@ protected:
 
     explicit Plugin(PluginType type, const QJsonObject* metaData, const QString& libPath);
 
-    bool readAttrsScope(const QJsonObject* metaData, const QString& name,
+    bool readAttrsScope(const QJsonObject* metaData, const QString& attrName,
             AttributesScope& attrsScope, std::vector<QString>& keys) const;
 
 private:
@@ -76,7 +76,7 @@ private:
     PluginKey m_key;
     QString m_id;
     QString m_author;
-    QString m_name;
+    QString m_title;
     QString m_descr;
     quint16 m_version;
     AttributesScope m_pluginAttrsScope;

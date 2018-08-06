@@ -92,7 +92,7 @@ void PluginsPage::loadHtml(const Plugin* plugin)
         return;
     }
 
-    QString html = "<h2>" + plugin->name() + "</h2><br>"
+    QString html = "<h2>" + plugin->title() + "</h2><br>"
                  + "<b>Author:</b> " + plugin->author() + "<br>"
                  + "<b>Plugin type:</b> " + _enumToString<PluginType>(plugin->type()) + "<br>"
                  + "<b>Version:</b> " + QString::number(plugin->version()) + "<br>"
@@ -141,22 +141,22 @@ void PluginsPage::insertRow(const Plugin* plugin)
     m_ui->table->insertRow(row);
     m_ui->table->setItem(row, UID, new QTableWidgetItem(plugin->id()));
     m_ui->table->setItem(row, VERSION, new QTableWidgetItem(QString::number(plugin->version())));
-    m_ui->table->setItem(row, NAME, new QTableWidgetItem(plugin->name()));
+    m_ui->table->setItem(row, TITLE, new QTableWidgetItem(plugin->title()));
     m_ui->table->setItem(row, TYPE, typeItem);
     m_ui->table->setCellWidget(row, UNLOAD, bUnload);
     m_ui->table->setSortingEnabled(true);
 
-    m_ui->table->item(row, VERSION)->setTextAlignment(Qt::AlignHCenter);
+    m_ui->table->item(row, VERSION)->setTextAlignment(Qt::AlignCenter);
 
     m_ui->table->horizontalHeader()->setSectionResizeMode(UID, QHeaderView::ResizeToContents);
     m_ui->table->horizontalHeader()->setSectionResizeMode(VERSION, QHeaderView::ResizeToContents);
     m_ui->table->horizontalHeader()->setSectionResizeMode(TYPE, QHeaderView::ResizeToContents);
-    m_ui->table->horizontalHeader()->setSectionResizeMode(NAME, QHeaderView::ResizeToContents);
+    m_ui->table->horizontalHeader()->setSectionResizeMode(TITLE, QHeaderView::ResizeToContents);
     m_ui->table->horizontalHeader()->setSectionResizeMode(UNLOAD, QHeaderView::ResizeToContents);
 
     connect(bUnload, &QPushButton::pressed, [this, typeItem, plugin]() {
         int res = QMessageBox::question(this, "Unloading Plugin",
-                        QString("Are you sure you want to unload the plugin '%1'?").arg(plugin->name()));
+            "Are you sure you want to unload the plugin '"+plugin->id()+"'?");
         if (res == QMessageBox::No) {
             return;
         }

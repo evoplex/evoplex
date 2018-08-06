@@ -184,7 +184,7 @@ bool MainApp::unloadPlugin(const Plugin* plugin, QString& error)
     if (!m_projects.empty()) {
         error = QString("Couldn't unload the plugin `%1`.\n"
                 "Please, close all projects and try again!")
-                .arg(plugin->name());
+                .arg(plugin->title());
         qWarning() << error;
         return false;
     }

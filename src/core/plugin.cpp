@@ -125,9 +125,9 @@ Plugin::Plugin(PluginType type, const QJsonObject* metaData, const QString& libP
 {
     m_id = metaData->value(PLUGIN_ATTR_UID).toString();
     m_author = metaData->value(PLUGIN_ATTR_AUTHOR).toString();
-    m_name = metaData->value(PLUGIN_ATTR_TITLE).toString();
+    m_title = metaData->value(PLUGIN_ATTR_TITLE).toString();
     m_descr = metaData->value(PLUGIN_ATTR_DESCRIPTION).toString();
-    if (m_id.isEmpty() || m_author.isEmpty() || m_name.isEmpty() || m_descr.isEmpty()) {
+    if (m_id.isEmpty() || m_author.isEmpty() || m_title.isEmpty() || m_descr.isEmpty()) {
         qWarning() << "missing required fields!";
         m_type = PluginType::Invalid;
         return;
@@ -155,7 +155,7 @@ Plugin::Plugin(PluginType type, const QJsonObject* metaData, const QString& libP
     Q_ASSERT(loader.isLoaded() && instance);
     m_factory = qobject_cast<PluginInterface*>(instance);
     if (!m_factory) {
-        qWarning() << QString("factory could not be created for '%1'").arg(m_name);
+        qWarning() << QString("factory could not be created for '%1'").arg(m_title);
         m_type = PluginType::Invalid;
         return;
     }
@@ -168,11 +168,11 @@ Plugin::~Plugin()
     Utils::deleteAndShrink(m_pluginAttrsScope);
 }
 
-bool Plugin::readAttrsScope(const QJsonObject* metaData, const QString& name,
+bool Plugin::readAttrsScope(const QJsonObject* metaData, const QString& attrName,
         AttributesScope& attrsScope, std::vector<QString>& keys) const
 {
-    if (metaData->contains(name)) {
-        QJsonArray json = metaData->value(name).toArray();
+    if (metaData->contains(attrName)) {
+        QJsonArray json = metaData->value(attrName).toArray();
         for (int id = 0; id < json.size(); ++id) {
             QVariantMap attrs = json.at(id).toObject().toVariantMap();
             AttributeRange* attrRange = AttributeRange::parse(id, attrs.firstKey(), attrs.first().toString());

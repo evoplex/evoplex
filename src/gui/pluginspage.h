@@ -47,7 +47,7 @@ private:
         TYPE = 0,
         UID = 1,
         VERSION = 2,
-        NAME = 3,
+        TITLE = 3,
         UNLOAD = 4
     };
 
