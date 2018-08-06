@@ -27,6 +27,7 @@ set(EVOPLEX_GUI_H
   experimentwidget.h
   fontstyles.h
   #linechart.h
+  linebutton.h
   outputwidget.h
   graphview.h
   gridview.h
@@ -53,6 +54,7 @@ set(EVOPLEX_GUI_CXX
   experimentwidget.cpp
   fontstyles.cpp
   #linechart.cpp
+  linebutton.cpp
   outputwidget.cpp
   graphview.cpp
   gridview.cpp

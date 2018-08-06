@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Plugins can now be versioned
 - Increases unit-tests coverage of core components
 - Adds new attribute range: "non-empty-string"
+- ExpDesigner is now able to recognize "filepath" and "dirpath" attributes
 
 ### Changed
 - Improves plugins initialization

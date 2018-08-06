@@ -51,7 +51,6 @@ public:
 
 private slots:
     void slotNodesWidget();
-    void slotOutputDir();
     void slotOutputWidget();
     void slotCreateExperiment();
     void slotRemoveExperiment();

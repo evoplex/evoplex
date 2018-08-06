@@ -29,6 +29,7 @@
 #include <QRadioButton>
 
 #include "experimentdesigner.h"
+#include "linebutton.h"
 #include "nodesgeneratordlg.h"
 #include "experimentwidget.h"
 #include "projectwidget.h"
@@ -125,31 +126,12 @@ ExperimentDesigner::ExperimentDesigner(MainApp* mainApp, QWidget *parent)
     itemEnabled->setText(0, "enable");
     m_ui->treeWidget->setItemWidget(itemEnabled, 1, m_enableOutputs);
     // -- add custom widget: output directory
-    QLineEdit* outDir = new QLineEdit();
-    QPushButton* outBrowseDir = new QPushButton("...");
-    outBrowseDir->setMaximumWidth(20);
-    connect(outBrowseDir, SIGNAL(clicked(bool)), SLOT(slotOutputDir()));
-    QHBoxLayout* outLayout = new QHBoxLayout(new QWidget(m_ui->treeWidget));
-    outLayout->setMargin(0);
-    outLayout->insertWidget(0, outDir);
-    outLayout->insertWidget(1, outBrowseDir);
-    m_widgetFields.insert(OUTPUT_DIR, QVariant::fromValue(outDir));
-    QTreeWidgetItem* itemDir = new QTreeWidgetItem(m_treeItemOutputs);
-    itemDir->setText(0, OUTPUT_DIR);
-    m_ui->treeWidget->setItemWidget(itemDir, 1, outLayout->parentWidget());
+    LineButton* outDir = new LineButton(this, LineButton::SelectDir);
+    addTreeWidget(m_treeItemOutputs, OUTPUT_DIR, QVariant::fromValue(outDir));
     // -- add custom widget: output directory
-    QLineEdit* outHeader = new QLineEdit();
-    QPushButton* outBuildHeader = new QPushButton("...");
-    outBuildHeader->setMaximumWidth(20);
-    connect(outBuildHeader, SIGNAL(clicked(bool)), SLOT(slotOutputWidget()));
-    QHBoxLayout* headerLayout = new QHBoxLayout(new QWidget(m_ui->treeWidget));
-    headerLayout->setMargin(0);
-    headerLayout->insertWidget(0, outHeader);
-    headerLayout->insertWidget(1, outBuildHeader);
-    m_widgetFields.insert(OUTPUT_HEADER, QVariant::fromValue(outHeader));
-    QTreeWidgetItem* itemHeader = new QTreeWidgetItem(m_treeItemOutputs);
-    itemHeader->setText(0, OUTPUT_HEADER);
-    m_ui->treeWidget->setItemWidget(itemHeader, 1, headerLayout->parentWidget());
+    LineButton* outHeader = new LineButton(this, LineButton::None);
+    connect(outHeader->button(), SIGNAL(clicked(bool)), SLOT(slotOutputWidget()));
+    addTreeWidget(m_treeItemOutputs, OUTPUT_HEADER, QVariant::fromValue(outHeader));
 
 /* TODO: make the buttons to avgTrials and saveSteps work*/
 /*    // -- avgTrials
@@ -174,11 +156,9 @@ ExperimentDesigner::ExperimentDesigner(MainApp* mainApp, QWidget *parent)
     m_ui->treeWidget->setItemWidget(itemOut, 1, outStepsLayout->parentWidget());
 */
     connect(m_enableOutputs, &QCheckBox::toggled,
-            [outDir, outBrowseDir, outHeader, outBuildHeader](bool b) {
+            [outDir, outHeader](bool b) {
                 outDir->setEnabled(b);
-                outBrowseDir->setEnabled(b);
                 outHeader->setEnabled(b);
-                outBuildHeader->setEnabled(b);
 //                outAvgTrials->setEnabled(b);
     });
     m_enableOutputs->setChecked(true);
@@ -320,6 +300,11 @@ void ExperimentDesigner::setExperiment(ExperimentPtr exp)
             le->setText(values.at(i).toQString());
             continue;
         }
+        LineButton* lb = qobject_cast<LineButton*>(widget);
+        if (lb) {
+            lb->setText(values.at(i).toQString());
+            continue;
+        }
         qFatal("unable to know the widget type.");
     }
 
@@ -349,15 +334,6 @@ void ExperimentDesigner::slotNodesWidget()
     adlg->deleteLater();
 }
 
-void ExperimentDesigner::slotOutputDir()
-{
-    QLineEdit* lineedit = m_widgetFields.value(OUTPUT_DIR).value<QLineEdit*>();
-    QString path = QFileDialog::getExistingDirectory(this, "Output Directory", lineedit->text());
-    if (!path.isEmpty()) {
-        lineedit->setText(path);
-    }
-}
-
 void ExperimentDesigner::slotOutputWidget()
 {
     if (m_selectedModelKey.first == STRING_NULL_PLUGINID) {
@@ -374,7 +350,7 @@ void ExperimentDesigner::slotOutputWidget()
 
     std::vector<Cache*> currFileCaches;
     const ModelPlugin* model = m_mainApp->model(m_selectedModelKey);
-    QString currentHeader = m_widgetFields.value(OUTPUT_HEADER).value<QLineEdit*>()->text();
+    QString currentHeader = m_widgetFields.value(OUTPUT_HEADER).value<LineButton*>()->text();
     if (!currentHeader.isEmpty()) {
         QString errorMsg;
         currFileCaches = Output::parseHeader(currentHeader.split(";", QString::SkipEmptyParts), trialIds, model, errorMsg);
@@ -395,7 +371,7 @@ void ExperimentDesigner::slotOutputWidget()
         }
         outputStr.chop(1);
 
-        m_widgetFields.value(OUTPUT_HEADER).value<QLineEdit*>()->setText(outputStr);
+        m_widgetFields.value(OUTPUT_HEADER).value<LineButton*>()->setText(outputStr);
     }
     ow->deleteLater();
     for (Cache* c : currFileCaches) c->deleteCache();
@@ -410,8 +386,8 @@ ExpInputs* ExperimentDesigner::readInputs(const int expId, QString& error) const
         error = "Please, select a valid 'graphId'.";
         return nullptr;
     } else if (m_enableOutputs->isChecked()
-               && (m_widgetFields.value(OUTPUT_DIR).value<QLineEdit*>()->text().isEmpty()
-                   || m_widgetFields.value(OUTPUT_HEADER).value<QLineEdit*>()->text().isEmpty())) {
+               && (m_widgetFields.value(OUTPUT_DIR).value<LineButton*>()->text().isEmpty()
+                   || m_widgetFields.value(OUTPUT_HEADER).value<LineButton*>()->text().isEmpty())) {
         error = "Please, insert a valid output directory and a output header.";
         return nullptr;
     }
@@ -472,6 +448,11 @@ ExpInputs* ExperimentDesigner::readInputs(const int expId, QString& error) const
         QLineEdit* le = qobject_cast<QLineEdit*>(widget);
         if (le) {
             values << le->text();
+            continue;
+        }
+        LineButton* lb = qobject_cast<LineButton*>(widget);
+        if (lb) {
+            values << lb->text();
             continue;
         }
 
@@ -689,7 +670,7 @@ void ExperimentDesigner::addPluginAttrs(QTreeWidgetItem* tree, const Plugin* plu
         case AttributeRange::Int_Set:
         case AttributeRange::String_Set: {
             const SetOfValues* sov = dynamic_cast<const SetOfValues*>(attrRange);
-            QComboBox* cb = new QComboBox();
+            QComboBox* cb = new QComboBox(this);
             for (const Value& v : sov->values()) {
                 cb->addItem(v.toQString());
             }
@@ -697,7 +678,15 @@ void ExperimentDesigner::addPluginAttrs(QTreeWidgetItem* tree, const Plugin* plu
             break;
         }
         case AttributeRange::Bool: {
-            widget = new QCheckBox();
+            widget = new QCheckBox(this);
+            break;
+        }
+        case AttributeRange::FilePath: {
+            widget = new LineButton(this, LineButton::SelectTextFile);
+            break;
+        }
+        case AttributeRange::DirPath: {
+            widget = new LineButton(this, LineButton::SelectDir);
             break;
         }
         default:
@@ -716,7 +705,7 @@ void ExperimentDesigner::addPluginAttrs(QTreeWidgetItem* tree, const Plugin* plu
 
 QSpinBox* ExperimentDesigner::newSpinBox(const int min, const int max)
 {
-    QSpinBox* sp = new QSpinBox();
+    QSpinBox* sp = new QSpinBox(this);
     sp->setMaximum(max);
     sp->setMinimum(min);
     sp->setButtonSymbols(QSpinBox::NoButtons);
@@ -725,7 +714,7 @@ QSpinBox* ExperimentDesigner::newSpinBox(const int min, const int max)
 
 QDoubleSpinBox* ExperimentDesigner::newDoubleSpinBox(const double min, const double max)
 {
-    QDoubleSpinBox* sp = new QDoubleSpinBox();
+    QDoubleSpinBox* sp = new QDoubleSpinBox(this);
     sp->setMaximum(max);
     sp->setMinimum(min);
     sp->setDecimals(8);
