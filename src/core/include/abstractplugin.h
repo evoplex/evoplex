@@ -40,7 +40,7 @@ public:
     // Initializes the plugin.
     // This method is called when the plugin is created and
     // is mainly used to validate inputs and set the environment.
-    // Return false if anything goes wrong.
+    // Return true if successful
     virtual bool init() = 0;
 };
 

@@ -34,14 +34,14 @@ bool CustomGraph::init()
     return true;
 }
 
-void CustomGraph::reset()
+bool CustomGraph::reset()
 {
     removeAllEdges();
 
     QFile file(m_filePath);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         qWarning() << "unable to read csv file with the set of nodes." << m_filePath;
-        return;
+        return false;
     }
 
     QTextStream in(&file);
@@ -59,7 +59,7 @@ void CustomGraph::reset()
         qWarning() << "the header is invalid."
                    << "It should have at least two columns: 'origin' and 'target'."
                    << m_filePath;
-        return;
+        return false;
     }
 
     // create edges
@@ -78,27 +78,31 @@ void CustomGraph::reset()
         int originId = values.at(0).toInt(&ok1);
         int targetId = values.at(1).toInt(&ok2);
         if (!ok1 || !ok2) {
-            qWarning() << "invalid values."
-                       << "The values for 'origin' and 'target' must be integers."
+            qWarning() << "'origin' and 'target' must be integers."
                        << m_filePath << "Row: " << row;
             isValid = false;
             break;
-        } else if (originId < 0 || originId >= numNodes() ||
-                   targetId < 0 || targetId >= numNodes()) {
-            qWarning() << "invalid values. 'origin' or 'target' are not in the set of nodes."
+        }
+
+        try {
+            addEdge(originId, targetId, new Attributes());
+        } catch (std::out_of_range) {
+            qWarning() << "'origin' or 'target' are not in the set of nodes."
                           << m_filePath << "Row: " << row;
             isValid = false;
             break;
         }
 
-        addEdge(originId, targetId, new Attributes());
         ++row;
     }
     file.close();
 
     if (!isValid) {
         removeAllEdges();
+        return false;
     }
+
+    return true;
 }
 
 

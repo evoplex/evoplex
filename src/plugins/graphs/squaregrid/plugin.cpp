@@ -46,7 +46,7 @@ bool SquareGrid::init()
     return true;
 }
 
-void SquareGrid::reset()
+bool SquareGrid::reset()
 {
     removeAllEdges();
 
@@ -72,6 +72,8 @@ void SquareGrid::reset()
             createFixedEdges(node.id(), func);
         }
     }
+
+    return true;
 }
 
 void SquareGrid::createPeriodicEdges(const int id, const edgesFunc& func)

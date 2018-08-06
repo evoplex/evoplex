@@ -148,7 +148,7 @@ bool Experiment::reset(QString* error)
     QString erroMsg;
     if (!m_inputs || m_expStatus == Status::Invalid) {
         erroMsg = "Tried to reset an invalid experiment.\n"
-                  "Please, check its inputs and try again.";
+                  "Please, check its inputs, click on Edit and try again.";
     } else if (m_expStatus == Status::Running || m_expStatus == Status::Queued) {
         erroMsg = "Tried to reset a running experiment.\n"
                   "Please, pause it and try again.";

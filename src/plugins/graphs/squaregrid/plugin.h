@@ -31,7 +31,7 @@ class SquareGrid: public AbstractGraph
 {
 public:
     bool init() override;
-    void reset() override;
+    bool reset() override;
 
 private:
     bool m_periodic; // boundary conditions: false for fixed

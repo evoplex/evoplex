@@ -31,7 +31,7 @@ class CustomGraph: public AbstractGraph
 {
 public:
     bool init() override;
-    void reset() override;
+    bool reset() override;
 
 private:
     // graph parameters

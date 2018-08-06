@@ -118,6 +118,14 @@ bool Trial::init()
 
     m_step = 0; // important!
 
+    // set-up the edges for the first time
+    if (!m_graph->reset()) {
+        qWarning() << "unable to create the trials."
+                   << "The graph could not be initialized."
+                   << "Experiment:" << m_exp->id();
+        return false;
+    }
+
     return true;
 }
 
@@ -144,7 +152,6 @@ void Trial::run()
             return;
         }
         m_exp->m_mutex.unlock();
-        m_graph->reset();
     }
 
     m_status = Status::Running;

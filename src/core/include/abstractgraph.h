@@ -39,7 +39,8 @@ public:
 
     // Resets the graph object to the original state.
     // This method is triggered after a successful init()
-    virtual void reset() = 0;
+    // Return true if successful
+    virtual bool reset() = 0;
 };
 
 class AbstractGraph : public AbstractPlugin, public AbstractGraphInterface
@@ -48,7 +49,7 @@ class AbstractGraph : public AbstractPlugin, public AbstractGraphInterface
 
 public:
     inline bool init() override;
-    inline void reset() override;
+    inline bool reset() override;
 
     GraphType type() const;
     inline bool isDirected() const;
@@ -102,8 +103,8 @@ private:
 inline bool AbstractGraph::init()
 { return false; }
 
-inline void AbstractGraph::reset()
-{ /* nothing */ }
+inline bool AbstractGraph::reset()
+{ return false; }
 
 inline bool AbstractGraph::isDirected() const
 { return type() == GraphType::Directed; }
