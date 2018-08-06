@@ -47,8 +47,7 @@ private:
         TYPE = 0,
         UID = 1,
         VERSION = 2,
-        TITLE = 3,
-        UNLOAD = 4
+        UNLOAD = 3
     };
 
     Ui_PluginsPage* m_ui;

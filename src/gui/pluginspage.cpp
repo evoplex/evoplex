@@ -141,7 +141,6 @@ void PluginsPage::insertRow(const Plugin* plugin)
     m_ui->table->insertRow(row);
     m_ui->table->setItem(row, UID, new QTableWidgetItem(plugin->id()));
     m_ui->table->setItem(row, VERSION, new QTableWidgetItem(QString::number(plugin->version())));
-    m_ui->table->setItem(row, TITLE, new QTableWidgetItem(plugin->title()));
     m_ui->table->setItem(row, TYPE, typeItem);
     m_ui->table->setCellWidget(row, UNLOAD, bUnload);
     m_ui->table->setSortingEnabled(true);
@@ -151,7 +150,6 @@ void PluginsPage::insertRow(const Plugin* plugin)
     m_ui->table->horizontalHeader()->setSectionResizeMode(UID, QHeaderView::ResizeToContents);
     m_ui->table->horizontalHeader()->setSectionResizeMode(VERSION, QHeaderView::ResizeToContents);
     m_ui->table->horizontalHeader()->setSectionResizeMode(TYPE, QHeaderView::ResizeToContents);
-    m_ui->table->horizontalHeader()->setSectionResizeMode(TITLE, QHeaderView::ResizeToContents);
     m_ui->table->horizontalHeader()->setSectionResizeMode(UNLOAD, QHeaderView::ResizeToContents);
 
     connect(bUnload, &QPushButton::pressed, [this, typeItem, plugin]() {
