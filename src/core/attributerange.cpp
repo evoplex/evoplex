@@ -34,6 +34,8 @@ AttributeRange* AttributeRange::parse(int attrId, const QString& attrName, const
         vs = new SingleValue(attrId, attrName, Bool);
     } else if (attrRangeStr == "string") {
         vs = new SingleValue(attrId, attrName, String);
+    } else if (attrRangeStr == "non-empty-string") {
+        vs = new SingleValue(attrId, attrName, NonEmptyString);
     } else if (attrRangeStr == "dirpath") {
         vs = new SingleValue(attrId, attrName, DirPath);
     } else if (attrRangeStr == "filepath") {
@@ -146,6 +148,9 @@ Value AttributeRange::validate(const QString& valueStr) const
     }
 
     switch (m_type) {
+    case NonEmptyString: {
+        return Value(valueStr);
+    }
     case Bool: {
         const QString v = valueStr.toLower();
         if (v == "true" || v == "1") return Value(true);
@@ -248,6 +253,9 @@ SingleValue::SingleValue(int id, const QString& attrName, Type type)
         break;
     case String:
         m_attrRangeStr = "string";
+        break;
+    case NonEmptyString:
+        m_attrRangeStr = "non-empty-string";
         break;
     case DirPath:
         m_attrRangeStr = "dirpath";

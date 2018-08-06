@@ -54,6 +54,7 @@ public:
 
         Bool,
         String,
+        NonEmptyString,
         DirPath,
         FilePath
     };
@@ -62,7 +63,8 @@ public:
     //   - "bool"               // a boolean
     //   - "dirpath"            // a string containing a valid dirpath (use forward slashes)
     //   - "filepath"           // a string containing a valid filepath (use forward slashes)
-    //   - "string"             // a string
+    //   - "string"             // a string (empty string is also valid)
+    //   - "non-empty-string"   // a non-empty string
     //   - "string{aaa,bbb}"    // set of strings
     //   - "int[min,max]"       // integers from min to max (including min and max)
     //   - "int{1,2,3}"         // set of integers

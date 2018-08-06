@@ -62,9 +62,9 @@ MainApp::MainApp()
     };
 
     addAttrScope(id, GENERAL_ATTR_EXPID, QString("int[0,%1]").arg(INT32_MAX));
-    addAttrScope(id, GENERAL_ATTR_NODES, "string");
-    addAttrScope(id, GENERAL_ATTR_GRAPHID, "string");
-    addAttrScope(id, GENERAL_ATTR_MODELID, "string");
+    addAttrScope(id, GENERAL_ATTR_NODES, "non-empty-string");
+    addAttrScope(id, GENERAL_ATTR_GRAPHID, "non-empty-string");
+    addAttrScope(id, GENERAL_ATTR_MODELID, "non-empty-string");
     addAttrScope(id, GENERAL_ATTR_GRAPHVS, QString("int[0,%1]").arg(UINT16_MAX));
     addAttrScope(id, GENERAL_ATTR_MODELVS, QString("int[0,%1]").arg(UINT16_MAX));
     addAttrScope(id, GENERAL_ATTR_SEED, QString("int[0,%1]").arg(INT32_MAX));

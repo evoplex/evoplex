@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Model plugins: added beforeLoop() and afterLoop() methods
 - Plugins can now be versioned
 - Increases unit-tests coverage of core components
+- Adds new attribute range: "non-empty-string"
 
 ### Changed
 - Improves plugins initialization

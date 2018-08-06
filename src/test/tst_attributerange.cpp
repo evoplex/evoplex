@@ -39,13 +39,16 @@ private slots:
     void tst_int_range();
     void tst_double_range();
     void tst_int_set();
-    void tst_string();
     void tst_string_set();
     void tst_double_set();
     void tst_filepath();
     void tst_dirpath();
+    void tst_string() { _tst_string(true); }
+    void tst_nonEmptyString() { _tst_string(false); }
 
 private:
+    void _tst_string(bool acceptEmpty);
+
     void _tst_parserInputs(AttributeRange* attrRge, const QString& attrName,
             const QString& attrRangeStr, AttributeRange::Type type, const Validate& vals);
 
@@ -346,11 +349,11 @@ void TestAttributeRange::tst_double_set()
     QVERIFY(v.toDouble() <= max);
 }
 
-void TestAttributeRange::tst_string()
+void TestAttributeRange::_tst_string(bool acceptEmpty)
 {
     const QString attrName("test");
-    const QString attrRangeStr("string");
-    const AttributeRange::Type type = AttributeRange::String;
+    const QString attrRangeStr = acceptEmpty ? "string" : "non-empty-string";
+    const AttributeRange::Type type = acceptEmpty ? AttributeRange::String : AttributeRange::NonEmptyString;
     AttrRngPtr attrRgePtr(AttributeRange::parse(0, attrName, attrRangeStr));
     AttributeRange* attrRge = attrRgePtr.get();
 
@@ -368,13 +371,10 @@ void TestAttributeRange::tst_string()
         // Case 4: unusual characters
         "abc£ãã&!£$%^*(áéí)",
 
-        // Case 5: empty string
-        "",
-
-        // Case 6: number
+        // Case 5: number
         "123",
 
-        // Case 7: boolean
+        // Case 6: boolean
         "true",
     };
     Validate vals;
@@ -385,6 +385,13 @@ void TestAttributeRange::tst_string()
 
     // Tests if functions work as expected
     _tst_parserInputs(attrRge, attrName, attrRangeStr, type, vals);
+
+    // Tests the empty/non-empty case
+    if (acceptEmpty) {
+        QCOMPARE(attrRge->validate(""), Value(""));
+    } else {
+        QCOMPARE(attrRge->validate(""), Value());
+    }
 
     // Tests min(), max() and rand() functions -- all should return a empty string
     QCOMPARE(attrRge->rand(m_prg.get()).toString(), "");
