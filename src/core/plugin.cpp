@@ -93,7 +93,9 @@ Plugin* Plugin::load(const QString& path, QString& error)
     QObject* instance = loader.instance(); // it'll load the plugin
     if (!instance) {
         error = QString("Unable to load the plugin.\n"
-                "Please, make sure it is a valid Evoplex plugin.\n %1").arg(path);
+                "Please, make sure it is a valid Evoplex plugin and that it was"
+                " built in the same mode (Release or Debug) and architecture "
+                "(32/64 bits) of Evoplex.\n %1").arg(path);
         loader.unload();
         qWarning() << error;
         return nullptr;
