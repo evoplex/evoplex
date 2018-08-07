@@ -27,19 +27,20 @@
 namespace evoplex
 {
 
-AttributeRange* AttributeRange::parse(int attrId, const QString& attrName, const QString& attrRangeStr)
+AttributeRangePtr AttributeRange::parse(int attrId, const QString& attrName,
+                                        const QString& attrRangeStr)
 {
-    AttributeRange* vs = nullptr;
+    AttributeRangePtr vs;
     if (attrRangeStr == "bool") {
-        vs = new SingleValue(attrId, attrName, Bool);
+        vs = std::make_unique<SingleValue>(attrId, attrName, Bool);
     } else if (attrRangeStr == "string") {
-        vs = new SingleValue(attrId, attrName, String);
+        vs = std::make_unique<SingleValue>(attrId, attrName, String);
     } else if (attrRangeStr == "non-empty-string") {
-        vs = new SingleValue(attrId, attrName, NonEmptyString);
+        vs = std::make_unique<SingleValue>(attrId, attrName, NonEmptyString);
     } else if (attrRangeStr == "dirpath") {
-        vs = new SingleValue(attrId, attrName, DirPath);
+        vs = std::make_unique<SingleValue>(attrId, attrName, DirPath);
     } else if (attrRangeStr == "filepath") {
-        vs = new SingleValue(attrId, attrName, FilePath);
+        vs = std::make_unique<SingleValue>(attrId, attrName, FilePath);
     } else if (attrRangeStr.contains('{') && attrRangeStr.endsWith('}')) {
         vs = setOfValues(attrRangeStr, attrId, attrName);
     } else if (attrRangeStr.contains('[') && attrRangeStr.endsWith(']')) {
@@ -48,13 +49,13 @@ AttributeRange* AttributeRange::parse(int attrId, const QString& attrName, const
 
     if (!vs || !vs->isValid()) {
         qWarning() << "unable to parse" << attrRangeStr;
-        delete vs;
-        vs = new SingleValue();
+        vs = std::make_unique<SingleValue>();
     }
     return vs;
 }
 
-AttributeRange* AttributeRange::setOfValues(QString attrRangeStr, const int id, const QString& attrName)
+AttributeRangePtr AttributeRange::setOfValues(QString attrRangeStr, const int id,
+                                              const QString& attrName)
 {
     QStringList valuesStr = attrRangeStr.remove("{").remove("}").split(",");
     Type type;
@@ -83,20 +84,21 @@ AttributeRange* AttributeRange::setOfValues(QString attrRangeStr, const int id, 
             values.push_back(vStr);
         }
     } else {
-        return new SingleValue();
+        return std::make_unique<SingleValue>();
     }
 
     if (!ok) {
-        return new SingleValue();
+        return std::make_unique<SingleValue>();
     }
-    return new SetOfValues(id, attrName, type, values);
+    return std::make_unique<SetOfValues>(id, attrName, type, values);
 }
 
-AttributeRange* AttributeRange::intervalOfValues(QString attrRangeStr, const int id, const QString& attrName)
+AttributeRangePtr AttributeRange::intervalOfValues(QString attrRangeStr, const int id,
+                                                   const QString& attrName)
 {
     QStringList values = attrRangeStr.remove("[").remove("]").split(",");
     if (values.size() != 2) {
-        return new SingleValue();
+        return std::make_unique<SingleValue>();
     }
 
     Type type;
@@ -126,13 +128,13 @@ AttributeRange* AttributeRange::intervalOfValues(QString attrRangeStr, const int
             max = Value(values.at(1).toDouble(&ok2));
         }
     } else {
-        return new SingleValue();
+        return std::make_unique<SingleValue>();
     }
 
     if (!ok1 || !ok2) {
-        return new SingleValue();
+        return std::make_unique<SingleValue>();
     }
-    return new IntervalOfValues(id, attrName, type, min, max);
+    return std::make_unique<IntervalOfValues>(id, attrName, type, min, max);
 }
 
 Value AttributeRange::validate(const QString& valueStr) const

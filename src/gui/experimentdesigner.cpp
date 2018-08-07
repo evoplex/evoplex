@@ -377,7 +377,7 @@ void ExperimentDesigner::slotOutputWidget()
     for (Cache* c : currFileCaches) c->deleteCache();
 }
 
-ExpInputs* ExperimentDesigner::readInputs(const int expId, QString& error) const
+std::unique_ptr<ExpInputs> ExperimentDesigner::readInputs(const int expId, QString& error) const
 {
     if (m_selectedModelKey.first == STRING_NULL_PLUGINID) {
         error = "Please, select a valid 'modelId'.";
@@ -471,11 +471,10 @@ ExpInputs* ExperimentDesigner::readInputs(const int expId, QString& error) const
     values << m_selectedModelKey.first << QString::number(m_selectedModelKey.second);
 
     QString errorMsg;
-    ExpInputs* inputs = ExpInputs::parse(m_mainApp, header, values, errorMsg);
+    auto inputs = ExpInputs::parse(m_mainApp, header, values, errorMsg);
     if (!inputs || !errorMsg.isEmpty()) {
         error += "Unable to create the experiment.\nError: \"" + errorMsg + "\"";
-        delete inputs; // this GUI should never create experiments with errors
-        return nullptr;
+        return nullptr; // this GUI should never create experiments with errors
     }
     return inputs;
 }
@@ -484,10 +483,9 @@ void ExperimentDesigner::slotCreateExperiment()
 {
     QString error;
     ExperimentPtr exp = nullptr;
-    ExpInputs* inputs = readInputs(m_project->generateExpId(), error);
-    if (inputs) { exp = m_project->newExperiment(inputs, error); }
+    ExpInputsPtr inputs = readInputs(m_project->generateExpId(), error);
+    if (inputs) { exp = m_project->newExperiment(std::move(inputs), error); }
     if (!error.isEmpty()) { QMessageBox::warning(this, "Experiment", error); }
-    if (!exp) { delete inputs; }
     setExperiment(exp);
 }
 
@@ -511,10 +509,9 @@ void ExperimentDesigner::slotEditExperiment()
         return;
     }
     QString error;
-    ExpInputs* inputs = readInputs(exp->id(), error);
-    if (!inputs || !m_project->editExperiment(exp->id(), inputs, error)) {
+    ExpInputsPtr inputs = readInputs(exp->id(), error);
+    if (!inputs || !m_project->editExperiment(exp->id(), std::move(inputs), error)) {
         QMessageBox::warning(this, "Experiment", error);
-        delete inputs;
     }
 }
 
@@ -655,7 +652,7 @@ void ExperimentDesigner::addPluginAttrs(QTreeWidgetItem* tree, const Plugin* plu
         item->setText(0, attrName);
         item->setData(0, Qt::UserRole, QVariant::fromValue(plugin->key()));
 
-        const AttributeRange* attrRange = plugin->pluginAttrRange(attrName);
+        auto attrRange = plugin->pluginAttrRange(attrName);
         QWidget* widget = nullptr;
         switch (attrRange->type()) {
         case AttributeRange::Double_Range: {
@@ -669,7 +666,7 @@ void ExperimentDesigner::addPluginAttrs(QTreeWidgetItem* tree, const Plugin* plu
         case AttributeRange::Double_Set:
         case AttributeRange::Int_Set:
         case AttributeRange::String_Set: {
-            const SetOfValues* sov = dynamic_cast<const SetOfValues*>(attrRange);
+            auto sov = dynamic_cast<SetOfValues*>(attrRange.get());
             QComboBox* cb = new QComboBox(this);
             for (const Value& v : sov->values()) {
                 cb->addItem(v.toQString());

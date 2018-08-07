@@ -29,7 +29,6 @@ class TestAttributeRange: public QObject
 {
     Q_OBJECT
 
-    using AttrRngPtr = std::unique_ptr<AttributeRange>;
     using Validate = std::vector<std::pair<QString, Value>>;
 
 private slots:
@@ -49,7 +48,7 @@ private slots:
 private:
     void _tst_string(bool acceptEmpty);
 
-    void _tst_parserInputs(AttributeRange* attrRge, const QString& attrName,
+    void _tst_parserInputs(AttributeRangePtr attrRge, const QString& attrName,
             const QString& attrRangeStr, AttributeRange::Type type, const Validate& vals);
 
     void _tst_validate(const std::vector<std::pair<QString, Value>>& values);
@@ -63,7 +62,7 @@ void TestAttributeRange::initTestCase()
     m_prg = std::unique_ptr<PRG>(new PRG(123));
 }
 
-void TestAttributeRange::_tst_parserInputs(AttributeRange* attrRge, const QString& attrName,
+void TestAttributeRange::_tst_parserInputs(AttributeRangePtr attrRge, const QString& attrName,
         const QString& attrRangeStr, AttributeRange::Type type, const Validate& vals)
 {
     QVERIFY(attrRge->isValid());
@@ -82,8 +81,7 @@ void TestAttributeRange::tst_bool()
     const QString attrName("test");
     const QString attrRangeStr("bool");
     const AttributeRange::Type type = AttributeRange::Bool;
-    AttrRngPtr attrRgePtr(AttributeRange::parse(0, attrName, attrRangeStr));
-    AttributeRange* attrRge = attrRgePtr.get();
+    auto attrRge = AttributeRange::parse(0, attrName, attrRangeStr);
 
     std::vector<std::pair<QString, Value>> values = {
         { "True", Value(true) },
@@ -127,9 +125,9 @@ void TestAttributeRange::tst_int_range()
     // Case 3: large range
     QStringList attrRangeStrs = {"int[0,1]", "int[-10,-5]", "int[-100,100]"};
 
-    AttributeRange* attrRge = AttributeRange::parse(0, attrNames[0], attrRangeStrs[0]);
-    AttributeRange* attrRge2 = AttributeRange::parse(1, attrNames[1], attrRangeStrs[1]);
-    AttributeRange* attrRge3 = AttributeRange::parse(2, attrNames[2], attrRangeStrs[2]);
+    auto attrRge = AttributeRange::parse(0, attrNames[0], attrRangeStrs[0]);
+    auto attrRge2 = AttributeRange::parse(1, attrNames[1], attrRangeStrs[1]);
+    auto attrRge3 = AttributeRange::parse(2, attrNames[2], attrRangeStrs[2]);
 
     // Tests value returned by 'AttributeRange::validate()'
 
@@ -205,9 +203,9 @@ void TestAttributeRange::tst_double_range()
     // Case 3: large range
     QStringList attrRangeStrs = {"double[1.1,1.2]", "double[-5.5,-3.3]", "double[-95.7,87.5]"};
 
-    AttributeRange* attrRge = AttributeRange::parse(0, attrNames.at(0), attrRangeStrs.at(0));
-    AttributeRange* attrRge2 = AttributeRange::parse(1, attrNames.at(1), attrRangeStrs.at(1));
-    AttributeRange* attrRge3 = AttributeRange::parse(2, attrNames.at(2), attrRangeStrs.at(2));
+    auto attrRge = AttributeRange::parse(0, attrNames.at(0), attrRangeStrs.at(0));
+    auto attrRge2 = AttributeRange::parse(1, attrNames.at(1), attrRangeStrs.at(1));
+    auto attrRge3 = AttributeRange::parse(2, attrNames.at(2), attrRangeStrs.at(2));
 
     // Tests value returned by 'AttributeRange::validate()'
     QCOMPARE(attrRge->validate("1.1"), Value(1.1));  // min
@@ -283,7 +281,7 @@ void TestAttributeRange::tst_int_set()
     int min = -100;
     int max = 100;
 
-    AttributeRange* attrRge = AttributeRange::parse(0, attrName, attrRangeStr);
+    auto attrRge = AttributeRange::parse(0, attrName, attrRangeStr);
 
     // Tests value returned by 'AttributeRange::validate()'
     QCOMPARE(attrRge->validate("0"), Value(0));
@@ -318,7 +316,7 @@ void TestAttributeRange::tst_double_set()
     double min = -95.7;
     double max = 87.5;
 
-    AttributeRange* attrRge = AttributeRange::parse(0, attrName, attrRangeStr);
+    auto attrRge = AttributeRange::parse(0, attrName, attrRangeStr);
 
     // Tests value returned by 'AttributeRange::validate()'
     QCOMPARE(attrRge->validate("0"), Value(0.0));
@@ -354,8 +352,7 @@ void TestAttributeRange::_tst_string(bool acceptEmpty)
     const QString attrName("test");
     const QString attrRangeStr = acceptEmpty ? "string" : "non-empty-string";
     const AttributeRange::Type type = acceptEmpty ? AttributeRange::String : AttributeRange::NonEmptyString;
-    AttrRngPtr attrRgePtr(AttributeRange::parse(0, attrName, attrRangeStr));
-    AttributeRange* attrRge = attrRgePtr.get();
+    auto attrRge = AttributeRange::parse(0, attrName, attrRangeStr);
 
     // to tests value returned by 'AttributeRange::validate()'
     QStringList _strs = {
@@ -413,8 +410,7 @@ void TestAttributeRange::tst_string_set()
     const QString attrName("test");
     const QString attrRangeStr = "string{" + _values + "}";
     const AttributeRange::Type type = AttributeRange::String_Set;
-    AttrRngPtr attrRgePtr(AttributeRange::parse(0, attrName, attrRangeStr));
-    AttributeRange* attrRge = attrRgePtr.get();
+    auto attrRge = AttributeRange::parse(0, attrName, attrRangeStr);
 
     Validate vals;
     QStringList values = _values.split(",");
@@ -443,8 +439,7 @@ void TestAttributeRange::tst_filepath()
     const QString attrName("test");
     const QString attrRangeStr("filepath");
     const AttributeRange::Type type = AttributeRange::FilePath;
-    AttrRngPtr attrRgePtr(AttributeRange::parse(0, attrName, attrRangeStr));
-    AttributeRange* attrRge = attrRgePtr.get();
+    auto attrRge = AttributeRange::parse(0, attrName, attrRangeStr);
 
     const QString existing = QCoreApplication::applicationFilePath();
     const QString missing = QDir::current().absoluteFilePath("none123");
@@ -468,8 +463,7 @@ void TestAttributeRange::tst_dirpath()
     const QString attrName("test");
     const QString attrRangeStr("dirpath");
     const AttributeRange::Type type = AttributeRange::DirPath;
-    AttrRngPtr attrRgePtr(AttributeRange::parse(0, attrName, attrRangeStr));
-    AttributeRange* attrRge = attrRgePtr.get();
+    auto attrRge = AttributeRange::parse(0, attrName, attrRangeStr);
 
     std::vector<std::pair<QString, Value>> vals = {
         { QDir::currentPath(), Value(QDir::currentPath())},

@@ -83,7 +83,7 @@ GraphWidget::GraphWidget(MainGUI* mainGUI, ExperimentPtr exp, ExperimentWidget* 
     connect(m_ui->bReset, SIGNAL(clicked(bool)), SLOT(resetView()));
 
     m_attrs.resize(static_cast<size_t>(exp->modelPlugin()->nodeAttrsScope().size()));
-    for (const AttributeRange* attrRange : exp->modelPlugin()->nodeAttrsScope()) {
+    for (auto const& attrRange : exp->modelPlugin()->nodeAttrsScope()) {
         QLineEdit* le = new QLineEdit();
         le->setToolTip(attrRange->attrRangeStr());
         connect(le, &QLineEdit::editingFinished, [this, attrRange, le]() {

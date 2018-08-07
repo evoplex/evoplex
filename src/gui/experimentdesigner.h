@@ -83,7 +83,7 @@ private:
     QDoubleSpinBox* newDoubleSpinBox(const double min, const double max);
     void addTreeWidget(QTreeWidgetItem* itemRoot, const QString& label, const QVariant& widget);
 
-    ExpInputs* readInputs(const int expId, QString& error) const;
+    std::unique_ptr<ExpInputs> readInputs(const int expId, QString& error) const;
 
     void pluginSelected(QTreeWidgetItem* itemRoot, const PluginKey& key);
 };

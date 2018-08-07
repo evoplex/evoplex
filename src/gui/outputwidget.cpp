@@ -127,7 +127,7 @@ void OutputWidget::slotClose(bool canceled)
         QString inputStr = m_ui->table->item(row, 4)->text();
         RowInfo rinfo = m_ui->table->item(row, 4)->data(Qt::UserRole).value<RowInfo>();
 
-        const AttributeRange* entityAttrRange;
+        AttributeRangePtr entityAttrRange;
         if (entity == DefaultOutput::E_Nodes) {
             entityAttrRange = m_modelPlugin->nodeAttrRange(attr);
         } else {
@@ -213,7 +213,7 @@ void OutputWidget::slotAdd()
         }
     }
 
-    const AttributeRange* entityAttrRange;
+    AttributeRangePtr entityAttrRange;
     if (m_ui->entityNode->isChecked()) {
         entityAttrRange = m_modelPlugin->nodeAttrRange(m_ui->attr->currentText());
     } else {

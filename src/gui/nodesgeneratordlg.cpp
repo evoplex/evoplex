@@ -93,7 +93,7 @@ NodesGeneratorDlg::NodesGeneratorDlg(QWidget* parent, const AttributesScope& nod
     slotHideRand();
 
     m_ui->table->setRowCount(m_nodeAttrsScope.size());
-    for (const AttributeRange* ar : m_nodeAttrsScope) {
+    for (auto const& ar : m_nodeAttrsScope) {
         m_ui->table->setItem(ar->id(), 0, new QTableWidgetItem(ar->attrName()));
 
         QComboBox* cb = new QComboBox(m_ui->table);
@@ -193,7 +193,7 @@ void NodesGeneratorDlg::fill(const QString& cmd)
     }
 
     QString errMsg;
-    std::unique_ptr<AttrsGenerator> ag(AttrsGenerator::parse(m_nodeAttrsScope, cmd, errMsg));
+    auto ag = AttrsGenerator::parse(m_nodeAttrsScope, cmd, errMsg);
     if (!errMsg.isEmpty() || !ag) {
         QMessageBox::warning(parentWidget(), "Nodes Generator", errMsg);
         return;
@@ -250,7 +250,7 @@ QString NodesGeneratorDlg::readCommand()
         }
     } else if (m_ui->bDiffData->isChecked()) {
         command = QString("#%1").arg(m_ui->numNodes->text());
-        for (const AttributeRange* ar : m_nodeAttrsScope) {
+        for (auto const& ar : m_nodeAttrsScope) {
             Q_ASSERT_X(m_ui->table->item(ar->id(), 0)->text() == ar->attrName(),
                        "NodesGeneratorDlg::fill", "attribute name mismatch. It should never happen!");
 

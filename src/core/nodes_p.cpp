@@ -47,13 +47,12 @@ Nodes NodesPrivate::fromCmd(const QString& cmd, const AttributesScope& attrsScop
         return fromFile(cmd, attrsScope, graphType, error, progress);
     }
 
-    AttrsGenerator* ag = AttrsGenerator::parse(attrsScope, cmd, error);
+    auto ag = AttrsGenerator::parse(attrsScope, cmd, error);
     if (!ag) {
         return Nodes();
     }
 
     SetOfAttributes setOfAttrs = ag->create();
-    delete ag;
 
     BaseNode::constructor_key k;
     Nodes nodes;
@@ -190,7 +189,7 @@ QStringList NodesPrivate::validateHeader(const QString& header,
         return QStringList();
     }
 
-    for (const auto* attrRange : attrsScope) {
+    for (const auto& attrRange : attrsScope) {
         if (!header.contains(attrRange->attrName())) {
             const QStringList expectedAttrs = attrsScope.keys();
             error = QString("the header is imcompatible for the model.\n"
@@ -219,7 +218,7 @@ Node NodesPrivate::readRow(const int row, const QStringList& header, const QStri
         } else if (header.at(col) == "y") {
             coordY = values.at(col).toInt(&isValid);
         } else {
-            AttributeRange* attrRange = attrsScope.value(header.at(col));
+            auto attrRange = attrsScope.value(header.at(col), nullptr);
             if (attrRange) { // is null if the column is not required
                 Value value = attrRange->validate(values.at(col));
                 if (value.isValid()) {

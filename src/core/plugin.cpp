@@ -167,7 +167,6 @@ Plugin::~Plugin()
 {
     QPluginLoader loader(m_libPath);
     loader.unload();
-    Utils::deleteAndShrink(m_pluginAttrsScope);
 }
 
 bool Plugin::readAttrsScope(const QJsonObject* metaData, const QString& attrName,
@@ -177,10 +176,8 @@ bool Plugin::readAttrsScope(const QJsonObject* metaData, const QString& attrName
         QJsonArray json = metaData->value(attrName).toArray();
         for (int id = 0; id < json.size(); ++id) {
             QVariantMap attrs = json.at(id).toObject().toVariantMap();
-            AttributeRange* attrRange = AttributeRange::parse(id, attrs.firstKey(), attrs.first().toString());
+            auto attrRange = AttributeRange::parse(id, attrs.firstKey(), attrs.first().toString());
             if (!attrRange->isValid()) {
-                delete attrRange;
-                Utils::deleteAndShrink(attrsScope);
                 Utils::deleteAndShrink(keys);
                 return false;
             }

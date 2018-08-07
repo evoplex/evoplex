@@ -26,8 +26,10 @@
 
 namespace evoplex {
 
+class AttrsGenerator;
 class AGSameFuncForAll;
 class AGDiffFunctions;
+using AttrsGeneratorPtr = std::unique_ptr<AttrsGenerator>;
 
 class AttrsGeneratorInterface
 {
@@ -50,8 +52,8 @@ public:
     //     - specific mode for each attribute:
     //         '#integer;attrName_[min|max|rand_seed|value_val];...'
     //     * the integer corresponds to the size of the set of attributes
-    static AttrsGenerator* parse(const AttributesScope& attrsScope,
-                                 const QString &cmd, QString& error);
+    static AttrsGeneratorPtr parse(const AttributesScope& attrsScope,
+                                   const QString &cmd, QString& error);
 
     virtual ~AttrsGenerator() = default;
 
@@ -74,12 +76,14 @@ protected:
 
 private:
     // auxiliar parser for commands starting with '*'
-    static AGSameFuncForAll* parseStarCmd(const AttributesScope& attrsScope,
-            const int numCopies, const QStringList& cmds, QString& error);
+    static std::unique_ptr<AGSameFuncForAll> parseStarCmd(
+            const AttributesScope& attrsScope, const int numCopies,
+            const QStringList& cmds, QString& error);
 
     // auxiliar parser for commands starting with '#'
-    static AGDiffFunctions* parseHashCmd(const AttributesScope& attrsScope,
-            const int numCopies, const QStringList& cmds, QString& error);
+    static std::unique_ptr<AGDiffFunctions> parseHashCmd(
+            const AttributesScope& attrsScope, const int numCopies,
+            const QStringList& cmds, QString& error);
 };
 
 
@@ -99,7 +103,7 @@ private:
     const Function m_function;
     const Value m_functionInput;
 
-    std::function<Value(const AttributeRange*)> f_value;
+    std::function<Value(AttributeRangePtr)> f_value;
     PRG* m_prg;
 };
 

@@ -73,7 +73,7 @@ void Experiment::deleteTrials()
     m_clonableNodes.clear();
 }
 
-bool Experiment::setInputs(ExpInputs* inputs, QString& error)
+bool Experiment::setInputs(ExpInputsPtr inputs, QString& error)
 {
     if (!disable(&error)) {
         return false;
@@ -81,14 +81,14 @@ bool Experiment::setInputs(ExpInputs* inputs, QString& error)
 
     QMutexLocker locker(&m_mutex);
 
-    Q_ASSERT(inputs != m_inputs);
+    Q_ASSERT(inputs.get() != m_inputs);
     delete m_inputs;
-    m_inputs = inputs;
+    m_inputs = inputs.release();
 
     // a few asserts for critical things that should never happen!
     Q_ASSERT_X(this == m_project.lock()->experiment(m_id).get(),
         "Experiment", "an experiment must be aware of its parent project!");
-    Q_ASSERT_X(m_id == inputs->general(GENERAL_ATTR_EXPID).toInt(),
+    Q_ASSERT_X(m_id == m_inputs->general(GENERAL_ATTR_EXPID).toInt(),
         "Experiment", "mismatched experiment id!");
     Q_ASSERT_X(m_inputs->graphPlugin() && m_inputs->modelPlugin(),
         "Experiment", "tried to setup an experiment with invalid plugins!");

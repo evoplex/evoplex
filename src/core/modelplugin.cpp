@@ -68,8 +68,6 @@ ModelPlugin::ModelPlugin(const QJsonObject* metaData, const QString& libPath)
 
 ModelPlugin::~ModelPlugin()
 {
-    Utils::deleteAndShrink(m_nodeAttrsScope);
-    Utils::deleteAndShrink(m_edgeAttrsScope);
 }
 
 } // evoplex

@@ -101,11 +101,11 @@ void TestNodes::_tst_invalid(QString cmd, bool has_attrs, GraphType graphType){
     if(has_attrs){
         const QStringList names = { "test0", "test1", "test2" };
 
-        AttributeRange* col0 = AttributeRange::parse(0, names[0], "int[0,1000]");
+        auto col0 = AttributeRange::parse(0, names[0], "int[0,1000]");
         attrsScope.insert(col0->attrName(), col0);
-        AttributeRange* col1 = AttributeRange::parse(1, names[1], "int[0,1000]");
+        auto col1 = AttributeRange::parse(1, names[1], "int[0,1000]");
         attrsScope.insert(col1->attrName(), col1);
-        AttributeRange* col2 = AttributeRange::parse(2, names[2], "int[0,1000]");
+        auto col2 = AttributeRange::parse(2, names[2], "int[0,1000]");
         attrsScope.insert(col2->attrName(), col2);
     }
 
@@ -139,11 +139,11 @@ void TestNodes::tst_fromCmd()
     QVERIFY(nodesOfSameType<UNode>(nodes));
 
     // Undirected with non-empty attrsScope
-    AttributeRange* col0 = AttributeRange::parse(0, names[0], attrRangeStr);
+    auto col0 = AttributeRange::parse(0, names[0], attrRangeStr);
     attrsScope.insert(col0->attrName(), col0);
-    AttributeRange* col1 = AttributeRange::parse(1, names[1], attrRangeStr);
+    auto col1 = AttributeRange::parse(1, names[1], attrRangeStr);
     attrsScope.insert(col1->attrName(), col1);
-    AttributeRange* col2 = AttributeRange::parse(2, names[2], attrRangeStr);
+    auto col2 = AttributeRange::parse(2, names[2], attrRangeStr);
     attrsScope.insert(col2->attrName(), col2);
 
     for(int i = 0; i < 3; i++){
@@ -289,11 +289,11 @@ void TestNodes::tst_fromFile_nodes_no_xy()
     AttributesScope attrsScope;
 
     // AttributeRange to be used for both sets of nodes
-    AttributeRange* col0 = AttributeRange::parse(0, "int-zero-two", "int[0,2]");
+    auto col0 = AttributeRange::parse(0, "int-zero-two", "int[0,2]");
     attrsScope.insert(col0->attrName(), col0);
-    AttributeRange* col1 = AttributeRange::parse(1, "bool", "bool");
+    auto col1 = AttributeRange::parse(1, "bool", "bool");
     attrsScope.insert(col1->attrName(), col1);
-    AttributeRange* col2 = AttributeRange::parse(2, "any-string", "string");
+    auto col2 = AttributeRange::parse(2, "any-string", "string");
     attrsScope.insert(col2->attrName(), col2);
 
     // Nodes with values read from file
@@ -329,7 +329,7 @@ void TestNodes::tst_fromFile_nodes_no_xy()
     QVERIFY(nodesOfSameType<DNode>(nodes));
 
     // Add attribute that is not in file
-    AttributeRange* col3 = AttributeRange::parse(3, "not-in-file", "string");
+    auto col3 = AttributeRange::parse(3, "not-in-file", "string");
     attrsScope.insert(col3->attrName(), col3);
 
     // Nodes with values read from file
@@ -348,7 +348,7 @@ void TestNodes::tst_fromFile_nodes_with_xy() {
     AttributesScope attrsScope;
 
     // AttributeRange to be used for both sets of nodes
-    AttributeRange* col0 = AttributeRange::parse(0, "bool", "bool");
+    auto col0 = AttributeRange::parse(0, "bool", "bool");
     attrsScope.insert(col0->attrName(), col0);
 
     // Nodes with values read from file
@@ -384,7 +384,7 @@ void TestNodes::tst_fromFile_nodes_with_xy() {
     QVERIFY(nodesOfSameType<DNode>(nodes));
 
     // Add attribute that is not in file
-    AttributeRange* col3 = AttributeRange::parse(3, "not-in-file", "string");
+    auto col3 = AttributeRange::parse(3, "not-in-file", "string");
     attrsScope.insert(col3->attrName(), col3);
 
     // Nodes with values read from file
@@ -395,7 +395,7 @@ void TestNodes::tst_fromFile_nodes_with_xy() {
 
 void TestNodes::_tst_fromFile_nodes_with_oneCoord(const QString& filePath) {
     // Attribute Range to be used for both sets of nodes
-    AttributeRange* col0 = AttributeRange::parse(0, "double-zero-one", "double[0,3]");
+    auto col0 = AttributeRange::parse(0, "double-zero-one", "double[0,3]");
     AttributesScope attrsScope;
     attrsScope.insert(col0->attrName(), col0);
 
@@ -406,8 +406,6 @@ void TestNodes::_tst_fromFile_nodes_with_oneCoord(const QString& filePath) {
 
     QVERIFY(nodesFromFile.empty());
     QVERIFY(!errorMsg.isEmpty());
-
-    delete col0;
 }
 
 // valid attributes AND x coordinates (only) -- should fail
@@ -430,7 +428,7 @@ void TestNodes::tst_fromFile_nodes_invalid_attrs() {
     AttributesScope attrsScope;
 
     // Attribute Range to be used for both sets of nodes
-    AttributeRange* col0 = AttributeRange::parse(0, "bool", "bool");
+    auto col0 = AttributeRange::parse(0, "bool", "bool");
     attrsScope.insert(col0->attrName(), col0);
 
     // Nodes with values read from file
@@ -467,7 +465,7 @@ void TestNodes::tst_fromFile_nodes_invalid_file() {
     AttributesScope attrsScope;
 
     // Attribute Range to be used for both sets of nodes
-    AttributeRange* col0 = AttributeRange::parse(0, "bool", "bool");
+    auto col0 = AttributeRange::parse(0, "bool", "bool");
     attrsScope.insert(col0->attrName(), col0);
 
     // Nodes with values read from file
@@ -531,11 +529,11 @@ void TestNodes::tst_saveToFile_with_attrs()
     // saving a set of UNodes with attributes
     GraphType graphType = GraphType::Undirected;
     AttributesScope attrsScope;
-    AttributeRange* col0 = AttributeRange::parse(0, names[0], "int[0,1000]");
+    auto col0 = AttributeRange::parse(0, names[0], "int[0,1000]");
     attrsScope.insert(col0->attrName(), col0);
-    AttributeRange* col1 = AttributeRange::parse(1, names[1], "int[0,1000]");
+    auto col1 = AttributeRange::parse(1, names[1], "int[0,1000]");
     attrsScope.insert(col1->attrName(), col1);
-    AttributeRange* col2 = AttributeRange::parse(2, names[2], "int[0,1000]");
+    auto col2 = AttributeRange::parse(2, names[2], "int[0,1000]");
     attrsScope.insert(col2->attrName(), col2);
 
     Nodes nodes = NodesPrivate::fromCmd("*3;min", attrsScope, graphType, errorMsg);

@@ -21,6 +21,7 @@
 #ifndef ATTRIBUTE_RANGE_H
 #define ATTRIBUTE_RANGE_H
 
+#include <memory>
 #include <vector>
 #include <QHash>
 
@@ -30,7 +31,8 @@
 namespace evoplex {
 
 class AttributeRange;
-using AttributesScope = QHash<QString, AttributeRange*>;
+using AttributeRangePtr = std::shared_ptr<AttributeRange>;
+using AttributesScope = QHash<QString, AttributeRangePtr>;
 
 class AttributeRangeInterface
 {
@@ -72,8 +74,8 @@ public:
     //   - "double{1.1,1.2}     // set of doubles
     //   * you can use 'max' to take the maximum value for the type
     //   * do NOT add spaces before/after the commas
-    static AttributeRange* parse(int attrId, const QString& attrName,
-                                 const QString& attrRangeStr);
+    static AttributeRangePtr parse(int attrId, const QString& attrName,
+                                   const QString& attrRangeStr);
 
     ~AttributeRange() override = default;
 
@@ -101,12 +103,12 @@ protected:
 
 private:
     // assume that attrRangeStr is equal to 'int{ }' or 'double{ }'
-    static AttributeRange* setOfValues(QString attrRangeStr, const int id,
-                                       const QString& attrName);
+    static AttributeRangePtr setOfValues(QString attrRangeStr, const int id,
+                                         const QString& attrName);
 
     // assume that attrRangeStr is equal to 'int[min,max]' or 'double[min,max]'
-    static AttributeRange* intervalOfValues(QString attrRangeStr, const int id,
-                                            const QString& attrName);
+    static AttributeRangePtr intervalOfValues(QString attrRangeStr, const int id,
+                                              const QString& attrName);
 };
 
 class SingleValue : public AttributeRange

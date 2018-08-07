@@ -108,14 +108,14 @@ void ColorMapMgr::resetSettingsToDefault()
 
 /************************************************************************/
 
-ColorMap* ColorMap::create(const AttributeRange* attrRange, const Colors& colors)
+ColorMap* ColorMap::create(AttributeRangePtr attrRange, const Colors& colors)
 {
-    const SetOfValues* set = dynamic_cast<const SetOfValues*>(attrRange);
+    auto set = dynamic_cast<SetOfValues*>(attrRange.get());
     if (set) {
         return new ColorMapSet(colors, set);
     }
 
-    const IntervalOfValues* interval = dynamic_cast<const IntervalOfValues*>(attrRange);
+    auto interval = dynamic_cast<IntervalOfValues*>(attrRange.get());
     if (interval) {
         return new ColorMapRange(colors, interval);
     }

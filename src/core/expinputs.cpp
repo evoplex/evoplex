@@ -69,8 +69,8 @@ std::vector<Value> ExpInputs::exportAttrValues() const
     return values;
 }
 
-ExpInputs* ExpInputs::parse(const MainApp* mainApp, const QStringList& header,
-                            const QStringList& values, QString& errMsg)
+ExpInputsPtr ExpInputs::parse(const MainApp* mainApp, const QStringList& header,
+                              const QStringList& values, QString& errMsg)
 {
     if (header.isEmpty() || values.isEmpty()) {
         errMsg += "The 'header' and 'values' cannot be empty.";
@@ -100,19 +100,19 @@ ExpInputs* ExpInputs::parse(const MainApp* mainApp, const QStringList& header,
         return nullptr;
     }
 
-    ExpInputs* ei = new ExpInputs(graph, model,
+    auto ei = ExpInputsPtr(new ExpInputs(graph, model,
         new Attributes(mainApp->generalAttrsScope().size()),
         new Attributes(graph->pluginAttrsScope().size()),
         new Attributes(model->pluginAttrsScope().size()),
-        std::vector<Cache*>());
+        std::vector<Cache*>()));
 
     QStringList failedAttrs;
-    parseAttrs(ei, mainApp, header, values, failedAttrs);
-    parseFileCache(ei, failedAttrs, errMsg);
+    parseAttrs(ei.get(), mainApp, header, values, failedAttrs);
+    parseFileCache(ei.get(), failedAttrs, errMsg);
 
     // make sure all attributes exist
     auto checkAll = [&failedAttrs](Attributes* attrs, const AttributesScope& attrsScope) {
-        for (const AttributeRange* attrRange : attrsScope) {
+        for (auto const& attrRange : attrsScope) {
             if (!attrs->contains(attrRange->attrName())) {
                 attrs->replace(attrRange->id(), attrRange->attrName(), Value());
                 failedAttrs.append(attrRange->attrName());
@@ -129,7 +129,7 @@ ExpInputs* ExpInputs::parse(const MainApp* mainApp, const QStringList& header,
     // Thus, to avoid incosistency between the plugin objects and the value of
     // the attributes in the ExpInputs, here we ensure that those fields
     // correspond to the same thing.
-    auto fixVs = [ei](const QString& attr, quint16 vs) mutable {
+    auto fixVs = [&ei](const QString& attr, quint16 vs) mutable {
         ei->m_generalAttrs->replace(ei->m_generalAttrs->indexOf(attr), attr, vs);
     };
     fixVs(GENERAL_ATTR_GRAPHVS, ei->graphPlugin()->version());
@@ -212,7 +212,7 @@ void ExpInputs::parseAttrs(ExpInputs* ei, const MainApp* mainApp, const QStringL
                 failedAttrs.append(attrName);
             }
         } else {
-            const AttributeRange* attrRange = nullptr;
+            AttributeRangePtr attrRange;
             Attributes* pluginAttrs = nullptr;
             if (attrName.startsWith(modelId_)) {
                 attrName = attrName.remove(modelId_);

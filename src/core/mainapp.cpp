@@ -97,7 +97,6 @@ MainApp::~MainApp()
     delete m_expMgr;
     m_expMgr = nullptr;
     Utils::deleteAndShrink(m_plugins);
-    Utils::deleteAndShrink(m_generalAttrsScope);
 }
 
 void MainApp::resetSettingsToDefault()

@@ -32,8 +32,8 @@
 
 namespace evoplex {
 
-AttrsGenerator* AttrsGenerator::parse(const AttributesScope& attrsScope,
-                                      const QString& cmd, QString& error)
+AttrsGeneratorPtr AttrsGenerator::parse(const AttributesScope& attrsScope,
+                                        const QString& cmd, QString& error)
 {
     if (cmd.isEmpty()) {
         error = "The command cannot be empty!";
@@ -63,7 +63,7 @@ AttrsGenerator* AttrsGenerator::parse(const AttributesScope& attrsScope,
         return nullptr;
     }
 
-    AttrsGenerator* ag = nullptr;
+    std::unique_ptr<AttrsGenerator> ag;
     if (_cmd.startsWith("*")) {
         ag = parseStarCmd(attrsScope, size, cmds, error);
     } else if (_cmd.startsWith("#") && !attrsScope.empty()) {
@@ -82,8 +82,9 @@ AttrsGenerator* AttrsGenerator::parse(const AttributesScope& attrsScope,
     return ag;
 }
 
-AGSameFuncForAll* AttrsGenerator::parseStarCmd(const AttributesScope& attrsScope,
-        const int size, const QStringList& cmds, QString& error)
+std::unique_ptr<AGSameFuncForAll> AttrsGenerator::parseStarCmd(
+        const AttributesScope& attrsScope, const int size,
+        const QStringList& cmds, QString& error)
 {
     if (cmds.size() != 1) {
         error = QString("Unable to parse '*%1;%2'."
@@ -115,11 +116,12 @@ AGSameFuncForAll* AttrsGenerator::parseStarCmd(const AttributesScope& attrsScope
         return nullptr;
     }
 
-    return new AGSameFuncForAll(attrsScope, size, func, value);
+    return std::make_unique<AGSameFuncForAll>(attrsScope, size, func, value);
 }
 
-AGDiffFunctions* AttrsGenerator::parseHashCmd(const AttributesScope& attrsScope,
-        const int size, const QStringList& cmds, QString& error)
+std::unique_ptr<AGDiffFunctions> AttrsGenerator::parseHashCmd(
+        const AttributesScope& attrsScope, const int size,
+        const QStringList& cmds, QString& error)
 {
     if (cmds.size() != attrsScope.size()) {
         const QStringList expectedAttrs = attrsScope.keys();
@@ -139,7 +141,7 @@ AGDiffFunctions* AttrsGenerator::parseHashCmd(const AttributesScope& attrsScope,
         QStringList attrCmdStr = cmd.split("_");
 
         attrCmd.attrName = attrCmdStr.at(0);
-        const AttributeRange* attrRange = attrsScope.value(attrCmd.attrName, nullptr);
+        auto attrRange = attrsScope.value(attrCmd.attrName, nullptr);
         if (attrRange) {
             attrCmd.attrId = attrRange->id();
         } else {
@@ -177,7 +179,7 @@ AGDiffFunctions* AttrsGenerator::parseHashCmd(const AttributesScope& attrsScope,
         attrCmds.emplace_back(attrCmd);
     }
 
-    return new AGDiffFunctions(attrsScope, size, attrCmds);
+    return std::make_unique<AGDiffFunctions>(attrsScope, size, attrCmds);
 }
 
 Value AttrsGenerator::parseRandSeed(QString seedStr)
@@ -216,17 +218,17 @@ AGSameFuncForAll::AGSameFuncForAll(const AttributesScope& attrsScope, const int 
     switch (m_function) {
     case Function::Min:
         m_command = QString("*%1;min").arg(m_size);
-        f_value = [](const AttributeRange* attrRange) { return attrRange->min(); };
+        f_value = [](auto attrRange) { return attrRange->min(); };
         break;
     case Function::Max:
         m_command = QString("*%1;max").arg(m_size);
-        f_value = [](const AttributeRange* attrRange) { return attrRange->max(); };
+        f_value = [](auto attrRange) { return attrRange->max(); };
         break;
     case Function::Rand:
         Q_ASSERT_X(funcInput.type() == Value::INT, "AGSameFuncForAll", "rand function expects an integer seed.");
         m_command = QString("*%1;rand_%2").arg(m_size).arg(funcInput.toQString());
         m_prg = new PRG(funcInput.toUInt());
-        f_value = [this](const AttributeRange* attrRange) { return attrRange->rand(m_prg); };
+        f_value = [this](auto attrRange) { return attrRange->rand(m_prg); };
         break;
     default:
         qFatal("invalid function!");
@@ -244,7 +246,7 @@ SetOfAttributes AGSameFuncForAll::create(std::function<void(int)> progress)
     ret.reserve(static_cast<size_t>(m_size));
     for (int id = 0; id < m_size; ++id) {
         Attributes attrs(m_attrsScope.size());
-        for (AttributeRange* attrRange : m_attrsScope) {
+        for (auto attrRange : m_attrsScope) {
             attrs.replace(attrRange->id(), attrRange->attrName(), f_value(attrRange));
         }
         ret.emplace_back(attrs);
@@ -281,7 +283,7 @@ SetOfAttributes AGDiffFunctions::create(std::function<void(int)> progress)
 
     std::function<Value()> value;
     for (const AttrCmd& cmd : m_attrCmds) {
-        const AttributeRange* attrRange = m_attrsScope.value(cmd.attrName, nullptr);
+        auto attrRange = m_attrsScope.value(cmd.attrName, nullptr);
         Q_ASSERT_X(attrRange, "AGDiffFunctions", "unable to find the attribute range");
 
         PRG* prg = nullptr;

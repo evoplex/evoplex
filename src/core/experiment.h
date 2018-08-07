@@ -64,7 +64,7 @@ public:
     // set the experiment inputs
     // Return true if successful
     // this method IS thread-safe
-    bool setInputs(ExpInputs* inputs, QString& error);
+    bool setInputs(ExpInputsPtr inputs, QString& error);
 
     // It disables the experiment, ie, removes all trials and
     // cached outputs, and sets the status to Disabled.

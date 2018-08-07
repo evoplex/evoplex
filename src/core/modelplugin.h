@@ -45,11 +45,11 @@ public:
 
     inline const std::vector<QString>& nodeAttrNames() const;
     inline const AttributesScope& nodeAttrsScope() const;
-    inline const AttributeRange* nodeAttrRange(const QString& attr) const;
+    inline AttributeRangePtr nodeAttrRange(const QString& attr) const;
 
     inline const std::vector<QString>& edgeAttrNames() const;
     inline const AttributesScope& edgeAttrsScope() const;
-    inline const AttributeRange* edgeAttrRange(const QString& attr) const;
+    inline AttributeRangePtr edgeAttrRange(const QString& attr) const;
 
 protected:
     explicit ModelPlugin(const QJsonObject* metaData, const QString& libPath);
@@ -84,7 +84,7 @@ inline const std::vector<QString>& ModelPlugin::nodeAttrNames() const
 inline const AttributesScope& ModelPlugin::nodeAttrsScope() const
 { return m_nodeAttrsScope; }
 
-inline const AttributeRange* ModelPlugin::nodeAttrRange(const QString& attr) const
+inline AttributeRangePtr ModelPlugin::nodeAttrRange(const QString& attr) const
 { return m_nodeAttrsScope.value(attr); }
 
 inline const std::vector<QString>& ModelPlugin::edgeAttrNames() const
@@ -93,7 +93,7 @@ inline const std::vector<QString>& ModelPlugin::edgeAttrNames() const
 inline const AttributesScope& ModelPlugin::edgeAttrsScope() const
 { return m_edgeAttrsScope; }
 
-inline const AttributeRange* ModelPlugin::edgeAttrRange(const QString& attr) const
+inline AttributeRangePtr ModelPlugin::edgeAttrRange(const QString& attr) const
 { return m_edgeAttrsScope.value(attr); }
 
 } //evoplex

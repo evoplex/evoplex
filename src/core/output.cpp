@@ -68,7 +68,7 @@ void Cache::flushAll()
 /*******************************************************/
 /*******************************************************/
 
-DefaultOutput::DefaultOutput(const Function f, const Entity e, const AttributeRange* attrRange)
+DefaultOutput::DefaultOutput(Function f, Entity e, AttributeRangePtr attrRange)
     : Output()
     , m_func(f)
     , m_entity(e)
@@ -290,7 +290,7 @@ std::vector<Cache*> Output::parseHeader(const QStringList& header, const std::ve
         }
 
         QStringList attrHeaderStr = h.split("_");
-        AttributeRange* attrRange = entityAttrsScope.value(attrHeaderStr.first());
+        auto attrRange = entityAttrsScope.value(attrHeaderStr.first());
         if (!attrRange->isValid()) {
             errorMsg = QString("invalid header! Attribute does not exist. (%1)\n").arg(h);
             qWarning() << errorMsg;

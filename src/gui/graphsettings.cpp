@@ -86,7 +86,7 @@ void GraphSettings::init()
 
 void GraphSettings::updateNodeCMap()
 {
-    const AttributeRange* attrRange = m_modelPlugin->nodeAttrRange(m_ui->nodeAttr->currentText());
+    auto attrRange = m_modelPlugin->nodeAttrRange(m_ui->nodeAttr->currentText());
     ColorMap* cmap = ColorMap::create(attrRange,
             m_cmMgr->colors(m_ui->nodeCMapName->currentText(),
                             m_ui->nodeCMapSize->currentText().toInt()));
@@ -118,7 +118,7 @@ int GraphSettings::nodeAttr() const
 
 void GraphSettings::updateEdgeCMap()
 {
-    const AttributeRange* attrRange = m_modelPlugin->edgeAttrRange(m_ui->edgeAttr->currentText());
+    auto attrRange = m_modelPlugin->edgeAttrRange(m_ui->edgeAttr->currentText());
     ColorMap* cmap = ColorMap::create(attrRange,
             m_cmMgr->colors(m_ui->edgeCMapName->currentText(),
                             m_ui->edgeCMapSize->currentText().toInt()));

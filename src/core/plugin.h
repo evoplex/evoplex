@@ -60,7 +60,7 @@ public:
 
     inline const std::vector<QString>& pluginAttrsNames() const { return m_pluginAttrsNames; }
     inline const AttributesScope& pluginAttrsScope() const { return m_pluginAttrsScope; }
-    inline const AttributeRange* pluginAttrRange(const QString& attr) const { return m_pluginAttrsScope.value(attr); }
+    inline const AttributeRangePtr pluginAttrRange(const QString& attr) const { return m_pluginAttrsScope.value(attr); }
 
 protected:
     PluginType m_type;

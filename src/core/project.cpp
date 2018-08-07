@@ -79,7 +79,7 @@ int Project::generateExpId() const
     return m_experiments.empty() ? 0 : (--m_experiments.end())->first + 1;
 }
 
-ExperimentPtr Project::newExperiment(ExpInputs* inputs, QString& error)
+ExperimentPtr Project::newExperiment(ExpInputsPtr inputs, QString& error)
 {
     QMutexLocker locker(&m_mutex);
 
@@ -96,7 +96,7 @@ ExperimentPtr Project::newExperiment(ExpInputs* inputs, QString& error)
 
     ExperimentPtr exp = std::make_shared<Experiment>(m_mainApp, expId, shared_from_this());
     m_experiments.insert({expId, exp});
-    exp->setInputs(inputs, error);
+    exp->setInputs(std::move(inputs), error);
 
     m_hasUnsavedChanges = true;
     emit (hasUnsavedChanges(m_hasUnsavedChanges));
@@ -128,7 +128,7 @@ bool Project::removeExperiment(int expId, QString& error)
     return true;
 }
 
-bool Project::editExperiment(int expId, ExpInputs* newInputs, QString& error)
+bool Project::editExperiment(int expId, ExpInputsPtr newInputs, QString& error)
 {
     QMutexLocker locker(&m_mutex);
 
@@ -137,7 +137,7 @@ bool Project::editExperiment(int expId, ExpInputs* newInputs, QString& error)
         error += "tried to edit a nonexistent experiment";
         return false;
     }
-    if (!(*it).second->setInputs(newInputs, error)) {
+    if (!(*it).second->setInputs(std::move(newInputs), error)) {
         return false;
     }
     m_hasUnsavedChanges = true;
@@ -173,12 +173,12 @@ int Project::importExperiments(const QString& filePath, QString& error)
     while (!in.atEnd()) {
         const QStringList values = in.readLine().split(",");
         QString expErrorMsg;
-        ExpInputs* inputs = ExpInputs::parse(m_mainApp, header, values, expErrorMsg);
+        auto inputs = ExpInputs::parse(m_mainApp, header, values, expErrorMsg);
         if (!expErrorMsg.isEmpty()) {
             error += QString("Row %1 : Warning: %2\n\n").arg(row).arg(expErrorMsg);
         }
         expErrorMsg.clear();
-        if (!inputs || !newExperiment(inputs, expErrorMsg)) {
+        if (!inputs || !newExperiment(std::move(inputs), expErrorMsg)) {
             error += QString("Row %1 (skipped): Critical error: %2\n\n").arg(row).arg(expErrorMsg);
         }
         if (!expErrorMsg.isEmpty()) {

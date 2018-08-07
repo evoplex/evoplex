@@ -27,6 +27,9 @@
 
 namespace evoplex {
 
+class ExpInputs;
+using ExpInputsPtr = std::unique_ptr<ExpInputs>;
+
 class ExpInputs
 {
 public:
@@ -34,8 +37,8 @@ public:
     // We assume that all graph/model attributes start with 'uid_'. It is very
     // important to avoid clashes between different attributes which use the same name.
     // @return nullptr if doesn't have valid plugins
-    static ExpInputs* parse(const MainApp* mainApp, const QStringList& header,
-                            const QStringList& values, QString& errMsg);
+    static ExpInputsPtr parse(const MainApp* mainApp, const QStringList& header,
+                              const QStringList& values, QString& errMsg);
 
     ~ExpInputs();
 

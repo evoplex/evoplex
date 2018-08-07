@@ -92,7 +92,7 @@ AttributesScope TestAttrsGenerator::_newAttrsScope(const QStringList& names, con
     AttributesScope attrsScope;
     attrsScope.reserve(names.size());
     for (int i = 0; i  < names.size(); ++i) {
-        AttributeRange* a = AttributeRange::parse(i, names.at(i), attrRges.at(i));
+        auto a = AttributeRange::parse(i, names.at(i), attrRges.at(i));
         attrsScope.insert(a->attrName(), a);
     }
     return attrsScope;
