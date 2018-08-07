@@ -33,59 +33,217 @@ private slots:
     void cleanupTestCase() {}
     void tst_parseStarCmd();
     void tst_parseHashCmd();
+    void _tst_attrs(const SetOfAttributes& res, const Attributes& attrs,  const bool testValues);
+    void _tst_mode(const SetOfAttributes& res, const QString& mode, const AttributesScope& ascope, const int& numOfAttrRges);
+    void _tst_parseStarCmd(const QString& func, const AttributesScope& attrsScope, const int& sizeOfAG, const Attributes& attrs);
+    QString _makeCmd(const QString& func, const Values& values, const QStringList& names, const int sizeOfAG);
+    AttributesScope _newAttrsScope(const QStringList& names, const QStringList& attrRges);
 };
+
+void TestAttrsGenerator::_tst_attrs(const SetOfAttributes& res, const Attributes& attrs,  const bool testValues)
+{
+    for (const Attributes& a : res) {
+        QCOMPARE(a.names(), attrs.names());
+        QCOMPARE(a.size(), attrs.size());
+
+        if (testValues) {
+            QCOMPARE(a.values(), attrs.values());
+            for (int j = 0; j < attrs.size(); ++j) {
+                QCOMPARE(a.value(j), attrs.value(j));
+            }
+        }
+    }
+}
+
+void TestAttrsGenerator::_tst_mode(const SetOfAttributes& res, const QString& mode, const AttributesScope& ascope, const int& numOfAttrRges)
+{
+    if (mode == "min") {
+        for (const auto& attrs : res) {
+            for (int i = 0; i < attrs.size(); ++i) {
+                auto attrRge = ascope.value(attrs.name(i));
+                QCOMPARE(attrs.value(i), attrRge->min());
+            }
+        }
+    } else if (mode == "max") {
+        for (const auto& attrs : res) {
+            for (int i = 0; i < attrs.size(); ++i) {
+                auto attrRge = ascope.value(attrs.name(i));
+                QCOMPARE(attrs.value(i), attrRge->max());
+            }
+        }
+    } else if (mode == "rand") {
+        for (const auto& attrs : res) {
+            for (int i = 0; i < attrs.size(); ++i) {
+                auto attrRge = ascope.value(attrs.name(i));
+                QVERIFY(attrs.value(i) >= attrRge->min());
+                QVERIFY(attrs.value(i) <= attrRge->max());
+            }
+        }
+    } else {
+        qFatal("the mode is invalid!");
+    }
+}
+
+AttributesScope TestAttrsGenerator::_newAttrsScope(const QStringList& names, const QStringList& attrRges)
+{
+    Q_ASSERT(names.size() == attrRges.size());
+    AttributesScope attrsScope;
+    attrsScope.reserve(names.size());
+    for (int i = 0; i  < names.size(); ++i) {
+        AttributeRange* a = AttributeRange::parse(i, names.at(i), attrRges.at(i));
+        attrsScope.insert(a->attrName(), a);
+    }
+    return attrsScope;
+}
+
+QString TestAttrsGenerator::_makeCmd(const QString& func, const Values& values, const QStringList& names, const int sizeOfAG)
+{
+    if (func == "value") {
+        QString cmd = QString("#%1").arg(Value(sizeOfAG).toQString());
+
+        for (int i = 0; i < values.size(); i++) {
+            cmd += QString(";s%1_%2_%3").arg(names.at(i)).arg(func).arg(values[i].toQString());
+        }
+        return cmd;
+    } else if (func == "mixed") {
+        QStringList cmdList = {
+            Value(sizeOfAG).toQString(),
+            QString("%1_min").arg(names.at(0)),
+            QString("%1_max").arg(names.at(1)),
+            QString("%1_rand_123").arg(names.at(2)),
+            QString("%1_value_%2").arg(names.at(3)).arg(values[3].toQString())
+        };
+        return QString("#%1;%2;%3;%4;%5").arg(cmdList.at(0)).arg(cmdList.at(1)).arg(cmdList.at(2)).arg(cmdList.at(3)).arg(cmdList.at(4));
+    } else if (func == "min" || func == "max" || func.split("_").startsWith("rand")) {
+        QString cmd = QString("#%1").arg(Value(sizeOfAG).toQString());
+
+        for (const QString& name : names) {
+            cmd += QString(";%1_%2").arg(name).arg(func);
+        }
+        return cmd;
+    } else {
+        qFatal("the function is invalid!");
+        return nullptr;
+    }
+}
+
+void TestAttrsGenerator::_tst_parseStarCmd(const QString& func, const AttributesScope& attrsScope, const int& sizeOfAG, const Attributes& attrs)
+{
+    const Attributes emptyAttrs;
+    const QString cmd = QString("*%1;%2").arg(Value(sizeOfAG).toQString()).arg(func);
+    QString error;
+    AttrsGenerator* agen = AttrsGenerator::parse(attrsScope, cmd, error);
+
+    if (agen) { // If the command is valid (parse did not return a null pointer)
+        QCOMPARE(agen->command(), cmd);
+        QCOMPARE(agen->size(), sizeOfAG);
+
+        const SetOfAttributes res = agen->create();
+
+        if (attrsScope.isEmpty()) { // Valid * command with empty attrScope
+            _tst_attrs(res, emptyAttrs, true);
+        } else { // Valid * command with non-empty attrScope
+            if (func == "min" || func == "max") {
+                _tst_mode(res, func, attrsScope, attrsScope.size());
+            }
+            else if (func.split("_").startsWith("rand")) {
+                _tst_mode(res, func.split("_").first(), attrsScope, attrsScope.size());
+                _tst_attrs(res, attrs, false);
+            }
+        }
+    }
+}
 
 void TestAttrsGenerator::tst_parseStarCmd()
 {
-    QString error;
+    const QStringList names = {"test0", "test1", "test2"};
+    const QStringList attrRgeStrs = {"int[0,2]", "double[2.3,7.8]", "int{-2,0,2,4,6}"};
+    const AttributesScope validAScope = _newAttrsScope(names, attrRgeStrs);
+    const AttributesScope emptyAScope;
 
-    // - same mode for all attributes:
-    //         '*integer;[min|max|rand_seed]'
-    /*
-    AttributesScope attrsScope =
-    QString cmd =
-    AttrsGenerator* agen = AttrsGenerator::parse(attrsScope,cmd, error);
-    */
-    /** IMPORTANT: this function is likely to be very long,
-     * if so, consider breaking into smaller functions
-     * (perhaps tst_parseStarCmd_min(), tst_parseStarCmd_max() ...) **/
+    Attributes attrs(3);
+    for (int i = 0; i < attrs.size(); ++i) {
+        attrs.replace(i, names.at(i), NULL);
+    }
 
+    const QStringList funcs = {
+        // valid functions
+        "min", "max", "rand_0", "rand_10",
+        // invalid functions
+        "mim", "mn", "", "rand_-10", "_10", "rand_notInt", "invalid"
+    };
 
-    // Potential cases:
-    // - agen->command() should return the same 'cmd' string passed through the parser()
-    // - agen->size() should return the same number of 'cmd'
+    // Sizes <= 0 cause ASSERT failures
+//    const int sizes[] = {-100, -1, 0, 1, 3};
+    const int sizes[] = {1, 3, 100};
 
-
-    // use the create() function to create the set of attributes.
-    // Each element is an 'Attributes' object
-    // our aim is to check if 'cmd' is able to generate a SetOfAttributes with the correct data
-    // SetOfAttributes res = agen->create();
-
+    for (const auto& func : funcs) {
+        for (int size : sizes) {
+            _tst_parseStarCmd(func, validAScope, size, attrs);
+            _tst_parseStarCmd(func, emptyAScope, size, attrs);
+        }
+    }
 }
 
 void TestAttrsGenerator::tst_parseHashCmd()
 {
+    const int sizeOfAgen = 3;
+    const QStringList names = {"test0", "test1", "test2", "test3"};
+    const QStringList attrRgeStrs = {"int[0,2]", "double[2.3,7.8]", "int{-2,0,2,4,6}", "double{-2.2, -1.1, 0, 2.3}"};
+    const Values values = {Value(1), Value(3.6), Value(4), Value(-1.1)};
     QString error;
 
-    // - specific mode for each attribute:
-    //       '#integer;attrName_[min|max|rand_seed|value_val];...'
-    /*
-    AttributesScope attrsScope =
-    QString cmd =
-    AttrsGenerator* AttrsGenerator::parse(attrsScope,cmd, error);
-    */
-    /** IMPORTANT: this function is likely to be very long,
-     * if so, consider breaking into smaller functions
-     * (perhaps tst_parseStarHash_min(), tst_parseHashCmd_max() ...) **/
+    const QStringList funcs = {"min","max","rand_123", "rand_-123", "value", "mixed"};
 
-    // Potential cases:
-    // - AttrsGenerator::command() should return the same 'cmd' string passed through the parser()
-    // - AttrsGenerator::size() should return the same number of 'cmd'
+    for (const QString& func : funcs) {
+       const QString cmd = _makeCmd(func, values, names, sizeOfAgen);
+       const AttributesScope attrsScope = _newAttrsScope(names, attrRgeStrs);
+       AttrsGenerator* agen = AttrsGenerator::parse(attrsScope, cmd, error);
 
-    // use the create() function to create the set of attributes.
-    // Each element is an Attributes object
-    // our aim is to check if 'cmd' is able to generate a SetOfAttributes with the correct data
-    // SetOfAttributes res = agen->create();
+       QCOMPARE(agen->command(), cmd);
+       QCOMPARE(agen->size(), sizeOfAgen);
+
+       const SetOfAttributes res = agen->create();
+
+       Attributes attrs(4);
+
+       if (func == "min") {
+           for (int i = 0; i < attrs.size(); ++i) {
+               attrs.replace(i, names.at(i), attrsScope.value(names.at(i))->min());
+           }
+           _tst_attrs(res, attrs, true);
+       } else if (func == "max") {
+           for (int i = 0; i < attrs.size(); ++i) {
+               attrs.replace(i, names.at(i), attrsScope.value(names.at(i))->max());
+           }
+           _tst_attrs(res, attrs, true);
+       } else if (func.split("_").first() == "rand") {
+           for (int i = 0; i < attrs.size(); ++i) {
+               attrs.replace(i, names.at(i), NULL);
+           }
+            _tst_attrs(res, attrs, false);
+            _tst_mode(res, "rand", attrsScope, 4);
+       } else if (func == "value") {
+           for (int i = 0; i < attrs.size(); ++i) {
+               attrs.replace(i, names.at(i), values[i]);
+           }
+           _tst_attrs(res, attrs, true);
+       } else if (func == "mixed") {
+           for (int i = 0; i < (attrs.size()-1); ++i) {
+               attrs.replace(i, names.at(i), NULL);
+           }
+            attrs.replace(3, names.at(3), values[3]);
+            _tst_attrs(res, attrs, false);
+
+            for (const Attributes& a : res){
+                QCOMPARE(a.value(0), attrsScope.value(names.at(0))->min());
+                QCOMPARE(a.value(1), attrsScope.value(names.at(1))->max());
+                QVERIFY(a.value(2) <= attrsScope.value(names.at(2))->max());
+                QVERIFY(a.value(2) >= attrsScope.value(names.at(2))->min());
+                QCOMPARE(a.value(3), values[3]);
+            }
+       }
+    }
 }
 
 } // evoplex
