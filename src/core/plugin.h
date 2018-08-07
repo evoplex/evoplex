@@ -45,22 +45,22 @@ public:
 
     static Plugin* load(const QString& path, QString& error);
 
-    inline AbstractPlugin* create() const { return m_factory->create(); }
+    inline AbstractPlugin* create() const;
 
     // The plugin's key is used to identify this plugin internally
-    inline const PluginKey& key() const { return m_key; }
+    inline const PluginKey& key() const;
 
-    inline const QString& path() const { return m_libPath; }
-    inline PluginType type() const { return m_type; }
-    inline const QString& id() const { return m_id; }
-    inline const QString& author() const { return m_author; }
-    inline const QString& title() const { return m_title; }
-    inline const QString& description() const { return m_descr; }
-    inline quint16 version() const { return m_version; }
+    inline const QString& path() const;
+    inline PluginType type() const;
+    inline const QString& id() const;
+    inline const QString& author() const;
+    inline const QString& title() const;
+    inline const QString& description() const;
+    inline quint16 version() const;
 
-    inline const std::vector<QString>& pluginAttrsNames() const { return m_pluginAttrsNames; }
-    inline const AttributesScope& pluginAttrsScope() const { return m_pluginAttrsScope; }
-    inline const AttributeRangePtr pluginAttrRange(const QString& attr) const { return m_pluginAttrsScope.value(attr); }
+    inline const std::vector<QString>& pluginAttrsNames() const;
+    inline const AttributesScope& pluginAttrsScope() const;
+    inline const AttributeRangePtr pluginAttrRange(const QString& attr) const;
 
 protected:
     PluginType m_type;
@@ -84,8 +84,44 @@ private:
 
     static bool checkMetaData(const QJsonObject& metaData, QString& error);
 };
-} // evoplex
 
+inline AbstractPlugin* Plugin::create() const
+{ return m_factory->create(); }
+
+inline const PluginKey& Plugin::key() const
+{ return m_key; }
+
+inline const QString& Plugin::path() const
+{ return m_libPath; }
+
+inline PluginType Plugin::type() const
+{ return m_type; }
+
+inline const QString& Plugin::id() const
+{ return m_id; }
+
+inline const QString& Plugin::author() const
+{ return m_author; }
+
+inline const QString& Plugin::title() const
+{ return m_title; }
+
+inline const QString& Plugin::description() const
+{ return m_descr; }
+
+inline quint16 Plugin::version() const
+{ return m_version; }
+
+inline const std::vector<QString>& Plugin::pluginAttrsNames() const
+{ return m_pluginAttrsNames; }
+
+inline const AttributesScope& Plugin::pluginAttrsScope() const
+{ return m_pluginAttrsScope; }
+
+inline const AttributeRangePtr Plugin::pluginAttrRange(const QString& attr) const
+{ return m_pluginAttrsScope.value(attr); }
+
+} // evoplex
 // makes PluginType available to QMetaType system
 Q_DECLARE_METATYPE(evoplex::PluginKey)
 
