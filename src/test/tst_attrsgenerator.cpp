@@ -33,6 +33,8 @@ private slots:
     void cleanupTestCase() {}
     void tst_parseStarCmd();
     void tst_parseHashCmd();
+
+private:
     void _tst_attrs(const SetOfAttributes& res, const Attributes& attrs,  const bool testValues);
     void _tst_mode(const SetOfAttributes& res, const QString& mode, const AttributesScope& ascope, const int& numOfAttrRges);
     void _tst_parseStarCmd(const QString& func, const AttributesScope& attrsScope, const int& sizeOfAG, const Attributes& attrs);
@@ -102,7 +104,7 @@ QString TestAttrsGenerator::_makeCmd(const QString& func, const Values& values, 
         QString cmd = QString("#%1").arg(Value(sizeOfAG).toQString());
 
         for (int i = 0; i < values.size(); i++) {
-            cmd += QString(";s%1_%2_%3").arg(names.at(i)).arg(func).arg(values[i].toQString());
+            cmd += QString(";%1_%2_%3").arg(names.at(i)).arg(func).arg(values[i].toQString());
         }
         return cmd;
     } else if (func == "mixed") {
@@ -114,7 +116,7 @@ QString TestAttrsGenerator::_makeCmd(const QString& func, const Values& values, 
             QString("%1_value_%2").arg(names.at(3)).arg(values[3].toQString())
         };
         return QString("#%1;%2;%3;%4;%5").arg(cmdList.at(0)).arg(cmdList.at(1)).arg(cmdList.at(2)).arg(cmdList.at(3)).arg(cmdList.at(4));
-    } else if (func == "min" || func == "max" || func.split("_").startsWith("rand")) {
+    } else if (func == "min" || func == "max" || func.startsWith("rand")) {
         QString cmd = QString("#%1").arg(Value(sizeOfAG).toQString());
 
         for (const QString& name : names) {
@@ -123,7 +125,6 @@ QString TestAttrsGenerator::_makeCmd(const QString& func, const Values& values, 
         return cmd;
     } else {
         qFatal("the function is invalid!");
-        return nullptr;
     }
 }
 
@@ -132,7 +133,7 @@ void TestAttrsGenerator::_tst_parseStarCmd(const QString& func, const Attributes
     const Attributes emptyAttrs;
     const QString cmd = QString("*%1;%2").arg(Value(sizeOfAG).toQString()).arg(func);
     QString error;
-    AttrsGenerator* agen = AttrsGenerator::parse(attrsScope, cmd, error);
+    auto agen = AttrsGenerator::parse(attrsScope, cmd, error);
 
     if (agen) { // If the command is valid (parse did not return a null pointer)
         QCOMPARE(agen->command(), cmd);
@@ -145,8 +146,7 @@ void TestAttrsGenerator::_tst_parseStarCmd(const QString& func, const Attributes
         } else { // Valid * command with non-empty attrScope
             if (func == "min" || func == "max") {
                 _tst_mode(res, func, attrsScope, attrsScope.size());
-            }
-            else if (func.split("_").startsWith("rand")) {
+            } else if (func.split("_").startsWith("rand")) {
                 _tst_mode(res, func.split("_").first(), attrsScope, attrsScope.size());
                 _tst_attrs(res, attrs, false);
             }
@@ -163,7 +163,7 @@ void TestAttrsGenerator::tst_parseStarCmd()
 
     Attributes attrs(3);
     for (int i = 0; i < attrs.size(); ++i) {
-        attrs.replace(i, names.at(i), NULL);
+        attrs.replace(i, names.at(i), 0);
     }
 
     const QStringList funcs = {
@@ -193,12 +193,12 @@ void TestAttrsGenerator::tst_parseHashCmd()
     const Values values = {Value(1), Value(3.6), Value(4), Value(-1.1)};
     QString error;
 
-    const QStringList funcs = {"min","max","rand_123", "rand_-123", "value", "mixed"};
+    const QStringList funcs = {"min", "max", "rand_123", "value", "mixed"};
 
     for (const QString& func : funcs) {
        const QString cmd = _makeCmd(func, values, names, sizeOfAgen);
        const AttributesScope attrsScope = _newAttrsScope(names, attrRgeStrs);
-       AttrsGenerator* agen = AttrsGenerator::parse(attrsScope, cmd, error);
+       auto agen = AttrsGenerator::parse(attrsScope, cmd, error);
 
        QCOMPARE(agen->command(), cmd);
        QCOMPARE(agen->size(), sizeOfAgen);
@@ -219,7 +219,7 @@ void TestAttrsGenerator::tst_parseHashCmd()
            _tst_attrs(res, attrs, true);
        } else if (func.split("_").first() == "rand") {
            for (int i = 0; i < attrs.size(); ++i) {
-               attrs.replace(i, names.at(i), NULL);
+               attrs.replace(i, names.at(i), 0);
            }
             _tst_attrs(res, attrs, false);
             _tst_mode(res, "rand", attrsScope, 4);
@@ -230,7 +230,7 @@ void TestAttrsGenerator::tst_parseHashCmd()
            _tst_attrs(res, attrs, true);
        } else if (func == "mixed") {
            for (int i = 0; i < (attrs.size()-1); ++i) {
-               attrs.replace(i, names.at(i), NULL);
+               attrs.replace(i, names.at(i), 0);
            }
             attrs.replace(3, names.at(3), values[3]);
             _tst_attrs(res, attrs, false);
