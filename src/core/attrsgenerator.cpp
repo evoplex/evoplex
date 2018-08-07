@@ -116,7 +116,8 @@ std::unique_ptr<AGSameFuncForAll> AttrsGenerator::parseStarCmd(
         return nullptr;
     }
 
-    return std::make_unique<AGSameFuncForAll>(attrsScope, size, func, value);
+    return std::unique_ptr<AGSameFuncForAll>(
+            new AGSameFuncForAll(attrsScope, size, func, value));
 }
 
 std::unique_ptr<AGDiffFunctions> AttrsGenerator::parseHashCmd(
@@ -179,7 +180,8 @@ std::unique_ptr<AGDiffFunctions> AttrsGenerator::parseHashCmd(
         attrCmds.emplace_back(attrCmd);
     }
 
-    return std::make_unique<AGDiffFunctions>(attrsScope, size, attrCmds);
+    return std::unique_ptr<AGDiffFunctions>(
+            new AGDiffFunctions(attrsScope, size, attrCmds));
 }
 
 Value AttrsGenerator::parseRandSeed(QString seedStr)

@@ -32,15 +32,20 @@ AttributeRangePtr AttributeRange::parse(int attrId, const QString& attrName,
 {
     AttributeRangePtr vs;
     if (attrRangeStr == "bool") {
-        vs = std::make_unique<SingleValue>(attrId, attrName, Bool);
+        vs = std::unique_ptr<SingleValue>(
+                new SingleValue(attrId, attrName, Bool));
     } else if (attrRangeStr == "string") {
-        vs = std::make_unique<SingleValue>(attrId, attrName, String);
+        vs = std::unique_ptr<SingleValue>(
+                new SingleValue(attrId, attrName, String));
     } else if (attrRangeStr == "non-empty-string") {
-        vs = std::make_unique<SingleValue>(attrId, attrName, NonEmptyString);
+        vs = std::unique_ptr<SingleValue>(
+                new SingleValue(attrId, attrName, NonEmptyString));
     } else if (attrRangeStr == "dirpath") {
-        vs = std::make_unique<SingleValue>(attrId, attrName, DirPath);
+        vs = std::unique_ptr<SingleValue>(
+                new SingleValue(attrId, attrName, DirPath));
     } else if (attrRangeStr == "filepath") {
-        vs = std::make_unique<SingleValue>(attrId, attrName, FilePath);
+        vs = std::unique_ptr<SingleValue>(
+                new SingleValue(attrId, attrName, FilePath));
     } else if (attrRangeStr.contains('{') && attrRangeStr.endsWith('}')) {
         vs = setOfValues(attrRangeStr, attrId, attrName);
     } else if (attrRangeStr.contains('[') && attrRangeStr.endsWith(']')) {
@@ -49,7 +54,7 @@ AttributeRangePtr AttributeRange::parse(int attrId, const QString& attrName,
 
     if (!vs || !vs->isValid()) {
         qWarning() << "unable to parse" << attrRangeStr;
-        vs = std::make_unique<SingleValue>();
+        vs = std::unique_ptr<SingleValue>(new SingleValue());
     }
     return vs;
 }
@@ -84,13 +89,13 @@ AttributeRangePtr AttributeRange::setOfValues(QString attrRangeStr, const int id
             values.push_back(vStr);
         }
     } else {
-        return std::make_unique<SingleValue>();
+        return std::unique_ptr<SingleValue>(new SingleValue());
     }
 
     if (!ok) {
-        return std::make_unique<SingleValue>();
+        return std::unique_ptr<SingleValue>(new SingleValue());
     }
-    return std::make_unique<SetOfValues>(id, attrName, type, values);
+    return std::unique_ptr<SetOfValues>(new SetOfValues(id, attrName, type, values));
 }
 
 AttributeRangePtr AttributeRange::intervalOfValues(QString attrRangeStr, const int id,
@@ -98,7 +103,7 @@ AttributeRangePtr AttributeRange::intervalOfValues(QString attrRangeStr, const i
 {
     QStringList values = attrRangeStr.remove("[").remove("]").split(",");
     if (values.size() != 2) {
-        return std::make_unique<SingleValue>();
+        return std::unique_ptr<SingleValue>(new SingleValue());
     }
 
     Type type;
@@ -128,13 +133,14 @@ AttributeRangePtr AttributeRange::intervalOfValues(QString attrRangeStr, const i
             max = Value(values.at(1).toDouble(&ok2));
         }
     } else {
-        return std::make_unique<SingleValue>();
+        return std::unique_ptr<SingleValue>(new SingleValue());
     }
 
     if (!ok1 || !ok2) {
-        return std::make_unique<SingleValue>();
+        return std::unique_ptr<SingleValue>(new SingleValue());
     }
-    return std::make_unique<IntervalOfValues>(id, attrName, type, min, max);
+    return std::unique_ptr<IntervalOfValues>(
+            new IntervalOfValues(id, attrName, type, min, max));
 }
 
 Value AttributeRange::validate(const QString& valueStr) const
@@ -277,7 +283,8 @@ SingleValue::SingleValue()
 
 /**********************************/
 
-IntervalOfValues::IntervalOfValues(int id, const QString& attrName, Type type, const Value& min, const Value& max)
+IntervalOfValues::IntervalOfValues(int id, const QString& attrName, Type type,
+                                   const Value& min, const Value& max)
     : AttributeRange(id, attrName, type)
 {
     m_min = min;
