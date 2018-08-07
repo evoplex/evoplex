@@ -220,17 +220,17 @@ AGSameFuncForAll::AGSameFuncForAll(const AttributesScope& attrsScope, const int 
     switch (m_function) {
     case Function::Min:
         m_command = QString("*%1;min").arg(m_size);
-        f_value = [](auto attrRange) { return attrRange->min(); };
+        f_value = [](AttributeRangePtr attrRange) { return attrRange->min(); };
         break;
     case Function::Max:
         m_command = QString("*%1;max").arg(m_size);
-        f_value = [](auto attrRange) { return attrRange->max(); };
+        f_value = [](AttributeRangePtr attrRange) { return attrRange->max(); };
         break;
     case Function::Rand:
         Q_ASSERT_X(funcInput.type() == Value::INT, "AGSameFuncForAll", "rand function expects an integer seed.");
         m_command = QString("*%1;rand_%2").arg(m_size).arg(funcInput.toQString());
         m_prg = new PRG(funcInput.toUInt());
-        f_value = [this](auto attrRange) { return attrRange->rand(m_prg); };
+        f_value = [this](AttributeRangePtr attrRange) { return attrRange->rand(m_prg); };
         break;
     default:
         qFatal("invalid function!");
