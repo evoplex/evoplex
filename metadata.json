@@ -1,7 +1,8 @@
 {
   "type": "model",
   "uid": "populationGrowthModel",
-  "name": "Population Growth Model",
+  "version": 1,
+  "title": "Population Growth Model",
   "author": "Evoplex",
   "description": "This model simulates the spread of infection across a population.",
 
