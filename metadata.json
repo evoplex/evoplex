@@ -5,6 +5,6 @@
   "author": "Evoplex",
   "description": "This model simulates the spread of infection across a population.",
 
-  "nodeAttributesScope": [ {"infected": "bool"}, {"infected_next_state": "bool"} ],
+  "nodeAttributesScope": [ {"infected": "bool"} ],
   "pluginAttributesScope": [ {"prob": "double[0,1]"} ]
 }
