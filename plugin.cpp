@@ -9,8 +9,7 @@ namespace evoplex {
 
 bool MinimalModel::init()
 {
-    m_live = AbstractModel::nodes().at(0)->attrs().indexOf("live");
-    m_live_next_state = AbstractModel::nodes().at(0)->attrs().indexOf("live_next_state");
+    m_live = node(0).attrs().indexOf("live");
 
     return true;
 }
@@ -18,41 +17,48 @@ bool MinimalModel::init()
 bool MinimalModel::algorithmStep()
 {
     int liveNeighbourCount;
-    NodePtr currentNode, neighbour;
+    NodePtr currentNode;
     bool nextState;
 
-    for (Nodes::Pair np : nodes()) {
-        currentNode = np.node();
+
+    std::vector<bool> nextInfectedStates;
+    nextInfectedStates.reserve(nodes().size());
+
+    for (Node node : nodes()) {
         liveNeighbourCount = 0;
 
-        for (Edges::Pair ep : np.node()->outEdges()) {
-            neighbour = ep.edge()->neighbour();
+        for(Edge edge : node.outEdges()){
+            Node neighbour = edge.neighbour();
 
             // If the neighbour is alive
-            if (neighbour->attrs().value(m_live).toBool()) {
+            if (neighbour.attrs().value(m_live).toBool()) {
                 liveNeighbourCount++;
             }
         }
 
-        if (currentNode->attrs().value(m_live).toBool()) {
+
+
+        if (node.attrs().value(m_live).toBool()) {
             if (liveNeighbourCount < 2) { // Case 1: Underpopulation
-                currentNode->setAttr(m_live_next_state, false);
+                nextInfectedStates.emplace_back(false);
             } else if ((liveNeighbourCount == 2)||(liveNeighbourCount == 3)) { // Case 2: Lives to next state
-                currentNode->setAttr(m_live_next_state, true);
+                nextInfectedStates.emplace_back(true);
             } else if (liveNeighbourCount > 3) { // Case 3: Overpopulation
-                currentNode->setAttr(m_live_next_state, false);
+                nextInfectedStates.emplace_back(false);
             }
         } else {
            if (liveNeighbourCount == 3) { // Case 4: Reproduction
-               currentNode->setAttr(m_live_next_state, true);
+               nextInfectedStates.emplace_back(true);
            }
        }
     }
 
-    for (Nodes::Pair np : nodes()) {
-        currentNode = np.node();
-        nextState = currentNode->attrs().value(m_live_next_state).toBool();
-        currentNode->setAttr(m_live, nextState);
+
+    // For each node, load the next state into the current state
+    size_t i = 0;
+    for (Node node : nodes()) {
+        node.setAttr(m_live, Value(nextInfectedStates.at(i)).toBool());
+        ++i;
     }
     return true;
 }
