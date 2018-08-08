@@ -19,16 +19,12 @@ bool MinimalModel::init()
 
 bool MinimalModel::algorithmStep()
 {
-    NodePtr currentNode, neighbour;
-    double randTest;
-    bool next_state_infection;
-
     std::vector<bool> nextInfectedStates;
     nextInfectedStates.reserve(nodes().size());
 
     // For each node
     for (Nodes::Pair np : nodes()) {
-        currentNode = np.node();
+        NodePtr currentNode = np.node();
 
         // if the node is already infected, there's nothing to do
         if (currentNode->attr(m_infectedAttrId).toBool()) {
