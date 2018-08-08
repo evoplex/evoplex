@@ -24,10 +24,13 @@ bool MinimalModel::algorithmStep()
     double randTest;
     bool next_state_infection;
 
+    std::vector<bool> nextInfectedStates;
+    nextInfectedStates.reserve(nodes().size());
+
     // For each node
-//    for (Nodes::Pair np : nodes()) {
-//        currentNode = np.node();
-//    }
+    for (Nodes::Pair np : nodes()) {
+        currentNode = np.node();
+    }
 
     // For each node
 //    for (int i = 0; i < m_number_of_nodes; ++i) {
