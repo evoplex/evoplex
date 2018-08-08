@@ -16,10 +16,8 @@ public:
     bool algorithmStep() override;
 
 private:
-    int m_infected;
-    int m_infected_next_state;
+    int m_infectedAttrId;
     int m_prob;
-    int m_number_of_nodes;
 };
 } // evoplex
 #endif // MINIMAL_MODEL_H

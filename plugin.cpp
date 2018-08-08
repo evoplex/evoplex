@@ -9,12 +9,12 @@ namespace evoplex {
 
 bool MinimalModel::init()
 {
-    m_infected = AbstractModel::nodes().at(0)->attrs().indexOf("infected");
+    m_infectedAttrId = AbstractModel::nodes().at(0)->attrs().indexOf("infected");
 
     // Initializing global variables
     m_prob = attr("prob").toDouble();
 
-    return m_infected >= 0;
+    return m_infectedAttrId >= 0;
 }
 
 bool MinimalModel::algorithmStep()
@@ -23,6 +23,11 @@ bool MinimalModel::algorithmStep()
     NodePtr currentNode, neighbour;
     double randTest;
     bool next_state_infection;
+
+    // For each node
+//    for (Nodes::Pair np : nodes()) {
+//        currentNode = np.node();
+//    }
 
     // For each node
 //    for (int i = 0; i < m_number_of_nodes; ++i) {
@@ -48,10 +53,12 @@ bool MinimalModel::algorithmStep()
 //        }
 //    }
 
-    // For each node, load the next state into the current state
-//    for (int i = 0; i < m_number_of_nodes; ++i) {
-//        currentNode = AbstractModel::nodes().at(i);
-//        next_state_infection = currentNode->attrs().value(m_infected_next_state).toBool();
+
+
+//     For each node, load the next state into the current state
+//    for (Nodes::Pair np : nodes()) {
+//        currentNode = np.node();
+//        next_state_infection = currentNode->attrs().value(m_infected+1).toBool();
 //        currentNode->setAttr(m_infected, next_state_infection);
 //    }
     return true;
