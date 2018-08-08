@@ -17,9 +17,6 @@ bool MinimalModel::init()
 bool MinimalModel::algorithmStep()
 {
     int liveNeighbourCount;
-    NodePtr currentNode;
-    bool nextState;
-
 
     std::vector<bool> nextInfectedStates;
     nextInfectedStates.reserve(nodes().size());
@@ -38,26 +35,29 @@ bool MinimalModel::algorithmStep()
 
 
 
-        if (node.attrs().value(m_live).toBool()) {
-            if (liveNeighbourCount < 2) { // Case 1: Underpopulation
+        if (node.attrs().value(m_live).toBool()) { // If the cell is live
+            if (liveNeighbourCount < 2) { // Underpopulation
                 nextInfectedStates.emplace_back(false);
-            } else if ((liveNeighbourCount == 2)||(liveNeighbourCount == 3)) { // Case 2: Lives to next state
+            } else if ((liveNeighbourCount == 2)||(liveNeighbourCount == 3)) { // Lives to next state
                 nextInfectedStates.emplace_back(true);
-            } else if (liveNeighbourCount > 3) { // Case 3: Overpopulation
+            }  else if (liveNeighbourCount > 3){ // Overpopulation
                 nextInfectedStates.emplace_back(false);
             }
         } else {
-           if (liveNeighbourCount == 3) { // Case 4: Reproduction
+            if (liveNeighbourCount == 3) { // Reproduction
                nextInfectedStates.emplace_back(true);
-           }
-       }
+            } else { // Remains dead
+                nextInfectedStates.emplace_back(false);
+            }
+        }
     }
+
 
 
     // For each node, load the next state into the current state
     size_t i = 0;
     for (Node node : nodes()) {
-        node.setAttr(m_live, Value(nextInfectedStates.at(i)).toBool());
+        node.setAttr(m_live, Value(nextInfectedStates.at(0)).toBool());
         ++i;
     }
     return true;
