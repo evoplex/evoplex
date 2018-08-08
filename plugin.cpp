@@ -57,8 +57,7 @@ bool PopulationGrowth::algorithmStep()
             continue;
         }
 
-        bool inf = Value(nextInfectedStates.at(i)).toBool();
-        currentNode->setAttr(m_infectedAttrId, inf);
+        currentNode->setAttr(m_infectedAttrId, Value(nextInfectedStates.at(i)).toBool());
         ++i;
     }
 
