@@ -3,13 +3,13 @@
  * Copyright (C) 2016-present
  */
 
-#ifndef MINIMAL_MODEL_H
-#define MINIMAL_MODEL_H
+#ifndef GAME_OF_LIFE_MODEL_H
+#define GAME_OF_LIFE_MODEL_H
 
 #include <plugininterface.h>
 
 namespace evoplex {
-class MinimalModel: public AbstractModel
+class GameOfLifeModel: public AbstractModel
 {
 public:
     bool init() override;
@@ -19,4 +19,4 @@ private:
     bool m_live;
 };
 } // evoplex
-#endif // MINIMAL_MODEL_H
+#endif // GAME_OF_LIFE_MODEL_H

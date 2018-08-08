@@ -7,14 +7,14 @@
 
 namespace evoplex {
 
-bool MinimalModel::init()
+bool GameOfLifeModel::init()
 {
     m_live = node(0).attrs().indexOf("live");
 
     return true;
 }
 
-bool MinimalModel::algorithmStep()
+bool GameOfLifeModel::algorithmStep()
 {
     int liveNeighbourCount;
 
@@ -33,8 +33,6 @@ bool MinimalModel::algorithmStep()
             }
         }
 
-
-
         if (node.attrs().value(m_live).toBool()) { // If the cell is live
             if (liveNeighbourCount < 2) { // Underpopulation
                 nextInfectedStates.emplace_back(false);
@@ -52,8 +50,6 @@ bool MinimalModel::algorithmStep()
         }
     }
 
-
-
     // For each node, load the next state into the current state
     size_t i = 0;
     for (Node node : nodes()) {
@@ -64,5 +60,5 @@ bool MinimalModel::algorithmStep()
 }
 
 } // evoplex
-REGISTER_PLUGIN(MinimalModel)
+REGISTER_PLUGIN(GameOfLifeModel)
 #include "plugin.moc"
