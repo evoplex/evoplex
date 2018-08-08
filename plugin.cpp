@@ -64,15 +64,15 @@ bool MinimalModel::algorithmStep()
 //            }
 //        }
 //    }
-
-//    size_t i = 0;
-//    for (Nodes::Pair np : nodes()) {
-//        NodePtr currentNode = np.node();
-//        currentNode->setAttr(m_infectedAttrId, nextInfectedStates.at(i));
-//        ++i;
-//    }
-
 //     For each node, load the next state into the current state
+    size_t i = 0;
+    for (Nodes::Pair np : nodes()) {
+        NodePtr currentNode = np.node();
+        currentNode->setAttr(m_infectedAttrId, Value(nextInfectedStates.at(i)).toBool());
+        ++i;
+    }
+
+
 //    for (Nodes::Pair np : nodes()) {
 //        currentNode = np.node();
 //        next_state_infection = currentNode->attrs().value(m_infected+1).toBool();
