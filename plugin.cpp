@@ -16,13 +16,11 @@ bool GameOfLifeModel::init()
 
 bool GameOfLifeModel::algorithmStep()
 {
-    int liveNeighbourCount;
-
     std::vector<bool> nextInfectedStates;
     nextInfectedStates.reserve(nodes().size());
 
     for (Node node : nodes()) {
-        liveNeighbourCount = 0;
+        int liveNeighbourCount = 0;
 
         for(Edge edge : node.outEdges()){
             Node neighbour = edge.neighbour();
