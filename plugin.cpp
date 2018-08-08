@@ -7,7 +7,7 @@
 
 namespace evoplex {
 
-bool MinimalModel::init()
+bool PopulationGrowth::init()
 {
     m_infectedAttrId = AbstractModel::nodes().at(0)->attrs().indexOf("infected");
 
@@ -17,7 +17,7 @@ bool MinimalModel::init()
     return m_infectedAttrId >= 0;
 }
 
-bool MinimalModel::algorithmStep()
+bool PopulationGrowth::algorithmStep()
 {
     std::vector<bool> nextInfectedStates;
     nextInfectedStates.reserve(nodes().size());
@@ -64,5 +64,5 @@ bool MinimalModel::algorithmStep()
     return true;
 }
 } // evoplex
-REGISTER_PLUGIN(MinimalModel)
+REGISTER_PLUGIN(PopulationGrowth)
 #include "plugin.moc"
