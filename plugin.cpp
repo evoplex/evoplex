@@ -19,7 +19,6 @@ bool MinimalModel::init()
 
 bool MinimalModel::algorithmStep()
 {
-    PRG* prg = new PRG(123);
     NodePtr currentNode, neighbour;
     double randTest;
     bool next_state_infection;
@@ -35,6 +34,22 @@ bool MinimalModel::algorithmStep()
         if (currentNode->attr(m_infectedAttrId).toBool()) {
             continue;
         }
+
+        // Select a random neighbour
+        const NodePtr neighbour = currentNode->randNeighbour(AbstractModel::prg());
+
+        // Check if the neighbour is currently infected
+//        if (neighbour->attrs().value(m_infected).toBool()) {
+//            // Generate a random double in the range [0,1]
+//            randTest = prg->randD(0,1);
+
+//            // Test if the number is less than or equal to the probablilty
+//            // (The probablity of this being true is the same as the probability itself)
+//            // Infect the next state of the current node if true
+//            if (randTest <= m_prob) {
+//                currentNode->setAttr(m_infected_next_state, true);
+//            }
+//        }
     }
 
     // For each node
