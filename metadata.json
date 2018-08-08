@@ -1,10 +1,11 @@
 {
   "type": "model",
   "uid": "gameOfLife",
-  "name": "Game Of Life",
+  "title": "Game Of Life",
+  "version": 1,
   "author": "Evoplex",
   "description": "This implements Conway's Game Of Life cellular automaton",
   "supportedGraphs": ["squareGrid","customGraph"],
 
-  "nodeAttributesScope": [ {"live": "bool"}, {"live_next_state": "bool"} ]
+  "nodeAttributesScope": [ {"live": "bool"} ]
 }
