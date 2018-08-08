@@ -9,7 +9,8 @@ namespace evoplex {
 
 bool PopulationGrowth::init()
 {
-    m_infectedAttrId = AbstractModel::nodes().at(0)->attrs().indexOf("infected");
+    // gets the id of the `infected` node's attribute, which is the same for all nodes
+    m_infectedAttrId = node(0)->attrs().indexOf("infected");
 
     // initializing model attribute, which is constant throughout the simulation
     m_prob = attr("prob").toDouble();
