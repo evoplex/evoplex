@@ -30,6 +30,11 @@ bool MinimalModel::algorithmStep()
     // For each node
     for (Nodes::Pair np : nodes()) {
         currentNode = np.node();
+
+        // if the node is already infected, there's nothing to do
+        if (currentNode->attr(m_infectedAttrId).toBool()) {
+            continue;
+        }
     }
 
     // For each node
