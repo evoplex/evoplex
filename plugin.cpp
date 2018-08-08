@@ -38,6 +38,8 @@ bool MinimalModel::algorithmStep()
         if (neighbour->attrs().value(m_infectedAttrId).toBool()) {
             const bool infected = m_prob > prg()->randD();
             nextInfectedStates.emplace_back(infected);
+        } else {
+            nextInfectedStates.emplace_back(false);
         }
     }
 
@@ -68,6 +70,12 @@ bool MinimalModel::algorithmStep()
     size_t i = 0;
     for (Nodes::Pair np : nodes()) {
         NodePtr currentNode = np.node();
+
+        // if the node is already infected, there's nothing to do
+        if (currentNode->attr(m_infectedAttrId).toBool()) {
+            continue;
+        }
+
         currentNode->setAttr(m_infectedAttrId, Value(nextInfectedStates.at(i)).toBool());
         ++i;
     }
