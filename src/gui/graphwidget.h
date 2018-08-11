@@ -74,7 +74,7 @@ protected:
     int m_zoomLevel;
     qreal m_nodeSizeRate;
     qreal m_nodeRadius;
-    QPoint m_origin;
+    QPointF m_origin;
 
     CacheStatus m_cacheStatus;
 
@@ -99,7 +99,7 @@ private slots:
 private:
     ExperimentWidget* m_expWidget; // parent
     QTimer m_updateCacheTimer;
-    QPoint m_posEntered;
+    QPointF m_posEntered;
     quint16 m_currTrialId;
 
     std::vector<QLineEdit*> m_attrs;

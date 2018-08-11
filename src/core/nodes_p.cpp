@@ -110,7 +110,6 @@ Nodes NodesPrivate::fromFile(const QString& filePath, const AttributesScope& att
         QStringList values = in.readLine().split(",");
         Node node = readRow(row, header, values, attrsScope, isDirected, error);
         if (node.isNull()) {
-            error = QString("%1\n row: %2").arg(error).arg(row);
             qWarning() << error;
             return Nodes();
         }
@@ -204,32 +203,38 @@ Node NodesPrivate::readRow(const int row, const QStringList& header, const QStri
         const AttributesScope& attrsScope, const bool isDirected, QString& error)
 {
     if (values.size() != header.size()) {
-        error = "rows must have the same number of columns!";
+        error += QString("the row %1 should have % columns!").arg(row).arg(header.size());
         return Node();
     }
 
-    int coordX = 0;
-    int coordY = row;
+    AttributeRangePtr attrRange;
+    float coordX = 0.f;
+    float coordY = row;
     Attributes attrs(attrsScope.size());
     for (int col = 0; col < values.size(); ++col) {
-        bool isValid = false;
+        bool isValid = true;
         if (header.at(col) == "x") {
-            coordX = values.at(col).toInt(&isValid);
+            coordX = values.at(col).toFloat(&isValid);
         } else if (header.at(col) == "y") {
-            coordY = values.at(col).toInt(&isValid);
+            coordY = values.at(col).toFloat(&isValid);
         } else {
-            auto attrRange = attrsScope.value(header.at(col), nullptr);
+            attrRange = attrsScope.value(header.at(col), nullptr);
             if (attrRange) { // is null if the column is not required
                 Value value = attrRange->validate(values.at(col));
                 if (value.isValid()) {
-                    isValid = true;
                     attrs.replace(attrRange->id(), header.at(col), value);
+                } else {
+                    isValid = false;
                 }
             }
         }
 
         if (!isValid) {
-            error = QString("invalid value at column: %1").arg(col);
+            error += QString("invalid value at column %1 ('%2') row %3!\n"
+                             "Expected: %4; Actual: %5")
+                    .arg(col).arg(header.at(col)).arg(row)
+                    .arg(attrRange ? attrRange->attrRangeStr() : "a number")
+                    .arg(values.at(col));
             return Node();
         }
     }

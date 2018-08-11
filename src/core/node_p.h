@@ -79,12 +79,12 @@ public:
     inline void setAttr(const int id, const Value& value);
 
     inline int id() const;
-    inline int x() const;
-    inline int y() const;
+    inline float x() const;
+    inline float y() const;
 
-    inline void setX(int x);    
-    inline void setY(int y);
-    inline void setCoords(int x, int y);
+    inline void setX(float x);
+    inline void setY(float y);
+    inline void setCoords(float x, float y);
 
     inline const Node& randNeighbour(PRG* prg) const;
 
@@ -93,21 +93,21 @@ protected:
 
     struct constructor_key { /* this is a private key accessible only to friends */ };
 
-    explicit BaseNode(const constructor_key&, int id, const Attributes& attrs, int x, int y);
+    explicit BaseNode(const constructor_key&, int id, const Attributes& attrs, float x, float y);
     explicit BaseNode(const constructor_key& k, int id, const Attributes& attr);
     ~BaseNode() override;
 
 private:
     const int m_id;
     Attributes m_attrs;
-    int m_x;
-    int m_y;
+    float m_x;
+    float m_y;
 };
 
 class UNode : public BaseNode
 {
 public:
-    explicit UNode(const constructor_key& k, int id, const Attributes& attrs, int x, int y);
+    explicit UNode(const constructor_key& k, int id, const Attributes& attrs, float x, float y);
     explicit UNode(const constructor_key& k, int id, const Attributes& attrs);
     ~UNode() override = default;
 
@@ -130,7 +130,7 @@ private:
 class DNode : public BaseNode
 {
 public:
-    explicit DNode(const constructor_key& k, int id, const Attributes& attrs, int x, int y);
+    explicit DNode(const constructor_key& k, int id, const Attributes& attrs, float x, float y);
     explicit DNode(const constructor_key& k, int id, const Attributes& attrs);
     ~DNode() override = default;
 
@@ -171,19 +171,19 @@ inline void BaseNode::setAttr(const int id, const Value& value)
 inline int BaseNode::id() const
 { return m_id; }
 
-inline int BaseNode::x() const
+inline float BaseNode::x() const
 { return m_x; }
 
-inline void BaseNode::setX(int x)
+inline void BaseNode::setX(float x)
 { m_x = x; }
 
-inline int BaseNode::y() const
+inline float BaseNode::y() const
 { return m_y; }
 
-inline void BaseNode::setY(int y)
+inline void BaseNode::setY(float y)
 { m_y = y; }
 
-inline void BaseNode::setCoords(int x, int y)
+inline void BaseNode::setCoords(float x, float y)
 { setX(x); setY(y); }
 
 inline const Node& BaseNode::randNeighbour(PRG* prg) const

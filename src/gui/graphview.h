@@ -46,7 +46,7 @@ private:
 
     int m_edgeAttr;
     ColorMap* m_edgeCMap;
-    float m_edgeSizeRate;
+    qreal m_edgeSizeRate;
 
     bool m_showNodes;
     bool m_showEdges;

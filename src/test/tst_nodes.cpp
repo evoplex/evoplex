@@ -360,18 +360,18 @@ void TestNodes::tst_fromFile_nodes_with_xy() {
     QVERIFY(nodesOfSameType<UNode>(nodesFromFile));
 
     nodes.at(0).setAttr(0, true);
-    nodes.at(0).setX(123);
+    nodes.at(0).setX(123.998f);
     nodes.at(0).setY(456);
 
     nodes.at(1).setAttr(0, false);
-    nodes.at(1).setX(456);
-    nodes.at(1).setY(-789);
+    nodes.at(1).setX(456.0987f);
+    nodes.at(1).setY(-789.112189f);
 
     nodes.at(2).setAttr(0, true);
     nodes.at(2).setX(-789);
     nodes.at(2).setY(789);
 
-    _compare_nodes(nodes,nodesFromFile);
+    _compare_nodes(nodes, nodesFromFile);
 
     // Test type returned for directed graph type
     graphType = GraphType::Directed;

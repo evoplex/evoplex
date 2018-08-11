@@ -31,8 +31,8 @@ namespace evoplex
 {
 
 GraphView::GraphView(MainGUI* mainGUI, ExperimentPtr exp, ExperimentWidget* parent)
-    : GraphWidget(mainGUI, exp, parent)
-    , m_edgeSizeRate(25.f)
+    : GraphWidget(mainGUI, exp, parent),
+      m_edgeSizeRate(25.)
 {
     setWindowTitle("Graph");
 
@@ -63,12 +63,12 @@ CacheStatus GraphView::refreshCache()
         return CacheStatus::Ready;
     }
 
-    float edgeSizeRate = m_edgeSizeRate * static_cast<float>(std::pow(1.25f, m_zoomLevel));
+    qreal edgeSizeRate = m_edgeSizeRate * std::pow(1.25f, m_zoomLevel);
     m_cache.reserve(m_trial->graph()->nodes().size());
 
     for (auto const& np : m_trial->graph()->nodes()) {
-        QPointF xy(m_origin.x() + edgeSizeRate * (1.f + np.second.x()),
-                   m_origin.y() + edgeSizeRate * (1.f + np.second.y()));
+        QPointF xy(m_origin.x() + edgeSizeRate * (1. + np.second.x()),
+                   m_origin.y() + edgeSizeRate * (1. + np.second.y()));
 
         if (!rect().contains(xy.toPoint())) {
             continue;

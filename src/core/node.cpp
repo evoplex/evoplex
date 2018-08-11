@@ -48,10 +48,10 @@ NodePtr Node::clone() const
 int Node::id() const
 { return m_ptr->id(); }
 
-int Node::x() const
+float Node::x() const
 { return m_ptr->x(); }
 
-int Node::y() const
+float Node::y() const
 { return m_ptr->y(); }
 
 const Attributes& Node::attrs() const
@@ -84,13 +84,13 @@ int Node::outDegree() const
 void Node::setAttr(const int id, const Value& value)
 { m_ptr->setAttr(id, value); }
 
-void Node::setX(int x)
+void Node::setX(float x)
 { m_ptr->setX(x); }
 
-void Node::setY(int y)
+void Node::setY(float y)
 { m_ptr->setY(y); }
 
-void Node::setCoords(int x, int y)
+void Node::setCoords(float x, float y)
 { m_ptr->setCoords(x, y); }
 
 } // evoplex

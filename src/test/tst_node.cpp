@@ -38,7 +38,7 @@ private slots:
 private:
     BaseNode::constructor_key key;
     void _tst_attrs(BaseNode* node, Attributes attrs);
-    void _tst_xy(BaseNode* node, int x, int y);
+    void _tst_xy(BaseNode* node, float x, float y);
     void _tst_clone(const BaseNode* node);
     void _tst_degree(BaseNode* node);
 };
@@ -59,7 +59,7 @@ void TestNode::_tst_attrs(BaseNode* node, Attributes attrs)
     QCOMPARE(node->attrs().size(), attrs.size());
 }
 
-void TestNode::_tst_xy(BaseNode* node, int x, int y)
+void TestNode::_tst_xy(BaseNode* node, float x, float y)
 {
     QCOMPARE(node->x(), x);
     QCOMPARE(node->y(), y);

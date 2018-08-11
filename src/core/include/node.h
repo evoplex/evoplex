@@ -48,8 +48,8 @@ public:
     NodePtr clone() const;
 
     int id() const;
-    int x() const;
-    int y() const;
+    float x() const;
+    float y() const;
 
     const Attributes& attrs() const;
     const Value& attr(size_t id) const;
@@ -64,9 +64,9 @@ public:
     int outDegree() const;
 
     void setAttr(const int id, const Value& value);
-    void setX(int x);
-    void setY(int y);
-    void setCoords(int x, int y);
+    void setX(float x);
+    void setY(float y);
+    void setCoords(float x, float y);
 
 private:
     NodePtr m_ptr;

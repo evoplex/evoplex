@@ -43,10 +43,10 @@ GraphWidget::GraphWidget(MainGUI* mainGUI, ExperimentPtr exp, ExperimentWidget* 
     , m_zoomLevel(0)
     , m_nodeSizeRate(10.)
     , m_nodeRadius(m_nodeSizeRate)
-    , m_origin(5,25)
+    , m_origin(5., 25.)
     , m_cacheStatus(CacheStatus::Ready)
     , m_expWidget(parent)
-    , m_posEntered(0,0)
+    , m_posEntered(0., 0.)
     , m_currTrialId(0)
 {
     setAttribute(Qt::WA_DeleteOnClose, true);
@@ -209,7 +209,7 @@ void GraphWidget::zoomOut()
 
 void GraphWidget::resetView()
 {
-    m_origin = QPoint(5,25);
+    m_origin = QPointF(5., 25.);
     m_zoomLevel = 0;
     m_nodeRadius = m_nodeSizeRate;
     m_selectedNode = -1;
@@ -220,7 +220,7 @@ void GraphWidget::resetView()
 void GraphWidget::mousePressEvent(QMouseEvent* e)
 {
     if (e->button() == Qt::LeftButton) {
-        m_posEntered = e->pos();
+        m_posEntered = e->localPos();
     }
 }
 
@@ -232,7 +232,7 @@ void GraphWidget::mouseReleaseEvent(QMouseEvent *e)
     }
 
     m_selectedNode = -1;
-    if (e->pos() == m_posEntered) {
+    if (e->localPos() == m_posEntered) {
         const Node& node = selectNode(e->pos());
         if (node.isNull()) {
             m_ui->inspector->hide();
@@ -243,7 +243,7 @@ void GraphWidget::mouseReleaseEvent(QMouseEvent *e)
         }
         update();
     } else {
-        m_origin += (e->pos() - m_posEntered);
+        m_origin += (e->localPos() - m_posEntered);
         m_ui->inspector->hide();
         updateCache();
     }

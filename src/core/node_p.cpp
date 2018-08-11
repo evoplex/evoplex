@@ -23,7 +23,7 @@
 // we need this cpp file to avoi weak-vtable issues
 namespace evoplex {
 
-BaseNode::BaseNode(const constructor_key&, int id, const Attributes& attrs, int x, int y)
+BaseNode::BaseNode(const constructor_key&, int id, const Attributes& attrs, float x, float y)
     : m_id(id),
       m_attrs(attrs),
       m_x(x),
@@ -40,7 +40,7 @@ BaseNode::~BaseNode()
 
 /*******************/
 
-UNode::UNode(const constructor_key& k, int id, const Attributes& attrs, int x, int y)
+UNode::UNode(const constructor_key& k, int id, const Attributes& attrs, float x, float y)
     : BaseNode(k, id, attrs, x, y)
 {
 }
@@ -52,7 +52,7 @@ UNode::UNode(const constructor_key& k, int id, const Attributes& attrs)
 
 /*******************/
 
-DNode::DNode(const constructor_key& k, int id, const Attributes& attrs, int x, int y)
+DNode::DNode(const constructor_key& k, int id, const Attributes& attrs, float x, float y)
     : BaseNode(k, id, attrs, x, y)
 {
 }
