@@ -257,8 +257,7 @@ void Experiment::expFinished()
         locker.unlock();
         disable(); // delete everything to save memory
         locker.relock();
-        m_expStatus = Status::Invalid; // keep it invalid
-        emit (statusChanged(m_expStatus));
+        m_expStatus = Status::Invalid; // keep it invalid (don't need to re-emit)
         return;
     }
 
