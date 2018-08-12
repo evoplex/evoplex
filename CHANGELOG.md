@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Fixed bug when pausing an experiment with queued trials
+- Close the ExperimentDesigner if there is no project opened
 
 ## [0.1.0] - 2018-08-06
 ### Added

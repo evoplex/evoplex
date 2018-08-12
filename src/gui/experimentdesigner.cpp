@@ -189,6 +189,11 @@ void ExperimentDesigner::removeWidgetFromList(PPageDockWidget *dw)
     int id = m_ui->cbWidgets->findData(QVariant::fromValue(dw));
     if (id != -1) {
         m_ui->cbWidgets->removeItem(id);
+        if (m_ui->cbWidgets->count() == 0) {
+            // if all projects were closed,
+            // make sure we also hide the ExpDesigner
+            setFloating(false);
+        }
     }
 }
 
@@ -216,9 +221,11 @@ void ExperimentDesigner::slotSetActiveWidget(int idx)
         m_project = dw->project();
         ExperimentWidget* ew = qobject_cast<ExperimentWidget*>(dw);
         m_ui->bSubmit->setVisible(!ew);
+        m_ui->bSubmit->setVisible(true);
         setExperiment(ew ? ew->exp() : nullptr);
     } else {
         m_project = nullptr;
+        m_ui->bSubmit->setVisible(false);
     }
 }
 
