@@ -168,7 +168,7 @@ void ExperimentsMgr::processQueue()
                 exp->expStatus() == Status::Finished ||
                 exp->pauseAt() < 0) { // is paused
             locker.unlock();
-            processQueue();
+            trialFinished(trial);
             return;
         }
 
@@ -200,6 +200,14 @@ void ExperimentsMgr::removeFromQueue(const ExperimentPtr& exp)
     QMutexLocker locker(&m_mutex);
     if (exp->expStatus() == Status::Queued) {
         m_queued.remove(exp);
+        auto it = m_queuedTrials.begin();
+        while (it != m_queuedTrials.end()) {
+            if ((*it)->m_exp == exp) {
+                it = m_queuedTrials.erase(it);
+            } else {
+                ++it;
+            }
+        }
         exp->setExpStatus(Status::Paused);
     }
 }

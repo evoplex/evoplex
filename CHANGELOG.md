@@ -11,6 +11,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Node's coordinates are now a float
 
+### Fixed
+- Fixed bug when pausing an experiment with queued trials
+
 ## [0.1.0] - 2018-08-06
 ### Added
 - Fixes #8 - Allows deleting an experiment
