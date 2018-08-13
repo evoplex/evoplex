@@ -91,7 +91,7 @@ void TestPRG::tst_randB()
     QVERIFY(trues2 > 400 && trues2 < 600);
 
     // general cases
-    auto tst = [&prg](double p) {
+    auto tst = [size, &prg](double p) {
         int trues1 = 0;
         int trues2 = 0;
         for (size_t i = 0; i < size; ++i) {
