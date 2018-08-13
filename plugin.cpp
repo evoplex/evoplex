@@ -1,6 +1,9 @@
 /**
- * Evoplex <https://evoplex.github.com>
- * Copyright (C) 2016-present
+ * Copyright (c) 2018 - Marcos Cardinot <marcos@cardinot.net>
+ * Copyright (c) 2018 - Ethan Padden <e.padden1@nuigalway.ie>
+ *
+ * This source code is licensed under the MIT license found in
+ * the LICENSE file in the root directory of this source tree.
  */
 
 #include "plugin.h"
@@ -22,22 +25,19 @@ bool PopulationGrowth::algorithmStep()
     std::vector<bool> nextInfectedStates;
     nextInfectedStates.reserve(nodes().size());
 
-    // For each node
     for (Node node : nodes()) {
-        // Check if the current node is currently healthy
-        // i.e. if the node is already infected, there's nothing to do
         if (node.attr(m_infectedAttrId).toBool()) {
             nextInfectedStates.emplace_back(true);
-            continue;
+            continue; // the node is already infected, there's nothing to do
         }
 
         // Select a random neighbour
-        Node neighbour = node.randNeighbour(AbstractModel::prg());
+        auto neighbour = node.randNeighbour(prg());
 
-        // Check if the neighbour is currently infected
-        if (neighbour.attrs().value(m_infectedAttrId).toBool()) {
-            const bool infected = m_prob > prg()->randD();
-            nextInfectedStates.emplace_back(infected);
+        // and check if the neighbour is currently infected
+        if (neighbour.attr(m_infectedAttrId).toBool()) {
+            // if so, the current node will become infected with a given probability
+            nextInfectedStates.emplace_back(m_prob > prg()->randD());
         } else {
             nextInfectedStates.emplace_back(false);
         }
@@ -46,13 +46,7 @@ bool PopulationGrowth::algorithmStep()
     // For each node, load the next state into the current state
     size_t i = 0;
     for (Node node : nodes()) {
-      // if the node is already infected, there's nothing to do
-        if (node.attr(m_infectedAttrId).toBool()) {
-            ++i;
-            continue;
-        }
-
-        node.setAttr(m_infectedAttrId, Value(nextInfectedStates.at(i)).toBool());
+        node.setAttr(m_infectedAttrId, Value(nextInfectedStates.at(i)));
         ++i;
     }
 
