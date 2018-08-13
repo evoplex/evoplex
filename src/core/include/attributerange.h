@@ -134,6 +134,7 @@ public:
 
 private:
     Value (evoplex::IntervalOfValues::*f_rand)(PRG*) const;
+    inline Value randB(PRG* prg) const;
     inline Value randD(PRG* prg) const;
     inline Value randI(PRG* prg) const;
 };
@@ -185,6 +186,9 @@ inline Value SingleValue::rand(PRG* prg) const
 
 inline Value IntervalOfValues::rand(PRG* prg) const
 { return (this->*f_rand)(prg); }
+
+inline Value IntervalOfValues::randB(PRG* prg) const
+{ return prg->randB(); }
 
 inline Value IntervalOfValues::randD(PRG* prg) const
 { return prg->randD(m_min.toDouble(), m_max.toDouble()); }

@@ -31,10 +31,7 @@ AttributeRangePtr AttributeRange::parse(int attrId, const QString& attrName,
                                         const QString& attrRangeStr)
 {
     AttributeRangePtr vs;
-    if (attrRangeStr == "bool") {
-        vs = std::unique_ptr<SingleValue>(
-                new SingleValue(attrId, attrName, Bool));
-    } else if (attrRangeStr == "string") {
+    if (attrRangeStr == "string") {
         vs = std::unique_ptr<SingleValue>(
                 new SingleValue(attrId, attrName, String));
     } else if (attrRangeStr == "non-empty-string") {
@@ -48,7 +45,8 @@ AttributeRangePtr AttributeRange::parse(int attrId, const QString& attrName,
                 new SingleValue(attrId, attrName, FilePath));
     } else if (attrRangeStr.contains('{') && attrRangeStr.endsWith('}')) {
         vs = setOfValues(attrRangeStr, attrId, attrName);
-    } else if (attrRangeStr.contains('[') && attrRangeStr.endsWith(']')) {
+    } else if (attrRangeStr == "bool" ||
+               (attrRangeStr.contains('[') && attrRangeStr.endsWith(']'))) {
         vs = intervalOfValues(attrRangeStr, attrId, attrName);
     }
 
@@ -101,6 +99,12 @@ AttributeRangePtr AttributeRange::setOfValues(QString attrRangeStr, const int id
 AttributeRangePtr AttributeRange::intervalOfValues(QString attrRangeStr, const int id,
                                                    const QString& attrName)
 {
+    if (attrRangeStr == "bool") {
+        return std::unique_ptr<IntervalOfValues>(
+                new IntervalOfValues(id, attrName,
+                AttributeRange::Bool, false, true));
+    }
+
     QStringList values = attrRangeStr.remove("[").remove("]").split(",");
     if (values.size() != 2) {
         return std::unique_ptr<SingleValue>(new SingleValue());
@@ -291,6 +295,10 @@ IntervalOfValues::IntervalOfValues(int id, const QString& attrName, Type type,
     m_max = max;
 
     switch (m_type) {
+    case Bool:
+        m_attrRangeStr = "bool";
+        f_rand = &evoplex::IntervalOfValues::randB;
+        break;
     case Double_Range:
         m_attrRangeStr = QString("double[%1,%2]").arg(min.toDouble()).arg(max.toDouble());
         f_rand = &evoplex::IntervalOfValues::randD;

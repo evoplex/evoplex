@@ -157,6 +157,9 @@ ColorMapRange::ColorMapRange(const Colors& colors, const IntervalOfValues* attrR
     } else if (attrRange->type() == AttributeRange::Double_Range) {
         m_max = static_cast<float>(attrRange->max().toDouble());
         m_min = static_cast<float>(attrRange->min().toDouble());
+    } else if (attrRange->type() == AttributeRange::Bool) {
+        m_max = 1.f;
+        m_min = 0.f;
     } else {
         qFatal("invalid attribute range!");
     }
@@ -169,6 +172,8 @@ const QColor ColorMapRange::colorFromValue(const Value& val) const
         value = val.toInt();
     } else if (val.type() == Value::DOUBLE) {
         value = static_cast<float>(val.toDouble());
+    } else if (val.type() == Value::BOOL) {
+        return m_colors.at(val.toBool());
     } else {
         qFatal("invalid attribute range!");
     }
