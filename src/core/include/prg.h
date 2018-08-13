@@ -37,6 +37,15 @@ public:
     // Returns the PRG seed
     inline unsigned int seed() const;
 
+    // Generate a random boolean according to the discrete probability function
+    // Where the probability of true is p and the probability of false is (1-p)
+    bool randBernoulli(double p);
+    inline bool randB(double p); // alias
+
+    // randBernoulli(p=0.5)
+    inline bool randBernoulli();
+    inline bool randB(); // alias
+
     // Generate a random double [0, 1)
     inline double randD();
     // Generate a random double [0, max)
@@ -66,6 +75,7 @@ private:
     std::mt19937 m_mteng; //  Mersenne Twister engine
     std::uniform_real_distribution<double> m_doubleZeroOne;
     std::uniform_real_distribution<float> m_floatZeroOne;
+    std::bernoulli_distribution m_bernoulli;
 };
 
 /************************************************************************
@@ -74,6 +84,15 @@ private:
 
 inline unsigned int PRG::seed() const
 { return m_seed; }
+
+inline bool PRG::randB(double p)
+{ return randBernoulli(p); }
+
+inline bool PRG::randB()
+{ return m_bernoulli(m_mteng); }
+
+inline bool PRG::randBernoulli()
+{ return m_bernoulli(m_mteng); }
 
 inline double PRG::randD()
 { return m_doubleZeroOne(m_mteng); }

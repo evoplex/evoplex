@@ -19,8 +19,9 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <QtTest>
+#include <memory>
 #include <prg.h>
+#include <QtTest>
 
 using namespace evoplex;
 
@@ -32,6 +33,7 @@ private slots:
     void initTestCase() {}
     void cleanupTestCase() {}
     void tst_prg();
+    void tst_randB();
     void tst_randD();
     void tst_randI();
     void tst_randS();
@@ -51,12 +53,12 @@ void TestPRG::tst_prg()
     int i = prg1->randI(123);
     QCOMPARE(d, prg2->randD());
     QCOMPARE(i, prg2->randI(123));
-    QVERIFY(d != prg2->randD());
+    QVERIFY(!qFuzzyCompare(d, prg2->randD()));
     QVERIFY(i != prg2->randI(123));
 
     delete prg1;
     prg1 = new PRG(922);
-    QVERIFY(d != prg1->randD());
+    QVERIFY(!qFuzzyCompare(d, prg1->randD()));
     QVERIFY(i != prg1->randI(123));
 
     delete prg1;
@@ -71,6 +73,39 @@ void TestPRG::tst_prg()
 
     delete prg1;
     delete prg2;
+}
+
+void TestPRG::tst_randB()
+{
+    auto prg = std::unique_ptr<PRG>(new PRG(0));
+    const int size = 1000;
+
+    // p=0.5 cases
+    int trues1 = 0;
+    int trues2 = 0;
+    for (size_t i = 0; i < size; ++i) {
+        if (prg->randB()) ++trues1;
+        if (prg->randBernoulli()) ++trues2;
+    }
+    QVERIFY(trues1 > 400 && trues1 < 600);
+    QVERIFY(trues2 > 400 && trues2 < 600);
+
+    // general cases
+    auto tst = [&prg](double p) {
+        int trues1 = 0;
+        int trues2 = 0;
+        for (size_t i = 0; i < size; ++i) {
+            if (prg->randBernoulli(p)) ++trues1;
+            if (prg->randB(p)) ++trues2;
+        }
+        QVERIFY(trues1 > size*(p-0.1)); // 10% margin
+        QVERIFY(trues1 < size*(p+0.1));
+        QVERIFY(trues2 > size*(p-0.1));
+        QVERIFY(trues2 < size*(p+0.1));
+    };
+    for (double p = 0.0; p <= 1.0; p+=0.1) {
+        tst(p);
+    }
 }
 
 void TestPRG::tst_randD()

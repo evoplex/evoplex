@@ -26,8 +26,15 @@ PRG::PRG(unsigned int seed)
     : m_seed(seed),
       m_mteng(seed),
       m_doubleZeroOne(0.0, 1.0),
-      m_floatZeroOne(0.f, 1.f)
+      m_floatZeroOne(0.f, 1.f),
+      m_bernoulli(0.5)
 {
+}
+
+bool PRG::randBernoulli(double p)
+{
+    std::bernoulli_distribution b(p);
+    return b(m_mteng);
 }
 
 double PRG::randD(double min, double max)
