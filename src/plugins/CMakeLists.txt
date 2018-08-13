@@ -59,6 +59,6 @@ set(GRAPHS
 add_plugins(graphs "${GRAPHS}")
 
 set(MODELS
-#  nowak92
+  nowak92
 )
 add_plugins(models "${MODELS}")
