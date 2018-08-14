@@ -95,7 +95,7 @@ QString Value::toQString(char format, int precision) const
 
 Value& Value::operator=(const Value& v)
 {
-    if(this != &v) { // check for self-assignment
+    if (this != &v) { // check for self-assignment
         if (m_type == STRING) { delete [] m_data.s; }
         m_type = v.m_type;
         switch (m_type) {

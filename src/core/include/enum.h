@@ -81,6 +81,15 @@ inline GraphType _enumFromString<GraphType>(const QString& str) {
     if (str == "directed") return GraphType::Directed;
     return GraphType::Invalid;
 }
+template<>
+inline QString _enumToString<GraphType>(GraphType type)
+{
+    switch (type) {
+    case GraphType::Undirected: return "undirected";
+    case GraphType::Directed: return "directed";
+    default: return "invalid";
+    }
+}
 
 enum class Function : unsigned char {
     Invalid = 0,

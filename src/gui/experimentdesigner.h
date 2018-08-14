@@ -24,9 +24,9 @@
 #include <QCheckBox>
 #include <QDockWidget>
 #include <QTreeWidgetItem>
-#include <QVariantHash>
-#include <QSpinBox>
+#include <QHash>
 
+#include "attrwidget.h"
 #include "projectspage.h"
 #include "core/project.h"
 
@@ -73,15 +73,14 @@ private:
     QTreeWidgetItem* m_treeItemOutputs;
     QTreeWidgetItem* m_treeItemModels;
     QTreeWidgetItem* m_treeItemGraphs;
-    QVariantHash m_widgetFields;
+    QHash<QString, AttrWidget*> m_attrWidgets;
     QCheckBox* m_enableOutputs;
     int m_graphTypeIdx; // position of the graphtype combobox in the graph tree
 
     void addPluginAttrs(QTreeWidgetItem* tree, const Plugin* plugin);
 
-    QSpinBox* newSpinBox(const int min, const int max);
-    QDoubleSpinBox* newDoubleSpinBox(const double min, const double max);
-    void addTreeWidget(QTreeWidgetItem* itemRoot, const QString& label, const QVariant& widget);
+    AttrWidget* addGeneralAttr(QTreeWidgetItem* itemRoot,
+            const QString& attrName, QWidget *customWidget=nullptr);
 
     std::unique_ptr<ExpInputs> readInputs(const int expId, QString& error) const;
 

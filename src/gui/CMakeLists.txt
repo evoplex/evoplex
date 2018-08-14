@@ -20,6 +20,7 @@
 
 set(EVOPLEX_GUI_H
   maingui.h
+  attrwidget.h
   nodesgeneratordlg.h
   colormap.h
   #contextmenutable.h
@@ -47,6 +48,7 @@ set(EVOPLEX_GUI_H
 
 set(EVOPLEX_GUI_CXX
   maingui.cpp
+  attrwidget.cpp
   nodesgeneratordlg.cpp
   experimentdesigner.cpp
   colormap.cpp
