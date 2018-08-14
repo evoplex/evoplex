@@ -72,7 +72,7 @@ public:
 
 protected:
     explicit ColorMap(const Colors& colors);
-    const Colors m_colors;
+    Colors m_colors;
 };
 
 /************************************************************************/

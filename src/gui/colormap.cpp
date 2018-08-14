@@ -160,6 +160,12 @@ ColorMapRange::ColorMapRange(const Colors& colors, const IntervalOfValues* attrR
     } else if (attrRange->type() == AttributeRange::Bool) {
         m_max = 1.f;
         m_min = 0.f;
+        if (m_colors.size() == 1) { // it needs two colors
+            // let's duplicate the color and use another alpha
+            QColor c = m_colors.front();
+            c.setAlphaF(c.alphaF() * 0.5);
+            m_colors.emplace_back(c);
+        }
     } else {
         qFatal("invalid attribute range!");
     }
