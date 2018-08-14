@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed bug when pausing an experiment with queued trials
 - Close the ExperimentDesigner if there is no project opened
 - `bool` attribute should act like a range and not as a single value
+- Attrs generator should accept literal boolean, i.e., 'true' and 'false'
 
 ## [0.1.0] - 2018-08-06
 ### Added

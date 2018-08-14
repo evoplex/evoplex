@@ -77,6 +77,10 @@ AttrsGeneratorPtr AttrsGenerator::parse(const AttributesScope& attrsScope,
         return nullptr;
     }
 
+    if (_cmd.startsWith("#")) {
+        _cmd.replace("value_true", "value_1");
+        _cmd.replace("value_false", "value_0");
+    }
     Q_ASSERT_X(_cmd == ag->command(), "AttrsGenerator",
                "something went extremely wrong with the command string!");
     return ag;
