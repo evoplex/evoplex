@@ -104,13 +104,13 @@ GraphWidget::~GraphWidget()
 
 void GraphWidget::setupInspector()
 {
-    QLayoutItem* item = m_ui->modelAttrs->takeAt(0);
-    while (item) {
+    QLayoutItem* item;
+    while (m_ui->modelAttrs->count() &&
+           (item = m_ui->modelAttrs->takeAt(0))) {
         if (item->widget()) {
             delete item->widget();
         }
         delete item;
-        item = m_ui->modelAttrs->takeAt(0);
     }
 
     m_attrWidgets.clear();
