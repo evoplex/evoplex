@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Increases unit-tests coverage of core components
 - Implements the Bernoulli distribution in the PRG class
+- New mode plugin: population growth
 
 ### Changed
 - Node's coordinates are now a float
