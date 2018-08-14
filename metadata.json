@@ -1,11 +1,11 @@
 {
   "type": "model",
   "uid": "gameOfLife",
-  "title": "Game Of Life",
+  "title": "Conway's Game of Life",
   "version": 1,
-  "author": "Evoplex",
-  "description": "This implements Conway's Game Of Life cellular automaton",
-  "supportedGraphs": ["squareGrid","customGraph"],
+  "author": "Ethan Padden and Marcos Cardinot",
+  "description": "This implements Conway's Game Of Life cellular automaton.",
 
+  "supportedGraphs": ["squareGrid"],
   "nodeAttributesScope": [ {"live": "bool"} ]
 }
