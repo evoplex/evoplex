@@ -40,7 +40,7 @@ public:
     inline const GraphTypes& validGraphTypes() const;
 
 protected:
-    explicit GraphPlugin(const QJsonObject* metaData, const QString& libPath);
+    explicit GraphPlugin(QPluginLoader* loader, const QString& libPath);
 
 private:
     std::vector<GraphType> m_validGraphTypes;

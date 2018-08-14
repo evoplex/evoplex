@@ -28,26 +28,27 @@
 
 namespace evoplex {
 
-ModelPlugin::ModelPlugin(const QJsonObject* metaData, const QString& libPath)
-    : Plugin(PluginType::Model, metaData, libPath)
+ModelPlugin::ModelPlugin(QPluginLoader* loader, const QString& libPath)
+    : Plugin(PluginType::Model, loader, libPath)
 {
     if (m_type == PluginType::Invalid) {
         return;
     }
 
-    if (!readAttrsScope(metaData, PLUGIN_ATTR_NODESCOPE, m_nodeAttrsScope, m_nodeAttrNames)) {
+    QJsonObject metaData = loader->metaData().value("MetaData").toObject();
+    if (!readAttrsScope(&metaData, PLUGIN_ATTR_NODESCOPE, m_nodeAttrsScope, m_nodeAttrNames)) {
         qWarning() << "failed to read the node's attributes!";
         m_type = PluginType::Invalid;
         return;
     }
 
-    if (!readAttrsScope(metaData, PLUGIN_ATTR_EDGESCOPE, m_edgeAttrsScope, m_edgeAttrNames)) {
+    if (!readAttrsScope(&metaData, PLUGIN_ATTR_EDGESCOPE, m_edgeAttrsScope, m_edgeAttrNames)) {
         qWarning() << "failed to read the edge's attributes!";
         m_type = PluginType::Invalid;
         return;
     }
 
-    QJsonArray supportedGraphs = metaData->value(PLUGIN_ATTR_SUPPORTEDGRAPHS).toArray();
+    QJsonArray supportedGraphs = metaData.value(PLUGIN_ATTR_SUPPORTEDGRAPHS).toArray();
     m_supportedGraphs.reserve(supportedGraphs.size());
     for (QJsonValueRef v : supportedGraphs) {
         QString graphId = v.toString();
@@ -56,7 +57,7 @@ ModelPlugin::ModelPlugin(const QJsonObject* metaData, const QString& libPath)
         }
     }
 
-    QJsonArray customOutputs = metaData->value(PLUGIN_ATTR_CUSTOMOUTPUTS).toArray();
+    QJsonArray customOutputs = metaData.value(PLUGIN_ATTR_CUSTOMOUTPUTS).toArray();
     m_customOutputs.reserve(customOutputs.size());
     for (QJsonValueRef v : customOutputs) {
         QString function = v.toString();

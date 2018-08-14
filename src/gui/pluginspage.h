@@ -41,29 +41,19 @@ private slots:
     void importPlugin();
     void rowSelectionChanged();
     void insertRow(const Plugin* plugin);
+    void slotUnload();
+    void slotReload();
 
 private:
     enum TableCols {
         TYPE = 0,
-        UID = 1,
-        VERSION = 2,
-        UNLOAD = 3
+        UID = 1
     };
 
     Ui_PluginsPage* m_ui;
     MainApp* m_mainApp;
-    QMainWindow* m_innerWindow;
 
     void loadHtml(const Plugin* plugin);
 };
-
-class ButtonHoverWatcher : public QObject
-{
-    Q_OBJECT
-public:
-    explicit ButtonHoverWatcher(QObject* parent) : QObject(parent) {}
-    virtual bool eventFilter(QObject* watched, QEvent* event) Q_DECL_OVERRIDE;
-};
-
-}
+} //evoplex
 #endif // PLUGINSPAGE_H

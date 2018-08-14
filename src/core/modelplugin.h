@@ -52,7 +52,7 @@ public:
     inline AttributeRangePtr edgeAttrRange(const QString& attr) const;
 
 protected:
-    explicit ModelPlugin(const QJsonObject* metaData, const QString& libPath);
+    explicit ModelPlugin(QPluginLoader* loader, const QString& libPath);
 
 private:
     QVector<QString> m_supportedGraphs;

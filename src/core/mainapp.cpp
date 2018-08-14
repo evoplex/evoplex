@@ -208,6 +208,20 @@ bool MainApp::unloadPlugin(const Plugin* plugin, QString& error)
     return true;
 }
 
+bool MainApp::reloadPlugin(const Plugin* plugin, QString& error)
+{
+    if (!m_projects.empty()) {
+        error = QString("Couldn't reload the plugin `%1`.\n"
+                "Please, close all projects and try again!")
+                .arg(plugin->title());
+        qWarning() << error;
+        return false;
+    }
+
+    QString path = plugin->path();
+    return unloadPlugin(plugin, error) && loadPlugin(path, error, true);
+}
+
 ProjectPtr MainApp::newProject(QString& error, const QString& filepath)
 {
     if (m_projects.size() > EVOPLEX_MAX_PROJECTS) {

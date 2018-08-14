@@ -62,6 +62,9 @@ public:
     // unload an existing plugin; return true if successful
     bool unloadPlugin(const Plugin* plugin, QString& error);
 
+    // reload an existing plugin; return true if successful
+    bool reloadPlugin(const Plugin* plugin, QString& error);
+
     // Create a new project
     ProjectPtr newProject(QString &error, const QString& filepath="");
 

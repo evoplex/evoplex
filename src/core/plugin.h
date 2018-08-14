@@ -25,6 +25,7 @@
 
 #include <QJsonObject>
 #include <QString>
+#include <QPluginLoader>
 
 #include "abstractplugin.h"
 #include "attributes.h"
@@ -65,12 +66,17 @@ public:
 protected:
     PluginType m_type;
 
-    explicit Plugin(PluginType type, const QJsonObject* metaData, const QString& libPath);
+    /**
+     * Relies that any plugin lugin is loaded from the temporary directory
+     * @param libPath refers to the original plugin's path
+     */
+    explicit Plugin(PluginType type, QPluginLoader* loader, const QString& libPath);
 
     bool readAttrsScope(const QJsonObject* metaData, const QString& attrName,
             AttributesScope& attrsScope, std::vector<QString>& keys) const;
 
 private:
+    QPluginLoader* m_loader;
     PluginInterface* m_factory;
     const QString m_libPath;
     PluginKey m_key;

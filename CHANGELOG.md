@@ -9,10 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Increases unit-tests coverage of core components
 - Implements the Bernoulli distribution in the PRG class
 - New mode plugin: population growth
+- Plugins can now be reloaded
 
 ### Changed
 - Node's coordinates are now a float
 - Improved the attributes' inspector of the graph widgets
+- Improved the PluginsPage
 
 ### Fixed
 - Fixed bug when pausing an experiment with queued trials

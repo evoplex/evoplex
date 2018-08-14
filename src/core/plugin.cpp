@@ -19,6 +19,7 @@
  */
 
 #include <QDebug>
+#include <QDir>
 #include <QFile>
 #include <QJsonArray>
 #include <QPluginLoader>
@@ -76,27 +77,43 @@ bool Plugin::checkMetaData(const QJsonObject& metaData, QString& error)
 
 Plugin* Plugin::load(const QString& path, QString& error)
 {
-    if (!QFile(path).exists()) {
+    QFile file(path);
+    if (!file.exists()) {
         error = "Unable to find the file. " + path;
         qWarning() << error;
         return nullptr;
     }
 
-    QPluginLoader loader(path);
-    QJsonObject metaData = loader.metaData().value("MetaData").toObject();
+    // we should NEVER load the plugin from the original path
+    // instead, we make a copy of the plugin to the temporary dir
+    // it allows us to safely unload and reload plugins later on
+    QString tempPath = path;
+    QString fname = QFileInfo(file).fileName();
+    while (QFile::exists(tempPath)) {
+        tempPath = QDir::temp().absoluteFilePath(
+                QString("evoplex_%1%2").arg(rand()).arg(fname));
+    }
+    if (!file.copy(tempPath)) {
+        error = "Unable make a temporary copy of the file " + path;
+        qWarning() << error;
+        return nullptr;
+    }
+
+    QPluginLoader* loader = new QPluginLoader(tempPath);
+    QJsonObject metaData = loader->metaData().value("MetaData").toObject();
     if (!checkMetaData(metaData, error)) {
         error += QString("\n+%1").arg(path);
         qWarning() << error;
         return nullptr;
     }
 
-    QObject* instance = loader.instance(); // it'll load the plugin
+    QObject* instance = loader->instance(); // it'll load the plugin
     if (!instance) {
         error = QString("Unable to load the plugin.\n"
                 "Please, make sure it is a valid Evoplex plugin and that it was"
                 " built in the same mode (Release or Debug) and architecture "
                 "(32/64 bits) of Evoplex.\n %1").arg(path);
-        loader.unload();
+        loader->unload();
         qWarning() << error;
         return nullptr;
     }
@@ -104,9 +121,9 @@ Plugin* Plugin::load(const QString& path, QString& error)
     Plugin* plugin = nullptr;
     const PluginType type = _enumFromString<PluginType>(metaData[PLUGIN_ATTR_TYPE].toString());
     if (type == PluginType::Graph) {
-        plugin = new GraphPlugin(&metaData, path);
+        plugin = new GraphPlugin(loader, path);
     } else if (type == PluginType::Model) {
-        plugin = new ModelPlugin(&metaData, path);
+        plugin = new ModelPlugin(loader, path);
     }
 
     if (!plugin || plugin->type() == PluginType::Invalid) {
@@ -120,22 +137,24 @@ Plugin* Plugin::load(const QString& path, QString& error)
     return plugin;
 }
 
-Plugin::Plugin(PluginType type, const QJsonObject* metaData, const QString& libPath)
+Plugin::Plugin(PluginType type, QPluginLoader* loader, const QString& libPath)
     : m_type(type),
+      m_loader(loader),
       m_factory(nullptr),
       m_libPath(libPath)
 {
-    m_id = metaData->value(PLUGIN_ATTR_UID).toString();
-    m_author = metaData->value(PLUGIN_ATTR_AUTHOR).toString();
-    m_title = metaData->value(PLUGIN_ATTR_TITLE).toString();
-    m_descr = metaData->value(PLUGIN_ATTR_DESCRIPTION).toString();
+    QJsonObject metaData = m_loader->metaData().value("MetaData").toObject();
+    m_id = metaData.value(PLUGIN_ATTR_UID).toString();
+    m_author = metaData.value(PLUGIN_ATTR_AUTHOR).toString();
+    m_title = metaData.value(PLUGIN_ATTR_TITLE).toString();
+    m_descr = metaData.value(PLUGIN_ATTR_DESCRIPTION).toString();
     if (m_id.isEmpty() || m_author.isEmpty() || m_title.isEmpty() || m_descr.isEmpty()) {
         qWarning() << "missing required fields!";
         m_type = PluginType::Invalid;
         return;
     }
 
-    int version = metaData->value(PLUGIN_ATTR_VERSION).toInt(-1);
+    int version = metaData.value(PLUGIN_ATTR_VERSION).toInt(-1);
     if (version < 0 || version >= UINT16_MAX) {
         qWarning() << QString("plugin's version must be an int >=0 and <%1").arg(UINT16_MAX);
         m_type = PluginType::Invalid;
@@ -145,17 +164,14 @@ Plugin::Plugin(PluginType type, const QJsonObject* metaData, const QString& libP
 
     m_key = {m_id, m_version};
 
-    if (!readAttrsScope(metaData, PLUGIN_ATTR_ATTRSSCOPE,
+    if (!readAttrsScope(&metaData, PLUGIN_ATTR_ATTRSSCOPE,
                         m_pluginAttrsScope, m_pluginAttrsNames)) {
         qWarning() << "failed to read the plugins's attributes!";
         m_type = PluginType::Invalid;
         return;
     }
 
-    QPluginLoader loader(libPath);
-    QObject* instance = loader.instance();
-    Q_ASSERT(loader.isLoaded() && instance);
-    m_factory = qobject_cast<PluginInterface*>(instance);
+    m_factory = qobject_cast<PluginInterface*>(m_loader->instance());
     if (!m_factory) {
         qWarning() << QString("factory could not be created for '%1'").arg(m_title);
         m_type = PluginType::Invalid;
@@ -165,8 +181,10 @@ Plugin::Plugin(PluginType type, const QJsonObject* metaData, const QString& libP
 
 Plugin::~Plugin()
 {
-    QPluginLoader loader(m_libPath);
-    loader.unload();
+    if (!m_loader->unload() || !QFile::remove(m_loader->fileName())) {
+        qWarning() << "failed to remove the plugin";
+    }
+    delete m_loader;
 }
 
 bool Plugin::readAttrsScope(const QJsonObject* metaData, const QString& attrName,
