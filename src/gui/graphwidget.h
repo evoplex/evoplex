@@ -102,7 +102,9 @@ private:
     QPointF m_posEntered;
     quint16 m_currTrialId;
 
-    std::vector<QLineEdit*> m_attrs;
+    std::vector<AttrWidget*> m_attrWidgets;
+
+    void setupInspector();
 
     void updateInspector(const Node& node);
 

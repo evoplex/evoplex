@@ -34,11 +34,24 @@ class AttrWidget : public QWidget
 public:
     explicit AttrWidget(AttributeRangePtr attrRange, QWidget* parent, QWidget* customWidget=nullptr);
 
-    Value value() const;
+    // set the current content of the field
+    // it does not check if the value matches the attrRange
     void setValue(const Value& value);
 
+    // get the current value
+    // it does not check if the value matches the attrRange
+    Value value() const;
+
+    // Return the current value if it is within the attrRange
+    // Otherwise, it returns a Value()
+    Value validate() const;
+
+    inline int id() const { return m_attrRange->id(); }
     inline const QString& attrName() const { return m_attrRange->attrName(); }
     inline QWidget* widget() const { return m_widget; }
+
+signals:
+    void editingFinished();
 
 private:
     bool m_useCustomWidget;

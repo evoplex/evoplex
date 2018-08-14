@@ -43,6 +43,11 @@ AttrWidget::AttrWidget(AttributeRangePtr attrRange, QWidget* parent, QWidget* cu
     setLayout(l);
 }
 
+Value AttrWidget::validate() const
+{
+    return m_attrRange->validate(value().toQString());
+}
+
 Value AttrWidget::value() const
 {
     auto sp = qobject_cast<QSpinBox*>(m_widget);
@@ -96,42 +101,52 @@ QWidget* AttrWidget::newWidget(AttributeRangePtr attrRange)
 {
     switch (attrRange->type()) {
     case AttributeRange::Double_Range: {
-        QDoubleSpinBox* sp = new QDoubleSpinBox(this);
+        auto sp = new QDoubleSpinBox(this);
         sp->setMaximum(attrRange->max().toDouble());
         sp->setMinimum(attrRange->min().toDouble());
         sp->setDecimals(8);
         sp->setButtonSymbols(QDoubleSpinBox::NoButtons);
+        connect(sp, SIGNAL(editingFinished()), SIGNAL(editingFinished()));
         return sp;
     }
     case AttributeRange::Int_Range: {
-        QSpinBox* sp = new QSpinBox(this);
+        auto sp = new QSpinBox(this);
         sp->setMaximum(attrRange->max().toInt());
         sp->setMinimum(attrRange->min().toInt());
         sp->setButtonSymbols(QSpinBox::NoButtons);
+        connect(sp, SIGNAL(editingFinished()), SIGNAL(editingFinished()));
         return sp;
     }
     case AttributeRange::Double_Set:
     case AttributeRange::Int_Set:
     case AttributeRange::String_Set: {
         auto sov = dynamic_cast<SetOfValues*>(attrRange.get());
-        QComboBox* cb = new QComboBox(this);
+        auto cb = new QComboBox(this);
         for (const Value& v : sov->values()) {
             cb->addItem(v.toQString());
         }
+        connect(cb, SIGNAL(currentIndexChanged(int)), SIGNAL(editingFinished()));
         return cb;
     }
     case AttributeRange::Bool: {
-        return new QCheckBox(this);
+        auto cb = new QCheckBox(this);
+        connect(cb, SIGNAL(stateChanged(int)), SIGNAL(editingFinished()));
+        return cb;
     }
     case AttributeRange::FilePath: {
-        return new LineButton(this, LineButton::SelectTextFile);
+        auto lb = new LineButton(this, LineButton::SelectTextFile);
+        connect(lb->line(), SIGNAL(editingFinished()), SIGNAL(editingFinished()));
+        return lb;
     }
     case AttributeRange::DirPath: {
-        return new LineButton(this, LineButton::SelectDir);
+        auto lb = new LineButton(this, LineButton::SelectDir);
+        connect(lb->line(), SIGNAL(editingFinished()), SIGNAL(editingFinished()));
+        return lb;
     }
     default:
-        QLineEdit* le = new QLineEdit(this);
+        auto le = new QLineEdit(this);
         le->setText(attrRange->min().toQString());
+        connect(le, SIGNAL(editingFinished()), SIGNAL(editingFinished()));
         return le;
     }
 }

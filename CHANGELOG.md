@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Node's coordinates are now a float
+- Improved the attributes' inspector of the graph widgets
 
 ### Fixed
 - Fixed bug when pausing an experiment with queued trials
