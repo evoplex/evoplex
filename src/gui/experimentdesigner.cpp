@@ -111,7 +111,8 @@ ExperimentDesigner::ExperimentDesigner(MainApp* mainApp, QWidget *parent)
     itemEnabled->setText(0, "enable");
     m_ui->treeWidget->setItemWidget(itemEnabled, 1, m_enableOutputs);
     // -- add custom widget: output directory
-    AttrWidget* outDir = addGeneralAttr(m_treeItemOutputs, OUTPUT_DIR);
+    LineButton* outDir = new LineButton(this, LineButton::SelectDir);
+    addGeneralAttr(m_treeItemOutputs, OUTPUT_DIR, outDir);
     // -- add custom widget: output directory
     LineButton* outHeader = new LineButton(this, LineButton::None);
     connect(outHeader->button(), SIGNAL(clicked(bool)), SLOT(slotOutputWidget()));
@@ -593,7 +594,7 @@ void ExperimentDesigner::addPluginAttrs(QTreeWidgetItem* tree, const Plugin* plu
     }
 }
 
-AttrWidget* ExperimentDesigner::addGeneralAttr(QTreeWidgetItem* itemRoot,
+void ExperimentDesigner::addGeneralAttr(QTreeWidgetItem* itemRoot,
         const QString& attrName, QWidget* customWidget)
 {
     AttrWidget* widget = new AttrWidget(
@@ -603,8 +604,6 @@ AttrWidget* ExperimentDesigner::addGeneralAttr(QTreeWidgetItem* itemRoot,
     QTreeWidgetItem* item = new QTreeWidgetItem(itemRoot);
     item->setText(0, attrName);
     m_ui->treeWidget->setItemWidget(item, 1, widget);
-
-    return widget;
 }
 
 } // evoplex

@@ -79,7 +79,7 @@ private:
 
     void addPluginAttrs(QTreeWidgetItem* tree, const Plugin* plugin);
 
-    AttrWidget* addGeneralAttr(QTreeWidgetItem* itemRoot,
+    void addGeneralAttr(QTreeWidgetItem* itemRoot,
             const QString& attrName, QWidget *customWidget=nullptr);
 
     std::unique_ptr<ExpInputs> readInputs(const int expId, QString& error) const;
