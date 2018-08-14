@@ -25,8 +25,8 @@
 #include <vector>
 #include <QString>
 
-namespace evoplex
-{
+namespace evoplex {
+
 class Value;
 typedef std::vector<Value> Values;
 
@@ -39,12 +39,16 @@ public:
 
     Value();
     Value(const Value& value);
-    Value(const bool value);
-    Value(const char value);
-    Value(const double value);
-    Value(const int value);
+    Value(bool value);
+    Value(char value);
+    Value(double value);
+    Value(int value);
     Value(const char* value);
     Value(const QString& value);
+
+    // let's accept the specialized vector<bool>
+    // http://www.cplusplus.com/reference/vector/vector-bool
+    Value(std::vector<bool>::reference value);
 
     ~Value();
 

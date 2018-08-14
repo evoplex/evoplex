@@ -92,43 +92,38 @@ void TestValue::tst_valueInvalid()
 
 void TestValue::tst_valueBool()
 {
-    Value v;
+    auto tst = [](Value v, bool b) {
+        // Testing type
+        QCOMPARE(v.isValid(), true);
+        QVERIFY(v.type() == Value::BOOL);
+        QVERIFY(v.isBool());
+        QVERIFY(!v.isChar());
+        QVERIFY(!v.isDouble());
+        QVERIFY(!v.isInt());
+        QVERIFY(!v.isString());
+        // Testing value
+        QCOMPARE(v.toBool(), b);
+        QCOMPARE(v.toQString(), b ? QString("1") : QString("0"));
+        QVERIFY_EXCEPTION_THROWN(v.toChar(), std::logic_error);
+        QVERIFY_EXCEPTION_THROWN(v.toDouble(), std::logic_error);
+        QVERIFY_EXCEPTION_THROWN(v.toInt(), std::logic_error);
+        QVERIFY_EXCEPTION_THROWN(v.toString(), std::logic_error);
+    };
 
-    // VALUE TESTS
-    // case where v is set to true
-    v = Value(true);
+    auto tstBool = [tst](bool b){
+        Value v1(b); // constructor
+        tst(v1, b);
+        Value v2 = b; // constructor
+        tst(v2, b);
+        Value v3 = Value(b); // operator=(Value)
+        tst(v3, b);
+        std::vector<bool> bs = {b};
+        Value v4 = bs.at(0); // specialized vector<bool>
+        tst(v3, b);
+    };
 
-    // Testing validity
-    QCOMPARE(v.isValid(), true);
-
-    // Testing type
-    QVERIFY(v.type() == Value::BOOL);
-    QVERIFY(v.isBool());
-    QVERIFY(!v.isChar());
-    QVERIFY(!v.isDouble());
-    QVERIFY(!v.isInt());
-    QVERIFY(!v.isString());
-
-    // Testing value
-    QCOMPARE(v.toBool(), true);
-    QCOMPARE(v.toQString(), QString("1"));
-    QVERIFY_EXCEPTION_THROWN(v.toChar(), std::logic_error);
-    QVERIFY_EXCEPTION_THROWN(v.toDouble(), std::logic_error);
-    QVERIFY_EXCEPTION_THROWN(v.toInt(), std::logic_error);
-    QVERIFY_EXCEPTION_THROWN(v.toString(), std::logic_error);
-
-    // case where v is set to false
-    v = Value(false);
-
-    // Testing validity
-    QCOMPARE(v.isValid(), true);
-
-    // Testing type
-    QVERIFY(v.type() == Value::BOOL);
-
-    // Testing value
-    QCOMPARE(v.toBool(), false);
-    QCOMPARE(v.toQString(), QString("0"));
+    tstBool(true);
+    tstBool(false);
 
     // COMPARISON TESTS
     const Value v1(true);

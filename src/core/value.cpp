@@ -38,22 +38,27 @@ Value::Value(const Value& value) : m_type(value.type())
     else if (m_type != INVALID) qFatal("non-existent type");
 }
 
-Value::Value(const bool value) : m_type(BOOL)
+Value::Value(bool value) : m_type(BOOL)
 {
     m_data.b = value;
 }
 
-Value::Value(const char value) : m_type(CHAR)
+Value::Value(std::vector<bool>::reference value) : m_type(BOOL)
+{
+    m_data.b = value.operator bool();
+}
+
+Value::Value(char value) : m_type(CHAR)
 {
     m_data.c = value;
 }
 
-Value::Value(const double value) : m_type(DOUBLE)
+Value::Value(double value) : m_type(DOUBLE)
 {
     m_data.d = value;
 }
 
-Value::Value(const int value) : m_type(INT)
+Value::Value(int value) : m_type(INT)
 {
     m_data.i = value;
 }
