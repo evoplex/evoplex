@@ -77,10 +77,10 @@ public:
     inline void push_back(QString name, Value value);
 
     inline const std::vector<QString>& names() const;
-    inline const QString& name(size_t id) const;
+    inline const QString& name(int id) const;
 
     inline const std::vector<Value>& values() const;
-    inline const Value& value(size_t id) const;
+    inline const Value& value(int id) const;
     inline Value value(const QString& name, Value defaultValue=Value()) const;
 
     inline void setValue(int id, const Value& value);
@@ -139,13 +139,13 @@ inline void Attributes::push_back(QString name, Value value) {
 inline const std::vector<QString>& Attributes::names() const
 { return m_names; }
 
-inline const QString& Attributes::name(size_t id) const
+inline const QString& Attributes::name(int id) const
 { return m_names.at(id); }
 
 inline const std::vector<Value>& Attributes::values() const
 { return m_values; }
 
-inline const Value& Attributes::value(size_t id) const
+inline const Value& Attributes::value(int id) const
 { return m_values.at(id); }
 
 inline Value Attributes::value(const QString& name, Value defaultValue) const {

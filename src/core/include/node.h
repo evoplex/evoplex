@@ -52,7 +52,7 @@ public:
     float y() const;
 
     const Attributes& attrs() const;
-    const Value& attr(size_t id) const;
+    const Value& attr(int id) const;
     Value attr(const QString& name, Value defaultValue=Value()) const;
 
     const Node& randNeighbour(PRG* prg) const;

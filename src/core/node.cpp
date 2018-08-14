@@ -57,7 +57,7 @@ float Node::y() const
 const Attributes& Node::attrs() const
 { return m_ptr->attrs(); }
 
-const Value& Node::attr(size_t id) const
+const Value& Node::attr(int id) const
 { return m_ptr->attr(id); }
 
 Value Node::attr(const QString& name, Value defaultValue) const

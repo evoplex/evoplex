@@ -52,9 +52,9 @@ public:
     PRG* prg() const;
     inline const Attributes* attrs() const;
 
-    inline const QString& attrName(size_t attrId) const;
+    inline const QString& attrName(int attrId) const;
 
-    inline const Value& attr(size_t attrId) const;
+    inline const Value& attr(int attrId) const;
     inline Value attr(const QString& name, Value defaultValue=Value()) const;
 
     inline bool attrExists(const char* name) const;
@@ -82,10 +82,10 @@ inline bool AbstractPlugin::init()
 inline const Attributes* AbstractPlugin::attrs() const
 { return m_attrs; }
 
-inline const QString& AbstractPlugin::attrName(size_t attrId) const
+inline const QString& AbstractPlugin::attrName(int attrId) const
 { return m_attrs->name(attrId); }
 
-inline const Value& AbstractPlugin::attr(size_t attrId) const
+inline const Value& AbstractPlugin::attr(int attrId) const
 { return m_attrs->value(attrId);  }
 
 inline Value AbstractPlugin::attr(const QString& name, Value defaultValue) const

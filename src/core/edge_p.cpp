@@ -64,7 +64,7 @@ const Node& Edge::neighbour() const
 const Attributes* Edge::attrs() const
 { return m_ptr->attrs(); }
 
-const Value& Edge::attr(size_t id) const
+const Value& Edge::attr(int id) const
 { return m_ptr->attr(id); }
 
 Value Edge::attr(const QString& name, Value defaultValue) const
