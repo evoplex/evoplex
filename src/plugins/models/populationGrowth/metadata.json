@@ -1,0 +1,11 @@
+{
+  "type": "model",
+  "uid": "populationGrowth",
+  "version": 1,
+  "title": "Population Growth Model",
+  "author": "Ethan Padden and Marcos Cardinot",
+  "description": "This model simulates the spread of infection across a population.",
+
+  "nodeAttributesScope": [ {"infected": "bool"} ],
+  "pluginAttributesScope": [ {"prob": "double[0,1]"} ]
+}

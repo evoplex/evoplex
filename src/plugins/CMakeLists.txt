@@ -60,5 +60,6 @@ add_plugins(graphs "${GRAPHS}")
 
 set(MODELS
   nowak92
+  populationGrowth
 )
 add_plugins(models "${MODELS}")
