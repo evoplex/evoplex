@@ -162,7 +162,6 @@ bool Experiment::reset(QString* error)
         return false;
     }
 
-    m_delay = m_mainApp->defaultStepDelay();
     m_stopAt = m_inputs->general(GENERAL_ATTR_STOPAT).toInt();
     setProgress(0);
 
@@ -194,6 +193,8 @@ void Experiment::enable(QString& error)
         emit (statusChanged(m_expStatus));
         return;
     }
+
+    m_delay = m_mainApp->defaultStepDelay();
 
     if (m_inputs->fileCaches().empty()) {
         return; // nothing to do
