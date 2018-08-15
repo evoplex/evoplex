@@ -33,16 +33,12 @@
 #include "core/attrsgenerator.h"
 #include "core/include/enum.h"
 
-#define STRING_NULL_PLUGINID "--"
-
 namespace evoplex {
 
 ExperimentDesigner::ExperimentDesigner(MainApp* mainApp, QWidget *parent)
     : QDockWidget(parent)
     , m_mainApp(mainApp)
     , m_project(nullptr)
-    , m_selectedGraphKey(STRING_NULL_PLUGINID, 0)
-    , m_selectedModelKey(STRING_NULL_PLUGINID, 0)
     , m_ui(new Ui_ExperimentDesigner)
 {
     setObjectName("ExperimentDesigner");
@@ -62,7 +58,7 @@ ExperimentDesigner::ExperimentDesigner(MainApp* mainApp, QWidget *parent)
     m_treeItemModels->setExpanded(true);
     // --  models available
     QComboBox* cb = new QComboBox(m_ui->treeWidget);
-    cb->insertItem(0, STRING_NULL_PLUGINID);
+    cb->insertItem(0, "--");
     connect(cb, SIGNAL(currentIndexChanged(int)), SLOT(slotModelSelected(int)));
     addGeneralAttr(m_treeItemModels, GENERAL_ATTR_MODELID, cb);
 
@@ -76,7 +72,7 @@ ExperimentDesigner::ExperimentDesigner(MainApp* mainApp, QWidget *parent)
     addGeneralAttr(m_treeItemGraphs, GENERAL_ATTR_NODES, nodesCmd);
     // --  graphs available
     cb = new QComboBox(m_ui->treeWidget);
-    cb->insertItem(0, STRING_NULL_PLUGINID);
+    cb->insertItem(0, "--");
     connect(cb, SIGNAL(currentIndexChanged(int)), SLOT(slotGraphSelected(int)));
     addGeneralAttr(m_treeItemGraphs, GENERAL_ATTR_GRAPHID, cb);
     // --  graph type
@@ -287,7 +283,7 @@ void ExperimentDesigner::setExperiment(ExperimentPtr exp)
 
 void ExperimentDesigner::slotNodesWidget()
 {
-    if (m_selectedModelKey.first == STRING_NULL_PLUGINID) {
+    if (m_selectedModelKey == PluginKey()) {
         QMessageBox::warning(this, "Experiment", "Please, select a valid 'modelId' first.");
         return;
     }
@@ -304,7 +300,7 @@ void ExperimentDesigner::slotNodesWidget()
 
 void ExperimentDesigner::slotOutputWidget()
 {
-    if (m_selectedModelKey.first == STRING_NULL_PLUGINID) {
+    if (m_selectedModelKey == PluginKey()) {
         QMessageBox::warning(this, "Experiment", "Please, select a valid 'modelId' first.");
         return;
     }
@@ -347,10 +343,10 @@ void ExperimentDesigner::slotOutputWidget()
 
 std::unique_ptr<ExpInputs> ExperimentDesigner::readInputs(const int expId, QString& error) const
 {
-    if (m_selectedModelKey.first == STRING_NULL_PLUGINID) {
+    if (m_selectedModelKey == PluginKey()) {
         error = "Please, select a valid 'modelId'.";
         return nullptr;
-    } else if (m_selectedGraphKey.first == STRING_NULL_PLUGINID) {
+    } else if (m_selectedGraphKey == PluginKey()) {
         error = "Please, select a valid 'graphId'.";
         return nullptr;
     } else if (m_enableOutputs->isChecked()
@@ -603,6 +599,7 @@ void ExperimentDesigner::addGeneralAttr(QTreeWidgetItem* itemRoot,
 
     QTreeWidgetItem* item = new QTreeWidgetItem(itemRoot);
     item->setText(0, attrName);
+    item->setToolTip(0, attrName);
     m_ui->treeWidget->setItemWidget(item, 1, widget);
 }
 
