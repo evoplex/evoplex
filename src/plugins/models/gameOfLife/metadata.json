@@ -1,0 +1,11 @@
+{
+  "type": "model",
+  "uid": "gameOfLife",
+  "title": "Conway's Game of Life",
+  "version": 1,
+  "author": "Ethan Padden and Marcos Cardinot",
+  "description": "This implements Conway's Game Of Life cellular automaton.",
+
+  "supportedGraphs": ["squareGrid"],
+  "nodeAttributesScope": [ {"live": "bool"} ]
+}

@@ -8,8 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Increases unit-tests coverage of core components
 - Implements the Bernoulli distribution in the PRG class
-- New mode plugin: population growth
 - Plugins can now be reloaded
+- New model plugin: population growth
+- New model plugin: Conway's Game of Life cellular automaton
 
 ### Changed
 - Node's coordinates are now a float
