@@ -66,13 +66,14 @@ MainGUI::MainGUI(MainApp* mainApp)
     , m_curPage(PAGE_NULL)
 {
     // main window
-    this->setWindowTitle("Evoplex");
-    this->setWindowIconText("Evoplex");
-    this->setWindowIcon(QIcon(":/icons/evoplex.svg"));
-    this->setGeometry(100,100,800,500);
-    this->setTabPosition(Qt::AllDockWidgetAreas, QTabWidget::South);
-    this->setDockNestingEnabled(true);
-    this->setContextMenuPolicy(Qt::NoContextMenu);
+    setObjectName("MainGUI");
+    setWindowTitle("Evoplex");
+    setWindowIconText("Evoplex");
+    setWindowIcon(QIcon(":/icons/evoplex.svg"));
+    setGeometry(100,100,800,500);
+    setTabPosition(Qt::AllDockWidgetAreas, QTabWidget::South);
+    setDockNestingEnabled(true);
+    setContextMenuPolicy(Qt::NoContextMenu);
 
     //
     // central widget
@@ -83,7 +84,7 @@ MainGUI::MainGUI(MainApp* mainApp)
     centralLayout->addWidget(m_projectsPage);
     centralLayout->addWidget(m_plugins);
     centralLayout->addWidget(m_settings);
-    this->setCentralWidget(centralLayout->parentWidget());
+    setCentralWidget(centralLayout->parentWidget());
     m_welcome->hide();
     //m_queue->hide();
     m_projectsPage->hide();
@@ -94,7 +95,7 @@ MainGUI::MainGUI(MainApp* mainApp)
     // left toolbar
     //
     QToolBar* toolbar = new QToolBar(this);
-    toolbar->setObjectName("toolbar");
+    toolbar->setObjectName("mainToolbar");
     QActionGroup* actionGroup = new QActionGroup(toolbar);
     QAction* acWelcome = new QAction(QIcon(":/icons/evoplex.svg"), "Welcome", actionGroup);
     acWelcome->setCheckable(true);
@@ -125,7 +126,7 @@ MainGUI::MainGUI(MainApp* mainApp)
     toolbar->setToolButtonStyle(Qt::ToolButtonIconOnly);
     toolbar->setMovable(false);
     toolbar->setFloatable(false);
-    this->addToolBar(Qt::LeftToolBarArea, toolbar);
+    addToolBar(Qt::LeftToolBarArea, toolbar);
     // remove the tooltips
     for (QToolButton* btn : toolbar->findChildren<QToolButton*>()) {
         btn->installEventFilter(this);
@@ -186,7 +187,7 @@ MainGUI::MainGUI(MainApp* mainApp)
     menuFile->addAction(actSaveAll);
     menuFile->addSeparator();
     menuFile->addAction(actQuit);
-    this->menuBar()->addMenu(menuFile);
+    menuBar()->addMenu(menuFile);
 
     QMenu* menuHelp = new QMenu("Help", this);
     QAction* acLog = new QAction("Log", this);
@@ -195,7 +196,7 @@ MainGUI::MainGUI(MainApp* mainApp)
     QAction* acAbout = new QAction("About", this);
     connect(acAbout, SIGNAL(triggered(bool)), SLOT(slotShowAbout()));
     menuHelp->addAction(acAbout);
-    this->menuBar()->addMenu(menuHelp);
+    menuBar()->addMenu(menuHelp);
 
     QSettings userPrefs;
     restoreGeometry(userPrefs.value("gui/geometry").toByteArray());

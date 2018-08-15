@@ -31,6 +31,16 @@ QToolBar {
   spacing: 3px;
   border: 0px;
 }
-QToolButton {
+QToolBar#mainToolbar > QToolButton {
   padding: 8px;
+}
+
+/* ProjectsPage */
+QWidget#contents {
+  background-color: rgb(24, 24, 24);
+}
+
+/* ExperimentWidget */
+QMainWindow#experimentWindow {
+  background-color: rgb(24,24,24);
 }

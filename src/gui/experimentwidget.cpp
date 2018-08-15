@@ -48,10 +48,10 @@ ExperimentWidget::ExperimentWidget(ExperimentPtr exp, MainGUI* mainGUI, Projects
     setFocusPolicy(Qt::StrongFocus);
 
     // setup the inner qmainwindow
+    m_innerWindow->setObjectName("experimentWindow");
     m_innerWindow->setDockOptions(QMainWindow::AllowTabbedDocks | QMainWindow::GroupedDragging);
     m_innerWindow->setDockNestingEnabled(true);
     m_innerWindow->setAnimated(true);
-    m_innerWindow->setStyleSheet("QMainWindow { background-color: rgb(24,24,24); }");
     m_innerWindow->setCentralWidget(nullptr);
 
     QToolBar* tb = new QToolBar("Controls", this);
@@ -78,12 +78,12 @@ ExperimentWidget::ExperimentWidget(ExperimentPtr exp, MainGUI* mainGUI, Projects
     m_delay->setMinimumWidth(100);
     m_delay->setMaximumWidth(100);
     m_delay->setValue(m_exp->delay());
+    m_delay->setToolTip("Delay simulation");
     tb->addWidget(m_delay);
 
     tb->setMovable(false);
     tb->setFloatable(false);
     tb->setIconSize(QSize(20,20));
-    tb->setStyleSheet("padding: 0px; background: rgb(53,53,53);");
     tb->setFocusPolicy(Qt::StrongFocus);
 
     connect(m_aPlayPause, &QAction::triggered, [this]() { m_exp->toggle(); });
