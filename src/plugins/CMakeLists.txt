@@ -59,6 +59,7 @@ set(GRAPHS
 add_plugins(graphs "${GRAPHS}")
 
 set(MODELS
+  gameOfLife
   nowak92
   populationGrowth
 )
