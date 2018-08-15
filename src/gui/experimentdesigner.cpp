@@ -23,8 +23,8 @@
 #include <QVariant>
 
 #include "experimentdesigner.h"
+#include "attrsgendlg.h"
 #include "linebutton.h"
-#include "nodesgeneratordlg.h"
 #include "experimentwidget.h"
 #include "projectwidget.h"
 #include "outputwidget.h"
@@ -284,14 +284,17 @@ void ExperimentDesigner::setExperiment(ExperimentPtr exp)
 void ExperimentDesigner::slotNodesWidget()
 {
     if (m_selectedModelKey == PluginKey()) {
-        QMessageBox::warning(this, "Experiment", "Please, select a valid 'modelId' first.");
+        QMessageBox::warning(this, "Experiment",
+            "Please, select a valid 'modelId' first.");
         return;
     }
 
     const ModelPlugin* model = m_mainApp->model(m_selectedModelKey);
     const QString& cmd = m_attrWidgets.value(GENERAL_ATTR_NODES)->value().toQString();
 
-    NodesGeneratorDlg* adlg = new NodesGeneratorDlg(this, model->nodeAttrsScope(), cmd);
+    AttrsGenDlg* adlg = new AttrsGenDlg(this, AttrsGenDlg::Mode::Nodes,
+                                        model->nodeAttrsScope(), cmd);
+
     if (adlg->exec() == QDialog::Accepted) {
         m_attrWidgets.value(GENERAL_ATTR_NODES)->setValue(adlg->readCommand());
     }

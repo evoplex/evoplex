@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>NodesGeneratorDlg</class>
- <widget class="QWidget" name="NodesGeneratorDlg">
+ <class>AttrsGenDlg</class>
+ <widget class="QWidget" name="AttrsGenDlg">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>525</width>
-    <height>658</height>
+    <height>690</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -15,9 +15,6 @@
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
-  </property>
-  <property name="windowTitle">
-   <string>Nodes Generator</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>

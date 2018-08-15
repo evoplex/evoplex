@@ -29,18 +29,21 @@
 #include "core/include/nodes.h"
 #include "core/nodes_p.h"
 
-#include "nodesgeneratordlg.h"
-#include "ui_nodesgeneratordlg.h"
+#include "attrsgendlg.h"
+#include "ui_attrsgendlg.h"
 #include "maingui.h"
 
 namespace evoplex {
 
-NodesGeneratorDlg::NodesGeneratorDlg(QWidget* parent, const AttributesScope& nodeAttrsScope, const QString& cmd)
+AttrsGenDlg::AttrsGenDlg(QWidget* parent, Mode mode,
+                         const AttributesScope& attrsScope, const QString& cmd)
     : QDialog(parent, MainGUI::kDefaultDlgFlags),
-      m_ui(new Ui_NodesGeneratorDlg),
-      m_nodeAttrsScope(nodeAttrsScope)
+      m_ui(new Ui_AttrsGenDlg),
+      m_mode(mode),
+      m_attrsScope(attrsScope)
 {
     setWindowModality(Qt::ApplicationModal);
+    setWindowTitle(m_mode == Mode::Nodes ? "Nodes Generator" : "Edges Attributes");
     m_ui->setupUi(this);
 
     m_ui->wFromFile->setVisible(false);
@@ -49,7 +52,7 @@ NodesGeneratorDlg::NodesGeneratorDlg(QWidget* parent, const AttributesScope& nod
     m_ui->wNumNodes->setVisible(false);
     connect(m_ui->bFromFile, SIGNAL(toggled(bool)), m_ui->wFromFile, SLOT(setVisible(bool)));
 
-    if (m_nodeAttrsScope.empty()) {
+    if (m_attrsScope.empty()) {
         connect(m_ui->bCreateNodes, SIGNAL(toggled(bool)), m_ui->wNumNodes, SLOT(setVisible(bool)));
         m_ui->bSameData->setVisible(false);
         m_ui->bDiffData->setVisible(false);
@@ -92,8 +95,8 @@ NodesGeneratorDlg::NodesGeneratorDlg(QWidget* parent, const AttributesScope& nod
     m_ui->func->setCurrentIndex(0);
     slotHideRand();
 
-    m_ui->table->setRowCount(m_nodeAttrsScope.size());
-    for (auto const& ar : m_nodeAttrsScope) {
+    m_ui->table->setRowCount(m_attrsScope.size());
+    for (auto const& ar : m_attrsScope) {
         m_ui->table->setItem(ar->id(), 0, new QTableWidgetItem(ar->attrName()));
 
         QComboBox* cb = new QComboBox(m_ui->table);
@@ -129,12 +132,12 @@ NodesGeneratorDlg::NodesGeneratorDlg(QWidget* parent, const AttributesScope& nod
     fill(cmd);
 }
 
-NodesGeneratorDlg::~NodesGeneratorDlg()
+AttrsGenDlg::~AttrsGenDlg()
 {
     delete m_ui;
 }
 
-void NodesGeneratorDlg::slotSaveAs()
+void AttrsGenDlg::slotSaveAs()
 {
     QString path = QFileDialog::getSaveFileName(this,
                                                 "Save Nodes",
@@ -162,9 +165,9 @@ void NodesGeneratorDlg::slotSaveAs()
         std::function<void(int)> progress = [&progressDlg, &pValue](int p) { progressDlg.setValue(pValue + p); };
 
         QString errMsg;
-        Nodes nodes = NodesPrivate::fromCmd(cmd, m_nodeAttrsScope, GraphType::Undirected, errMsg, progress);
-        Q_ASSERT_X(errMsg.isEmpty(), "NodesGeneratorDlg::slotSaveAs", "the command should be free of erros here");
-        Q_ASSERT_X(!nodes.empty(), "NodesGeneratorDlg::slotSaveAs", "nodes size must be >0");
+        Nodes nodes = NodesPrivate::fromCmd(cmd, m_attrsScope, GraphType::Undirected, errMsg, progress);
+        Q_ASSERT_X(errMsg.isEmpty(), "AttrsGenDlg", "the command should be free of erros here");
+        Q_ASSERT_X(!nodes.empty(), "AttrsGenDlg", "nodes size must be >0");
 
         pValue = numNodes;
         saved = NodesPrivate::saveToFile(nodes, path, progress);
@@ -180,7 +183,7 @@ void NodesGeneratorDlg::slotSaveAs()
     }
 }
 
-void NodesGeneratorDlg::fill(const QString& cmd)
+void AttrsGenDlg::fill(const QString& cmd)
 {
     if (cmd.isEmpty()) {
         return;
@@ -193,7 +196,7 @@ void NodesGeneratorDlg::fill(const QString& cmd)
     }
 
     QString errMsg;
-    auto ag = AttrsGenerator::parse(m_nodeAttrsScope, cmd, errMsg);
+    auto ag = AttrsGenerator::parse(m_attrsScope, cmd, errMsg);
     if (!errMsg.isEmpty() || !ag) {
         QMessageBox::warning(parentWidget(), "Nodes Generator", errMsg);
         return;
@@ -201,8 +204,8 @@ void NodesGeneratorDlg::fill(const QString& cmd)
 
     AGSameFuncForAll* agsame = dynamic_cast<AGSameFuncForAll*>(ag.get());
     if (agsame) {
-        m_ui->bSameData->setChecked(!m_nodeAttrsScope.empty());
-        m_ui->bCreateNodes->setChecked(m_nodeAttrsScope.empty());
+        m_ui->bSameData->setChecked(!m_attrsScope.empty());
+        m_ui->bCreateNodes->setChecked(m_attrsScope.empty());
         m_ui->numNodes->setValue(agsame->size());
         m_ui->func->setCurrentIndex(m_ui->func->findData(static_cast<int>(agsame->function())));
         const Value& v = agsame->functionInput();
@@ -216,7 +219,7 @@ void NodesGeneratorDlg::fill(const QString& cmd)
         m_ui->numNodes->setValue(agdiff->size());
         for (const AGDiffFunctions::AttrCmd& ac : agdiff->attrCmds()) {
             Q_ASSERT_X(m_ui->table->item(ac.attrId, 0)->text() == ac.attrName,
-                       "NodesGeneratorDlg::fill", "attribute name mismatch. It should never happen!");
+                       "AttrsGenDlg::fill", "attribute name mismatch. It should never happen!");
             QComboBox* cb = qobject_cast<QComboBox*>(m_ui->table->cellWidget(ac.attrId, 1));
             QLineEdit* le = qobject_cast<QLineEdit*>(m_ui->table->cellWidget(ac.attrId, 2));
             cb->setCurrentIndex(cb->findData(static_cast<int>(ac.func)));
@@ -231,7 +234,7 @@ void NodesGeneratorDlg::fill(const QString& cmd)
     }
 }
 
-QString NodesGeneratorDlg::readCommand()
+QString AttrsGenDlg::readCommand()
 {
     QString command;
     if (m_ui->bFromFile->isChecked()) {
@@ -250,9 +253,9 @@ QString NodesGeneratorDlg::readCommand()
         }
     } else if (m_ui->bDiffData->isChecked()) {
         command = QString("#%1").arg(m_ui->numNodes->text());
-        for (auto const& ar : m_nodeAttrsScope) {
+        for (auto const& ar : m_attrsScope) {
             Q_ASSERT_X(m_ui->table->item(ar->id(), 0)->text() == ar->attrName(),
-                       "NodesGeneratorDlg::fill", "attribute name mismatch. It should never happen!");
+                       "AttrsGenDlg", "attribute name mismatch. It should never happen!");
 
             QComboBox* cb = qobject_cast<QComboBox*>(m_ui->table->cellWidget(ar->id(), 1));
             command += QString(";%1_%2").arg(ar->attrName(), cb->currentText());

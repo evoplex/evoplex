@@ -18,26 +18,33 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef NODESGENERATORDLG_H
-#define NODESGENERATORDLG_H
+#ifndef ATTRSGENDLG_H
+#define ATTRSGENDLG_H
 
 #include <QDialog>
 
 #include "attributerange.h"
 #include "core/attrsgenerator.h"
 
-class Ui_NodesGeneratorDlg;
+class Ui_AttrsGenDlg;
 
 namespace evoplex
 {
 
-class NodesGeneratorDlg : public QDialog
+class AttrsGenDlg : public QDialog
 {
     Q_OBJECT
 
 public:
-    explicit NodesGeneratorDlg(QWidget* parent, const AttributesScope& nodeAttrsScope, const QString& cmd = "");
-    ~NodesGeneratorDlg();
+    enum class Mode {
+        Edges,
+        Nodes
+    };
+
+    explicit AttrsGenDlg(QWidget* parent, Mode mode,
+            const AttributesScope& attrsScope, const QString& cmd = "");
+
+    ~AttrsGenDlg();
 
     QString readCommand();
 
@@ -45,11 +52,12 @@ private slots:
     void slotSaveAs();
 
 private:
-    Ui_NodesGeneratorDlg* m_ui;
-    const AttributesScope& m_nodeAttrsScope;
+    Ui_AttrsGenDlg* m_ui;
+    const Mode m_mode;
+    const AttributesScope& m_attrsScope;
 
     void fill(const QString& cmd);
 };
 
 } // evoplex
-#endif // NODESGENERATORDLG_H
+#endif // ATTRSGENDLG_H
