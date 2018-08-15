@@ -22,7 +22,7 @@ bool PopulationGrowth::init()
 
 bool PopulationGrowth::algorithmStep()
 {
-    std::vector<bool> nextInfectedStates;
+    std::vector<Value> nextInfectedStates;
     nextInfectedStates.reserve(nodes().size());
 
     for (Node node : nodes()) {
@@ -46,7 +46,7 @@ bool PopulationGrowth::algorithmStep()
     // For each node, load the next state into the current state
     size_t i = 0;
     for (Node node : nodes()) {
-        node.setAttr(m_infectedAttrId, Value(nextInfectedStates.at(i)));
+        node.setAttr(m_infectedAttrId, nextInfectedStates.at(i));
         ++i;
     }
 
