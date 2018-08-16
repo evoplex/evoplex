@@ -26,6 +26,7 @@ set(EVOPLEX_CORE_INCLUDE
 
   include/attributes.h
   include/attributerange.h
+  include/attrsgenerator.h
   include/node.h
   include/nodes.h
   include/edge.h
@@ -40,7 +41,6 @@ set(EVOPLEX_CORE_INCLUDE
 set(EVOPLEX_CORE_H
   graphplugin.h
   modelplugin.h
-  attrsgenerator.h
   output.h
   plugin.h
 

@@ -21,21 +21,23 @@
 #ifndef ATTRS_GENERATOR_H
 #define ATTRS_GENERATOR_H
 
+#include "attributes.h"
 #include "attributerange.h"
-#include "modelplugin.h"
+#include "enum.h"
 
 namespace evoplex {
 
-class AttrsGenerator;
 class AGSameFuncForAll;
 class AGDiffFunctions;
+class AttrsGenerator;
 using AttrsGeneratorPtr = std::unique_ptr<AttrsGenerator>;
 
 class AttrsGeneratorInterface
 {
 public:
     virtual ~AttrsGeneratorInterface() = default;
-    virtual SetOfAttributes create(std::function<void(int)> progress = [](int){}) = 0;
+    virtual SetOfAttributes create(int size=-1,
+        std::function<void(int)> progress = [](int){}) = 0;
 };
 
 /**
@@ -47,15 +49,21 @@ public:
     // Expected commands:
     //     - integer
     //         '*integer;min' alias
-    //     - same mode for all attributes:
+    //     - same function for all attributes:
     //         '*integer;[min|max|rand_seed]'
-    //     - specific mode for each attribute:
+    //         '*[min|max|rand_seed]'
+    //              -> alias for interger=1
+    //     - specific function for each attribute:
     //         '#integer;attrName_[min|max|rand_seed|value_val];...'
+    //         '#attrName_[min|max|rand_seed|value_val];...'
+    //              -> alias for interger=1
     //     * the integer corresponds to the size of the set of attributes
     static AttrsGeneratorPtr parse(const AttributesScope& attrsScope,
                                    const QString &cmd, QString& error);
 
     virtual ~AttrsGenerator() = default;
+
+    inline AttributesScope attrsScope() const { return m_attrsScope; }
 
     // the source command for the AttrsGenerator object
     inline const QString& command() { return m_command; }
@@ -95,7 +103,9 @@ public:
                               const Function& func, const Value& funcInput);
     ~AGSameFuncForAll() override;
 
-    SetOfAttributes create(std::function<void(int)> progress = [](int){}) override;
+    SetOfAttributes create(int size=-1,
+            std::function<void(int)> progress = [](int){}) override;
+
     inline Function function() const { return m_function; }
     inline const Value& functionInput() const { return m_functionInput; }
 
@@ -123,7 +133,9 @@ public:
                              const std::vector<AttrCmd>& attrCmds);
     ~AGDiffFunctions() override = default;
 
-    SetOfAttributes create(std::function<void(int)> progress = [](int){}) override;
+    SetOfAttributes create(int size=-1,
+            std::function<void(int)> progress = [](int){}) override;
+
     inline const std::vector<AttrCmd>& attrCmds() const { return m_attrCmds; }
 
 private:

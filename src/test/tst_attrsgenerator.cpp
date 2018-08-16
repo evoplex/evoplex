@@ -21,7 +21,8 @@
 
 #include <memory>
 #include <QtTest>
-#include <core/attrsgenerator.h>
+
+#include <core/include/attrsgenerator.h>
 
 namespace evoplex {
 class TestAttrsGenerator: public QObject
@@ -35,14 +36,24 @@ private slots:
     void tst_parseHashCmd();
 
 private:
-    void _tst_attrs(const SetOfAttributes& res, const Attributes& attrs,  const bool testValues);
-    void _tst_mode(const SetOfAttributes& res, const QString& mode, const AttributesScope& ascope, const int& numOfAttrRges);
-    void _tst_parseStarCmd(const QString& func, const AttributesScope& attrsScope, const int& sizeOfAG, const Attributes& attrs);
-    QString _makeCmd(const QString& func, const Values& values, const QStringList& names, const int sizeOfAG);
-    AttributesScope _newAttrsScope(const QStringList& names, const QStringList& attrRges);
+    void _tst_attrs(const SetOfAttributes& res,
+            const Attributes& attrs, bool testValues);
+
+    void _tst_mode(const SetOfAttributes& res, const QString& mode,
+            const AttributesScope& ascope);
+
+    void _tst_parseStarCmd(const QString& func, const AttributesScope& attrsScope,
+            int sizeOfAG, const Attributes& attrs, bool valid);
+
+    QString _makeCmd(const QString& func, const Values& values,
+            const QStringList& names, const int sizeOfAG);
+
+    AttributesScope _newAttrsScope(const QStringList& names,
+            const QStringList& attrRges);
 };
 
-void TestAttrsGenerator::_tst_attrs(const SetOfAttributes& res, const Attributes& attrs,  const bool testValues)
+void TestAttrsGenerator::_tst_attrs(const SetOfAttributes& res,
+                                    const Attributes& attrs,  bool testValues)
 {
     for (const Attributes& a : res) {
         QCOMPARE(a.names(), attrs.names());
@@ -57,7 +68,8 @@ void TestAttrsGenerator::_tst_attrs(const SetOfAttributes& res, const Attributes
     }
 }
 
-void TestAttrsGenerator::_tst_mode(const SetOfAttributes& res, const QString& mode, const AttributesScope& ascope, const int& numOfAttrRges)
+void TestAttrsGenerator::_tst_mode(const SetOfAttributes& res,
+                                   const QString& mode, const AttributesScope& ascope)
 {
     if (mode == "min") {
         for (const auto& attrs : res) {
@@ -128,28 +140,33 @@ QString TestAttrsGenerator::_makeCmd(const QString& func, const Values& values, 
     }
 }
 
-void TestAttrsGenerator::_tst_parseStarCmd(const QString& func, const AttributesScope& attrsScope, const int& sizeOfAG, const Attributes& attrs)
+void TestAttrsGenerator::_tst_parseStarCmd(const QString& func, const AttributesScope& attrsScope,
+                                           int sizeOfAG, const Attributes& attrs, bool valid)
 {
     const Attributes emptyAttrs;
     const QString cmd = QString("*%1;%2").arg(Value(sizeOfAG).toQString()).arg(func);
     QString error;
     auto agen = AttrsGenerator::parse(attrsScope, cmd, error);
 
-    if (agen) { // If the command is valid (parse did not return a null pointer)
-        QCOMPARE(agen->command(), cmd);
-        QCOMPARE(agen->size(), sizeOfAG);
+    if (!valid) {
+        QVERIFY(!agen); // must be null
+        QVERIFY(!error.isEmpty());
+        return;
+    }
 
-        const SetOfAttributes res = agen->create();
+    QCOMPARE(agen->command(), cmd);
+    QCOMPARE(agen->size(), sizeOfAG);
 
-        if (attrsScope.isEmpty()) { // Valid * command with empty attrScope
-            _tst_attrs(res, emptyAttrs, true);
-        } else { // Valid * command with non-empty attrScope
-            if (func == "min" || func == "max") {
-                _tst_mode(res, func, attrsScope, attrsScope.size());
-            } else if (func.split("_").startsWith("rand")) {
-                _tst_mode(res, func.split("_").first(), attrsScope, attrsScope.size());
-                _tst_attrs(res, attrs, false);
-            }
+    const SetOfAttributes res = agen->create();
+
+    if (attrsScope.isEmpty()) { // Valid * command with empty attrScope
+        _tst_attrs(res, emptyAttrs, true);
+    } else { // Valid * command with non-empty attrScope
+        if (func == "min" || func == "max") {
+            _tst_mode(res, func, attrsScope);
+        } else if (func.split("_").startsWith("rand")) {
+            _tst_mode(res, func.split("_").first(), attrsScope);
+            _tst_attrs(res, attrs, false);
         }
     }
 }
@@ -166,21 +183,25 @@ void TestAttrsGenerator::tst_parseStarCmd()
         attrs.replace(i, names.at(i), 0);
     }
 
-    const QStringList funcs = {
-        // valid functions
+    const int validSizes[] = {1, 3, 10};
+    const QStringList validFuncs = {
         "min", "max", "rand_0", "rand_10",
-        // invalid functions
+    };
+    for (const auto& func : validFuncs) {
+        for (int size : validSizes) {
+            _tst_parseStarCmd(func, validAScope, size, attrs, true);
+            _tst_parseStarCmd(func, emptyAScope, size, attrs, true);
+        }
+    }
+
+    const int invalidSizes[] = {-100, -1, 0};
+    const QStringList invalidFuncs = {
         "mim", "mn", "", "rand_-10", "_10", "rand_notInt", "invalid"
     };
-
-    // Sizes <= 0 cause ASSERT failures
-//    const int sizes[] = {-100, -1, 0, 1, 3};
-    const int sizes[] = {1, 3, 100};
-
-    for (const auto& func : funcs) {
-        for (int size : sizes) {
-            _tst_parseStarCmd(func, validAScope, size, attrs);
-            _tst_parseStarCmd(func, emptyAScope, size, attrs);
+    for (const auto& func : invalidFuncs) {
+        for (int size : invalidSizes) {
+            _tst_parseStarCmd(func, validAScope, size, attrs, false);
+            _tst_parseStarCmd(func, emptyAScope, size, attrs, false);
         }
     }
 }
@@ -222,7 +243,7 @@ void TestAttrsGenerator::tst_parseHashCmd()
                attrs.replace(i, names.at(i), 0);
            }
             _tst_attrs(res, attrs, false);
-            _tst_mode(res, "rand", attrsScope, 4);
+            _tst_mode(res, "rand", attrsScope);
        } else if (func == "value") {
            for (int i = 0; i < attrs.size(); ++i) {
                attrs.replace(i, names.at(i), values[i]);

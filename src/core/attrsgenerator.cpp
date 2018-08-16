@@ -41,26 +41,36 @@ AttrsGeneratorPtr AttrsGenerator::parse(const AttributesScope& attrsScope,
         return nullptr;
     }
 
-    QStringList cmds = cmd.split(";");
-    QString sizeStr = cmds.takeFirst();
+    QStringList cmds;
     QString _cmd;
-    int size = -1;
 
     bool sizeIsValid = false;
-    if (cmds.empty()) { // '*int;min' alias
-        size = sizeStr.toInt(&sizeIsValid);
+    int size = cmd.toInt(&sizeIsValid);
+    if (sizeIsValid) { // cmd is just an interger
         _cmd = QString("*%1;min").arg(size);
         cmds.push_back("min");
     } else {
+        cmds = cmd.split(";");
+        QString sizeStr = cmds.first();
         size = sizeStr.remove(0,1).toInt(&sizeIsValid);
         _cmd = cmd;
     }
 
-    if (!sizeIsValid || size < 1) {
-        error = "Unable to parse '" + cmd + "'.\nIt should start with a positive"
-                " integer representing the size of the attributes set.";
-        qWarning() << error;
-        return nullptr;
+    if (sizeIsValid) {
+        if (size < 1) {
+            error = "Unable to parse '" + cmd + "'.\n"
+                    "The size of the attributes set cannot be negative!";
+            qWarning() << error;
+            return nullptr;
+        }
+        // the size was parsed correctly, let's take it out of the cmds
+        cmds.takeFirst();
+    } else { // cmd doesn't set a size
+        size = 1;
+        // expects that cmd starts with * or #
+        // so, let's take the first char of the cmd
+        cmds.first().remove(0,1);
+        _cmd = QString("%1%2;%3").arg(cmd.at(0)).arg(size).arg(cmds.join(";"));
     }
 
     std::unique_ptr<AttrsGenerator> ag;
@@ -69,7 +79,7 @@ AttrsGeneratorPtr AttrsGenerator::parse(const AttributesScope& attrsScope,
     } else if (_cmd.startsWith("#") && !attrsScope.empty()) {
         ag = parseHashCmd(attrsScope, size, cmds, error);
     } else {
-        error = "the command '" + cmd + "'. is invalid!";
+        error = "the command '" + cmd + "' is invalid!";
     }
 
     if (!ag) {
@@ -246,11 +256,13 @@ AGSameFuncForAll::~AGSameFuncForAll()
     delete m_prg;
 }
 
-SetOfAttributes AGSameFuncForAll::create(std::function<void(int)> progress)
+SetOfAttributes AGSameFuncForAll::create(int size, std::function<void(int)> progress)
 {
+    size = size < 1 ? m_size : size;
+
     SetOfAttributes ret;
-    ret.reserve(static_cast<size_t>(m_size));
-    for (int id = 0; id < m_size; ++id) {
+    ret.reserve(static_cast<size_t>(size));
+    for (int id = 0; id < size; ++id) {
         Attributes attrs(m_attrsScope.size());
         for (auto attrRange : m_attrsScope) {
             attrs.replace(attrRange->id(), attrRange->attrName(), f_value(attrRange));
@@ -278,11 +290,13 @@ AGDiffFunctions::AGDiffFunctions(const AttributesScope& attrsScope, const int si
     }
 }
 
-SetOfAttributes AGDiffFunctions::create(std::function<void(int)> progress)
+SetOfAttributes AGDiffFunctions::create(int size, std::function<void(int)> progress)
 {
+    size = size < 1 ? m_size : size;
+
     SetOfAttributes setOfAttrs;
-    setOfAttrs.reserve(static_cast<size_t>(m_size));
-    for (int i = 0; i < m_size; ++i) {
+    setOfAttrs.reserve(static_cast<size_t>(size));
+    for (int i = 0; i < size; ++i) {
         Attributes attrs(m_attrsScope.size());
         setOfAttrs.emplace_back(attrs);
     }
@@ -318,8 +332,8 @@ SetOfAttributes AGDiffFunctions::create(std::function<void(int)> progress)
     }
 
     SetOfAttributes ret;
-    ret.reserve(static_cast<size_t>(m_size));
-    for (int id = 0; id < m_size; ++id) {
+    ret.reserve(static_cast<size_t>(size));
+    for (int id = 0; id < size; ++id) {
         ret.emplace_back(setOfAttrs.at(static_cast<size_t>(id)));
         progress(id);
     }
