@@ -53,7 +53,7 @@ function(add_plugins ROOT_DIR PLUGINS)
 endfunction(add_plugins)
 
 set(GRAPHS
-  customgraph
+  edgesFromCSV
   squaregrid
 )
 add_plugins(graphs "${GRAPHS}")

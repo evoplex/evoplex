@@ -1,0 +1,14 @@
+{
+  "type": "graph",
+  "uid": "edgesFromCSV",
+  "version": 1,
+  "title": "Edges from CSV file",
+  "author": "Marcos Cardinot",
+  "description": "It allows importing edges from a csv file. The first and second columns must be labelled as 'origin' and 'target' respectively.",
+
+  "supportsEdgeAttrsGen": false,
+  "validGraphTypes": [],
+  "pluginAttributesScope": [
+    {"filePath": "filepath"}
+  ]
+}

@@ -17,6 +17,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Node's coordinates are now a float
 - Attributes' inspector of the graph widgets now shows a proper field for each type of attribute
 - Plugins page: minor GUI improvements
+- Renamed the 'customGraph' plugin to 'edgesFromCSV'
+- 'edgesFromCSV' plugin now supports edge attributes
 
 ### Fixed
 - Fixed bug when pausing an experiment with queued trials

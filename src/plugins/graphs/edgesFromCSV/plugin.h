@@ -18,8 +18,8 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef MOORE_GRID_H
-#define MOORE_GRID_H
+#ifndef EDGES_FROM_FILE_H
+#define EDGES_FROM_FILE_H
 
 #include <QPair>
 #include <vector>
@@ -27,7 +27,7 @@
 #include <plugininterface.h>
 
 namespace evoplex {
-class CustomGraph: public AbstractGraph
+class EdgesFromCSV: public AbstractGraph
 {
 public:
     bool init() override;
@@ -37,7 +37,10 @@ private:
     // graph parameters
     enum GraphAttr { FilePath };
     QString m_filePath;
+
+    bool validateHeader(const QStringList &header) const;
+    bool readRow(int row, const QStringList& header, const QStringList& values);
 };
 }
 
-#endif // MOORE_GRID_H
+#endif // EDGES_FROM_FILE_H
