@@ -48,6 +48,12 @@ LineButton::LineButton(QWidget* parent, Mode mode)
     }
 }
 
+void LineButton::setReadOnly(bool r)
+{
+    m_line->setReadOnly(r);
+    m_button->setDisabled(r);
+}
+
 void LineButton::slotSelectDir()
 {
     QString path = QFileDialog::getExistingDirectory(this,

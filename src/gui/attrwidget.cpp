@@ -43,6 +43,14 @@ AttrWidget::AttrWidget(AttributeRangePtr attrRange, QWidget* parent, QWidget* cu
     setLayout(l);
 }
 
+void AttrWidget::setReadOnly(bool r)
+{
+    if (m_isReadOnly != r) {
+        emit (readOnlyChanged(r));
+    }
+    m_isReadOnly = r;
+}
+
 Value AttrWidget::validate() const
 {
     return m_attrRange->validate(value().toQString());
@@ -106,7 +114,8 @@ QWidget* AttrWidget::newWidget(AttributeRangePtr attrRange)
         sp->setMinimum(attrRange->min().toDouble());
         sp->setDecimals(8);
         sp->setButtonSymbols(QDoubleSpinBox::NoButtons);
-        connect(sp, SIGNAL(editingFinished()), SIGNAL(editingFinished()));
+        connect(sp, SIGNAL(valueChanged(double)), SIGNAL(valueChanged()));
+        connect(this, &AttrWidget::readOnlyChanged, [sp](bool on) { sp->setReadOnly(on); });
         return sp;
     }
     case AttributeRange::Int_Range: {
@@ -114,7 +123,8 @@ QWidget* AttrWidget::newWidget(AttributeRangePtr attrRange)
         sp->setMaximum(attrRange->max().toInt());
         sp->setMinimum(attrRange->min().toInt());
         sp->setButtonSymbols(QSpinBox::NoButtons);
-        connect(sp, SIGNAL(editingFinished()), SIGNAL(editingFinished()));
+        connect(sp, SIGNAL(valueChanged(int)), SIGNAL(valueChanged()));
+        connect(this, &AttrWidget::readOnlyChanged, [sp](bool on) { sp->setReadOnly(on); });
         return sp;
     }
     case AttributeRange::Double_Set:
@@ -125,28 +135,33 @@ QWidget* AttrWidget::newWidget(AttributeRangePtr attrRange)
         for (const Value& v : sov->values()) {
             cb->addItem(v.toQString());
         }
-        connect(cb, SIGNAL(currentIndexChanged(int)), SIGNAL(editingFinished()));
+        connect(cb, SIGNAL(currentIndexChanged(int)), SIGNAL(valueChanged()));
+        connect(this, SIGNAL(readOnlyChanged(bool)), cb, SLOT(setDisabled(bool)));
         return cb;
     }
     case AttributeRange::Bool: {
         auto cb = new QCheckBox(this);
-        connect(cb, SIGNAL(stateChanged(int)), SIGNAL(editingFinished()));
+        connect(cb, SIGNAL(stateChanged(int)), SIGNAL(valueChanged()));
+        connect(this, SIGNAL(readOnlyChanged(bool)), cb, SLOT(setDisabled(bool)));
         return cb;
     }
     case AttributeRange::FilePath: {
         auto lb = new LineButton(this, LineButton::SelectTextFile);
-        connect(lb->line(), SIGNAL(editingFinished()), SIGNAL(editingFinished()));
+        connect(lb->line(), SIGNAL(textChanged(QString)), SIGNAL(valueChanged()));
+        connect(this, SIGNAL(readOnlyChanged(bool)), lb, SLOT(setReadOnly(bool)));
         return lb;
     }
     case AttributeRange::DirPath: {
         auto lb = new LineButton(this, LineButton::SelectDir);
-        connect(lb->line(), SIGNAL(editingFinished()), SIGNAL(editingFinished()));
+        connect(lb->line(), SIGNAL(textChanged(QString)), SIGNAL(valueChanged()));
+        connect(this, SIGNAL(readOnlyChanged(bool)), lb, SLOT(setReadOnly(bool)));
         return lb;
     }
     default:
         auto le = new QLineEdit(this);
         le->setText(attrRange->min().toQString());
-        connect(le, SIGNAL(editingFinished()), SIGNAL(editingFinished()));
+        connect(le, SIGNAL(textChanged(QString)), SIGNAL(valueChanged()));
+        connect(this, &AttrWidget::readOnlyChanged, [le](bool on) { le->setReadOnly(on); });
         return le;
     }
 }

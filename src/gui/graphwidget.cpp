@@ -73,6 +73,14 @@ GraphWidget::GraphWidget(MainGUI* mainGUI, ExperimentPtr exp, ExperimentWidget* 
             [this](int trialId) { if (trialId == m_currTrialId) setTrial(m_currTrialId); },
             Qt::QueuedConnection);
 
+    connect(exp.get(), &Experiment::statusChanged, [this](Status s) {
+        for (AttrWidget* aw : m_attrWidgets) {
+            if (aw && s != Status::Invalid) {
+                aw->setReadOnly(s == Status::Running);
+            }
+        }
+    });
+
     connect(m_settingsDlg, &GraphSettings::nodeAttrUpdated, [this](int idx) { m_nodeAttr = idx; });
     connect(m_settingsDlg, SIGNAL(nodeCMapUpdated(ColorMap*)), SLOT(setNodeCMap(ColorMap*)));
     m_nodeAttr = m_settingsDlg->nodeAttr();
@@ -119,38 +127,57 @@ void GraphWidget::setupInspector()
     for (auto attrRange : m_exp->modelPlugin()->nodeAttrsScope()) {
         AttrWidget* aw = new AttrWidget(attrRange, this);
         aw->setToolTip(attrRange->attrRangeStr());
-        connect(aw, &AttrWidget::editingFinished, [this, attrRange, aw]() {
-            if (!m_trial || !m_trial->graph() || m_ui->nodeId->value() < 0) {
-                return;
-            }
-            QString err;
-            Node node = m_trial->graph()->node(m_ui->nodeId->value());
-            if (m_trial->status() == Status::Running) {
-                err = "You cannot change things in a running experiment.\n"
-                      "Please, pause it and try again.";
-            } else {
-                Value v = aw->validate();
-                if (v.isValid()) {
-                    node.setAttr(attrRange->id(), v);
-                    // let the other widgets aware that they all need to be updated
-                    emit (m_expWidget->updateWidgets(true));
-                    return;
-                } else {
-                    err = "The input for '" + attrRange->attrName() + "' is invalid.\n"
-                          "Expected: " + attrRange->attrRangeStr();
-                }
-            }
-            QMessageBox::warning(this, "Graph", err);
-            aw->setValue(node.attr(attrRange->id()));
-        });
+        connect(aw, &AttrWidget::valueChanged, [this, aw]() { attrChanged(aw); });
         m_attrWidgets.at(attrRange->id()) = aw;
         m_ui->modelAttrs->insertRow(attrRange->id(), attrRange->attrName(), aw);
+
         QWidget* l = m_ui->modelAttrs->labelForField(aw);
         l->setToolTip(attrRange->attrName());
         l->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
         l->setMinimumWidth(m_ui->lNodeId->minimumWidth());
     }
+
+    m_ui->inspector->adjustSize();
+    const int margin = 5;
+    m_inspGeo = m_ui->inspector->frameGeometry();
+    m_inspGeo.setHeight(m_inspGeo.height() + titleBarWidget()->height() + margin);
+    m_inspGeo.setWidth(m_inspGeo.width() + margin);
+    m_inspGeo.setX(m_inspGeo.x() - margin);
+    m_inspGeo.setY(m_inspGeo.y() - margin);
+
     m_ui->inspector->hide();
+}
+
+void GraphWidget::attrChanged(AttrWidget* aw) const
+{
+    if (!m_trial || !m_trial->graph() || m_ui->nodeId->value() < 0) {
+        return;
+    }
+
+    if (m_trial->status() == Status::Running) {
+        Node node = m_trial->graph()->node(m_ui->nodeId->value());
+        aw->blockSignals(true);
+        aw->setValue(node.attr(aw->id()));
+        aw->blockSignals(false);
+        QMessageBox::warning(parentWidget(), "Graph",
+            "You cannot change things in a running experiment.\n"
+            "Please, pause it and try again.");
+    }
+
+    Node node = m_trial->graph()->node(m_ui->nodeId->value());
+    Value v = aw->validate();
+    if (v.isValid()) {
+        node.setAttr(aw->id(), v);
+        // let the other widgets aware that they all need to be updated
+        emit (m_expWidget->updateWidgets(true));
+    } else {
+        aw->blockSignals(true);
+        aw->setValue(node.attr(aw->id()));
+        aw->blockSignals(false);
+        QString err = "The input for '" + aw->attrName() +
+                "' is invalid.\nExpected: " + aw->attrRangeStr();
+        QMessageBox::warning(parentWidget(), "Graph", err);
+    }
 }
 
 void GraphWidget::updateCache(bool force)
@@ -247,7 +274,7 @@ void GraphWidget::mousePressEvent(QMouseEvent* e)
 void GraphWidget::mouseReleaseEvent(QMouseEvent *e)
 {
     if (!m_trial || !m_trial->model() || e->button() != Qt::LeftButton ||
-            (m_ui->inspector->isVisible() && m_ui->inspector->geometry().contains(e->pos()))) {
+            (m_ui->inspector->isVisible() && m_inspGeo.contains(e->pos()))) {
         return;
     }
 
@@ -280,7 +307,9 @@ void GraphWidget::updateInspector(const Node& node)
     m_ui->nodeId->setValue(node.id());
     m_ui->neighbors->setText(QString::number(node.outDegree()));
     for (auto aw : m_attrWidgets) {
+        aw->blockSignals(true);
         aw->setValue(node.attr(aw->id()));
+        aw->blockSignals(false);
     }
 }
 

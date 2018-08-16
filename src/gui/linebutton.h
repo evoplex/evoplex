@@ -44,6 +44,7 @@ public:
     inline void setText(const QString& t) const { return m_line->setText(t); }
 
 public slots:
+    void setReadOnly(bool r);
     void slotSelectDir();
     void slotSelectFile();
 

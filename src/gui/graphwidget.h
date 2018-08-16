@@ -101,8 +101,11 @@ private:
     QTimer m_updateCacheTimer;
     QPointF m_posEntered;
     quint16 m_currTrialId;
+    QRect m_inspGeo; // inspector geometry
 
     std::vector<AttrWidget*> m_attrWidgets;
+
+    void attrChanged(AttrWidget* aw) const;
 
     void setupInspector();
 

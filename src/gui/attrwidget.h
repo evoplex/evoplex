@@ -48,17 +48,24 @@ public:
 
     inline int id() const { return m_attrRange->id(); }
     inline const QString& attrName() const { return m_attrRange->attrName(); }
+    inline const QString& attrRangeStr() const { return m_attrRange->attrRangeStr(); }
     inline QWidget* widget() const { return m_widget; }
 
+public slots:
+    void setReadOnly(bool r);
+
 signals:
-    void editingFinished();
+    void valueChanged();
+    void readOnlyChanged(bool);
 
 private:
     bool m_useCustomWidget;
     QWidget* m_widget;
     AttributeRangePtr m_attrRange;
+    bool m_isReadOnly;
 
     QWidget* newWidget(AttributeRangePtr attrRange);
 };
+
 } // evoplex
 #endif // ATTRWIDGET_H
