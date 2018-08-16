@@ -114,8 +114,11 @@ void TestNode::tst_Node()
         attrs.replace(i, names[i], values[i]);
     }
 
-    auto tests = [this, id, x, y, attrs](BaseNode* node) {
+    auto prg = std::unique_ptr<PRG>(new PRG(0));
+    auto tests = [this, id, x, y, attrs, &prg](BaseNode* node) {
         QCOMPARE(node->id(), id);
+        QCOMPARE(node->randNeighbour(prg.get()), Node());
+        QVERIFY(node->randNeighbour(prg.get()).isNull());
         _tst_attrs(node, attrs);
         _tst_xy(node, x, y);
         _tst_clone(node);
