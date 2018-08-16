@@ -25,6 +25,7 @@
 #include <QMutex>
 
 #include "abstractplugin.h"
+#include "attrsgenerator.h"
 #include "edges.h"
 #include "enum.h"
 #include "nodes.h"
@@ -78,13 +79,15 @@ public:
     Edges::iterator removeEdge(Edges::iterator it);
 
 protected:
+    AttrsGeneratorPtr m_edgeAttrsGen;
     Edges m_edges;
     Nodes m_nodes;
 
     AbstractGraph();
     ~AbstractGraph() override = default;
 
-    bool setup(Trial& trial, const Attributes& attrs, Nodes& nodes);
+    bool setup(Trial& trial, AttrsGeneratorPtr edgeGen,
+               const Attributes& attrs, Nodes& nodes);
 
 private:
     int m_lastNodeId;

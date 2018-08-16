@@ -50,6 +50,7 @@ public:
     void setExperiment(ExperimentPtr exp);
 
 private slots:
+    void slotEdgesWidget();
     void slotNodesWidget();
     void slotOutputWidget();
     void slotCreateExperiment();
@@ -75,7 +76,8 @@ private:
     QTreeWidgetItem* m_treeItemGraphs;
     QHash<QString, AttrWidget*> m_attrWidgets;
     QCheckBox* m_enableOutputs;
-    int m_graphTypeIdx; // position of the graphtype combobox in the graph tree
+    int m_graphTypeIdx;  // position of the graphtype combobox in the graph tree
+    int m_edgesAttrsIdx; // position of the edgesAttrs field in the graph tree
 
     void addPluginAttrs(QTreeWidgetItem* tree, const Plugin* plugin);
 

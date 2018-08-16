@@ -22,6 +22,9 @@
 #include <QMessageBox>
 #include <QVariant>
 
+#include "core/include/attrsgenerator.h"
+#include "core/include/enum.h"
+
 #include "experimentdesigner.h"
 #include "attrsgendlg.h"
 #include "linebutton.h"
@@ -29,9 +32,6 @@
 #include "projectwidget.h"
 #include "outputwidget.h"
 #include "ui_experimentdesigner.h"
-
-#include "core/attrsgenerator.h"
-#include "core/include/enum.h"
 
 namespace evoplex {
 
@@ -66,7 +66,7 @@ ExperimentDesigner::ExperimentDesigner(MainApp* mainApp, QWidget *parent)
     m_treeItemGraphs = new QTreeWidgetItem(m_ui->treeWidget);
     m_treeItemGraphs->setText(0, "Graph");
     m_treeItemGraphs->setExpanded(false);
-    // -- add custom widget -- nodes creator
+    // -- nodes generator
     LineButton* nodesCmd = new LineButton(this, LineButton::None);
     connect(nodesCmd->button(), SIGNAL(clicked(bool)), SLOT(slotNodesWidget()));
     addGeneralAttr(m_treeItemGraphs, GENERAL_ATTR_NODES, nodesCmd);
@@ -83,6 +83,11 @@ ExperimentDesigner::ExperimentDesigner(MainApp* mainApp, QWidget *parent)
                    static_cast<int>(GraphType::Directed));
     m_graphTypeIdx = m_treeItemGraphs->childCount();
     addGeneralAttr(m_treeItemGraphs, GENERAL_ATTR_GRAPHTYPE, cb);
+    // -- edges generator
+    LineButton* edgesCmd = new LineButton(this, LineButton::None);
+    connect(edgesCmd->button(), SIGNAL(clicked(bool)), SLOT(slotEdgesWidget()));
+    m_edgesAttrsIdx = m_treeItemGraphs->childCount();
+    addGeneralAttr(m_treeItemGraphs, GENERAL_ATTR_EDGEATTRS, edgesCmd);
 
     // setup the tree widget: general attributes
     m_treeItemGeneral = new QTreeWidgetItem(m_ui->treeWidget);
@@ -281,6 +286,32 @@ void ExperimentDesigner::setExperiment(ExperimentPtr exp)
     }
 }
 
+void ExperimentDesigner::slotEdgesWidget()
+{
+    if (m_selectedModelKey == PluginKey() || m_selectedGraphKey == PluginKey()) {
+        QMessageBox::warning(this, "Experiment",
+            "Please, select a valid 'graphId' first.");
+        return;
+    }
+
+    const ModelPlugin* model = m_mainApp->model(m_selectedModelKey);
+    if (model->edgeAttrsScope().empty()) {
+        QMessageBox::information(this, "Attributes Generator",
+            "Cannot open the attributes generator for the current model."
+            " The edges do not have attributes");
+        return;
+    }
+
+    const QString& cmd = m_attrWidgets.value(GENERAL_ATTR_EDGEATTRS)->value().toQString();
+    AttrsGenDlg* adlg = new AttrsGenDlg(this, AttrsGenDlg::Mode::Edges,
+                                        model->edgeAttrsScope(), cmd);
+
+    if (adlg->exec() == QDialog::Accepted) {
+        m_attrWidgets.value(GENERAL_ATTR_EDGEATTRS)->setValue(adlg->readCommand());
+    }
+    adlg->deleteLater();
+}
+
 void ExperimentDesigner::slotNodesWidget()
 {
     if (m_selectedModelKey == PluginKey()) {
@@ -455,11 +486,20 @@ void ExperimentDesigner::slotGraphSelected(int cbIdx)
     m_selectedGraphKey = cb->itemData(cbIdx).value<PluginKey>();
     pluginSelected(m_treeItemGraphs, m_selectedGraphKey);
 
-    const GraphPlugin* plugin = m_mainApp->graph(m_selectedGraphKey);
-    m_treeItemGeneral->setExpanded(plugin);
-    m_treeItemOutputs->setExpanded(plugin);
-    m_treeItemGraphs->child(m_graphTypeIdx)->setHidden(
-            !plugin || plugin->validGraphTypes().size() < 2);
+    const GraphPlugin* graph = m_mainApp->graph(m_selectedGraphKey);
+    m_treeItemGeneral->setExpanded(graph);
+    m_treeItemOutputs->setExpanded(graph);
+    if (graph) {
+        m_treeItemGraphs->child(m_graphTypeIdx)->setHidden(
+                graph->validGraphTypes().size() < 2);
+        const ModelPlugin* model = m_mainApp->model(m_selectedModelKey);
+        m_treeItemGraphs->child(m_edgesAttrsIdx)->setHidden(
+                !graph->supportsEdgeAttrsGen() ||
+                !model || model->edgeAttrsScope().empty());
+    } else {
+        m_treeItemGraphs->child(m_graphTypeIdx)->setHidden(true);
+        m_treeItemGraphs->child(m_edgesAttrsIdx)->setHidden(true);
+    }
 }
 
 void ExperimentDesigner::slotModelSelected(int cbIdx)
@@ -473,6 +513,15 @@ void ExperimentDesigner::slotModelSelected(int cbIdx)
     m_treeItemOutputs->setHidden(!model);
     m_treeItemGraphs->setHidden(!model);
     m_treeItemGraphs->setExpanded(model);
+
+    if (model) {
+        const GraphPlugin* graph = m_mainApp->graph(m_selectedGraphKey);
+        m_treeItemGraphs->child(m_edgesAttrsIdx)->setHidden(
+                model->edgeAttrsScope().empty() ||
+                !graph || !graph->supportsEdgeAttrsGen());
+    } else {
+        m_treeItemGraphs->child(m_edgesAttrsIdx)->setHidden(true);
+    }
 }
 
 void ExperimentDesigner::pluginSelected(QTreeWidgetItem* itemRoot, const PluginKey& key)

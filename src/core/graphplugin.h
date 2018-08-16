@@ -38,11 +38,13 @@ public:
     virtual ~GraphPlugin() = default;
 
     inline const GraphTypes& validGraphTypes() const;
+    inline bool supportsEdgeAttrsGen() const;
 
 protected:
     explicit GraphPlugin(QPluginLoader* loader, const QString& libPath);
 
 private:
+    bool m_supportsEdgeAttrsGen;
     std::vector<GraphType> m_validGraphTypes;
 };
 
@@ -52,6 +54,9 @@ private:
 
 inline const GraphPlugin::GraphTypes& GraphPlugin::validGraphTypes() const
 { return m_validGraphTypes; }
+
+inline bool GraphPlugin::supportsEdgeAttrsGen() const
+{ return m_supportsEdgeAttrsGen; }
 
 } //evoplex
 #endif // GRAPHPLUGIN_H

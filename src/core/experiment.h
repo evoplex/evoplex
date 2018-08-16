@@ -28,6 +28,7 @@
 
 #include <QMutex>
 
+#include "attrsgenerator.h"
 #include "constants.h"
 #include "enum.h"
 #include "expinputs.h"
@@ -168,6 +169,9 @@ private:
     // in the 'm_clonableNodes' container. Except when the experiment has only
     // one trial.
     Nodes m_clonableNodes;
+
+    // Parse the edge attrs command and return an AttrsGenerator
+    AttrsGeneratorPtr edgeAttrsGen(bool& ok) const;
 
     // Return a clone of 'm_clonableNodes'. It also clear the 'm_clonableNodes'
     // if 'trialId' is the last trial being created for this experiment.

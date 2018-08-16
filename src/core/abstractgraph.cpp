@@ -33,12 +33,14 @@ AbstractGraph::AbstractGraph()
 {
 }
 
-bool AbstractGraph::setup(Trial& trial, const Attributes& attrs, Nodes& nodes)
+bool AbstractGraph::setup(Trial& trial, AttrsGeneratorPtr edgeGen,
+                          const Attributes& attrs, Nodes& nodes)
 {
     Q_ASSERT_X(nodes.size() < EVOPLEX_MAX_NODES, "setup", "too many nodes!");
     Q_ASSERT_X(!nodes.empty(), "setup", "set of nodes cannot be empty!");
     m_nodes = nodes;
     m_lastNodeId = static_cast<int>(m_nodes.size());
+    m_edgeAttrsGen = std::move(edgeGen);
     return AbstractPlugin::setup(trial, attrs);
 }
 

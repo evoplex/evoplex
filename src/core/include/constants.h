@@ -43,6 +43,7 @@
 #define GENERAL_ATTR_TRIALS "trials"               // number of times the experiment has to be repeated
 #define GENERAL_ATTR_AUTODELETE "autoDelete"       // automatically deletes the experiment from memory
 #define GENERAL_ATTR_GRAPHTYPE "graphType"         // graph type of a graph generator
+#define GENERAL_ATTR_EDGEATTRS "edgeAttrs"         // a command to AttrsGenerator
 
 #define OUTPUT_DIR "directory"              // path to the directory in which the file will be saved
 #define OUTPUT_AVGTRIALS "avgTrials"        // 1 to indicate if the output should be done across all trials; 0 otherwise
@@ -65,6 +66,7 @@
 #define PLUGIN_ATTR_CUSTOMOUTPUTS "customOutputs"      // custom outputs defined in the model
 #define PLUGIN_ATTR_SUPPORTEDGRAPHS "supportedGraphs"  // graphIds allowed in the model; empty to allow all graphs
 // graph (only)
-#define PLUGIN_ATTR_VALIDGRAPHTYPES "validGraphTypes"  // valid graph types of a graph generator
+#define PLUGIN_ATTR_VALIDGRAPHTYPES "validGraphTypes"     // valid graph types of a graph generator
+#define PLUGIN_ATTR_EDGEATTRSGEN "supportsEdgeAttrsGen"   // true if the graph supports edge attributes generator
 
 #endif // CONSTANTS_H

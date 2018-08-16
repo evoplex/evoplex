@@ -27,18 +27,40 @@
 namespace evoplex {
 
 GraphPlugin::GraphPlugin(QPluginLoader* loader, const QString& libPath)
-    : Plugin(PluginType::Graph, loader, libPath)
+    : Plugin(PluginType::Graph, loader, libPath),
+      m_supportsEdgeAttrsGen(false)
 {
     if (m_type == PluginType::Invalid) {
         return;
     }
 
     QJsonObject metaData = loader->metaData().value("MetaData").toObject();
-    if (!metaData.contains(PLUGIN_ATTR_VALIDGRAPHTYPES)) {
-        qWarning() << "missing 'validGraphTypes'.";
+    if (!metaData.contains(PLUGIN_ATTR_VALIDGRAPHTYPES) ||
+            !metaData.contains(PLUGIN_ATTR_EDGEATTRSGEN)) {
+        qWarning() << "missing attributes. Expected: "
+                   << PLUGIN_ATTR_VALIDGRAPHTYPES
+                   << PLUGIN_ATTR_EDGEATTRSGEN;
         m_type = PluginType::Invalid;
         return;
     }
+
+    if (!metaData.contains(PLUGIN_ATTR_VALIDGRAPHTYPES) ||
+        !metaData.value(PLUGIN_ATTR_VALIDGRAPHTYPES).isArray()) {
+        qWarning() << QString("the attribute '%1' must exist and be of the "
+                "type '%2'.").arg(PLUGIN_ATTR_VALIDGRAPHTYPES, "array");
+        m_type = PluginType::Invalid;
+        return;
+    }
+
+    if (!metaData.contains(PLUGIN_ATTR_EDGEATTRSGEN) ||
+        !metaData.value(PLUGIN_ATTR_EDGEATTRSGEN).isBool()) {
+        qWarning() << QString("the attribute '%1' must exist and be of the "
+                "type '%2'.").arg(PLUGIN_ATTR_EDGEATTRSGEN, "bool");
+        m_type = PluginType::Invalid;
+        return;
+    }
+
+    m_supportsEdgeAttrsGen = metaData.value(PLUGIN_ATTR_EDGEATTRSGEN).toBool();
 
     QJsonArray array = metaData.value(PLUGIN_ATTR_VALIDGRAPHTYPES).toArray();
     for (auto it : array) {

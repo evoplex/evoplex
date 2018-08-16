@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- Adds support to edges attributes
 - Increases unit-tests coverage of core components
 - Implements the Bernoulli distribution in the PRG class
 - Plugins can now be reloaded

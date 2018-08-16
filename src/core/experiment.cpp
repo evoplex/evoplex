@@ -338,6 +338,24 @@ Nodes Experiment::cloneCachedNodes(const int trialId)
     return nodes;
 }
 
+AttrsGeneratorPtr Experiment::edgeAttrsGen(bool& ok) const
+{
+    ok = true;
+    if (modelPlugin()->edgeAttrsScope().empty()) {
+        return nullptr;
+    }
+    const QString& cmd = m_inputs->general(GENERAL_ATTR_EDGEATTRS).toQString();
+    if (cmd.isEmpty()) {
+        qWarning() << GENERAL_ATTR_EDGEATTRS << "must not be empty!";
+        ok = false;
+        return nullptr;
+    }
+    QString error;
+    auto r = AttrsGenerator::parse(modelPlugin()->edgeAttrsScope(), cmd, error);
+    ok = error.isEmpty();
+    return r;
+}
+
 Nodes Experiment::createNodes() const
 {
     const QString& cmd = m_inputs->general(GENERAL_ATTR_NODES).toQString();

@@ -72,6 +72,7 @@ MainApp::MainApp()
     addAttrScope(id, GENERAL_ATTR_TRIALS, QString("int[1,%1]").arg(EVOPLEX_MAX_TRIALS));
     addAttrScope(id, GENERAL_ATTR_AUTODELETE, "bool");
     addAttrScope(id, GENERAL_ATTR_GRAPHTYPE, "string");
+    addAttrScope(id, GENERAL_ATTR_EDGEATTRS, "string");
 
     addAttrScope(id, OUTPUT_DIR, "string");
     addAttrScope(id, OUTPUT_HEADER, "string");
