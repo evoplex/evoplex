@@ -82,8 +82,8 @@ GraphWidget::GraphWidget(MainGUI* mainGUI, ExperimentPtr exp, ExperimentWidget* 
     connect(m_ui->bZoomOut, SIGNAL(clicked(bool)), SLOT(zoomOut()));
     connect(m_ui->bReset, SIGNAL(clicked(bool)), SLOT(resetView()));
 
-    m_ui->inspector->hide();
     connect(m_ui->bCloseInspector, SIGNAL(clicked(bool)), SLOT(clearSelection()));
+    setupInspector();
 
     m_updateCacheTimer.setSingleShot(true);
     connect(&m_updateCacheTimer, &QTimer::timeout, [this]() { updateCache(true); });
