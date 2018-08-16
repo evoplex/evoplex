@@ -86,7 +86,7 @@ public:
     inline void setY(float y);
     inline void setCoords(float x, float y);
 
-    inline const Node& randNeighbour(PRG* prg) const;
+    Node randNeighbour(PRG* prg) const;
 
 protected:
     Edges m_outEdges;
@@ -185,9 +185,6 @@ inline void BaseNode::setY(float y)
 
 inline void BaseNode::setCoords(float x, float y)
 { setX(x); setY(y); }
-
-inline const Node& BaseNode::randNeighbour(PRG* prg) const
-{ return std::next(m_outEdges.cbegin(), prg->randI(outDegree()-1))->second.neighbour(); }
 
 /************************************************************************
    UNode: Inline member functions

@@ -177,7 +177,7 @@ QStringList NodesPrivate::validateHeader(const QString& header,
         error = QString("there are '%1' duplicated keys.").arg(duplicates);
         return QStringList();
     } else if (headerList.empty()) {
-        error = "the header cannot be empty. Is it comma-separated format?";
+        error = "the header cannot be empty. Is it in comma-separated format?";
         return QStringList();
     }
 
@@ -191,7 +191,7 @@ QStringList NodesPrivate::validateHeader(const QString& header,
     for (const auto& attrRange : attrsScope) {
         if (!header.contains(attrRange->attrName())) {
             const QStringList expectedAttrs = attrsScope.keys();
-            error = QString("the header is imcompatible for the model.\n"
+            error = QString("the header is imcompatible with the model.\n"
                             "Expected attributes: %1").arg(expectedAttrs.join(", "));
             return QStringList();
         }

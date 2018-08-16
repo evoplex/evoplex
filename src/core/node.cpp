@@ -39,6 +39,20 @@ Node::Node(const std::pair<const int, Edge>& p)
     : m_ptr(p.second.neighbour().m_ptr)
 {}
 
+Node& Node::operator=(const Node& n)
+{
+    if (this != &n) { // check for self-assignment
+        m_ptr = n.m_ptr;
+    }
+    return *this;
+}
+
+bool Node::operator==(const Node& n) const
+{ return m_ptr == n.m_ptr; }
+
+bool Node::operator!=(const Node& n) const
+{ return m_ptr != n.m_ptr; }
+
 bool Node::isNull() const
 { return m_ptr ? false : true; }
 
@@ -63,7 +77,7 @@ const Value& Node::attr(int id) const
 Value Node::attr(const QString& name, Value defaultValue) const
 { return m_ptr->attr(name, defaultValue); }
 
-const Node& Node::randNeighbour(PRG* prg) const
+Node Node::randNeighbour(PRG* prg) const
 { return m_ptr->randNeighbour(prg); }
 
 const Edges& Node::inEdges() const

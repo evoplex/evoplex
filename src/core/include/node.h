@@ -44,6 +44,10 @@ public:
     Node(const std::pair<const int, Node>& p);
     Node(const std::pair<const int, Edge>& p);
 
+    Node& operator=(const Node& n);
+    bool operator==(const Node& n) const;
+    bool operator!=(const Node& n) const;
+
     bool isNull() const;
     NodePtr clone() const;
 
@@ -55,7 +59,7 @@ public:
     const Value& attr(int id) const;
     Value attr(const QString& name, Value defaultValue=Value()) const;
 
-    const Node& randNeighbour(PRG* prg) const;
+    Node randNeighbour(PRG* prg) const;
     const Edges& inEdges() const;
     const Edges& outEdges() const;
 

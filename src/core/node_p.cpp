@@ -19,6 +19,7 @@
  */
 
 #include "node_p.h"
+#include "node.h"
 
 // we need this cpp file to avoi weak-vtable issues
 namespace evoplex {
@@ -36,6 +37,18 @@ BaseNode::BaseNode(const constructor_key& k, int id, const Attributes& attr)
 
 BaseNode::~BaseNode()
 {
+}
+
+Node BaseNode::randNeighbour(PRG* prg) const
+{
+    const int od = outDegree();
+    if (od < 1) {
+        return Node();
+    } else if (od == 1) {
+        return m_outEdges.begin()->second.neighbour();
+    }
+    return std::next(m_outEdges.cbegin(),
+            prg->randI(od-1))->second.neighbour();
 }
 
 /*******************/

@@ -22,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Close the ExperimentDesigner if there is no project opened
 - `bool` attribute should act like a range and not as a single value
 - Attrs generator should accept literal boolean, i.e., 'true' and 'false'
+- Node::randNeighbour crashes when neighbourhood is empty
 
 ## [0.1.0] - 2018-08-06
 ### Added
