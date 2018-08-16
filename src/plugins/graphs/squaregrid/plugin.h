@@ -44,10 +44,12 @@ private:
     typedef std::function<edges2d(const int, const int)> edgesFunc;
 
     // create edges with fixed boundary conditions
-    void createFixedEdges(const int id, const edgesFunc& func);
+    void createFixedEdges(const int id, const edgesFunc& func,
+                          const SetOfAttributes& soa, int& edgeId);
 
     // create edges with periodic boundary conditions (i.e., a toroid)
-    void createPeriodicEdges(const int id, const edgesFunc& func);
+    void createPeriodicEdges(const int id, const edgesFunc& func,
+                             const SetOfAttributes& soa, int& edgeId);
 
     static edges2d directed4Edges(const int id, const int width);
     static edges2d directed8Edges(const int id, const int width);

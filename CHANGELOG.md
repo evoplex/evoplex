@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Plugins page: minor GUI improvements
 - Renamed the 'customGraph' plugin to 'edgesFromCSV'
 - 'edgesFromCSV' plugin now supports edge attributes
+- 'squareGuid' plugin now supports edge attributes
 
 ### Fixed
 - Fixed bug when pausing an experiment with queued trials

@@ -50,11 +50,19 @@ bool SquareGrid::reset()
 {
     removeAllEdges();
 
+    int numEdges = m_nodes.size() * m_numNeighbours;
     edgesFunc func;
-    if (m_numNeighbours == 4) {
-        func = isDirected() ? directed4Edges : undirected4Edges;
+    if (isDirected()) {
+        func = m_numNeighbours == 4 ? directed4Edges : directed8Edges;
     } else {
-        func = isDirected() ? directed8Edges : undirected8Edges;
+        func = m_numNeighbours == 4 ? undirected4Edges : undirected8Edges;
+        numEdges /= 2;
+    }
+
+    int edgeId = 0;
+    SetOfAttributes soa;
+    if (m_edgeAttrsGen) {
+        soa = m_edgeAttrsGen->create(numEdges);
     }
 
     if (m_periodic) {
@@ -62,21 +70,22 @@ bool SquareGrid::reset()
             int x, y;
             ind2sub(node.id(), m_width, y, x);
             node.setCoords(x, y);
-            createPeriodicEdges(node.id(), func);
+            createPeriodicEdges(node.id(), func, soa, edgeId);
         }
     } else {
         for (Node node : m_nodes) {
             int x, y;
             ind2sub(node.id(), m_width, y, x);
             node.setCoords(x, y);
-            createFixedEdges(node.id(), func);
+            createFixedEdges(node.id(), func, soa, edgeId);
         }
     }
 
     return true;
 }
 
-void SquareGrid::createPeriodicEdges(const int id, const edgesFunc& func)
+void SquareGrid::createPeriodicEdges(const int id, const edgesFunc& func,
+                                     const SetOfAttributes& soa, int& edgeId)
 {
     edges2d neighbors = func(id, m_width);
     for (std::pair<int,int> neighbor : neighbors) {
@@ -94,11 +103,15 @@ void SquareGrid::createPeriodicEdges(const int id, const edgesFunc& func)
 
         int nId = linearIdx(neighbor, m_width);
         Q_ASSERT_X(nId < numNodes(), "SquareGrid::createEdges", "neighbor must exist");
-        addEdge(id, nId, new Attributes());
+
+        auto attrs = soa.empty() ? new Attributes() : new Attributes(soa.at(edgeId));
+        addEdge(id, nId, attrs);
+        ++edgeId;
     }
 }
 
-void SquareGrid::createFixedEdges(const int id, const edgesFunc& func)
+void SquareGrid::createFixedEdges(const int id, const edgesFunc& func,
+                                  const SetOfAttributes& soa, int& edgeId)
 {
     edges2d neighbors = func(id, m_width);
     for (std::pair<int,int> neighbor : neighbors) {
@@ -108,7 +121,10 @@ void SquareGrid::createFixedEdges(const int id, const edgesFunc& func)
         }
         int nId = linearIdx(neighbor, m_width);
         Q_ASSERT_X(nId < numNodes(), "SquareGrid::createEdges", "neighbor must exist");
-        addEdge(id, nId, new Attributes());
+
+        auto attrs = soa.empty() ? new Attributes() : new Attributes(soa.at(edgeId));
+        addEdge(id, nId, attrs);
+        ++edgeId;
     }
 }
 
