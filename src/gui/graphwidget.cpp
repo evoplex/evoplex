@@ -278,10 +278,10 @@ void GraphWidget::mouseReleaseEvent(QMouseEvent *e)
         return;
     }
 
-    m_selectedNode = -1;
     if (e->localPos() == m_posEntered) {
         const Node& node = selectNode(e->pos());
-        if (node.isNull()) {
+        if (node.isNull() || m_selectedNode == node.id()) {
+            m_selectedNode = -1;
             m_ui->inspector->hide();
         } else {
             m_selectedNode = node.id();
@@ -290,6 +290,7 @@ void GraphWidget::mouseReleaseEvent(QMouseEvent *e)
         }
         update();
     } else {
+        m_selectedNode = -1;
         m_origin += (e->localPos() - m_posEntered);
         m_ui->inspector->hide();
         updateCache();
