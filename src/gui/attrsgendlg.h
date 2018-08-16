@@ -24,7 +24,7 @@
 #include <QDialog>
 
 #include "attributerange.h"
-#include "core/attrsgenerator.h"
+#include "attrsgenerator.h"
 
 class Ui_AttrsGenDlg;
 
@@ -56,7 +56,12 @@ private:
     const Mode m_mode;
     const AttributesScope& m_attrsScope;
 
+    void setupForEdges();
+    void setupForNodes();
     void fill(const QString& cmd);
+
+    QString readCommand_sameData() const;
+    QString readCommand_diffData() const;
 };
 
 } // evoplex

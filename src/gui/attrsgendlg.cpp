@@ -43,40 +43,21 @@ AttrsGenDlg::AttrsGenDlg(QWidget* parent, Mode mode,
       m_attrsScope(attrsScope)
 {
     setWindowModality(Qt::ApplicationModal);
-    setWindowTitle(m_mode == Mode::Nodes ? "Nodes Generator" : "Edges Attributes");
     m_ui->setupUi(this);
 
     m_ui->wFromFile->setVisible(false);
     m_ui->wSameData->setVisible(false);
     m_ui->wDiffData->setVisible(false);
     m_ui->wNumNodes->setVisible(false);
-    connect(m_ui->bFromFile, SIGNAL(toggled(bool)), m_ui->wFromFile, SLOT(setVisible(bool)));
 
-    if (m_attrsScope.empty()) {
-        connect(m_ui->bCreateNodes, SIGNAL(toggled(bool)), m_ui->wNumNodes, SLOT(setVisible(bool)));
-        m_ui->bSameData->setVisible(false);
-        m_ui->bDiffData->setVisible(false);
-        m_ui->bCreateNodes->setChecked(true);
+    if (m_mode == Mode::Edges) {
+        setupForEdges();
     } else {
-        connect(m_ui->bSameData, SIGNAL(toggled(bool)), m_ui->wSameData, SLOT(setVisible(bool)));
-        connect(m_ui->bSameData, SIGNAL(toggled(bool)), m_ui->wNumNodes, SLOT(setVisible(bool)));
-        connect(m_ui->bDiffData, SIGNAL(toggled(bool)), m_ui->wDiffData, SLOT(setVisible(bool)));
-        connect(m_ui->bDiffData, SIGNAL(toggled(bool)), m_ui->wNumNodes, SLOT(setVisible(bool)));
-        m_ui->bCreateNodes->setVisible(false);
-        m_ui->bSameData->setChecked(true);
+        setupForNodes();
     }
 
-    connect(m_ui->saveAs, SIGNAL(pressed()), SLOT(slotSaveAs()));
     connect(m_ui->cancel, SIGNAL(pressed()), SLOT(reject()));
     connect(m_ui->ok, SIGNAL(pressed()), SLOT(accept()));
-
-    connect(m_ui->browseFile, &QPushButton::pressed, [this]() {
-        QString path = QFileDialog::getOpenFileName(this, "Initial Population",
-                m_ui->filepath->text(), "Text Files (*.csv *.txt)");
-        if (!path.isEmpty()) {
-            m_ui->filepath->setText(path);
-        }
-    });
 
     const auto MIN = static_cast<unsigned char>(Function::Min);
     const auto MAX = static_cast<unsigned char>(Function::Max);
@@ -132,6 +113,52 @@ AttrsGenDlg::AttrsGenDlg(QWidget* parent, Mode mode,
     fill(cmd);
 }
 
+void AttrsGenDlg::setupForEdges()
+{
+    Q_ASSERT_X(!m_attrsScope.empty(), "AttrsGenDlg",
+        "cannot open the AttrsGenDlg for edges with an empty attrsScope");
+
+    setWindowTitle("Edges Generator");
+
+    connect(m_ui->bSameData, SIGNAL(toggled(bool)), m_ui->wSameData, SLOT(setVisible(bool)));
+    connect(m_ui->bDiffData, SIGNAL(toggled(bool)), m_ui->wDiffData, SLOT(setVisible(bool)));
+
+    m_ui->saveAs->setVisible(false);
+    m_ui->bFromFile->setVisible(false);
+    m_ui->bCreateNodes->setVisible(false);
+    m_ui->bSameData->setChecked(true);
+}
+
+void AttrsGenDlg::setupForNodes()
+{
+    setWindowTitle("Nodes Generator");
+
+    connect(m_ui->saveAs, SIGNAL(pressed()), SLOT(slotSaveAs()));
+
+    connect(m_ui->bFromFile, SIGNAL(toggled(bool)), m_ui->wFromFile, SLOT(setVisible(bool)));
+    connect(m_ui->browseFile, &QPushButton::pressed, [this]() {
+        QString path = QFileDialog::getOpenFileName(this, "Initial Population",
+                m_ui->filepath->text(), "Text Files (*.csv *.txt)");
+        if (!path.isEmpty()) {
+            m_ui->filepath->setText(path);
+        }
+    });
+
+    if (m_attrsScope.empty()) {
+        connect(m_ui->bCreateNodes, SIGNAL(toggled(bool)), m_ui->wNumNodes, SLOT(setVisible(bool)));
+        m_ui->bSameData->setVisible(false);
+        m_ui->bDiffData->setVisible(false);
+        m_ui->bCreateNodes->setChecked(true);
+    } else {
+        connect(m_ui->bSameData, SIGNAL(toggled(bool)), m_ui->wSameData, SLOT(setVisible(bool)));
+        connect(m_ui->bSameData, SIGNAL(toggled(bool)), m_ui->wNumNodes, SLOT(setVisible(bool)));
+        connect(m_ui->bDiffData, SIGNAL(toggled(bool)), m_ui->wDiffData, SLOT(setVisible(bool)));
+        connect(m_ui->bDiffData, SIGNAL(toggled(bool)), m_ui->wNumNodes, SLOT(setVisible(bool)));
+        m_ui->bCreateNodes->setVisible(false);
+        m_ui->bSameData->setChecked(true);
+    }
+}
+
 AttrsGenDlg::~AttrsGenDlg()
 {
     delete m_ui;
@@ -139,10 +166,13 @@ AttrsGenDlg::~AttrsGenDlg()
 
 void AttrsGenDlg::slotSaveAs()
 {
+    if (m_mode == Mode::Edges) {
+        return;
+    }
+
     QString path = QFileDialog::getSaveFileName(this,
-                                                "Save Nodes",
-                                                m_ui->filepath->text(),
-                                                "Text Files (*.csv)");
+            "Save Nodes", m_ui->filepath->text(), "Text Files (*.csv)");
+
     if (path.isEmpty()) {
         return;
     }
@@ -157,7 +187,7 @@ void AttrsGenDlg::slotSaveAs()
         }
 
         const int numNodes = m_ui->numNodes->value();
-        QProgressDialog progressDlg("Exporting Nodes...", QString(), 0, 2 * numNodes, this);
+        QProgressDialog progressDlg("Saving file", QString(), 0, 2 * numNodes, this);
         progressDlg.setWindowModality(Qt::WindowModal);
         progressDlg.setValue(0);
 
@@ -174,10 +204,10 @@ void AttrsGenDlg::slotSaveAs()
     }
 
     if (saved) {
-        QMessageBox::information(this, "Exporting Nodes",
+        QMessageBox::information(this, "Saving file",
                 "The set of nodes was saved successfully!\n" + path);
     } else {
-        QMessageBox::warning(this, "Exporting Nodes",
+        QMessageBox::warning(this, "Saving file",
                 "ERROR! Unable to save the set of nodes at:\n"
                 + path + "\nPlease, make sure this directory is writable.");
     }
@@ -189,7 +219,7 @@ void AttrsGenDlg::fill(const QString& cmd)
         return;
     }
 
-    if (QFileInfo::exists(cmd)) {
+    if (m_mode == Mode::Nodes && QFileInfo::exists(cmd)) {
         m_ui->bFromFile->setChecked(true);
         m_ui->filepath->setText(cmd);
         return;
@@ -198,7 +228,7 @@ void AttrsGenDlg::fill(const QString& cmd)
     QString errMsg;
     auto ag = AttrsGenerator::parse(m_attrsScope, cmd, errMsg);
     if (!errMsg.isEmpty() || !ag) {
-        QMessageBox::warning(parentWidget(), "Nodes Generator", errMsg);
+        QMessageBox::warning(parentWidget(), "Attributes Generator", errMsg);
         return;
     }
 
@@ -239,7 +269,7 @@ QString AttrsGenDlg::readCommand()
     QString command;
     if (m_ui->bFromFile->isChecked()) {
         if (!QFileInfo::exists(m_ui->filepath->text())) {
-            QMessageBox::warning(this, "Nodes from csv file...",
+            QMessageBox::warning(this, "Attributes from csv file...",
                 "The file does not exist.\nPlease, check the file path!");
             return QString();
         }
@@ -247,44 +277,69 @@ QString AttrsGenDlg::readCommand()
     } else if (m_ui->bCreateNodes->isChecked()) {
         command = m_ui->numNodes->text();
     } else if (m_ui->bSameData->isChecked()) {
-        command = QString("*%1;%2").arg(m_ui->numNodes->text(), m_ui->func->currentText());
-        if (m_ui->func->currentData() == static_cast<int>(Function::Rand)) {
-            command += QString("_%1").arg(m_ui->fseed->value());
-        }
+        command = readCommand_sameData();
     } else if (m_ui->bDiffData->isChecked()) {
-        command = QString("#%1").arg(m_ui->numNodes->text());
-        for (auto const& ar : m_attrsScope) {
-            Q_ASSERT_X(m_ui->table->item(ar->id(), 0)->text() == ar->attrName(),
-                       "AttrsGenDlg", "attribute name mismatch. It should never happen!");
-
-            QComboBox* cb = qobject_cast<QComboBox*>(m_ui->table->cellWidget(ar->id(), 1));
-            command += QString(";%1_%2").arg(ar->attrName(), cb->currentText());
-
-            QString valStr = qobject_cast<QLineEdit*>(m_ui->table->cellWidget(ar->id(), 2))->text();
-            Function f = static_cast<Function>(cb->currentData().toInt());
-            if (f == Function::Rand) {
-                Value seed = AttrsGenerator::parseRandSeed("rand_" + valStr);
-                if (!seed.isValid()) {
-                    QMessageBox::warning(this, "Nodes Generator",
-                        "The PRG seed for '" + ar->attrName() + "' should be a positive integer!\n");
-                    return QString();
-                }
-                command += "_" + valStr;
-            } else if (f == Function::Value) {
-                if (!ar->validate(valStr).isValid()) {
-                    QMessageBox::warning(this, "Nodes Generator",
-                        "The value of '" + ar->attrName() + "' is invalid!\n"
-                         "Expected: " + ar->attrRangeStr());
-                    return QString();
-                }
-                command += "_" + valStr;
-            }
-        }
+        command = readCommand_diffData();
     } else {
         qFatal("invalid command!");
     }
 
     return command;
 }
+
+QString AttrsGenDlg::readCommand_diffData() const
+{
+    QString cmd("#");
+    if (m_mode == Mode::Nodes) {
+        cmd += m_ui->numNodes->text();
+    }
+
+    for (auto const& ar : m_attrsScope) {
+        Q_ASSERT_X(m_ui->table->item(ar->id(), 0)->text() == ar->attrName(),
+                   "AttrsGenDlg", "attribute name mismatch. It should never happen!");
+
+        QComboBox* cb = qobject_cast<QComboBox*>(m_ui->table->cellWidget(ar->id(), 1));
+        cmd += QString(";%1_%2").arg(ar->attrName(), cb->currentText());
+
+        QString valStr = qobject_cast<QLineEdit*>(m_ui->table->cellWidget(ar->id(), 2))->text();
+        Function f = static_cast<Function>(cb->currentData().toInt());
+        if (f == Function::Rand) {
+            Value seed = AttrsGenerator::parseRandSeed("rand_" + valStr);
+            if (!seed.isValid()) {
+                QMessageBox::warning(parentWidget(), "Attributes Generator",
+                        "The PRG seed for '" + ar->attrName() +
+                        "' should be a positive integer!\n");
+                return QString();
+            }
+            cmd += "_" + valStr;
+        } else if (f == Function::Value) {
+            if (!ar->validate(valStr).isValid()) {
+                QMessageBox::warning(parentWidget(), "Attributes Generator",
+                        "The value of '" + ar->attrName() + "' is invalid!\n"
+                        "Expected: " + ar->attrRangeStr());
+                return QString();
+            }
+            cmd += "_" + valStr;
+        }
+    }
+
+    return cmd.replace("#;", "#");
+}
+
+QString AttrsGenDlg::readCommand_sameData() const
+{
+    QString cmd("*");
+    if (m_mode == Mode::Nodes) {
+        cmd += m_ui->numNodes->text() + ";";
+    }
+    cmd += m_ui->func->currentText();
+
+    if (m_ui->func->currentData() == static_cast<int>(Function::Rand)) {
+        cmd += QString("_%1").arg(m_ui->fseed->value());
+    }
+
+    return cmd;
+}
+
 
 } // evoplex
