@@ -67,7 +67,7 @@ public:
     static ColorMap* create(AttributeRangePtr attrRange, const Colors& colors);
 
     virtual ~ColorMap();
-    virtual const QColor colorFromValue(const Value& val) const = 0;
+    virtual const QColor& colorFromValue(const Value& val) const = 0;
     inline const Colors& colors() const { return m_colors; }
 
 protected:
@@ -81,7 +81,7 @@ class SingleColor : public ColorMap
 {
 public:
     explicit SingleColor(QColor color);
-    virtual const QColor colorFromValue(const Value& val) const;
+    virtual const QColor& colorFromValue(const Value& val) const;
 };
 
 /************************************************************************/
@@ -90,7 +90,7 @@ class ColorMapRange : public ColorMap
 {
 public:
     explicit ColorMapRange(const Colors& colors, const IntervalOfValues* attrRange);
-    virtual const QColor colorFromValue(const Value& val) const;
+    virtual const QColor& colorFromValue(const Value& val) const;
 private:
     float m_max;
     float m_min;
@@ -102,7 +102,7 @@ class ColorMapSet : public ColorMap
 {
 public:
     explicit ColorMapSet(const Colors& colors, const SetOfValues* attrRange);
-    virtual const QColor colorFromValue(const Value& val) const;
+    virtual const QColor& colorFromValue(const Value& val) const;
 private:
     std::unordered_map<Value, QColor> m_cmap;
 };

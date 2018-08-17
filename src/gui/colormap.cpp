@@ -140,7 +140,7 @@ SingleColor::SingleColor(QColor color)
 {
 }
 
-const QColor SingleColor::colorFromValue(const Value& val) const
+const QColor& SingleColor::colorFromValue(const Value& val) const
 {
     Q_UNUSED(val);
     return m_colors.front();
@@ -171,7 +171,7 @@ ColorMapRange::ColorMapRange(const Colors& colors, const IntervalOfValues* attrR
     }
 }
 
-const QColor ColorMapRange::colorFromValue(const Value& val) const
+const QColor& ColorMapRange::colorFromValue(const Value& val) const
 {
     float value;
     if (val.type() == Value::INT) {
@@ -198,12 +198,12 @@ ColorMapSet::ColorMapSet(const Colors& colors, const SetOfValues* attrRange)
     }
 }
 
-const QColor ColorMapSet::colorFromValue(const Value& val) const
+const QColor& ColorMapSet::colorFromValue(const Value& val) const
 {
     const auto i = m_cmap.find(val);
     if (i == m_cmap.cend()) {
         // qWarning() << "invalid value!" << val.toQString();
-        return Qt::black;
+        return m_cmap.begin()->second;
     }
     return i->second;
 }
