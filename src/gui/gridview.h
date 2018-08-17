@@ -21,17 +21,16 @@
 #ifndef GRIDVIEW_H
 #define GRIDVIEW_H
 
-#include "graphwidget.h"
+#include "basegraphgl.h"
 
-namespace evoplex
-{
+namespace evoplex {
 
-class GridView : public GraphWidget
+class GridView : public BaseGraphGL
 {
     Q_OBJECT
 
 public:
-    explicit GridView(MainGUI* mainGUI, ExperimentPtr exp, ExperimentWidget* parent);
+    explicit GridView(ExperimentPtr exp, GraphWidget* parent);
 
 protected:
     void paintEvent(QPaintEvent*) override;

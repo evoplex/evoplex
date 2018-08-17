@@ -21,15 +21,14 @@
 #ifndef GRAPHVIEW_H
 #define GRAPHVIEW_H
 
-#include "graphwidget.h"
+#include "basegraphgl.h"
 
-namespace evoplex
-{
+namespace evoplex {
 
-class GraphView : public GraphWidget
+class GraphView : public BaseGraphGL
 {
 public:
-    explicit GraphView(MainGUI* mainGUI, ExperimentPtr exp, ExperimentWidget* parent);
+    explicit GraphView(ExperimentPtr exp, GraphWidget* parent);
 
 protected:
     void paintEvent(QPaintEvent*) override;

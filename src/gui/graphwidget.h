@@ -22,97 +22,45 @@
 #define GRAPHWIDGET_H
 
 #include <QDockWidget>
-#include <QLineEdit>
-#include <QMouseEvent>
-#include <QTimer>
-#include <vector>
 
 #include "core/experiment.h"
 
-#include "colormap.h"
 #include "experimentwidget.h"
 #include "graphsettings.h"
 #include "maingui.h"
 
-class Ui_GraphWidget;
-
 namespace evoplex {
 
-enum class CacheStatus {
-    Ready,
-    Updating,
-    Scheduled
-};
+class BaseGraphGL;
 
-class GraphWidgetInterface
-{
-protected:
-    virtual ~GraphWidgetInterface() = default;
-    virtual void paintEvent(QPaintEvent*) = 0;
-    virtual Node selectNode(const QPoint& pos) const = 0;
-    virtual CacheStatus refreshCache() = 0;
-};
-
-class GraphWidget : public QDockWidget, public GraphWidgetInterface
+class GraphWidget : public QDockWidget
 {
     Q_OBJECT
 
-protected:
-    explicit GraphWidget(MainGUI* mainGUI, ExperimentPtr exp, ExperimentWidget* parent);
+public:
+    enum class Mode {
+        Graph,
+        Grid
+    };
+
+    explicit GraphWidget(Mode mode, MainGUI* mainGUI, ExperimentPtr exp, ExperimentWidget* parent);
     ~GraphWidget();
 
-    Ui_GraphWidget* m_ui;
-    GraphSettings* m_settingsDlg;
-    ExperimentPtr m_exp;
-    const Trial* m_trial;
-
-    int m_currStep;
-    int m_selectedNode;
-    int m_nodeAttr;
-    ColorMap* m_nodeCMap;
-
-    int m_zoomLevel;
-    qreal m_nodeSizeRate;
-    qreal m_nodeRadius;
-    QPointF m_origin;
-
-    CacheStatus m_cacheStatus;
-
-    void mousePressEvent(QMouseEvent* e);
-    void mouseReleaseEvent(QMouseEvent* e);
-    void resizeEvent(QResizeEvent* e);
-
-    virtual CacheStatus refreshCache() { return CacheStatus::Ready; }
+    inline GraphSettings* settingsDlg() const;
 
 public slots:
     void updateView(bool forceUpdate);
-    void setTrial(quint16 trialId);
-    void clearSelection();
 
-private slots:
-    void slotRestarted();
-    void zoomIn();
-    void zoomOut();
-    void resetView();
-    void setNodeCMap(ColorMap* cmap);
+signals:
+    void updateWidgets(bool);
 
 private:
-    ExperimentWidget* m_expWidget; // parent
-    QTimer m_updateCacheTimer;
-    QPointF m_posEntered;
-    quint16 m_currTrialId;
-    QRect m_inspGeo; // inspector geometry
-
-    std::vector<AttrWidget*> m_attrWidgets;
-
-    void attrChanged(AttrWidget* aw) const;
-
-    void setupInspector();
-
-    void updateInspector(const Node& node);
-
-    void updateCache(bool force=false);
+    GraphSettings* m_settingsDlg;
+    BaseGraphGL* m_graph;
 };
-}
 
+inline GraphSettings* GraphWidget::settingsDlg() const
+{ return m_settingsDlg; }
+
+} // evoplex
 #endif // GRAPHWIDGET_H

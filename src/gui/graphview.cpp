@@ -23,23 +23,24 @@
 #include "core/trial.h"
 
 #include "graphview.h"
-#include "ui_graphwidget.h"
+#include "ui_basegraphgl.h"
 #include "ui_graphsettings.h"
 #include "utils.h"
 
 namespace evoplex
 {
 
-GraphView::GraphView(MainGUI* mainGUI, ExperimentPtr exp, ExperimentWidget* parent)
-    : GraphWidget(mainGUI, exp, parent),
+GraphView::GraphView(ExperimentPtr exp, GraphWidget* parent)
+    : BaseGraphGL(exp, parent),
       m_edgeSizeRate(25.)
 {
     setWindowTitle("Graph");
 
-    m_edgeAttr = m_settingsDlg->edgeAttr();
-    m_edgeCMap = m_settingsDlg->edgeCMap();
-    connect(m_settingsDlg, &GraphSettings::edgeAttrUpdated, [this](int idx) { m_edgeAttr = idx; });
-    connect(m_settingsDlg, &GraphSettings::edgeCMapUpdated, [this](ColorMap* cmap) {
+    auto s = m_graphWidget->settingsDlg();
+    m_edgeAttr = s->edgeAttr();
+    m_edgeCMap = s->edgeCMap();
+    connect(s, &GraphSettings::edgeAttrUpdated, [this](int idx) { m_edgeAttr = idx; });
+    connect(s, &GraphSettings::edgeCMapUpdated, [this](ColorMap* cmap) {
         delete m_edgeCMap;
         m_edgeCMap = cmap;
         update();
@@ -94,13 +95,15 @@ CacheStatus GraphView::refreshCache()
 
 void GraphView::paintEvent(QPaintEvent*)
 {
-    if (m_cacheStatus != CacheStatus::Ready) {
-        return;
-    }
-
     QPainter painter;
     painter.begin(this);
     painter.setRenderHint(QPainter::Antialiasing);
+    painter.fillRect(rect(), m_background);
+
+    if (m_cacheStatus != CacheStatus::Ready) {
+        painter.end();
+        return;
+    }
 
     if (m_showEdges) {
         Cache cacheSelected;
@@ -126,7 +129,7 @@ void GraphView::paintEvent(QPaintEvent*)
         for (const Cache& cache : m_cache) {
             if (m_selectedNode == cache.node.id()) {
                 painter.setBrush(QColor(10,10,10,100));
-                painter.drawEllipse(cache.xy, m_nodeRadius*1.5f, m_nodeRadius*1.5f);
+                painter.drawEllipse(cache.xy, m_nodeRadius*1.5, m_nodeRadius*1.5);
             }
 
             if (m_nodeAttr >= 0) {

@@ -23,15 +23,15 @@
 #include "core/trial.h"
 
 #include "gridview.h"
-#include "ui_graphwidget.h"
+#include "ui_basegraphgl.h"
 #include "ui_graphsettings.h"
 #include "utils.h"
 
 namespace evoplex
 {
 
-GridView::GridView(MainGUI* mainGUI, ExperimentPtr exp, ExperimentWidget* parent)
-    : GraphWidget(mainGUI, exp, parent)
+GridView::GridView(ExperimentPtr exp, GraphWidget* parent)
+    : BaseGraphGL(exp, parent)
 {
     setWindowTitle("Grid");
     //m_settingsDlg->edges->setHidden(true);
@@ -73,13 +73,15 @@ CacheStatus GridView::refreshCache()
 
 void GridView::paintEvent(QPaintEvent*)
 {
-    if (m_cacheStatus != CacheStatus::Ready) {
-        return;
-    }
-
     QPainter painter;
     painter.begin(this);
     painter.setRenderHint(QPainter::Antialiasing);
+    painter.fillRect(rect(), m_background);
+
+    if (m_cacheStatus != CacheStatus::Ready) {
+        painter.end();
+        return;
+    }
 
     for (const Cache& cache : m_cache) {
         QColor color;

@@ -27,8 +27,7 @@
 
 #include "experimentwidget.h"
 #include "linechart.h"
-#include "graphview.h"
-#include "gridview.h"
+#include "graphwidget.h"
 
 namespace evoplex {
 
@@ -106,20 +105,18 @@ ExperimentWidget::ExperimentWidget(ExperimentPtr exp, MainGUI* mainGUI, Projects
     layout->addWidget(m_innerWindow);
     layout->addWidget(tb);
     setWidget(layout->parentWidget());
-    connect(m_aGraph, &QAction::triggered, [this, mainGUI]() {
+    auto newGraph = [this, mainGUI](GraphWidget::Mode mode) {
         if (isAutoDeleteOff()) {
-            GraphView* graph = new GraphView(mainGUI, m_exp, this);
+            GraphWidget* graph = new GraphWidget(mode, mainGUI, m_exp, this);
             m_innerWindow->addDockWidget(Qt::TopDockWidgetArea, graph);
+            connect(graph, SIGNAL(updateWidgets(bool)), this, SIGNAL(updateWidgets(bool)));
             connect(this, SIGNAL(updateWidgets(bool)), graph, SLOT(updateView(bool)));
         }
-    });
-    connect(m_aGrid, &QAction::triggered, [this, mainGUI]() {
-        if (isAutoDeleteOff()) {
-            GridView* grid = new GridView(mainGUI, m_exp, this);
-            m_innerWindow->addDockWidget(Qt::TopDockWidgetArea, grid);
-            connect(this, SIGNAL(updateWidgets(bool)), grid, SLOT(updateView(bool)));
-        }
-    });
+    };
+    connect(m_aGraph, &QAction::triggered,
+            [newGraph]() { newGraph(GraphWidget::Mode::Graph); });
+    connect(m_aGrid, &QAction::triggered,
+            [newGraph]() { newGraph(GraphWidget::Mode::Grid); });
 
     /* FIXME: Disabling LineChart button for now.
      * This feature is in a very unstable state yet.

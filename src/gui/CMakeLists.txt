@@ -30,10 +30,11 @@ set(EVOPLEX_GUI_H
   #linechart.h
   linebutton.h
   outputwidget.h
+  basegraphgl.h
   graphview.h
   gridview.h
-  graphsettings.h
   graphwidget.h
+  graphsettings.h
   projectwidget.h
   savedialog.h
   tablewidget.h
@@ -58,10 +59,11 @@ set(EVOPLEX_GUI_CXX
   #linechart.cpp
   linebutton.cpp
   outputwidget.cpp
+  basegraphgl.cpp
   graphview.cpp
   gridview.cpp
-  graphsettings.cpp
   graphwidget.cpp
+  graphsettings.cpp
   projectwidget.cpp
   savedialog.cpp
   tablewidget.cpp
@@ -77,7 +79,7 @@ set(EVOPLEX_GUI_CXX
 set(EVOPLEX_GUI_UIFORM
   attrsgendlg
   experimentdesigner
-  graphwidget
+  basegraphgl
   graphsettings
   #linechartsettings
   outputwidget
