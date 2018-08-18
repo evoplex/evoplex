@@ -47,9 +47,9 @@ GraphView::GraphView(ColorMapMgr* cMgr, ExperimentPtr exp, GraphWidget* parent)
     m_showNodes = m_ui->bShowNodes->isChecked();
     m_showEdges = m_ui->bShowEdges->isChecked();
     connect(m_ui->bShowNodes, &QPushButton::clicked,
-        [this](bool b) { m_showNodes = b; update(); });
+        [this](bool b) { m_showNodes = b; updateCache(); });
     connect(m_ui->bShowEdges, &QPushButton::clicked,
-        [this](bool b) { m_showEdges = b; update(); });
+        [this](bool b) { m_showEdges = b; updateCache(); });
 
     setTrial(0); // init at trial 0
 }
@@ -59,8 +59,8 @@ CacheStatus GraphView::refreshCache()
     if (paintingActive()) {
         return CacheStatus::Scheduled;
     }
-    Utils::deleteAndShrink(m_cache);
-    if (!m_trial || !m_trial->graph()) {
+    Utils::clearAndShrink(m_cache);
+    if (!m_trial || !m_trial->graph() || (!m_showNodes && !m_showEdges)) {
         return CacheStatus::Ready;
     }
 
@@ -76,13 +76,23 @@ CacheStatus GraphView::refreshCache()
         }
 
         Cache cache;
-        cache.node = np.second;
         cache.xy = xy;
-        cache.edges.reserve(np.second.outEdges().size());
-        for (auto const& ep : np.second.outEdges()) {
-            QPointF xy2(m_origin.x() + edgeSizeRate * (1.0 + ep.second.neighbour().x()),
-                        m_origin.y() + edgeSizeRate * (1.0 + ep.second.neighbour().y()));
-            cache.edges.emplace_back(QLineF(xy, xy2));
+
+        if (m_showNodes) {
+            cache.node = np.second;
+        }
+
+        if (m_showEdges) {
+            cache.edges.reserve(np.second.outEdges().size());
+            for (auto const& ep : np.second.outEdges()) {
+                QPointF xy2(m_origin.x() + edgeSizeRate * (1.0 + ep.second.neighbour().x()),
+                            m_origin.y() + edgeSizeRate * (1.0 + ep.second.neighbour().y()));
+                QLineF line(xy, xy2);
+                if (!m_showNodes || line.length() - m_nodeRadius * 2. > 4.0) {
+                    cache.edges.emplace_back(line); // just add visible edges
+                }
+            }
+            cache.edges.shrink_to_fit();
         }
 
         m_cache.emplace_back(cache);
@@ -107,7 +117,7 @@ void GraphView::paintEvent(QPaintEvent*)
     if (m_showEdges) {
         Cache cacheSelected;
         for (const Cache& cache : m_cache) {
-            if (m_selectedNode == cache.node.id()) {
+            if (!cache.node.isNull() && cache.node.id() == m_selectedNode) {
                 cacheSelected = cache;
             }
             for (const QLineF& edge : cache.edges) {
@@ -127,7 +137,10 @@ void GraphView::paintEvent(QPaintEvent*)
     const double nodeRadius = m_nodeRadius;
     if (m_showNodes && m_nodeAttr >= 0 && m_nodeCMap) {
         for (const Cache& cache : m_cache) {
-            if (m_selectedNode == cache.node.id()) {
+            if (cache.node.isNull()) {
+                break;
+            }
+            if (cache.node.id() == m_selectedNode) {
                 painter.setBrush(QColor(10,10,10,100));
                 painter.drawEllipse(cache.xy, nodeRadius*1.5, nodeRadius*1.5);
             }

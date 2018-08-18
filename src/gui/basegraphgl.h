@@ -86,6 +86,8 @@ protected:
     CacheStatus refreshCache() override
     { return CacheStatus::Ready; }
 
+    void updateCache(bool force=false);
+
     void mousePressEvent(QMouseEvent* e) override;
     void mouseReleaseEvent(QMouseEvent* e) override;
     void resizeEvent(QResizeEvent* e) override;
@@ -118,8 +120,6 @@ private:
     void setupInspector();
 
     void updateInspector(const Node& node);
-
-    void updateCache(bool force=false);
 };
 }
 

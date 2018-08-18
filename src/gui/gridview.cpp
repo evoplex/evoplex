@@ -50,7 +50,7 @@ CacheStatus GridView::refreshCache()
     if (paintingActive()) {
         return CacheStatus::Scheduled;
     }
-    Utils::deleteAndShrink(m_cache);
+    Utils::clearAndShrink(m_cache);
     if (!m_trial || !m_trial->graph()) {
         return CacheStatus::Ready;
     }

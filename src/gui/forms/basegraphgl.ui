@@ -2,6 +2,14 @@
 <ui version="4.0">
  <class>BaseGraphGL</class>
  <widget class="QOpenGLWidget" name="BaseGraphGL">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>526</width>
+    <height>291</height>
+   </rect>
+  </property>
   <layout class="QGridLayout" name="gridLayout_2">
    <property name="topMargin">
     <number>20</number>
@@ -108,16 +116,34 @@ color: rgb(255, 255, 255);</string>
      </item>
      <item>
       <widget class="QPushButton" name="bShowNodes">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <property name="minimumSize">
         <size>
-         <width>5</width>
-         <height>5</height>
+         <width>0</width>
+         <height>22</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>16777215</width>
+         <height>22</height>
         </size>
        </property>
        <property name="font">
         <font>
          <pointsize>8</pointsize>
         </font>
+       </property>
+       <property name="toolTip">
+        <string>Show nodes</string>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">padding: 0 4px 0 4px;</string>
        </property>
        <property name="text">
         <string>Nodes</string>
@@ -134,14 +160,26 @@ color: rgb(255, 255, 255);</string>
       <widget class="QPushButton" name="bShowEdges">
        <property name="minimumSize">
         <size>
-         <width>5</width>
-         <height>5</height>
+         <width>0</width>
+         <height>22</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>16777215</width>
+         <height>22</height>
         </size>
        </property>
        <property name="font">
         <font>
          <pointsize>8</pointsize>
         </font>
+       </property>
+       <property name="toolTip">
+        <string>Show edges</string>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">padding: 0 4px 0 4px;</string>
        </property>
        <property name="text">
         <string>Edges</string>

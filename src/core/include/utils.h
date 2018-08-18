@@ -42,10 +42,9 @@ namespace Utils
     }
 
     template <class T>
-    void deleteAndShrink(std::vector<T>& v) {
+    void clearAndShrink(std::vector<T>& v) {
         v.clear();
-        std::vector<T> ve;
-        ve.swap(v);
+        v.shrink_to_fit();
     }
 
     template <typename T, class C>

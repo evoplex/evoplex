@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Node's coordinates are now a float
 - Graph widgets now use an OpenGL back end
+- Improved GraphView performance by avoiding caching invisible elements
 - Attributes' inspector of the graph widgets now shows a proper field for each type of attribute
 - Plugins page: minor GUI improvements
 - Renamed the 'customGraph' plugin to 'edgesFromCSV'

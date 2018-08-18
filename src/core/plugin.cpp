@@ -196,7 +196,7 @@ bool Plugin::readAttrsScope(const QJsonObject* metaData, const QString& attrName
             QVariantMap attrs = json.at(id).toObject().toVariantMap();
             auto attrRange = AttributeRange::parse(id, attrs.firstKey(), attrs.first().toString());
             if (!attrRange->isValid()) {
-                Utils::deleteAndShrink(keys);
+                Utils::clearAndShrink(keys);
                 return false;
             }
             attrsScope.insert(attrRange->attrName(), attrRange);
