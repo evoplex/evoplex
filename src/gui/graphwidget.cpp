@@ -26,29 +26,32 @@
 
 namespace evoplex {
 
-GraphWidget::GraphWidget(Mode mode, MainGUI* mainGUI,
+GraphWidget::GraphWidget(Mode mode, ColorMapMgr* cMgr,
                          ExperimentPtr exp, ExperimentWidget* parent)
     : QDockWidget(parent),
-      m_settingsDlg(new GraphSettings(mainGUI, exp, this)),
       m_graph(nullptr)
 {
     TitleBar* titleBar = new TitleBar(exp.get(), this);
     setTitleBarWidget(titleBar);
 
     if (mode == Mode::Graph) {
-        m_graph = new GraphView(exp, this);
+        m_graph = new GraphView(cMgr, exp, this);
     } else {
-        m_graph = new GridView(exp, this);
+        m_graph = new GridView(cMgr, exp, this);
     }
     setWidget(m_graph);
-    connect(m_graph, SIGNAL(updateWidgets(bool)), SIGNAL(updateWidgets(bool)));
+    connect(m_graph, SIGNAL(updateWidgets(bool)),
+            SIGNAL(updateWidgets(bool)));
 
-    connect(titleBar, SIGNAL(openSettingsDlg()), m_settingsDlg, SLOT(show()));
-    connect(titleBar, SIGNAL(trialSelected(quint16)), m_graph, SLOT(setTrial(quint16)));
+    connect(titleBar, &TitleBar::openSettingsDlg,
+            [this]() { m_graph->openSettings(); });
+    connect(titleBar, SIGNAL(trialSelected(quint16)),
+            m_graph, SLOT(setTrial(quint16)));
 }
 
 GraphWidget::~GraphWidget()
 {
+    delete m_graph;
 }
 
 void GraphWidget::updateView(bool forceUpdate)

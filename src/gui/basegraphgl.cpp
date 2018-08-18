@@ -27,7 +27,6 @@
 
 #include "basegraphgl.h"
 #include "ui_basegraphgl.h"
-#include "graphwidget.h"
 
 namespace evoplex {
 
@@ -39,6 +38,8 @@ BaseGraphGL::BaseGraphGL(ExperimentPtr exp, GraphWidget* parent)
       m_trial(nullptr),
       m_currStep(-1),
       m_selectedNode(-1),
+      m_nodeAttr(-1),
+      m_nodeCMap(nullptr),
       m_background(QColor(239,235,231)),
       m_zoomLevel(0),
       m_nodeSizeRate(10.),
@@ -69,12 +70,6 @@ BaseGraphGL::BaseGraphGL(ExperimentPtr exp, GraphWidget* parent)
         }
     });
 
-    auto s = m_graphWidget->settingsDlg();
-    connect(s, &GraphSettings::nodeAttrUpdated, [this](int idx) { m_nodeAttr = idx; });
-    connect(s, SIGNAL(nodeCMapUpdated(ColorMap*)), SLOT(setNodeCMap(ColorMap*)));
-    m_nodeAttr = s->nodeAttr();
-    m_nodeCMap = s->nodeCMap();
-
     connect(m_ui->bZoomIn, SIGNAL(clicked(bool)), SLOT(zoomIn()));
     connect(m_ui->bZoomOut, SIGNAL(clicked(bool)), SLOT(zoomOut()));
     connect(m_ui->bReset, SIGNAL(clicked(bool)), SLOT(resetView()));
@@ -91,7 +86,6 @@ BaseGraphGL::~BaseGraphGL()
     m_trial = nullptr;
     m_exp = nullptr;
     delete m_ui;
-    delete m_nodeCMap;
 }
 
 void BaseGraphGL::setupInspector()
@@ -198,8 +192,8 @@ void BaseGraphGL::slotRestarted()
 
 void BaseGraphGL::setNodeCMap(ColorMap* cmap)
 {
-    delete m_nodeCMap;
     m_nodeCMap = cmap;
+    m_nodeAttr = cmap ? cmap->attrRange()->id() : -1;
     update();
 }
 

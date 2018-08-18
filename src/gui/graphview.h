@@ -22,18 +22,26 @@
 #define GRAPHVIEW_H
 
 #include "basegraphgl.h"
+#include "graphsettings.h"
 
 namespace evoplex {
 
 class GraphView : public BaseGraphGL
 {
+    Q_OBJECT
 public:
-    explicit GraphView(ExperimentPtr exp, GraphWidget* parent);
+    explicit GraphView(ColorMapMgr* cMgr, ExperimentPtr exp, GraphWidget* parent);
+
+public slots:
+    void openSettings() override { m_settingsDlg->show(); }
 
 protected:
     void paintEvent(QPaintEvent*) override;
     Node selectNode(const QPoint& pos) const override;
     CacheStatus refreshCache() override;
+
+private slots:
+    void setEdgeCMap(ColorMap* cmap);
 
 private:
     struct Cache {
@@ -42,6 +50,7 @@ private:
         std::vector<QLineF> edges;
     };
     std::vector<Cache> m_cache;
+    GraphSettings* m_settingsDlg;
 
     int m_edgeAttr;
     ColorMap* m_edgeCMap;

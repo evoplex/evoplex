@@ -18,45 +18,39 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "graphsettings.h"
-#include "ui_graphsettings.h"
-#include "maingui.h"
+#include "gridsettings.h"
+#include "ui_gridsettings.h"
 
 namespace evoplex {
 
-GraphSettings::GraphSettings(ColorMapMgr* cMgr, ExperimentPtr exp, QWidget *parent)
+GridSettings::GridSettings(ColorMapMgr* cMgr, ExperimentPtr exp, QWidget *parent)
     : QDialog(parent, MainGUI::kDefaultDlgFlags),
-      m_ui(new Ui_GraphSettings),
+      m_ui(new Ui_GridSettings),
       m_cMgr(cMgr),
       m_exp(exp)
 {
     m_ui->setupUi(this);
+
     connect(m_exp.get(), SIGNAL(restarted()), SLOT(init()));
+    init();
 }
 
-GraphSettings::~GraphSettings()
+GridSettings::~GridSettings()
 {
     delete m_ui;
 }
 
-void GraphSettings::init()
+void GridSettings::init()
 {
-    Q_ASSERT_X(m_exp->modelPlugin(), "GraphSettings",
+    Q_ASSERT_X(m_exp->modelPlugin(), "GridSettings",
                "tried to init the graph settings for a null model!");
 
     m_ui->nodesColor->init(m_cMgr, m_exp->modelPlugin()->nodeAttrsScope());
-
-    m_ui->edgesColor->init(m_cMgr, m_exp->modelPlugin()->edgeAttrsScope());
 }
 
-AttrColorSelector* GraphSettings::nodeColorSelector() const
+AttrColorSelector* GridSettings::nodeColorSelector() const
 {
     return m_ui->nodesColor;
-}
-
-AttrColorSelector* GraphSettings::edgeColorSelector() const
-{
-    return m_ui->edgesColor;
 }
 
 } // evoplex

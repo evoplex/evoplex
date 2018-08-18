@@ -27,29 +27,29 @@
 #include "ui_graphsettings.h"
 #include "utils.h"
 
-namespace evoplex
-{
+namespace evoplex {
 
-GraphView::GraphView(ExperimentPtr exp, GraphWidget* parent)
+GraphView::GraphView(ColorMapMgr* cMgr, ExperimentPtr exp, GraphWidget* parent)
     : BaseGraphGL(exp, parent),
+      m_settingsDlg(new GraphSettings(cMgr, exp, this)),
+      m_edgeAttr(-1),
+      m_edgeCMap(nullptr),
       m_edgeSizeRate(25.)
 {
     setWindowTitle("Graph");
 
-    auto s = m_graphWidget->settingsDlg();
-    m_edgeAttr = s->edgeAttr();
-    m_edgeCMap = s->edgeCMap();
-    connect(s, &GraphSettings::edgeAttrUpdated, [this](int idx) { m_edgeAttr = idx; });
-    connect(s, &GraphSettings::edgeCMapUpdated, [this](ColorMap* cmap) {
-        delete m_edgeCMap;
-        m_edgeCMap = cmap;
-        update();
-    });
+    connect(m_settingsDlg->nodeColorSelector(),
+            SIGNAL(cmapUpdated(ColorMap*)), SLOT(setNodeCMap(ColorMap*)));
+    connect(m_settingsDlg->edgeColorSelector(),
+            SIGNAL(cmapUpdated(ColorMap*)), SLOT(setEdgeCMap(ColorMap*)));
+    m_settingsDlg->init();
 
     m_showNodes = m_ui->bShowNodes->isChecked();
     m_showEdges = m_ui->bShowEdges->isChecked();
-    connect(m_ui->bShowNodes, &QPushButton::clicked, [this](bool b) { m_showNodes = b; update(); });
-    connect(m_ui->bShowEdges, &QPushButton::clicked, [this](bool b) { m_showEdges = b; update(); });
+    connect(m_ui->bShowNodes, &QPushButton::clicked,
+        [this](bool b) { m_showNodes = b; update(); });
+    connect(m_ui->bShowEdges, &QPushButton::clicked,
+        [this](bool b) { m_showEdges = b; update(); });
 
     setTrial(0); // init at trial 0
 }
@@ -79,7 +79,6 @@ CacheStatus GraphView::refreshCache()
         cache.node = np.second;
         cache.xy = xy;
         cache.edges.reserve(np.second.outEdges().size());
-
         for (auto const& ep : np.second.outEdges()) {
             QPointF xy2(m_origin.x() + edgeSizeRate * (1.0 + ep.second.neighbour().x()),
                         m_origin.y() + edgeSizeRate * (1.0 + ep.second.neighbour().y()));
@@ -125,21 +124,18 @@ void GraphView::paintEvent(QPaintEvent*)
         }
     }
 
-    if (m_showNodes) {
+    const double nodeRadius = m_nodeRadius;
+    if (m_showNodes && m_nodeAttr >= 0 && m_nodeCMap) {
         for (const Cache& cache : m_cache) {
             if (m_selectedNode == cache.node.id()) {
                 painter.setBrush(QColor(10,10,10,100));
-                painter.drawEllipse(cache.xy, m_nodeRadius*1.5, m_nodeRadius*1.5);
+                painter.drawEllipse(cache.xy, nodeRadius*1.5, nodeRadius*1.5);
             }
-
-            if (m_nodeAttr >= 0) {
-                const Value& value = cache.node.attr(m_nodeAttr);
-                painter.setBrush(m_nodeCMap->colorFromValue(value));
-            } else {
-                painter.setBrush(m_nodeCMap->colors().front());
-            }
+            const Value& value = cache.node.attr(m_nodeAttr);
+            const QColor& color = m_nodeCMap->colorFromValue(value);
+            painter.setBrush(color);
             painter.setPen(Qt::black);
-            painter.drawEllipse(cache.xy, m_nodeRadius, m_nodeRadius);
+            painter.drawEllipse(cache.xy, nodeRadius, nodeRadius);
         }
     }
 
@@ -159,6 +155,13 @@ Node GraphView::selectNode(const QPoint& pos) const
         }
     }
     return Node();
+}
+
+void GraphView::setEdgeCMap(ColorMap* cmap)
+{
+    m_edgeCMap = cmap;
+    m_edgeAttr = cmap ? cmap->attrRange()->id() : -1;
+    update();
 }
 
 } // evoplex

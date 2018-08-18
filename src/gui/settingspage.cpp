@@ -82,7 +82,7 @@ void SettingsPage::refreshFields()
 {
     m_ui->threads->setValue(m_mainGUI->mainApp()->expMgr()->maxThreadsCount());
 
-    const CMapKey cmap = m_mainGUI->colorMapMgr()->defaultColorMap();
+    const CMapKey cmap = m_mainGUI->colorMapMgr()->defaultCMapKey();
     m_ui->colormaps->setCurrentText(cmap.first);
     m_ui->colormapsize->setCurrentText(QString::number(cmap.second));
 

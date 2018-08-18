@@ -27,13 +27,18 @@
 #include "ui_graphsettings.h"
 #include "utils.h"
 
-namespace evoplex
-{
+namespace evoplex {
 
-GridView::GridView(ExperimentPtr exp, GraphWidget* parent)
-    : BaseGraphGL(exp, parent)
+GridView::GridView(ColorMapMgr* cMgr, ExperimentPtr exp, GraphWidget* parent)
+    : BaseGraphGL(exp, parent),
+      m_settingsDlg(new GridSettings(cMgr, exp, this))
 {
     setWindowTitle("Grid");
+
+    connect(m_settingsDlg->nodeColorSelector(),
+            SIGNAL(cmapUpdated(ColorMap*)), SLOT(setNodeCMap(ColorMap*)));
+    m_settingsDlg->init();
+
     //m_settingsDlg->edges->setHidden(true);
     m_ui->bShowNodes->hide();
     m_ui->bShowEdges->hide();
@@ -53,10 +58,11 @@ CacheStatus GridView::refreshCache()
     const Nodes& nodes = m_trial->graph()->nodes();
     m_cache.reserve(nodes.size());
 
+    const double nodeRadius = m_nodeRadius;
     for (auto const& np : nodes) {
-        QRectF r(m_origin.x() + np.second.x() * m_nodeRadius,
-                 m_origin.y() + np.second.y() * m_nodeRadius,
-                 m_nodeRadius, m_nodeRadius);
+        QRectF r(m_origin.x() + np.second.x() * nodeRadius,
+                 m_origin.y() + np.second.y() * nodeRadius,
+                 nodeRadius, nodeRadius);
 
         if (!rect().contains(r.x(), r.y()))
             continue;
@@ -78,7 +84,7 @@ void GridView::paintEvent(QPaintEvent*)
     painter.setRenderHint(QPainter::Antialiasing);
     painter.fillRect(rect(), m_background);
 
-    if (m_cacheStatus != CacheStatus::Ready) {
+    if (m_cacheStatus != CacheStatus::Ready || m_nodeAttr < 0 || !m_nodeCMap) {
         painter.end();
         return;
     }
@@ -87,11 +93,9 @@ void GridView::paintEvent(QPaintEvent*)
         QColor color;
         if (m_selectedNode == cache.node.id()) {
             color = QColor(10,10,10,100);
-        } else if (m_nodeAttr >= 0) {
+        } else {
             const Value& value = cache.node.attr(m_nodeAttr);
             color = m_nodeCMap->colorFromValue(value);
-        } else {
-            color = m_nodeCMap->colors().front();
         }
         painter.setBrush(color);
         painter.setPen(color);

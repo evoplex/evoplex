@@ -28,8 +28,7 @@
 
 #include "colormap.h"
 
-namespace evoplex
-{
+namespace evoplex {
 
 ColorMapMgr::ColorMapMgr()
 {
@@ -110,21 +109,26 @@ void ColorMapMgr::resetSettingsToDefault()
 
 ColorMap* ColorMap::create(AttributeRangePtr attrRange, const Colors& colors)
 {
+    if (!attrRange) {
+        return nullptr;
+    }
+
     auto set = dynamic_cast<SetOfValues*>(attrRange.get());
     if (set) {
-        return new ColorMapSet(colors, set);
+        return new ColorMapSet(attrRange, colors);
     }
 
     auto interval = dynamic_cast<IntervalOfValues*>(attrRange.get());
     if (interval) {
-        return new ColorMapRange(colors, interval);
+        return new ColorMapRange(attrRange, colors);
     }
 
-    return new SingleColor(colors.front());
+    return new SingleColor(attrRange, colors.front());
 }
 
-ColorMap::ColorMap(const Colors& colors)
-    : m_colors(colors)
+ColorMap::ColorMap(AttributeRangePtr attrRange, const Colors& colors)
+    : m_attrRange(attrRange),
+      m_colors(colors)
 {
     Q_ASSERT_X(colors.size() > 0, "ColorMap", "the color size is invalid!");
 }
@@ -135,8 +139,8 @@ ColorMap::~ColorMap()
 
 /************************************************************************/
 
-SingleColor::SingleColor(QColor color)
-    : ColorMap({color})
+SingleColor::SingleColor(AttributeRangePtr attrRange, QColor color)
+    : ColorMap(attrRange, {color})
 {
 }
 
@@ -148,8 +152,8 @@ const QColor& SingleColor::colorFromValue(const Value& val) const
 
 /************************************************************************/
 
-ColorMapRange::ColorMapRange(const Colors& colors, const IntervalOfValues* attrRange)
-    : ColorMap(colors)
+ColorMapRange::ColorMapRange(AttributeRangePtr attrRange, const Colors& colors)
+    : ColorMap(attrRange, colors)
 {
     if (attrRange->type() == AttributeRange::Int_Range) {
         m_max = attrRange->max().toInt();
@@ -188,11 +192,14 @@ const QColor& ColorMapRange::colorFromValue(const Value& val) const
 
 /************************************************************************/
 
-ColorMapSet::ColorMapSet(const Colors& colors, const SetOfValues* attrRange)
-    : ColorMap(colors)
+ColorMapSet::ColorMapSet(AttributeRangePtr attrRange, const Colors& colors)
+    : ColorMap(attrRange, colors)
 {
+    auto set = dynamic_cast<SetOfValues*>(attrRange.get());
+    Q_ASSERT(set);
+
     size_t c = 0;
-    for (const Value& value : attrRange->values()) {
+    for (const Value& value : set->values()) {
         m_cmap.insert({value, m_colors.at(c++)});
         c = (c == m_colors.size()) ? 0 : c;
     }

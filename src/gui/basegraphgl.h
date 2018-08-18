@@ -46,6 +46,9 @@ enum class CacheStatus {
 
 class GraphGLInterface
 {
+public:
+    virtual void openSettings() = 0;
+
 protected:
     virtual ~GraphGLInterface() = default;
     virtual void paintEvent(QPaintEvent*) = 0;
@@ -57,9 +60,11 @@ class BaseGraphGL : public QOpenGLWidget, public GraphGLInterface
 {
     Q_OBJECT
 
+public:
+    ~BaseGraphGL() override;
+
 protected:
     explicit BaseGraphGL(ExperimentPtr exp, GraphWidget* parent);
-    ~BaseGraphGL() override;
 
     Ui_BaseGraphGL* m_ui;
     GraphWidget* m_graphWidget;

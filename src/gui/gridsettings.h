@@ -18,38 +18,37 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef GRAPHSETTINGS_H
-#define GRAPHSETTINGS_H
+#ifndef GRIDSETTINGS_H
+#define GRIDSETTINGS_H
 
 #include <QDialog>
 
 #include "core/experiment.h"
 #include "attrcolorselector.h"
-#include "colormap.h"
+#include "maingui.h"
 
-class Ui_GraphSettings;
+class Ui_GridSettings;
 
 namespace evoplex {
 
-class GraphSettings : public QDialog
+class GridSettings : public QDialog
 {
     Q_OBJECT
 
 public:
-    explicit GraphSettings(ColorMapMgr* cMgr, ExperimentPtr exp, QWidget* parent);
-    ~GraphSettings();
+    explicit GridSettings(ColorMapMgr* cMgr, ExperimentPtr exp, QWidget* parent);
+    ~GridSettings();
 
     AttrColorSelector* nodeColorSelector() const;
-    AttrColorSelector* edgeColorSelector() const;
 
 public slots:
     void init();
 
 private:
-    Ui_GraphSettings* m_ui;
+    Ui_GridSettings* m_ui;
     ColorMapMgr* m_cMgr;
     const ExperimentPtr m_exp;
 };
 
 } // evoplex
-#endif // GRAPHSETTINGS_H
+#endif // GRIDSETTINGS_H

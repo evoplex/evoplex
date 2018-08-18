@@ -107,7 +107,7 @@ ExperimentWidget::ExperimentWidget(ExperimentPtr exp, MainGUI* mainGUI, Projects
     setWidget(layout->parentWidget());
     auto newGraph = [this, mainGUI](GraphWidget::Mode mode) {
         if (isAutoDeleteOff()) {
-            GraphWidget* graph = new GraphWidget(mode, mainGUI, m_exp, this);
+            GraphWidget* graph = new GraphWidget(mode, mainGUI->colorMapMgr(), m_exp, this);
             m_innerWindow->addDockWidget(Qt::TopDockWidgetArea, graph);
             connect(graph, SIGNAL(updateWidgets(bool)), this, SIGNAL(updateWidgets(bool)));
             connect(this, SIGNAL(updateWidgets(bool)), graph, SLOT(updateView(bool)));

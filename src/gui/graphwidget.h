@@ -26,7 +26,6 @@
 #include "core/experiment.h"
 
 #include "experimentwidget.h"
-#include "graphsettings.h"
 #include "maingui.h"
 
 namespace evoplex {
@@ -43,10 +42,10 @@ public:
         Grid
     };
 
-    explicit GraphWidget(Mode mode, MainGUI* mainGUI, ExperimentPtr exp, ExperimentWidget* parent);
-    ~GraphWidget();
+    explicit GraphWidget(Mode mode, ColorMapMgr* cMgr,
+                         ExperimentPtr exp, ExperimentWidget* parent);
 
-    inline GraphSettings* settingsDlg() const;
+    virtual ~GraphWidget();
 
 public slots:
     void updateView(bool forceUpdate);
@@ -55,12 +54,8 @@ signals:
     void updateWidgets(bool);
 
 private:
-    GraphSettings* m_settingsDlg;
     BaseGraphGL* m_graph;
 };
-
-inline GraphSettings* GraphWidget::settingsDlg() const
-{ return m_settingsDlg; }
 
 } // evoplex
 #endif // GRAPHWIDGET_H

@@ -29,11 +29,10 @@
 #include "attributes.h"
 #include "attributerange.h"
 
-namespace evoplex
-{
+namespace evoplex {
 
-typedef std::vector<QColor> Colors;
-typedef QPair<QString, int> CMapKey; // <name,size>
+using Colors = std::vector<QColor>;
+using CMapKey = QPair<QString, int>; // <name,size>
 
 class ColorMapMgr
 {
@@ -47,7 +46,7 @@ public:
     inline QStringList names() const { return m_names; }
     inline QStringList sizes(const QString& name) const { return m_sizesAvailable.value(name); }
 
-    inline const CMapKey& defaultColorMap() const { return m_dfCMap; }
+    inline const CMapKey& defaultCMapKey() const { return m_dfCMap; }
     inline void setDefaultColorMap(const CMapKey& key) { setDefaultColorMap(key.first, key.second); }
     void setDefaultColorMap(const QString& name, const int size);
 
@@ -68,10 +67,12 @@ public:
 
     virtual ~ColorMap();
     virtual const QColor& colorFromValue(const Value& val) const = 0;
+    inline const AttributeRangePtr& attrRange() const { return m_attrRange; }
     inline const Colors& colors() const { return m_colors; }
 
 protected:
-    explicit ColorMap(const Colors& colors);
+    explicit ColorMap(AttributeRangePtr attrRange, const Colors& colors);
+    AttributeRangePtr m_attrRange;
     Colors m_colors;
 };
 
@@ -80,7 +81,7 @@ protected:
 class SingleColor : public ColorMap
 {
 public:
-    explicit SingleColor(QColor color);
+    explicit SingleColor(AttributeRangePtr attrRange, QColor color);
     virtual const QColor& colorFromValue(const Value& val) const;
 };
 
@@ -89,8 +90,9 @@ public:
 class ColorMapRange : public ColorMap
 {
 public:
-    explicit ColorMapRange(const Colors& colors, const IntervalOfValues* attrRange);
+    explicit ColorMapRange(AttributeRangePtr attrRange, const Colors& colors);
     virtual const QColor& colorFromValue(const Value& val) const;
+
 private:
     float m_max;
     float m_min;
@@ -101,8 +103,9 @@ private:
 class ColorMapSet : public ColorMap
 {
 public:
-    explicit ColorMapSet(const Colors& colors, const SetOfValues* attrRange);
+    explicit ColorMapSet(AttributeRangePtr attrRange, const Colors& colors);
     virtual const QColor& colorFromValue(const Value& val) const;
+
 private:
     std::unordered_map<Value, QColor> m_cmap;
 };

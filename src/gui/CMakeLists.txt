@@ -20,6 +20,7 @@
 
 set(EVOPLEX_GUI_H
   maingui.h
+  attrcolorselector.h
   attrwidget.h
   attrsgendlg.h
   colormap.h
@@ -35,6 +36,7 @@ set(EVOPLEX_GUI_H
   gridview.h
   graphwidget.h
   graphsettings.h
+  gridsettings.h
   projectwidget.h
   savedialog.h
   tablewidget.h
@@ -49,6 +51,7 @@ set(EVOPLEX_GUI_H
 
 set(EVOPLEX_GUI_CXX
   maingui.cpp
+  attrcolorselector.cpp
   attrwidget.cpp
   attrsgendlg.cpp
   experimentdesigner.cpp
@@ -64,6 +67,7 @@ set(EVOPLEX_GUI_CXX
   gridview.cpp
   graphwidget.cpp
   graphsettings.cpp
+  gridsettings.cpp
   projectwidget.cpp
   savedialog.cpp
   tablewidget.cpp
@@ -77,10 +81,12 @@ set(EVOPLEX_GUI_CXX
 )
 
 set(EVOPLEX_GUI_UIFORM
+  attrcolorselector
   attrsgendlg
   experimentdesigner
   basegraphgl
   graphsettings
+  gridsettings
   #linechartsettings
   outputwidget
   pluginspage
