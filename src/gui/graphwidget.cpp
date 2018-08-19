@@ -22,7 +22,7 @@
 #include "basegraphgl.h"
 #include "graphview.h"
 #include "gridview.h"
-#include "titlebar.h"
+#include "graphtitlebar.h"
 
 namespace evoplex {
 
@@ -31,7 +31,7 @@ GraphWidget::GraphWidget(Mode mode, ColorMapMgr* cMgr,
     : QDockWidget(parent),
       m_graph(nullptr)
 {
-    TitleBar* titleBar = new TitleBar(exp.get(), this);
+    GraphTitleBar* titleBar = new GraphTitleBar(exp.get(), this);
     setTitleBarWidget(titleBar);
 
     if (mode == Mode::Graph) {
@@ -45,7 +45,7 @@ GraphWidget::GraphWidget(Mode mode, ColorMapMgr* cMgr,
     connect(m_graph, SIGNAL(updateWidgets(bool)),
             SIGNAL(updateWidgets(bool)));
 
-    connect(titleBar, &TitleBar::openSettingsDlg,
+    connect(titleBar, &GraphTitleBar::openSettingsDlg,
             [this]() { m_graph->openSettings(); });
     connect(titleBar, SIGNAL(trialSelected(quint16)),
             m_graph, SLOT(setTrial(quint16)));

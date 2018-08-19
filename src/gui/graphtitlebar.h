@@ -27,17 +27,17 @@
 
 #include "core/experiment.h"
 
-class Ui_TitleBar;
+class Ui_GraphTitleBar;
 
 namespace evoplex {
 
-class TitleBar : public QWidget
+class GraphTitleBar : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit TitleBar(const Experiment* exp, QDockWidget* parent);
-    ~TitleBar();
+    explicit GraphTitleBar(const Experiment* exp, QDockWidget* parent);
+    ~GraphTitleBar();
 
 signals:
     void trialSelected(quint16);
@@ -53,7 +53,7 @@ protected:
 
 private:
     QDockWidget* m_parent;
-    Ui_TitleBar* m_ui;
+    Ui_GraphTitleBar* m_ui;
     const Experiment* m_exp;
 
     const QIcon m_kIconFull;

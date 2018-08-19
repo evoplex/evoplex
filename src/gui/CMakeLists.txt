@@ -40,7 +40,7 @@ set(EVOPLEX_GUI_H
   projectwidget.h
   savedialog.h
   tablewidget.h
-  titlebar.h
+  graphtitlebar.h
 
   pluginspage.h
   projectspage.h
@@ -71,7 +71,7 @@ set(EVOPLEX_GUI_CXX
   projectwidget.cpp
   savedialog.cpp
   tablewidget.cpp
-  titlebar.cpp
+  graphtitlebar.cpp
 
   pluginspage.cpp
   projectspage.cpp
@@ -87,6 +87,7 @@ set(EVOPLEX_GUI_UIFORM
   basegraphgl
   graphsettings
   gridsettings
+  graphtitlebar
   #linechartsettings
   outputwidget
   pluginspage
@@ -94,7 +95,6 @@ set(EVOPLEX_GUI_UIFORM
   queuepage
   savedialog
   settingspage
-  titlebar
   welcomepage
 )
 foreach(uiform ${EVOPLEX_GUI_UIFORM})

@@ -23,15 +23,15 @@
 #include <QMessageBox>
 #include <QPainter>
 
-#include "titlebar.h"
-#include "ui_titlebar.h"
+#include "graphtitlebar.h"
+#include "ui_graphtitlebar.h"
 
 namespace evoplex {
 
-TitleBar::TitleBar(const Experiment* exp, QDockWidget* parent)
+GraphTitleBar::GraphTitleBar(const Experiment* exp, QDockWidget* parent)
     : QWidget(parent),
       m_parent(parent),
-      m_ui(new Ui_TitleBar),
+      m_ui(new Ui_GraphTitleBar),
       m_exp(exp),
       m_kIconFull(":/icons/material/fullscreen_white_18"),
       m_kIconFullExit(":/icons/material/fullscreen_exit_white_18"),
@@ -63,12 +63,12 @@ TitleBar::TitleBar(const Experiment* exp, QDockWidget* parent)
     slotRestarted(); // init
 }
 
-TitleBar::~TitleBar()
+GraphTitleBar::~GraphTitleBar()
 {
     delete m_ui;
 }
 
-void TitleBar::paintEvent(QPaintEvent* pe)
+void GraphTitleBar::paintEvent(QPaintEvent* pe)
 {
     QStyleOption opt;
     opt.init(this);
@@ -77,7 +77,7 @@ void TitleBar::paintEvent(QPaintEvent* pe)
     QWidget::paintEvent(pe);
 }
 
-void TitleBar::slotRestarted()
+void GraphTitleBar::slotRestarted()
 {
     const quint16 currTrial = m_ui->cbTrial->currentText().toUShort();
     m_ui->cbTrial->blockSignals(true);
@@ -94,7 +94,7 @@ void TitleBar::slotRestarted()
     }
 }
 
-void TitleBar::slotFloating(bool floating)
+void GraphTitleBar::slotFloating(bool floating)
 {
     if (floating) {
         m_ui->bFloat->setIcon(m_kIconAttach);
@@ -105,7 +105,7 @@ void TitleBar::slotFloating(bool floating)
     }
 }
 
-void TitleBar::slotFullScreen()
+void GraphTitleBar::slotFullScreen()
 {
     m_parent->setFloating(true);
     auto g = QApplication::desktop()->availableGeometry(m_parent);
