@@ -44,3 +44,6 @@ QWidget#contents {
 QMainWindow#experimentWindow {
   background-color: rgb(24,24,24);
 }
+QWidget#TitleBar {
+  background-color:rgb(40,40,40);
+}

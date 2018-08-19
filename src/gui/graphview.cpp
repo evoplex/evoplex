@@ -37,8 +37,6 @@ GraphView::GraphView(ColorMapMgr* cMgr, ExperimentPtr exp, GraphWidget* parent)
       m_edgeSizeRate(25.),
       m_nodePen(Qt::black)
 {
-    setWindowTitle("Graph");
-
     connect(m_settingsDlg->nodeColorSelector(),
             SIGNAL(cmapUpdated(ColorMap*)), SLOT(setNodeCMap(ColorMap*)));
     connect(m_settingsDlg->edgeColorSelector(),

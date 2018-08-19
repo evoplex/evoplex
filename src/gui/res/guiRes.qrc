@@ -43,4 +43,60 @@
     <qresource prefix="/stylesheets">
         <file>stylesheets/dark.qss</file>
     </qresource>
+    <qresource prefix="/icons/material">
+        <file>material-icons/navigation/png/ic_close_black_16dp.png</file>
+        <file>material-icons/navigation/png/ic_close_black_18dp.png</file>
+        <file>material-icons/navigation/png/ic_close_black_24dp.png</file>
+        <file>material-icons/navigation/png/ic_close_black_32dp.png</file>
+        <file>material-icons/navigation/png/ic_close_black_36dp.png</file>
+        <file>material-icons/navigation/png/ic_close_black_48dp.png</file>
+        <file>material-icons/navigation/png/ic_close_black_64dp.png</file>
+        <file>material-icons/navigation/png/ic_close_black_128dp.png</file>
+        <file>material-icons/navigation/png/ic_close_black_256dp.png</file>
+        <file>material-icons/navigation/png/ic_close_black_512dp.png</file>
+        <file>material-icons/navigation/png/ic_close_black_1024dp.png</file>
+        <file>material-icons/navigation/png/ic_close_white_16dp.png</file>
+        <file>material-icons/navigation/png/ic_close_white_18dp.png</file>
+        <file>material-icons/navigation/png/ic_close_white_24dp.png</file>
+        <file>material-icons/navigation/png/ic_close_white_32dp.png</file>
+        <file>material-icons/navigation/png/ic_close_white_36dp.png</file>
+        <file>material-icons/navigation/png/ic_close_white_48dp.png</file>
+        <file>material-icons/navigation/png/ic_close_white_64dp.png</file>
+        <file>material-icons/navigation/png/ic_close_white_128dp.png</file>
+        <file>material-icons/navigation/png/ic_close_white_256dp.png</file>
+        <file>material-icons/navigation/png/ic_close_white_512dp.png</file>
+        <file>material-icons/navigation/png/ic_close_white_1024dp.png</file>
+        <file>material-icons/navigation/png/ic_expand_less_black_18dp.png</file>
+        <file>material-icons/navigation/png/ic_expand_less_black_24dp.png</file>
+        <file>material-icons/navigation/png/ic_expand_less_black_36dp.png</file>
+        <file>material-icons/navigation/png/ic_expand_less_black_48dp.png</file>
+        <file alias="detach_white_18">material-icons/navigation/png/ic_expand_less_white_18dp.png</file>
+        <file>material-icons/navigation/png/ic_expand_less_white_24dp.png</file>
+        <file>material-icons/navigation/png/ic_expand_less_white_36dp.png</file>
+        <file>material-icons/navigation/png/ic_expand_less_white_48dp.png</file>
+        <file>material-icons/navigation/png/ic_expand_more_black_18dp.png</file>
+        <file>material-icons/navigation/png/ic_expand_more_black_24dp.png</file>
+        <file>material-icons/navigation/png/ic_expand_more_black_36dp.png</file>
+        <file>material-icons/navigation/png/ic_expand_more_black_48dp.png</file>
+        <file alias="attach_white_18">material-icons/navigation/png/ic_expand_more_white_18dp.png</file>
+        <file>material-icons/navigation/png/ic_expand_more_white_24dp.png</file>
+        <file>material-icons/navigation/png/ic_expand_more_white_36dp.png</file>
+        <file>material-icons/navigation/png/ic_expand_more_white_48dp.png</file>
+        <file>material-icons/navigation/png/ic_fullscreen_black_18dp.png</file>
+        <file>material-icons/navigation/png/ic_fullscreen_black_24dp.png</file>
+        <file>material-icons/navigation/png/ic_fullscreen_black_36dp.png</file>
+        <file>material-icons/navigation/png/ic_fullscreen_black_48dp.png</file>
+        <file>material-icons/navigation/png/ic_fullscreen_exit_black_18dp.png</file>
+        <file>material-icons/navigation/png/ic_fullscreen_exit_black_24dp.png</file>
+        <file>material-icons/navigation/png/ic_fullscreen_exit_black_36dp.png</file>
+        <file>material-icons/navigation/png/ic_fullscreen_exit_black_48dp.png</file>
+        <file alias="fullscreen_exit_white_18">material-icons/navigation/png/ic_fullscreen_exit_white_18dp.png</file>
+        <file>material-icons/navigation/png/ic_fullscreen_exit_white_24dp.png</file>
+        <file>material-icons/navigation/png/ic_fullscreen_exit_white_36dp.png</file>
+        <file>material-icons/navigation/png/ic_fullscreen_exit_white_48dp.png</file>
+        <file alias="fullscreen_white_18">material-icons/navigation/png/ic_fullscreen_white_18dp.png</file>
+        <file>material-icons/navigation/png/ic_fullscreen_white_24dp.png</file>
+        <file>material-icons/navigation/png/ic_fullscreen_white_36dp.png</file>
+        <file>material-icons/navigation/png/ic_fullscreen_white_48dp.png</file>
+    </qresource>
 </RCC>

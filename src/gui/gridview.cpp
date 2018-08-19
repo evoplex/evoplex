@@ -33,8 +33,6 @@ GridView::GridView(ColorMapMgr* cMgr, ExperimentPtr exp, GraphWidget* parent)
     : BaseGraphGL(exp, parent),
       m_settingsDlg(new GridSettings(cMgr, exp, this))
 {
-    setWindowTitle("Grid");
-
     connect(m_settingsDlg->nodeColorSelector(),
             SIGNAL(cmapUpdated(ColorMap*)), SLOT(setNodeCMap(ColorMap*)));
     m_settingsDlg->init();

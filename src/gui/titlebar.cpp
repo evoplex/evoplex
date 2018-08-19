@@ -18,6 +18,8 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <QApplication>
+#include <QDesktopWidget>
 #include <QMessageBox>
 #include <QPainter>
 
@@ -28,31 +30,37 @@ namespace evoplex {
 
 TitleBar::TitleBar(const Experiment* exp, QDockWidget* parent)
     : QWidget(parent),
+      m_parent(parent),
       m_ui(new Ui_TitleBar),
-      m_exp(exp)
+      m_exp(exp),
+      m_kIconFull(":/icons/material/fullscreen_white_18"),
+      m_kIconFullExit(":/icons/material/fullscreen_exit_white_18"),
+      m_kIconDetach(":/icons/material/detach_white_18"),
+      m_kIconAttach(":/icons/material/attach_white_18")
 {
     m_ui->setupUi(this);
     setFocusPolicy(Qt::StrongFocus);
-    setStyleSheet("background-color:rgb(40,40,40);");
 
-    connect(m_exp, SIGNAL(restarted()), SLOT(slotRestarted()));
-    slotRestarted(); // init
+    m_ui->bFloat->setIcon(parent->isFloating() ? m_kIconAttach : m_kIconDetach);
+    auto g = QApplication::desktop()->availableGeometry(parent);
+    m_ui->bMaximize->setIcon(g.size() == parent->geometry().size()
+                             ? m_kIconFull : m_kIconFullExit);
 
-    QStyle* style = QApplication::style();
-    m_ui->bClose->setIcon(style->standardIcon(QStyle::SP_TitleBarCloseButton));
-    m_ui->bFloat->setIcon(style->standardIcon(QStyle::SP_TitleBarNormalButton));
     connect(m_ui->bClose, SIGNAL(clicked(bool)), parent, SLOT(close()));
+    connect(m_ui->bMaximize, SIGNAL(clicked(bool)), SLOT(slotFullScreen()));
     connect(m_ui->bFloat, &QPushButton::clicked,
-            [parent]() { parent->setFloating(!parent->isFloating()); });
+        [parent]() { parent->setFloating(!parent->isFloating()); });
+    connect(parent, SIGNAL(topLevelChanged(bool)), SLOT(slotFloating(bool)));
 
     connect(m_ui->bSettings, SIGNAL(clicked(bool)), SIGNAL(openSettingsDlg()));
-
     connect(m_ui->cbTrial, QOverload<int>::of(&QComboBox::currentIndexChanged),
         [this](int t) {
             Q_ASSERT(t >= 0 && t < UINT16_MAX);
             emit(trialSelected(static_cast<quint16>(t)));
-        }
-    );
+        });
+
+    connect(m_exp, SIGNAL(restarted()), SLOT(slotRestarted()));
+    slotRestarted(); // init
 }
 
 TitleBar::~TitleBar()
@@ -83,6 +91,30 @@ void TitleBar::slotRestarted()
     const quint16 _currTrial = m_ui->cbTrial->currentText().toUShort();
     if (currTrial != _currTrial) {
         emit(trialSelected(_currTrial));
+    }
+}
+
+void TitleBar::slotFloating(bool floating)
+{
+    if (floating) {
+        m_ui->bFloat->setIcon(m_kIconAttach);
+        m_ui->bFloat->setToolTip("attach");
+    } else {
+        m_ui->bFloat->setIcon(m_kIconDetach);
+        m_ui->bFloat->setToolTip("detach");
+    }
+}
+
+void TitleBar::slotFullScreen()
+{
+    m_parent->setFloating(true);
+    auto g = QApplication::desktop()->availableGeometry(m_parent);
+    if (g.size() == m_parent->geometry().size()) {
+        m_parent->setGeometry(m_parent->parentWidget()->geometry());
+        m_ui->bMaximize->setIcon(m_kIconFull);
+    } else {
+        m_parent->setGeometry(g);
+        m_ui->bMaximize->setIcon(m_kIconFullExit);
     }
 }
 

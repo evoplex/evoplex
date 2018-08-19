@@ -36,8 +36,10 @@ GraphWidget::GraphWidget(Mode mode, ColorMapMgr* cMgr,
 
     if (mode == Mode::Graph) {
         m_graph = new GraphView(cMgr, exp, this);
+        setWindowTitle("Graph");
     } else {
         m_graph = new GridView(cMgr, exp, this);
+        setWindowTitle("Grid");
     }
     setWidget(m_graph);
     connect(m_graph, SIGNAL(updateWidgets(bool)),
@@ -47,6 +49,10 @@ GraphWidget::GraphWidget(Mode mode, ColorMapMgr* cMgr,
             [this]() { m_graph->openSettings(); });
     connect(titleBar, SIGNAL(trialSelected(quint16)),
             m_graph, SLOT(setTrial(quint16)));
+
+    // the widget might not be repaint after a drag and drop
+    connect(this, &QDockWidget::dockLocationChanged,
+            [this](){ m_graph->update(); });
 }
 
 GraphWidget::~GraphWidget()

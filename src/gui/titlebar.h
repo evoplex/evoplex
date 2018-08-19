@@ -22,6 +22,7 @@
 #define TITLEBAR_H
 
 #include <QDockWidget>
+#include <QIcon>
 #include <QWidget>
 
 #include "core/experiment.h"
@@ -44,14 +45,22 @@ signals:
 
 private slots:
     void slotRestarted();
+    void slotFloating(bool isFloating);
+    void slotFullScreen();
 
 protected:
     virtual void paintEvent(QPaintEvent* pe);
 
 private:
+    QDockWidget* m_parent;
     Ui_TitleBar* m_ui;
     const Experiment* m_exp;
-};
-}
 
+    const QIcon m_kIconFull;
+    const QIcon m_kIconFullExit;
+    const QIcon m_kIconDetach;
+    const QIcon m_kIconAttach;
+};
+
+} // evoplex
 #endif // TITLEBAR_H
