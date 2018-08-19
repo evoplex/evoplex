@@ -37,7 +37,6 @@ BaseGraphGL::BaseGraphGL(ExperimentPtr exp, GraphWidget* parent)
       m_exp(exp),
       m_trial(nullptr),
       m_currStep(-1),
-      m_selectedNode(-1),
       m_nodeAttr(-1),
       m_nodeCMap(nullptr),
       m_background(QColor(239,235,231)),
@@ -74,7 +73,8 @@ BaseGraphGL::BaseGraphGL(ExperimentPtr exp, GraphWidget* parent)
     connect(m_ui->bZoomOut, SIGNAL(clicked(bool)), SLOT(zoomOut()));
     connect(m_ui->bReset, SIGNAL(clicked(bool)), SLOT(resetView()));
 
-    connect(m_ui->bCloseInspector, SIGNAL(clicked(bool)), SLOT(clearSelection()));
+    connect(m_ui->bCloseInspector, &QPushButton::clicked,
+            [this](bool) { clearSelection(); });
     setupInspector();
 
     m_updateCacheTimer.setSingleShot(true);
@@ -183,7 +183,7 @@ void BaseGraphGL::slotRestarted()
         close();
         return;
     }
-    m_selectedNode = -1;
+    clearSelection();
     setupInspector();
     m_trial = nullptr;
     m_ui->currStep->setText("--");
@@ -214,6 +214,7 @@ void BaseGraphGL::zoomIn()
     ++m_zoomLevel;
     m_nodeRadius = m_nodeSizeRate * std::pow(1.25f, m_zoomLevel);
     updateCache();
+    clearSelection();
 }
 
 void BaseGraphGL::zoomOut()
@@ -221,6 +222,7 @@ void BaseGraphGL::zoomOut()
     --m_zoomLevel;
     m_nodeRadius = m_nodeSizeRate * std::pow(1.25f, m_zoomLevel);
     updateCache();
+    clearSelection();
 }
 
 void BaseGraphGL::resetView()
@@ -228,9 +230,8 @@ void BaseGraphGL::resetView()
     m_origin = QPointF(5., 5.);
     m_zoomLevel = 0;
     m_nodeRadius = m_nodeSizeRate;
-    m_selectedNode = -1;
-    m_ui->inspector->hide();
     updateCache();
+    clearSelection();
 }
 
 void BaseGraphGL::mousePressEvent(QMouseEvent* e)
@@ -248,20 +249,18 @@ void BaseGraphGL::mouseReleaseEvent(QMouseEvent *e)
     }
 
     if (e->localPos() == m_posEntered) {
+        Node prevSelection = selectedNode();
         const Node& node = selectNode(e->pos());
-        if (node.isNull() || m_selectedNode == node.id()) {
-            m_selectedNode = -1;
-            m_ui->inspector->hide();
+        if (node.isNull() || prevSelection == node) {
+            clearSelection();
         } else {
-            m_selectedNode = node.id();
             updateInspector(node);
             m_ui->inspector->show();
+            update();
         }
-        update();
     } else {
-        m_selectedNode = -1;
         m_origin += (e->localPos() - m_posEntered);
-        m_ui->inspector->hide();
+        clearSelection();
         updateCache();
     }
 }
@@ -302,7 +301,6 @@ void BaseGraphGL::updateView(bool forceUpdate)
 
 void BaseGraphGL::clearSelection()
 {
-    m_selectedNode = -1;
     m_ui->inspector->hide();
     update();
 }

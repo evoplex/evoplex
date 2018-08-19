@@ -58,16 +58,17 @@ CacheStatus GridView::refreshCache()
     const Nodes& nodes = m_trial->graph()->nodes();
     m_cache.reserve(nodes.size());
 
+    const int m = 50;
+    QRectF frame = frameGeometry().marginsAdded(QMargins(m,m,m,m));
+
     const double nodeRadius = m_nodeRadius;
     for (auto const& np : nodes) {
-        QRectF r(m_origin.x() + np.second.x() * nodeRadius,
-                 m_origin.y() + np.second.y() * nodeRadius,
-                 nodeRadius, nodeRadius);
-
-        if (!rect().contains(r.x(), r.y()))
+        QRectF r = cellRect(np.second, nodeRadius);
+        if (!frame.contains(r.x(), r.y())) {
             continue;
+        }
 
-        Cache c;
+        Cell c;
         c.node = np.second;
         c.rect = r;
         m_cache.emplace_back(c);
@@ -89,32 +90,49 @@ void GridView::paintEvent(QPaintEvent*)
         return;
     }
 
-    for (const Cache& cache : m_cache) {
-        QColor color;
-        if (m_selectedNode == cache.node.id()) {
-            color = QColor(10,10,10,100);
-        } else {
-            const Value& value = cache.node.attr(m_nodeAttr);
-            color = m_nodeCMap->colorFromValue(value);
+    painter.setOpacity(m_selectedCell.node.isNull() ? 1.0 : 0.2);
+    painter.setPen(Qt::transparent);
+
+    for (const Cell& cell : m_cache) {
+        if (cell.node.isNull()) {
+            break;
         }
-        painter.setBrush(color);
-        painter.setPen(color);
-        painter.drawRect(cache.rect);
+        drawCell(painter, cell);
+    }
+
+    if (!m_selectedCell.node.isNull()) {
+        painter.setOpacity(1.0);
+        // draw neighbours
+        for (auto const& n : m_selectedCell.node.outEdges()) {
+            drawCell(painter, {n, cellRect(n, m_nodeRadius)});
+        }
+        // draw selected node
+        drawCell(painter, m_selectedCell);
+        painter.setBrush(QBrush(m_background.color(), Qt::DiagCrossPattern));
+        painter.drawRect(m_selectedCell.rect);
     }
 
     painter.end();
 }
 
-Node GridView::selectNode(const QPoint& pos) const
+Node GridView::selectNode(const QPoint& pos)
 {
     if (m_cacheStatus == CacheStatus::Ready) {
-        for (const Cache& cache : m_cache) {
-            if (cache.rect.contains(pos)) {
-                return cache.node;
+        for (const Cell& cell : m_cache) {
+            if (cell.rect.contains(pos)) {
+                m_selectedCell = cell;
+                return cell.node;
             }
         }
     }
     return Node();
 }
 
+void GridView::drawCell(QPainter& painter, const Cell& cell) const
+{
+    const Value& value = cell.node.attr(m_nodeAttr);
+    painter.setBrush(m_nodeCMap->colorFromValue(value));
+    painter.drawRect(cell.rect);
 }
+
+} // evoplex

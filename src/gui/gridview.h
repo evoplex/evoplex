@@ -37,17 +37,36 @@ public slots:
 
 protected:
     void paintEvent(QPaintEvent*) override;
-    Node selectNode(const QPoint& pos) const override;
+    Node selectNode(const QPoint& pos) override;
+    virtual Node selectedNode() const override;
+    void clearSelection() override;
     CacheStatus refreshCache() override;
 
 private:
-    struct Cache {
+    struct Cell {
         Node node;
         QRectF rect;
     };
-    std::vector<Cache> m_cache;
+    std::vector<Cell> m_cache;
     GridSettings* m_settingsDlg;
+    Cell m_selectedCell;
+
+    void drawCell(QPainter& painter, const Cell& cell) const;
+
+    inline QRectF cellRect(const Node& n, double length) const;
 };
+
+inline Node GridView::selectedNode() const
+{ return m_selectedCell.node; }
+
+inline void GridView::clearSelection()
+{ m_selectedCell = Cell(); BaseGraphGL::clearSelection(); }
+
+inline QRectF GridView::cellRect(const Node& n, double length) const {
+    return QRectF(m_origin.x() + n.x() * length,
+                  m_origin.y() + n.y() * length,
+                  length, length);
+}
 
 } // evoplex
 #endif // GRIDVIEW_H

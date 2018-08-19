@@ -52,7 +52,9 @@ public:
 protected:
     virtual ~GraphGLInterface() = default;
     virtual void paintEvent(QPaintEvent*) = 0;
-    virtual Node selectNode(const QPoint& pos) const = 0;
+    virtual Node selectNode(const QPoint& pos) = 0;
+    virtual Node selectedNode() const = 0;
+    virtual void clearSelection() = 0;
     virtual CacheStatus refreshCache() = 0;
 };
 
@@ -72,7 +74,6 @@ protected:
     const Trial* m_trial;
 
     int m_currStep;
-    int m_selectedNode;
     int m_nodeAttr;
     ColorMap* m_nodeCMap;
 
@@ -83,8 +84,10 @@ protected:
     QPointF m_origin;
 
     CacheStatus m_cacheStatus;
-    CacheStatus refreshCache() override
-    { return CacheStatus::Ready; }
+
+    CacheStatus refreshCache() override { return CacheStatus::Ready; }
+
+    void clearSelection() override;
 
     void updateCache(bool force=false);
 
@@ -96,14 +99,13 @@ signals:
     void updateWidgets(bool) const;
 
 public slots:
+    virtual void zoomIn();
+    virtual void zoomOut();
     void updateView(bool forceUpdate);
     void setTrial(quint16 trialId);
-    void clearSelection();
 
 private slots:
     void slotRestarted();
-    void zoomIn();
-    void zoomOut();
     void resetView();
     void setNodeCMap(ColorMap* cmap);
 

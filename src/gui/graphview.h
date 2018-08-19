@@ -33,23 +33,21 @@ public:
     explicit GraphView(ColorMapMgr* cMgr, ExperimentPtr exp, GraphWidget* parent);
 
 public slots:
-    void openSettings() override { m_settingsDlg->show(); }
+    inline void zoomIn() override;
+    inline void zoomOut() override;
+    inline void openSettings() override;
 
 protected:
     void paintEvent(QPaintEvent*) override;
-    Node selectNode(const QPoint& pos) const override;
+    Node selectNode(const QPoint& pos) override;
+    inline Node selectedNode() const override;
+    inline void clearSelection() override;
     CacheStatus refreshCache() override;
 
 private slots:
     void setEdgeCMap(ColorMap* cmap);
 
 private:
-    struct Cache {
-        Node node;
-        QPointF xy;
-        std::vector<QLineF> edges;
-    };
-    std::vector<Cache> m_cache;
     GraphSettings* m_settingsDlg;
 
     int m_edgeAttr;
@@ -58,7 +56,54 @@ private:
 
     bool m_showNodes;
     bool m_showEdges;
+
+    QPen m_nodePen;
+    void updateNodePen();
+
+    struct Star {
+        Node node;
+        QPointF xy;
+        std::vector<QLineF> edges;
+        Star() {}
+        Star(Node n, QPointF xy, std::vector<QLineF> e)
+            : node(n), xy(xy), edges(e) {}
+    };
+    std::vector<Star> m_cache;
+    Star m_selectedStar;
+    Star createStar(const Node& node, const qreal& edgeSizeRate, const QPointF& xy);
+
+    void drawNode(QPainter& painter, const Star& s, double r) const;
+    void drawEdges(QPainter& painter) const;
+    void drawNodes(QPainter& painter, double nodeRadius) const;
+    void drawSelectedStar(QPainter& painter, double nodeRadius) const;
+
+    inline qreal currEdgeSize() const;
+    inline QPointF nodePoint(const Node& node, const qreal& edgeSizeRate) const;
 };
+
+inline Node GraphView::selectedNode() const
+{ return m_selectedStar.node; }
+
+inline void GraphView::clearSelection()
+{ m_selectedStar = Star(); BaseGraphGL::clearSelection(); }
+
+inline void GraphView::zoomIn()
+{ updateNodePen(); BaseGraphGL::zoomIn(); }
+
+inline void GraphView::zoomOut()
+{ updateNodePen(); BaseGraphGL::zoomOut(); }
+
+inline void GraphView::openSettings()
+{ m_settingsDlg->show(); }
+
+inline qreal GraphView::currEdgeSize() const
+{ return m_edgeSizeRate * std::pow(1.25f, m_zoomLevel); }
+
+inline QPointF GraphView::nodePoint(const Node& node, const qreal& edgeSizeRate) const
+{
+    return QPointF(m_origin.x() + edgeSizeRate * (1. + node.x()),
+                   m_origin.y() + edgeSizeRate * (1. + node.y()));
+}
 
 } // evoplex
 #endif // GRAPHVIEW_H

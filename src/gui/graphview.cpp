@@ -34,7 +34,8 @@ GraphView::GraphView(ColorMapMgr* cMgr, ExperimentPtr exp, GraphWidget* parent)
       m_settingsDlg(new GraphSettings(cMgr, exp, this)),
       m_edgeAttr(-1),
       m_edgeCMap(nullptr),
-      m_edgeSizeRate(25.)
+      m_edgeSizeRate(25.),
+      m_nodePen(Qt::black)
 {
     setWindowTitle("Graph");
 
@@ -51,7 +52,34 @@ GraphView::GraphView(ColorMapMgr* cMgr, ExperimentPtr exp, GraphWidget* parent)
     connect(m_ui->bShowEdges, &QPushButton::clicked,
         [this](bool b) { m_showEdges = b; updateCache(); });
 
+    updateNodePen();
+
     setTrial(0); // init at trial 0
+}
+
+GraphView::Star GraphView::createStar(const Node& node,
+        const qreal& edgeSizeRate, const QPointF& xy)
+{
+    Star star;
+    star.xy = xy;
+
+    if (m_showNodes) {
+        star.node = node;
+    }
+
+    if (m_showEdges) {
+        star.edges.reserve(node.outEdges().size());
+        for (auto const& ep : node.outEdges()) {
+            QPointF xy2 = nodePoint(ep.second.neighbour(), edgeSizeRate);
+            QLineF line(xy, xy2);
+            if (!m_showNodes || line.length() - m_nodeRadius * 2. > 4.0) {
+                star.edges.emplace_back(line); // just add the visible edges
+            }
+        }
+        star.edges.shrink_to_fit();
+    }
+
+    return star;
 }
 
 CacheStatus GraphView::refreshCache()
@@ -64,38 +92,17 @@ CacheStatus GraphView::refreshCache()
         return CacheStatus::Ready;
     }
 
-    qreal edgeSizeRate = m_edgeSizeRate * std::pow(1.25f, m_zoomLevel);
+    const int m = 50;
+    QRect frame = frameGeometry().marginsAdded(QMargins(m,m,m,m));
+
+    qreal edgeSizeRate = currEdgeSize();
     m_cache.reserve(m_trial->graph()->nodes().size());
-
     for (auto const& np : m_trial->graph()->nodes()) {
-        QPointF xy(m_origin.x() + edgeSizeRate * (1. + np.second.x()),
-                   m_origin.y() + edgeSizeRate * (1. + np.second.y()));
-
-        if (!rect().contains(xy.toPoint())) {
+        QPointF xy = nodePoint(np.second, edgeSizeRate);
+        if (!frame.contains(xy.toPoint())) {
             continue;
         }
-
-        Cache cache;
-        cache.xy = xy;
-
-        if (m_showNodes) {
-            cache.node = np.second;
-        }
-
-        if (m_showEdges) {
-            cache.edges.reserve(np.second.outEdges().size());
-            for (auto const& ep : np.second.outEdges()) {
-                QPointF xy2(m_origin.x() + edgeSizeRate * (1.0 + ep.second.neighbour().x()),
-                            m_origin.y() + edgeSizeRate * (1.0 + ep.second.neighbour().y()));
-                QLineF line(xy, xy2);
-                if (!m_showNodes || line.length() - m_nodeRadius * 2. > 4.0) {
-                    cache.edges.emplace_back(line); // just add visible edges
-                }
-            }
-            cache.edges.shrink_to_fit();
-        }
-
-        m_cache.emplace_back(cache);
+        m_cache.emplace_back(createStar(np.second, edgeSizeRate, xy));
     }
     m_cache.shrink_to_fit();
 
@@ -114,56 +121,29 @@ void GraphView::paintEvent(QPaintEvent*)
         return;
     }
 
-    if (m_showEdges) {
-        Cache cacheSelected;
-        for (const Cache& cache : m_cache) {
-            if (!cache.node.isNull() && cache.node.id() == m_selectedNode) {
-                cacheSelected = cache;
-            }
-            for (const QLineF& edge : cache.edges) {
-                painter.setPen(Qt::gray);
-                painter.drawLine(edge);
-            }
-        }
-
-        if (!cacheSelected.node.isNull()) {
-            for (const QLineF& edge : cacheSelected.edges) {
-                painter.setPen(QPen(Qt::black, 3));
-                painter.drawLine(edge);
-            }
-        }
+    if (m_selectedStar.node.isNull()) {
+        painter.setOpacity(1.0);
+        drawEdges(painter);
+    } else {
+        painter.setOpacity(0.2);
     }
-
     const double nodeRadius = m_nodeRadius;
-    if (m_showNodes && m_nodeAttr >= 0 && m_nodeCMap) {
-        for (const Cache& cache : m_cache) {
-            if (cache.node.isNull()) {
-                break;
-            }
-            if (cache.node.id() == m_selectedNode) {
-                painter.setBrush(QColor(10,10,10,100));
-                painter.drawEllipse(cache.xy, nodeRadius*1.5, nodeRadius*1.5);
-            }
-            const Value& value = cache.node.attr(m_nodeAttr);
-            const QColor& color = m_nodeCMap->colorFromValue(value);
-            painter.setBrush(color);
-            painter.setPen(Qt::black);
-            painter.drawEllipse(cache.xy, nodeRadius, nodeRadius);
-        }
-    }
+    drawNodes(painter, nodeRadius);
+    drawSelectedStar(painter, nodeRadius);
 
     painter.end();
 }
 
-Node GraphView::selectNode(const QPoint& pos) const
+Node GraphView::selectNode(const QPoint& pos)
 {
     if (m_cacheStatus == CacheStatus::Ready) {
-        for (const Cache& cache : m_cache) {
-            if (pos.x() > cache.xy.x()-m_nodeRadius
-                    && pos.x() < cache.xy.x()+m_nodeRadius
-                    && pos.y() > cache.xy.y()-m_nodeRadius
-                    && pos.y() < cache.xy.y()+m_nodeRadius) {
-                return cache.node;
+        for (const Star& star : m_cache) {
+            if (pos.x() > star.xy.x()-m_nodeRadius
+                    && pos.x() < star.xy.x()+m_nodeRadius
+                    && pos.y() > star.xy.y()-m_nodeRadius
+                    && pos.y() < star.xy.y()+m_nodeRadius) {
+                m_selectedStar = star;
+                return star.node;
             }
         }
     }
@@ -175,6 +155,97 @@ void GraphView::setEdgeCMap(ColorMap* cmap)
     m_edgeCMap = cmap;
     m_edgeAttr = cmap ? cmap->attrRange()->id() : -1;
     update();
+}
+
+void GraphView::updateNodePen()
+{
+    if (m_nodeRadius < 8) {
+        m_nodePen = QColor(100,100,100,0);
+    } else if (m_nodeRadius < 13) {
+        // 255/(13-8)*(x-8)
+        m_nodePen = QColor(100,100,100,51*(m_nodeRadius-8.));
+    } else {
+        m_nodePen = QColor(100,100,100,255);
+    }
+}
+
+void GraphView::drawNode(QPainter& painter, const Star& s, double r) const
+{
+    const Value& value = s.node.attr(m_nodeAttr);
+    painter.setBrush(m_nodeCMap->colorFromValue(value));
+    painter.drawEllipse(s.xy, r, r);
+}
+
+void GraphView::drawNodes(QPainter& painter, double nodeRadius) const
+{
+    if (!m_showNodes || m_nodeAttr < 0 || !m_nodeCMap) {
+        return;
+    }
+    painter.save();
+    painter.setPen(m_nodePen);
+    for (const Star& star : m_cache) {
+        if (star.node.isNull()) {
+            break;
+        }
+        drawNode(painter, star, nodeRadius);
+    }
+    painter.restore();
+}
+
+void GraphView::drawEdges(QPainter& painter) const
+{
+    if (!m_showEdges) {
+        return;
+    }
+    painter.save();
+    painter.setPen(Qt::gray);
+    for (const Star& star : m_cache) {
+        for (const QLineF& edge : star.edges) {
+            painter.drawLine(edge);
+        }
+    }
+    painter.restore();
+}
+
+void GraphView::drawSelectedStar(QPainter& painter, double nodeRadius) const
+{
+    if (m_selectedStar.node.isNull()) {
+        return;
+    }
+
+    painter.setOpacity(1.0);
+
+    // draw shadow of the seleted node
+    painter.save();
+    double shadowRadius = nodeRadius*1.5;
+    QRadialGradient r(m_selectedStar.xy, shadowRadius, m_selectedStar.xy);
+    r.setColorAt(0, Qt::black);
+    r.setColorAt(1, m_background.color());
+    painter.setBrush(r);
+    painter.setPen(Qt::transparent);
+    painter.drawEllipse(m_selectedStar.xy, shadowRadius, shadowRadius);
+    painter.restore();
+
+    painter.save();
+    // highlight immediate edges
+    for (const QLineF& edge : m_selectedStar.edges) {
+        painter.setPen(QPen(Qt::black, 3));
+        painter.drawLine(edge);
+    }
+
+    // draw selected node
+    painter.setPen(m_nodePen);
+    drawNode(painter, m_selectedStar, nodeRadius);
+
+    // draw neighbours
+    const Edges& oe = m_selectedStar.node.outEdges();
+    const double esize = currEdgeSize();
+    for (auto const& e : oe) {
+        const Node& n = e.second.neighbour();
+        Star s(n, nodePoint(n, esize), {});
+        drawNode(painter, s, nodeRadius);
+    }
+    painter.restore();
 }
 
 } // evoplex
