@@ -114,5 +114,37 @@
         <file alias="settings_white_24">material-icons/action/png/ic_settings_white_24dp.png</file>
         <file>material-icons/action/png/ic_settings_white_36dp.png</file>
         <file>material-icons/action/png/ic_settings_white_48dp.png</file>
+        <file>material-icons/action/png/ic_delete_black_18dp.png</file>
+        <file>material-icons/action/png/ic_delete_black_24dp.png</file>
+        <file>material-icons/action/png/ic_delete_black_36dp.png</file>
+        <file>material-icons/action/png/ic_delete_black_48dp.png</file>
+        <file>material-icons/action/png/ic_delete_forever_black_18dp.png</file>
+        <file>material-icons/action/png/ic_delete_forever_black_24dp.png</file>
+        <file>material-icons/action/png/ic_delete_forever_black_36dp.png</file>
+        <file>material-icons/action/png/ic_delete_forever_black_48dp.png</file>
+        <file>material-icons/action/png/ic_delete_forever_white_18dp.png</file>
+        <file>material-icons/action/png/ic_delete_forever_white_24dp.png</file>
+        <file>material-icons/action/png/ic_delete_forever_white_36dp.png</file>
+        <file>material-icons/action/png/ic_delete_forever_white_48dp.png</file>
+        <file>material-icons/action/png/ic_delete_white_18dp.png</file>
+        <file alias="delete_white_24">material-icons/action/png/ic_delete_white_24dp.png</file>
+        <file>material-icons/action/png/ic_delete_white_36dp.png</file>
+        <file>material-icons/action/png/ic_delete_white_48dp.png</file>
+        <file>material-icons/image/png/ic_edit_black_18dp.png</file>
+        <file>material-icons/image/png/ic_edit_black_24dp.png</file>
+        <file>material-icons/image/png/ic_edit_black_36dp.png</file>
+        <file>material-icons/image/png/ic_edit_black_48dp.png</file>
+        <file>material-icons/image/png/ic_edit_white_18dp.png</file>
+        <file alias="edit_white_24">material-icons/image/png/ic_edit_white_24dp.png</file>
+        <file>material-icons/image/png/ic_edit_white_36dp.png</file>
+        <file>material-icons/image/png/ic_edit_white_48dp.png</file>
+        <file>material-icons/content/png/ic_add_black_18dp.png</file>
+        <file>material-icons/content/png/ic_add_black_24dp.png</file>
+        <file>material-icons/content/png/ic_add_black_36dp.png</file>
+        <file>material-icons/content/png/ic_add_black_48dp.png</file>
+        <file>material-icons/content/png/ic_add_white_18dp.png</file>
+        <file alias="add_white_24">material-icons/content/png/ic_add_white_24dp.png</file>
+        <file>material-icons/content/png/ic_add_white_36dp.png</file>
+        <file>material-icons/content/png/ic_add_white_48dp.png</file>
     </qresource>
 </RCC>

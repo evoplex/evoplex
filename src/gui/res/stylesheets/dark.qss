@@ -76,6 +76,11 @@ QMainWindow#experimentWindow > QToolBar, QToolBar#Controls {
   padding: 0 10px 0 10px;
 }
 
+/* BaseGraphGL */
+QWidget#inspector {
+  background-color: rgb(51, 51, 51);
+}
+
 /* ExperimentDesigner */
 QTreeWidget#treeWidget {
   /*background-color: rgb(51, 51, 51);*/

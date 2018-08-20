@@ -66,10 +66,10 @@
      <widget class="QWidget" name="widget" native="true">
       <layout class="QHBoxLayout" name="horizontalLayout_2">
        <property name="topMargin">
-        <number>2</number>
+        <number>3</number>
        </property>
        <property name="bottomMargin">
-        <number>2</number>
+        <number>1</number>
        </property>
        <item>
         <widget class="QComboBox" name="cbWidgets">
@@ -96,8 +96,33 @@
        </item>
        <item>
         <widget class="QPushButton" name="bRemove">
-         <property name="text">
-          <string>Remove</string>
+         <property name="minimumSize">
+          <size>
+           <width>24</width>
+           <height>24</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>24</width>
+           <height>24</height>
+          </size>
+         </property>
+         <property name="toolTip">
+          <string>remove experiment</string>
+         </property>
+         <property name="icon">
+          <iconset resource="../res/guiRes.qrc">
+           <normaloff>:/icons/material/delete_white_24</normaloff>:/icons/material/delete_white_24</iconset>
+         </property>
+         <property name="iconSize">
+          <size>
+           <width>24</width>
+           <height>24</height>
+          </size>
+         </property>
+         <property name="flat">
+          <bool>true</bool>
          </property>
         </widget>
        </item>
@@ -109,8 +134,33 @@
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
-         <property name="text">
-          <string>Edit</string>
+         <property name="minimumSize">
+          <size>
+           <width>24</width>
+           <height>24</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>24</width>
+           <height>24</height>
+          </size>
+         </property>
+         <property name="toolTip">
+          <string>edit experiment</string>
+         </property>
+         <property name="icon">
+          <iconset resource="../res/guiRes.qrc">
+           <normaloff>:/icons/material/edit_white_24</normaloff>:/icons/material/edit_white_24</iconset>
+         </property>
+         <property name="iconSize">
+          <size>
+           <width>24</width>
+           <height>24</height>
+          </size>
+         </property>
+         <property name="flat">
+          <bool>true</bool>
          </property>
         </widget>
        </item>
@@ -122,8 +172,33 @@
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
-         <property name="text">
-          <string>Create</string>
+         <property name="minimumSize">
+          <size>
+           <width>24</width>
+           <height>24</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>24</width>
+           <height>24</height>
+          </size>
+         </property>
+         <property name="toolTip">
+          <string>add experiment</string>
+         </property>
+         <property name="icon">
+          <iconset resource="../res/guiRes.qrc">
+           <normaloff>:/icons/material/add_white_24</normaloff>:/icons/material/add_white_24</iconset>
+         </property>
+         <property name="iconSize">
+          <size>
+           <width>24</width>
+           <height>24</height>
+          </size>
+         </property>
+         <property name="flat">
+          <bool>true</bool>
          </property>
         </widget>
        </item>
@@ -133,6 +208,8 @@
    </layout>
   </widget>
  </widget>
- <resources/>
+ <resources>
+  <include location="../res/guiRes.qrc"/>
+ </resources>
  <connections/>
 </ui>
