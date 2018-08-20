@@ -80,8 +80,11 @@ public:
     inline bool isRunning() const;
 
 public slots:
-    // execute all experiments of this project.
+    // execute all experiments of this project
     void playAll();
+
+    // pause all experiments of this project
+    void pauseAll();
 
 signals:
     void expAdded(int expId);

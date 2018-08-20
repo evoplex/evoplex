@@ -146,5 +146,13 @@
         <file alias="add_white_24">material-icons/content/png/ic_add_white_24dp.png</file>
         <file>material-icons/content/png/ic_add_white_36dp.png</file>
         <file>material-icons/content/png/ic_add_white_48dp.png</file>
+        <file>material-icons/av/png/ic_playlist_add_check_black_18dp.png</file>
+        <file>material-icons/av/png/ic_playlist_add_check_black_24dp.png</file>
+        <file>material-icons/av/png/ic_playlist_add_check_black_36dp.png</file>
+        <file>material-icons/av/png/ic_playlist_add_check_black_48dp.png</file>
+        <file>material-icons/av/png/ic_playlist_add_check_white_18dp.png</file>
+        <file alias="pauseall_white_24">material-icons/av/png/ic_playlist_add_check_white_24dp.png</file>
+        <file>material-icons/av/png/ic_playlist_add_check_white_36dp.png</file>
+        <file>material-icons/av/png/ic_playlist_add_check_white_48dp.png</file>
     </qresource>
 </RCC>

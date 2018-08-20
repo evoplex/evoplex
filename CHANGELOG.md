@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Implements the Bernoulli distribution in the PRG class
 - Plugins can now be reloaded
 - Adds button to maximize graph widgets
+- Adds button to pause all experiments
 - New model plugin: population growth
 - New model plugin: Conway's Game of Life cellular automaton
 

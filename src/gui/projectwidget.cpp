@@ -51,6 +51,9 @@ ProjectWidget::ProjectWidget(ProjectPtr project, MainGUI* mainGUI, ProjectsPage*
     connect(this, SIGNAL(objectNameChanged(QString)),
             titlebar, SLOT(setTitle(QString)));
 
+    auto bPauseAll = new QPushButton(this);
+    titlebar->addButton(bPauseAll, ":/icons/material/pauseall_white_24", "pause all experiments");
+    connect(bPauseAll, SIGNAL(pressed()), m_project.get(), SLOT(pauseAll()));
     auto bPlayAll = new QPushButton(this);
     titlebar->addButton(bPlayAll, ":/icons/material/playall_white_24", "play all experiments");
     connect(bPlayAll, SIGNAL(pressed()), m_project.get(), SLOT(playAll()));

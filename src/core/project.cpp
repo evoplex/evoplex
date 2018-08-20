@@ -74,6 +74,16 @@ void Project::playAll()
         i.second->play();
 }
 
+void Project::pauseAll()
+{
+    for (auto& i : m_experiments) {
+        if (i.second->expStatus() == Status::Running ||
+                i.second->expStatus() == Status::Queued) {
+            i.second->pause();
+        }
+    }
+}
+
 int Project::generateExpId() const
 {
     return m_experiments.empty() ? 0 : (--m_experiments.end())->first + 1;
