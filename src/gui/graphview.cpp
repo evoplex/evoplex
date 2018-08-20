@@ -67,8 +67,9 @@ GraphView::Star GraphView::createStar(const Node& node,
         for (auto const& ep : node.outEdges()) {
             QPointF xy2 = nodePoint(ep.second.neighbour(), edgeSizeRate);
             QLineF line(xy, xy2);
+            // just add the visible edges
             if (!m_showNodes || line.length() - m_nodeRadius * 2. > 4.0) {
-                star.edges.emplace_back(line); // just add the visible edges
+                star.edges.push_back({ep.second, line});
             }
         }
         star.edges.shrink_to_fit();
@@ -199,10 +200,20 @@ void GraphView::drawEdges(QPainter& painter) const
         return;
     }
     painter.save();
-    painter.setPen(Qt::gray);
-    for (const Star& star : m_cache) {
-        for (const QLineF& edge : star.edges) {
-            painter.drawLine(edge);
+    if (m_edgeAttr >= 0 && m_edgeCMap) {
+        for (const Star& star : m_cache) {
+            for (auto const& ep : star.edges) {
+                const Value& value = ep.first.attr(m_edgeAttr);
+                painter.setPen(m_edgeCMap->colorFromValue(value));
+                painter.drawLine(ep.second);
+            }
+        }
+    } else {
+        painter.setPen(Qt::gray);
+        for (const Star& star : m_cache) {
+            for (auto const& ep : star.edges) {
+                painter.drawLine(ep.second);
+            }
         }
     }
     painter.restore();
@@ -229,9 +240,9 @@ void GraphView::drawSelectedStar(QPainter& painter, double nodeRadius) const
 
     painter.save();
     // highlight immediate edges
-    for (const QLineF& edge : m_selectedStar.edges) {
-        painter.setPen(QPen(Qt::black, 3));
-        painter.drawLine(edge);
+    painter.setPen(QPen(Qt::black, 3));
+    for (auto const& ep : m_selectedStar.edges) {
+        painter.drawLine(ep.second);
     }
 
     // draw selected node

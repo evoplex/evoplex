@@ -65,9 +65,9 @@ private:
     struct Star {
         Node node;
         QPointF xy;
-        std::vector<QLineF> edges;
+        std::vector<std::pair<Edge,QLineF>> edges;
         Star() {}
-        Star(Node n, QPointF xy, std::vector<QLineF> e)
+        Star(Node n, QPointF xy, std::vector<std::pair<Edge,QLineF>> e)
             : node(n), xy(xy), edges(e) {}
     };
     std::vector<Star> m_cache;
