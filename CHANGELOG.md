@@ -12,7 +12,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Plugins can now be reloaded
 - Adds button to maximize graph widgets
 - Adds button to pause all experiments
-- Allows setting the node and edge sizes in the graph widgets
+- Graph widgets: Allows scaling the nodes and edges
+- Graph widgets: Allows setting the edge with
 - New model plugin: population growth
 - New model plugin: Conway's Game of Life cellular automaton
 

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>314</width>
-    <height>236</height>
+    <height>262</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -59,19 +59,9 @@
       <string>Edges</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_2">
-      <item row="1" column="0">
-       <widget class="evoplex::AttrColorSelector" name="edgesColor" native="true"/>
-      </item>
       <item row="0" column="0">
-       <layout class="QHBoxLayout" name="horizontalLayout_2">
-        <item>
-         <widget class="QLabel" name="label_2">
-          <property name="text">
-           <string>Edge scale:</string>
-          </property>
-         </widget>
-        </item>
-        <item>
+       <layout class="QGridLayout" name="gridLayout">
+        <item row="0" column="1">
          <widget class="QSlider" name="edgeScale">
           <property name="minimum">
            <number>10</number>
@@ -87,7 +77,40 @@
           </property>
          </widget>
         </item>
+        <item row="0" column="0">
+         <widget class="QLabel" name="label_2">
+          <property name="text">
+           <string>Edge scale:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QSlider" name="edgeWidth">
+          <property name="minimum">
+           <number>1</number>
+          </property>
+          <property name="maximum">
+           <number>20</number>
+          </property>
+          <property name="pageStep">
+           <number>2</number>
+          </property>
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="label_3">
+          <property name="text">
+           <string>Edge width:</string>
+          </property>
+         </widget>
+        </item>
        </layout>
+      </item>
+      <item row="2" column="0">
+       <widget class="evoplex::AttrColorSelector" name="edgesColor" native="true"/>
       </item>
      </layout>
     </widget>

@@ -38,6 +38,7 @@ public slots:
     inline void zoomOut() override;
     inline void openSettings() override;
     void setEdgeScale(int v);
+    void setEdgeWidth(int v);
 
 protected:
     void paintEvent(QPaintEvent*) override;
@@ -59,6 +60,7 @@ private:
     bool m_showNodes;
     bool m_showEdges;
 
+    QPen m_edgePen;
     QPen m_nodePen;
     void updateNodePen();
 

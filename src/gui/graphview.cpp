@@ -34,6 +34,7 @@ GraphView::GraphView(ColorMapMgr* cMgr, ExperimentPtr exp, GraphWidget* parent)
       m_settingsDlg(new GraphSettings(cMgr, exp, this)),
       m_edgeAttr(-1),
       m_edgeCMap(nullptr),
+      m_edgePen(Qt::gray),
       m_nodePen(Qt::black)
 {
     m_settingsDlg->init();
@@ -159,6 +160,12 @@ void GraphView::setEdgeScale(int v)
     updateCache();
 }
 
+void GraphView::setEdgeWidth(int v)
+{
+    m_edgePen = QPen(Qt::gray, v);
+    update();
+}
+
 void GraphView::updateNodePen()
 {
     if (m_nodeRadius < 8) {
@@ -201,15 +208,17 @@ void GraphView::drawEdges(QPainter& painter) const
     }
     painter.save();
     if (m_edgeAttr >= 0 && m_edgeCMap) {
+        QPen pen = m_edgePen;
         for (const Star& star : m_cache) {
             for (auto const& ep : star.edges) {
                 const Value& value = ep.first.attr(m_edgeAttr);
-                painter.setPen(m_edgeCMap->colorFromValue(value));
+                pen.setColor(m_edgeCMap->colorFromValue(value));
+                painter.setPen(m_edgePen);
                 painter.drawLine(ep.second);
             }
         }
     } else {
-        painter.setPen(Qt::gray);
+        painter.setPen(m_edgePen);
         for (const Star& star : m_cache) {
             for (auto const& ep : star.edges) {
                 painter.drawLine(ep.second);
@@ -240,7 +249,7 @@ void GraphView::drawSelectedStar(QPainter& painter, double nodeRadius) const
 
     painter.save();
     // highlight immediate edges
-    painter.setPen(QPen(Qt::black, 3));
+    painter.setPen(QPen(Qt::darkGray, m_edgePen.width() + 3));
     for (auto const& ep : m_selectedStar.edges) {
         painter.drawLine(ep.second);
     }

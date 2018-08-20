@@ -45,6 +45,7 @@ GraphSettings::GraphSettings(ColorMapMgr* cMgr, ExperimentPtr exp, GraphView* pa
 
     connect(m_ui->nodeScale, SIGNAL(valueChanged(int)), SLOT(slotNodeScale(int)));
     connect(m_ui->edgeScale, SIGNAL(valueChanged(int)), SLOT(slotEdgeScale(int)));
+    connect(m_ui->edgeWidth, SIGNAL(valueChanged(int)), SLOT(slotEdgeWidth(int)));
 
     connect(m_ui->bOk, SIGNAL(pressed()), SLOT(close()));
     connect(m_ui->bRestore, SIGNAL(pressed()), SLOT(restoreSettings()));
@@ -64,6 +65,7 @@ void GraphSettings::init()
     QSettings userPrefs;
     m_ui->nodeScale->setValue(userPrefs.value("graphSettings/nodeScale", 10).toInt());
     m_ui->edgeScale->setValue(userPrefs.value("graphSettings/edgeScale", 25).toInt());
+    m_ui->edgeWidth->setValue(userPrefs.value("graphSettings/edgeWidth", 1).toInt());
 
     auto cmap = m_cMgr->defaultCMapKey();
     CMapKey n(userPrefs.value("graphSettings/nodeCMap", cmap.first).toString(),
@@ -82,6 +84,7 @@ void GraphSettings::restoreSettings()
     QSettings userPrefs;
     userPrefs.setValue("graphSettings/nodeScale", 10);
     userPrefs.setValue("graphSettings/edgeScale", 25);
+    userPrefs.setValue("graphSettings/edgeWidth", 1);
     auto cmap = m_cMgr->defaultCMapKey();
     userPrefs.setValue("graphSettings/nodeCMap", cmap.first);
     userPrefs.setValue("graphSettings/nodeCMapSize", cmap.second);
@@ -95,6 +98,7 @@ void GraphSettings::saveAsDefault()
     QSettings userPrefs;
     userPrefs.setValue("graphSettings/nodeScale", nodeScale());
     userPrefs.setValue("graphSettings/edgeScale", edgeScale());
+    userPrefs.setValue("graphSettings/edgeWidth", edgeWidth());
     userPrefs.setValue("graphSettings/nodeCMap", nodeColorSelector()->cmapName());
     userPrefs.setValue("graphSettings/nodeCMapSize", nodeColorSelector()->cmapSize());
     userPrefs.setValue("graphSettings/edgeCMap", edgeColorSelector()->cmapName());
@@ -113,6 +117,12 @@ void GraphSettings::slotEdgeScale(int v)
     m_ui->edgeScale->setToolTip(QString::number(v));
 }
 
+void GraphSettings::slotEdgeWidth(int v)
+{
+    m_parent->setEdgeWidth(v);
+    m_ui->edgeWidth->setToolTip(QString::number(v));
+}
+
 int GraphSettings::nodeScale() const
 {
     return m_ui->nodeScale->value();
@@ -121,6 +131,11 @@ int GraphSettings::nodeScale() const
 int GraphSettings::edgeScale() const
 {
     return m_ui->edgeScale->value();
+}
+
+int GraphSettings::edgeWidth() const
+{
+    return m_ui->edgeWidth->value();
 }
 
 AttrColorSelector* GraphSettings::nodeColorSelector() const

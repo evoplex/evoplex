@@ -43,6 +43,7 @@ public:
 
     int nodeScale() const;
     int edgeScale() const;
+    int edgeWidth() const;
 
     AttrColorSelector* nodeColorSelector() const;
     AttrColorSelector* edgeColorSelector() const;
@@ -55,6 +56,7 @@ public slots:
 private slots:
     void slotNodeScale(int v);
     void slotEdgeScale(int v);
+    void slotEdgeWidth(int v);
 
 private:
     Ui_GraphSettings* m_ui;
