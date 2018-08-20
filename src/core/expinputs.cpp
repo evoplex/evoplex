@@ -123,6 +123,9 @@ ExpInputsPtr ExpInputs::parse(const MainApp* mainApp, const QStringList& header,
     checkAll(ei->m_graphAttrs, graph->pluginAttrsScope());
     checkAll(ei->m_modelAttrs, model->pluginAttrsScope());
 
+    // check if the given node/edge commands are valid
+    checkAttrCommands(ei.get(), failedAttrs);
+
     // even when something goes wrong, if the experiment has found a valid model
     // and graph, it can be opened by the user. In those cases, the modelVersion
     // and graphVersion might be empty or not the same as the loaded plugins.
@@ -262,6 +265,33 @@ void ExpInputs::parseFileCache(ExpInputs* ei, QStringList& failedAttrs, QString&
     }
 }
 
+void ExpInputs::checkAttrCommands(ExpInputs* ei, QStringList& failedAttrs)
+{
+    auto model = ei->modelPlugin();
+    auto gAttrs = ei->m_generalAttrs;
 
+    // node command
+    QString error;
+    auto nAttrs = AttrsGenerator::parse(model->nodeAttrsScope(),
+            gAttrs->value(GENERAL_ATTR_NODES).toQString(), error);
+    if (!nAttrs || !error.isEmpty()) {
+        failedAttrs.append(GENERAL_ATTR_NODES);
+    }
+
+    // edge command
+    if (model->edgeAttrsScope().empty()) {
+        // if the model doesn't define edgeAttrs,
+        // make sure we leave it empty
+        gAttrs->setValue(gAttrs->indexOf(GENERAL_ATTR_EDGEATTRS), "");
+    } else if (ei->graphPlugin()->supportsEdgeAttrsGen()) {
+        // if the graph supports edge commands, make sure it's valid
+        QString error;
+        auto eAttrs = AttrsGenerator::parse(model->edgeAttrsScope(),
+                gAttrs->value(GENERAL_ATTR_EDGEATTRS).toQString(), error);
+        if (!eAttrs || !error.isEmpty()) {
+            failedAttrs.append(GENERAL_ATTR_EDGEATTRS);
+        }
+    }
+}
 
 } // evoplex

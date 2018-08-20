@@ -83,6 +83,7 @@ BaseGraphGL::BaseGraphGL(ExperimentPtr exp, GraphWidget* parent)
 
 BaseGraphGL::~BaseGraphGL()
 {
+    m_attrWidgets.clear();
     m_trial = nullptr;
     m_exp = nullptr;
     delete m_ui;

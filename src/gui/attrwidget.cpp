@@ -50,6 +50,11 @@ AttrWidget::AttrWidget(AttributeRangePtr attrRange, QWidget* parent, QWidget* cu
     setAttribute(Qt::WA_NoSystemBackground);
 }
 
+AttrWidget::~AttrWidget()
+{
+    delete m_widget;
+}
+
 void AttrWidget::setReadOnly(bool r)
 {
     if (m_isReadOnly != r) {

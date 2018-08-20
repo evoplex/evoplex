@@ -54,6 +54,7 @@ void AttrColorSelector::init(ColorMapMgr* cmapMgr, CMapKey cmap, AttributesScope
     blockAllSignals(false);
 
     if (m_attrScope.empty()) {
+        updateCMap();
         return;
     }
 

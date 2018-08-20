@@ -81,6 +81,8 @@ private:
             const QStringList& header, const QStringList& values, QStringList& failedAttrs);
 
     static void parseFileCache(ExpInputs* ei, QStringList& failedAttrs, QString& errMsg);
+
+    static void checkAttrCommands(ExpInputs* ei, QStringList& failedAttrs);
 };
 
 inline const GraphPlugin* ExpInputs::graphPlugin() const

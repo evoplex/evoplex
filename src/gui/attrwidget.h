@@ -34,6 +34,8 @@ class AttrWidget : public QWidget
 public:
     explicit AttrWidget(AttributeRangePtr attrRange, QWidget* parent, QWidget* customWidget=nullptr);
 
+    virtual ~AttrWidget();
+
     // set the current content of the field
     // it does not check if the value matches the attrRange
     void setValue(const Value& value);
