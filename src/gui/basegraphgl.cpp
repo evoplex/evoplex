@@ -41,8 +41,8 @@ BaseGraphGL::BaseGraphGL(ExperimentPtr exp, GraphWidget* parent)
       m_nodeCMap(nullptr),
       m_background(QColor(239,235,231)),
       m_zoomLevel(0),
-      m_nodeSizeRate(10.),
-      m_nodeRadius(m_nodeSizeRate),
+      m_nodeScale(10.),
+      m_nodeRadius(m_nodeScale),
       m_origin(5.,5.),
       m_cacheStatus(CacheStatus::Ready),
       m_posEntered(0.,0.),
@@ -209,10 +209,17 @@ void BaseGraphGL::setTrial(quint16 trialId)
     updateCache();
 }
 
+void BaseGraphGL::setNodeScale(int v)
+{
+    m_nodeScale = v;
+    m_nodeRadius = m_nodeScale * std::pow(1.25f, m_zoomLevel);
+    update();
+}
+
 void BaseGraphGL::zoomIn()
 {
     ++m_zoomLevel;
-    m_nodeRadius = m_nodeSizeRate * std::pow(1.25f, m_zoomLevel);
+    m_nodeRadius = m_nodeScale * std::pow(1.25f, m_zoomLevel);
     updateCache();
     clearSelection();
 }
@@ -220,7 +227,7 @@ void BaseGraphGL::zoomIn()
 void BaseGraphGL::zoomOut()
 {
     --m_zoomLevel;
-    m_nodeRadius = m_nodeSizeRate * std::pow(1.25f, m_zoomLevel);
+    m_nodeRadius = m_nodeScale * std::pow(1.25f, m_zoomLevel);
     updateCache();
     clearSelection();
 }
@@ -229,7 +236,7 @@ void BaseGraphGL::resetView()
 {
     m_origin = QPointF(5., 5.);
     m_zoomLevel = 0;
-    m_nodeRadius = m_nodeSizeRate;
+    m_nodeRadius = m_nodeScale;
     updateCache();
     clearSelection();
 }

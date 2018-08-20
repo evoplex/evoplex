@@ -31,22 +31,34 @@ class Ui_GraphSettings;
 
 namespace evoplex {
 
+class GraphView;
+
 class GraphSettings : public QDialog
 {
     Q_OBJECT
 
 public:
-    explicit GraphSettings(ColorMapMgr* cMgr, ExperimentPtr exp, QWidget* parent);
+    explicit GraphSettings(ColorMapMgr* cMgr, ExperimentPtr exp, GraphView* parent);
     ~GraphSettings();
+
+    int nodeScale() const;
+    int edgeScale() const;
 
     AttrColorSelector* nodeColorSelector() const;
     AttrColorSelector* edgeColorSelector() const;
 
 public slots:
     void init();
+    void restoreSettings();
+    void saveAsDefault();
+
+private slots:
+    void slotNodeScale(int v);
+    void slotEdgeScale(int v);
 
 private:
     Ui_GraphSettings* m_ui;
+    GraphView* m_parent;
     ColorMapMgr* m_cMgr;
     const ExperimentPtr m_exp;
 };

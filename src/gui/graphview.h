@@ -29,6 +29,7 @@ namespace evoplex {
 class GraphView : public BaseGraphGL
 {
     Q_OBJECT
+
 public:
     explicit GraphView(ColorMapMgr* cMgr, ExperimentPtr exp, GraphWidget* parent);
 
@@ -36,6 +37,7 @@ public slots:
     inline void zoomIn() override;
     inline void zoomOut() override;
     inline void openSettings() override;
+    void setEdgeScale(int v);
 
 protected:
     void paintEvent(QPaintEvent*) override;
@@ -52,7 +54,7 @@ private:
 
     int m_edgeAttr;
     ColorMap* m_edgeCMap;
-    qreal m_edgeSizeRate;
+    qreal m_edgeScale;
 
     bool m_showNodes;
     bool m_showEdges;
@@ -97,7 +99,7 @@ inline void GraphView::openSettings()
 { m_settingsDlg->show(); }
 
 inline qreal GraphView::currEdgeSize() const
-{ return m_edgeSizeRate * std::pow(1.25f, m_zoomLevel); }
+{ return m_edgeScale * std::pow(1.25f, m_zoomLevel); }
 
 inline QPointF GraphView::nodePoint(const Node& node, const qreal& edgeSizeRate) const
 {

@@ -42,7 +42,7 @@ AttrColorSelector::~AttrColorSelector()
     delete m_cmap;
 }
 
-void AttrColorSelector::init(ColorMapMgr* cmapMgr, AttributesScope scope)
+void AttrColorSelector::init(ColorMapMgr* cmapMgr, CMapKey cmap, AttributesScope scope)
 {
     m_cmapMgr = cmapMgr;
     m_attrScope = scope;
@@ -61,9 +61,9 @@ void AttrColorSelector::init(ColorMapMgr* cmapMgr, AttributesScope scope)
         m_ui->attr->addItem(aRange->attrName());
     }
     m_ui->cmapName->insertItems(0, m_cmapMgr->names());
-    m_ui->cmapName->setCurrentText(m_cmapMgr->defaultCMapKey().first);
-    slotCMapName(m_cmapMgr->defaultCMapKey().first); // fill sizes
-    m_ui->cmapSize->setCurrentText(QString::number(m_cmapMgr->defaultCMapKey().second));
+    m_ui->cmapName->setCurrentText(cmap.first);
+    slotCMapName(cmap.first); // call once to fill sizes
+    m_ui->cmapSize->setCurrentText(QString::number(cmap.second));
     updateCMap();
 }
 
@@ -93,6 +93,16 @@ void AttrColorSelector::blockAllSignals(bool b)
     m_ui->attr->blockSignals(b);
     m_ui->cmapName->blockSignals(b);
     m_ui->cmapSize->blockSignals(b);
+}
+
+QString AttrColorSelector::cmapName() const
+{
+    return m_ui->cmapName->currentText();
+}
+
+int AttrColorSelector::cmapSize() const
+{
+    return m_ui->cmapSize->currentText().toInt();
 }
 
 } // evoplex

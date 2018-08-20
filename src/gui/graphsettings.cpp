@@ -18,20 +18,37 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <QSettings>
+#include <QSlider>
+
 #include "graphsettings.h"
 #include "ui_graphsettings.h"
 #include "maingui.h"
+#include "graphview.h"
 
 namespace evoplex {
 
-GraphSettings::GraphSettings(ColorMapMgr* cMgr, ExperimentPtr exp, QWidget *parent)
+GraphSettings::GraphSettings(ColorMapMgr* cMgr, ExperimentPtr exp, GraphView* parent)
     : QDialog(parent, MainGUI::kDefaultDlgFlags),
       m_ui(new Ui_GraphSettings),
+      m_parent(parent),
       m_cMgr(cMgr),
       m_exp(exp)
 {
     m_ui->setupUi(this);
     connect(m_exp.get(), SIGNAL(restarted()), SLOT(init()));
+
+    connect(m_ui->nodesColor, SIGNAL(cmapUpdated(ColorMap*)),
+            parent, SLOT(setNodeCMap(ColorMap*)));
+    connect(m_ui->edgesColor, SIGNAL(cmapUpdated(ColorMap*)),
+            parent, SLOT(setEdgeCMap(ColorMap*)));
+
+    connect(m_ui->nodeScale, SIGNAL(valueChanged(int)), SLOT(slotNodeScale(int)));
+    connect(m_ui->edgeScale, SIGNAL(valueChanged(int)), SLOT(slotEdgeScale(int)));
+
+    connect(m_ui->bOk, SIGNAL(pressed()), SLOT(close()));
+    connect(m_ui->bRestore, SIGNAL(pressed()), SLOT(restoreSettings()));
+    connect(m_ui->bSaveAsDefault, SIGNAL(pressed()), SLOT(saveAsDefault()));
 }
 
 GraphSettings::~GraphSettings()
@@ -44,9 +61,66 @@ void GraphSettings::init()
     Q_ASSERT_X(m_exp->modelPlugin(), "GraphSettings",
                "tried to init the graph settings for a null model!");
 
-    m_ui->nodesColor->init(m_cMgr, m_exp->modelPlugin()->nodeAttrsScope());
+    QSettings userPrefs;
+    m_ui->nodeScale->setValue(userPrefs.value("graphSettings/nodeScale", 10).toInt());
+    m_ui->edgeScale->setValue(userPrefs.value("graphSettings/edgeScale", 25).toInt());
 
-    m_ui->edgesColor->init(m_cMgr, m_exp->modelPlugin()->edgeAttrsScope());
+    auto cmap = m_cMgr->defaultCMapKey();
+    CMapKey n(userPrefs.value("graphSettings/nodeCMap", cmap.first).toString(),
+              userPrefs.value("graphSettings/nodeCMapSize", cmap.second).toInt());
+    m_ui->nodesColor->init(m_cMgr, n, m_exp->modelPlugin()->nodeAttrsScope());
+    m_ui->nodesColor->setVisible(!m_exp->modelPlugin()->nodeAttrsScope().empty());
+
+    CMapKey e(userPrefs.value("graphSettings/edgeCMap", cmap.first).toString(),
+              userPrefs.value("graphSettings/edgeCMapSize", cmap.second).toInt());
+    m_ui->edgesColor->init(m_cMgr, e, m_exp->modelPlugin()->edgeAttrsScope());
+    m_ui->edgesColor->setVisible(!m_exp->modelPlugin()->edgeAttrsScope().empty());
+}
+
+void GraphSettings::restoreSettings()
+{
+    QSettings userPrefs;
+    userPrefs.setValue("graphSettings/nodeScale", 10);
+    userPrefs.setValue("graphSettings/edgeScale", 25);
+    auto cmap = m_cMgr->defaultCMapKey();
+    userPrefs.setValue("graphSettings/nodeCMap", cmap.first);
+    userPrefs.setValue("graphSettings/nodeCMapSize", cmap.second);
+    userPrefs.setValue("graphSettings/edgeCMap", cmap.first);
+    userPrefs.setValue("graphSettings/edgeCMapSize", cmap.second);
+    init();
+}
+
+void GraphSettings::saveAsDefault()
+{
+    QSettings userPrefs;
+    userPrefs.setValue("graphSettings/nodeScale", nodeScale());
+    userPrefs.setValue("graphSettings/edgeScale", edgeScale());
+    userPrefs.setValue("graphSettings/nodeCMap", nodeColorSelector()->cmapName());
+    userPrefs.setValue("graphSettings/nodeCMapSize", nodeColorSelector()->cmapSize());
+    userPrefs.setValue("graphSettings/edgeCMap", edgeColorSelector()->cmapName());
+    userPrefs.setValue("graphSettings/edgeCMapSize", edgeColorSelector()->cmapSize());
+}
+
+void GraphSettings::slotNodeScale(int v)
+{
+    m_parent->setNodeScale(v);
+    m_ui->nodeScale->setToolTip(QString::number(v));
+}
+
+void GraphSettings::slotEdgeScale(int v)
+{
+    m_parent->setEdgeScale(v);
+    m_ui->edgeScale->setToolTip(QString::number(v));
+}
+
+int GraphSettings::nodeScale() const
+{
+    return m_ui->nodeScale->value();
+}
+
+int GraphSettings::edgeScale() const
+{
+    return m_ui->edgeScale->value();
 }
 
 AttrColorSelector* GraphSettings::nodeColorSelector() const

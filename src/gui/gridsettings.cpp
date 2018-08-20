@@ -32,7 +32,10 @@ GridSettings::GridSettings(ColorMapMgr* cMgr, ExperimentPtr exp, QWidget *parent
     m_ui->setupUi(this);
 
     connect(m_exp.get(), SIGNAL(restarted()), SLOT(init()));
-    init();
+
+    connect(m_ui->bOk, SIGNAL(pressed()), SLOT(close()));
+    connect(m_ui->bRestore, SIGNAL(pressed()), SLOT(restoreSettings()));
+    connect(m_ui->bSaveAsDefault, SIGNAL(pressed()), SLOT(saveAsDefault()));
 }
 
 GridSettings::~GridSettings()
@@ -45,7 +48,27 @@ void GridSettings::init()
     Q_ASSERT_X(m_exp->modelPlugin(), "GridSettings",
                "tried to init the graph settings for a null model!");
 
-    m_ui->nodesColor->init(m_cMgr, m_exp->modelPlugin()->nodeAttrsScope());
+    QSettings userPrefs;
+    auto cmap = m_cMgr->defaultCMapKey();
+    CMapKey n(userPrefs.value("graphSettings/nodeCMap", cmap.first).toString(),
+              userPrefs.value("graphSettings/nodeCMapSize", cmap.second).toInt());
+    m_ui->nodesColor->init(m_cMgr, n, m_exp->modelPlugin()->nodeAttrsScope());
+}
+
+void GridSettings::restoreSettings()
+{
+    auto cmap = m_cMgr->defaultCMapKey();
+    QSettings userPrefs;
+    userPrefs.setValue("graphSettings/nodeCMap", cmap.first);
+    userPrefs.setValue("graphSettings/nodeCMapSize", cmap.second);
+    init();
+}
+
+void GridSettings::saveAsDefault()
+{
+    QSettings userPrefs;
+    userPrefs.setValue("graphSettings/nodeCMap", nodeColorSelector()->cmapName());
+    userPrefs.setValue("graphSettings/nodeCMapSize", nodeColorSelector()->cmapSize());
 }
 
 AttrColorSelector* GridSettings::nodeColorSelector() const

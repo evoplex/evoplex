@@ -37,7 +37,9 @@ public:
     explicit AttrColorSelector(QWidget *parent = nullptr);
     ~AttrColorSelector();
 
-    void init(ColorMapMgr* cmapMgr, AttributesScope scope);
+    void init(ColorMapMgr* cmapMgr, CMapKey cmap, AttributesScope scope);
+    QString cmapName() const;
+    int cmapSize() const;
     inline ColorMap* cmap() const;
 
 signals:

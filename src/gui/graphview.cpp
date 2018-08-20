@@ -34,14 +34,11 @@ GraphView::GraphView(ColorMapMgr* cMgr, ExperimentPtr exp, GraphWidget* parent)
       m_settingsDlg(new GraphSettings(cMgr, exp, this)),
       m_edgeAttr(-1),
       m_edgeCMap(nullptr),
-      m_edgeSizeRate(25.),
       m_nodePen(Qt::black)
 {
-    connect(m_settingsDlg->nodeColorSelector(),
-            SIGNAL(cmapUpdated(ColorMap*)), SLOT(setNodeCMap(ColorMap*)));
-    connect(m_settingsDlg->edgeColorSelector(),
-            SIGNAL(cmapUpdated(ColorMap*)), SLOT(setEdgeCMap(ColorMap*)));
     m_settingsDlg->init();
+    setNodeScale(m_settingsDlg->nodeScale());
+    m_edgeScale = m_settingsDlg->edgeScale();
 
     m_showNodes = m_ui->bShowNodes->isChecked();
     m_showEdges = m_ui->bShowEdges->isChecked();
@@ -153,6 +150,12 @@ void GraphView::setEdgeCMap(ColorMap* cmap)
     m_edgeCMap = cmap;
     m_edgeAttr = cmap ? cmap->attrRange()->id() : -1;
     update();
+}
+
+void GraphView::setEdgeScale(int v)
+{
+    m_edgeScale = v;
+    updateCache();
 }
 
 void GraphView::updateNodePen()

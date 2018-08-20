@@ -43,6 +43,8 @@ public:
 
 public slots:
     void init();
+    void restoreSettings();
+    void saveAsDefault();
 
 private:
     Ui_GridSettings* m_ui;

@@ -79,7 +79,7 @@ protected:
 
     QBrush m_background;
     int m_zoomLevel;
-    qreal m_nodeSizeRate;
+    qreal m_nodeScale;
     qreal m_nodeRadius;
     QPointF m_origin;
 
@@ -103,6 +103,7 @@ public slots:
     virtual void zoomOut();
     void updateView(bool forceUpdate);
     void setTrial(quint16 trialId);
+    void setNodeScale(int v);
 
 private slots:
     void slotRestarted();
