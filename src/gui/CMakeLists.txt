@@ -46,6 +46,7 @@ set(EVOPLEX_GUI_H
   projectspage.h
   #queuepage.h
   settingspage.h
+  titlebar.h
   welcomepage.h
 )
 
@@ -77,6 +78,7 @@ set(EVOPLEX_GUI_CXX
   projectspage.cpp
   #queuepage.cpp
   settingspage.cpp
+  titlebar.cpp
   welcomepage.cpp
 )
 
@@ -95,6 +97,7 @@ set(EVOPLEX_GUI_UIFORM
   queuepage
   savedialog
   settingspage
+  titlebar
   welcomepage
 )
 foreach(uiform ${EVOPLEX_GUI_UIFORM})

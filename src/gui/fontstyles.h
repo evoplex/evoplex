@@ -45,6 +45,7 @@ public:
     static QFont subtitle2();
     static QFont body1();
     static QFont body2();
+    static QFont caption();
 };
 
 #endif // FONTSTYLES_H

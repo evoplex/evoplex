@@ -41,3 +41,4 @@ QFont FontStyles::subtitle1() { return font(regular, 16, 0.15); }
 QFont FontStyles::subtitle2() { return font(medium, 14, 0.15); }
 QFont FontStyles::body1() { return font(regular, 16, 0.5); }
 QFont FontStyles::body2() { return font(regular, 14, 0.25); }
+QFont FontStyles::caption() { return font(regular, 12, 0.4); }

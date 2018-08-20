@@ -28,6 +28,7 @@
 #include "experimentwidget.h"
 #include "linechart.h"
 #include "graphwidget.h"
+#include "titlebar.h"
 
 namespace evoplex {
 
@@ -46,6 +47,10 @@ ExperimentWidget::ExperimentWidget(ExperimentPtr exp, MainGUI* mainGUI, Projects
     setWindowTitle(objectName());
     setFocusPolicy(Qt::StrongFocus);
 
+    auto titlebar = new TitleBar(this);
+    titlebar->setSubtitle("EXPERIMENT");
+    setTitleBarWidget(titlebar);
+
     // setup the inner qmainwindow
     m_innerWindow->setObjectName("experimentWindow");
     m_innerWindow->setDockOptions(QMainWindow::AllowTabbedDocks | QMainWindow::GroupedDragging);
@@ -53,7 +58,8 @@ ExperimentWidget::ExperimentWidget(ExperimentPtr exp, MainGUI* mainGUI, Projects
     m_innerWindow->setAnimated(true);
     m_innerWindow->setCentralWidget(nullptr);
 
-    QToolBar* tb = new QToolBar("Controls", this);
+    QToolBar* tb = new QToolBar("Controls", m_innerWindow);
+    tb->setObjectName("Controls");
     m_aPlayPause = tb->addAction(m_kIcon_play, "Play/Pause");
     m_aNext = tb->addAction(m_kIcon_next, "Next step");
     m_aStop = tb->addAction(m_kIcon_stop, "Stop");
@@ -102,6 +108,8 @@ ExperimentWidget::ExperimentWidget(ExperimentPtr exp, MainGUI* mainGUI, Projects
     slotStatusChanged(exp->expStatus()); // just to init the controls
 
     QVBoxLayout* layout = new QVBoxLayout(new QWidget(this));
+    layout->setMargin(0);
+    layout->setSpacing(0);
     layout->addWidget(m_innerWindow);
     layout->addWidget(tb);
     setWidget(layout->parentWidget());

@@ -1,31 +1,36 @@
-QLineEdit, QSpinBox, QDoubleSpinBox {
-  color: rgb(255, 255, 255);
-  background-color: transparent;
+QLineEdit, QSpinBox, QDoubleSpinBox, LineButton {
+  background: transparent;
+  color: white;
   border-bottom-width: 1px;
   border-style: solid;
   border-color: rgb(40,40,40);
 }
 QLineEdit:focus, QSpinBox:focus, QDoubleSpinBox:focus {
+  background: transparent;
   border-color: rgb(42, 130, 218);
 }
 QLineEdit:hover, QSpinBox:hover, QDoubleSpinBox:hover {
+  background: transparent;
   border-color: rgb(42, 130, 218);
 }
+QComboBox, QMenu {
+  background: rgb(40, 40, 40);
+  selection-background-color: rgb(64, 64, 64);
+  color: white;
+}
+QComboBox QAbstractItemView, QMenu QAbstractItemView {
+  background: rgb(40, 40, 40);
+  selection-background-color: lightgray;
+}
+QCheckBox {
+  background-color: transparent;
+  color: white;
+}
 
-QTreeWidget {
-  background-color: rgb(51, 51, 51);
+/* MainGUI */
+QMainWindow#MainGUI {
+  background: rgb(51, 51, 51);
 }
-QTreeWidget::item {
-  height: 26px;
-  margin-top: 4px;
-  padding-left: 6px;
-  padding-right: 10px;
-}
-QTreeWidget::item:has-children {
-  margin-top: 8px;
-  margin-bottom: -3px;
-}
-
 QToolBar {
   font: 8px;
   spacing: 3px;
@@ -35,15 +40,66 @@ QToolBar#mainToolbar > QToolButton {
   padding: 8px;
 }
 
+/* TitleBar */
+QWidget#TitleBar {
+  background-color: qlineargradient(spread:pad,
+    x1:0, y1:0, x2:0, y2:1,
+    stop:0 rgba(51, 51, 51, 255),
+    stop:1 rgba(40,40,40, 255));
+}
+
 /* ProjectsPage */
 QWidget#contents {
-  background-color: rgb(24, 24, 24);
+  background-color: qlineargradient(spread:pad,
+    x1:0, y1:0, x2:0, y2:1,
+    stop:0 rgba(40, 40, 40, 255),
+    stop:0.2 rgba(24, 24, 24, 255),
+    stop:1 rgba(24,24,24, 255));
+}
+QTabBar {
+  background: rgb(51, 51, 51);
 }
 
 /* ExperimentWidget */
 QMainWindow#experimentWindow {
-  background-color: rgb(24,24,24);
+  background-color: qlineargradient(spread:pad,
+    x1:0, y1:0, x2:0, y2:1,
+    stop:0 rgba(40, 40, 40, 255),
+    stop:0.2 rgba(24, 24, 24, 255),
+    stop:1 rgba(24,24,24, 255));
 }
 QWidget#GraphTitleBar {
   background-color:rgb(40,40,40);
+}
+QMainWindow#experimentWindow > QToolBar, QToolBar#Controls {
+  background: rgb(51, 51, 51);
+  padding: 0 10px 0 10px;
+}
+
+/* ExperimentDesigner */
+QTreeWidget#treeWidget {
+  /*background-color: rgb(51, 51, 51);*/
+  background: transparent;
+}
+QTreeWidget::item#treeWidget {
+  background: transparent;
+  height: 26px;
+  margin-top: 4px;
+  padding-left: 6px;
+  padding-right: 10px;
+}
+QTreeWidget::item:has-children#treeWidget {
+  background: transparent;
+  margin-top: 8px;
+  margin-bottom: -3px;
+}
+QWidget#expDesignerContents {
+  background-color: qlineargradient(spread:pad,
+    x1:0, y1:0, x2:0, y2:1,
+    stop:0 rgba(40, 40, 40, 255),
+    stop:0.2 rgba(24, 24, 24, 255),
+    stop:1 rgba(24,24,24, 255));
+}
+QWidget#expDesignerContents QWidget#widget {
+  background-color: rgb(51,51,51);
 }

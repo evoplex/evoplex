@@ -18,20 +18,21 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TITLEBAR_H
-#define TITLEBAR_H
+#ifndef GRAPHTITLEBAR_H
+#define GRAPHTITLEBAR_H
 
 #include <QDockWidget>
 #include <QIcon>
 #include <QWidget>
 
 #include "core/experiment.h"
+#include "titlebar.h"
 
 class Ui_GraphTitleBar;
 
 namespace evoplex {
 
-class GraphTitleBar : public QWidget
+class GraphTitleBar : public BaseTitleBar
 {
     Q_OBJECT
 
@@ -45,22 +46,11 @@ signals:
 
 private slots:
     void slotRestarted();
-    void slotFloating(bool isFloating);
-    void slotFullScreen();
-
-protected:
-    virtual void paintEvent(QPaintEvent* pe);
 
 private:
-    QDockWidget* m_parent;
     Ui_GraphTitleBar* m_ui;
     const Experiment* m_exp;
-
-    const QIcon m_kIconFull;
-    const QIcon m_kIconFullExit;
-    const QIcon m_kIconDetach;
-    const QIcon m_kIconAttach;
 };
 
 } // evoplex
-#endif // TITLEBAR_H
+#endif // GRAPHTITLEBAR_H

@@ -29,15 +29,16 @@
 #include "projectwidget.h"
 #include "fontstyles.h"
 #include "savedialog.h"
+#include "titlebar.h"
 #include "ui_projectwidget.h"
 
 namespace evoplex {
 
 ProjectWidget::ProjectWidget(ProjectPtr project, MainGUI* mainGUI, ProjectsPage* ppage)
-    : PPageDockWidget(ppage)
-    , m_ui(new Ui_ProjectWidget)
-    , m_mainGUI(mainGUI)
-    , m_project(project)
+    : PPageDockWidget(ppage),
+      m_ui(new Ui_ProjectWidget),
+      m_mainGUI(mainGUI),
+      m_project(project)
 {
     m_ui->setupUi(this);
 
@@ -45,7 +46,18 @@ ProjectWidget::ProjectWidget(ProjectPtr project, MainGUI* mainGUI, ProjectsPage*
     setWindowTitle(objectName());
     setFocusPolicy(Qt::StrongFocus);
 
-    m_ui->labelExps->setFont(FontStyles::subtitle1());
+    auto titlebar = new TitleBar(this);
+    titlebar->setSubtitle("PROJECT");
+    connect(this, SIGNAL(objectNameChanged(QString)),
+            titlebar, SLOT(setTitle(QString)));
+
+    auto bPlayAll = new QPushButton(this);
+    titlebar->addButton(bPlayAll, ":/icons/material/playall_white_24", "play all experiments");
+    connect(bPlayAll, SIGNAL(pressed()), m_project.get(), SLOT(playAll()));
+
+    setTitleBarWidget(titlebar);
+
+    m_ui->labelExps->setFont(FontStyles::subtitle2());
 
     connect(m_project.get(), SIGNAL(expAdded(int)), SLOT(slotInsertRow(int)));
     connect(m_project.get(), SIGNAL(expEdited(int)), SLOT(slotUpdateRow(int)));
@@ -61,8 +73,6 @@ ProjectWidget::ProjectWidget(ProjectPtr project, MainGUI* mainGUI, ProjectsPage*
     m_headerIdx.insert(TableWidget::H_TRIALS, col++);
     m_ui->table->insertColumns(m_headerIdx.keys());
     m_ui->table->init(mainGUI->mainApp()->expMgr());
-
-    connect(m_ui->playAll, &QPushButton::pressed, [this]() { m_project->playAll(); });
 
     connect(m_ui->table, SIGNAL(itemSelectionChanged()), SLOT(slotSelectionChanged()));
     connect(m_ui->table, SIGNAL(itemDoubleClicked(QTableWidgetItem*)),

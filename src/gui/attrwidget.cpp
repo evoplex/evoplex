@@ -41,6 +41,13 @@ AttrWidget::AttrWidget(AttributeRangePtr attrRange, QWidget* parent, QWidget* cu
     l->setMargin(0);
     l->setSpacing(0);
     setLayout(l);
+
+    // let's ensure that the AttrWidget is not filled with the main palette
+    // background. It's particularly important when placing AttrWidgets in
+    // a QTreeWidget; whithout this flag, they will use the system background
+    // color when expanding/collapsing the tree, which causes a ugly flashing
+    // effect.
+    setAttribute(Qt::WA_NoSystemBackground);
 }
 
 void AttrWidget::setReadOnly(bool r)

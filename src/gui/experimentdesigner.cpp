@@ -39,10 +39,15 @@ ExperimentDesigner::ExperimentDesigner(MainApp* mainApp, QWidget *parent)
     : QDockWidget(parent)
     , m_mainApp(mainApp)
     , m_project(nullptr)
+    , m_titleBar(new TitleBar(this))
     , m_ui(new Ui_ExperimentDesigner)
 {
     setObjectName("ExperimentDesigner");
     m_ui->setupUi(this);
+
+    m_titleBar->setSubtitle("EXPERIMENT DESIGNER");
+    m_titleBar->setTitle(objectName());
+    setTitleBarWidget(m_titleBar);
 
     m_ui->treeWidget->setFocusPolicy(Qt::NoFocus);
     m_ui->bRemove->hide();
@@ -209,9 +214,11 @@ void ExperimentDesigner::slotSetActiveWidget(int idx)
         m_ui->bSubmit->setVisible(!ew);
         m_ui->bSubmit->setVisible(true);
         setExperiment(ew ? ew->exp() : nullptr);
+        m_titleBar->setTitle(dw->objectName());
     } else {
         m_project = nullptr;
         m_ui->bSubmit->setVisible(false);
+        m_titleBar->setTitle(objectName());
     }
 }
 

@@ -66,9 +66,6 @@ public:
     // A project is composed of plain csv files
     bool saveProject(QString& errMsg, std::function<void(int)>& progress);
 
-    // execute all experiments of this project.
-    void playAll();
-
     void setFilePath(const QString& path);
 
     // generate a valid experiment id
@@ -81,6 +78,10 @@ public:
     inline const Experiments& experiments() const;
     inline bool hasUnsavedChanges() const;
     inline bool isRunning() const;
+
+public slots:
+    // execute all experiments of this project.
+    void playAll();
 
 signals:
     void expAdded(int expId);

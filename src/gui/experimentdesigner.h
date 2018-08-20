@@ -26,9 +26,11 @@
 #include <QTreeWidgetItem>
 #include <QHash>
 
+#include "core/project.h"
+
 #include "attrwidget.h"
 #include "projectspage.h"
-#include "core/project.h"
+#include "titlebar.h"
 
 class Ui_ExperimentDesigner;
 
@@ -69,6 +71,7 @@ private:
     PluginKey m_selectedGraphKey;
     PluginKey m_selectedModelKey;
 
+    TitleBar* m_titleBar;
     Ui_ExperimentDesigner* m_ui;
     QTreeWidgetItem* m_treeItemGeneral;
     QTreeWidgetItem* m_treeItemOutputs;

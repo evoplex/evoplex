@@ -98,5 +98,21 @@
         <file>material-icons/navigation/png/ic_fullscreen_white_24dp.png</file>
         <file>material-icons/navigation/png/ic_fullscreen_white_36dp.png</file>
         <file>material-icons/navigation/png/ic_fullscreen_white_48dp.png</file>
+        <file>material-icons/av/png/ic_playlist_play_black_18dp.png</file>
+        <file>material-icons/av/png/ic_playlist_play_black_24dp.png</file>
+        <file>material-icons/av/png/ic_playlist_play_black_36dp.png</file>
+        <file>material-icons/av/png/ic_playlist_play_black_48dp.png</file>
+        <file>material-icons/av/png/ic_playlist_play_white_18dp.png</file>
+        <file alias="playall_white_24">material-icons/av/png/ic_playlist_play_white_24dp.png</file>
+        <file>material-icons/av/png/ic_playlist_play_white_36dp.png</file>
+        <file>material-icons/av/png/ic_playlist_play_white_48dp.png</file>
+        <file>material-icons/action/png/ic_settings_black_18dp.png</file>
+        <file>material-icons/action/png/ic_settings_black_24dp.png</file>
+        <file>material-icons/action/png/ic_settings_black_36dp.png</file>
+        <file>material-icons/action/png/ic_settings_black_48dp.png</file>
+        <file alias="settings_white_18">material-icons/action/png/ic_settings_white_18dp.png</file>
+        <file alias="settings_white_24">material-icons/action/png/ic_settings_white_24dp.png</file>
+        <file>material-icons/action/png/ic_settings_white_36dp.png</file>
+        <file>material-icons/action/png/ic_settings_white_48dp.png</file>
     </qresource>
 </RCC>

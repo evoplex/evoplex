@@ -24,13 +24,13 @@
     <number>0</number>
    </property>
    <property name="topMargin">
-    <number>0</number>
+    <number>3</number>
    </property>
    <property name="rightMargin">
     <number>4</number>
    </property>
    <property name="bottomMargin">
-    <number>0</number>
+    <number>3</number>
    </property>
    <item>
     <widget class="QLabel" name="label">
@@ -66,21 +66,56 @@
     </widget>
    </item>
    <item>
-    <widget class="QPushButton" name="bSettings">
-     <property name="maximumSize">
+    <spacer name="horizontalSpacer_2">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Fixed</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
       <size>
-       <width>16777215</width>
+       <width>8</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item>
+    <widget class="QPushButton" name="bSettings">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>22</width>
        <height>18</height>
       </size>
      </property>
-     <property name="text">
-      <string>Settings</string>
+     <property name="maximumSize">
+      <size>
+       <width>22</width>
+       <height>18</height>
+      </size>
+     </property>
+     <property name="toolTip">
+      <string>settings</string>
+     </property>
+     <property name="icon">
+      <iconset resource="../res/guiRes.qrc">
+       <normaloff>:/icons/material/material-icons/action/png/ic_settings_white_36dp.png</normaloff>:/icons/material/material-icons/action/png/ic_settings_white_36dp.png</iconset>
      </property>
      <property name="iconSize">
       <size>
        <width>18</width>
        <height>18</height>
       </size>
+     </property>
+     <property name="flat">
+      <bool>true</bool>
      </property>
     </widget>
    </item>
