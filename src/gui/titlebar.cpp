@@ -22,6 +22,7 @@
 #include <QDebug>
 #include <QDesktopWidget>
 #include <QPainter>
+#include <QStyleOption>
 
 #include "fontstyles.h"
 #include "titlebar.h"
