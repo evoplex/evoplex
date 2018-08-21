@@ -62,6 +62,7 @@ class AbstractModel : public AbstractPlugin, public AbstractModelInterface
     friend class Trial;
 
 public:
+    const QString& graphId() const;
     AbstractGraph* graph() const;
 
     // current time step

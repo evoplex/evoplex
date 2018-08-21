@@ -52,6 +52,7 @@ public:
     // number of steps or the pause criteria defined by the user.
     void run() override;
 
+    const QString& graphId() const;
     GraphType graphType() const;
 
     inline quint16 id() const;

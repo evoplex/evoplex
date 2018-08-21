@@ -44,6 +44,11 @@ bool AbstractGraph::setup(Trial& trial, AttrsGeneratorPtr edgeGen,
     return AbstractPlugin::setup(trial, attrs);
 }
 
+const QString& AbstractGraph::id() const
+{
+    return m_trial->graphId();
+}
+
 GraphType AbstractGraph::type() const
 {
     return m_trial->graphType();

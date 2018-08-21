@@ -49,6 +49,9 @@ class AbstractGraph : public AbstractPlugin, public AbstractGraphInterface
     friend class Trial;
 
 public:
+    // returns the graph id
+    const QString& id() const;
+
     GraphType type() const;
     inline bool isDirected() const;
     inline bool isUndirected() const;

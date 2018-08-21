@@ -23,6 +23,9 @@
 
 namespace evoplex {
 
+const QString& AbstractModel::graphId() const
+{ return m_trial->graphId(); }
+
 AbstractGraph* AbstractModel::graph() const
 { return m_trial->graph(); }
 

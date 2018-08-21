@@ -54,6 +54,11 @@ Trial::~Trial()
     delete m_prg;
 }
 
+const QString& Trial::graphId() const
+{
+    return m_exp->graphPlugin()->id();
+}
+
 GraphType Trial::graphType() const
 {
     return  m_exp->graphType();
