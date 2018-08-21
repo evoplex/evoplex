@@ -1,5 +1,6 @@
-#include "lib/qtmaterialoverlaywidget.h"
 #include <QEvent>
+
+#include "qtmaterialoverlaywidget.h"
 
 /*!
  *  \class QtMaterialOverlayWidget

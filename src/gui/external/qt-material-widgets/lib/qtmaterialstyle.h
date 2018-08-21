@@ -2,7 +2,7 @@
 #define QTMATERIALSTYLE_H
 
 #include <QtWidgets/QCommonStyle>
-#include "lib/qtmaterialstyle_p.h"
+#include "qtmaterialstyle_p.h"
 
 #define MATERIAL_DISABLE_THEME_COLORS \
     if (d->useThemeColors == true) { d->useThemeColors = false; }

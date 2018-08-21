@@ -1,8 +1,9 @@
-#include "lib/qtmaterialtheme.h"
-#include "lib/qtmaterialtheme_p.h"
 #include <QString>
 #include <QStringBuilder>
 #include <QDebug>
+
+#include "qtmaterialtheme.h"
+#include "qtmaterialtheme_p.h"
 
 /*!material
  *  \class QtMaterialThemePrivate
