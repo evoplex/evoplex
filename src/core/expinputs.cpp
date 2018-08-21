@@ -271,11 +271,13 @@ void ExpInputs::checkAttrCommands(ExpInputs* ei, QStringList& failedAttrs)
     auto gAttrs = ei->m_generalAttrs;
 
     // node command
-    QString error;
-    auto nAttrs = AttrsGenerator::parse(model->nodeAttrsScope(),
-            gAttrs->value(GENERAL_ATTR_NODES).toQString(), error);
-    if (!nAttrs || !error.isEmpty()) {
-        failedAttrs.append(GENERAL_ATTR_NODES);
+    QString nodeCmd = gAttrs->value(GENERAL_ATTR_NODES).toQString();
+    if (!QFileInfo::exists(nodeCmd)) { // not an existing file
+        QString error;
+        auto nAttrs = AttrsGenerator::parse(model->nodeAttrsScope(), nodeCmd, error);
+        if (!nAttrs || !error.isEmpty()) {
+            failedAttrs.append(GENERAL_ATTR_NODES);
+        }
     }
 
     // edge command
