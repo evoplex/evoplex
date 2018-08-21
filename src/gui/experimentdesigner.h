@@ -62,7 +62,7 @@ private slots:
     void slotGraphSelected(int cbIdx);
     void slotPluginAdded(const Plugin* plugin);
     void slotPluginRemoved(PluginKey key, PluginType type);
-    void slotSetActiveWidget(int idx);
+    void slotActiveWidget(int idx);
 
 private:
     MainApp* m_mainApp;

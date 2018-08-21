@@ -72,7 +72,7 @@ ExperimentDesigner::ExperimentDesigner(MainApp* mainApp, QWidget *parent)
     connect(m_bAdd, SIGNAL(clicked(bool)), SLOT(slotCreateExperiment()));
 
     m_ui->treeWidget->setFocusPolicy(Qt::NoFocus);
-    connect(m_ui->cbWidgets, SIGNAL(currentIndexChanged(int)), SLOT(slotSetActiveWidget(int)));
+    connect(m_ui->cbWidgets, SIGNAL(currentIndexChanged(int)), SLOT(slotActiveWidget(int)));
 
     // setup the tree widget: model
     m_treeItemModels = new QTreeWidgetItem(m_ui->treeWidget);
@@ -216,12 +216,12 @@ void ExperimentDesigner::setActiveWidget(PPageDockWidget* dw)
 {
     int id = m_ui->cbWidgets->findData(QVariant::fromValue(dw));
     if (id == -1 || !dw->project()) {
-        qFatal("project is null or qdockwidget is not in the list!");
+        qWarning() << "project is null or qdockwidget is not in the list!";
     }
     m_ui->cbWidgets->setCurrentIndex(id);
 }
 
-void ExperimentDesigner::slotSetActiveWidget(int idx)
+void ExperimentDesigner::slotActiveWidget(int idx)
 {
     QVariant v = m_ui->cbWidgets->itemData(idx);
     if (v.isValid() && !v.isNull()) {
@@ -231,7 +231,6 @@ void ExperimentDesigner::slotSetActiveWidget(int idx)
         m_project = dw->project();
         ExperimentWidget* ew = qobject_cast<ExperimentWidget*>(dw);
         m_bAdd->setVisible(!ew);
-        m_bAdd->setVisible(true);
         setExperiment(ew ? ew->exp() : nullptr);
         setWindowTitle(dw->objectName());
     } else {
