@@ -94,9 +94,12 @@ void GraphTitleBar::slotExporNodes()
         return;
     }
 
+    // make the initial path be the `projectName_nodes.csv`
     QString path = m_exp->project()->filepath();
-    path = QFileDialog::getSaveFileName(this, "Export Nodes",
-            path.isEmpty() ? QDir::homePath() : path, "Text Files (*.csv)");
+    QDir dir = path.isEmpty() ? QDir::home() : QFileInfo(path).dir();
+    path = dir.absoluteFilePath(m_exp->project()->name() + "_nodes.csv");
+
+    path = QFileDialog::getSaveFileName(this, "Export Nodes", path, "Text Files (*.csv)");
     if (path.isEmpty()) {
         return;
     }
