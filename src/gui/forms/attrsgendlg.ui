@@ -317,9 +317,9 @@
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="ok">
+      <widget class="QPushButton" name="cancel">
        <property name="text">
-        <string>Ok</string>
+        <string>Cancel</string>
        </property>
       </widget>
      </item>
@@ -331,9 +331,12 @@
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="cancel">
+      <widget class="QPushButton" name="ok">
        <property name="text">
-        <string>Cancel</string>
+        <string>Ok</string>
+       </property>
+       <property name="default">
+        <bool>true</bool>
        </property>
       </widget>
      </item>
