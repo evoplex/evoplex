@@ -20,7 +20,7 @@
 
 cmake_minimum_required(VERSION 3.1.0 FATAL_ERROR)
 
-set(EVOPLEX_VERSION 0.1.1)
+set(EVOPLEX_VERSION 0.2.0)
 set(EVOPLEX_RELEASE "development")
 
 if(EVOPLEX_RELEASE STREQUAL "")
