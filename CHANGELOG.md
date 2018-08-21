@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Adds button to pause all experiments
 - Graph widgets: Allows scaling the nodes and edges
 - Graph widgets: Allows setting the edge with
+- Graph widgets: Allows exporting nodes to file
 - New model plugin: population growth
 - New model plugin: Conway's Game of Life cellular automaton
 

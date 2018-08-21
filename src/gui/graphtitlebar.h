@@ -45,12 +45,16 @@ signals:
     void openSettingsDlg();
 
 private slots:
+    void slotExporNodes();
     void slotRestarted();
 
 private:
+    const QSize m_iconSize;
+
     Ui_GraphTitleBar* m_ui;
     const Experiment* m_exp;
 
+    QtMaterialIconButton* m_bExportNodes;
     QtMaterialIconButton* m_bSettings;
 };
 

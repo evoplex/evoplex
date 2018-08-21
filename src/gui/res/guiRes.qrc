@@ -173,5 +173,13 @@
         <file>material-icons/toggle/svg/ic_radio_button_checked_48px.svg</file>
         <file>material-icons/toggle/svg/ic_radio_button_unchecked_24px.svg</file>
         <file>material-icons/toggle/svg/ic_radio_button_unchecked_48px.svg</file>
+        <file>material-icons/editor/png/baseline_table_chart_black_18dp.png</file>
+        <file>material-icons/editor/png/baseline_table_chart_black_24dp.png</file>
+        <file>material-icons/editor/png/baseline_table_chart_black_36dp.png</file>
+        <file>material-icons/editor/png/baseline_table_chart_black_48dp.png</file>
+        <file alias="table_white_18">material-icons/editor/png/baseline_table_chart_white_18dp.png</file>
+        <file>material-icons/editor/png/baseline_table_chart_white_24dp.png</file>
+        <file>material-icons/editor/png/baseline_table_chart_white_36dp.png</file>
+        <file>material-icons/editor/png/baseline_table_chart_white_48dp.png</file>
     </qresource>
 </RCC>
