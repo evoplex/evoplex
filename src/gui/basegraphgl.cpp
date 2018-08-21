@@ -112,7 +112,7 @@ void BaseGraphGL::setupInspector()
 
         QWidget* l = m_ui->modelAttrs->labelForField(aw);
         l->setToolTip(attrRange->attrName());
-        l->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
+        l->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::MinimumExpanding);
         l->setMinimumWidth(m_ui->lNodeId->minimumWidth());
     }
 

@@ -36,11 +36,14 @@
 namespace evoplex {
 
 ExperimentDesigner::ExperimentDesigner(MainApp* mainApp, QWidget *parent)
-    : QDockWidget(parent)
-    , m_mainApp(mainApp)
-    , m_project(nullptr)
-    , m_titleBar(new TitleBar(this))
-    , m_ui(new Ui_ExperimentDesigner)
+    : QDockWidget(parent),
+      m_mainApp(mainApp),
+      m_project(nullptr),
+      m_titleBar(new TitleBar(this)),
+      m_ui(new Ui_ExperimentDesigner),
+      m_bRemove(new QtMaterialIconButton(QIcon(":/icons/material/delete_white_24"), this)),
+      m_bEdit(new QtMaterialIconButton(QIcon(":/icons/material/edit_white_24"), this)),
+      m_bAdd(new QtMaterialIconButton(QIcon(":/icons/material/add_white_24"), this))
 {
     setObjectName("ExperimentDesigner");
     m_ui->setupUi(this);
@@ -49,12 +52,24 @@ ExperimentDesigner::ExperimentDesigner(MainApp* mainApp, QWidget *parent)
     m_titleBar->setTitle(objectName());
     setTitleBarWidget(m_titleBar);
 
+    m_bRemove->setColor(Qt::white);
+    m_bRemove->setIconSize(QSize(24,24));
+    m_ui->widget->layout()->addWidget(m_bRemove);
+    m_bRemove->hide();
+    connect(m_bRemove, SIGNAL(clicked(bool)), SLOT(slotRemoveExperiment()));
+
+    m_bEdit->setColor(Qt::white);
+    m_bEdit->setIconSize(QSize(24,24));
+    m_ui->widget->layout()->addWidget(m_bEdit);
+    m_bEdit->hide();
+    connect(m_bEdit, SIGNAL(clicked(bool)), SLOT(slotEditExperiment()));
+
+    m_bAdd->setColor(Qt::white);
+    m_bAdd->setIconSize(QSize(24,24));
+    m_ui->widget->layout()->addWidget(m_bAdd);
+    connect(m_bAdd, SIGNAL(clicked(bool)), SLOT(slotCreateExperiment()));
+
     m_ui->treeWidget->setFocusPolicy(Qt::NoFocus);
-    m_ui->bRemove->hide();
-    m_ui->bEdit->hide();
-    connect(m_ui->bSubmit, SIGNAL(clicked(bool)), SLOT(slotCreateExperiment()));
-    connect(m_ui->bRemove, SIGNAL(clicked(bool)), SLOT(slotRemoveExperiment()));
-    connect(m_ui->bEdit, SIGNAL(clicked(bool)), SLOT(slotEditExperiment()));
     connect(m_ui->cbWidgets, SIGNAL(currentIndexChanged(int)), SLOT(slotSetActiveWidget(int)));
 
     // setup the tree widget: model
@@ -112,7 +127,8 @@ ExperimentDesigner::ExperimentDesigner(MainApp* mainApp, QWidget *parent)
     m_treeItemOutputs->setText(0, "File Outputs");
     m_treeItemOutputs->setExpanded(false);
     // -- enabled
-    m_enableOutputs = new QCheckBox("save to file");
+    m_enableOutputs = new AttrWidget(AttributeRange::parse(-1, "enabled", "bool"), this);
+    m_enableOutputs->setToolTip("save to file");
     QTreeWidgetItem* itemEnabled = new QTreeWidgetItem(m_treeItemOutputs);
     itemEnabled->setText(0, "enable");
     m_ui->treeWidget->setItemWidget(itemEnabled, 1, m_enableOutputs);
@@ -126,7 +142,7 @@ ExperimentDesigner::ExperimentDesigner(MainApp* mainApp, QWidget *parent)
 
 /* TODO: make the buttons to avgTrials and saveSteps work*/
 /*    // -- avgTrials
-    QCheckBox* outAvgTrials = new QCheckBox("average trials");
+    QtMaterialCheckBox* outAvgTrials = new QtMaterialCheckBox("average trials");
     addGeneralAttr(m_treeItemOutputs, OUTPUT_AVGTRIALS, QVariant::fromValue(outAvgTrials));
     // -- steps to save
     QRadioButton* outAllSteps = new QRadioButton("all");
@@ -146,14 +162,15 @@ ExperimentDesigner::ExperimentDesigner(MainApp* mainApp, QWidget *parent)
     itemOut->setText(0, OUTPUT_SAVESTEPS);
     m_ui->treeWidget->setItemWidget(itemOut, 1, outStepsLayout->parentWidget());
 */
-    connect(m_enableOutputs, &QCheckBox::toggled,
-            [outDir, outHeader](bool b) {
-                outDir->setEnabled(b);
-                outHeader->setEnabled(b);
-//                outAvgTrials->setEnabled(b);
-    });
-    m_enableOutputs->setChecked(true);
-    m_enableOutputs->setChecked(false);
+    connect(m_enableOutputs, &AttrWidget::valueChanged,
+        [this, outDir, outHeader]() {
+            bool b = m_enableOutputs->value().toBool();
+            outDir->setDisabled(b);
+            outHeader->setDisabled(b);
+//          outAvgTrials->setDisabled(b);
+        });
+    m_enableOutputs->setValue(true);
+    m_enableOutputs->setValue(false);
 
     for (const Plugin* p : m_mainApp->plugins()) { slotPluginAdded(p); }
     connect(m_mainApp, SIGNAL(pluginAdded(const Plugin*)),
@@ -211,13 +228,13 @@ void ExperimentDesigner::slotSetActiveWidget(int idx)
         dw->raise();
         m_project = dw->project();
         ExperimentWidget* ew = qobject_cast<ExperimentWidget*>(dw);
-        m_ui->bSubmit->setVisible(!ew);
-        m_ui->bSubmit->setVisible(true);
+        m_bAdd->setVisible(!ew);
+        m_bAdd->setVisible(true);
         setExperiment(ew ? ew->exp() : nullptr);
         m_titleBar->setTitle(dw->objectName());
     } else {
         m_project = nullptr;
-        m_ui->bSubmit->setVisible(false);
+        m_bAdd->setVisible(false);
         m_titleBar->setTitle(objectName());
     }
 }
@@ -225,15 +242,15 @@ void ExperimentDesigner::slotSetActiveWidget(int idx)
 void ExperimentDesigner::setExperiment(ExperimentPtr exp)
 {
     if (!exp) {
-        m_ui->bEdit->hide();
-        m_ui->bRemove->hide();
+        m_bEdit->hide();
+        m_bRemove->hide();
         return;
     }
 
     m_exp = exp;
-    m_ui->bEdit->show();
-    m_ui->bRemove->show();
-    m_enableOutputs->setChecked(exp->hasOutputs());
+    m_bEdit->show();
+    m_bRemove->show();
+    m_enableOutputs->setValue(exp->hasOutputs());
 
     std::vector<QString> header = exp->inputs()->exportAttrNames(true);
     std::vector<Value> values = exp->inputs()->exportAttrValues();
@@ -390,7 +407,7 @@ std::unique_ptr<ExpInputs> ExperimentDesigner::readInputs(const int expId, QStri
     } else if (m_selectedGraphKey == PluginKey()) {
         error = "Please, select a valid 'graphId'.";
         return nullptr;
-    } else if (m_enableOutputs->isChecked()
+    } else if (m_enableOutputs->value().toBool()
                && (m_attrWidgets.value(OUTPUT_DIR)->value().toQString().isEmpty()
                    || m_attrWidgets.value(OUTPUT_HEADER)->value().toQString().isEmpty())) {
         error = "Please, insert a valid output directory and a output header.";
@@ -431,7 +448,7 @@ std::unique_ptr<ExpInputs> ExperimentDesigner::readInputs(const int expId, QStri
 
     }
 
-    if (!m_enableOutputs->isChecked()) {
+    if (!m_enableOutputs->value().toBool()) {
         header << OUTPUT_DIR << OUTPUT_HEADER;
         values << "" << "";
     }

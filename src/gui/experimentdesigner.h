@@ -21,12 +21,13 @@
 #ifndef EXPERIMENT_DESIGNER_H
 #define EXPERIMENT_DESIGNER_H
 
-#include <QCheckBox>
 #include <QDockWidget>
 #include <QTreeWidgetItem>
 #include <QHash>
 
 #include "core/project.h"
+
+#include "external/qt-material-widgets/qtmaterialiconbutton.h"
 
 #include "attrwidget.h"
 #include "projectspage.h"
@@ -73,12 +74,15 @@ private:
 
     TitleBar* m_titleBar;
     Ui_ExperimentDesigner* m_ui;
+    QtMaterialIconButton* m_bRemove;
+    QtMaterialIconButton* m_bEdit;
+    QtMaterialIconButton* m_bAdd;
     QTreeWidgetItem* m_treeItemGeneral;
     QTreeWidgetItem* m_treeItemOutputs;
     QTreeWidgetItem* m_treeItemModels;
     QTreeWidgetItem* m_treeItemGraphs;
     QHash<QString, AttrWidget*> m_attrWidgets;
-    QCheckBox* m_enableOutputs;
+    AttrWidget* m_enableOutputs;
     int m_graphTypeIdx;  // position of the graphtype combobox in the graph tree
     int m_edgesAttrsIdx; // position of the edgesAttrs field in the graph tree
 

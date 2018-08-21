@@ -18,11 +18,12 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <QCheckBox>
 #include <QComboBox>
 #include <QHBoxLayout>
 #include <QLineEdit>
 #include <QDebug>
+
+#include "external/qt-material-widgets/qtmaterialtoggle.h"
 
 #include "attrwidget.h"
 #include "linebutton.h"
@@ -34,12 +35,15 @@ AttrWidget::AttrWidget(AttributeRangePtr attrRange, QWidget* parent, QWidget* cu
       m_attrRange(attrRange)
 {
     m_widget = customWidget ? customWidget : newWidget(attrRange);
-    m_widget->setAutoFillBackground(true); // important! see qt docs
+    m_widget->setFocusPolicy(Qt::StrongFocus);
+    m_widget->setSizePolicy(QSizePolicy::MinimumExpanding,
+                            QSizePolicy::Preferred);
 
     auto l = new QHBoxLayout(this);
     l->addWidget(m_widget);
     l->setMargin(0);
     l->setSpacing(0);
+    l->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
     setLayout(l);
 
     // let's ensure that the AttrWidget is not filled with the main palette
@@ -76,7 +80,7 @@ Value AttrWidget::value() const
     auto dsp = qobject_cast<QDoubleSpinBox*>(m_widget);
     if (dsp) return dsp->value();
 
-    auto chb = qobject_cast<QCheckBox*>(m_widget);
+    auto chb = qobject_cast<QtMaterialToggle*>(m_widget);
     if (chb) return chb->isChecked();
 
     auto le = qobject_cast<QLineEdit*>(m_widget);
@@ -99,7 +103,7 @@ void AttrWidget::setValue(const Value& value)
     auto dsp = qobject_cast<QDoubleSpinBox*>(m_widget);
     if (dsp) { dsp->setValue(value.toDouble()); return; }
 
-    auto chb = qobject_cast<QCheckBox*>(m_widget);
+    auto chb = qobject_cast<QtMaterialToggle*>(m_widget);
     if (chb) { chb->setChecked(value.toBool()); return; }
 
     auto le = qobject_cast<QLineEdit*>(m_widget);
@@ -152,8 +156,10 @@ QWidget* AttrWidget::newWidget(AttributeRangePtr attrRange)
         return cb;
     }
     case AttributeRange::Bool: {
-        auto cb = new QCheckBox(this);
-        connect(cb, SIGNAL(stateChanged(int)), SIGNAL(valueChanged()));
+        auto cb = new QtMaterialToggle(this);
+        cb->setMaximumSize(QSize(60, 36));
+        cb->setActiveColor(palette().color(QPalette::Link));
+        connect(cb, SIGNAL(toggled(bool)), SIGNAL(valueChanged()));
         connect(this, SIGNAL(readOnlyChanged(bool)), cb, SLOT(setDisabled(bool)));
         return cb;
     }

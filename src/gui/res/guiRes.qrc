@@ -154,5 +154,24 @@
         <file alias="pauseall_white_24">material-icons/av/png/ic_playlist_add_check_white_24dp.png</file>
         <file>material-icons/av/png/ic_playlist_add_check_white_36dp.png</file>
         <file>material-icons/av/png/ic_playlist_add_check_white_48dp.png</file>
+        <file>material-icons/toggle/png/ic_check_box_black_24dp.png</file>
+        <file>material-icons/toggle/png/ic_check_box_outline_blank_black_24dp.png</file>
+        <file>material-icons/toggle/png/ic_check_box_outline_blank_white_24dp.png</file>
+        <file>material-icons/toggle/png/ic_check_box_white_24dp.png</file>
+        <file>material-icons/toggle/png/ic_indeterminate_check_box_black_24dp.png</file>
+        <file>material-icons/toggle/png/ic_indeterminate_check_box_white_24dp.png</file>
+        <file>material-icons/toggle/png/ic_radio_button_checked_black_24dp.png</file>
+        <file>material-icons/toggle/png/ic_radio_button_checked_white_24dp.png</file>
+        <file>material-icons/toggle/png/ic_radio_button_unchecked_black_24dp.png</file>
+        <file>material-icons/toggle/png/ic_radio_button_unchecked_white_24dp.png</file>
+        <file>material-icons/toggle/svg/ic_check_box_24px.svg</file>
+        <file>material-icons/toggle/svg/ic_check_box_48px.svg</file>
+        <file>material-icons/toggle/svg/ic_check_box_outline_blank_24px.svg</file>
+        <file>material-icons/toggle/svg/ic_check_box_outline_blank_48px.svg</file>
+        <file>material-icons/toggle/svg/ic_indeterminate_check_box_24px.svg</file>
+        <file>material-icons/toggle/svg/ic_radio_button_checked_24px.svg</file>
+        <file>material-icons/toggle/svg/ic_radio_button_checked_48px.svg</file>
+        <file>material-icons/toggle/svg/ic_radio_button_unchecked_24px.svg</file>
+        <file>material-icons/toggle/svg/ic_radio_button_unchecked_48px.svg</file>
     </qresource>
 </RCC>

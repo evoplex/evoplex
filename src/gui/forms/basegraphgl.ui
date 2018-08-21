@@ -369,7 +369,11 @@ color: rgb(255, 255, 255);</string>
        </layout>
       </item>
       <item>
-       <layout class="QFormLayout" name="modelAttrs"/>
+       <layout class="QFormLayout" name="modelAttrs">
+        <property name="formAlignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+       </layout>
       </item>
       <item>
        <spacer name="verticalSpacer">
