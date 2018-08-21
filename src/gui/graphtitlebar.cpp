@@ -26,11 +26,15 @@ namespace evoplex {
 GraphTitleBar::GraphTitleBar(const Experiment* exp, QDockWidget* parent)
     : BaseTitleBar(parent),
       m_ui(new Ui_GraphTitleBar),
-      m_exp(exp)
+      m_exp(exp),
+      m_bSettings(new QtMaterialIconButton(QIcon(":/icons/material/settings_white_18"), this))
 {
     m_ui->setupUi(this);
 
-    connect(m_ui->bSettings, SIGNAL(clicked(bool)), SIGNAL(openSettingsDlg()));
+    m_bSettings->setIconSize(QSize(18,18));
+    m_bSettings->setColor(Qt::white);
+    m_ui->btns->addWidget(m_bSettings);
+    connect(m_bSettings, SIGNAL(clicked(bool)), SIGNAL(openSettingsDlg()));
 
     connect(m_ui->cbTrial, QOverload<int>::of(&QComboBox::currentIndexChanged),
         [this](int t) {
@@ -41,7 +45,7 @@ GraphTitleBar::GraphTitleBar(const Experiment* exp, QDockWidget* parent)
     connect(m_exp, SIGNAL(restarted()), SLOT(slotRestarted()));
     slotRestarted(); // init
 
-    init(m_ui->bFloat, m_ui->bMaximize, m_ui->bClose);
+    init(qobject_cast<QHBoxLayout*>(layout()));
 }
 
 GraphTitleBar::~GraphTitleBar()

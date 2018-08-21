@@ -23,8 +23,11 @@
 
 #include <QDockWidget>
 #include <QIcon>
+#include <QHBoxLayout>
 #include <QPushButton>
 #include <QWidget>
+
+#include "external/qt-material-widgets/qtmaterialiconbutton.h"
 
 class Ui_TitleBar;
 
@@ -36,21 +39,20 @@ class BaseTitleBar : public QWidget
 
 public:
     explicit BaseTitleBar(QDockWidget *parent);
+    virtual ~BaseTitleBar();
 
-    void init(QPushButton* floating=nullptr,
-              QPushButton* maximize=nullptr,
-              QPushButton* close=nullptr);
+    void init(QHBoxLayout* layout);
 
 protected:
-    QDockWidget* m_parent;
-    QPushButton* m_floatingBtn;
-    QPushButton* m_maximizeBtn;
-    QPushButton* m_closeBtn;
-
     const QIcon m_kIconFull;
     const QIcon m_kIconFullExit;
     const QIcon m_kIconDetach;
     const QIcon m_kIconAttach;
+
+    QDockWidget* m_parent;
+    QtMaterialIconButton* m_bFloat;
+    QtMaterialIconButton* m_bMaximize;
+    QtMaterialIconButton* m_bClose;
 
     // it makes the qt stylesheet work for this titlebar
     virtual void paintEvent(QPaintEvent* pe);
@@ -68,7 +70,7 @@ public:
     explicit TitleBar(QDockWidget* parent);
     ~TitleBar();
 
-    void addButton(QPushButton* btn, const QString& iconPath, QString toolTip="");
+    void addButton(QtMaterialIconButton* btn, QString toolTip="");
 
 public slots:
     void setTitle(const QString& label);

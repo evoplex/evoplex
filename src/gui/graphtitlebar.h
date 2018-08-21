@@ -50,6 +50,8 @@ private slots:
 private:
     Ui_GraphTitleBar* m_ui;
     const Experiment* m_exp;
+
+    QtMaterialIconButton* m_bSettings;
 };
 
 } // evoplex

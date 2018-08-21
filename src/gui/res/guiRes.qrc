@@ -56,7 +56,7 @@
         <file>material-icons/navigation/png/ic_close_black_512dp.png</file>
         <file>material-icons/navigation/png/ic_close_black_1024dp.png</file>
         <file>material-icons/navigation/png/ic_close_white_16dp.png</file>
-        <file>material-icons/navigation/png/ic_close_white_18dp.png</file>
+        <file alias="close_white_18">material-icons/navigation/png/ic_close_white_18dp.png</file>
         <file>material-icons/navigation/png/ic_close_white_24dp.png</file>
         <file>material-icons/navigation/png/ic_close_white_32dp.png</file>
         <file>material-icons/navigation/png/ic_close_white_36dp.png</file>

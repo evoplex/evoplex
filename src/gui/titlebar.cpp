@@ -32,46 +32,49 @@ namespace evoplex {
 
 BaseTitleBar::BaseTitleBar(QDockWidget* parent)
     : QWidget(parent),
-      m_parent(parent),
-      m_floatingBtn(nullptr),
       m_kIconFull(":/icons/material/fullscreen_white_18"),
       m_kIconFullExit(":/icons/material/fullscreen_exit_white_18"),
       m_kIconDetach(":/icons/material/detach_white_18"),
-      m_kIconAttach(":/icons/material/attach_white_18")
+      m_kIconAttach(":/icons/material/attach_white_18"),
+      m_parent(parent),
+      m_bFloat(new QtMaterialIconButton(m_kIconDetach)),
+      m_bMaximize(new QtMaterialIconButton(m_kIconFull))
 {
     setFocusPolicy(Qt::StrongFocus);
+
+    m_bFloat->setColor(Qt::white);
+    m_bFloat->setIconSize(QSize(18,18));
+    m_bMaximize->setColor(Qt::white);
+    m_bMaximize->setIconSize(QSize(18,18));
 }
 
-void BaseTitleBar::init(QPushButton* floating, QPushButton* maximize, QPushButton* close)
+BaseTitleBar::~BaseTitleBar()
 {
-    m_floatingBtn = floating;
-    m_maximizeBtn = maximize;
-    m_closeBtn = close;
+    delete m_bFloat;
+    delete m_bMaximize;
+    delete m_bClose;
+}
 
-    if (m_floatingBtn) {
-        m_floatingBtn->setIcon(m_parent->isFloating()
-                               ? m_kIconAttach : m_kIconDetach);
-
-        connect(m_floatingBtn, &QPushButton::clicked,
+void BaseTitleBar::init(QHBoxLayout* layout)
+{
+    layout->addWidget(m_bFloat);
+    m_bFloat->setIcon(m_parent->isFloating()
+                      ? m_kIconAttach : m_kIconDetach);
+    connect(m_bFloat, &QtMaterialIconButton::clicked,
             [this]() { m_parent->setFloating(!m_parent->isFloating()); });
+    connect(m_parent, SIGNAL(topLevelChanged(bool)),
+            SLOT(slotFloating(bool)));
 
-        connect(m_parent, SIGNAL(topLevelChanged(bool)),
-                SLOT(slotFloating(bool)));
-    }
+    layout->addWidget(m_bMaximize);
+    m_bMaximize->setIcon(m_kIconFull);
+    connect(m_bMaximize, SIGNAL(clicked(bool)), SLOT(slotFullScreen()));
 
-    if (m_maximizeBtn) {
-        m_maximizeBtn->setIcon(m_kIconFull);
-        connect(m_maximizeBtn, SIGNAL(clicked(bool)), SLOT(slotFullScreen()));
-    }
-
-    if (m_closeBtn) {
-        if (m_parent->features().testFlag(QDockWidget::DockWidgetClosable)) {
-            connect(m_closeBtn, SIGNAL(clicked(bool)), m_parent, SLOT(close()));
-            m_closeBtn->setHidden(false);
-        } else {
-            m_closeBtn->setDisabled(true);
-            m_closeBtn->setHidden(true);
-        }
+    if (m_parent->features().testFlag(QDockWidget::DockWidgetClosable)) {
+        m_bClose = new QtMaterialIconButton(QIcon(":/icons/material/close_white_18"));
+        m_bClose->setColor(Qt::white);
+        m_bClose->setIconSize(QSize(18,18));
+        layout->addWidget(m_bClose);
+        connect(m_bClose, SIGNAL(clicked(bool)), m_parent, SLOT(close()));
     }
 }
 
@@ -87,12 +90,12 @@ void BaseTitleBar::paintEvent(QPaintEvent* pe)
 void BaseTitleBar::slotFloating(bool floating)
 {
     if (floating) {
-        m_floatingBtn->setIcon(m_kIconAttach);
-        m_floatingBtn->setToolTip("attach");
+        m_bFloat->setIcon(m_kIconAttach);
+        m_bFloat->setToolTip("attach");
     } else {
-        m_floatingBtn->setIcon(m_kIconDetach);
-        m_floatingBtn->setToolTip("detach");
-        m_maximizeBtn->setIcon(m_kIconFull);
+        m_bFloat->setIcon(m_kIconDetach);
+        m_bFloat->setToolTip("detach");
+        m_bMaximize->setIcon(m_kIconFull);
     }
 }
 
@@ -102,10 +105,10 @@ void BaseTitleBar::slotFullScreen()
     auto g = QApplication::desktop()->availableGeometry(m_parent);
     if (m_parent->frameGeometry().size() == g.size()) {
         m_parent->setGeometry(m_parent->parentWidget()->frameGeometry());
-        m_maximizeBtn->setIcon(m_kIconFull);
+        m_bMaximize->setIcon(m_kIconFull);
     } else {
         m_parent->setGeometry(g);
-        m_maximizeBtn->setIcon(m_kIconFullExit);
+        m_bMaximize->setIcon(m_kIconFullExit);
     }
 }
 
@@ -124,7 +127,7 @@ TitleBar::TitleBar(QDockWidget* parent)
     m_ui->lTitle->setFont(FontStyles::subtitle1());
     m_ui->lTitle->setText(parent->objectName());
 
-    init(m_ui->bFloat, m_ui->bMaximize, m_ui->bClose);
+    init(m_ui->top);
 }
 
 TitleBar::~TitleBar()
@@ -132,13 +135,12 @@ TitleBar::~TitleBar()
     delete m_ui;
 }
 
-void TitleBar::addButton(QPushButton* btn, const QString& iconPath, QString toolTip)
+void TitleBar::addButton(QtMaterialIconButton* btn, QString toolTip)
 {
-    btn->setFlat(true);
     btn->setIconSize(m_iconSize);
-    btn->setMaximumSize(m_iconSize);
-    btn->setMinimumSize(m_iconSize);
-    btn->setIcon(QIcon(iconPath));
+    btn->setMaximumSize(m_iconSize * 1.25);
+    btn->setMinimumSize(m_iconSize * 1.25);
+    btn->setColor(Qt::white);
     btn->setToolTip(toolTip);
     m_ui->btnLayout->addWidget(btn);
 }
