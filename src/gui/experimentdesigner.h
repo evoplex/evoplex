@@ -31,7 +31,6 @@
 
 #include "attrwidget.h"
 #include "projectspage.h"
-#include "titlebar.h"
 
 class Ui_ExperimentDesigner;
 
@@ -72,7 +71,6 @@ private:
     PluginKey m_selectedGraphKey;
     PluginKey m_selectedModelKey;
 
-    TitleBar* m_titleBar;
     Ui_ExperimentDesigner* m_ui;
     QtMaterialIconButton* m_bRemove;
     QtMaterialIconButton* m_bEdit;

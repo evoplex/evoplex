@@ -285,7 +285,7 @@ color: rgb(255, 255, 255);</string>
           </property>
           <property name="icon">
            <iconset resource="../res/guiRes.qrc">
-            <normaloff>:/icons/material/material-icons/navigation/png/ic_close_white_18dp.png</normaloff>:/icons/material/material-icons/navigation/png/ic_close_white_18dp.png</iconset>
+            <normaloff>:/icons/material/close_white_18</normaloff>:/icons/material/close_white_18</iconset>
           </property>
           <property name="iconSize">
            <size>

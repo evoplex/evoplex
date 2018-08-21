@@ -31,6 +31,7 @@
 #include "experimentwidget.h"
 #include "projectwidget.h"
 #include "outputwidget.h"
+#include "titlebar.h"
 #include "ui_experimentdesigner.h"
 
 namespace evoplex {
@@ -39,18 +40,19 @@ ExperimentDesigner::ExperimentDesigner(MainApp* mainApp, QWidget *parent)
     : QDockWidget(parent),
       m_mainApp(mainApp),
       m_project(nullptr),
-      m_titleBar(new TitleBar(this)),
       m_ui(new Ui_ExperimentDesigner),
       m_bRemove(new QtMaterialIconButton(QIcon(":/icons/material/delete_white_24"), this)),
       m_bEdit(new QtMaterialIconButton(QIcon(":/icons/material/edit_white_24"), this)),
       m_bAdd(new QtMaterialIconButton(QIcon(":/icons/material/add_white_24"), this))
 {
+    setWindowTitle("Experiment Designer");
     setObjectName("ExperimentDesigner");
     m_ui->setupUi(this);
 
-    m_titleBar->setSubtitle("EXPERIMENT DESIGNER");
-    m_titleBar->setTitle(objectName());
-    setTitleBarWidget(m_titleBar);
+    auto titleBar = new TitleBar(this);
+    titleBar->setSubtitle("EXPERIMENT DESIGNER");
+    titleBar->setTitle(windowTitle());
+    setTitleBarWidget(titleBar);
 
     m_bRemove->setColor(Qt::white);
     m_bRemove->setIconSize(QSize(24,24));
@@ -231,11 +233,11 @@ void ExperimentDesigner::slotSetActiveWidget(int idx)
         m_bAdd->setVisible(!ew);
         m_bAdd->setVisible(true);
         setExperiment(ew ? ew->exp() : nullptr);
-        m_titleBar->setTitle(dw->objectName());
+        setWindowTitle(dw->objectName());
     } else {
         m_project = nullptr;
         m_bAdd->setVisible(false);
-        m_titleBar->setTitle(objectName());
+        setWindowTitle(objectName());
     }
 }
 

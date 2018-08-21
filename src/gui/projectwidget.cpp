@@ -46,19 +46,18 @@ ProjectWidget::ProjectWidget(ProjectPtr project, MainGUI* mainGUI, ProjectsPage*
     setWindowTitle(objectName());
     setFocusPolicy(Qt::StrongFocus);
 
-    auto titlebar = new TitleBar(this);
-    titlebar->setSubtitle("PROJECT");
-    connect(this, SIGNAL(objectNameChanged(QString)),
-            titlebar, SLOT(setTitle(QString)));
+    auto titleBar = new TitleBar(this);
+    titleBar->setSubtitle("PROJECT");
+    titleBar->setTitle(windowTitle());
 
     auto bPauseAll = new QtMaterialIconButton(QIcon(":/icons/material/pauseall_white_24"), this);
-    titlebar->addButton(bPauseAll, "pause all experiments");
+    titleBar->addButton(bPauseAll, "pause all experiments");
     connect(bPauseAll, SIGNAL(pressed()), m_project.get(), SLOT(pauseAll()));
     auto bPlayAll = new QtMaterialIconButton(QIcon(":/icons/material/playall_white_24"), this);
-    titlebar->addButton(bPlayAll, "play all experiments");
+    titleBar->addButton(bPlayAll, "play all experiments");
     connect(bPlayAll, SIGNAL(pressed()), m_project.get(), SLOT(playAll()));
 
-    setTitleBarWidget(titlebar);
+    setTitleBarWidget(titleBar);
 
     m_ui->labelExps->setFont(FontStyles::subtitle2());
 

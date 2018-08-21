@@ -44,6 +44,7 @@ public:
     void init(QHBoxLayout* layout);
 
 protected:
+    const QColor m_iconColor;
     const QIcon m_kIconFull;
     const QIcon m_kIconFullExit;
     const QIcon m_kIconDetach;

@@ -32,19 +32,21 @@ namespace evoplex {
 
 BaseTitleBar::BaseTitleBar(QDockWidget* parent)
     : QWidget(parent),
+      m_iconColor(Qt::white),
       m_kIconFull(":/icons/material/fullscreen_white_18"),
       m_kIconFullExit(":/icons/material/fullscreen_exit_white_18"),
       m_kIconDetach(":/icons/material/detach_white_18"),
       m_kIconAttach(":/icons/material/attach_white_18"),
       m_parent(parent),
       m_bFloat(new QtMaterialIconButton(m_kIconDetach)),
-      m_bMaximize(new QtMaterialIconButton(m_kIconFull))
+      m_bMaximize(new QtMaterialIconButton(m_kIconFull)),
+      m_bClose(nullptr)
 {
     setFocusPolicy(Qt::StrongFocus);
 
-    m_bFloat->setColor(Qt::white);
+    m_bFloat->setColor(m_iconColor);
     m_bFloat->setIconSize(QSize(18,18));
-    m_bMaximize->setColor(Qt::white);
+    m_bMaximize->setColor(m_iconColor);
     m_bMaximize->setIconSize(QSize(18,18));
 }
 
@@ -125,7 +127,8 @@ TitleBar::TitleBar(QDockWidget* parent)
     f.setPixelSize(12);
     m_ui->lSubtitle->setFont(FontStyles::caption());
     m_ui->lTitle->setFont(FontStyles::subtitle1());
-    m_ui->lTitle->setText(parent->objectName());
+    m_ui->lTitle->setText(parent->windowTitle());
+    connect(parent, SIGNAL(windowTitleChanged(QString)), SLOT(setTitle(QString)));
 
     init(m_ui->top);
 }
@@ -140,7 +143,7 @@ void TitleBar::addButton(QtMaterialIconButton* btn, QString toolTip)
     btn->setIconSize(m_iconSize);
     btn->setMaximumSize(m_iconSize * 1.25);
     btn->setMinimumSize(m_iconSize * 1.25);
-    btn->setColor(Qt::white);
+    btn->setColor(m_iconColor);
     btn->setToolTip(toolTip);
     m_ui->btnLayout->addWidget(btn);
 }

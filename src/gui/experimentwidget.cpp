@@ -47,9 +47,10 @@ ExperimentWidget::ExperimentWidget(ExperimentPtr exp, MainGUI* mainGUI, Projects
     setWindowTitle(objectName());
     setFocusPolicy(Qt::StrongFocus);
 
-    auto titlebar = new TitleBar(this);
-    titlebar->setSubtitle("EXPERIMENT");
-    setTitleBarWidget(titlebar);
+    auto titleBar = new TitleBar(this);
+    titleBar->setSubtitle("EXPERIMENT");
+    titleBar->setTitle(windowTitle());
+    setTitleBarWidget(titleBar);
 
     // setup the inner qmainwindow
     m_innerWindow->setObjectName("experimentWindow");
