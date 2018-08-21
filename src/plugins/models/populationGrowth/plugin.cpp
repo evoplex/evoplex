@@ -28,7 +28,12 @@ bool PopulationGrowth::algorithmStep()
     for (Node node : nodes()) {
         if (node.attr(m_infectedAttrId).toBool()) {
             nextInfectedStates.emplace_back(true);
-            continue; // the node is already infected, there's nothing to do
+            continue; // the node is already infected; skip
+        }
+
+        if (node.outDegree() < 1) {
+            nextInfectedStates.emplace_back(false);
+            continue; // the node does not have neighbours; skip
         }
 
         // Select a random neighbour
