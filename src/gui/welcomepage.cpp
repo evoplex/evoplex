@@ -41,8 +41,8 @@ WelcomePage::WelcomePage(MainGUI* maingui)
 
     refreshList();
     connect(maingui->mainApp(), SIGNAL(listOfRecentProjectsUpdated()), SLOT(refreshList()));
-    connect(m_ui->recent, &QListWidget::doubleClicked, [this](const QModelIndex& index) {
-        emit (m_maingui->openProject(index.data().toString()));
+    connect(m_ui->recent, &QListWidget::itemActivated, [this](QListWidgetItem* item) {
+        emit (m_maingui->openProject(item->text()));
     });
 }
 
