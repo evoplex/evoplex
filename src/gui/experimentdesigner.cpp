@@ -116,9 +116,9 @@ ExperimentDesigner::ExperimentDesigner(MainApp* mainApp, QWidget *parent)
     m_treeItemGeneral->setText(0, "Simulation");
     m_treeItemGeneral->setExpanded(false);
     // -- seed
-    addGeneralAttr(m_treeItemGeneral, GENERAL_ATTR_SEED);
+    addGeneralAttr(m_treeItemGeneral, GENERAL_ATTR_SEED)->setValue(100);
     // --  stop at
-    addGeneralAttr(m_treeItemGeneral, GENERAL_ATTR_STOPAT);
+    addGeneralAttr(m_treeItemGeneral, GENERAL_ATTR_STOPAT)->setValue(1000);
     // --  trials
     addGeneralAttr(m_treeItemGeneral, GENERAL_ATTR_TRIALS);
     // --  auto delete
@@ -674,7 +674,7 @@ void ExperimentDesigner::addPluginAttrs(QTreeWidgetItem* tree, const Plugin* plu
     }
 }
 
-void ExperimentDesigner::addGeneralAttr(QTreeWidgetItem* itemRoot,
+AttrWidget* ExperimentDesigner::addGeneralAttr(QTreeWidgetItem* itemRoot,
         const QString& attrName, QWidget* customWidget)
 {
     AttrWidget* widget = new AttrWidget(
@@ -685,6 +685,8 @@ void ExperimentDesigner::addGeneralAttr(QTreeWidgetItem* itemRoot,
     item->setText(0, attrName);
     item->setToolTip(0, attrName);
     m_ui->treeWidget->setItemWidget(item, 1, widget);
+
+    return widget;
 }
 
 } // evoplex

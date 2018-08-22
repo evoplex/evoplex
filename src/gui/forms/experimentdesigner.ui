@@ -32,8 +32,17 @@
     </property>
     <item>
      <widget class="QTreeWidget" name="treeWidget">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="MinimumExpanding" vsizetype="Expanding">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
       <property name="frameShape">
        <enum>QFrame::NoFrame</enum>
+      </property>
+      <property name="horizontalScrollBarPolicy">
+       <enum>Qt::ScrollBarAlwaysOff</enum>
       </property>
       <property name="editTriggers">
        <set>QAbstractItemView::NoEditTriggers</set>
@@ -50,14 +59,17 @@
       <attribute name="headerVisible">
        <bool>false</bool>
       </attribute>
+      <attribute name="headerDefaultSectionSize">
+       <number>120</number>
+      </attribute>
       <column>
        <property name="text">
-        <string>Attribute</string>
+        <string/>
        </property>
       </column>
       <column>
        <property name="text">
-        <string>Value</string>
+        <string/>
        </property>
       </column>
      </widget>
