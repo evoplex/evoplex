@@ -45,10 +45,10 @@
 #define GENERAL_ATTR_GRAPHTYPE "graphType"         // graph type of a graph generator
 #define GENERAL_ATTR_EDGEATTRS "edgeAttrs"         // a command to AttrsGenerator
 
-#define OUTPUT_DIR "directory"              // path to the directory in which the file will be saved
-#define OUTPUT_AVGTRIALS "avgTrials"        // 1 to indicate if the output should be done across all trials; 0 otherwise
-#define OUTPUT_HEADER "header"              // valid header
-#define OUTPUT_SAVESTEPS "saveSteps"        // n=0 to save all steps; n>0 to save the last n steps
+#define OUTPUT_DIR "outputDirectory"              // path to the directory in which the file will be saved
+#define OUTPUT_AVGTRIALS "outputAvgTrials"        // 1 to indicate if the output should be done across all trials; 0 otherwise
+#define OUTPUT_HEADER "outputHeader"              // valid header
+#define OUTPUT_SAVESTEPS "outputSaveSteps"        // n=0 to save all steps; n>0 to save the last n steps
 
 /******************************************************************************
     Plugin stuff

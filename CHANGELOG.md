@@ -27,6 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Attributes' inspector of the graph widgets now shows a proper field for each type of attribute
 - Plugins page: minor GUI improvements
 - Renamed the 'customGraph' plugin to 'edgesFromCSV'
+- Appended the word `output` to all output attributes
 - 'edgesFromCSV' plugin now supports edge attributes
 - 'squareGuid' plugin now supports edge attributes
 
