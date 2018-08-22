@@ -42,8 +42,8 @@ ProjectWidget::ProjectWidget(ProjectPtr project, MainGUI* mainGUI, ProjectsPage*
 {
     m_ui->setupUi(this);
 
-    setObjectName(m_project->name());
-    setWindowTitle(objectName());
+    setObjectName("ProjectWidget");
+    setWindowTitle(m_project->name());
     setFocusPolicy(Qt::StrongFocus);
 
     auto titleBar = new TitleBar(this);
@@ -218,8 +218,7 @@ void ProjectWidget::onItemDoubleClicked(QTableWidgetItem* item)
 
 void ProjectWidget::slotHasUnsavedChanges(bool b)
 {
-    setObjectName(m_project->name());
-    setWindowTitle(objectName() + (b ? "*" : ""));
+    setWindowTitle(m_project->name() + (b ? "*" : ""));
     emit (hasUnsavedChanges(m_project->id()));
 }
 

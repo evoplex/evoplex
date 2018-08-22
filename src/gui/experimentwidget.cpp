@@ -43,9 +43,12 @@ ExperimentWidget::ExperimentWidget(ExperimentPtr exp, MainGUI* mainGUI, Projects
     , m_innerWindow(new QMainWindow(this))
     , m_timer(new QTimer)
 {
-    setObjectName(QString("%1(%2)").arg(m_exp->project()->name()).arg(m_exp->id()));
-    setWindowTitle(objectName());
     setFocusPolicy(Qt::StrongFocus);
+
+    setObjectName("ExperimentWidget");
+    slotProjectNameChanged(m_exp->project()->name());
+    connect(m_exp->project().get(), SIGNAL(nameChanged(QString)),
+            SLOT(slotProjectNameChanged(QString)));
 
     auto titleBar = new TitleBar(this);
     titleBar->setSubtitle("EXPERIMENT");
@@ -153,8 +156,16 @@ ExperimentWidget::~ExperimentWidget()
 void ExperimentWidget::closeEvent(QCloseEvent* event)
 {
     m_exp->disconnect(this); // important to avoid triggering slotStatusChanged()
+    m_exp->project()->disconnect(this); // important to avoid setting the windowTitle
     emit (closed());
     QDockWidget::closeEvent(event);
+}
+
+void ExperimentWidget::slotProjectNameChanged(const QString& newName)
+{
+    if (m_exp) {
+        setWindowTitle(QString("%1(%2)").arg(newName).arg(m_exp->id()));
+    }
 }
 
 void ExperimentWidget::slotStatusChanged(Status status)

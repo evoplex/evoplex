@@ -64,8 +64,12 @@ bool Project::init(QString& error, const QString& filepath)
 void Project::setFilePath(const QString& path)
 {
     m_filepath = path;
+    QString name = m_name;
     m_name = path.isEmpty() ? QString("Project%1").arg(m_id)
                             : QFileInfo(path).baseName();
+    if (name != m_name) {
+        emit (nameChanged(m_name));
+    }
 }
 
 void Project::playAll()

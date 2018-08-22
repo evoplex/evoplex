@@ -190,7 +190,14 @@ void ExperimentDesigner::addWidgetToList(PPageDockWidget* dw)
 {
     int id = m_ui->cbWidgets->findData(QVariant::fromValue(dw));
     if (id == -1) {
-        m_ui->cbWidgets->addItem(dw->objectName(), QVariant::fromValue(dw));
+        m_ui->cbWidgets->addItem(dw->windowTitle(), QVariant::fromValue(dw));
+        connect(dw->project().get(), &Project::nameChanged,
+            [this, dw](const QString& newName) {
+                if (!dw) return;
+                int id = m_ui->cbWidgets->findData(QVariant::fromValue(dw));
+                if (id >= 0) m_ui->cbWidgets->setItemText(id, newName);
+                setWindowTitle(m_ui->cbWidgets->currentText());
+            });
     }
 }
 
@@ -232,11 +239,11 @@ void ExperimentDesigner::slotActiveWidget(int idx)
         ExperimentWidget* ew = qobject_cast<ExperimentWidget*>(dw);
         m_bAdd->setVisible(!ew);
         setExperiment(ew ? ew->exp() : nullptr);
-        setWindowTitle(dw->objectName());
+        setWindowTitle(dw->windowTitle());
     } else {
         m_project = nullptr;
         m_bAdd->setVisible(false);
-        setWindowTitle(objectName());
+        setWindowTitle(windowTitle());
     }
 }
 

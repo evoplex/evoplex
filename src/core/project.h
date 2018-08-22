@@ -91,6 +91,7 @@ signals:
     void expEdited(int expId);
     void expRemoved(int expId);
     void hasUnsavedChanges(bool);
+    void nameChanged(const QString& newName);
 
 private:
     QMutex m_mutex;
