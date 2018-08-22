@@ -126,7 +126,7 @@ bool Value::operator==(const Value& v) const
     case DOUBLE: return qFuzzyCompare(m_data.d, v.m_data.d);
     case BOOL: return m_data.b == v.m_data.b;
     case CHAR: return m_data.c == v.m_data.c;
-    case STRING: return strcmp (m_data.s, v.m_data.s) == 0;
+    case STRING: return qstrcmp(m_data.s, v.m_data.s) == 0;
     case INVALID: return m_type == v.m_type;
     }
     throw std::invalid_argument("invalid type of Value");
@@ -143,7 +143,7 @@ bool Value::operator!=(const Value& v) const
     case DOUBLE: return !qFuzzyCompare(m_data.d, v.m_data.d);
     case BOOL: return m_data.b != v.m_data.b;
     case CHAR: return m_data.c != v.m_data.c;
-    case STRING: return strcmp (m_data.s, v.m_data.s) != 0;
+    case STRING: return qstrcmp(m_data.s, v.m_data.s) != 0;
     case INVALID: return m_type != v.m_type;
     }
     throw std::invalid_argument("invalid type of Value");
@@ -160,7 +160,7 @@ bool Value::operator<(const Value& v) const
     case DOUBLE: return m_data.d < v.m_data.d;
     case BOOL: return m_data.b < v.m_data.b;
     case CHAR: return m_data.c < v.m_data.c;
-    case STRING: return strcmp(m_data.s, v.m_data.s) < 0;
+    case STRING: return qstrcmp(m_data.s, v.m_data.s) < 0;
     default: throw std::invalid_argument("invalid type of Value");
     }
 }
@@ -176,7 +176,7 @@ bool Value::operator>(const Value& v) const
     case DOUBLE: return m_data.d > v.m_data.d;
     case BOOL: return m_data.b > v.m_data.b;
     case CHAR: return m_data.c > v.m_data.c;
-    case STRING: return strcmp(m_data.s, v.m_data.s) > 0;
+    case STRING: return qstrcmp(m_data.s, v.m_data.s) > 0;
     default: throw std::invalid_argument("invalid type of Value");
     }
 }
@@ -192,7 +192,7 @@ bool Value::operator<=(const Value& v) const
     case DOUBLE: return m_data.d <= v.m_data.d;
     case BOOL: return m_data.b <= v.m_data.b;
     case CHAR: return m_data.c <= v.m_data.c;
-    case STRING: return strcmp(m_data.s, v.m_data.s) <= 0;
+    case STRING: return qstrcmp(m_data.s, v.m_data.s) <= 0;
     default: throw std::invalid_argument("invalid type of Value");
     }
 }
@@ -208,7 +208,7 @@ bool Value::operator>=(const Value& v) const
     case DOUBLE: return m_data.d >= v.m_data.d;
     case BOOL: return m_data.b >= v.m_data.b;
     case CHAR: return m_data.c >= v.m_data.c;
-    case STRING: return strcmp(m_data.s, v.m_data.s) >= 0;
+    case STRING: return qstrcmp(m_data.s, v.m_data.s) >= 0;
     default: throw std::invalid_argument("invalid type of Value");
     }
 }
