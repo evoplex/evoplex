@@ -342,12 +342,20 @@ void MainGUI::slotShowLog()
 void MainGUI::slotShowAbout()
 {
     QString version = "Evoplex " + qApp->applicationVersion();
-    QString txt = "Evoplex is a multi-agent system for networks (graphs).\n\n"
-                  "Based on Qt " QT_VERSION_STR " (" COMPILER_VERSION " " COMPILER_ARCHITECTURE ")\n\n"
-                  "Built on " EVOPLEX_BUILDDATE "\n\n"
-                  "From revision " EVOPLEX_GIT_COMMIT_HASH " (" EVOPLEX_GIT_BRANCH ")\n\n"
-                  "Copyright 2016-" + QDate::currentDate().toString("yyyy") + " Marcos Cardinot et al.\n" +
-                  qApp->organizationDomain();
+    QString txt =
+        "Evoplex is a fast, robust and extensible platform to "
+        "implement either Agent‑Based Models (ABM) or Multi-Agent "
+        "Systems (MAS) imposing a theoretical-graph approach."
+        "<br><br>"
+        "Based on Qt " QT_VERSION_STR " (" COMPILER_VERSION " " COMPILER_ARCHITECTURE ")"
+        "<br><br>"
+        "Built on " EVOPLEX_BUILDDATE
+        "<br><br>"
+        "From revision " EVOPLEX_GIT_COMMIT_HASH " (" EVOPLEX_GIT_BRANCH ")"
+        "<br><br>"
+        "Copyright 2016-" + QDate::currentDate().toString("yyyy") + " Marcos Cardinot et al.<br>"
+        "Website: <a href='" + qApp->organizationDomain() + "'>" + qApp->organizationDomain() + "</a><br>"
+        "Follow us on Twitter: <a href='https://twitter.com/EvoplexOrg'>@EvoplexOrg</a>";
     QMessageBox::about(this, version, txt);
 }
 
