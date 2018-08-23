@@ -40,7 +40,7 @@ Experiment::Experiment(MainApp* mainApp, const int id, ProjectWPtr project)
       m_stopAt(-1),
       m_pauseAt(-1),
       m_progress(0),
-      m_delay(0),
+      m_delay(mainApp->defaultStepDelay()),
       m_expStatus(Status::Invalid)
 {
     Q_ASSERT_X(project.lock(), "Experiment", "an experiment must belong to a valid project");
@@ -193,8 +193,6 @@ void Experiment::enable(QString& error)
         emit (statusChanged(m_expStatus));
         return;
     }
-
-    m_delay = m_mainApp->defaultStepDelay();
 
     if (m_inputs->fileCaches().empty()) {
         return; // nothing to do
