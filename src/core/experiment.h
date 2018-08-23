@@ -79,13 +79,6 @@ public:
 
     bool reset(QString*error=nullptr);
 
-    // play if it's paused and pause it's running
-    void toggle();
-
-    // run all trials
-    void play();
-    void playNext();
-
     // create a set of nodes for the current inputs
     Nodes createNodes() const;
 
@@ -94,16 +87,10 @@ public:
     inline bool hasOutputs() const;
     inline void addOutput(OutputPtr output);
 
-    // pause all trials asap
-    inline void pause();
     // pause all trials at a specific step
     inline int pauseAt() const;
     inline void setPauseAt(int step);
 
-    // stop all trials asap
-    // It sets stopAt and playAt to 0 and makes sure that all trials are
-    // triggred once to make them turn from Disabled (-1) to Finished (0)
-    inline void stop();
     // stop all trials at a specific step
     inline int stopAt() const;
     inline void setStopAt(int step);
@@ -128,6 +115,22 @@ public:
     inline const ModelPlugin* modelPlugin() const;
     inline const GraphPlugin* graphPlugin() const;
     inline GraphType graphType() const;
+
+public slots:
+    // play if it's paused and pause it's running
+    void toggle();
+
+    // run all trials
+    void play();
+    void playNext();
+
+    // pause all trials asap
+    inline void pause();
+
+    // stop all trials asap
+    // It sets stopAt and playAt to 0 and makes sure that all trials are
+    // triggred once to make them turn from Disabled (-1) to Finished (0)
+    inline void stop();
 
 signals:
     void trialCreated(int trialId);

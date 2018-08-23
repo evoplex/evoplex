@@ -33,15 +33,15 @@
 namespace evoplex {
 
 ExperimentWidget::ExperimentWidget(ExperimentPtr exp, MainGUI* mainGUI, ProjectsPage* ppage)
-    : PPageDockWidget(ppage)
-    , m_kIcon_play(QIcon(":/icons/play.svg"))
-    , m_kIcon_pause(QIcon(":/icons/pause.svg"))
-    , m_kIcon_next(QIcon(":/icons/next.svg"))
-    , m_kIcon_reset(QIcon(":/icons/reset.svg"))
-    , m_kIcon_stop(QIcon(":/icons/stop.svg"))
-    , m_exp(exp)
-    , m_innerWindow(new QMainWindow(this))
-    , m_timer(new QTimer)
+    : PPageDockWidget(ppage),
+      m_kIcon_play(QIcon(":/icons/material/play_white_36")),
+      m_kIcon_pause(QIcon(":/icons/material/pause_white_36")),
+      m_kIcon_next(QIcon(":/icons/material/next_white_36")),
+      m_kIcon_reset(QIcon(":/icons/material/replay_white_24")),
+      m_kIcon_stop(QIcon(":/icons/material/stop_white_36")),
+      m_exp(exp),
+      m_innerWindow(new QMainWindow(this)),
+      m_timer(new QTimer)
 {
     setFocusPolicy(Qt::StrongFocus);
 
@@ -64,13 +64,24 @@ ExperimentWidget::ExperimentWidget(ExperimentPtr exp, MainGUI* mainGUI, Projects
 
     QToolBar* tb = new QToolBar("Controls", m_innerWindow);
     tb->setObjectName("Controls");
-    m_aPlayPause = tb->addAction(m_kIcon_play, "Play/Pause");
-    m_aNext = tb->addAction(m_kIcon_next, "Next step");
-    m_aStop = tb->addAction(m_kIcon_stop, "Stop");
-    m_aReset = tb->addAction(m_kIcon_reset, "Reset");
+    auto newBtn = [this, tb](const QIcon& icn, const QString& tooltip) {
+        auto btn = new QtMaterialIconButton(icn, tb);
+        btn->setIconSize(QSize(30,30));
+        btn->setToolTip(tooltip);
+        QColor color = palette().color(QPalette::Text);
+        btn->setColor(color);
+        color.setAlpha(120);
+        btn->setDisabledColor(color);
+        tb->addWidget(btn);
+        return btn;
+    };
+    m_aPlayPause = newBtn(m_kIcon_play, "Play");
+    m_aNext = newBtn(m_kIcon_next, "Next step");
+    m_aStop = newBtn(m_kIcon_stop, "Stop");
+    m_aReset = newBtn(m_kIcon_reset, "Reset");
     tb->addSeparator();
-    m_aGraph = tb->addAction(QIcon(":/icons/graph.svg"), "Graph");
-    m_aGrid = tb->addAction(QIcon(":/icons/grid.svg"), "Grid");
+    m_aGraph = newBtn(QIcon(":/icons/material/graph_white_24"), "Graph");
+    m_aGrid = newBtn(QIcon(":/icons/material/grid_white_18"), "Grid");
     /* FIXME: Disabling LineChart button for now.
      * This feature is in a very unstable state yet.
     m_aLineChart = tb->addAction(QIcon(":/icons/line-chart.svg"), "Line chart");
@@ -80,25 +91,25 @@ ExperimentWidget::ExperimentWidget(ExperimentPtr exp, MainGUI* mainGUI, Projects
     spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     tb->addWidget(spacer);
 
-    m_delay = new QSlider(Qt::Horizontal, this);
+    m_delay = new QtMaterialSlider(this);
+    m_delay->setThumbColor(palette().color(QPalette::Link));
     m_delay->setSingleStep(10);
     m_delay->setPageStep(100);
     m_delay->setMaximum(500);
-    m_delay->setMinimumWidth(100);
-    m_delay->setMaximumWidth(100);
+    m_delay->setMinimumWidth(150);
+    m_delay->setMaximumWidth(150);
     m_delay->setValue(m_exp->delay());
-    m_delay->setToolTip("Delay simulation");
+    m_delay->setToolTip(QString("Delay simulation (%1 msecs)").arg(m_exp->delay()));
     tb->addWidget(m_delay);
 
     tb->setMovable(false);
     tb->setFloatable(false);
-    tb->setIconSize(QSize(20,20));
     tb->setFocusPolicy(Qt::StrongFocus);
 
-    connect(m_aPlayPause, &QAction::triggered, [this]() { m_exp->toggle(); });
-    connect(m_aNext, &QAction::triggered, [this]() { m_exp->playNext(); });
-    connect(m_aStop, &QAction::triggered, [this]() { m_exp->stop(); });
-    connect(m_aReset, &QAction::triggered, [this]() {
+    connect(m_aPlayPause, SIGNAL(pressed()), m_exp.get(), SLOT(toggle()));
+    connect(m_aNext, SIGNAL(pressed()), m_exp.get(), SLOT(playNext()));
+    connect(m_aStop, SIGNAL(pressed()), m_exp.get(), SLOT(stop()));
+    connect(m_aReset, &QtMaterialIconButton::pressed, [this]() {
         QString error;
         if (!m_exp->reset(&error)) {
             QMessageBox::warning(this, "Experiment", error);
@@ -106,6 +117,7 @@ ExperimentWidget::ExperimentWidget(ExperimentPtr exp, MainGUI* mainGUI, Projects
     });
     connect(m_delay, &QSlider::valueChanged, [this](int v) {
         m_exp->setDelay(static_cast<quint16>(v));
+        m_delay->setToolTip(QString("Delay simulation (%1 msecs)").arg(v));
     });
 
     connect(m_exp.get(), SIGNAL(statusChanged(Status)), SLOT(slotStatusChanged(Status)));
@@ -125,9 +137,9 @@ ExperimentWidget::ExperimentWidget(ExperimentPtr exp, MainGUI* mainGUI, Projects
             connect(this, SIGNAL(updateWidgets(bool)), graph, SLOT(updateView(bool)));
         }
     };
-    connect(m_aGraph, &QAction::triggered,
+    connect(m_aGraph, &QtMaterialIconButton::pressed,
             [newGraph]() { newGraph(GraphWidget::Mode::Graph); });
-    connect(m_aGrid, &QAction::triggered,
+    connect(m_aGrid, &QtMaterialIconButton::pressed,
             [newGraph]() { newGraph(GraphWidget::Mode::Grid); });
 
     /* FIXME: Disabling LineChart button for now.
@@ -172,18 +184,21 @@ void ExperimentWidget::slotStatusChanged(Status status)
 {
     if (status == Status::Paused || status == Status::Disabled) {
         m_aPlayPause->setIcon(m_kIcon_play);
+        m_aPlayPause->setToolTip("Play");
         m_aPlayPause->setEnabled(true);
         m_aNext->setEnabled(true);
         m_aStop->setEnabled(status != Status::Disabled);
         m_aReset->setEnabled(true);
     } else if (status == Status::Running || status == Status::Queued) {
         m_aPlayPause->setIcon(m_kIcon_pause);
+        m_aPlayPause->setToolTip("Pause");
         m_aPlayPause->setEnabled(true);
         m_aNext->setEnabled(false);
         m_aStop->setEnabled(true);
         m_aReset->setEnabled(false);
     } else if (status == Status::Finished || status == Status::Invalid) {
         m_aPlayPause->setIcon(m_kIcon_play);
+        m_aPlayPause->setToolTip("Play");
         m_aPlayPause->setEnabled(false);
         m_aNext->setEnabled(false);
         m_aStop->setEnabled(false);

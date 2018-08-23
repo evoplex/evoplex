@@ -181,5 +181,79 @@
         <file>material-icons/editor/png/baseline_table_chart_white_24dp.png</file>
         <file>material-icons/editor/png/baseline_table_chart_white_36dp.png</file>
         <file>material-icons/editor/png/baseline_table_chart_white_48dp.png</file>
+        <file alias="pause_white_18">material-icons/av/png/ic_pause_white_18dp.png</file>
+        <file alias="pause_white_24">material-icons/av/png/ic_pause_white_24dp.png</file>
+        <file alias="pause_white_36">material-icons/av/png/ic_pause_white_36dp.png</file>
+        <file>material-icons/av/png/ic_pause_white_48dp.png</file>
+        <file>material-icons/av/png/ic_play_arrow_black_18dp.png</file>
+        <file>material-icons/av/png/ic_play_arrow_black_24dp.png</file>
+        <file>material-icons/av/png/ic_play_arrow_black_36dp.png</file>
+        <file>material-icons/av/png/ic_play_arrow_black_48dp.png</file>
+        <file alias="play_white_18">material-icons/av/png/ic_play_arrow_white_18dp.png</file>
+        <file alias="play_white_24">material-icons/av/png/ic_play_arrow_white_24dp.png</file>
+        <file alias="play_white_36">material-icons/av/png/ic_play_arrow_white_36dp.png</file>
+        <file>material-icons/av/png/ic_play_arrow_white_48dp.png</file>
+        <file>material-icons/av/png/ic_replay_black_18dp.png</file>
+        <file>material-icons/av/png/ic_replay_black_24dp.png</file>
+        <file>material-icons/av/png/ic_replay_black_36dp.png</file>
+        <file>material-icons/av/png/ic_replay_black_48dp.png</file>
+        <file alias="replay_white_18">material-icons/av/png/ic_replay_white_18dp.png</file>
+        <file alias="replay_white_24">material-icons/av/png/ic_replay_white_24dp.png</file>
+        <file alias="replay_white_36">material-icons/av/png/ic_replay_white_36dp.png</file>
+        <file>material-icons/av/png/ic_replay_white_48dp.png</file>
+        <file>material-icons/av/png/ic_skip_next_black_18dp.png</file>
+        <file>material-icons/av/png/ic_skip_next_black_24dp.png</file>
+        <file>material-icons/av/png/ic_skip_next_black_36dp.png</file>
+        <file>material-icons/av/png/ic_skip_next_black_48dp.png</file>
+        <file alias="next_white_18">material-icons/av/png/ic_skip_next_white_18dp.png</file>
+        <file alias="next_white_24">material-icons/av/png/ic_skip_next_white_24dp.png</file>
+        <file alias="next_white_36">material-icons/av/png/ic_skip_next_white_36dp.png</file>
+        <file>material-icons/av/png/ic_skip_next_white_48dp.png</file>
+        <file>material-icons/av/png/ic_stop_black_18dp.png</file>
+        <file>material-icons/av/png/ic_stop_black_24dp.png</file>
+        <file>material-icons/av/png/ic_stop_black_36dp.png</file>
+        <file>material-icons/av/png/ic_stop_black_48dp.png</file>
+        <file alias="stop_white_18">material-icons/av/png/ic_stop_white_18dp.png</file>
+        <file alias="stop_white_24">material-icons/av/png/ic_stop_white_24dp.png</file>
+        <file alias="stop_white_36">material-icons/av/png/ic_stop_white_36dp.png</file>
+        <file>material-icons/av/png/ic_stop_white_48dp.png</file>
+        <file>material-icons/av/svg/ic_pause_24px.svg</file>
+        <file>material-icons/av/svg/ic_pause_48px.svg</file>
+        <file>material-icons/av/svg/ic_play_arrow_24px.svg</file>
+        <file>material-icons/av/svg/ic_play_arrow_48px.svg</file>
+        <file>material-icons/av/svg/ic_playlist_add_check_24px.svg</file>
+        <file>material-icons/av/svg/ic_playlist_add_check_48px.svg</file>
+        <file>material-icons/av/svg/ic_playlist_play_24px.svg</file>
+        <file>material-icons/av/svg/ic_playlist_play_48px.svg</file>
+        <file>material-icons/av/svg/ic_replay_24px.svg</file>
+        <file>material-icons/av/svg/ic_replay_48px.svg</file>
+        <file>material-icons/av/svg/ic_skip_next_24px.svg</file>
+        <file>material-icons/av/svg/ic_skip_next_48px.svg</file>
+        <file>material-icons/av/svg/ic_stop_24px.svg</file>
+        <file>material-icons/av/svg/ic_stop_48px.svg</file>
+        <file>material-icons/editor/png/ic_linear_scale_black_18dp.png</file>
+        <file>material-icons/editor/png/ic_linear_scale_black_24dp.png</file>
+        <file>material-icons/editor/png/ic_linear_scale_black_36dp.png</file>
+        <file>material-icons/editor/png/ic_linear_scale_black_48dp.png</file>
+        <file>material-icons/editor/png/ic_linear_scale_white_18dp.png</file>
+        <file>material-icons/editor/png/ic_linear_scale_white_24dp.png</file>
+        <file>material-icons/editor/png/ic_linear_scale_white_36dp.png</file>
+        <file>material-icons/editor/png/ic_linear_scale_white_48dp.png</file>
+        <file>material-icons/image/png/ic_grid_on_black_18dp.png</file>
+        <file>material-icons/image/png/ic_grid_on_black_24dp.png</file>
+        <file>material-icons/image/png/ic_grid_on_black_36dp.png</file>
+        <file>material-icons/image/png/ic_grid_on_black_48dp.png</file>
+        <file alias="grid_white_18">material-icons/image/png/ic_grid_on_white_18dp.png</file>
+        <file alias="grid_white_24">material-icons/image/png/ic_grid_on_white_24dp.png</file>
+        <file alias="grid_white_36">material-icons/image/png/ic_grid_on_white_36dp.png</file>
+        <file>material-icons/image/png/ic_grid_on_white_48dp.png</file>
+        <file alias="graph_white_18">material-icons/image/png/ic_grain_black_18dp.png</file>
+        <file alias="graph_white_24">material-icons/image/png/ic_grain_black_24dp.png</file>
+        <file alias="graph_white_36">material-icons/image/png/ic_grain_black_36dp.png</file>
+        <file>material-icons/image/png/ic_grain_black_48dp.png</file>
+        <file>material-icons/image/png/ic_grain_white_18dp.png</file>
+        <file>material-icons/image/png/ic_grain_white_24dp.png</file>
+        <file>material-icons/image/png/ic_grain_white_36dp.png</file>
+        <file>material-icons/image/png/ic_grain_white_48dp.png</file>
     </qresource>
 </RCC>

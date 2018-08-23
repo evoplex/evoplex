@@ -24,6 +24,9 @@
 #include <QDockWidget>
 #include <QMainWindow>
 
+#include "external/qt-material-widgets/qtmaterialiconbutton.h"
+#include "external/qt-material-widgets/qtmaterialslider.h"
+
 #include "experimentdesigner.h"
 #include "projectspage.h"
 #include "core/project.h"
@@ -65,14 +68,14 @@ private:
     QMainWindow* m_innerWindow;
     QTimer* m_timer;
 
-    QAction* m_aPlayPause;
-    QAction* m_aNext;
-    QAction* m_aStop;
-    QAction* m_aReset;
-    QAction* m_aGraph;
-    QAction* m_aGrid;
-    QAction* m_aLineChart;
-    QSlider* m_delay;
+    QtMaterialIconButton* m_aPlayPause;
+    QtMaterialIconButton* m_aNext;
+    QtMaterialIconButton* m_aStop;
+    QtMaterialIconButton* m_aReset;
+    QtMaterialIconButton* m_aGraph;
+    QtMaterialIconButton* m_aGrid;
+    QtMaterialIconButton* m_aLineChart;
+    QtMaterialSlider* m_delay;
 
     bool isAutoDeleteOff();
 };
