@@ -73,8 +73,6 @@ private:
     MainGUI* m_mainGUI;
     ProjectPtr m_project;
 
-    QMap<TableWidget::Header, int> m_headerIdx; // map Header to column index
-
     void fillRow(int row, const ExperimentPtr& exp);
 
     void insertItem(int row, TableWidget::Header header,

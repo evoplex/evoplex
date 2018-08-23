@@ -21,8 +21,10 @@
 #include <QDebug>
 #include <QHBoxLayout>
 #include <QMainWindow>
+#include <QMenu>
 #include <QMessageBox>
 #include <QTableWidgetItem>
+#include <QVariant>
 
 #include "core/experimentsmgr.h"
 
@@ -49,14 +51,6 @@ ProjectWidget::ProjectWidget(ProjectPtr project, MainGUI* mainGUI, ProjectsPage*
     auto titleBar = new TitleBar(this);
     titleBar->setSubtitle("PROJECT");
     titleBar->setTitle(windowTitle());
-
-    auto bPauseAll = new QtMaterialIconButton(QIcon(":/icons/material/pauseall_white_24"), this);
-    titleBar->addButton(bPauseAll, "pause all experiments");
-    connect(bPauseAll, SIGNAL(pressed()), m_project.get(), SLOT(pauseAll()));
-    auto bPlayAll = new QtMaterialIconButton(QIcon(":/icons/material/playall_white_24"), this);
-    titleBar->addButton(bPlayAll, "play all experiments");
-    connect(bPlayAll, SIGNAL(pressed()), m_project.get(), SLOT(playAll()));
-
     setTitleBarWidget(titleBar);
 
     m_ui->labelExps->setFont(FontStyles::subtitle2());
@@ -64,28 +58,61 @@ ProjectWidget::ProjectWidget(ProjectPtr project, MainGUI* mainGUI, ProjectsPage*
     connect(m_project.get(), SIGNAL(expAdded(int)), SLOT(slotInsertRow(int)));
     connect(m_project.get(), SIGNAL(expEdited(int)), SLOT(slotUpdateRow(int)));
     connect(m_project.get(), SIGNAL(expRemoved(int)), SLOT(slotRemoveRow(int)));
+    connect(m_project.get(), SIGNAL(hasUnsavedChanges(bool)),
+            SLOT(slotHasUnsavedChanges(bool)));
 
-    int col = 0;
-    m_headerIdx.insert(TableWidget::H_BUTTON, col++);
-    m_headerIdx.insert(TableWidget::H_EXPID, col++);
-    m_headerIdx.insert(TableWidget::H_SEED, col++);
-    m_headerIdx.insert(TableWidget::H_STOPAT, col++);
-    m_headerIdx.insert(TableWidget::H_MODEL, col++);
-    m_headerIdx.insert(TableWidget::H_GRAPH, col++);
-    m_headerIdx.insert(TableWidget::H_TRIALS, col++);
-    m_ui->table->insertColumns(m_headerIdx.keys());
     m_ui->table->init(mainGUI->mainApp()->expMgr());
 
     connect(m_ui->table, SIGNAL(itemSelectionChanged()), SLOT(slotSelectionChanged()));
     connect(m_ui->table, SIGNAL(itemDoubleClicked(QTableWidgetItem*)),
             SLOT(onItemDoubleClicked(QTableWidgetItem*)));
 
-    connect(m_project.get(), SIGNAL(hasUnsavedChanges(bool)),
-            SLOT(slotHasUnsavedChanges(bool)));
+    QSettings userPrefs;
+    auto _visibleCols = QVariant::fromValue<QVariantList>({TableWidget::H_BUTTON,
+            TableWidget::H_EXPID, TableWidget::H_MODEL, TableWidget::H_GRAPH });
+    auto visibleCols = userPrefs.value("projectWidget/showColumns", _visibleCols).toList();
+    if (visibleCols.isEmpty()) {
+        visibleCols.append(_visibleCols);
+    }
+
+    QMenu* tableSettings = new QMenu(this);
+    auto it = m_ui->table->headerLabels().begin();
+    while (it != m_ui->table->headerLabels().end()) {
+        auto a = new QAction(it.value(), this);
+        a->setCheckable(true);
+        connect(a, &QAction::toggled, [this, it](bool checked) {
+            m_ui->table->setColumnHidden(it.key(), !checked);
+        });
+        a->setData(it.key());
+        a->setChecked(visibleCols.contains(QVariant(it.key())));
+        m_ui->table->setColumnHidden(it.key(), !a->isChecked());
+        tableSettings->addAction(a);
+        ++it;
+    }
+
+    auto bPauseAll = new QtMaterialIconButton(QIcon(":/icons/material/pauseall_white_24"), this);
+    titleBar->addButton(bPauseAll, "pause all experiments");
+    connect(bPauseAll, SIGNAL(pressed()), m_project.get(), SLOT(pauseAll()));
+    auto bPlayAll = new QtMaterialIconButton(QIcon(":/icons/material/playall_white_24"), this);
+    titleBar->addButton(bPlayAll, "play all experiments");
+    connect(bPlayAll, SIGNAL(pressed()), m_project.get(), SLOT(playAll()));
+    auto bSettings = new QtMaterialIconButton(QIcon(":/icons/material/settings_white_18"), this);
+    titleBar->addButton(bSettings, "table settings");
+    connect(bSettings, &QtMaterialIconButton::pressed, [tableSettings](){ tableSettings->exec(QCursor::pos()); });
 }
 
 ProjectWidget::~ProjectWidget()
 {
+    QVariantList visibleCols;
+    int cols = m_ui->table->horizontalHeader()->count();
+    for (int col = 0; col < cols; ++col) {
+        if (!m_ui->table->isColumnHidden(col)) {
+            visibleCols.append(col);
+        }
+    }
+    QSettings userPrefs;
+    userPrefs.setValue("projectWidget/showColumns", visibleCols);
+
     delete m_ui;
 }
 
@@ -148,7 +175,7 @@ void ProjectWidget::fillRow(int row, const ExperimentPtr& exp)
         //QFont font = item->font();
         //font.setItalic(true);
         //item->setFont(font);
-        m_ui->table->setItem(row, m_headerIdx.value(header), item);
+        m_ui->table->setItem(row, header, item);
     };
 
     // model stuff
@@ -168,9 +195,8 @@ void ProjectWidget::slotInsertRow(int expId)
 
 void ProjectWidget::slotUpdateRow(int expId)
 {
-    const int expIdCol = m_headerIdx.value(TableWidget::H_EXPID);
     for (int row = 0; row < m_ui->table->rowCount(); ++row) {
-        if (expId == m_ui->table->item(row, expIdCol)->text().toInt()) {
+        if (expId == m_ui->table->item(row, TableWidget::H_EXPID)->text().toInt()) {
             fillRow(row, m_project->experiment(expId));
             return;
         }
@@ -180,9 +206,8 @@ void ProjectWidget::slotUpdateRow(int expId)
 
 void ProjectWidget::slotRemoveRow(int expId)
 {
-    const int expIdCol = m_headerIdx.value(TableWidget::H_EXPID);
     for (int row = 0; row < m_ui->table->rowCount(); ++row) {
-        if (expId == m_ui->table->item(row, expIdCol)->text().toInt()) {
+        if (expId == m_ui->table->item(row, TableWidget::H_EXPID)->text().toInt()) {
             m_ui->table->removeRow(row);
             return;
         }
@@ -195,7 +220,7 @@ void ProjectWidget::insertItem(int row, TableWidget::Header header,
     QTableWidgetItem* item = new QTableWidgetItem(label);
     item->setTextAlignment(Qt::AlignCenter);
     item->setToolTip(tooltip);
-    m_ui->table->setItem(row, m_headerIdx.value(header), item);
+    m_ui->table->setItem(row, header, item);
 }
 
 void ProjectWidget::slotSelectionChanged()
@@ -204,15 +229,14 @@ void ProjectWidget::slotSelectionChanged()
         emit (expSelectionChanged(-1));
     } else {
         const int row = m_ui->table->selectedItems().first()->row();
-        const int expId = m_ui->table->item(row,
-                m_headerIdx.value(TableWidget::H_EXPID))->text().toInt();
+        const int expId = m_ui->table->item(row, TableWidget::H_EXPID)->text().toInt();
         emit (expSelectionChanged(expId));
     }
 }
 
 void ProjectWidget::onItemDoubleClicked(QTableWidgetItem* item)
 {
-    int expId = m_ui->table->item(item->row(), m_headerIdx.value(TableWidget::H_EXPID))->text().toInt();
+    int expId = m_ui->table->item(item->row(), TableWidget::H_EXPID)->text().toInt();
     emit (openExperiment(expId));
 }
 

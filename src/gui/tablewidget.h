@@ -42,7 +42,6 @@ class TableWidget : public QTableWidget
 public:
     enum Header {
         H_BUTTON = 0, // always the first
-        H_PROJID,
         H_EXPID,
         H_SEED,
         H_STOPAT,
@@ -57,7 +56,8 @@ public:
     void init(ExperimentsMgr* expMgr);
 
     int insertRow(Experiment* exp);
-    void insertColumns(const QList<Header>& headers);
+
+    inline const QMap<Header, QString>& headerLabels() const;
 
 public slots:
     void removeRow(int row);
@@ -80,7 +80,6 @@ private:
 };
 
 /*********************************************************/
-/*********************************************************/
 
 class RowsDelegate : public QStyledItemDelegate
 {
@@ -100,5 +99,11 @@ private:
     Status m_status;
     quint16 m_progress;
 };
+
+/*********************************************************/
+
+inline const QMap<TableWidget::Header, QString>& TableWidget::headerLabels() const
+{ return m_headerLabel; }
+
 } // evoplex
 #endif // TABLEWIDGET_H

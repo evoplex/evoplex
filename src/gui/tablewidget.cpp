@@ -58,7 +58,6 @@ TableWidget::TableWidget(QWidget *parent)
     );
 
     m_headerLabel.insert(H_BUTTON, "");
-    m_headerLabel.insert(H_PROJID, "Project");
     m_headerLabel.insert(H_EXPID, "#");
     m_headerLabel.insert(H_SEED, "Seed");
     m_headerLabel.insert(H_STOPAT, "Stop at");
@@ -66,18 +65,27 @@ TableWidget::TableWidget(QWidget *parent)
     m_headerLabel.insert(H_GRAPH, "Graph");
     m_headerLabel.insert(H_TRIALS, "Trials");
 
-    horizontalHeader()->setHighlightSections(false);
-    horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-
-    verticalHeader()->setVisible(false);
-    verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);
-    verticalHeader()->setDefaultSectionSize(40);
-
+    setColumnCount(m_headerLabel.size());
+    setHorizontalHeaderLabels(m_headerLabel.values());
     setShowGrid(false);
     setSortingEnabled(true);
     setEditTriggers(QAbstractItemView::NoEditTriggers);
     setSelectionBehavior(QAbstractItemView::SelectRows);
     setSelectionMode(QAbstractItemView::SingleSelection);
+
+    horizontalHeader()->setHighlightSections(false);
+    horizontalHeader()->setStretchLastSection(true);
+    horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
+    horizontalHeader()->setSectionResizeMode(H_EXPID, QHeaderView::ResizeToContents);
+    horizontalHeader()->setSectionResizeMode(H_SEED, QHeaderView::ResizeToContents);
+    horizontalHeader()->setSectionResizeMode(H_STOPAT, QHeaderView::ResizeToContents);
+    horizontalHeader()->setSectionResizeMode(H_TRIALS, QHeaderView::ResizeToContents);
+    horizontalHeader()->setSectionResizeMode(H_MODEL, QHeaderView::Stretch);
+    horizontalHeader()->setSectionResizeMode(H_GRAPH, QHeaderView::Stretch);
+
+    verticalHeader()->setVisible(false);
+    verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);
+    verticalHeader()->setDefaultSectionSize(40);
 
     connect(this, SIGNAL(itemClicked(QTableWidgetItem*)),
             SLOT(onItemClicked(QTableWidgetItem*)));
@@ -94,23 +102,6 @@ void TableWidget::init(ExperimentsMgr* expMgr)
 {
     m_expMgr = expMgr;
     connect(m_expMgr, SIGNAL(progressUpdated()), viewport(), SLOT(update()));
-}
-
-void TableWidget::insertColumns(const QList<Header>& headers)
-{
-    Q_ASSERT_X(headers.at(0) == H_BUTTON, "TableWidget::insertColumns",
-             "the toggle button MUST be in the first column");
-
-    QStringList labels;
-    labels << m_headerLabel.value(H_BUTTON);
-    for (int i = 1; i < headers.size(); ++i) {
-        Header h = headers.at(i);
-        Q_ASSERT_X(h != H_BUTTON, "TableWidget::insertColumns",
-                   "we must have only one toggle button in a row");
-        labels << m_headerLabel.value(h);
-    }
-    setColumnCount(labels.size());
-    setHorizontalHeaderLabels(labels);
 }
 
 int TableWidget::insertRow(Experiment* exp)
