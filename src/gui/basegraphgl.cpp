@@ -58,16 +58,11 @@ BaseGraphGL::BaseGraphGL(ExperimentPtr exp, GraphWidget* parent)
 
     // setTrial() triggers a timer that needs to be exec in the main thread
     // thus, we need to use queuedconnection here
-    connect(exp.get(), &Experiment::trialCreated, this,
+    connect(m_exp.get(), &Experiment::trialCreated, this,
             [this](int trialId) { if (trialId == m_currTrialId) setTrial(m_currTrialId); },
             Qt::QueuedConnection);
 
-    connect(exp.get(), &Experiment::statusChanged, [this](Status s) {
-        if (s == Status::Invalid) return;
-        for (AttrWidget* aw : m_attrWidgets) {
-            if (aw) aw->setReadOnly(s == Status::Running);
-        }
-    });
+    connect(m_exp.get(), SIGNAL(statusChanged(Status)), SLOT(slotStatusChanged(Status)));
 
     connect(m_ui->bZoomIn, SIGNAL(clicked(bool)), SLOT(zoomIn()));
     connect(m_ui->bZoomOut, SIGNAL(clicked(bool)), SLOT(zoomOut()));
@@ -83,6 +78,7 @@ BaseGraphGL::BaseGraphGL(ExperimentPtr exp, GraphWidget* parent)
 
 BaseGraphGL::~BaseGraphGL()
 {
+    m_exp->disconnect(this); // important to avoid triggering statusChanged()
     m_attrWidgets.clear();
     m_trial = nullptr;
     m_exp = nullptr;
@@ -94,9 +90,6 @@ void BaseGraphGL::setupInspector()
     QLayoutItem* item;
     while (m_ui->modelAttrs->count() &&
            (item = m_ui->modelAttrs->takeAt(0))) {
-        if (item->widget()) {
-            delete item->widget();
-        }
         delete item;
     }
 
@@ -104,13 +97,14 @@ void BaseGraphGL::setupInspector()
     m_attrWidgets.resize(static_cast<size_t>(m_exp->modelPlugin()->nodeAttrsScope().size()));
 
     for (auto attrRange : m_exp->modelPlugin()->nodeAttrsScope()) {
-        AttrWidget* aw = new AttrWidget(attrRange, this);
+        auto aw = QSharedPointer<AttrWidget>::create(attrRange, nullptr);
         aw->setToolTip(attrRange->attrRangeStr());
-        connect(aw, &AttrWidget::valueChanged, [this, aw]() { attrChanged(aw); });
+        connect(aw.data(), &AttrWidget::valueChanged,
+                [this, _aw=aw.toWeakRef()]() { attrChanged(_aw.toStrongRef()); });
         m_attrWidgets.at(attrRange->id()) = aw;
-        m_ui->modelAttrs->insertRow(attrRange->id(), attrRange->attrName(), aw);
+        m_ui->modelAttrs->insertRow(attrRange->id(), attrRange->attrName(), aw.data());
 
-        QWidget* l = m_ui->modelAttrs->labelForField(aw);
+        QWidget* l = m_ui->modelAttrs->labelForField(aw.data());
         l->setToolTip(attrRange->attrName());
         l->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::MinimumExpanding);
         l->setMinimumWidth(m_ui->lNodeId->minimumWidth());
@@ -119,7 +113,7 @@ void BaseGraphGL::setupInspector()
     m_ui->inspector->hide();
 }
 
-void BaseGraphGL::attrChanged(AttrWidget* aw) const
+void BaseGraphGL::attrChanged(QSharedPointer<AttrWidget> aw) const
 {
     if (!m_trial || !m_trial->graph() || m_ui->nodeId->value() < 0) {
         return;
@@ -176,6 +170,15 @@ void BaseGraphGL::updateCache(bool force)
     });
     watcher->setFuture(future);
     m_mutex.unlock();
+}
+
+void BaseGraphGL::slotStatusChanged(Status s)
+{
+    for (auto aw : m_attrWidgets) {
+        if (aw) {
+            aw->setReadOnly(s == Status::Running);
+        }
+    }
 }
 
 void BaseGraphGL::slotRestarted()

@@ -32,7 +32,8 @@ namespace evoplex {
 AttrWidget::AttrWidget(AttributeRangePtr attrRange, QWidget* parent, QWidget* customWidget)
     : QWidget(parent),
       m_useCustomWidget(customWidget),
-      m_attrRange(attrRange)
+      m_attrRange(attrRange),
+      m_isReadOnly(false)
 {
     m_widget = customWidget ? customWidget : newWidget(attrRange);
     m_widget->setFocusPolicy(Qt::StrongFocus);
@@ -125,7 +126,7 @@ QWidget* AttrWidget::newWidget(AttributeRangePtr attrRange)
 {
     switch (attrRange->type()) {
     case AttributeRange::Double_Range: {
-        auto sp = new QDoubleSpinBox(this);
+        auto sp = new QDoubleSpinBox();
         sp->setMaximum(attrRange->max().toDouble());
         sp->setMinimum(attrRange->min().toDouble());
         sp->setDecimals(8);
@@ -135,7 +136,7 @@ QWidget* AttrWidget::newWidget(AttributeRangePtr attrRange)
         return sp;
     }
     case AttributeRange::Int_Range: {
-        auto sp = new QSpinBox(this);
+        auto sp = new QSpinBox();
         sp->setMaximum(attrRange->max().toInt());
         sp->setMinimum(attrRange->min().toInt());
         sp->setButtonSymbols(QSpinBox::NoButtons);
@@ -147,7 +148,7 @@ QWidget* AttrWidget::newWidget(AttributeRangePtr attrRange)
     case AttributeRange::Int_Set:
     case AttributeRange::String_Set: {
         auto sov = dynamic_cast<SetOfValues*>(attrRange.get());
-        auto cb = new QComboBox(this);
+        auto cb = new QComboBox();
         for (const Value& v : sov->values()) {
             cb->addItem(v.toQString());
         }
@@ -156,7 +157,7 @@ QWidget* AttrWidget::newWidget(AttributeRangePtr attrRange)
         return cb;
     }
     case AttributeRange::Bool: {
-        auto cb = new QtMaterialToggle(this);
+        auto cb = new QtMaterialToggle();
         cb->setMaximumSize(QSize(60, 36));
         cb->setActiveColor(palette().color(QPalette::Link));
         connect(cb, SIGNAL(toggled(bool)), SIGNAL(valueChanged()));
@@ -164,19 +165,19 @@ QWidget* AttrWidget::newWidget(AttributeRangePtr attrRange)
         return cb;
     }
     case AttributeRange::FilePath: {
-        auto lb = new LineButton(this, LineButton::SelectTextFile);
+        auto lb = new LineButton(nullptr, LineButton::SelectTextFile);
         connect(lb->line(), SIGNAL(textChanged(QString)), SIGNAL(valueChanged()));
         connect(this, SIGNAL(readOnlyChanged(bool)), lb, SLOT(setReadOnly(bool)));
         return lb;
     }
     case AttributeRange::DirPath: {
-        auto lb = new LineButton(this, LineButton::SelectDir);
+        auto lb = new LineButton(nullptr, LineButton::SelectDir);
         connect(lb->line(), SIGNAL(textChanged(QString)), SIGNAL(valueChanged()));
         connect(this, SIGNAL(readOnlyChanged(bool)), lb, SLOT(setReadOnly(bool)));
         return lb;
     }
     default:
-        auto le = new QLineEdit(this);
+        auto le = new QLineEdit();
         le->setText(attrRange->min().toQString());
         connect(le, SIGNAL(textChanged(QString)), SIGNAL(valueChanged()));
         connect(this, &AttrWidget::readOnlyChanged, [le](bool on) { le->setReadOnly(on); });

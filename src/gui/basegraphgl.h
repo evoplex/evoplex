@@ -21,11 +21,13 @@
 #ifndef BASEGRAPHGL_H
 #define BASEGRAPHGL_H
 
+#include <vector>
+
 #include <QOpenGLWidget>
 #include <QLineEdit>
 #include <QMouseEvent>
+#include <QSharedPointer>
 #include <QTimer>
-#include <vector>
 
 #include "core/experiment.h"
 
@@ -106,6 +108,7 @@ public slots:
     void setNodeScale(int v);
 
 private slots:
+    void slotStatusChanged(Status s);
     void slotRestarted();
     void resetView();
     void setNodeCMap(ColorMap* cmap);
@@ -116,9 +119,9 @@ private:
     quint16 m_currTrialId;
     QMutex m_mutex;
     QRect m_inspGeo; // inspector geometry with margin
-    std::vector<AttrWidget*> m_attrWidgets;
+    std::vector<QSharedPointer<AttrWidget>> m_attrWidgets;
 
-    void attrChanged(AttrWidget* aw) const;
+    void attrChanged(QSharedPointer<AttrWidget> aw) const;
 
     void setupInspector();
 
