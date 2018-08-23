@@ -85,16 +85,16 @@ QWidget#inspector {
 QTreeWidget#treeWidget {
   /*background-color: rgb(51, 51, 51);*/
   background: transparent;
+  margin-left: 6px;
+  margin-right: 10px;
 }
 QTreeWidget::item#treeWidget {
-  background: transparent;
   height: 26px;
   margin-top: 4px;
   padding-left: 6px;
   padding-right: 10px;
 }
 QTreeWidget::item:has-children#treeWidget {
-  background: transparent;
   margin-top: 8px;
   margin-bottom: -3px;
 }
