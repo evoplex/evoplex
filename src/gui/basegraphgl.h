@@ -115,7 +115,7 @@ private slots:
 
 private:
     QTimer m_updateCacheTimer;
-    QPointF m_posEntered;
+    QPoint m_posEntered;
     quint16 m_currTrialId;
     QMutex m_mutex;
     QRect m_inspGeo; // inspector geometry with margin

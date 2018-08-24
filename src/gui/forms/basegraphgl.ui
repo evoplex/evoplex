@@ -2,13 +2,11 @@
 <ui version="4.0">
  <class>BaseGraphGL</class>
  <widget class="QOpenGLWidget" name="BaseGraphGL">
-  <property name="geometry">
-   <rect>
-    <x>0</x>
-    <y>0</y>
-    <width>526</width>
-    <height>291</height>
-   </rect>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
   </property>
   <layout class="QGridLayout" name="gridLayout_2">
    <property name="topMargin">
@@ -106,10 +104,13 @@ color: rgb(255, 255, 255);</string>
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>
+       <property name="sizeType">
+        <enum>QSizePolicy::MinimumExpanding</enum>
+       </property>
        <property name="sizeHint" stdset="0">
         <size>
-         <width>0</width>
-         <height>0</height>
+         <width>5</width>
+         <height>5</height>
         </size>
        </property>
       </spacer>
@@ -197,10 +198,13 @@ color: rgb(255, 255, 255);</string>
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>
+       <property name="sizeType">
+        <enum>QSizePolicy::MinimumExpanding</enum>
+       </property>
        <property name="sizeHint" stdset="0">
         <size>
-         <width>0</width>
-         <height>0</height>
+         <width>5</width>
+         <height>5</height>
         </size>
        </property>
       </spacer>
@@ -212,10 +216,13 @@ color: rgb(255, 255, 255);</string>
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::MinimumExpanding</enum>
+     </property>
      <property name="sizeHint" stdset="0">
       <size>
-       <width>34</width>
-       <height>14</height>
+       <width>10</width>
+       <height>10</height>
       </size>
      </property>
     </spacer>
@@ -248,10 +255,16 @@ color: rgb(255, 255, 255);</string>
       </sizepolicy>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout">
+      <property name="topMargin">
+       <number>6</number>
+      </property>
       <item>
-       <layout class="QHBoxLayout" name="hLayout">
+       <layout class="QHBoxLayout" name="topLayout">
+        <property name="spacing">
+         <number>0</number>
+        </property>
         <item>
-         <spacer name="horizontalSpacer">
+         <spacer name="hspacer">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
           </property>
@@ -264,13 +277,7 @@ color: rgb(255, 255, 255);</string>
          </spacer>
         </item>
         <item>
-         <widget class="QPushButton" name="bCloseInspector">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
+         <widget class="QLabel" name="bCloseInspector">
           <property name="minimumSize">
            <size>
             <width>24</width>
@@ -283,18 +290,14 @@ color: rgb(255, 255, 255);</string>
             <height>24</height>
            </size>
           </property>
-          <property name="icon">
-           <iconset resource="../res/guiRes.qrc">
-            <normaloff>:/icons/material/close_white_18</normaloff>:/icons/material/close_white_18</iconset>
+          <property name="lineWidth">
+           <number>0</number>
           </property>
-          <property name="iconSize">
-           <size>
-            <width>24</width>
-            <height>24</height>
-           </size>
+          <property name="pixmap">
+           <pixmap resource="../res/guiRes.qrc">:/icons/material/close_white_18</pixmap>
           </property>
-          <property name="flat">
-           <bool>true</bool>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
           </property>
          </widget>
         </item>
@@ -342,6 +345,9 @@ color: rgb(255, 255, 255);</string>
         </item>
         <item row="2" column="1">
          <widget class="QLineEdit" name="neighbors">
+          <property name="enabled">
+           <bool>true</bool>
+          </property>
           <property name="readOnly">
            <bool>true</bool>
           </property>
@@ -349,6 +355,9 @@ color: rgb(255, 255, 255);</string>
         </item>
         <item row="1" column="1">
          <widget class="QSpinBox" name="nodeId">
+          <property name="enabled">
+           <bool>true</bool>
+          </property>
           <property name="readOnly">
            <bool>true</bool>
           </property>

@@ -37,7 +37,6 @@ GridView::GridView(ColorMapMgr* cMgr, ExperimentPtr exp, GraphWidget* parent)
             SIGNAL(cmapUpdated(ColorMap*)), SLOT(setNodeCMap(ColorMap*)));
     m_settingsDlg->init();
 
-    //m_settingsDlg->edges->setHidden(true);
     m_ui->bShowNodes->hide();
     m_ui->bShowEdges->hide();
     setTrial(0); // init at trial 0

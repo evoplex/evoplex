@@ -20,6 +20,7 @@
 
 #include <QtConcurrent>
 #include <QFutureWatcher>
+#include <QFormLayout>
 #include <QMessageBox>
 #include <QMutex>
 
@@ -45,11 +46,14 @@ BaseGraphGL::BaseGraphGL(ExperimentPtr exp, GraphWidget* parent)
       m_nodeRadius(m_nodeScale),
       m_origin(5.,5.),
       m_cacheStatus(CacheStatus::Ready),
-      m_posEntered(0.,0.),
+      m_posEntered(0,0),
       m_currTrialId(0)
 {
     m_ui->setupUi(this);
     setAttribute(Qt::WA_DeleteOnClose, true);
+
+    // Qt uses this attribute to optimize paint events on resizes (see docs)
+    setAttribute(Qt::WA_StaticContents, true);
 
     Q_ASSERT_X(!m_exp->autoDeleteTrials(), "BaseGraphGL",
                "tried to build a BaseGraphGL for a experiment that will be auto-deleted!");
@@ -68,8 +72,6 @@ BaseGraphGL::BaseGraphGL(ExperimentPtr exp, GraphWidget* parent)
     connect(m_ui->bZoomOut, SIGNAL(clicked(bool)), SLOT(zoomOut()));
     connect(m_ui->bReset, SIGNAL(clicked(bool)), SLOT(resetView()));
 
-    connect(m_ui->bCloseInspector, &QPushButton::clicked,
-            [this](bool) { clearSelection(); });
     setupInspector();
 
     m_updateCacheTimer.setSingleShot(true);
@@ -87,11 +89,18 @@ BaseGraphGL::~BaseGraphGL()
 
 void BaseGraphGL::setupInspector()
 {
-    QLayoutItem* item;
-    while (m_ui->modelAttrs->count() &&
-           (item = m_ui->modelAttrs->takeAt(0))) {
-        delete item;
+    // important! for some reason, changing the layout (add/delete itens)
+    // in a invisible UI disables all fields in an irreversible way.
+    // Tested on Qt 5.9--5.11
+    m_ui->inspector->show();
+
+    while (m_ui->modelAttrs->count()) {
+        auto item = m_ui->modelAttrs->takeRow(0);
+        delete item.labelItem->widget();
+        delete item.labelItem;
+        delete item.fieldItem;
     }
+    m_ui->inspector->hide();
 
     m_attrWidgets.clear();
     m_attrWidgets.resize(static_cast<size_t>(m_exp->modelPlugin()->nodeAttrsScope().size()));
@@ -109,8 +118,6 @@ void BaseGraphGL::setupInspector()
         l->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::MinimumExpanding);
         l->setMinimumWidth(m_ui->lNodeId->minimumWidth());
     }
-
-    m_ui->inspector->hide();
 }
 
 void BaseGraphGL::attrChanged(QSharedPointer<AttrWidget> aw) const
@@ -248,29 +255,38 @@ void BaseGraphGL::resetView()
 void BaseGraphGL::mousePressEvent(QMouseEvent* e)
 {
     if (e->button() == Qt::LeftButton) {
-        m_posEntered = e->localPos();
+        m_posEntered = e->pos();
     }
+    QOpenGLWidget::mousePressEvent(e);
 }
 
 void BaseGraphGL::mouseReleaseEvent(QMouseEvent *e)
 {
-    if (!m_trial || !m_trial->model() || e->button() != Qt::LeftButton ||
-            (m_ui->inspector->isVisible() && m_inspGeo.contains(e->pos()))) {
+    QOpenGLWidget::mouseReleaseEvent(e);
+
+    if (m_ui->inspector->isVisible() && m_inspGeo.contains(e->pos())) {
+        auto p = m_ui->bCloseInspector->mapFrom(this, e->pos());
+        if (m_ui->bCloseInspector->rect().contains(p)) {
+            clearSelection();
+        }
         return;
     }
 
-    if (e->localPos() == m_posEntered) {
+    if (!m_trial || !m_trial->model() || e->button() != Qt::LeftButton) {
+        return;
+    }
+
+    if (e->pos() == m_posEntered) {
         Node prevSelection = selectedNode();
         const Node& node = selectNode(e->pos());
         if (node.isNull() || prevSelection == node) {
             clearSelection();
         } else {
             updateInspector(node);
-            m_ui->inspector->show();
             update();
         }
     } else {
-        m_origin += (e->localPos() - m_posEntered);
+        m_origin += (e->pos() - m_posEntered);
         clearSelection();
         updateCache();
     }
@@ -297,7 +313,6 @@ void BaseGraphGL::updateInspector(const Node& node)
     m_ui->inspector->adjustSize();
     m_inspGeo = m_ui->inspector->frameGeometry();
     m_inspGeo += QMargins(5,5,5,5);
-    m_ui->inspector->hide();
 }
 
 void BaseGraphGL::updateView(bool forceUpdate)
