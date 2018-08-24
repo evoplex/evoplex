@@ -21,6 +21,9 @@
 #ifndef ATTRS_GENERATOR_H
 #define ATTRS_GENERATOR_H
 
+#include <functional>
+#include <memory>
+
 #include "attributes.h"
 #include "attributerange.h"
 #include "enum.h"

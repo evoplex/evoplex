@@ -21,6 +21,7 @@
 #ifndef ATTRIBUTE_RANGE_H
 #define ATTRIBUTE_RANGE_H
 
+#include <functional>
 #include <memory>
 #include <vector>
 #include <QHash>
@@ -133,10 +134,7 @@ public:
     inline Value rand(PRG* prg) const override;
 
 private:
-    Value (evoplex::IntervalOfValues::*f_rand)(PRG*) const;
-    inline Value randB(PRG* prg) const;
-    inline Value randD(PRG* prg) const;
-    inline Value randI(PRG* prg) const;
+    std::function<Value(PRG*)> f_rand;
 };
 
 class SetOfValues : public AttributeRange
@@ -180,26 +178,19 @@ inline const Value& AttributeRange::max() const
 /***********************/
 
 inline Value SingleValue::rand(PRG* prg) const
-{ return prg->randI(1) ? m_max : m_min; }
+{ return prg->bernoulli() ? m_max : m_min; }
 
 /***********************/
 
 inline Value IntervalOfValues::rand(PRG* prg) const
-{ return (this->*f_rand)(prg); }
-
-inline Value IntervalOfValues::randB(PRG* prg) const
-{ return prg->randB(); }
-
-inline Value IntervalOfValues::randD(PRG* prg) const
-{ return prg->randD(m_min.toDouble(), m_max.toDouble()); }
-
-inline Value IntervalOfValues::randI(PRG* prg) const
-{ return prg->randI(m_min.toInt(), m_max.toInt()); }
+{ return f_rand(prg); }
 
 /***********************/
 
-inline Value SetOfValues::rand(PRG* prg) const
-{ return m_values.at(prg->randI(m_values.size()-1)); }
+inline Value SetOfValues::rand(PRG* prg) const {
+    if (m_values.empty()) return Value();
+    return m_values.at(prg->uniform(m_values.size()-1));
+}
 
 inline const Values& SetOfValues::values() const
 { return m_values; }

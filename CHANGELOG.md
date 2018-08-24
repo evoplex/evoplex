@@ -39,6 +39,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Attrs generator should accept literal boolean, i.e., 'true' and 'false'
 - Node::randNeighbour crashes when neighbourhood is empty
 
+### Removed
+- PRG: replaced all `rand()` functions by `uniform()` and `bernoulli()`
+
 ## [0.1.0] - 2018-08-06
 ### Added
 - Fixes #8 - Allows deleting an experiment

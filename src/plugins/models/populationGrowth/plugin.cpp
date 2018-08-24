@@ -42,7 +42,7 @@ bool PopulationGrowth::algorithmStep()
         // and check if the neighbour is currently infected
         if (neighbour.attr(m_infectedAttrId).toBool()) {
             // if so, the current node will become infected with a given probability
-            nextInfectedStates.emplace_back(m_prob > prg()->randD());
+            nextInfectedStates.emplace_back(m_prob > prg()->uniform());
         } else {
             nextInfectedStates.emplace_back(false);
         }

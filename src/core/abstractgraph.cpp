@@ -39,6 +39,7 @@ bool AbstractGraph::setup(Trial& trial, AttrsGeneratorPtr edgeGen,
     Q_ASSERT_X(nodes.size() < EVOPLEX_MAX_NODES, "setup", "too many nodes!");
     Q_ASSERT_X(!nodes.empty(), "setup", "set of nodes cannot be empty!");
     m_nodes = nodes;
+    m_numNodesDist = std::uniform_int_distribution<int>(0, numNodes()-1);
     m_lastNodeId = static_cast<int>(m_nodes.size());
     m_edgeAttrsGen = std::move(edgeGen);
     return AbstractPlugin::setup(trial, attrs);
@@ -54,6 +55,14 @@ GraphType AbstractGraph::type() const
     return m_trial->graphType();
 }
 
+Node AbstractGraph::randNode() const
+{
+    if (m_nodes.empty()) {
+        return Node();
+    }
+    return std::next(m_nodes.cbegin(), prg()->uniform(m_numNodesDist))->second;
+}
+
 Node AbstractGraph::addNode(Attributes attr, int x, int y)
 {
     QMutexLocker locker(&m_mutex);
@@ -66,6 +75,7 @@ Node AbstractGraph::addNode(Attributes attr, int x, int y)
         node.m_ptr = std::make_shared<UNode>(k, m_lastNodeId, attr, x, y);
     }
     m_nodes.insert({m_lastNodeId, node});
+    m_numNodesDist = std::uniform_int_distribution<int>(0, numNodes()-1);
     return node;
 }
 
@@ -123,13 +133,18 @@ void AbstractGraph::removeNode(const Node& node)
     removeAllEdges(node);
     QMutexLocker locker(&m_mutex);
     m_nodes.erase(node.id());
+    int sz = m_nodes.empty() ? 0 : numNodes()-1;
+    m_numNodesDist = std::uniform_int_distribution<int>(0, sz);
 }
 
 Nodes::iterator AbstractGraph::removeNode(Nodes::iterator it)
 {
     removeAllEdges(it->second);
     QMutexLocker locker(&m_mutex);
-    return m_nodes.erase(it);
+    it = m_nodes.erase(it);
+    int sz = m_nodes.empty() ? 0 : numNodes()-1;
+    m_numNodesDist = std::uniform_int_distribution<int>(0, sz);
+    return it;
 }
 
 void AbstractGraph::removeEdge(const Edge& edge)

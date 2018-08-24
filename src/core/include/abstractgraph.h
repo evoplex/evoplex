@@ -60,7 +60,7 @@ public:
     inline const Edge &edge(int id) const;
     inline const Nodes& nodes() const;
     inline Node node(int id) const;
-    inline Node randNode() const;
+    Node randNode() const;
 
     inline int numNodes() const;
     inline int numEdges() const;
@@ -96,6 +96,8 @@ private:
     int m_lastNodeId;
     int m_lastEdgeId;
     QMutex m_mutex;
+
+    std::uniform_int_distribution<int> m_numNodesDist;
 };
 
 
@@ -120,9 +122,6 @@ inline const Edge& AbstractGraph::edge(int id) const
 
 inline Node AbstractGraph::node(int id) const
 { return m_nodes.at(id); }
-
-inline Node AbstractGraph::randNode() const
-{ return m_nodes.at(prg()->randI(numNodes()-1)); }
 
 inline int AbstractGraph::numEdges() const
 { return static_cast<int>(m_edges.size()); }

@@ -50,6 +50,7 @@ public:
     inline bool init() override;
 
     PRG* prg() const;
+    inline PRG* rand() const; // prg() alias
     inline const Attributes* attrs() const;
 
     inline const QString& attrName(int attrId) const;
@@ -78,6 +79,9 @@ private:
 
 inline bool AbstractPlugin::init()
 { return false; }
+
+inline PRG* AbstractPlugin::rand() const
+{ return prg(); }
 
 inline const Attributes* AbstractPlugin::attrs() const
 { return m_attrs; }

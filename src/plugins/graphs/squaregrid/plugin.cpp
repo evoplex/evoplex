@@ -50,7 +50,7 @@ bool SquareGrid::reset()
 {
     removeAllEdges();
 
-    int numEdges = m_nodes.size() * m_numNeighbours;
+    int numEdges = numNodes() * m_numNeighbours;
     edgesFunc func;
     if (isDirected()) {
         func = m_numNeighbours == 4 ? directed4Edges : directed8Edges;

@@ -297,15 +297,15 @@ IntervalOfValues::IntervalOfValues(int id, const QString& attrName, Type type,
     switch (m_type) {
     case Bool:
         m_attrRangeStr = "bool";
-        f_rand = &evoplex::IntervalOfValues::randB;
+        f_rand = [](PRG* prg) { return prg->bernoulli(); };
         break;
     case Double_Range:
         m_attrRangeStr = QString("double[%1,%2]").arg(min.toDouble()).arg(max.toDouble());
-        f_rand = &evoplex::IntervalOfValues::randD;
+        f_rand = [this](PRG* prg) { return prg->uniform(m_min.toDouble(), m_max.toDouble()); };
         break;
     case Int_Range:
         m_attrRangeStr = QString("int[%1,%2]").arg(min.toInt()).arg(max.toInt());
-        f_rand = &evoplex::IntervalOfValues::randI;
+        f_rand = [this](PRG* prg) { return prg->uniform(m_min.toInt(), m_max.toInt()); };
         break;
     default:
         m_attrRangeStr.clear();

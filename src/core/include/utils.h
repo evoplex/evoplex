@@ -94,7 +94,7 @@ namespace Utils
         // While there remain elements to shuffle…
         while (n) {
             // Pick a remaining element…
-            const size_t i = std::floor(prg->randD() * n--);
+            const size_t i = std::floor(prg->uniform() * n--);
             // And swap it with the current element.
             const T t = vector[n];
             vector[n] = vector[i];

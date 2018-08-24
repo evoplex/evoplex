@@ -41,14 +41,11 @@ BaseNode::~BaseNode()
 
 Node BaseNode::randNeighbour(PRG* prg) const
 {
-    const int od = outDegree();
-    if (od < 1) {
+    if (m_outEdges.empty()) {
         return Node();
-    } else if (od == 1) {
-        return m_outEdges.begin()->second.neighbour();
     }
-    return std::next(m_outEdges.cbegin(),
-            prg->randI(od-1))->second.neighbour();
+    auto i = prg->uniform(outDegree()-1);
+    return std::next(m_outEdges.cbegin(), i)->second.neighbour();
 }
 
 /*******************/

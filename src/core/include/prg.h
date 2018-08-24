@@ -35,82 +35,62 @@ public:
     explicit PRG(unsigned int seed);
 
     // Returns the PRG seed
-    inline unsigned int seed() const;
+    inline unsigned int seed() const
+    { return m_seed; }
 
     // Generate a random boolean according to the discrete probability function
     // Where the probability of true is p and the probability of false is (1-p)
-    bool randBernoulli(double p);
-    inline bool randB(double p); // alias
+    inline bool bernoulli(double p)
+    { std::bernoulli_distribution b(p); return b(m_mteng); }
 
     // randBernoulli(p=0.5)
-    inline bool randBernoulli();
-    inline bool randB(); // alias
+    inline bool bernoulli()
+    { return m_bernoulli(m_mteng); }
+
+    // Generate a random double/float [min, max)
+    template <typename T>
+    T uniform(T min, T max)
+    { std::uniform_real_distribution<T> d(min, max); return d(m_mteng); }
+
+    // Generate a random integer [min, max]
+    inline int uniform(int min, int max)
+    { std::uniform_int_distribution<int> d(min, max); return d(m_mteng); }
+
+    // Generate a random size_t [min, max]
+    inline size_t uniform(size_t min, size_t max)
+    { std::uniform_int_distribution<size_t> d(min, max); return d(m_mteng); }
+
+    // Generate a random double/float [0, max)
+    template <typename T>
+    T uniform(T max)
+    { std::uniform_real_distribution<T> d(0, max); return d(m_mteng); }
+
+    // Generate a random integer [0, max]
+    inline int uniform(int max)
+    { std::uniform_int_distribution<int> d(0, max); return d(m_mteng); }
+
+    // Generate a random size_t [0, max]
+    inline size_t uniform(size_t max)
+    { std::uniform_int_distribution<size_t> d(0, max); return d(m_mteng); }
 
     // Generate a random double [0, 1)
-    inline double randD();
-    // Generate a random double [0, max)
-    inline double randD(double max);
-    // Generate a random double [min, max)
-    double randD(double min, double max);
+    inline double uniform()
+    { return m_doubleZeroOne(m_mteng); }
 
-    // Generate a random float [0, 1)
-    inline float randF();
-    // Generate a random float [0, max)
-    inline float randF(float max);
-    // Generate a random float [min, max)
-    float randF(float min, float max);
+    template <typename T>
+    inline T uniform(std::uniform_real_distribution<T> d)
+    { return d(m_mteng); }
 
-    // Generate a random integer [0, max]
-    inline int randI(int max);
-    // Generate a random integer [min, max]
-    int randI(int min, int max);
-
-    // Generate a random integer [0, max]
-    inline size_t randI(size_t max);
-    // Generate a random integer [min, max]
-    size_t randS(size_t min, size_t max);
+    template <typename T>
+    T uniform(std::uniform_int_distribution<T> d)
+    { return d(m_mteng); }
 
 private:
     const unsigned int m_seed;
     std::mt19937 m_mteng; //  Mersenne Twister engine
     std::uniform_real_distribution<double> m_doubleZeroOne;
-    std::uniform_real_distribution<float> m_floatZeroOne;
     std::bernoulli_distribution m_bernoulli;
 };
-
-/************************************************************************
-   PRG: Inline member functions
- ************************************************************************/
-
-inline unsigned int PRG::seed() const
-{ return m_seed; }
-
-inline bool PRG::randB(double p)
-{ return randBernoulli(p); }
-
-inline bool PRG::randB()
-{ return m_bernoulli(m_mteng); }
-
-inline bool PRG::randBernoulli()
-{ return m_bernoulli(m_mteng); }
-
-inline double PRG::randD()
-{ return m_doubleZeroOne(m_mteng); }
-
-inline double PRG::randD(double max)
-{ return randD(0.0, max); }
-
-inline float PRG::randF()
-{ return m_floatZeroOne(m_mteng); }
-
-inline float PRG::randF(float max)
-{ return randF(0.f, max); }
-
-inline int PRG::randI(int max)
-{ return randI(0, max); }
-
-inline size_t PRG::randI(size_t max)
-{ return randS(0, max); }
 
 } // evoplex
 #endif // PRG_H
