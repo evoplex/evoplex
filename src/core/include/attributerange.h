@@ -39,7 +39,19 @@ class AttributeRangeInterface
 {
 public:
     virtual ~AttributeRangeInterface() = default;
+
+    // returns a random value in the attrRange
     virtual Value rand(PRG* prg) const = 0;
+
+    // returns the value after `v`
+    // if `v` is the last, it returns the first value in the attrRange
+    // if `v` is not in the attrRange, it returns `v`
+    virtual Value next(const Value& v) const = 0;
+
+    // returns the value before `v`
+    // if `v` is the first, it returns the last value in the attrRange
+    // if `v` is not in the attrRange, it returns `v`
+    virtual Value prev(const Value& v) const = 0;
 };
 
 class AttributeRange : public AttributeRangeInterface
@@ -121,6 +133,8 @@ public:
     ~SingleValue() override = default;
 
     inline Value rand(PRG*) const override;
+    inline Value next(const Value& v) const override;
+    inline Value prev(const Value& v) const override;
 };
 
 class IntervalOfValues : public AttributeRange
@@ -132,9 +146,13 @@ public:
     ~IntervalOfValues() override = default;
 
     inline Value rand(PRG* prg) const override;
+    inline Value next(const Value& v) const override;
+    inline Value prev(const Value& v) const override;
 
 private:
     std::function<Value(PRG*)> f_rand;
+    std::function<Value(const Value&)> f_next;
+    std::function<Value(const Value&)> f_prev;
 };
 
 class SetOfValues : public AttributeRange
@@ -145,6 +163,8 @@ public:
     ~SetOfValues() override = default;
 
     inline Value rand(PRG* prg) const override;
+    Value next(const Value& v) const override;
+    Value prev(const Value& v) const override;
 
     inline const Values& values() const;
 
@@ -180,10 +200,22 @@ inline const Value& AttributeRange::max() const
 inline Value SingleValue::rand(PRG* prg) const
 { return prg->bernoulli() ? m_max : m_min; }
 
+inline Value SingleValue::next(const Value& val) const
+{ return val; }
+
+inline Value SingleValue::prev(const Value& val) const
+{ return val; }
+
 /***********************/
 
 inline Value IntervalOfValues::rand(PRG* prg) const
 { return f_rand(prg); }
+
+inline Value IntervalOfValues::next(const Value& val) const
+{ return f_next(val); }
+
+inline Value IntervalOfValues::prev(const Value& val) const
+{ return f_prev(val); }
 
 /***********************/
 

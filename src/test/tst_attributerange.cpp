@@ -115,6 +115,16 @@ void TestAttributeRange::tst_bool()
     // Tests 'AttributeRange::min()' and 'AttributeRange::max()'
     QCOMPARE(attrRge->min().toBool(), min);
     QCOMPARE(attrRge->max().toBool(), max);
+
+    // Tests 'AttributeRange::prev()'
+    QCOMPARE(attrRge->prev(true).toBool(), false);
+    QCOMPARE(attrRge->prev(false).toBool(), true);
+    QCOMPARE(attrRge->prev(1475.85), Value(1475.85));
+
+    // Tests 'AttributeRange::next()'
+    QCOMPARE(attrRge->next(true).toBool(), false);
+    QCOMPARE(attrRge->next(false).toBool(), true);
+    QCOMPARE(attrRge->next("true"), Value("true"));
 }
 
 void TestAttributeRange::tst_int_range()
@@ -125,9 +135,9 @@ void TestAttributeRange::tst_int_range()
     // Case 3: large range
     QStringList attrRangeStrs = {"int[0,1]", "int[-10,-5]", "int[-100,100]"};
 
-    auto attrRge = AttributeRange::parse(0, attrNames[0], attrRangeStrs[0]);
-    auto attrRge2 = AttributeRange::parse(1, attrNames[1], attrRangeStrs[1]);
-    auto attrRge3 = AttributeRange::parse(2, attrNames[2], attrRangeStrs[2]);
+    const auto attrRge = AttributeRange::parse(0, attrNames[0], attrRangeStrs[0]);
+    const auto attrRge2 = AttributeRange::parse(1, attrNames[1], attrRangeStrs[1]);
+    const auto attrRge3 = AttributeRange::parse(2, attrNames[2], attrRangeStrs[2]);
 
     // Tests value returned by 'AttributeRange::validate()'
 
@@ -193,6 +203,36 @@ void TestAttributeRange::tst_int_range()
     QCOMPARE(v.type(), Value::INT);
     QVERIFY(v.toInt() >= min);
     QVERIFY(v.toInt() <= max);
+
+    // Tests 'AttributeRange::prev()'
+    // int[0,1]
+    QCOMPARE(attrRge->prev(1475.85), Value(1475.85)); // invalid case: different type
+    QCOMPARE(attrRge->prev(2).toInt(), 2); // invalid case: not in the range
+    QCOMPARE(attrRge->prev(0).toInt(), 1);
+    QCOMPARE(attrRge->prev(1).toInt(), 0);
+    // int[-10,-5]
+    QCOMPARE(attrRge2->prev(-10).toInt(), -5); // first
+    QCOMPARE(attrRge2->prev(-7).toInt(), -8); // middle
+    QCOMPARE(attrRge2->prev(-5).toInt(), -6); // last
+    // int[-100,100]
+    QCOMPARE(attrRge3->prev(-100).toInt(), 100); // first
+    QCOMPARE(attrRge3->prev(0).toInt(), -1); // middle
+    QCOMPARE(attrRge3->prev(100).toInt(), 99); // last
+
+    // Tests 'AttributeRange::next()'
+    // int[0,1]
+    QCOMPARE(attrRge->next(1475.85), Value(1475.85)); // invalid case: different type
+    QCOMPARE(attrRge->next(2), Value(2)); // invalid case: not in the range
+    QCOMPARE(attrRge->next(0).toInt(), 1);
+    QCOMPARE(attrRge->next(1).toInt(), 0);
+    // int[-10,-5]
+    QCOMPARE(attrRge2->next(-10).toInt(), -9); // first
+    QCOMPARE(attrRge2->next(-7).toInt(), -6); // middle
+    QCOMPARE(attrRge2->next(-5).toInt(), -10); // last
+    // int[-100,100]
+    QCOMPARE(attrRge3->next(-100).toInt(), -99); // first
+    QCOMPARE(attrRge3->next(0).toInt(), 1); // middle
+    QCOMPARE(attrRge3->next(100).toInt(), -100); // last
 }
 
 void TestAttributeRange::tst_double_range()
@@ -203,9 +243,9 @@ void TestAttributeRange::tst_double_range()
     // Case 3: large range
     QStringList attrRangeStrs = {"double[1.1,1.2]", "double[-5.5,-3.3]", "double[-95.7,87.5]"};
 
-    auto attrRge = AttributeRange::parse(0, attrNames.at(0), attrRangeStrs.at(0));
-    auto attrRge2 = AttributeRange::parse(1, attrNames.at(1), attrRangeStrs.at(1));
-    auto attrRge3 = AttributeRange::parse(2, attrNames.at(2), attrRangeStrs.at(2));
+    const auto attrRge = AttributeRange::parse(0, attrNames.at(0), attrRangeStrs.at(0));
+    const auto attrRge2 = AttributeRange::parse(1, attrNames.at(1), attrRangeStrs.at(1));
+    const auto attrRge3 = AttributeRange::parse(2, attrNames.at(2), attrRangeStrs.at(2));
 
     // Tests value returned by 'AttributeRange::validate()'
     QCOMPARE(attrRge->validate("1.1"), Value(1.1));  // min
@@ -271,6 +311,36 @@ void TestAttributeRange::tst_double_range()
     QCOMPARE(v.type(), Value::DOUBLE);
     QVERIFY(v.toDouble() >= min);
     QVERIFY(v.toDouble() <= max);
+
+    // Tests 'AttributeRange::prev()'
+    // double[1.1,1.2]
+    QCOMPARE(attrRge->prev("abc"), Value("abc")); // invalid case: different type
+    QCOMPARE(attrRge->prev(2.0), Value(2.0)); // invalid case: not in the range
+    QCOMPARE(attrRge->prev(1.1).toDouble(), 1.2);
+    QCOMPARE(attrRge->prev(1.2).toDouble(), 1.1);
+    // double[-5.5,-3.3]
+    QCOMPARE(attrRge2->prev(-5.5).toDouble(), -3.3); // first
+    QCOMPARE(attrRge2->prev(-4.235).toDouble(), -5.235); // middle
+    QCOMPARE(attrRge2->prev(-3.3).toDouble(), -4.3); // last
+    // double[-95.7,87.5]
+    QCOMPARE(attrRge3->prev(-95.7).toDouble(), 87.5); // first
+    QCOMPARE(attrRge3->prev(0.089).toDouble(), -0.911); // middle
+    QCOMPARE(attrRge3->prev(87.5).toDouble(), 86.5); // last
+
+    // Tests 'AttributeRange::next()'
+    // double[1.1,1.2]
+    QCOMPARE(attrRge->next("abc"), Value("abc")); // invalid case: different type
+    QCOMPARE(attrRge->next(2.0), Value(2.0)); // invalid case: not in the range
+    QCOMPARE(attrRge->next(1.1).toDouble(), 1.2);
+    QCOMPARE(attrRge->next(1.2).toDouble(), 1.1);
+    // double[-5.5,-3.3]
+    QCOMPARE(attrRge2->next(-5.5).toDouble(), -4.5); // first
+    QCOMPARE(attrRge2->next(-4.4875299).toDouble(), -3.4875299); // middle
+    QCOMPARE(attrRge2->next(-3.3).toDouble(), -5.5); // last
+    // double[-95.7,87.5]
+    QCOMPARE(attrRge3->next(-95.7).toDouble(), -94.7); // first
+    QCOMPARE(attrRge3->next(0.089).toDouble(), 1.089); // middle
+    QCOMPARE(attrRge3->next(87.5).toDouble(), -95.7); // last
 }
 
 void TestAttributeRange::tst_int_set()
@@ -306,6 +376,22 @@ void TestAttributeRange::tst_int_set()
     QCOMPARE(v.type(), Value::INT);
     QVERIFY(v.toInt() >= min);
     QVERIFY(v.toInt() <= max);
+
+    // Tests 'AttributeRange::prev()'
+    // int{0,1,-5,100,-100}
+    QCOMPARE(attrRge->prev("abc"), Value("abc")); // invalid case: different type
+    QCOMPARE(attrRge->prev(2).toInt(), 2); // invalid case: not in the range
+    QCOMPARE(attrRge->prev(0).toInt(), -100); // first
+    QCOMPARE(attrRge->prev(-5).toInt(), 1); // middle
+    QCOMPARE(attrRge->prev(-100).toInt(), 100); // last
+
+    // Tests 'AttributeRange::next()'
+    // int{0,1,-5,100,-100}
+    QCOMPARE(attrRge->next(1475.85), Value(1475.85)); // invalid case: different type
+    QCOMPARE(attrRge->next(2), Value(2)); // invalid case: not in the range
+    QCOMPARE(attrRge->next(0).toInt(), 1); // first
+    QCOMPARE(attrRge->next(-5).toInt(), 100); // middle
+    QCOMPARE(attrRge->next(-100).toInt(), 0); // last
 }
 
 void TestAttributeRange::tst_double_set()
@@ -345,6 +431,22 @@ void TestAttributeRange::tst_double_set()
     QCOMPARE(v.type(), Value::DOUBLE);
     QVERIFY(v.toDouble() >= min);
     QVERIFY(v.toDouble() <= max);
+
+    // Tests 'AttributeRange::prev()'
+    // double{0,1.2,-5.5,-95.7,87.5,12}
+    QCOMPARE(attrRge->prev("abc"), Value("abc")); // invalid case: different type
+    QCOMPARE(attrRge->prev(2.5).toDouble(), 2.5); // invalid case: not in the range
+    QCOMPARE(attrRge->prev(0.0).toDouble(), 12.0); // first
+    QCOMPARE(attrRge->prev(-95.7).toDouble(), -5.5); // middle
+    QCOMPARE(attrRge->prev(12.0).toDouble(), 87.5); // last
+
+    // Tests 'AttributeRange::next()'
+    // double{0,1.2,-5.5,-95.7,87.5,12}
+    QCOMPARE(attrRge->next(true), Value(true)); // invalid case: different type
+    QCOMPARE(attrRge->next(2.5), Value(2.5)); // invalid case: not in the range
+    QCOMPARE(attrRge->next(0.0).toDouble(), 1.2); // first
+    QCOMPARE(attrRge->next(-95.7).toDouble(), 87.5); // middle
+    QCOMPARE(attrRge->next(12.0).toDouble(), 0.0); // last
 }
 
 void TestAttributeRange::_tst_string(bool acceptEmpty)
@@ -396,6 +498,14 @@ void TestAttributeRange::_tst_string(bool acceptEmpty)
     QCOMPARE(attrRge->min().toString(), "");
     QCOMPARE(attrRge->min().toQString(), QString());
     QCOMPARE(attrRge->min().toQString(), QString());
+
+    // Tests 'AttributeRange::prev()'
+    QCOMPARE(attrRge->prev(1235), Value(1235)); // invalid case: different type
+    QCOMPARE(attrRge->prev("abc"), Value("abc"));
+
+    // Tests 'AttributeRange::next()'
+    QCOMPARE(attrRge->next(true), Value(true)); // invalid case: different type
+    QCOMPARE(attrRge->next("abc"), Value("abc"));
 }
 
 void TestAttributeRange::tst_string_set()
@@ -432,6 +542,21 @@ void TestAttributeRange::tst_string_set()
     QCOMPARE(attrRge->min().toQString(), QString(min));
     QCOMPARE(attrRge->max().toQString(), QString(max));
     QVERIFY(values.contains(attrRge->rand(m_prg.get()).toString()));
+
+    // Tests 'AttributeRange::prev()'
+    // sample,this sentence is a long string for testing purposes,a,abc£ãã&!£$%^*(áéí),123
+    QCOMPARE(attrRge->prev(true), Value(true)); // invalid case: different type
+    QCOMPARE(attrRge->prev("abc"), Value("abc")); // invalid case: not in the range
+    QCOMPARE(attrRge->prev("sample").toString(), "123"); // first
+    QCOMPARE(attrRge->prev("this sentence is a long string for testing purposes").toString(), "sample"); // middle
+    QCOMPARE(attrRge->prev("123").toString(), "abc£ãã&!£$%^*(áéí)"); // last
+
+    // Tests 'AttributeRange::next()'
+    QCOMPARE(attrRge->next(1475.85), Value(1475.85)); // invalid case: different type
+    QCOMPARE(attrRge->next("abc"), Value("abc")); // invalid case: not in the range
+    QCOMPARE(attrRge->next("sample").toString(), "this sentence is a long string for testing purposes"); // first
+    QCOMPARE(attrRge->next("a").toString(), "abc£ãã&!£$%^*(áéí)"); // middle
+    QCOMPARE(attrRge->next("123").toString(), "sample"); // last
 }
 
 void TestAttributeRange::tst_filepath()
@@ -456,6 +581,14 @@ void TestAttributeRange::tst_filepath()
     QCOMPARE(attrRge->rand(m_prg.get()).toString(), "");
     QCOMPARE(attrRge->min().toString(), "");
     QCOMPARE(attrRge->min().toString(), "");
+
+    // Tests 'AttributeRange::prev()'
+    QCOMPARE(attrRge->prev(1235), Value(1235)); // invalid case: different type
+    QCOMPARE(attrRge->prev("abc"), Value("abc"));
+
+    // Tests 'AttributeRange::next()'
+    QCOMPARE(attrRge->next(true), Value(true)); // invalid case: different type
+    QCOMPARE(attrRge->next("abc"), Value("abc"));
 }
 
 void TestAttributeRange::tst_dirpath()
@@ -477,6 +610,14 @@ void TestAttributeRange::tst_dirpath()
     QCOMPARE(attrRge->rand(m_prg.get()).toString(), "");
     QCOMPARE(attrRge->min().toString(), "");
     QCOMPARE(attrRge->min().toString(), "");
+
+    // Tests 'AttributeRange::prev()'
+    QCOMPARE(attrRge->prev(1235), Value(1235)); // invalid case: different type
+    QCOMPARE(attrRge->prev("abc"), Value("abc"));
+
+    // Tests 'AttributeRange::next()'
+    QCOMPARE(attrRge->next(true), Value(true)); // invalid case: different type
+    QCOMPARE(attrRge->next("abc"), Value("abc"));
 }
 
 QTEST_MAIN(TestAttributeRange)

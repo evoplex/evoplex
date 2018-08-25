@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Adds support to edges attributes
 - Increases unit-tests coverage of core components
 - Implements the Bernoulli distribution in the PRG class
+- Implements `AttributeRange::next()` and `AttributeRange::prev()`
 - Plugins can now be reloaded
 - Projects page: Adds button to maximize graph widgets
 - Projects page: Adds button to pause all experiments
