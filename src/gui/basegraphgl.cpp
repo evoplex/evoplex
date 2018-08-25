@@ -41,7 +41,7 @@ BaseGraphGL::BaseGraphGL(ExperimentPtr exp, GraphWidget* parent)
       m_nodeAttr(-1),
       m_nodeCMap(nullptr),
       m_background(QColor(239,235,231)),
-      m_zoomLevel(0),
+      m_zoomLevel(0.f),
       m_nodeScale(10.),
       m_nodeRadius(m_nodeScale),
       m_origin(5.,5.),
@@ -250,6 +250,21 @@ void BaseGraphGL::resetView()
     m_nodeRadius = m_nodeScale;
     updateCache();
     clearSelection();
+}
+
+void BaseGraphGL::wheelEvent(QWheelEvent* e)
+{
+    m_zoomLevel += (e->angleDelta().y() / 120.f);
+    auto newNodeRadius = m_nodeScale * std::pow(1.25f, m_zoomLevel);
+
+    auto fromOrigin = e->posF() - m_origin;
+    auto newPos = fromOrigin * (newNodeRadius / m_nodeRadius);
+    m_origin -= (newPos - fromOrigin);
+    m_nodeRadius = newNodeRadius;
+
+    updateCache();
+    clearSelection();
+    e->accept();
 }
 
 void BaseGraphGL::mousePressEvent(QMouseEvent* e)

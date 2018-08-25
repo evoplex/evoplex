@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Graph widgets: Allows scaling the nodes and edges
 - Graph widgets: Allows setting the edge with
 - Graph widgets: Allows exporting nodes to file
+- Graph widgets: Allows zooming in/out with the mouse wheel
 - New model plugin: Population growth `populationGrowth`
 - New model plugin: Conway's Game of Life cellular automaton `gameOfLife`
 - New model plugin: Elementary cellular automaton rules `cellularAutomata1D`

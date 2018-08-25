@@ -80,7 +80,7 @@ protected:
     ColorMap* m_nodeCMap;
 
     QBrush m_background;
-    int m_zoomLevel;
+    float m_zoomLevel;
     qreal m_nodeScale;
     qreal m_nodeRadius;
     QPointF m_origin;
@@ -96,6 +96,7 @@ protected:
     void mousePressEvent(QMouseEvent* e) override;
     void mouseReleaseEvent(QMouseEvent* e) override;
     void resizeEvent(QResizeEvent* e) override;
+    void wheelEvent(QWheelEvent* e) override;
 
 signals:
     void updateWidgets(bool) const;
