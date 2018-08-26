@@ -89,17 +89,17 @@ CacheStatus GraphView::refreshCache()
         return CacheStatus::Ready;
     }
 
-    const int m = 50;
-    QRect frame = frameGeometry().marginsAdded(QMargins(m,m,m,m));
+    const qreal edgeSR = currEdgeSize();
+    const int m = qRound(edgeSR);
+    QRect frame = frameGeometry().marginsAdded(QMargins(m, m, m, m));
 
-    qreal edgeSizeRate = currEdgeSize();
     m_cache.reserve(m_trial->graph()->nodes().size());
     for (auto const& np : m_trial->graph()->nodes()) {
-        QPointF xy = nodePoint(np.second, edgeSizeRate);
+        QPointF xy = nodePoint(np.second, edgeSR);
         if (!frame.contains(xy.toPoint())) {
             continue;
         }
-        m_cache.emplace_back(createStar(np.second, edgeSizeRate, xy));
+        m_cache.emplace_back(createStar(np.second, edgeSR, xy));
     }
     m_cache.shrink_to_fit();
 

@@ -55,10 +55,10 @@ CacheStatus GridView::refreshCache()
     const Nodes& nodes = m_trial->graph()->nodes();
     m_cache.reserve(nodes.size());
 
-    const int m = 50;
+    const double nodeRadius = m_nodeRadius;
+    const int m = qRound(nodeRadius * 2.0);
     QRectF frame = frameGeometry().marginsAdded(QMargins(m,m,m,m));
 
-    const double nodeRadius = m_nodeRadius;
     for (auto const& np : nodes) {
         QRectF r = cellRect(np.second, nodeRadius);
         if (!frame.contains(r.x(), r.y())) {
