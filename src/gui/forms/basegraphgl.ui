@@ -376,9 +376,6 @@ color: rgb(255, 255, 255);</string>
           <property name="enabled">
            <bool>true</bool>
           </property>
-          <property name="readOnly">
-           <bool>true</bool>
-          </property>
           <property name="buttonSymbols">
            <enum>QAbstractSpinBox::NoButtons</enum>
           </property>

@@ -43,6 +43,7 @@ public slots:
 protected:
     void paintEvent(QPaintEvent*) override;
     Node selectNode(const QPointF &pos, bool center) override;
+    bool selectNode(const Node& node, bool center) override;
     inline Node selectedNode() const override;
     inline QPointF selectedNodePos() const override;
     inline void clearSelection() override;

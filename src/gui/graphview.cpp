@@ -49,8 +49,7 @@ GraphView::GraphView(ColorMapMgr* cMgr, ExperimentPtr exp, GraphWidget* parent)
         [this](bool b) { m_showEdges = b; updateCache(); });
 
     updateNodePen();
-    qreal esize = currEdgeSize();
-    m_origin += QPointF(esize, esize);
+    m_origin += m_origin; // double margin
 
     setTrial(0); // init at trial 0
 }
@@ -156,6 +155,28 @@ Node GraphView::selectNode(const QPointF& pos, bool center)
         }
     }
     return Node();
+}
+
+bool GraphView::selectNode(const Node& node, bool center)
+{
+    m_selectedStar = Star();
+    if (m_cacheStatus != CacheStatus::Ready) {
+        return false;
+    }
+
+    const QPointF p = nodePoint(node, currEdgeSize());
+    for (const Star& star : m_cache) {
+        if (star.xy == p) {
+            m_selectedStar = star;
+            if (center) { m_origin = rect().center() - p; }
+            return true;
+        }
+    }
+
+    m_selectedStar = createStar(node, currEdgeSize(), p);
+    m_origin = rect().center() - m_selectedStar.xy;
+    updateCache();
+    return true;
 }
 
 void GraphView::setEdgeCMap(ColorMap* cmap)

@@ -44,7 +44,7 @@ BaseGraphGL::BaseGraphGL(ExperimentPtr exp, GraphWidget* parent)
       m_zoomLevel(0.f),
       m_nodeScale(10.),
       m_nodeRadius(m_nodeScale),
-      m_origin(5.,5.),
+      m_origin(m_nodeScale, m_nodeScale),
       m_cacheStatus(CacheStatus::Ready),
       m_posEntered(0,0),
       m_currTrialId(0)
@@ -94,6 +94,7 @@ BaseGraphGL::BaseGraphGL(ExperimentPtr exp, GraphWidget* parent)
     });
     m_ui->topLayout->addWidget(m_bRefresh);
 
+    connect(m_ui->nodeId, SIGNAL(editingFinished()), SLOT(slotSelectNode()));
     setupInspector();
 
     m_updateCacheTimer.setSingleShot(true);
@@ -107,6 +108,20 @@ BaseGraphGL::~BaseGraphGL()
     m_trial = nullptr;
     m_exp = nullptr;
     delete m_ui;
+}
+
+void BaseGraphGL::slotSelectNode()
+{
+    try {
+        Node node = m_trial->graph()->node(m_ui->nodeId->value());
+        selectNode(node, m_bCenter->isChecked());
+    } catch (std::out_of_range) {
+        if (selectedNode().isNull()) {
+            clearSelection();
+        } else {
+            m_ui->nodeId->setValue(selectedNode().id());
+        }
+    }
 }
 
 void BaseGraphGL::setupInspector()
@@ -267,7 +282,7 @@ void BaseGraphGL::zoomOut()
 
 void BaseGraphGL::resetView()
 {
-    m_origin = QPointF(5., 5.);
+    m_origin = QPointF(m_nodeScale, m_nodeScale);
     m_zoomLevel = 0;
     m_nodeRadius = m_nodeScale;
     updateCache();

@@ -24,6 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Graph widgets: Allows moving graph with the arrow keys
 - Graph widgets: Inspector has now a button to allow centralizing the selection
 - Graph widgets: Inspector has now a refresh button
+- Graph widgets: Allows selecting a node by id
 - New model plugin: Population growth `populationGrowth`
 - New model plugin: Conway's Game of Life cellular automaton `gameOfLife`
 - New model plugin: Elementary cellular automaton rules `cellularAutomata1D`

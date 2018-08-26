@@ -133,6 +133,28 @@ Node GridView::selectNode(const QPointF& pos, bool center)
     return Node();
 }
 
+bool GridView::selectNode(const Node& node, bool center)
+{
+    m_selectedCell = Cell();
+    if (m_cacheStatus != CacheStatus::Ready) {
+        return false;
+    }
+
+    const QRectF p = cellRect(node, m_nodeRadius);
+    for (const Cell& cell : m_cache) {
+        if (cell.rect == p) {
+            m_selectedCell = cell;
+            if (center) { m_origin = rect().center() - p.center(); }
+            return true;
+        }
+    }
+
+    m_selectedCell = {node, p};
+    m_origin = rect().center() - p.center();
+    updateCache();
+    return true;
+}
+
 void GridView::drawCell(QPainter& painter, const Cell& cell) const
 {
     const Value& value = cell.node.attr(m_nodeAttr);
