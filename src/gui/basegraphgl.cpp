@@ -269,9 +269,7 @@ void BaseGraphGL::wheelEvent(QWheelEvent* e)
 
 void BaseGraphGL::mousePressEvent(QMouseEvent* e)
 {
-    if (e->button() == Qt::LeftButton) {
-        m_posEntered = e->pos();
-    }
+    m_posEntered = e->pos();
     QOpenGLWidget::mousePressEvent(e);
 }
 
@@ -287,23 +285,35 @@ void BaseGraphGL::mouseReleaseEvent(QMouseEvent *e)
         return;
     }
 
-    if (!m_trial || !m_trial->model() || e->button() != Qt::LeftButton) {
+    if (!m_trial || !m_trial->model()) {
         return;
     }
 
-    if (e->pos() == m_posEntered) {
-        Node prevSelection = selectedNode();
-        const Node& node = selectNode(e->pos());
-        if (node.isNull() || prevSelection == node) {
-            clearSelection();
+    if (e->button() == Qt::LeftButton) {
+        if (e->pos() == m_posEntered) {
+            Node prevSelection = selectedNode();
+            const Node& node = selectNode(e->pos());
+            if (node.isNull() || prevSelection == node) {
+                clearSelection();
+            } else {
+                updateInspector(node);
+                update();
+            }
         } else {
-            updateInspector(node);
-            update();
+            m_origin += (e->pos() - m_posEntered);
+            clearSelection();
+            updateCache();
         }
-    } else {
-        m_origin += (e->pos() - m_posEntered);
-        clearSelection();
-        updateCache();
+    } else if (e->button() == Qt::RightButton && m_nodeAttr >= 0 &&
+               m_trial->status() != Status::Running) {
+        Node node = selectNode(e->pos());
+        if (!node.isNull()) {
+            const QString& attrName = node.attrs().name(m_nodeAttr);
+            auto attrRange = m_exp->modelPlugin()->nodeAttrRange(attrName);
+            node.setAttr(m_nodeAttr, attrRange->next(node.attr(m_nodeAttr)));
+            clearSelection();
+            emit (updateWidgets(true));
+        }
     }
 }
 
