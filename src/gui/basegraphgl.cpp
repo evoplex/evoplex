@@ -317,6 +317,55 @@ void BaseGraphGL::mouseReleaseEvent(QMouseEvent *e)
     }
 }
 
+void BaseGraphGL::keyPressEvent(QKeyEvent* e)
+{
+    if (e->modifiers().testFlag(Qt::ControlModifier)) {
+        if (e->key() == Qt::Key_0) {
+            resetView();
+        } else if (e->key() == Qt::Key_Plus) {
+            zoomIn();
+        } else if (e->key() == Qt::Key_Minus) {
+            zoomOut();
+        }
+        QOpenGLWidget::keyPressEvent(e);
+        return;
+    }
+
+    qreal increment = e->isAutoRepeat() ? 5.0 : 1.0;
+    if (e->modifiers().testFlag(Qt::ShiftModifier)) {
+        increment *= 5.0;
+    }
+
+    if (e->key() == Qt::Key_Right) {
+        m_origin.rx() += increment;
+    } else if (e->key() == Qt::Key_Left) {
+        m_origin.rx() -= increment;
+    } else if (e->key() == Qt::Key_Up) {
+        m_origin.ry() -= increment;
+    } else if (e->key() == Qt::Key_Down) {
+        m_origin.ry() += increment;
+    }
+    QOpenGLWidget::keyPressEvent(e);
+}
+
+void BaseGraphGL::keyReleaseEvent(QKeyEvent* e)
+{
+    if (!e->isAutoRepeat()) {
+        updateCache();
+        if (e->key() == Qt::Key_Space) {
+            Node node = selectedNode();
+            if (!node.isNull()) {
+                const QString& attrName = node.attrs().name(m_nodeAttr);
+                auto attrRange = m_exp->modelPlugin()->nodeAttrRange(attrName);
+                node.setAttr(m_nodeAttr, attrRange->next(node.attr(m_nodeAttr)));
+                updateInspector(node);
+                emit (updateWidgets(true));
+            }
+        }
+    }
+    QOpenGLWidget::keyReleaseEvent(e);
+}
+
 void BaseGraphGL::resizeEvent(QResizeEvent* e)
 {
     QOpenGLWidget::resizeEvent(e);

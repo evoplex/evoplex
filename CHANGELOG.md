@@ -18,7 +18,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Graph widgets: Allows setting the edge with
 - Graph widgets: Allows exporting nodes to file
 - Graph widgets: Allows zooming in/out with the mouse wheel
-- Graph widgets: right click to set the value (call `AttributeRange::next()`)
+- Graph widgets: right click to toggle the attribute's value
+- Graph widgets: Select node and hit `space` to toggle the attribute's value
+- Graph widgets: `ctrl +` to zoom in, `ctrl -` to zoom out and `ctrl 0` to reset zoom
+- Graph widgets: Allows moving graph with the arrow keys
 - New model plugin: Population growth `populationGrowth`
 - New model plugin: Conway's Game of Life cellular automaton `gameOfLife`
 - New model plugin: Elementary cellular automaton rules `cellularAutomata1D`
