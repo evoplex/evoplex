@@ -136,18 +136,23 @@ void GraphView::paintEvent(QPaintEvent*)
     painter.end();
 }
 
-Node GraphView::selectNode(const QPoint& pos)
+Node GraphView::selectNode(const QPointF& pos, bool center)
 {
-    const QPoint p = pos - m_origin.toPoint();
-    if (m_cacheStatus == CacheStatus::Ready) {
-        for (const Star& star : m_cache) {
-            if (p.x() > star.xy.x()-m_nodeRadius
-                    && p.x() < star.xy.x()+m_nodeRadius
-                    && p.y() > star.xy.y()-m_nodeRadius
-                    && p.y() < star.xy.y()+m_nodeRadius) {
-                m_selectedStar = star;
-                return star.node;
-            }
+    m_selectedStar = Star();
+    if (m_cacheStatus != CacheStatus::Ready) {
+        return Node();
+    }
+
+    const QPointF p = pos - m_origin;
+    for (const Star& star : m_cache) {
+        if (p.x() > star.xy.x()-m_nodeRadius &&
+            p.x() < star.xy.x()+m_nodeRadius &&
+            p.y() > star.xy.y()-m_nodeRadius &&
+            p.y() < star.xy.y()+m_nodeRadius)
+        {
+            m_selectedStar = star;
+            if (center) { m_origin = rect().center() - star.xy; }
+            return star.node;
         }
     }
     return Node();

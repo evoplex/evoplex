@@ -115,14 +115,19 @@ void GridView::paintEvent(QPaintEvent*)
     painter.end();
 }
 
-Node GridView::selectNode(const QPoint& pos)
+Node GridView::selectNode(const QPointF& pos, bool center)
 {
-    if (m_cacheStatus == CacheStatus::Ready) {
-        for (const Cell& cell : m_cache) {
-            if (cell.rect.contains(pos)) {
-                m_selectedCell = cell;
-                return cell.node;
-            }
+    m_selectedCell = Cell();
+    if (m_cacheStatus != CacheStatus::Ready) {
+        return Node();
+    }
+
+    const QPointF p = pos - m_origin;
+    for (const Cell& cell : m_cache) {
+        if (cell.rect.contains(p)) {
+            m_selectedCell = cell;
+            if (center) { m_origin = rect().center() - cell.rect.center(); }
+            return cell.node;
         }
     }
     return Node();

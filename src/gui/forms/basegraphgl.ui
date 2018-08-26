@@ -270,10 +270,13 @@ color: rgb(255, 255, 255);</string>
        <number>6</number>
       </property>
       <item>
-       <layout class="QHBoxLayout" name="topLayout">
+       <layout class="QHBoxLayout" name="_topLayout">
         <property name="spacing">
          <number>0</number>
         </property>
+        <item>
+         <layout class="QHBoxLayout" name="topLayout"/>
+        </item>
         <item>
          <spacer name="hspacer">
           <property name="orientation">

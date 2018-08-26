@@ -42,8 +42,9 @@ public slots:
 
 protected:
     void paintEvent(QPaintEvent*) override;
-    Node selectNode(const QPoint& pos) override;
+    Node selectNode(const QPointF &pos, bool center) override;
     inline Node selectedNode() const override;
+    inline QPointF selectedNodePos() const override;
     inline void clearSelection() override;
     CacheStatus refreshCache() override;
 
@@ -87,6 +88,9 @@ private:
 
 inline Node GraphView::selectedNode() const
 { return m_selectedStar.node; }
+
+inline QPointF GraphView::selectedNodePos() const
+{ return m_selectedStar.xy + m_origin; }
 
 inline void GraphView::clearSelection()
 { m_selectedStar = Star(); BaseGraphGL::clearSelection(); }

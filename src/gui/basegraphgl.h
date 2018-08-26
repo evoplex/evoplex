@@ -54,8 +54,9 @@ public:
 protected:
     virtual ~GraphGLInterface() = default;
     virtual void paintEvent(QPaintEvent*) = 0;
-    virtual Node selectNode(const QPoint& pos) = 0;
+    virtual Node selectNode(const QPointF& pos, bool center) = 0;
     virtual Node selectedNode() const = 0;
+    virtual QPointF selectedNodePos() const = 0;
     virtual void clearSelection() = 0;
     virtual CacheStatus refreshCache() = 0;
 };
@@ -117,6 +118,8 @@ private slots:
     void setNodeCMap(ColorMap* cmap);
 
 private:
+    QtMaterialIconButton* m_bCenter;
+
     QTimer m_updateCacheTimer;
     QPoint m_posEntered;
     quint16 m_currTrialId;

@@ -37,8 +37,9 @@ public slots:
 
 protected:
     void paintEvent(QPaintEvent*) override;
-    Node selectNode(const QPoint& pos) override;
+    Node selectNode(const QPointF& pos, bool center) override;
     virtual Node selectedNode() const override;
+    inline QPointF selectedNodePos() const override;
     void clearSelection() override;
     CacheStatus refreshCache() override;
 
@@ -58,6 +59,9 @@ private:
 
 inline Node GridView::selectedNode() const
 { return m_selectedCell.node; }
+
+inline QPointF GridView::selectedNodePos() const
+{ return m_selectedCell.rect.center() + m_origin; }
 
 inline void GridView::clearSelection()
 { m_selectedCell = Cell(); BaseGraphGL::clearSelection(); }

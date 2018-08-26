@@ -255,5 +255,13 @@
         <file>material-icons/image/png/ic_grain_white_24dp.png</file>
         <file>material-icons/image/png/ic_grain_white_36dp.png</file>
         <file>material-icons/image/png/ic_grain_white_48dp.png</file>
+        <file>material-icons/image/png/ic_center_focus_strong_black_18dp.png</file>
+        <file>material-icons/image/png/ic_center_focus_strong_black_24dp.png</file>
+        <file>material-icons/image/png/ic_center_focus_strong_black_36dp.png</file>
+        <file>material-icons/image/png/ic_center_focus_strong_black_48dp.png</file>
+        <file alias="center_white_18">material-icons/image/png/ic_center_focus_strong_white_18dp.png</file>
+        <file>material-icons/image/png/ic_center_focus_strong_white_24dp.png</file>
+        <file>material-icons/image/png/ic_center_focus_strong_white_36dp.png</file>
+        <file>material-icons/image/png/ic_center_focus_strong_white_48dp.png</file>
     </qresource>
 </RCC>

@@ -72,6 +72,20 @@ BaseGraphGL::BaseGraphGL(ExperimentPtr exp, GraphWidget* parent)
     connect(m_ui->bZoomOut, SIGNAL(clicked(bool)), SLOT(zoomOut()));
     connect(m_ui->bReset, SIGNAL(clicked(bool)), SLOT(resetView()));
 
+    m_bCenter = new QtMaterialIconButton(QIcon(":/icons/material/center_white_18"), this);
+    m_bCenter->setToolTip("centralize selection");
+    m_bCenter->setCheckable(true);
+    m_bCenter->setChecked(false);
+    m_bCenter->setColor(Qt::white);
+    connect(m_bCenter, &QtMaterialIconButton::toggled, [this](bool checked) {
+        if (!selectedNode().isNull() && checked) {
+            selectNode(selectedNodePos(), true);
+            updateCache();
+        }
+        m_bCenter->setColor(checked ? palette().color(QPalette::Link) : Qt::white);
+    });
+    m_ui->topLayout->addWidget(m_bCenter, 0, Qt::AlignLeft);
+
     setupInspector();
 
     m_updateCacheTimer.setSingleShot(true);
@@ -292,12 +306,12 @@ void BaseGraphGL::mouseReleaseEvent(QMouseEvent *e)
     if (e->button() == Qt::LeftButton) {
         if (e->pos() == m_posEntered) {
             Node prevSelection = selectedNode();
-            const Node& node = selectNode(e->pos());
+            const Node& node = selectNode(e->localPos(), m_bCenter->isChecked());
             if (node.isNull() || prevSelection == node) {
                 clearSelection();
             } else {
                 updateInspector(node);
-                update();
+                m_bCenter->isChecked() ? updateCache() : update();
             }
         } else {
             m_origin += (e->pos() - m_posEntered);
@@ -306,7 +320,7 @@ void BaseGraphGL::mouseReleaseEvent(QMouseEvent *e)
         }
     } else if (e->button() == Qt::RightButton && m_nodeAttr >= 0 &&
                m_trial->status() != Status::Running) {
-        Node node = selectNode(e->pos());
+        Node node = selectNode(e->localPos(), false);
         if (!node.isNull()) {
             const QString& attrName = node.attrs().name(m_nodeAttr);
             auto attrRange = m_exp->modelPlugin()->nodeAttrRange(attrName);
