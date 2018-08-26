@@ -275,7 +275,11 @@ color: rgb(255, 255, 255);</string>
          <number>0</number>
         </property>
         <item>
-         <layout class="QHBoxLayout" name="topLayout"/>
+         <layout class="QHBoxLayout" name="topLayout">
+          <property name="spacing">
+           <number>7</number>
+          </property>
+         </layout>
         </item>
         <item>
          <spacer name="hspacer">

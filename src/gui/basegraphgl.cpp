@@ -84,7 +84,15 @@ BaseGraphGL::BaseGraphGL(ExperimentPtr exp, GraphWidget* parent)
         }
         m_bCenter->setColor(checked ? palette().color(QPalette::Link) : Qt::white);
     });
-    m_ui->topLayout->addWidget(m_bCenter, 0, Qt::AlignLeft);
+    m_ui->topLayout->addWidget(m_bCenter);
+
+    m_bRefresh = new QtMaterialIconButton(QIcon(":/icons/material/refresh_white_18"), this);
+    m_bRefresh->setToolTip("refresh");
+    m_bRefresh->setColor(Qt::white);
+    connect(m_bRefresh, &QtMaterialIconButton::pressed, [this]() {
+        updateInspector(selectedNode());
+    });
+    m_ui->topLayout->addWidget(m_bRefresh);
 
     setupInspector();
 

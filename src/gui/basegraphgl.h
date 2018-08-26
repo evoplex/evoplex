@@ -119,6 +119,7 @@ private slots:
 
 private:
     QtMaterialIconButton* m_bCenter;
+    QtMaterialIconButton* m_bRefresh;
 
     QTimer m_updateCacheTimer;
     QPoint m_posEntered;
