@@ -401,8 +401,10 @@ void BaseGraphGL::updateView(bool forceUpdate)
 
 void BaseGraphGL::clearSelection()
 {
-    m_ui->inspector->hide();
-    update();
+    if (m_ui->inspector->isVisible()) {
+        m_ui->inspector->hide();
+        update();
+    }
 }
 
 } // evoplex
