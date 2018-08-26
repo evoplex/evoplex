@@ -57,7 +57,8 @@ CacheStatus GridView::refreshCache()
 
     const double nodeRadius = m_nodeRadius;
     const int m = qRound(nodeRadius * 2.0);
-    QRectF frame = frameGeometry().marginsAdded(QMargins(m,m,m,m));
+    QRectF frame = rect().translated(-m_origin.toPoint());
+    frame = frame.marginsAdded(QMargins(m, m, m, m));
 
     for (auto const& np : nodes) {
         QRectF r = cellRect(np.second, nodeRadius);
@@ -81,6 +82,8 @@ void GridView::paintEvent(QPaintEvent*)
     painter.begin(this);
     painter.setRenderHint(QPainter::Antialiasing);
     painter.fillRect(rect(), m_background);
+
+    painter.translate(m_origin);
 
     if (m_cacheStatus != CacheStatus::Ready || m_nodeAttr < 0 || !m_nodeCMap) {
         painter.end();

@@ -63,9 +63,7 @@ inline void GridView::clearSelection()
 { m_selectedCell = Cell(); BaseGraphGL::clearSelection(); }
 
 inline QRectF GridView::cellRect(const Node& n, double length) const {
-    return QRectF(m_origin.x() + n.x() * length,
-                  m_origin.y() + n.y() * length,
-                  length, length);
+    return QRectF(n.x() * length, n.y() * length, length, length);
 }
 
 } // evoplex

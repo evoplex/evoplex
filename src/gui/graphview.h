@@ -105,8 +105,7 @@ inline qreal GraphView::currEdgeSize() const
 
 inline QPointF GraphView::nodePoint(const Node& node, const qreal& edgeSizeRate) const
 {
-    return QPointF(m_origin.x() + edgeSizeRate * (1. + node.x()),
-                   m_origin.y() + edgeSizeRate * (1. + node.y()));
+    return QPointF(edgeSizeRate * node.x(), edgeSizeRate * node.y());
 }
 
 } // evoplex

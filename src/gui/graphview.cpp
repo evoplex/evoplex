@@ -49,6 +49,8 @@ GraphView::GraphView(ColorMapMgr* cMgr, ExperimentPtr exp, GraphWidget* parent)
         [this](bool b) { m_showEdges = b; updateCache(); });
 
     updateNodePen();
+    qreal esize = currEdgeSize();
+    m_origin += QPointF(esize, esize);
 
     setTrial(0); // init at trial 0
 }
@@ -91,12 +93,13 @@ CacheStatus GraphView::refreshCache()
 
     const qreal edgeSR = currEdgeSize();
     const int m = qRound(edgeSR);
-    QRect frame = frameGeometry().marginsAdded(QMargins(m, m, m, m));
+    QRectF frame = rect().translated(-m_origin.toPoint());
+    frame = frame.marginsAdded(QMargins(m, m, m, m));
 
     m_cache.reserve(m_trial->graph()->nodes().size());
     for (auto const& np : m_trial->graph()->nodes()) {
         QPointF xy = nodePoint(np.second, edgeSR);
-        if (!frame.contains(xy.toPoint())) {
+        if (!frame.contains(xy)) {
             continue;
         }
         m_cache.emplace_back(createStar(np.second, edgeSR, xy));
@@ -112,6 +115,8 @@ void GraphView::paintEvent(QPaintEvent*)
     painter.begin(this);
     painter.setRenderHint(QPainter::Antialiasing);
     painter.fillRect(rect(), m_background);
+
+    painter.translate(m_origin);
 
     if (m_cacheStatus != CacheStatus::Ready) {
         painter.end();
@@ -133,12 +138,13 @@ void GraphView::paintEvent(QPaintEvent*)
 
 Node GraphView::selectNode(const QPoint& pos)
 {
+    const QPoint p = pos - m_origin.toPoint();
     if (m_cacheStatus == CacheStatus::Ready) {
         for (const Star& star : m_cache) {
-            if (pos.x() > star.xy.x()-m_nodeRadius
-                    && pos.x() < star.xy.x()+m_nodeRadius
-                    && pos.y() > star.xy.y()-m_nodeRadius
-                    && pos.y() < star.xy.y()+m_nodeRadius) {
+            if (p.x() > star.xy.x()-m_nodeRadius
+                    && p.x() < star.xy.x()+m_nodeRadius
+                    && p.y() > star.xy.y()-m_nodeRadius
+                    && p.y() < star.xy.y()+m_nodeRadius) {
                 m_selectedStar = star;
                 return star.node;
             }
