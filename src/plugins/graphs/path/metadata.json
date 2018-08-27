@@ -1,0 +1,12 @@
+{
+  "type": "graph",
+  "uid": "path",
+  "version": 1,
+  "title": "Path Graph",
+  "author": "Marcos Cardinot",
+  "description": "It generates a path graph (linear graph) from a set of nodes.",
+
+  "supportsEdgeAttrsGen": true,
+  "validGraphTypes": [ "undirected", "directed" ],
+  "pluginAttributesScope": [ { "layout": "string{horizontal,vertical,none}" } ]
+}
