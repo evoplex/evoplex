@@ -40,7 +40,7 @@ void QtMaterialTextFieldPrivate::init()
     q->setFont(QFont("Roboto", 11, QFont::Normal));
 
     stateMachine->start();
-    QCoreApplication::processEvents();
+    // EVOPLEX: QCoreApplication::processEvents();
 }
 
 /*!

@@ -55,7 +55,7 @@ void QtMaterialDrawerPrivate::init()
     widget->setParent(q);
 
     stateMachine->start();
-    QCoreApplication::processEvents();
+    // EVOPLEX: QCoreApplication::processEvents();
 }
 
 /*!

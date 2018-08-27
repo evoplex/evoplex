@@ -39,7 +39,7 @@ void QtMaterialSnackbarPrivate::init()
     q->setFont(font);
 
     stateMachine->start();
-    QCoreApplication::processEvents();
+    // EVOPLEX: QCoreApplication::processEvents();
 }
 
 /*!

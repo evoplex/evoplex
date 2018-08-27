@@ -103,7 +103,7 @@ void QtMaterialTogglePrivate::init()
     setupProperties();
 
     stateMachine->start();
-    QCoreApplication::processEvents();
+    // EVOPLEX: QCoreApplication::processEvents();
 }
 
 void QtMaterialTogglePrivate::setupProperties()

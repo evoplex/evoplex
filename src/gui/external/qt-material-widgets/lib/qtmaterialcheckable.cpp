@@ -120,7 +120,7 @@ void QtMaterialCheckablePrivate::init()
     disabledCheckedState->assignProperty(checkedIcon, "color", q->disabledColor());
 
     stateMachine->start();
-    QCoreApplication::processEvents();
+    // EVOPLEX: QCoreApplication::processEvents();
 }
 
 /*!

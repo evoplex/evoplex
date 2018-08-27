@@ -52,7 +52,7 @@ void QtMaterialSliderPrivate::init()
     q->setAttribute(Qt::WA_WState_OwnSizePolicy, false);
 
     stateMachine->start();
-    QCoreApplication::processEvents();
+    // EVOPLEX: QCoreApplication::processEvents();
 }
 
 QRectF QtMaterialSliderPrivate::trackBoundingRect() const

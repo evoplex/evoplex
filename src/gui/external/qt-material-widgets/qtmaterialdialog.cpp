@@ -100,7 +100,7 @@ void QtMaterialDialogPrivate::init()
                      proxy, SLOT(makeTransparent()));
 
     stateMachine->start();
-    QCoreApplication::processEvents();
+    // EVOPLEX: QCoreApplication::processEvents();
 }
 
 /*!
