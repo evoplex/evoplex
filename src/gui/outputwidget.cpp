@@ -52,7 +52,7 @@ OutputWidget::OutputWidget(const ModelPlugin* modelPlugin, const std::vector<int
     slotEntityChanged(true); // init
     m_ui->entityEdge->setDisabled(modelPlugin->edgeAttrNames().empty());
 
-    connect(m_ui->add, SIGNAL(clicked(bool)), SLOT(slotAdd()));
+    connect(m_ui->add, SIGNAL(pressed()), SLOT(slotAdd()));
     connect(m_ui->func, SIGNAL(currentIndexChanged(int)), SLOT(slotFuncChanged(int)));
     connect(m_ui->entityNode, SIGNAL(toggled(bool)), SLOT(slotEntityChanged(bool)));
 

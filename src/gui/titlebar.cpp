@@ -69,14 +69,14 @@ void BaseTitleBar::init(QHBoxLayout* layout)
 
     layout->addWidget(m_bMaximize);
     m_bMaximize->setIcon(m_kIconFull);
-    connect(m_bMaximize, SIGNAL(clicked(bool)), SLOT(slotFullScreen()));
+    connect(m_bMaximize, SIGNAL(pressed()), SLOT(slotFullScreen()));
 
     if (m_parent->features().testFlag(QDockWidget::DockWidgetClosable)) {
         m_bClose = new QtMaterialIconButton(QIcon(":/icons/material/close_white_18"));
         m_bClose->setColor(Qt::white);
         m_bClose->setIconSize(QSize(18,18));
         layout->addWidget(m_bClose);
-        connect(m_bClose, SIGNAL(clicked(bool)), m_parent, SLOT(close()));
+        connect(m_bClose, SIGNAL(pressed()), m_parent, SLOT(close()));
     }
 }
 

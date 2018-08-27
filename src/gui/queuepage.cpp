@@ -53,8 +53,8 @@ QueuePage::QueuePage(MainGUI* mainGUI)
     ExperimentsMgr* expMgr = mainGUI->mainApp()->expMgr();
     connect(expMgr, SIGNAL(statusChanged(Experiment*)), SLOT(slotStatusChanged(Experiment*)));
 
-    connect(m_ui->bClearQueue, SIGNAL(clicked(bool)), expMgr, SLOT(clearQueue()));
-    connect(m_ui->bClearIdle, SIGNAL(clicked(bool)), expMgr, SLOT(clearIdle()));
+    connect(m_ui->bClearQueue, SIGNAL(pressed()), expMgr, SLOT(clearQueue()));
+    connect(m_ui->bClearIdle, SIGNAL(pressed()), expMgr, SLOT(clearIdle()));
 
     connect(m_ui->tableIdle, &QTableWidget::cellClicked, [this]() {
             m_ui->tableQueue->clearSelection(); m_ui->tableRunning->clearSelection();});

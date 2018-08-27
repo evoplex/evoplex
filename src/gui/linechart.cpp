@@ -51,7 +51,7 @@ LineChart::LineChart(ExperimentPtr exp, QWidget* parent)
 
     QDialog* dlg = new QDialog(this, Qt::WindowSystemMenuHint | Qt::WindowTitleHint); // removes ?
     m_settingsDlg->setupUi(dlg);
-    connect(m_settingsDlg->bEditSeries, SIGNAL(clicked(bool)), SLOT(slotOutputWidget()));
+    connect(m_settingsDlg->bEditSeries, SIGNAL(pressed()), SLOT(slotOutputWidget()));
 
     TitleBar* titleBar = new TitleBar(m_exp.get(), this);
     setTitleBarWidget(titleBar);

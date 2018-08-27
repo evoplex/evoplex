@@ -44,13 +44,13 @@ GraphTitleBar::GraphTitleBar(const Experiment* exp, QDockWidget* parent)
     m_bExportNodes->setIconSize(QSize(22,18));
     m_bExportNodes->setColor(m_iconColor);
     m_ui->btns->addWidget(m_bExportNodes);
-    connect(m_bExportNodes, SIGNAL(clicked(bool)), SLOT(slotExporNodes()));
+    connect(m_bExportNodes, SIGNAL(pressed()), SLOT(slotExporNodes()));
 
     m_bSettings->setToolTip("graph settings");
     m_bSettings->setIconSize(QSize(22,18));
     m_bSettings->setColor(m_iconColor);
     m_ui->btns->addWidget(m_bSettings);
-    connect(m_bSettings, SIGNAL(clicked(bool)), SIGNAL(openSettingsDlg()));
+    connect(m_bSettings, SIGNAL(pressed()), SIGNAL(openSettingsDlg()));
 
     connect(m_ui->cbTrial, QOverload<int>::of(&QComboBox::currentIndexChanged),
         [this](int t) {

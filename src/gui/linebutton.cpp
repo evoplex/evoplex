@@ -42,9 +42,9 @@ LineButton::LineButton(QWidget* parent, Mode mode)
     setLayout(hlayout);
 
     if (m_mode == SelectDir) {
-        connect(m_button, SIGNAL(clicked(bool)), SLOT(slotSelectDir()));
+        connect(m_button, SIGNAL(pressed()), SLOT(slotSelectDir()));
     } else if (m_mode == SelectTextFile) {
-        connect(m_button, SIGNAL(clicked(bool)), SLOT(slotSelectFile()));
+        connect(m_button, SIGNAL(pressed()), SLOT(slotSelectFile()));
     }
 }
 

@@ -68,9 +68,9 @@ BaseGraphGL::BaseGraphGL(ExperimentPtr exp, GraphWidget* parent)
 
     connect(m_exp.get(), SIGNAL(statusChanged(Status)), SLOT(slotStatusChanged(Status)));
 
-    connect(m_ui->bZoomIn, SIGNAL(clicked(bool)), SLOT(zoomIn()));
-    connect(m_ui->bZoomOut, SIGNAL(clicked(bool)), SLOT(zoomOut()));
-    connect(m_ui->bReset, SIGNAL(clicked(bool)), SLOT(resetView()));
+    connect(m_ui->bZoomIn, SIGNAL(pressed()), SLOT(zoomIn()));
+    connect(m_ui->bZoomOut, SIGNAL(pressed()), SLOT(zoomOut()));
+    connect(m_ui->bReset, SIGNAL(pressed()), SLOT(resetView()));
 
     m_bCenter = new QtMaterialIconButton(QIcon(":/icons/material/center_white_18"), this);
     m_bCenter->setToolTip("centralize selection");

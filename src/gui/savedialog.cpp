@@ -36,7 +36,7 @@ SaveDialog::SaveDialog(QWidget *parent)
 {
     m_ui->setupUi(this);
 
-    connect(m_ui->browse, SIGNAL(clicked(bool)), SLOT(browseDir()));
+    connect(m_ui->browse, SIGNAL(pressed()), SLOT(browseDir()));
     connect(m_ui->btn, SIGNAL(rejected()), SLOT(hide()));
     connect(m_ui->btn, &QDialogButtonBox::accepted, [this]() {
         QString f = QString("%1/%2.csv").arg(m_ui->dest->text(), m_ui->pname->text());

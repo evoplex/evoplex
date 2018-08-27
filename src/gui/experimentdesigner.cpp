@@ -58,18 +58,18 @@ ExperimentDesigner::ExperimentDesigner(MainApp* mainApp, QWidget *parent)
     m_bRemove->setIconSize(QSize(24,24));
     m_ui->widget->layout()->addWidget(m_bRemove);
     m_bRemove->hide();
-    connect(m_bRemove, SIGNAL(clicked(bool)), SLOT(slotRemoveExperiment()));
+    connect(m_bRemove, SIGNAL(pressed()), SLOT(slotRemoveExperiment()));
 
     m_bEdit->setColor(Qt::white);
     m_bEdit->setIconSize(QSize(24,24));
     m_ui->widget->layout()->addWidget(m_bEdit);
     m_bEdit->hide();
-    connect(m_bEdit, SIGNAL(clicked(bool)), SLOT(slotEditExperiment()));
+    connect(m_bEdit, SIGNAL(pressed()), SLOT(slotEditExperiment()));
 
     m_bAdd->setColor(Qt::white);
     m_bAdd->setIconSize(QSize(24,24));
     m_ui->widget->layout()->addWidget(m_bAdd);
-    connect(m_bAdd, SIGNAL(clicked(bool)), SLOT(slotCreateExperiment()));
+    connect(m_bAdd, SIGNAL(pressed()), SLOT(slotCreateExperiment()));
 
     m_ui->treeWidget->setFocusPolicy(Qt::NoFocus);
     connect(m_ui->cbWidgets, SIGNAL(currentIndexChanged(int)), SLOT(slotActiveWidget(int)));
@@ -90,7 +90,7 @@ ExperimentDesigner::ExperimentDesigner(MainApp* mainApp, QWidget *parent)
     m_treeItemGraphs->setExpanded(false);
     // -- nodes generator
     LineButton* nodesCmd = new LineButton(this, LineButton::None);
-    connect(nodesCmd->button(), SIGNAL(clicked(bool)), SLOT(slotNodesWidget()));
+    connect(nodesCmd->button(), SIGNAL(pressed()), SLOT(slotNodesWidget()));
     addGeneralAttr(m_treeItemGraphs, GENERAL_ATTR_NODES, nodesCmd);
     // --  graphs available
     cb = new QComboBox(m_ui->treeWidget);
@@ -107,7 +107,7 @@ ExperimentDesigner::ExperimentDesigner(MainApp* mainApp, QWidget *parent)
     addGeneralAttr(m_treeItemGraphs, GENERAL_ATTR_GRAPHTYPE, cb);
     // -- edges generator
     LineButton* edgesCmd = new LineButton(this, LineButton::None);
-    connect(edgesCmd->button(), SIGNAL(clicked(bool)), SLOT(slotEdgesWidget()));
+    connect(edgesCmd->button(), SIGNAL(pressed()), SLOT(slotEdgesWidget()));
     m_edgesAttrsIdx = m_treeItemGraphs->childCount();
     addGeneralAttr(m_treeItemGraphs, GENERAL_ATTR_EDGEATTRS, edgesCmd);
 
@@ -139,7 +139,7 @@ ExperimentDesigner::ExperimentDesigner(MainApp* mainApp, QWidget *parent)
     addGeneralAttr(m_treeItemOutputs, OUTPUT_DIR, outDir);
     // -- add custom widget: output directory
     LineButton* outHeader = new LineButton(this, LineButton::None);
-    connect(outHeader->button(), SIGNAL(clicked(bool)), SLOT(slotOutputWidget()));
+    connect(outHeader->button(), SIGNAL(pressed()), SLOT(slotOutputWidget()));
     addGeneralAttr(m_treeItemOutputs, OUTPUT_HEADER, outHeader);
 
 /* TODO: make the buttons to avgTrials and saveSteps work*/

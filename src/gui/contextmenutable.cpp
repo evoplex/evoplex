@@ -48,7 +48,7 @@ MenuSpinBox::MenuSpinBox(const QString& title, QWidget* parent)
     m_action->setDefaultWidget(w);
     addAction(m_action);
 
-    connect(okButton, SIGNAL(clicked(bool)), this, SIGNAL(okButton()));
+    connect(okButton, SIGNAL(pressed()), this, SIGNAL(okButton()));
 }
 
 MenuSpinBox::~MenuSpinBox()
