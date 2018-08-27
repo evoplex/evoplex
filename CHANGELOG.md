@@ -31,6 +31,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - New model plugin: Conway's Game of Life cellular automaton `gameOfLife`
 - New model plugin: Elementary cellular automaton rules `cellularAutomata1D`
 - New graph plugin: Path graph (linear graph) (#1)
+- New graph plugin: Cycle graph (#2)
 
 ### Changed
 - Node's coordinates are now a float

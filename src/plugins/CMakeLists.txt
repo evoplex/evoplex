@@ -53,6 +53,7 @@ function(add_plugins ROOT_DIR PLUGINS)
 endfunction(add_plugins)
 
 set(GRAPHS
+  cycle
   edgesFromCSV
   path
   squaregrid

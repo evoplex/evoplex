@@ -1,0 +1,11 @@
+{
+  "type": "graph",
+  "uid": "cycle",
+  "version": 1,
+  "title": "Cycle Graph",
+  "author": "Marcos Cardinot",
+  "description": "It generates a cycle graph from a set of nodes.",
+
+  "supportsEdgeAttrsGen": true,
+  "validGraphTypes": [ "undirected", "directed" ]
+}
