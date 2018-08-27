@@ -24,11 +24,12 @@
 #include <QAction>
 #include <QMainWindow>
 
-#include "colormap.h"
 #include "core/mainapp.h"
+#include "colormap.h"
 
 namespace evoplex {
 
+class ConsoleWidget;
 class ProjectWidget;
 class SaveDialog;
 
@@ -88,6 +89,7 @@ private:
     ProjectsPage* m_projectsPage;
     PluginsPage* m_plugins;
     SettingsPage* m_settings;
+    ConsoleWidget* m_console;
     Page m_curPage;
 
     QAction* m_actNewProject;

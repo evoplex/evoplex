@@ -102,6 +102,7 @@ set(EVOPLEX_GUI_H
   tablewidget.h
   graphtitlebar.h
 
+  consolewidget.h
   pluginspage.h
   projectspage.h
   #queuepage.h
@@ -134,6 +135,7 @@ set(EVOPLEX_GUI_CXX
   tablewidget.cpp
   graphtitlebar.cpp
 
+  consolewidget.cpp
   pluginspage.cpp
   projectspage.cpp
   #queuepage.cpp
@@ -145,6 +147,7 @@ set(EVOPLEX_GUI_CXX
 set(EVOPLEX_GUI_UIFORM
   attrcolorselector
   attrsgendlg
+  consoletitlebar
   experimentdesigner
   basegraphgl
   graphsettings

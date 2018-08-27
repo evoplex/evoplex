@@ -39,6 +39,17 @@ QToolBar {
 QToolBar#mainToolbar > QToolButton {
   padding: 8px;
 }
+QStatusBar {
+  background-color: rgb(66, 133, 244);
+}
+QPlainTextEdit#Console {
+  background-color: rgb(24,24,24);
+}
+QWidget#ConsoleTitleBar, QDockWidget::title {
+  text-align: left;
+  background-color:rgb(40,40,40);
+  padding: 0 5px 0 5px;
+}
 
 /* TitleBar */
 QWidget#TitleBar {

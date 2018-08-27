@@ -61,7 +61,7 @@ int main(int argc, char* argv[])
     // Enables high-DPI scaling in Qt on supported platforms
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling, true);
 
-    evoplex::Logger::init();
+    evoplex::Logger::instance()->init();
 
     const QString copyright = "Copyright (C) 2016-" % QDate::currentDate().toString("yyyy");
     const QString authors = "Marcos Cardinot et al.";
@@ -76,7 +76,7 @@ int main(int argc, char* argv[])
     qInfo() << qPrintable(QString("[ %1 ]").arg(versionLine.leftJustified(maxLength, ' ')));
     qInfo() << qPrintable(QString("[ %1 ]").arg(copyrightLine.leftJustified(maxLength, ' ')));
     qInfo() << qPrintable(" " % QString().fill('-', maxLength+2));
-    qInfo() << "Writing log file to:" << QDir::toNativeSeparators(evoplex::Logger::logFileName());
+    qInfo() << "Writing log file to:" << QDir::toNativeSeparators(evoplex::Logger::instance()->logFileName());
 
     // init application
     evoplex::MainApp mainApp;
@@ -140,7 +140,7 @@ int main(int argc, char* argv[])
         // TODO: handle args
     }
 
-    evoplex::Logger::deinit();
+    evoplex::Logger::instance()->destroy();
 
     return result;
 }

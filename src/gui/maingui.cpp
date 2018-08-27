@@ -29,12 +29,20 @@
 #include <QPlainTextEdit>
 #include <QPushButton>
 #include <QSettings>
+#include <QStatusBar>
 #include <QToolBar>
 #include <QToolButton>
 #include <QVBoxLayout>
 
+#include "../config.h"
+#include "core/logger.h"
+#include "core/project.h"
+
+#include "external/qt-material-widgets/qtmaterialflatbutton.h"
+
 #include "maingui.h"
 #include "fontstyles.h"
+#include "consolewidget.h"
 #include "projectwidget.h"
 #include "savedialog.h"
 #include "pluginspage.h"
@@ -43,10 +51,6 @@
 #include "settingspage.h"
 #include "welcomepage.h"
 
-#include "../config.h"
-#include "core/logger.h"
-#include "core/project.h"
-
 namespace evoplex {
 
 // By default, a QDialog should have only the close button
@@ -54,16 +58,17 @@ namespace evoplex {
 const QFlags<Qt::WindowType> MainGUI::kDefaultDlgFlags = Qt::CustomizeWindowHint | Qt::WindowCloseButtonHint | Qt::WindowSystemMenuHint | Qt::WindowTitleHint;
 
 MainGUI::MainGUI(MainApp* mainApp)
-    : QMainWindow(nullptr)
-    , m_mainApp(mainApp)
-    , m_colorMapMgr(new ColorMapMgr)
-    , m_saveDialog(new SaveDialog(this))
-    , m_welcome(new WelcomePage(this))
-    //, m_queue(new QueuePage(this))
-    , m_projectsPage(new ProjectsPage(this))
-    , m_plugins(new PluginsPage(this))
-    , m_settings(new SettingsPage(this))
-    , m_curPage(PAGE_NULL)
+    : QMainWindow(nullptr),
+      m_mainApp(mainApp),
+      m_colorMapMgr(new ColorMapMgr),
+      m_saveDialog(new SaveDialog(this)),
+      m_welcome(new WelcomePage(this)),
+    // m_queue(new QueuePage(this)),
+      m_projectsPage(new ProjectsPage(this)),
+      m_plugins(new PluginsPage(this)),
+      m_settings(new SettingsPage(this)),
+      m_console(new ConsoleWidget(this)),
+      m_curPage(PAGE_NULL)
 {
     // main window
     setObjectName("MainGUI");
@@ -79,6 +84,7 @@ MainGUI::MainGUI(MainApp* mainApp)
     // central widget
     //
     QHBoxLayout* centralLayout = new QHBoxLayout(new QWidget(this));
+    centralLayout->setContentsMargins(0,0,0,0);
     centralLayout->addWidget(m_welcome);
     //centralLayout->addWidget(m_queue);
     centralLayout->addWidget(m_projectsPage);
@@ -201,6 +207,28 @@ MainGUI::MainGUI(MainApp* mainApp)
     QSettings userPrefs;
     restoreGeometry(userPrefs.value("gui/geometry").toByteArray());
     restoreState(userPrefs.value("gui/windowState").toByteArray());
+
+    //
+    // status bar
+    //
+    setStatusBar(new QStatusBar(this));
+    auto bWarning = new QtMaterialFlatButton(this);
+    bWarning->setCheckable(true);
+    bWarning->setFont(FontStyles::caption());
+    bWarning->setForegroundColor(Qt::white);
+    bWarning->setOverlayColor(Qt::lightGray);
+    bWarning->setIcon(QIcon(":/icons/material/warning_white_18"));
+    bWarning->setText("0");
+    bWarning->setMaximumHeight(18);
+    bWarning->setChecked(false);
+    m_console->setVisible(false);
+    statusBar()->addPermanentWidget(bWarning);
+    addDockWidget(Qt::BottomDockWidgetArea, m_console);
+    connect(bWarning, SIGNAL(toggled(bool)), m_console, SLOT(setVisible(bool)));
+    connect(m_console, SIGNAL(visibilityChanged(bool)), bWarning, SLOT(setChecked(bool)));
+    connect(m_console, &ConsoleWidget::warningsCountChanged, [bWarning](int v) {
+        bWarning->setText(QString::number(v));
+    });
 }
 
 MainGUI::~MainGUI()
@@ -309,24 +337,24 @@ void MainGUI::slotShowLog()
     QVBoxLayout* l = new QVBoxLayout(d);
     l->addWidget(new QLabel("Use the following to provide more detailed information about your system to bug reports:"));
 
-    QPlainTextEdit* text = new QPlainTextEdit(Logger::log(), d);
+    QPlainTextEdit* text = new QPlainTextEdit(Logger::instance()->log(), d);
     text->setReadOnly(true);
     text->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     l->addWidget(text);
 
-    l->addWidget(new QLabel("Writing log file to: " + Logger::logFileName()));
+    l->addWidget(new QLabel("Writing log file to: " + Logger::instance()->logFileName()));
 
     QHBoxLayout* bts = new QHBoxLayout();
     bts->addSpacerItem(new QSpacerItem(5, 5, QSizePolicy::MinimumExpanding, QSizePolicy::Minimum));
     QPushButton* refresh = new QPushButton("Refresh");
-    connect(refresh, &QPushButton::pressed, [text](){ text->setPlainText(Logger::log()); });
+    connect(refresh, &QPushButton::pressed, [text](){ text->setPlainText(Logger::instance()->log()); });
     bts->addWidget(refresh);
     QPushButton* copy = new QPushButton("Copy to Clipboard");
     connect(copy, &QPushButton::pressed, [text](){ text->selectAll(); text->copy(); });
     bts->addWidget(copy);
     QPushButton* location = new QPushButton("Open Location");
     connect(location, &QPushButton::pressed, [](){
-        QDesktopServices::openUrl(QUrl("file:///"+Logger::logDir(), QUrl::TolerantMode)); });
+        QDesktopServices::openUrl(QUrl("file:///"+Logger::instance()->logDir(), QUrl::TolerantMode)); });
     bts->addWidget(location);
     QPushButton* close = new QPushButton("Close");
     connect(close, &QPushButton::pressed, [d](){ d->close(); });

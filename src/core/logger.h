@@ -30,34 +30,42 @@ namespace evoplex {
 
 // This class was mostly based on the StelLogger.hpp from Stellarium
 // https://github.com/Stellarium/stellarium/blob/master/src/StelLogger.hpp
-class Logger
+class Logger : public QObject
 {
-public:
-    static void init();
+    Q_OBJECT
 
-    static void deinit();
+public:
+    static Logger* instance() { return m_instance; }
 
     // Handler for qDebug() and friends. Writes message to log file at $USERDIR/log.txt and echoes to stderr.
     static void debugLogHandler(QtMsgType type, const QMessageLogContext& ctx, const QString& str);
+
+    void init();
+
+    void destroy();
 
     // Write the message plus a newline to the log file at $USERDIR/log.txt.
     // @param msg message to write.
     // If you call this function the message will be only in the log file,
     // not on the console like with qDebug().
-    static void writeLog(QString msg);
+    void writeLog(QString msg);
 
-    static const QString& log() { return m_log; }
+    const QString& log() { return m_log; }
 
-    static QString logFileName() { return m_logFile.fileName(); }
+    QString logFileName() { return m_logFile.fileName(); }
 
-    static QString logDir() { return m_logDir.absolutePath(); }
+    QString logDir() { return m_logDir.absolutePath(); }
+
+signals:
+    void warning(const QString& msg);
 
 private:
-    static QFile m_logFile;
-    static QString m_log;
-    static QMutex m_fileMutex;
-    static QDir m_logDir;
-    static QString m_logDateFormat;
+    static Logger* m_instance;
+    QFile m_logFile;
+    QString m_log;
+    QMutex m_fileMutex;
+    QDir m_logDir;
+    QString m_logDateFormat;
 };
 } // evoplex
 

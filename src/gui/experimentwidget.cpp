@@ -208,7 +208,9 @@ void ExperimentWidget::slotStatusChanged(Status status)
     }
 
     if (status == Status::Invalid) {
-        QMessageBox::warning(this, "Experiment", "Something went wrong with your settings!");
+        QMessageBox::warning(this, "Experiment",
+            "Something went wrong with your settings!\n"
+            "Check the error messages in the console.");
     }
 }
 

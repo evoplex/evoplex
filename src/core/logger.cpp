@@ -36,11 +36,7 @@
 namespace evoplex
 {
 
-QFile Logger::m_logFile;
-QString Logger::m_log;
-QMutex Logger::m_fileMutex;
-QDir Logger::m_logDir;
-QString Logger::m_logDateFormat;
+Logger* Logger::m_instance = new Logger;
 
 void Logger::init()
 {
@@ -223,7 +219,7 @@ void Logger::init()
 #endif
 }
 
-void Logger::deinit()
+void Logger::destroy()
 {
     const QDateTime sevenDaysAgo = QDateTime::currentDateTime().addDays(-7);
     const QStringList oldLogs = m_logDir.entryList(QStringList("log_*.txt"), QDir::Files);
@@ -239,6 +235,8 @@ void Logger::deinit()
 
     qInstallMessageHandler(nullptr);
     m_logFile.close();
+    delete m_instance;
+    m_instance = nullptr;
 }
 
 void Logger::debugLogHandler(QtMsgType type, const QMessageLogContext& ctx, const QString& msg)
@@ -256,6 +254,7 @@ void Logger::debugLogHandler(QtMsgType type, const QMessageLogContext& ctx, cons
         formattedMsg = "[" % classFunc  % "] " % formattedMsg;
         if (type == QtWarningMsg) {
             color = 35; // magenta
+            emit (m_instance->warning(formattedMsg));
         } else if (type == QtCriticalMsg || type == QtFatalMsg) {
             color = 31; // red
             formattedMsg = formattedMsg % " (" % ctx.file % ":" % QString::number(ctx.line) % ")";
@@ -265,7 +264,7 @@ void Logger::debugLogHandler(QtMsgType type, const QMessageLogContext& ctx, cons
     fprintf(stderr, "\033[0;%um%s\033[0m\n", color, qPrintable(formattedMsg));
     fflush(stderr);
 
-    writeLog(formattedMsg);
+    m_instance->writeLog(formattedMsg);
 }
 
 void Logger::writeLog(QString msg)

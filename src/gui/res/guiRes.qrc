@@ -271,5 +271,21 @@
         <file>material-icons/navigation/png/ic_refresh_white_24dp.png</file>
         <file>material-icons/navigation/png/ic_refresh_white_36dp.png</file>
         <file>material-icons/navigation/png/ic_refresh_white_48dp.png</file>
+        <file>material-icons/alert/png/ic_warning_white_48dp.png</file>
+        <file>material-icons/alert/png/ic_warning_white_36dp.png</file>
+        <file>material-icons/alert/png/ic_warning_white_24dp.png</file>
+        <file alias="warning_white_18">material-icons/alert/png/ic_warning_white_18dp.png</file>
+        <file>material-icons/alert/png/ic_warning_black_48dp.png</file>
+        <file>material-icons/alert/png/ic_warning_black_36dp.png</file>
+        <file>material-icons/alert/png/ic_warning_black_24dp.png</file>
+        <file>material-icons/alert/png/ic_warning_black_18dp.png</file>
+        <file>material-icons/communication/png/ic_clear_all_white_48dp.png</file>
+        <file>material-icons/communication/png/ic_clear_all_white_36dp.png</file>
+        <file>material-icons/communication/png/ic_clear_all_white_24dp.png</file>
+        <file alias="clear_white_18">material-icons/communication/png/ic_clear_all_white_18dp.png</file>
+        <file>material-icons/communication/png/ic_clear_all_black_48dp.png</file>
+        <file>material-icons/communication/png/ic_clear_all_black_36dp.png</file>
+        <file>material-icons/communication/png/ic_clear_all_black_24dp.png</file>
+        <file>material-icons/communication/png/ic_clear_all_black_18dp.png</file>
     </qresource>
 </RCC>
