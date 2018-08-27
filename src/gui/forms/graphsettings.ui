@@ -32,10 +32,10 @@
         <item>
          <widget class="QSlider" name="nodeScale">
           <property name="minimum">
-           <number>5</number>
+           <number>1</number>
           </property>
           <property name="maximum">
-           <number>55</number>
+           <number>200</number>
           </property>
           <property name="value">
            <number>10</number>
@@ -64,10 +64,10 @@
         <item row="0" column="1">
          <widget class="QSlider" name="edgeScale">
           <property name="minimum">
-           <number>10</number>
+           <number>1</number>
           </property>
           <property name="maximum">
-           <number>110</number>
+           <number>200</number>
           </property>
           <property name="value">
            <number>25</number>
