@@ -65,6 +65,8 @@ bool PathGraph::reset()
             addEdge(nodeId, nodeId+1, new Attributes());
         }
     }
+    // last node
+    fixCoords(node(numNodes() - 1));
 
     return true;
 }
