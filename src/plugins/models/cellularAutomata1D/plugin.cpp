@@ -28,6 +28,11 @@ bool CellularAutomata1D::init()
     // gets the `squareGrid` height
     m_height = graph()->attr("height").toInt();
 
+    if (m_height < 2) {
+        qWarning() << "the 'squareGrid' height must be >= 2";
+        return false;
+    }
+
     // gets the id of the `state` node's attribute, which is the same for all nodes
     m_stateAttrId = node(0).attrs().indexOf("state");
 
