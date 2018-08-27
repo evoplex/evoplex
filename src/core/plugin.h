@@ -58,6 +58,8 @@ public:
     inline const QString& title() const;
     inline const QString& description() const;
     inline quint16 version() const;
+    inline QJsonObject metaData() const;
+    inline const QString& compactMetaData() const;
 
     inline const std::vector<QString>& pluginAttrsNames() const;
     inline const AttributesScope& pluginAttrsScope() const;
@@ -65,6 +67,7 @@ public:
 
 protected:
     PluginType m_type;
+    QJsonObject m_metaData;
 
     /**
      * Relies that any plugin lugin is loaded from the temporary directory
@@ -72,13 +75,14 @@ protected:
      */
     explicit Plugin(PluginType type, QPluginLoader* loader, const QString& libPath);
 
-    bool readAttrsScope(const QJsonObject* metaData, const QString& attrName,
-            AttributesScope& attrsScope, std::vector<QString>& keys) const;
+    bool readAttrsScope(const QString& attrName, AttributesScope& attrsScope,
+                        std::vector<QString>& keys) const;
 
 private:
     QPluginLoader* m_loader;
     PluginInterface* m_factory;
     const QString m_libPath;
+    QString m_compactMetaData;
     PluginKey m_key;
     QString m_id;
     QString m_author;
@@ -117,6 +121,12 @@ inline const QString& Plugin::description() const
 
 inline quint16 Plugin::version() const
 { return m_version; }
+
+inline QJsonObject Plugin::metaData() const
+{ return m_metaData; }
+
+inline const QString& Plugin::compactMetaData() const
+{ return m_compactMetaData; }
 
 inline const std::vector<QString>& Plugin::pluginAttrsNames() const
 { return m_pluginAttrsNames; }

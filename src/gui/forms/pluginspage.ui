@@ -165,8 +165,10 @@ QPushButton::hover {
         </sizepolicy>
        </property>
        <property name="styleSheet">
-        <string notr="true">background-color: rgb(24, 24, 24);
-padding: 20px;</string>
+        <string notr="true">QTextBrowser {
+background-color: rgb(24, 24, 24);
+padding: 20px;
+}</string>
        </property>
        <property name="frameShape">
         <enum>QFrame::NoFrame</enum>

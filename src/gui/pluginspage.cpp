@@ -129,7 +129,12 @@ void PluginsPage::loadHtml(const Plugin* plugin)
                  + "<b>Author:</b> " + plugin->author() + "<br>"
                  + "<b>Plugin type:</b> " + _enumToString<PluginType>(plugin->type()) + "<br>"
                  + "<b>Version:</b> " + QString::number(plugin->version()) + "<br>"
-                 + "<b>Description:</b> " + plugin->description() + "<br>";
+                 "<br>"
+                 + "<b>Description:</b><br>" + plugin->description() + "<br>"
+                 "<br>"
+                 + "<b>Location:</b><br>" + plugin->path() + "<br>"
+                 "<br>"
+                 + "<b>Meta data:</b><br>" + plugin->compactMetaData() + "<br>";
 
     m_ui->browser->setHtml(html);
 }

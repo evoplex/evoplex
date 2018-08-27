@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Implements `AttributeRange::next()` and `AttributeRange::prev()`
 - Plugins can now be reloaded
 - Main GUI: Adds a status bar and a console to show the error messages
+- Plugins page: Displays plugins location and meta data (#3)
 - Projects page: Adds button to maximize graph widgets
 - Projects page: Adds button to pause all experiments
 - Experiments table: Allows hiding columns

@@ -22,6 +22,7 @@
 #include <QDir>
 #include <QFile>
 #include <QJsonArray>
+#include <QJsonDocument>
 #include <QPluginLoader>
 #include <QVariantMap>
 
@@ -143,18 +144,18 @@ Plugin::Plugin(PluginType type, QPluginLoader* loader, const QString& libPath)
       m_factory(nullptr),
       m_libPath(libPath)
 {
-    QJsonObject metaData = m_loader->metaData().value("MetaData").toObject();
-    m_id = metaData.value(PLUGIN_ATTR_UID).toString();
-    m_author = metaData.value(PLUGIN_ATTR_AUTHOR).toString();
-    m_title = metaData.value(PLUGIN_ATTR_TITLE).toString();
-    m_descr = metaData.value(PLUGIN_ATTR_DESCRIPTION).toString();
+    m_metaData = m_loader->metaData().value("MetaData").toObject();
+    m_id = m_metaData.value(PLUGIN_ATTR_UID).toString();
+    m_author = m_metaData.value(PLUGIN_ATTR_AUTHOR).toString();
+    m_title = m_metaData.value(PLUGIN_ATTR_TITLE).toString();
+    m_descr = m_metaData.value(PLUGIN_ATTR_DESCRIPTION).toString();
     if (m_id.isEmpty() || m_author.isEmpty() || m_title.isEmpty() || m_descr.isEmpty()) {
         qWarning() << "missing required fields!";
         m_type = PluginType::Invalid;
         return;
     }
 
-    int version = metaData.value(PLUGIN_ATTR_VERSION).toInt(-1);
+    int version = m_metaData.value(PLUGIN_ATTR_VERSION).toInt(-1);
     if (version < 0 || version >= UINT16_MAX) {
         qWarning() << QString("plugin's version must be an int >=0 and <%1").arg(UINT16_MAX);
         m_type = PluginType::Invalid;
@@ -164,8 +165,7 @@ Plugin::Plugin(PluginType type, QPluginLoader* loader, const QString& libPath)
 
     m_key = {m_id, m_version};
 
-    if (!readAttrsScope(&metaData, PLUGIN_ATTR_ATTRSSCOPE,
-                        m_pluginAttrsScope, m_pluginAttrsNames)) {
+    if (!readAttrsScope(PLUGIN_ATTR_ATTRSSCOPE, m_pluginAttrsScope, m_pluginAttrsNames)) {
         qWarning() << "failed to read the plugins's attributes!";
         m_type = PluginType::Invalid;
         return;
@@ -177,6 +177,15 @@ Plugin::Plugin(PluginType type, QPluginLoader* loader, const QString& libPath)
         m_type = PluginType::Invalid;
         return;
     }
+
+    // build the compactMetaData without the general keys
+    auto metaData = m_metaData;
+    QStringList removeKeys = { PLUGIN_ATTR_UID, PLUGIN_ATTR_AUTHOR,
+            PLUGIN_ATTR_TITLE, PLUGIN_ATTR_DESCRIPTION, PLUGIN_ATTR_VERSION};
+    for (auto const& k : removeKeys) { metaData.remove(k); }
+
+    QJsonDocument doc(metaData);
+    m_compactMetaData = doc.toJson(QJsonDocument::Indented);
 }
 
 Plugin::~Plugin()
@@ -187,11 +196,11 @@ Plugin::~Plugin()
     delete m_loader;
 }
 
-bool Plugin::readAttrsScope(const QJsonObject* metaData, const QString& attrName,
-        AttributesScope& attrsScope, std::vector<QString>& keys) const
+bool Plugin::readAttrsScope(const QString& attrName, AttributesScope& attrsScope,
+                            std::vector<QString>& keys) const
 {
-    if (metaData->contains(attrName)) {
-        QJsonArray json = metaData->value(attrName).toArray();
+    if (m_metaData.contains(attrName)) {
+        QJsonArray json = m_metaData.value(attrName).toArray();
         for (int id = 0; id < json.size(); ++id) {
             QVariantMap attrs = json.at(id).toObject().toVariantMap();
             auto attrRange = AttributeRange::parse(id, attrs.firstKey(), attrs.first().toString());
