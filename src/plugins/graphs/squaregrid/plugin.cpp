@@ -39,7 +39,8 @@ bool SquareGrid::init()
     m_width = attr("width").toInt();
 
     if (numNodes() != m_height * m_width) {
-        qWarning() << "Wrong shape! The number of nodes should be equal to 'height'*'width'.";
+        qWarning() << "Wrong shape! The number of nodes should be equal to 'height'*'width'."
+                   << "Expected: " << m_height * m_width << "Actual:" << numNodes();
         return false;
     }
 
