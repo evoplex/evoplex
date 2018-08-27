@@ -338,7 +338,7 @@ color: rgb(255, 255, 255);</string>
            </size>
           </property>
           <property name="text">
-           <string>node</string>
+           <string>node id</string>
           </property>
          </widget>
         </item>
@@ -365,6 +365,9 @@ color: rgb(255, 255, 255);</string>
          <widget class="QLineEdit" name="neighbors">
           <property name="enabled">
            <bool>true</bool>
+          </property>
+          <property name="toolTip">
+           <string>neighbours ids</string>
           </property>
           <property name="readOnly">
            <bool>true</bool>

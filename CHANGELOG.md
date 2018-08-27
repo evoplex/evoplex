@@ -32,6 +32,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Node's coordinates are now a float
 - Graph widgets now use an OpenGL back end
+- Graph widgets: Inspector now displays the neighbours ids
 - Improved look and feel of graph widgets
 - Improved GraphView performance by avoiding caching invisible elements
 - Attributes' inspector of the graph widgets now shows a proper field for each type of attribute

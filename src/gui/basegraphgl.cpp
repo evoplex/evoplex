@@ -412,8 +412,17 @@ void BaseGraphGL::resizeEvent(QResizeEvent* e)
 
 void BaseGraphGL::updateInspector(const Node& node)
 {
+    QSet<int> neighbors;
+    for (auto const& e : node.outEdges()) {
+        neighbors.insert(e.second.neighbour().id());
+    }
+    QString neighbors_;
+    for (auto const& id : neighbors) {
+        neighbors_ += QString::number(id) + " ";
+    }
+
     m_ui->nodeId->setValue(node.id());
-    m_ui->neighbors->setText(QString::number(node.outDegree()));
+    m_ui->neighbors->setText(neighbors_);
     for (auto aw : m_attrWidgets) {
         aw->blockSignals(true);
         aw->setValue(node.attr(aw->id()));
