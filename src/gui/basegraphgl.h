@@ -26,6 +26,7 @@
 #include <QOpenGLWidget>
 #include <QLineEdit>
 #include <QMouseEvent>
+#include <QPainter>
 #include <QSharedPointer>
 #include <QTimer>
 
@@ -53,7 +54,7 @@ public:
 
 protected:
     virtual ~GraphGLInterface() = default;
-    virtual void paintEvent(QPaintEvent*) = 0;
+    virtual void paintFrame(QPainter& painter) const = 0;
     virtual Node selectNode(const QPointF& pos, bool center) = 0;
     virtual bool selectNode(const Node& node, bool center) = 0;
     virtual Node selectedNode() const = 0;
@@ -68,6 +69,8 @@ class BaseGraphGL : public QOpenGLWidget, public GraphGLInterface
 
 public:
     ~BaseGraphGL() override;
+
+    void paint(QPaintDevice* device, bool paintBackground) const;
 
 protected:
     explicit BaseGraphGL(ExperimentPtr exp, GraphWidget* parent);
@@ -95,6 +98,7 @@ protected:
 
     void updateCache(bool force=false);
 
+    inline void paintEvent(QPaintEvent*) override;
     void mousePressEvent(QMouseEvent* e) override;
     void mouseReleaseEvent(QMouseEvent* e) override;
     void resizeEvent(QResizeEvent* e) override;
@@ -136,6 +140,9 @@ private:
 
     void updateInspector(const Node& node);
 };
-}
 
+inline void BaseGraphGL::paintEvent(QPaintEvent*)
+{ paint(this, true); }
+
+} // evoplex
 #endif // BASEGRAPHGL_H

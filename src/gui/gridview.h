@@ -36,7 +36,7 @@ public slots:
     void openSettings() override { m_settingsDlg->show(); }
 
 protected:
-    void paintEvent(QPaintEvent*) override;
+    void paintFrame(QPainter& painter) const override;
     Node selectNode(const QPointF& pos, bool center) override;
     bool selectNode(const Node& node, bool center) override;
     virtual Node selectedNode() const override;

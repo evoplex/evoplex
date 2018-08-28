@@ -108,33 +108,6 @@ CacheStatus GraphView::refreshCache()
     return CacheStatus::Ready;
 }
 
-void GraphView::paintEvent(QPaintEvent*)
-{
-    QPainter painter;
-    painter.begin(this);
-    painter.setRenderHint(QPainter::Antialiasing);
-    painter.fillRect(rect(), m_background);
-
-    painter.translate(m_origin);
-
-    if (m_cacheStatus != CacheStatus::Ready) {
-        painter.end();
-        return;
-    }
-
-    if (m_selectedStar.node.isNull()) {
-        painter.setOpacity(1.0);
-        drawEdges(painter);
-    } else {
-        painter.setOpacity(0.2);
-    }
-    const double nodeRadius = m_nodeRadius;
-    drawNodes(painter, nodeRadius);
-    drawSelectedStar(painter, nodeRadius);
-
-    painter.end();
-}
-
 Node GraphView::selectNode(const QPointF& pos, bool center)
 {
     m_selectedStar = Star();
@@ -208,6 +181,19 @@ void GraphView::updateNodePen()
     } else {
         m_nodePen = QColor(100,100,100,255);
     }
+}
+
+void GraphView::paintFrame(QPainter& painter) const
+{
+    if (m_selectedStar.node.isNull()) {
+        painter.setOpacity(1.0);
+        drawEdges(painter);
+    } else {
+        painter.setOpacity(0.2);
+    }
+    const double nodeRadius = m_nodeRadius;
+    drawNodes(painter, nodeRadius);
+    drawSelectedStar(painter, nodeRadius);
 }
 
 void GraphView::drawNode(QPainter& painter, const Star& s, double r) const

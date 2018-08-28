@@ -76,17 +76,9 @@ CacheStatus GridView::refreshCache()
     return CacheStatus::Ready;
 }
 
-void GridView::paintEvent(QPaintEvent*)
+void GridView::paintFrame(QPainter& painter) const
 {
-    QPainter painter;
-    painter.begin(this);
-    painter.setRenderHint(QPainter::Antialiasing);
-    painter.fillRect(rect(), m_background);
-
-    painter.translate(m_origin);
-
-    if (m_cacheStatus != CacheStatus::Ready || m_nodeAttr < 0 || !m_nodeCMap) {
-        painter.end();
+    if (m_nodeAttr < 0 || !m_nodeCMap) {
         return;
     }
 
@@ -111,8 +103,6 @@ void GridView::paintEvent(QPaintEvent*)
         painter.setBrush(QBrush(m_background.color(), Qt::DiagCrossPattern));
         painter.drawRect(m_selectedCell.rect);
     }
-
-    painter.end();
 }
 
 Node GridView::selectNode(const QPointF& pos, bool center)

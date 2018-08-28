@@ -32,12 +32,14 @@ class Ui_GraphTitleBar;
 
 namespace evoplex {
 
+class GraphWidget;
+
 class GraphTitleBar : public BaseTitleBar
 {
     Q_OBJECT
 
 public:
-    explicit GraphTitleBar(const Experiment* exp, QDockWidget* parent);
+    explicit GraphTitleBar(const Experiment* exp, GraphWidget* parent);
     ~GraphTitleBar();
 
 signals:
@@ -45,17 +47,25 @@ signals:
     void openSettingsDlg();
 
 private slots:
-    void slotExporNodes();
+    void slotExportImage();
+    void slotExportNodes();
     void slotRestarted();
 
 private:
     const QSize m_iconSize;
 
     Ui_GraphTitleBar* m_ui;
+    GraphWidget* m_graphWidget;
     const Experiment* m_exp;
 
     QtMaterialIconButton* m_bExportNodes;
     QtMaterialIconButton* m_bSettings;
+    QtMaterialIconButton* m_bScreenShot;
+
+    bool readyToExport();
+
+    // return a path like `projectName_expN_filename`
+    QString guessInitialPath(const QString& filename) const;
 };
 
 } // evoplex

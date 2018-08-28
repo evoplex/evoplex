@@ -29,40 +29,40 @@ namespace evoplex {
 GraphWidget::GraphWidget(Mode mode, ColorMapMgr* cMgr,
                          ExperimentPtr exp, ExperimentWidget* parent)
     : QDockWidget(parent),
-      m_graph(nullptr)
+      m_view(nullptr)
 {
     GraphTitleBar* titleBar = new GraphTitleBar(exp.get(), this);
     setTitleBarWidget(titleBar);
 
     if (mode == Mode::Graph) {
-        m_graph = new GraphView(cMgr, exp, this);
+        m_view = new GraphView(cMgr, exp, this);
         setWindowTitle("Graph");
     } else {
-        m_graph = new GridView(cMgr, exp, this);
+        m_view = new GridView(cMgr, exp, this);
         setWindowTitle("Grid");
     }
-    setWidget(m_graph);
-    connect(m_graph, SIGNAL(updateWidgets(bool)),
+    setWidget(m_view);
+    connect(m_view, SIGNAL(updateWidgets(bool)),
             SIGNAL(updateWidgets(bool)));
 
     connect(titleBar, &GraphTitleBar::openSettingsDlg,
-            [this]() { m_graph->openSettings(); });
+            [this]() { m_view->openSettings(); });
     connect(titleBar, SIGNAL(trialSelected(quint16)),
-            m_graph, SLOT(setTrial(quint16)));
+            m_view, SLOT(setTrial(quint16)));
 
     // the widget might not be repaint after a drag and drop
     connect(this, &QDockWidget::dockLocationChanged,
-            [this](){ m_graph->update(); });
+            [this](){ m_view->update(); });
 }
 
 GraphWidget::~GraphWidget()
 {
-    delete m_graph;
+    delete m_view;
 }
 
 void GraphWidget::updateView(bool forceUpdate)
 {
-    if (m_graph) m_graph->updateView(forceUpdate);
+    if (m_view) m_view->updateView(forceUpdate);
 }
 
 } // evoplex

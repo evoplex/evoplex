@@ -110,6 +110,22 @@ BaseGraphGL::~BaseGraphGL()
     delete m_ui;
 }
 
+void BaseGraphGL::paint(QPaintDevice* device, bool paintBackground) const
+{
+    QPainter painter;
+    painter.begin(device);
+    painter.setRenderHint(QPainter::Antialiasing);
+    if (paintBackground) {
+        painter.fillRect(rect(), m_background);
+    }
+
+    painter.translate(m_origin);
+    if (m_cacheStatus == CacheStatus::Ready) {
+        paintFrame(painter);
+    }
+    painter.end();
+}
+
 void BaseGraphGL::slotSelectNode()
 {
     try {

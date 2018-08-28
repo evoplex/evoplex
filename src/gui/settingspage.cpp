@@ -68,7 +68,10 @@ SettingsPage::SettingsPage(MainGUI* mainGUI)
     m_ui->stepsToFlush->setMinimum(1);
     m_ui->stepsToFlush->setMaximum(EVOPLEX_MAX_STEPS);
     connect(m_ui->stepsToFlush, static_cast<void(QSpinBox::*)(int)>(&QSpinBox::valueChanged),
-            [mainGUI](int newValue) { mainGUI->mainApp()->setStepsToFlush(newValue); });
+        [mainGUI](int v) { mainGUI->mainApp()->setStepsToFlush(v); });
+
+    connect(m_ui->imageQuality, static_cast<void(QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+        [](int v) { QSettings s; s.setValue("settings/imgQuality", v); });
 
     refreshFields();
 }
@@ -89,6 +92,9 @@ void SettingsPage::refreshFields()
     m_ui->delay->setValue(m_mainGUI->mainApp()->defaultStepDelay());
 
     m_ui->stepsToFlush->setValue(m_mainGUI->mainApp()->stepsToFlush());
+
+    QSettings s;
+    m_ui->imageQuality->setValue(s.value("settings/imgQuality", 90).toInt());
 }
 
 void SettingsPage::resetDefaults()
@@ -96,6 +102,8 @@ void SettingsPage::resetDefaults()
     m_mainGUI->mainApp()->expMgr()->resetSettingsToDefault();
     m_mainGUI->colorMapMgr()->resetSettingsToDefault();
     m_mainGUI->mainApp()->resetSettingsToDefault();
+    QSettings s;
+    s.setValue("settings/imgQuality", 90);
     refreshFields();
 }
 

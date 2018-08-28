@@ -18,7 +18,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Experiments table: Allows hiding columns
 - Graph widgets: Allows scaling the nodes and edges
 - Graph widgets: Allows setting the edge with
-- Graph widgets: Allows exporting nodes to file
+- Graph widgets: Allows exporting nodes to a csv file
+- Graph widgets: Allows exporting graph as image (svg, png, jpg and jpeg)
 - Graph widgets: Allows zooming in/out with the mouse wheel
 - Graph widgets: right click to toggle the attribute's value
 - Graph widgets: Select node and hit `space` to toggle the attribute's value

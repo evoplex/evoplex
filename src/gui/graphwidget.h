@@ -47,6 +47,8 @@ public:
 
     virtual ~GraphWidget();
 
+    inline BaseGraphGL* view() const;
+
 public slots:
     void updateView(bool forceUpdate);
 
@@ -54,8 +56,11 @@ signals:
     void updateWidgets(bool);
 
 private:
-    BaseGraphGL* m_graph;
+    BaseGraphGL* m_view;
 };
+
+inline BaseGraphGL* GraphWidget::view() const
+{ return m_view; }
 
 } // evoplex
 #endif // GRAPHWIDGET_H

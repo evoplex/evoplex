@@ -21,30 +21,41 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QProgressDialog>
+#include <QtSvg/QSvgGenerator>
 
 #include "core/nodes_p.h"
 #include "core/project.h"
 #include "core/trial.h"
 
 #include "graphtitlebar.h"
+#include "graphwidget.h"
+#include "basegraphgl.h"
 #include "ui_graphtitlebar.h"
 
 namespace evoplex {
 
-GraphTitleBar::GraphTitleBar(const Experiment* exp, QDockWidget* parent)
+GraphTitleBar::GraphTitleBar(const Experiment* exp, GraphWidget* parent)
     : BaseTitleBar(parent),
       m_ui(new Ui_GraphTitleBar),
+      m_graphWidget(parent),
       m_exp(exp),
       m_bExportNodes(new QtMaterialIconButton(QIcon(":/icons/material/table_white_18"), this)),
-      m_bSettings(new QtMaterialIconButton(QIcon(":/icons/material/settings_white_18"), this))
+      m_bSettings(new QtMaterialIconButton(QIcon(":/icons/material/settings_white_18"), this)),
+      m_bScreenShot(new QtMaterialIconButton(QIcon(":/icons/material/screenshot_white_18"), this))
 {
     m_ui->setupUi(this);
+
+    m_bScreenShot->setToolTip("export as image");
+    m_bScreenShot->setIconSize(QSize(22,18));
+    m_bScreenShot->setColor(m_iconColor);
+    m_ui->btns->addWidget(m_bScreenShot);
+    connect(m_bScreenShot, SIGNAL(pressed()), SLOT(slotExportImage()));
 
     m_bExportNodes->setToolTip("export nodes to file");
     m_bExportNodes->setIconSize(QSize(22,18));
     m_bExportNodes->setColor(m_iconColor);
     m_ui->btns->addWidget(m_bExportNodes);
-    connect(m_bExportNodes, SIGNAL(pressed()), SLOT(slotExporNodes()));
+    connect(m_bExportNodes, SIGNAL(pressed()), SLOT(slotExportNodes()));
 
     m_bSettings->setToolTip("graph settings");
     m_bSettings->setIconSize(QSize(22,18));
@@ -69,41 +80,49 @@ GraphTitleBar::~GraphTitleBar()
     delete m_ui;
 }
 
-void GraphTitleBar::slotExporNodes()
+void GraphTitleBar::slotExportImage()
 {
-    if (m_exp->expStatus() == Status::Disabled ||
-            m_exp->expStatus() == Status::Invalid) {
-        QMessageBox::warning(this, "Exporting nodes",
-                "This experiment is invalid or has not been initialized yet.\n"
-                "Please, initialize the experiment and try again.");
-        return;
-    } else if (m_exp->expStatus() == Status::Running ||
-                    m_exp->expStatus() == Status::Queued) {
-        QMessageBox::warning(this, "Exporting nodes",
-                "Please, pause the experiment and try again.");
+    if (!readyToExport()) {
         return;
     }
 
-    const quint16 currTrial = m_ui->cbTrial->currentText().toUShort();
-    auto trial = m_exp->trial(currTrial);
-    if (!trial || trial->graph()->nodes().empty()) {
-        QMessageBox::warning(this, "Exporting nodes",
-                "Could not export the set of nodes.\n"
-                "Please, make sure this experiment is valid and that "
-                "there are nodes to be exported!");
+    QString path = guessInitialPath(".png");
+    path = QFileDialog::getSaveFileName(this, "Export Nodes", path,
+            "Image files (*.svg *.png *.jpg *.jpeg)");
+    if (path.isEmpty()) {
         return;
     }
 
-    // make the initial path be the `projectName_nodes.csv`
-    QString path = m_exp->project()->filepath();
-    QDir dir = path.isEmpty() ? QDir::home() : QFileInfo(path).dir();
-    path = dir.absoluteFilePath(m_exp->project()->name() + "_nodes.csv");
+    if (path.endsWith(".svg")) {
+        QSvgGenerator g;
+        g.setFileName(path);
+        g.setSize(m_graphWidget->view()->frameSize());
+        g.setViewBox(m_graphWidget->view()->rect());
+        g.setTitle("Evoplex");
+        g.setDescription("Created with Evoplex (https://evoplex.org).");
+        g.setResolution(300);
+        m_graphWidget->view()->paint(&g, false);
+    } else {
+        QSettings userPrefs;
+        QImage img(m_graphWidget->view()->frameSize(), QImage::Format_ARGB32);
+        m_graphWidget->view()->paint(&img, false);
+        img.save(path, Q_NULLPTR, userPrefs.value("settings/imgQuality", 90).toInt());
+    }
+}
 
+void GraphTitleBar::slotExportNodes()
+{
+    if (!readyToExport()) {
+        return;
+    }
+
+    QString path = guessInitialPath("_nodes.csv");
     path = QFileDialog::getSaveFileName(this, "Export Nodes", path, "Text Files (*.csv)");
     if (path.isEmpty()) {
         return;
     }
 
+    auto trial = m_exp->trial(m_ui->cbTrial->currentText().toUShort());
     QProgressDialog progressDlg("Exporting nodes", QString(), 0, trial->graph()->numNodes(), this);
     progressDlg.setWindowModality(Qt::WindowModal);
     progressDlg.setValue(0);
@@ -134,6 +153,45 @@ void GraphTitleBar::slotRestarted()
     if (currTrial != _currTrial) {
         emit(trialSelected(_currTrial));
     }
+}
+
+bool GraphTitleBar::readyToExport()
+{
+    if (m_exp->expStatus() == Status::Disabled ||
+            m_exp->expStatus() == Status::Invalid) {
+        QMessageBox::warning(this, "Exporting nodes",
+                "This experiment is invalid or has not been initialized yet.\n"
+                "Please, initialize the experiment and try again.");
+        return false;
+    }
+
+    if (m_exp->expStatus() == Status::Running ||
+            m_exp->expStatus() == Status::Queued) {
+        QMessageBox::warning(this, "Exporting nodes",
+                "Please, pause the experiment and try again.");
+        return false;
+    }
+
+    const quint16 currTrial = m_ui->cbTrial->currentText().toUShort();
+    auto trial = m_exp->trial(currTrial);
+    if (!trial || trial->graph()->nodes().empty()) {
+        QMessageBox::warning(this, "Exporting nodes",
+                "Could not export the set of nodes.\n"
+                "Please, make sure this experiment is valid and that "
+                "there are nodes to be exported!");
+        return false;
+    }
+
+    return true;
+}
+
+QString GraphTitleBar::guessInitialPath(const QString& filename) const
+{
+    QString path = m_exp->project()->filepath();
+    QDir dir = path.isEmpty() ? QDir::home() : QFileInfo(path).dir();
+    path = dir.absoluteFilePath(QString("%1_exp%2%3")
+            .arg(m_exp->project()->name()).arg(m_exp->id()).arg(filename));
+    return path;
 }
 
 } // evoplex

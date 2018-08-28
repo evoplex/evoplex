@@ -41,7 +41,7 @@ public slots:
     void setEdgeWidth(int v);
 
 protected:
-    void paintEvent(QPaintEvent*) override;
+    void paintFrame(QPainter& painter) const override;
     Node selectNode(const QPointF &pos, bool center) override;
     bool selectNode(const Node& node, bool center) override;
     inline Node selectedNode() const override;
