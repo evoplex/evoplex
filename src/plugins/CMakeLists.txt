@@ -57,6 +57,7 @@ set(GRAPHS
   edgesFromCSV
   path
   squaregrid
+  zeroEdges
 )
 add_plugins(graphs "${GRAPHS}")
 

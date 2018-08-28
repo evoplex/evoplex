@@ -1,0 +1,8 @@
+{
+  "type": "graph",
+  "uid": "zeroEdges",
+  "version": 1,
+  "title": "Zero Edges",
+  "author": "Marcos Cardinot",
+  "description": "It generates a graph without edges."
+}
