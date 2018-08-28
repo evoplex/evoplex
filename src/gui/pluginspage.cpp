@@ -53,6 +53,9 @@ PluginsPage::PluginsPage(MainGUI* mainGUI)
     m_ui->bReload->setVisible(false);
     connect(m_ui->bUnload, SIGNAL(pressed()), SLOT(slotUnload()));
     connect(m_ui->bReload, SIGNAL(pressed()), SLOT(slotReload()));
+
+    m_ui->table->sortByColumn(1, Qt::AscendingOrder);
+    m_ui->table->sortByColumn(0, Qt::AscendingOrder);
 }
 
 PluginsPage::~PluginsPage()

@@ -604,7 +604,8 @@ void ExperimentDesigner::slotPluginAdded(const Plugin* plugin)
 
     cb->blockSignals(true);
     cb->insertItem(cb->count(), label, QVariant::fromValue(plugin->key()));
-    cb->setCurrentIndex(0); // moves to --
+    cb->model()->sort(0);
+    cb->setCurrentText("--"); // moves to --
     cb->blockSignals(false);
 }
 
