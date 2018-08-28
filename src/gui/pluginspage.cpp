@@ -125,16 +125,19 @@ void PluginsPage::loadHtml(const Plugin* plugin)
         return;
     }
 
-    QString html = "<h2>" + plugin->title() + "</h2><br>"
-                 + "<b>Author:</b> " + plugin->author() + "<br>"
-                 + "<b>Plugin type:</b> " + _enumToString<PluginType>(plugin->type()) + "<br>"
-                 + "<b>Version:</b> " + QString::number(plugin->version()) + "<br>"
-                 "<br>"
-                 + "<b>Description:</b><br>" + plugin->description() + "<br>"
-                 "<br>"
-                 + "<b>Location:</b><br>" + plugin->path() + "<br>"
-                 "<br>"
-                 + "<b>Meta data:</b><br>" + plugin->compactMetaData() + "<br>";
+    QString html =
+        "<h2>" + plugin->title() + "</h2><br>"
+        "<b>Author:</b> " + plugin->author() + "<br>"
+        "<b>Plugin type:</b> " + _enumToString<PluginType>(plugin->type()) + "<br>"
+        "<b>Version:</b> " + QString::number(plugin->version()) + "<br>"
+        "<br>"
+        "<b>Description:</b><br>" + plugin->description() + "<br>"
+        "<br>"
+        "<b>Location:</b><br>" + plugin->path() + "<br>";
+
+    if (!plugin->compactMetaData().isEmpty()) {
+        html += "<br><b>Meta data:</b><br>" + plugin->compactMetaData() + "<br>";
+    }
 
     m_ui->browser->setHtml(html);
 }

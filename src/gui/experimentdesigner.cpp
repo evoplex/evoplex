@@ -452,8 +452,6 @@ std::unique_ptr<ExpInputs> ExperimentDesigner::readInputs(const int expId, QStri
         }
 
         values << it.value()->value().toQString('g', 8);
-
-
     }
 
     if (!m_enableOutputs->value().toBool()) {

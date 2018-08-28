@@ -191,7 +191,7 @@ QStringList NodesPrivate::validateHeader(const QString& header,
     for (const auto& attrRange : attrsScope) {
         if (!header.contains(attrRange->attrName())) {
             const QStringList expectedAttrs = attrsScope.keys();
-            error = QString("the header is imcompatible with the model.\n"
+            error = QString("the header is incompatible with the model.\n"
                             "Expected attributes: %1").arg(expectedAttrs.join(", "));
             return QStringList();
         }

@@ -180,12 +180,16 @@ Plugin::Plugin(PluginType type, QPluginLoader* loader, const QString& libPath)
 
     // build the compactMetaData without the general keys
     auto metaData = m_metaData;
-    QStringList removeKeys = { PLUGIN_ATTR_UID, PLUGIN_ATTR_AUTHOR,
-            PLUGIN_ATTR_TITLE, PLUGIN_ATTR_DESCRIPTION, PLUGIN_ATTR_VERSION};
-    for (auto const& k : removeKeys) { metaData.remove(k); }
-
-    QJsonDocument doc(metaData);
-    m_compactMetaData = doc.toJson(QJsonDocument::Indented);
+    QStringList removeKeys = {
+        PLUGIN_ATTR_TYPE, PLUGIN_ATTR_UID, PLUGIN_ATTR_AUTHOR,
+        PLUGIN_ATTR_TITLE, PLUGIN_ATTR_DESCRIPTION, PLUGIN_ATTR_VERSION };
+    for (auto const& k : removeKeys) {
+        metaData.remove(k);
+    }
+    if (!metaData.isEmpty()) {
+        QJsonDocument doc(metaData);
+        m_compactMetaData = doc.toJson(QJsonDocument::Indented);
+    }
 }
 
 Plugin::~Plugin()

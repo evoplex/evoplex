@@ -34,43 +34,36 @@ GraphPlugin::GraphPlugin(QPluginLoader* loader, const QString& libPath)
         return;
     }
 
-    QJsonObject metaData = loader->metaData().value("MetaData").toObject();
-    if (!metaData.contains(PLUGIN_ATTR_VALIDGRAPHTYPES) ||
-            !metaData.contains(PLUGIN_ATTR_EDGEATTRSGEN)) {
-        qWarning() << "missing attributes. Expected: "
-                   << PLUGIN_ATTR_VALIDGRAPHTYPES
-                   << PLUGIN_ATTR_EDGEATTRSGEN;
-        m_type = PluginType::Invalid;
-        return;
-    }
-
-    if (!metaData.contains(PLUGIN_ATTR_VALIDGRAPHTYPES) ||
-        !metaData.value(PLUGIN_ATTR_VALIDGRAPHTYPES).isArray()) {
-        qWarning() << QString("the attribute '%1' must exist and be of the "
-                "type '%2'.").arg(PLUGIN_ATTR_VALIDGRAPHTYPES, "array");
-        m_type = PluginType::Invalid;
-        return;
-    }
-
-    if (!metaData.contains(PLUGIN_ATTR_EDGEATTRSGEN) ||
-        !metaData.value(PLUGIN_ATTR_EDGEATTRSGEN).isBool()) {
-        qWarning() << QString("the attribute '%1' must exist and be of the "
-                "type '%2'.").arg(PLUGIN_ATTR_EDGEATTRSGEN, "bool");
-        m_type = PluginType::Invalid;
-        return;
-    }
-
-    m_supportsEdgeAttrsGen = metaData.value(PLUGIN_ATTR_EDGEATTRSGEN).toBool();
-
-    QJsonArray array = metaData.value(PLUGIN_ATTR_VALIDGRAPHTYPES).toArray();
-    for (auto it : array) {
-        GraphType type = _enumFromString<GraphType>(it.toString());
-        if (type == GraphType::Invalid) {
-            qWarning() << "invalid value for 'validGraphTypes':" << it.toString();
+    if (m_metaData.contains(PLUGIN_ATTR_VALIDGRAPHTYPES)) {
+        if (!m_metaData.value(PLUGIN_ATTR_VALIDGRAPHTYPES).isArray()) {
+            qWarning() << QString("the attribute '%1' must be an array.")
+                          .arg(PLUGIN_ATTR_VALIDGRAPHTYPES);
             m_type = PluginType::Invalid;
             return;
         }
-        m_validGraphTypes.emplace_back(type);
+        m_supportsEdgeAttrsGen = m_metaData.value(
+                    PLUGIN_ATTR_EDGEATTRSGEN).toBool();
+    }
+
+    if (m_metaData.contains(PLUGIN_ATTR_EDGEATTRSGEN)) {
+        if (!m_metaData.value(PLUGIN_ATTR_EDGEATTRSGEN).isBool()) {
+            qWarning() << QString("the attribute '%1' must be a boolean.")
+                          .arg(PLUGIN_ATTR_EDGEATTRSGEN);
+            m_type = PluginType::Invalid;
+            return;
+        }
+
+        QJsonArray array = m_metaData.value(PLUGIN_ATTR_VALIDGRAPHTYPES).toArray();
+        for (auto it : array) {
+            GraphType type = _enumFromString<GraphType>(it.toString());
+            if (type == GraphType::Invalid) {
+                qWarning() << QString("invalid value for '%1': %2")
+                              .arg(PLUGIN_ATTR_VALIDGRAPHTYPES, it.toString());
+                m_type = PluginType::Invalid;
+                return;
+            }
+            m_validGraphTypes.emplace_back(type);
+        }
     }
 }
 

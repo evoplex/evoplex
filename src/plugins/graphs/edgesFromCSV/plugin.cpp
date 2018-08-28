@@ -98,7 +98,7 @@ bool EdgesFromCSV::validateHeader(const QStringList& header) const
             }
 
             const QStringList expectedAttrs = ascope.keys();
-            qWarning() << QString("the header is imcompatible with the model.\n"
+            qWarning() << QString("the header is incompatible with the model.\n"
                         "Expected attributes: %1").arg(expectedAttrs.join(", "));
             return false;
         }
