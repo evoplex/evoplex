@@ -1,0 +1,11 @@
+{
+  "type": "graph",
+  "uid": "star",
+  "version": 1,
+  "title": "Star Graph",
+  "author": "Marcos Cardinot",
+  "description": "It generates a graph with star topology. The first node (id=0) is placed in the center and connected to all other nodes.",
+
+  "supportsEdgeAttrsGen": true,
+  "validGraphTypes": [ "undirected", "directed" ]
+}
