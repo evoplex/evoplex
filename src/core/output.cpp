@@ -184,7 +184,7 @@ void Output::updateListOfInputs()
     m_allTrialIds.clear();
     m_allInputs.clear();
     for (Cache* cache : m_caches) {
-        m_allInputs.insert(m_allInputs.cend(), cache->m_inputs.begin(), cache->m_inputs.end());
+        m_allInputs.insert(m_allInputs.end(), cache->m_inputs.begin(), cache->m_inputs.end());
         for (const auto& it : cache->m_trials) {
             m_allTrialIds.insert(it.first);
         }
