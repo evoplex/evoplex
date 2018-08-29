@@ -161,8 +161,8 @@ void BaseGraphGL::setupInspector()
     for (auto attrRange : m_exp->modelPlugin()->nodeAttrsScope()) {
         auto aw = QSharedPointer<AttrWidget>::create(attrRange, nullptr);
         aw->setToolTip(attrRange->attrRangeStr());
-        connect(aw.data(), &AttrWidget::valueChanged,
-                [this, _aw=aw.toWeakRef()]() { attrChanged(_aw.toStrongRef()); });
+        auto _aw = aw.toWeakRef();
+        connect(aw.data(), &AttrWidget::valueChanged, [this, _aw]() { attrChanged(_aw); });
         m_attrWidgets.at(attrRange->id()) = aw;
         m_ui->modelAttrs->insertRow(attrRange->id(), attrRange->attrName(), aw.data());
 
@@ -173,9 +173,14 @@ void BaseGraphGL::setupInspector()
     }
 }
 
-void BaseGraphGL::attrChanged(QSharedPointer<AttrWidget> aw) const
+void BaseGraphGL::attrChanged(QWeakPointer<AttrWidget> _aw) const
 {
     if (!m_trial || !m_trial->graph() || m_ui->nodeId->value() < 0) {
+        return;
+    }
+
+    auto aw = _aw.toStrongRef();
+    if (!aw) {
         return;
     }
 

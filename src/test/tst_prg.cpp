@@ -83,7 +83,7 @@ void TestPRG::tst_bernoulli()
     // p=0.5 cases
     int trues1 = 0;
     int trues2 = 0;
-    for (size_t i = 0; i < size; ++i) {
+    for (int i = 0; i < size; ++i) {
         if (prg->bernoulli()) ++trues1;
         if (prg->bernoulli(.5)) ++trues2;
     }
@@ -93,7 +93,7 @@ void TestPRG::tst_bernoulli()
     // general cases
     auto tst = [size, &prg](double p) {
         int trues1 = 0;
-        for (size_t i = 0; i < size; ++i) {
+        for (int i = 0; i < size; ++i) {
             if (prg->bernoulli(p)) ++trues1;
         }
         QVERIFY(trues1 > size*(p-0.1)); // 10% margin
@@ -185,7 +185,7 @@ void TestPRG::tst_uniformSizeT()
     v = prg->uniform(min, max);
     QVERIFY(v >= min && v <= max);
     v = prg->uniform(max);
-    QVERIFY(v >= 0 && v <= max);
+    QVERIFY(v <= max);
 
     delete prg;
 }

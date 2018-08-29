@@ -134,7 +134,7 @@ private:
     QRect m_inspGeo; // inspector geometry with margin
     std::vector<QSharedPointer<AttrWidget>> m_attrWidgets;
 
-    void attrChanged(QSharedPointer<AttrWidget> aw) const;
+    void attrChanged(QWeakPointer<AttrWidget> _aw) const;
 
     void setupInspector();
 
