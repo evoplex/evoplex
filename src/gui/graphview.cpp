@@ -92,18 +92,33 @@ CacheStatus GraphView::refreshCache()
 
     const qreal edgeSR = currEdgeSize();
     const int m = qRound(edgeSR);
+    QMargins margins(m, m, m, m);
     QRectF frame = rect().translated(-m_origin.toPoint());
-    frame = frame.marginsAdded(QMargins(m, m, m, m));
+    frame = frame.marginsAdded(margins);
+
+    Node n = *m_trial->graph()->nodes().begin();
+    QRectF boundariesGraph(nodePoint(n, edgeSR), QSizeF(m_nodeRadius, m_nodeRadius));
+    QRectF boundariesView;
+    bool boundariesViewIsNull = true;
 
     m_cache.reserve(m_trial->graph()->nodes().size());
     for (auto const& np : m_trial->graph()->nodes()) {
         QPointF xy = nodePoint(np.second, edgeSR);
+        adjustRect(boundariesGraph, xy);
         if (!frame.contains(xy)) {
             continue;
+        }
+        if (boundariesViewIsNull) {
+            boundariesView = QRectF(xy.x(), xy.y(), m_nodeRadius, m_nodeRadius);
+            boundariesViewIsNull = false;
+        } else {
+            adjustRect(boundariesView, xy);
         }
         m_cache.emplace_back(createStar(np.second, edgeSR, xy));
     }
     m_cache.shrink_to_fit();
+    m_boundariesGraph = boundariesGraph.marginsAdded(margins);
+    m_boundariesView = boundariesView.marginsAdded(margins);
 
     return CacheStatus::Ready;
 }

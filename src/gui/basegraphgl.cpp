@@ -226,6 +226,25 @@ void BaseGraphGL::updateCache(bool force)
         if (m_cacheStatus == CacheStatus::Scheduled) {
             m_updateCacheTimer.start(10);
         }
+
+        double scale;
+        int w = m_ui->minimapFrame->width();
+        int h = m_ui->minimapFrame->height();
+        if (m_boundariesGraph.width() > m_boundariesGraph.height()) {
+            scale = w / m_boundariesGraph.width();
+            h = m_boundariesGraph.height() * scale;
+        } else {
+            scale = h / m_boundariesGraph.height();
+            w = m_boundariesGraph.width() * scale;
+        }
+        m_ui->minimapGraph->resize(w, h);
+        m_ui->minimapGraph->move(0, 0);//(m_ui->minimapFrame->height() - h) * 0.5);
+
+        int xv = (m_boundariesView.topLeft().x() - m_boundariesGraph.topLeft().x()) * scale;
+        int yv = (m_boundariesView.topLeft().y() - m_boundariesGraph.topLeft().y()) * scale;
+        m_ui->minimapView->resize(m_boundariesView.width()*scale, m_boundariesView.height()*scale);
+        m_ui->minimapView->move(xv, yv);
+
         update();
     });
     watcher->setFuture(future);
@@ -301,6 +320,10 @@ void BaseGraphGL::resetView()
     m_origin = QPointF(m_nodeScale, m_nodeScale);
     m_zoomLevel = 0;
     m_nodeRadius = m_nodeScale;
+
+    m_origin = m_boundariesGraph.topLeft();
+    m_nodeRadius = m_nodeScale;
+
     updateCache();
     clearSelection();
 }

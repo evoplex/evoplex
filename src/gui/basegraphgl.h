@@ -89,6 +89,8 @@ protected:
     qreal m_nodeScale;
     qreal m_nodeRadius;
     QPointF m_origin;
+    QRectF m_boundariesGraph;
+    QRectF m_boundariesView;
 
     CacheStatus m_cacheStatus;
 
@@ -97,6 +99,9 @@ protected:
     void clearSelection() override;
 
     void updateCache(bool force=false);
+
+    // adjust rect to include xy
+    inline void adjustRect(QRectF& r, const QPointF& xy) const;
 
     inline void paintEvent(QPaintEvent*) override;
     void mousePressEvent(QMouseEvent* e) override;
@@ -143,6 +148,15 @@ private:
 
 inline void BaseGraphGL::paintEvent(QPaintEvent*)
 { paint(this, true); }
+
+inline void BaseGraphGL::adjustRect(QRectF& r, const QPointF& xy) const
+{
+    if (xy.x() < r.left()) r.setX(xy.x());
+    else if (xy.x() > r.right()) r.setRight(xy.x());
+
+    if (xy.y() < r.top()) r.setY(xy.y());
+    else if (xy.y() > r.bottom()) r.setBottom(xy.y());
+}
 
 } // evoplex
 #endif // BASEGRAPHGL_H
