@@ -142,7 +142,8 @@ Plugin::Plugin(PluginType type, QPluginLoader* loader, const QString& libPath)
     : m_type(type),
       m_loader(loader),
       m_factory(nullptr),
-      m_libPath(libPath)
+      m_libPath(libPath),
+      m_version(0)
 {
     m_metaData = m_loader->metaData().value("MetaData").toObject();
     m_id = m_metaData.value(PLUGIN_ATTR_UID).toString();

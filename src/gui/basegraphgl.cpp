@@ -50,7 +50,6 @@ BaseGraphGL::BaseGraphGL(ExperimentPtr exp, GraphWidget* parent)
       m_currTrialId(0)
 {
     m_ui->setupUi(this);
-    setAttribute(Qt::WA_DeleteOnClose, true);
 
     // Qt uses this attribute to optimize paint events on resizes (see docs)
     setAttribute(Qt::WA_StaticContents, true);
@@ -249,7 +248,7 @@ void BaseGraphGL::slotStatusChanged(Status s)
 void BaseGraphGL::slotRestarted()
 {
     if (m_exp->autoDeleteTrials()) {
-        close();
+        m_graphWidget->close();
         return;
     }
     clearSelection();

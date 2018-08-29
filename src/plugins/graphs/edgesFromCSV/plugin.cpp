@@ -143,6 +143,7 @@ bool EdgesFromCSV::readRow(int row, const QStringList& header, const QStringList
                               .arg(col).arg(header.at(col)).arg(row)
                               .arg(attrRange ? attrRange->attrRangeStr() : "a number")
                               .arg(values.at(col));
+                delete attrs;
                 return false;
             }
         }

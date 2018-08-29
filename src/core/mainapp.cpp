@@ -149,6 +149,7 @@ const Plugin* MainApp::loadPlugin(const QString& path, QString& error, const boo
 {
     Plugin* plugin = Plugin::load(path, error);
     if (!plugin || plugin->type() == PluginType::Invalid) {
+        delete plugin;
         return nullptr;
     }
 

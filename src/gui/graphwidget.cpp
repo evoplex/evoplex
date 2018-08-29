@@ -31,6 +31,8 @@ GraphWidget::GraphWidget(Mode mode, ColorMapMgr* cMgr,
     : QDockWidget(parent),
       m_view(nullptr)
 {
+    setAttribute(Qt::WA_DeleteOnClose, true);
+
     GraphTitleBar* titleBar = new GraphTitleBar(exp.get(), this);
     setTitleBarWidget(titleBar);
 

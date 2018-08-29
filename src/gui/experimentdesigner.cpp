@@ -167,9 +167,9 @@ ExperimentDesigner::ExperimentDesigner(MainApp* mainApp, QWidget *parent)
     connect(m_enableOutputs, &AttrWidget::valueChanged,
         [this, outDir, outHeader]() {
             bool b = m_enableOutputs->value().toBool();
-            outDir->setDisabled(b);
-            outHeader->setDisabled(b);
-//          outAvgTrials->setDisabled(b);
+            outDir->setEnabled(b);
+            outHeader->setEnabled(b);
+//          outAvgTrials->setEnabled(b);
         });
     m_enableOutputs->setValue(true);
     m_enableOutputs->setValue(false);
