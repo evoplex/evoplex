@@ -21,7 +21,7 @@
 # CPack: general configuration
 set(CPACK_PACKAGE_NAME ${PROJECT_NAME})
 set(CPACK_PACKAGE_VERSION ${PROJECT_VERSION})
-set(CPACK_PACKAGE_DESCRIPTION "Evoplex is a multi-agent system for networks (graphs).")
+set(CPACK_PACKAGE_DESCRIPTION "Evoplex is a fast, robust and extensible platform to implement either Agent‑Based Models (ABM) or Multi-Agent Systems (MAS) imposing a theoretical-graph approach.")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY ${CPACK_PACKAGE_DESCRIPTION})
 set(CPACK_PACKAGE_HOMEPAGE_URL "https://evoplex.org")
 set(CPACK_PACKAGE_VENDOR "Evoplex Team <${CPACK_PACKAGE_HOMEPAGE_URL}>")
@@ -52,7 +52,7 @@ elseif(UNIX)
 
   # CPack: RPM package generator
   set(CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION / /usr/local /usr/local/bin /usr/local/include /usr/local/lib)
-  set(CPACK_RPM_PACKAGE_REQUIRES "cmake >= 3.1, qt5-qtbase-devel >= 5.8, qt5-qtbase-devel-gui >= 5.8, qt5-qtcharts >= 5.8")
+  set(CPACK_RPM_PACKAGE_REQUIRES "cmake >= 3.1, qt5-qtbase-devel >= 5.8, qt5-qtbase-devel-gui >= 5.8, qt5-qtcharts >= 5.8, qt5-qtsvg >= 5.8")
   set(CPACK_RPM_PACKAGE_DESCRIPTION ${CPACK_PACKAGE_DESCRIPTION})
   set(CPACK_RPM_PACKAGE_RELEASE ${EVOPLEX_RELEASE})
   set(CPACK_RPM_FILE_NAME "${CPACK_PACKAGE_FILE_NAME}.rpm")
@@ -61,7 +61,7 @@ elseif(UNIX)
   set(CPACK_RPM_CHANGELOG_FILE "${CMAKE_BINARY_DIR}/RPMCHANGELOG.txt")
 
   # CPack: Debian package generator
-  set(CPACK_DEBIAN_PACKAGE_DEPENDS "cmake (>= 3.1), qt5-default (>= 5.8), libqt5charts5 (>=5.8)")
+  set(CPACK_DEBIAN_PACKAGE_DEPENDS "cmake (>= 3.1), qt5-default (>= 5.8), libqt5charts5 (>=5.8), libqt5svg5 (>=5.8)")
   set(CPACK_DEBIAN_PACKAGE_DESCRIPTION ${CPACK_PACKAGE_DESCRIPTION})
   set(CPACK_DEBIAN_PACKAGE_MAINTAINER ${CPACK_PACKAGE_VENDOR})
   set(CPACK_DEBIAN_PACKAGE_SECTION "contrib/science")
