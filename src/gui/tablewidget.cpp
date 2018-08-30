@@ -36,7 +36,8 @@ TableWidget::TableWidget(QWidget *parent)
       kIcon_pause(QPixmap(":/icons/pause-circle.svg").scaledToWidth(28, Qt::SmoothTransformation)),
       kIcon_pauseon(QPixmap(":/icons/pause-circle-on.svg").scaledToWidth(28, Qt::SmoothTransformation)),
       kIcon_x(QPixmap(":/icons/x.svg").scaledToWidth(14, Qt::SmoothTransformation)),
-      kPen_blue(QPen(QBrush(QColor(66,133,244)), 3)),
+      kPen_circleon(QBrush(QColor(66,133,244)), 3),
+      kPen_circle(QBrush(QColor(80,80,80)), 3),
       m_expMgr(nullptr)
 {
     setMouseTracking(true);
@@ -212,34 +213,50 @@ void RowsDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option,
 
     painter->save();
     painter->setRenderHint(QPainter::Antialiasing);
-    QPoint center = opt.rect.center();
+
+    QPointF center = opt.rect.center();
+    center.rx() -= 7;
+    center.ry() -= 7;
+
     if (m_status == Status::Paused || m_status == Status::Disabled) {
+        center.rx() -= 7;
+        center.ry() -= 7;
         if (btnIsHovered) { //play (only when hovered)
-            painter->drawPixmap(center.x()-14, center.y()-14, m_table->kIcon_playon);
+            painter->drawPixmap(center, m_table->kIcon_playon);
         } else if (rowIsHovered) {
-            painter->drawPixmap(center.x()-14, center.y()-14, m_table->kIcon_play);
+            painter->drawPixmap(center, m_table->kIcon_play);
         }
-        // show progress
-        if (m_progress > 0) {
-            painter->setPen(m_table->kPen_blue);
-            painter->drawArc(center.x()-14, center.y()-14, 28, 28, 90*16, -m_progress*16);
+        if (m_progress > 0) { // show progress
+            drawProgress(painter, center);
         }
     } else if (m_status == Status::Running || m_status == Status::Queued) {
+        center.rx() -= 7;
+        center.ry() -= 7;
         if (btnIsHovered || rowIsHovered) { // pause (always show)
-            painter->drawPixmap(center.x()-14, center.y()-14, m_table->kIcon_pauseon);
+            painter->drawPixmap(center, m_table->kIcon_pauseon);
         } else {
-            painter->drawPixmap(center.x()-14, center.y()-14, m_table->kIcon_pause);
+            painter->drawPixmap(center, m_table->kIcon_pause);
         }
-        // show progress
-        if (m_progress > 0) {
-            painter->setPen(m_table->kPen_blue);
-            painter->drawArc(center.x()-14, center.y()-14, 28, 28, 90*16, -m_progress*16);
+        if (m_progress > 0) { // show progress
+            drawProgress(painter, center);
         }
     } else if (m_status == Status::Finished) { // check (always)
-        painter->drawPixmap(center.x()-7, center.y()-7, m_table->kIcon_check);
+        painter->drawPixmap(center, m_table->kIcon_check);
     } else {
-        painter->drawPixmap(center.x()-7, center.y()-7, m_table->kIcon_x);
+        painter->drawPixmap(center, m_table->kIcon_x);
     }
     painter->restore();
 }
+
+void RowsDelegate::drawProgress(QPainter* painter, const QPointF& c) const
+{
+    painter->setPen(m_table->kPen_circleon);
+    QRectF center(c.x(), c.y(), 28, 28);
+    const int start = 1440; // 90*16
+    const int angle = (m_progress+1)*16;
+    painter->drawArc(center, start, -angle);
+    painter->setPen(m_table->kPen_circle);
+    painter->drawArc(center, start, 5760-angle); // 5760 = full circle
 }
+
+} // evoplex

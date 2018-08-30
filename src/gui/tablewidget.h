@@ -72,7 +72,8 @@ private:
     const QPixmap kIcon_pause;
     const QPixmap kIcon_pauseon;
     const QPixmap kIcon_x;
-    const QPen kPen_blue;
+    const QPen kPen_circleon;
+    const QPen kPen_circle;
 
     ExperimentsMgr* m_expMgr;
 
@@ -98,6 +99,8 @@ private:
     int m_hoveredCol;
     Status m_status;
     quint16 m_progress;
+
+    void drawProgress(QPainter* painter, const QPointF& c) const;
 };
 
 /*********************************************************/
