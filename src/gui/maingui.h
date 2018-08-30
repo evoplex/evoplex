@@ -65,6 +65,7 @@ private slots:
     void slotSaveAll();
     void slotShowLog();
     void slotShowAbout();
+    void slotCheckedForUpdates(const QJsonObject& j);
 
 protected:
     void closeEvent(QCloseEvent* event);

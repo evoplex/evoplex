@@ -70,6 +70,10 @@ SettingsPage::SettingsPage(MainGUI* mainGUI)
     connect(m_ui->stepsToFlush, static_cast<void(QSpinBox::*)(int)>(&QSpinBox::valueChanged),
         [mainGUI](int v) { mainGUI->mainApp()->setStepsToFlush(v); });
 
+    connect(m_ui->checkUpdates, &QCheckBox::toggled, [mainGUI](bool b) {
+        mainGUI->mainApp()->setCheckUpdatesAtStart(b);
+    });
+
     connect(m_ui->imageQuality, static_cast<void(QSpinBox::*)(int)>(&QSpinBox::valueChanged),
         [](int v) { QSettings s; s.setValue("settings/imgQuality", v); });
 
@@ -92,6 +96,8 @@ void SettingsPage::refreshFields()
     m_ui->delay->setValue(m_mainGUI->mainApp()->defaultStepDelay());
 
     m_ui->stepsToFlush->setValue(m_mainGUI->mainApp()->stepsToFlush());
+
+    m_ui->checkUpdates->setChecked(m_mainGUI->mainApp()->checkUpdatesAtStart());
 
     QSettings s;
     m_ui->imageQuality->setValue(s.value("settings/imgQuality", 90).toInt());

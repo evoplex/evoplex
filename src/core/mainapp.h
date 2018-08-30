@@ -26,6 +26,7 @@
 
 #include <QDir>
 #include <QHash>
+#include <QtNetwork/QNetworkAccessManager>
 #include <QObject>
 #include <QSettings>
 
@@ -76,6 +77,9 @@ public:
     inline int stepsToFlush() const;
     void setStepsToFlush(int steps);
 
+    inline bool checkUpdatesAtStart() const;
+    void setCheckUpdatesAtStart(bool b);
+
     inline ExperimentsMgr* expMgr() const;
     inline const QHash<PluginKey, Plugin*>& plugins() const;
     inline const QMultiHash<QString, quint16>& graphs() const;
@@ -90,10 +94,16 @@ public:
 
     void addPathToRecentProjects(const QString& projectFilePath);
 
+public slots:
+    // checks for updates
+    // returns an empty QJsonObject if there's no updates
+    void checkForUpdates();
+
 signals:
     void pluginAdded(const Plugin* plugin);
     void pluginRemoved(PluginKey key, PluginType t);
     void listOfRecentProjectsUpdated();
+    void checkedForUpdates(const QJsonObject& json);
 
 private:
     // Load built-in plugins
@@ -109,6 +119,9 @@ private:
     QSettings m_userPrefs;
     quint16 m_defaultStepDelay; // msec
     int m_stepsToFlush;
+    bool m_checkUpdatesAtStart;
+
+    QNetworkAccessManager* m_networkMgr;
 
     std::map<int, ProjectPtr> m_projects; // opened projects.
 
@@ -130,6 +143,9 @@ inline quint16 MainApp::defaultStepDelay() const
 
 inline int MainApp::stepsToFlush() const
 { return m_stepsToFlush; }
+
+inline bool MainApp::checkUpdatesAtStart() const
+{ return m_checkUpdatesAtStart; }
 
 inline ExperimentsMgr* MainApp::expMgr() const
 { return m_expMgr; }

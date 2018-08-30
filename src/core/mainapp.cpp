@@ -21,6 +21,9 @@
 #include <QCoreApplication>
 #include <QDebug>
 #include <QFileInfo>
+#include <QJsonDocument>
+#include <QNetworkReply>
+#include <QUrlQuery>
 
 #include "mainapp.h"
 #include "attributes.h"
@@ -44,7 +47,8 @@ const char* MainApp::kPluginExtension = ".so";
 #endif
 
 MainApp::MainApp()
-    : m_expMgr(new ExperimentsMgr())
+    : m_expMgr(new ExperimentsMgr()),
+      m_networkMgr(new QNetworkAccessManager())
 {
     qRegisterMetaType<Status>("Status"); // makes it available for signals/slots
     qRegisterMetaType<Function>("Function");
@@ -55,6 +59,7 @@ MainApp::MainApp()
     resetSettingsToDefault();
     m_defaultStepDelay = static_cast<quint16>(m_userPrefs.value("settings/stepDelay", m_defaultStepDelay).toInt());
     m_stepsToFlush = m_userPrefs.value("settings/stepsToFlush", m_stepsToFlush).toInt();
+    m_checkUpdatesAtStart = m_userPrefs.value("settings/checkUpdatesAtStart", m_checkUpdatesAtStart).toBool();
 
     int id = 0;
     auto addAttrScope = [this](int& id, const QString& name, const QString& attrRangeStr) {
@@ -94,6 +99,7 @@ MainApp::MainApp()
 
 MainApp::~MainApp()
 {
+    delete m_networkMgr;
     m_projects.clear();
     delete m_expMgr;
     m_expMgr = nullptr;
@@ -104,6 +110,7 @@ void MainApp::resetSettingsToDefault()
 {
     m_defaultStepDelay = 0;
     m_stepsToFlush = 10000;
+    m_checkUpdatesAtStart = true;
 }
 
 void MainApp::setDefaultStepDelay(quint16 msec)
@@ -116,6 +123,12 @@ void MainApp::setStepsToFlush(int steps)
 {
     m_stepsToFlush = steps;
     m_userPrefs.setValue("settings/stepsToFlush", m_stepsToFlush);
+}
+
+void MainApp::setCheckUpdatesAtStart(bool b)
+{
+    m_checkUpdatesAtStart = b;
+    m_userPrefs.setValue("settings/checkUpdatesAtStart", m_checkUpdatesAtStart);
 }
 
 void MainApp::initSystemPlugins()
@@ -293,6 +306,23 @@ const GraphPlugin* MainApp::graph(const PluginKey& key) const
 const ModelPlugin* MainApp::model(const PluginKey &key) const
 {
     return dynamic_cast<ModelPlugin*>(m_plugins.value(key, nullptr));
+}
+
+void MainApp::checkForUpdates()
+{
+    QUrl url = m_userPrefs.value("settings/releasesUrl",
+            qApp->organizationDomain() + "/data/releases.txt").toUrl();
+
+    QNetworkReply* reply = m_networkMgr->get(QNetworkRequest((QUrl(url))));
+    connect(reply, &QNetworkReply::finished, [this, reply]() {
+        emit (checkedForUpdates(QJsonDocument::fromJson(reply->readAll()).object()));
+    });
+    QNetworkRequest req(QUrl("http://www.google-analytics.com/collect"));
+    req.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
+    QUrlQuery query("v=1&t=event&tid=UA-121617079-2&cid=evoplex");
+    query.addQueryItem("ec", qApp->applicationVersion());
+    query.addQueryItem("ea", QSysInfo::prettyProductName());
+    m_networkMgr->post(req, query.toString().toLatin1());
 }
 
 } // evoplex

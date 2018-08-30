@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>561</width>
-    <height>453</height>
+    <height>427</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -103,33 +103,6 @@ QPushButton::hover {
      <property name="verticalSpacing">
       <number>10</number>
      </property>
-     <item row="2" column="2">
-      <widget class="QLabel" name="label_4">
-       <property name="text">
-        <string>Size:</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="0">
-      <widget class="QLabel" name="label_6">
-       <property name="text">
-        <string>Flush after:</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="0">
-      <widget class="QLabel" name="label_3">
-       <property name="text">
-        <string>Default colormap:</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-       </property>
-      </widget>
-     </item>
      <item row="0" column="1">
       <widget class="QSpinBox" name="threads">
        <property name="minimum">
@@ -137,16 +110,16 @@ QPushButton::hover {
        </property>
       </widget>
      </item>
-     <item row="2" column="1">
-      <widget class="QComboBox" name="colormaps"/>
-     </item>
-     <item row="1" column="1">
-      <widget class="QSpinBox" name="stepsToFlush">
-       <property name="suffix">
-        <string> step(s)</string>
+     <item row="5" column="0">
+      <widget class="QLabel" name="label">
+       <property name="toolTip">
+        <string>The quality factor used when exporting a graph as image. Specify 0 to obtain small compressed files, 100 for large uncompressed files.</string>
        </property>
-       <property name="minimum">
-        <number>1</number>
+       <property name="text">
+        <string>Image quality</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
        </property>
       </widget>
      </item>
@@ -160,17 +133,37 @@ QPushButton::hover {
        </property>
       </widget>
      </item>
-     <item row="3" column="0">
-      <widget class="QLabel" name="label_5">
+     <item row="3" column="2">
+      <widget class="QLabel" name="label_4">
        <property name="text">
-        <string>Default step delay:</string>
+        <string>Size:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="QComboBox" name="colormaps"/>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLabel" name="label_6">
+       <property name="text">
+        <string>Flush after:</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
        </property>
       </widget>
      </item>
-     <item row="3" column="1">
+     <item row="3" column="3">
+      <widget class="QComboBox" name="colormapsize">
+       <property name="minimumSize">
+        <size>
+         <width>50</width>
+         <height>0</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="1">
       <widget class="QSlider" name="delay">
        <property name="maximum">
         <number>500</number>
@@ -186,30 +179,17 @@ QPushButton::hover {
        </property>
       </widget>
      </item>
-     <item row="2" column="3">
-      <widget class="QComboBox" name="colormapsize">
-       <property name="minimumSize">
-        <size>
-         <width>50</width>
-         <height>0</height>
-        </size>
-       </property>
-      </widget>
-     </item>
-     <item row="4" column="0">
-      <widget class="QLabel" name="label">
-       <property name="toolTip">
-        <string>The quality factor used when exporting a graph as image. Specify 0 to obtain small compressed files, 100 for large uncompressed files.</string>
-       </property>
+     <item row="3" column="0">
+      <widget class="QLabel" name="label_3">
        <property name="text">
-        <string>Image quality</string>
+        <string>Default colormap:</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
        </property>
       </widget>
      </item>
-     <item row="4" column="1">
+     <item row="5" column="1">
       <widget class="QSpinBox" name="imageQuality">
        <property name="minimum">
         <number>0</number>
@@ -219,6 +199,43 @@ QPushButton::hover {
        </property>
        <property name="value">
         <number>90</number>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="0">
+      <widget class="QLabel" name="label_5">
+       <property name="text">
+        <string>Default step delay:</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QSpinBox" name="stepsToFlush">
+       <property name="suffix">
+        <string> step(s)</string>
+       </property>
+       <property name="minimum">
+        <number>1</number>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="label_7">
+       <property name="text">
+        <string>Software updates:</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QCheckBox" name="checkUpdates">
+       <property name="text">
+        <string>check at startup</string>
        </property>
       </widget>
      </item>

@@ -229,6 +229,13 @@ MainGUI::MainGUI(MainApp* mainApp)
     connect(m_console, &ConsoleWidget::warningsCountChanged, [bWarning](int v) {
         bWarning->setText(QString::number(v));
     });
+
+    // checks for updates
+    connect(m_mainApp, SIGNAL(checkedForUpdates(QJsonObject)),
+            SLOT(slotCheckedForUpdates(QJsonObject)));
+    if (m_mainApp->checkUpdatesAtStart()) {
+        QTimer::singleShot(1000, m_mainApp, SLOT(checkForUpdates()));
+    }
 }
 
 MainGUI::~MainGUI()
@@ -328,6 +335,47 @@ void MainGUI::slotSaveAll()
 {
     for (auto& p : m_mainApp->projects()) {
         m_saveDialog->save(p.second);
+    }
+}
+
+void MainGUI::slotCheckedForUpdates(const QJsonObject& j)
+{
+    if (j.isEmpty()) {
+        qWarning() << "failed to check for updates (connection failed)";
+        return;
+    }
+
+    QDate d(2000, 1, 1);
+    for (const QString& s : j.keys()) {
+        auto _d = QDate::fromString(s, "yyyy-MM-dd");
+        if (_d.isValid() && _d > d) {
+            d = _d;
+        }
+    }
+
+    if (d == QDate(2000, 1, 1)) {
+        qWarning() << "failed to check for updates (invalid database: keys not found)";
+        return;
+    }
+
+    auto mostRecent = j.value(d.toString("yyyy-MM-dd")).toObject();
+    QStringList currVersion = QString(EVOPLEX_VERSION).split(".");
+    if (currVersion.size() != 3 || !mostRecent.contains("major") ||
+            !mostRecent.contains("minor") || !mostRecent.contains("patch")) {
+        qWarning() << "failed to check for updates (invalid database: missing fields)";
+        return;
+    }
+
+    if (mostRecent.value("major").toInt() > currVersion.at(0).toInt() ||
+        mostRecent.value("minor").toInt() > currVersion.at(1).toInt() ||
+        mostRecent.value("patch").toInt() > currVersion.at(2).toInt())
+    {
+        auto url = mostRecent.value("url").toString("https://evoplex.org");
+        auto vs = mostRecent.value("version").toString();
+        QMessageBox::information(this, "Updates",
+            "A new version of Evoplex has been released!<br><br>"
+            "You can download this version (" + vs + ") using the link:<br>"
+            "<a href='" + url + "'>" + url + "</a>");
     }
 }
 
