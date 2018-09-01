@@ -38,11 +38,11 @@ set(_EXTERNAL_QT_MATERIAL_WIDGETS
     qtmaterialflatbutton.cpp
     qtmaterialflatbutton_internal.cpp
     qtmaterialiconbutton.cpp
-    qtmateriallist.cpp
-    qtmateriallistitem.cpp
+#    qtmateriallist.cpp
+#    qtmateriallistitem.cpp
 #    qtmaterialmenu.cpp
 #    qtmaterialmenu_internal.cpp
-    qtmaterialpaper.cpp
+#    qtmaterialpaper.cpp
     qtmaterialprogress.cpp
     qtmaterialprogress_internal.cpp
     qtmaterialradiobutton.cpp
@@ -53,7 +53,7 @@ set(_EXTERNAL_QT_MATERIAL_WIDGETS
     qtmaterialslider_internal.cpp
     qtmaterialsnackbar.cpp
     qtmaterialsnackbar_internal.cpp
-    qtmaterialtable.cpp
+#    qtmaterialtable.cpp
     qtmaterialtabs.cpp
     qtmaterialtabs_internal.cpp
     qtmaterialtextfield.cpp
