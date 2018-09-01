@@ -58,10 +58,13 @@ void AttrColorSelector::init(ColorMapMgr* cmapMgr, CMapKey cmap, AttributesScope
         return;
     }
 
+    QVector<QString> attrNames(m_attrScope.size());
     for (auto const& aRange : m_attrScope) {
-        m_ui->attr->addItem(aRange->attrName());
+        attrNames.replace(aRange->id(), aRange->attrName());
     }
-    m_ui->cmapName->insertItems(0, m_cmapMgr->names());
+    m_ui->attr->addItems(attrNames.toList());
+
+    m_ui->cmapName->addItems(m_cmapMgr->names());
     m_ui->cmapName->setCurrentText(cmap.first);
     slotCMapName(cmap.first); // call once to fill sizes
     m_ui->cmapSize->setCurrentText(QString::number(cmap.second));
