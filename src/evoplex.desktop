@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Evoplex
+Comment=Agent-based modeling
+Exec=evoplex
+Icon=evoplex
+Categories=Science;
+Terminal=false
