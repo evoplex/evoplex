@@ -117,7 +117,7 @@ public slots:
     void setNodeScale(int v);
 
 private slots:
-    void slotSelectNode();
+    void slotSelectNode(int nodeid);
     void slotStatusChanged(Status s);
     void slotRestarted();
     void resetView();

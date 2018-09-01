@@ -91,7 +91,7 @@ BaseGraphGL::BaseGraphGL(ExperimentPtr exp, GraphWidget* parent)
     });
     m_ui->topLayout->addWidget(m_bRefresh);
 
-    connect(m_ui->nodeId, SIGNAL(editingFinished()), SLOT(slotSelectNode()));
+    connect(m_ui->nodeId, SIGNAL(valueChanged(int)), SLOT(slotSelectNode(int)));
     setupInspector();
 
     m_updateCacheTimer.setSingleShot(true);
@@ -123,10 +123,10 @@ void BaseGraphGL::paint(QPaintDevice* device, bool paintBackground) const
     painter.end();
 }
 
-void BaseGraphGL::slotSelectNode()
+void BaseGraphGL::slotSelectNode(int nodeid)
 {
     try {
-        Node node = m_trial->graph()->node(m_ui->nodeId->value());
+        Node node = m_trial->graph()->node(nodeid);
         selectNode(node, m_bCenter->isChecked());
     } catch (std::out_of_range) {
         if (selectedNode().isNull()) {
