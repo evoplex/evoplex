@@ -39,7 +39,7 @@ protected:
     void paintFrame(QPainter& painter) const override;
     Node selectNode(const QPointF& pos, bool center) override;
     bool selectNode(const Node& node, bool center) override;
-    virtual Node selectedNode() const override;
+    Node selectedNode() const override;
     inline QPointF selectedNodePos() const override;
     void clearSelection() override;
     CacheStatus refreshCache() override;

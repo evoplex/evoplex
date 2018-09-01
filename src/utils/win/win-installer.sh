@@ -1,4 +1,4 @@
-#! /usr/bin/sh
+#!/usr/bin/bash
 
 # Script to create a Windows Installer using the QtInstallerFramework
 # @author Marcos Cardinot

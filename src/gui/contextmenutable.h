@@ -50,7 +50,6 @@ signals:
 private:
     QWidgetAction* m_action;
     QSpinBox* m_spinBox;
-
 };
 
 class ContextMenuTable: public QMenu
