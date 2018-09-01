@@ -319,7 +319,7 @@ void MainApp::checkForUpdates()
     });
     QNetworkRequest req(QUrl("http://www.google-analytics.com/collect"));
     req.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
-    QUrlQuery query("v=1&t=event&tid=UA-121617079-2&cid=evoplex");
+    QUrlQuery query("v=1&t=event&tid=UA-121617079-3&cid=evoplex");
     query.addQueryItem("ec", qApp->applicationVersion());
     query.addQueryItem("ea", QSysInfo::prettyProductName());
     m_networkMgr->post(req, query.toString().toLatin1());

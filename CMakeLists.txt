@@ -110,11 +110,11 @@ configure_file("${CMAKE_SOURCE_DIR}/src/config.h.in" "${CMAKE_BINARY_DIR}/src/co
 # Find qt5 packages
 find_package(Qt5Core 5.8.0 REQUIRED)
 find_package(Qt5Concurrent 5.8.0 REQUIRED)
+find_package(Qt5Network 5.8.0 REQUIRED)
 find_package(Qt5Charts 5.8.0 REQUIRED)
 find_package(Qt5Widgets 5.8.0 REQUIRED)
 find_package(Qt5Test 5.8.0 REQUIRED)
 find_package(Qt5Svg 5.8.0 REQUIRED)
-find_package(Qt5Network 5.8.0 REQUIRED)
 
 # set compilation and installation directories
 if(APPLE)
