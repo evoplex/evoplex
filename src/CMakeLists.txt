@@ -40,7 +40,7 @@ if (APPLE)
     MACOSX_BUNDLE_BUNDLE_NAME ${PROJECT_NAME}
     MACOSX_BUNDLE_COPYRIGHT "Copyright (c) 2018 Marcos Cardinot et al."
     MACOSX_BUNDLE_GUI_IDENTIFIER "org.evoplex.evoplex"
-    MACOSX_BUNDLE_INFO_STRING "A multi-agent system for networks (graphs)."
+    MACOSX_BUNDLE_INFO_STRING "Agent-based modeling <https://evoplex.org>"
     MACOSX_BUNDLE_ICON_FILE "evoplex.icns"
     MACOSX_BUNDLE_LONG_VERSION_STRING "${EVOPLEX_VERSION_RELEASE}"
     MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION}
