@@ -91,7 +91,7 @@ ExperimentWidget::ExperimentWidget(ExperimentPtr exp, MainGUI* mainGUI, Projects
     spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     tb->addWidget(spacer);
 
-    m_delay = new QtMaterialSlider(this);
+    m_delay = new QtMaterialSlider(); // qt5.9: do not set parent! repaint issues
     m_delay->setThumbColor(palette().color(QPalette::Link));
     m_delay->setSingleStep(10);
     m_delay->setPageStep(100);
@@ -162,6 +162,7 @@ ExperimentWidget::ExperimentWidget(ExperimentPtr exp, MainGUI* mainGUI, Projects
 
 ExperimentWidget::~ExperimentWidget()
 {
+    delete m_delay;
     delete m_timer;
 }
 
