@@ -20,9 +20,7 @@
 
 #include <QtConcurrent>
 #include <QFutureWatcher>
-#include <QFormLayout>
 #include <QMessageBox>
-#include <QMutex>
 
 #include "core/trial.h"
 
@@ -158,33 +156,32 @@ void BaseGraphGL::setupInspector()
     m_attrWidgets.resize(static_cast<size_t>(m_exp->modelPlugin()->nodeAttrsScope().size()));
 
     for (auto attrRange : m_exp->modelPlugin()->nodeAttrsScope()) {
-        auto aw = QSharedPointer<AttrWidget>::create(attrRange, nullptr);
+        auto aw = std::make_shared<AttrWidget>(attrRange, nullptr);
         aw->setToolTip(attrRange->attrRangeStr());
-        auto _aw = aw.toWeakRef();
-        connect(aw.data(), &AttrWidget::valueChanged, [this, _aw]() { attrChanged(_aw); });
+        int aId = aw->id();
+        connect(aw.get(), &AttrWidget::valueChanged, [this, aId]() { attrChanged(aId); });
         m_attrWidgets.at(attrRange->id()) = aw;
-        m_ui->modelAttrs->insertRow(attrRange->id(), attrRange->attrName(), aw.data());
+        m_ui->modelAttrs->insertRow(attrRange->id(), attrRange->attrName(), aw.get());
 
-        QWidget* l = m_ui->modelAttrs->labelForField(aw.data());
+        QWidget* l = m_ui->modelAttrs->labelForField(aw.get());
         l->setToolTip(attrRange->attrName());
         l->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::MinimumExpanding);
         l->setMinimumWidth(m_ui->lNodeId->minimumWidth());
     }
 }
 
-void BaseGraphGL::attrChanged(QWeakPointer<AttrWidget> _aw) const
+void BaseGraphGL::attrChanged(int attrId) const
 {
     if (!m_trial || !m_trial->graph() || m_ui->nodeId->value() < 0) {
         return;
     }
 
-    auto aw = _aw.toStrongRef();
-    if (!aw) {
-        return;
-    }
+    std::shared_ptr<AttrWidget> aw;
+    try { aw = m_attrWidgets.at(attrId); }
+    catch (std::out_of_range) { return; }
 
+    Node node = m_trial->graph()->node(m_ui->nodeId->value());
     if (m_trial->status() == Status::Running) {
-        Node node = m_trial->graph()->node(m_ui->nodeId->value());
         aw->blockSignals(true);
         aw->setValue(node.attr(aw->id()));
         aw->blockSignals(false);
@@ -193,7 +190,6 @@ void BaseGraphGL::attrChanged(QWeakPointer<AttrWidget> _aw) const
             "Please, pause it and try again.");
     }
 
-    Node node = m_trial->graph()->node(m_ui->nodeId->value());
     Value v = aw->validate();
     if (v.isValid()) {
         node.setAttr(aw->id(), v);

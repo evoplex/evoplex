@@ -21,13 +21,13 @@
 #ifndef BASEGRAPHGL_H
 #define BASEGRAPHGL_H
 
+#include <memory>
 #include <vector>
 
 #include <QOpenGLWidget>
-#include <QLineEdit>
 #include <QMouseEvent>
+#include <QMutex>
 #include <QPainter>
-#include <QSharedPointer>
 #include <QTimer>
 
 #include "core/experiment.h"
@@ -132,9 +132,9 @@ private:
     quint16 m_currTrialId;
     QMutex m_mutex;
     QRect m_inspGeo; // inspector geometry with margin
-    std::vector<QSharedPointer<AttrWidget>> m_attrWidgets;
+    std::vector<std::shared_ptr<AttrWidget>> m_attrWidgets;
 
-    void attrChanged(QWeakPointer<AttrWidget> _aw) const;
+    void attrChanged(int attrId) const;
 
     void setupInspector();
 
