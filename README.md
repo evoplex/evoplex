@@ -16,6 +16,8 @@
 
 --------------------------------------------------------------------------------
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/f393fa28b9bc443d8847a5e672ec4826)](https://app.codacy.com/app/cardinot/evoplex?utm_source=github.com&utm_medium=referral&utm_content=evoplex/evoplex&utm_campaign=Badge_Grade_Dashboard)
+
 Evoplex is a platform for implementing Agent-Based Models (ABM) and Multi-Agent Systems (MAS) imposing a [theoretical-graph approach](https://en.wikipedia.org/wiki/Graph_theory). Here, each agent is represented as a node in the network and is constrained to interact only with its neighbours, which are linked by edges in the network.
 
 <p align="center">
