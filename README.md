@@ -11,12 +11,11 @@
 <a href="https://coveralls.io/github/evoplex/evoplex"><img src="https://coveralls.io/repos/github/evoplex/evoplex/badge.svg" alt="Testing"></a>
 <a href="https://codecov.io/gh/evoplex/evoplex"><img src="https://codecov.io/gh/evoplex/evoplex/branch/master/graph/badge.svg" alt="Testing"></a>
 <a href="https://scan.coverity.com/projects/evoplex-evoplex"><img src="https://scan.coverity.com/projects/16076/badge.svg" alt="Testing"></a>
+<a href="https://app.codacy.com/app/cardinot/evoplex"><img src="https://api.codacy.com/project/badge/Grade/f393fa28b9bc443d8847a5e672ec4826" alt="Testing"></a>
 <a href="https://github.com/evoplex/evoplex/blob/master/README.md#evoplex"><img src="https://img.shields.io/badge/awesome-yes-green.svg" alt=""></a>
 </p>
 
 --------------------------------------------------------------------------------
-
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/f393fa28b9bc443d8847a5e672ec4826)](https://app.codacy.com/app/cardinot/evoplex?utm_source=github.com&utm_medium=referral&utm_content=evoplex/evoplex&utm_campaign=Badge_Grade_Dashboard)
 
 Evoplex is a platform for implementing Agent-Based Models (ABM) and Multi-Agent Systems (MAS) imposing a [theoretical-graph approach](https://en.wikipedia.org/wiki/Graph_theory). Here, each agent is represented as a node in the network and is constrained to interact only with its neighbours, which are linked by edges in the network.
 

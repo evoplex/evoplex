@@ -31,8 +31,8 @@
 namespace evoplex {
 
 ColorMapMgr::ColorMapMgr()
+    : m_dfCMap("Black", 1)
 {
-    m_dfCMap = CMapKey("Black", 1);
     m_colormaps.insert(m_dfCMap, {Qt::black});
     m_names.append(m_dfCMap.first);
     m_sizesAvailable.insert(m_dfCMap.first, {"1"});

@@ -199,7 +199,7 @@ void AttrsGenDlg::slotSaveAs()
         Q_ASSERT_X(errMsg.isEmpty(), "AttrsGenDlg", "the command should be free of erros here");
         Q_ASSERT_X(!nodes.empty(), "AttrsGenDlg", "nodes size must be >0");
 
-        pValue = numNodes;
+        pValue = numNodes; // progress() starts from 50%
         saved = NodesPrivate::saveToFile(nodes, path, progress);
     }
 

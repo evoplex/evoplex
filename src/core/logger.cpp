@@ -241,7 +241,7 @@ void Logger::destroy()
 
 void Logger::debugLogHandler(QtMsgType type, const QMessageLogContext& ctx, const QString& msg)
 {
-    int color = 39; // default color
+    uint color = 39; // default color
     QString formattedMsg = msg;
     if (type == QtInfoMsg) {
         color = 34; // blue
