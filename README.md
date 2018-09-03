@@ -20,7 +20,7 @@
 Evoplex is a platform for implementing Agent-Based Models (ABM) and Multi-Agent Systems (MAS) imposing a [theoretical-graph approach](https://en.wikipedia.org/wiki/Graph_theory). Here, each agent is represented as a node in the network and is constrained to interact only with its neighbours, which are linked by edges in the network.
 
 <p align="center">
-  <img alt="Evoplex 0.1.0" src="https://evoplex.org/img/evoplex2018-06-17.gif" width="70%">
+  <img alt="Evoplex 0.2.0" src="https://evoplex.org/img/evoplex0.2.0_nowak92_2018-09-03.gif" width="90%">
 </p>
 
 **Wait, another multi-agent system?** Why not using something like [MASON](https://cs.gmu.edu/~eclab/projects/mason/) or [NetLogo](https://ccl.northwestern.edu/netlogo/)?
@@ -30,11 +30,13 @@ In fact, most of the existing pieces of software are not good enough. Main issue
 
 In this way, we decided to create Evoplex! An extremely fast, multi-threaded, user-friendly, cross-platform and truly modular application.
 
-Evoplex was originally developed to tackle problems in the field of [Evolutionary Graph Theory](https://en.wikipedia.org/wiki/Evolutionary_graph_theory). However, it has been used in a wide range of scenarios, including:
+Evoplex was originally developed to tackle problems in the field of **Evo**lutionary Computation and Com**plex** Systems, and that's why we call it **Evoplex**. However, it has been used in a wide range of scenarios, including:
 
+ * [Evolutionary Graph Theory](https://en.wikipedia.org/wiki/Evolutionary_graph_theory)
  * [Evolutionary Dynamics](https://en.wikipedia.org/wiki/Evolutionary_dynamics)
  * [Game Theory](https://en.wikipedia.org/wiki/Game_theory)
  * [Cellular Automata](https://en.wikipedia.org/wiki/Cellular_automaton)
+ * [Complex Adaptive Systems](https://en.wikipedia.org/wiki/Complex_adaptive_system)
  * ... the applications are endless!
 
 ## Getting Started
