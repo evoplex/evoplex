@@ -95,11 +95,12 @@ ExperimentWidget::ExperimentWidget(ExperimentPtr exp, MainGUI* mainGUI, Projects
     m_delay->setThumbColor(palette().color(QPalette::Link));
     m_delay->setSingleStep(10);
     m_delay->setPageStep(100);
+    m_delay->setMinimum(0);
     m_delay->setMaximum(500);
     m_delay->setMinimumWidth(150);
     m_delay->setMaximumWidth(150);
-    m_delay->setValue(m_exp->delay());
-    m_delay->setToolTip(QString("Delay simulation (%1 msecs)").arg(m_exp->delay()));
+    m_delay->setValue(mainGUI->mainApp()->defaultStepDelay());
+    slotUpdateDelay(m_delay->value());
     tb->addWidget(m_delay);
 
     tb->setMovable(false);
@@ -109,15 +110,12 @@ ExperimentWidget::ExperimentWidget(ExperimentPtr exp, MainGUI* mainGUI, Projects
     connect(m_aPlayPause, SIGNAL(pressed()), m_exp.get(), SLOT(toggle()));
     connect(m_aNext, SIGNAL(pressed()), m_exp.get(), SLOT(playNext()));
     connect(m_aStop, SIGNAL(pressed()), m_exp.get(), SLOT(stop()));
+    connect(m_delay, SIGNAL(valueChanged(int)), SLOT(slotUpdateDelay(int)));
     connect(m_aReset, &QtMaterialIconButton::pressed, [this]() {
         QString error;
         if (!m_exp->reset(&error)) {
             QMessageBox::warning(this, "Experiment", error);
         }
-    });
-    connect(m_delay, &QSlider::valueChanged, [this](int v) {
-        m_exp->setDelay(static_cast<quint16>(v));
-        m_delay->setToolTip(QString("Delay simulation (%1 msecs)").arg(v));
     });
 
     connect(m_exp.get(), SIGNAL(statusChanged(Status)), SLOT(slotStatusChanged(Status)));
@@ -168,6 +166,7 @@ ExperimentWidget::~ExperimentWidget()
 
 void ExperimentWidget::closeEvent(QCloseEvent* event)
 {
+    m_exp->setDelay(0);
     m_exp->disconnect(this); // important to avoid triggering slotStatusChanged()
     m_exp->project()->disconnect(this); // important to avoid setting the windowTitle
     emit (closed());
@@ -213,6 +212,12 @@ void ExperimentWidget::slotStatusChanged(Status status)
             "Something went wrong with your settings!\n"
             "Check the error messages in the console.");
     }
+}
+
+void ExperimentWidget::slotUpdateDelay(int v)
+{
+    m_exp->setDelay(static_cast<quint16>(v));
+    m_delay->setToolTip(QString("Delay simulation (%1 msecs)").arg(v));
 }
 
 bool ExperimentWidget::isAutoDeleteOff()

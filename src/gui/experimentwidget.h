@@ -56,6 +56,7 @@ protected:
 private slots:
     void slotStatusChanged(Status status);
     void slotProjectNameChanged(const QString& newName);
+    void slotUpdateDelay(int v);
 
 private:
     const QIcon m_kIcon_play;
