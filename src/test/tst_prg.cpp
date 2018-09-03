@@ -28,7 +28,6 @@ using namespace evoplex;
 class TestPRG: public QObject
 {
     Q_OBJECT
-
 private slots:
     void initTestCase() {}
     void cleanupTestCase() {}
@@ -42,8 +41,8 @@ private slots:
 
 void TestPRG::tst_prg()
 {
-    PRG* prg1 = new PRG(921);
-    PRG* prg2 = new PRG(921);
+    auto prg1 = std::unique_ptr<PRG>(new PRG(921));
+    auto prg2 = std::unique_ptr<PRG>(new PRG(921));
 
     QCOMPARE(prg1->uniform(), prg2->uniform(0.0, 1.0));
     QCOMPARE(prg1->uniform(), prg2->uniform(1.0));
@@ -56,23 +55,16 @@ void TestPRG::tst_prg()
     QVERIFY(!qFuzzyCompare(d, prg2->uniform()));
     QVERIFY(i != prg2->uniform(123));
 
-    delete prg1;
-    prg1 = new PRG(922);
-    QVERIFY(!qFuzzyCompare(d, prg1->uniform()));
-    QVERIFY(i != prg1->uniform(123));
+    auto prg3 = std::unique_ptr<PRG>(new PRG(922));
+    QVERIFY(!qFuzzyCompare(d, prg3->uniform()));
+    QVERIFY(i != prg3->uniform(123));
 
-    delete prg1;
-    delete prg2;
-
-    prg1 = new PRG(0);
-    for (int i = 0; i < 1000; ++i) prg1->uniform();
-    prg2 = new PRG(0);
-    for (int i = 0; i < 1000; ++i) prg2->uniform();
-    QCOMPARE(prg1->uniform(), prg2->uniform());
-    QCOMPARE(prg1->uniform(10), prg2->uniform(10));
-
-    delete prg1;
-    delete prg2;
+    auto prg4 = std::unique_ptr<PRG>(new PRG(0));
+    for (int i = 0; i < 1000; ++i) prg4->uniform();
+    auto prg5 = std::unique_ptr<PRG>(new PRG(0));
+    for (int i = 0; i < 1000; ++i) prg5->uniform();
+    QCOMPARE(prg4->uniform(), prg5->uniform());
+    QCOMPARE(prg4->uniform(10), prg5->uniform(10));
 }
 
 void TestPRG::tst_bernoulli()
@@ -106,7 +98,7 @@ void TestPRG::tst_bernoulli()
 
 void TestPRG::tst_uniformDouble()
 {
-    PRG* prg = new PRG(0);
+    auto prg = std::unique_ptr<PRG>(new PRG(0));
     double v, min, max;
 
     // [0, 1)
@@ -128,13 +120,11 @@ void TestPRG::tst_uniformDouble()
     max = min;
     v = prg->uniform(min, max);
     QVERIFY(v == min);
-
-    delete prg;
 }
 
 void TestPRG::tst_uniformInt()
 {
-    PRG* prg = new PRG(0);
+    auto prg = std::unique_ptr<PRG>(new PRG(0));
     int v, min, max;
 
     // [0, 10)
@@ -156,13 +146,11 @@ void TestPRG::tst_uniformInt()
     max = min;
     v = prg->uniform(min, max);
     QVERIFY(v == min);
-
-    delete prg;
 }
 
 void TestPRG::tst_uniformSizeT()
 {
-    PRG* prg = new PRG(0);
+    auto prg = std::unique_ptr<PRG>(new PRG(0));
     size_t v, min, max;
 
     // [0, 10)
@@ -186,13 +174,11 @@ void TestPRG::tst_uniformSizeT()
     QVERIFY(v >= min && v <= max);
     v = prg->uniform(max);
     QVERIFY(v <= max);
-
-    delete prg;
 }
 
 void TestPRG::tst_uniformFloat()
 {
-    PRG* prg = new PRG(0);
+    auto prg = std::unique_ptr<PRG>(new PRG(0));
     float v, min, max;
 
     // [0, 10)
@@ -214,8 +200,7 @@ void TestPRG::tst_uniformFloat()
     max = min;
     v = prg->uniform(min, max);
     QVERIFY(v == min);
-
-    delete prg;
 }
+
 QTEST_MAIN(TestPRG)
 #include "tst_prg.moc"
