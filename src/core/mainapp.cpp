@@ -22,7 +22,9 @@
 #include <QDebug>
 #include <QFileInfo>
 #include <QJsonDocument>
+#include <QNetworkAccessManager>
 #include <QNetworkReply>
+#include <QNetworkRequest>
 #include <QUrlQuery>
 
 #include "mainapp.h"

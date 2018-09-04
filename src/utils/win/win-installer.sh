@@ -4,9 +4,10 @@
 # @author Marcos Cardinot
 
 ROOTDIR="/c/evoplex"
-CONFIGXML="$ROOTDIR/evoplex/src/utils/win/win-config.xml"
-PACKAGEXML="$ROOTDIR/evoplex/src/utils/win/win-package.xml"
-INSTALLERSCRIPT="$ROOTDIR/evoplex/src/utils/win/win-installerscript.qs"
+UTILSDIR="$ROOTDIR/evoplex/src/utils/win"
+CONFIGXML="$UTILSDIR/win-config.xml"
+PACKAGEXML="$UTILSDIR/win-package.xml"
+INSTALLERSCRIPT="$UTILSDIR/win-installerscript.qs"
 LICENSE="$ROOTDIR/evoplex/LICENSE.txt"
 LOGO="$ROOTDIR/evoplex/src/evoplex.png"
 TODAY="$(date +'%Y-%m-%d')"
@@ -21,7 +22,8 @@ sed -i.bac "/<$1>/,/<\/$1>/ s/<$2><\/$2>/<$2>$3<\/$2>/g;" $4
 set -v
 
 cd $ROOTDIR/build/releases
-windeployqt.exe .
+windeployqt.exe --no-translations .
+cp $UTILSDIR/*.dll .
 cd $ROOTDIR
 
 

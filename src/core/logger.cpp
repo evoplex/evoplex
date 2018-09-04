@@ -22,11 +22,12 @@
 #include <QDateTime>
 #include <QDebug>
 #include <QProcess>
+#include <QSslSocket>
 #include <QStandardPaths>
 #include <QStringBuilder>
 #include <QSysInfo>
 #ifdef Q_OS_WIN
-  #include <windows.h>
+  #include <Windows.h>
 #endif
 
 #include "logger.h"
@@ -66,6 +67,10 @@ void Logger::init()
     writeLog(QString("Qt runtime version: %1").arg(qVersion()));
     writeLog(QString("Qt compilation version: %1").arg(QT_VERSION_STR));
     writeLog(QString("Architecture: %1").arg(COMPILER_ARCHITECTURE));
+
+    writeLog(QString("SslSupport: %1").arg(QSslSocket::supportsSsl()));
+    writeLog(QString("SslLibraryBuildVersion: %1").arg(QSslSocket::sslLibraryBuildVersionString()));
+    writeLog(QString("SslLibraryRuntimeVersion: %1").arg(QSslSocket::sslLibraryVersionString()));
 
     // write memory and CPU info
 #ifdef Q_OS_LINUX

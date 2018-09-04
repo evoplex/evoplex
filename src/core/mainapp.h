@@ -26,12 +26,13 @@
 
 #include <QDir>
 #include <QHash>
-#include <QtNetwork/QNetworkAccessManager>
 #include <QObject>
 #include <QSettings>
 
 #include "attributerange.h"
 #include "enum.h"
+
+class QNetworkAccessManager;
 
 namespace evoplex {
 

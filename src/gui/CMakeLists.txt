@@ -169,7 +169,7 @@ endforeach(uiform)
 qt5_wrap_ui(EVOPLEX_GUI_UI ${EVOPLEX_GUI_UI})
 
 add_library(EvoplexGUI STATIC ${EVOPLEX_GUI_CXX} ${EVOPLEX_GUI_UI} ${EXTERNAL_QT_MATERIAL_WIDGETS})
-target_link_libraries(EvoplexGUI PRIVATE EvoplexCore Qt5::Core Qt5::Concurrent Qt5::Widgets Qt5::Charts Qt5::Svg)
+target_link_libraries(EvoplexGUI PRIVATE EvoplexCore Qt5::Core Qt5::Concurrent Qt5::Network Qt5::Widgets Qt5::Charts Qt5::Svg)
 
 set_target_properties(EvoplexGUI PROPERTIES
   ARCHIVE_OUTPUT_DIRECTORY ${EVOPLEX_OUTPUT_ARCHIVE}

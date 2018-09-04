@@ -93,7 +93,7 @@ Value AttrWidget::value() const
     auto cb = qobject_cast<QComboBox*>(m_widget);
     if (cb) return cb->currentText();
 
-    qFatal("unable to know the widget type.");
+    throw std::invalid_argument("invalid widget type");
 }
 
 void AttrWidget::setValue(const Value& value)
