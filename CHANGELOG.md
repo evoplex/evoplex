@@ -4,7 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.2.0] - 2018-09-03
+## [Unreleased]
+
+
+## [0.2.0] - 2018-09-04
 ### Added
 - Adds support to edges attributes
 - Increases unit-tests coverage of core components
@@ -38,8 +41,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Node's coordinates are now a float
-- Graph widgets now use an OpenGL back end
-- Graph widgets: Inspector now displays the neighbours ids
+- Graph widgets now use an OpenGL backend
+- Graph widgets: Inspector now displays the neighbours' ids
 - Improved look and feel of graph widgets
 - Improved GraphView performance by avoiding caching invisible elements
 - Attributes' inspector of the graph widgets now shows a proper field for each type of attribute
@@ -52,9 +55,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Fixed bug when pausing an experiment with queued trials
 - Close the ExperimentDesigner if there is no project opened
-- `bool` attribute should act like a range and not as a single value
+- `bool` attribute should act as a range and not as a single value
 - Attrs generator should accept literal boolean, i.e., 'true' and 'false'
-- Node::randNeighbour crashes when neighbourhood is empty
+- Node::randNeighbour crashes when the neighbourhood is empty
 
 ### Removed
 - PRG: replaced all `rand()` functions by `uniform()` and `bernoulli()`
