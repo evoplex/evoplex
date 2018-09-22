@@ -66,12 +66,14 @@ Please see the [CONTRIBUTING](https://github.com/evoplex/evoplex/blob/master/CON
 - Follow us on [Twitter](https://twitter.com/EvoplexOrg)
 - Join us on our [Gitter chat channel](https://gitter.im/EvoplexOrg/evoplex)
 
-## Citing
+## How to cite
 
 If you use Evoplex in your publication, you can cite it as:
 
-> Marcos Cardinot, Colm O'Riordan, & Josephine Griffith. Evoplex: a powerful multi-agent system for networks. Zenodo. [http://doi.org/10.5281/zenodo.1340735](http://doi.org/10.5281/zenodo.1340735)
+> Marcos Cardinot, Colm O'Riordan, & Josephine Griffith. Evoplex: an agent-based modeling platform for networks. Zenodo. [https://doi.org/10.5281/zenodo.1340734](https://doi.org/10.5281/zenodo.1340734)
 
 ## License
 
-Evoplex is licensed under the [GNU General Public License v3.0](https://github.com/evoplex/evoplex/blob/master/LICENSE.txt).
+The *EvoplexCore* library is licensed under the [Apache License 2.0](https://github.com/evoplex/evoplex/blob/master/src/core/LICENSE.txt).
+
+The *EvoplexGUI* library is licensed under the [GNU General Public License v3.0](https://github.com/evoplex/evoplex/blob/master/src/gui/LICENSE.txt).
