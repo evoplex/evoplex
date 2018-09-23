@@ -8,7 +8,7 @@ UTILSDIR="$ROOTDIR/evoplex/src/utils/win"
 CONFIGXML="$UTILSDIR/win-config.xml"
 PACKAGEXML="$UTILSDIR/win-package.xml"
 INSTALLERSCRIPT="$UTILSDIR/win-installerscript.qs"
-LICENSE="$ROOTDIR/evoplex/LICENSE.txt"
+LICENSE="$ROOTDIR/evoplex/src/gui/LICENSE.txt"
 LOGO="$ROOTDIR/evoplex/src/evoplex.png"
 TODAY="$(date +'%Y-%m-%d')"
 
