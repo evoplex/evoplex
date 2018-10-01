@@ -59,7 +59,7 @@ Node AbstractGraph::randNode() const
     return std::next(m_nodes.cbegin(), prg()->uniform(m_numNodesDist))->second;
 }
 
-Node AbstractGraph::addNode(Attributes attr, int x, int y)
+Node AbstractGraph::addNode(Attributes attr, float x, float y)
 {
     QMutexLocker locker(&m_mutex);
     ++m_lastNodeId;

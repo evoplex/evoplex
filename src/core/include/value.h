@@ -24,7 +24,7 @@
 namespace evoplex {
 
 class Value;
-typedef std::vector<Value> Values;
+using Values = std::vector<Value>;
 
 class Value
 {

@@ -68,9 +68,11 @@ namespace Utils
         s.clear();
     }
 
-    // Find index of value in range.
-    // Returns the index of the first element in the range that compares equal to val
-    // If no such element is found, the function returns -1
+    /**
+     * @brief Find index of value in range.
+     * Returns the index of the first element in the range that compares equal to val
+     * If no such element is found, the function returns -1
+     */
     template <class C, class T>
     int indexOf(const C& container, const T& val) {
         Q_ASSERT(container.size() < INT32_MAX);
@@ -81,9 +83,11 @@ namespace Utils
         return -1;
     }
 
-    // Fisher–Yates shuffle algorithm
-    // https://bost.ocks.org/mike/shuffle
-    // http://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle
+    /**
+     * @brief Fisher–Yates shuffle algorithm.
+     * https://bost.ocks.org/mike/shuffle
+     * http://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle
+     */
     template <typename T>
     void shuffle(std::vector<T>& vector, PRG* prg) {
         size_t n = vector.size();

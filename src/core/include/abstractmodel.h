@@ -27,54 +27,84 @@
 
 namespace evoplex {
 
-class AbstractModelInterface
+/**
+ * @brief Provides a common interface for Model plugins.
+ * @see AbstractModel
+ * @ingroup AbstractModel
+ */
+class AbstractModelInterface : public AbstractPlugin
 {
 public:
-    // destructor
+    //! Provide a default destructor to keep compilers happy.
     virtual ~AbstractModelInterface() = default;
 
-    // It is executed before the algorithmStep() loop
-    // The default implementation of this method does nothing.
+    //! @see AbstractPlugin::init()
+    using AbstractPlugin::init;
+
+    /**
+     * @brief It is executed before the algorithmStep() loop.
+     * The default implementation of this function does nothing.
+     */
     virtual void beforeLoop() = 0;
 
-    // It is executed in a loop and must contain all the logic to perform ONE step.
-    // Return true if algorithm is good for another step or false to stop asap.
+    /**
+     * @brief It is executed in a loop and must contain all the logic to perform ONE step.
+     * @returns true if algorithm is good for another step or false to stop asap.
+     */
     virtual bool algorithmStep() = 0;
 
-    // It is executed after the algorithmStep() loop ends.
-    // The default implementation of this method does nothing.
+    /**
+     * @brief It is executed after the algorithmStep() loop ends.
+     * The default implementation of this function does nothing.
+     */
     virtual void afterLoop() = 0;
 
-    // It allows implementing custom outputs which can be plotted or stored
-    // in a file through Evoplex. The "inputs" must be defined in the
-    // metaData.json file. If an experiment requests some custom output,
-    // this method will be called once at each time step, receiving the
-    // requested inputs.
+    /**
+     * @brief Allows implementing custom outputs for the model plugin.
+     *
+     * A "custom output" can be plotted or stored in a file through Evoplex.
+     * The \p inputs must be defined in the metadata.json file. If an experiment
+     * requests some custom output, this function will be called once at each
+     * time step, receiving the requested \p inputs.
+     * The default implementation of this function does nothing.
+     * @return the Value output for each of the \p inputs
+     */
     virtual Values customOutputs(const Values& inputs) const = 0;
 };
 
-class AbstractModel : public AbstractPlugin, public AbstractModelInterface
+/**
+ * @brief Abstract base class for Model plugins.
+ * @ingroup AbstractModel
+ */
+class AbstractModel : public AbstractModelInterface
 {
     friend class Trial;
 
 public:
+    //! @returns the graph id
     const QString& graphId() const;
+    //! @returns the current graph
     AbstractGraph* graph() const;
 
-    // current time step
+    //! @returns the current time step
     int step() const;
-
-    // last time step
+    //! @returns the end time step (stopAt)
     int lastStep() const;
 
+    //! @see AbstractGraph::nodes()
     inline const Nodes& nodes() const;
+    //! @see AbstractGraph::node(int)
     inline Node node(int nodeId) const;
+
+    //! @see AbstractGraph::edges()
     inline const Edges& edges() const;
+    //! @see AbstractGraph::edge(int)
     inline const Edge& edge(int edgeId) const;
+    //! @see AbstractGraph::edge(int,int)
     inline const Edge& edge(int originId, int neighbourId) const;
 
     // AbstractModelInterface stuff
-    // the default implementation of the methods below do nothing
+    // the default implementation of the functions below do nothing
     inline void beforeLoop() override {}
     inline void afterLoop() override {}
     inline Values customOutputs(const Values& inputs) const override
@@ -82,7 +112,6 @@ public:
 
 protected:
     AbstractModel() = default;
-    ~AbstractModel() override = default;
 };
 
 /************************************************************************
@@ -102,7 +131,7 @@ inline const Edge& AbstractModel::edge(int edgeId) const
 { return graph()->edge(edgeId); }
 
 inline const Edge &AbstractModel::edge(int originId, int neighbourId) const
-{ return node(originId).outEdges().at(neighbourId); }
+{ return graph()->edge(originId, neighbourId); }
 
 } // evoplex
 #endif // ABSTRACT_MODEL_H

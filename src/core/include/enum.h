@@ -22,6 +22,7 @@
 namespace evoplex {
 
 /**
+ * @brief Gets a QString from enum.
  * We need an efficient and simple way to convert enums to strings (vice-versa),
  * many times we also need to catch invalid strings as Invalid. Also, sometimes
  * the string does not reflect the enum name.
@@ -33,16 +34,18 @@ namespace evoplex {
  */
 template <typename T>
 T _enumFromString(const QString& str);
+
+//! converts an enum to QString
 template <typename T>
 QString _enumToString(T e);
 
 enum class Status {
-    Invalid,   // something went wrong
-    Disabled,  // has not yet been initialized
-    Paused,    // ready for another step
-    Queued,    // queued to run
-    Running,   // running in a work thread
-    Finished,  // all is done
+    Invalid,   //! something went wrong
+    Disabled,  //! has not yet been initialized
+    Paused,    //! ready for another step
+    Queued,    //! queued to run
+    Running,   //! running in a work thread
+    Finished,  //! all is done
 };
 
 enum class PluginType : int {

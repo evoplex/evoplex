@@ -26,11 +26,14 @@ namespace evoplex {
 class Stats
 {
 public:
-    // count frequency of the header values in the container
-    // eg.,
-    //     if header is ['a', 'c'], it'll count how many a's and c's exist in the container
-    //     if there are 100 a's and 123 c's, it'll return [100, 123]
-    //     if there are no a's and c's, it'll return [0, 0]
+    /**
+     * @brief Count frequency of the header values in the container.
+     *
+     * Example:
+     *  - if header is ['a', 'c'], it'll count how many a's and c's exist in the container
+     *  - if there are 100 a's and 123 c's, it'll return [100, 123]
+     *  - if there are no a's and c's, it'll return [0, 0]
+     */
     template<typename ConstIterator>
     static std::vector<Value> count(ConstIterator entityBegin, ConstIterator entityEnd,
                                     const int attrIdx, std::vector<Value> header)

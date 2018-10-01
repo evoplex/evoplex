@@ -19,6 +19,11 @@
 
 namespace evoplex {
 
+bool AbstractPlugin::init()
+{
+    return true;
+}
+
 bool AbstractPlugin::setup(Trial& trial, const Attributes& attrs)
 {
     m_trial = &trial;
