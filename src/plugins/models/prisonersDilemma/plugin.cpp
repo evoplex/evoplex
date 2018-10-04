@@ -9,13 +9,13 @@
 
 namespace evoplex {
 
-bool ModelNowak::init()
+bool PDGame::init()
 {
     m_temptation = attr("temptation", -1.0).toDouble();
     return m_temptation >=1.0 && m_temptation <= 2.0;
 }
 
-bool ModelNowak::algorithmStep()
+bool PDGame::algorithmStep()
 {
     // 1. each agent accumulates the payoff obtained by playing
     //    the game with all its neighbours and itself
@@ -59,7 +59,7 @@ bool ModelNowak::algorithmStep()
 
 // 0) cooperator; 1) new cooperator
 // 2) defector;   3) new defector
-double ModelNowak::playGame(const int sX, const int sY) const
+double PDGame::playGame(const int sX, const int sY) const
 {
     switch (binarize(sX) * 2 + binarize(sY)) {
     case 0: return 1.0;             // CC : Reward for mutual cooperation
@@ -72,11 +72,11 @@ double ModelNowak::playGame(const int sX, const int sY) const
 
 // transform from 0|2 -> 0 (cooperator)
 //                1|3 -> 1 (defector)
-int ModelNowak::binarize(const int strategy) const
+int PDGame::binarize(const int strategy) const
 {
     return (strategy < 2) ? strategy : strategy - 2;
 }
 
 } // evoplex
-REGISTER_PLUGIN(ModelNowak)
+REGISTER_PLUGIN(PDGame)
 #include "plugin.moc"

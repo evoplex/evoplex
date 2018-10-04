@@ -44,7 +44,7 @@ Rule 110: initial population with all cells off (blue) and one on-cell in the fi
 ## How to cite
 If you mention this model or the Evoplex software in a publication, please cite it as:
 
-> Marcos Cardinot, Colm O'Riordan, & Josephine Griffith. (2018). Evoplex: a powerful multi-agent system for networks. Zenodo. http://doi.org/10.5281/zenodo.1340734
+> Marcos Cardinot, Colm O'Riordan, & Josephine Griffith (2018). Evoplex: an agent-based modeling platform for networks. Zenodo. http://doi.org/10.5281/zenodo.1340734
 
 ## License
 This plugin is licensed under the [MIT License](https://opensource.org/licenses/MIT) terms.

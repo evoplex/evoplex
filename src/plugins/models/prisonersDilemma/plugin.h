@@ -5,13 +5,13 @@
  * the LICENSE file in the root directory of this source tree.
  */
 
-#ifndef NOWAK92_H
-#define NOWAK92_H
+#ifndef PDGAME_H
+#define PDGAME_H
 
 #include <plugininterface.h>
 
 namespace evoplex {
-class ModelNowak: public AbstractModel
+class PDGame: public AbstractModel
 {
 public:
     bool init() override;

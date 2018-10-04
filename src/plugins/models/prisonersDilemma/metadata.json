@@ -1,8 +1,8 @@
 {
   "type": "model",
-  "uid": "nowak92",
+  "uid": "prisonersDilemma",
   "version": 1,
-  "title": "Evolutionary games and spatial chaos",
+  "title": "Prisoner's Dilemma Game",
   "author": "Marcos Cardinot",
   "description": "It implements the experiment proposed by Nowak, M. A., & May, R. M. (1992). Evolutionary games and spatial chaos. Nature, 359(6398), 826. DOI: http://dx.doi.org/10.1038/359826a0",
   "supportedGraphs": ["squareGrid","edgesFromFile"],
