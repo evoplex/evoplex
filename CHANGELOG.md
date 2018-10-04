@@ -5,7 +5,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- Improved the source code documentation.
 
+### Changed
+- EvoplexCore is now licensed under the Apache 2.0 License terms.
+- Update the `nowak92` plugin which is now called `prisonersDilemma`.
 
 ## [0.2.0] - 2018-09-04
 ### Added
