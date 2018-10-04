@@ -23,67 +23,100 @@ namespace evoplex {
 
 /**
  * @brief Pseudo-random number generator.
- *        Based on the classic Mersenne Twister (std::mt19937)
+ *        Based on the classic Mersenne Twister (std::mt19937).
+ * @ingroup PublicAPI
  */
 class PRG
 {
 public:
+    /**
+     * @brief PRG constructor.
+     * @param seed The pseudo-random generator @p seed.
+     */
     explicit PRG(unsigned int seed);
 
-    // Returns the PRG seed
+     /**
+     * @brief Gets the initial PRG seed.
+     */
     inline unsigned int seed() const
     { return m_seed; }
 
-    // Generate a random boolean according to the discrete probability function
-    // Where the probability of true is p and the probability of false is (1-p)
+    /**
+     * @brief Bernoulli distribution.
+     * It generates a random boolean according to the discrete probability
+     * function, where the probability of true is @p p and the probability
+     * of false is (1-p).
+     */
     inline bool bernoulli(double p)
     { std::bernoulli_distribution b(p); return b(m_mteng); }
 
-    // randBernoulli(p=0.5)
+    /**
+     * @brief randBernoulli(p=0.5) alias.
+     */
     inline bool bernoulli()
     { return m_bernoulli(m_mteng); }
 
-    // Generate a random double/float [min, max)
+    /**
+     * @brief Generates a random double/float [min, max).
+     */
     template <typename T>
     T uniform(T min, T max)
     { std::uniform_real_distribution<T> d(min, max); return d(m_mteng); }
 
-    // Generate a random integer [min, max]
+    /**
+     * @brief Generates a random integer [min, max].
+     */
     inline int uniform(int min, int max)
     { std::uniform_int_distribution<int> d(min, max); return d(m_mteng); }
 
-    // Generate a random size_t [min, max]
+    /**
+     * @brief Generates a random size_t [min, max].
+     */
     inline size_t uniform(size_t min, size_t max)
     { std::uniform_int_distribution<size_t> d(min, max); return d(m_mteng); }
 
-    // Generate a random double/float [0, max)
+    /**
+     * @brief Generates a random double/float [0, max).
+     */
     template <typename T>
     T uniform(T max)
     { std::uniform_real_distribution<T> d(0, max); return d(m_mteng); }
 
-    // Generate a random integer [0, max]
+    /**
+     * @brief Generates a random integer [0, max].
+     */
     inline int uniform(int max)
     { std::uniform_int_distribution<int> d(0, max); return d(m_mteng); }
 
-    // Generate a random size_t [0, max]
+    /**
+     * @brief Generates a random size_t [0, max].
+     */
     inline size_t uniform(size_t max)
     { std::uniform_int_distribution<size_t> d(0, max); return d(m_mteng); }
 
-    // Generate a random double [0, 1)
+    /**
+     * @brief Generates a random double [0, 1).
+     */
     inline double uniform()
     { return m_doubleZeroOne(m_mteng); }
 
+    /**
+     * @brief Uniform continuous distribution for random numbers.
+     */
     template <typename T>
     inline T uniform(std::uniform_real_distribution<T> d)
     { return d(m_mteng); }
 
+    /**
+     * @brief Uniform discrete distribution for random numbers.
+     */
     template <typename T>
     T uniform(std::uniform_int_distribution<T> d)
     { return d(m_mteng); }
 
 private:
     const unsigned int m_seed;
-    std::mt19937 m_mteng; //  Mersenne Twister engine
+    std::mt19937 m_mteng; //!  Mersenne Twister engine
     std::uniform_real_distribution<double> m_doubleZeroOne;
     std::bernoulli_distribution m_bernoulli;
 };

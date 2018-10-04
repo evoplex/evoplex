@@ -23,11 +23,15 @@
 
 namespace evoplex {
 
+/**
+ * @brief The Stats class.
+ */
 class Stats
 {
 public:
     /**
      * @brief Count frequency of the header values in the container.
+     * @publicsection
      *
      * Example:
      *  - if header is ['a', 'c'], it'll count how many a's and c's exist in the container
@@ -49,6 +53,7 @@ public:
         return ret;
     }
 
+    //! @copydoc count()
     template<typename Container>
     static std::vector<Value> count(Container entity, const int attrIdx, std::vector<Value> values)
     {

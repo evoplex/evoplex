@@ -25,13 +25,16 @@
 
 namespace evoplex {
 
+/**
+ * @brief A common interface for plugins.
+ */
 class PluginInterface
 {
 public:
-    // provide the destructor to keep compilers happy.
+    //! Provides the destructor to keep compilers happy.
     virtual ~PluginInterface() = default;
 
-    // create a model/graph object.
+    //! Creates a model/graph object.
     virtual AbstractPlugin* create() = 0;
 };
 }

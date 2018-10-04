@@ -37,6 +37,9 @@ class AbstractPlugin
     friend class AbstractGraph;
 
 public:
+//! @addtogroup PluginsAPI
+//! @{
+
     /**
      * @brief Initializes the plugin.
      * This method is called when the plugin is created and
@@ -46,25 +49,40 @@ public:
      */
     virtual bool init();
 
-    //! @returns pseudo-random generator pointer
+    /**
+     * @brief pseudo-random generator pointer.
+     * This PRG is built with the Trial seed.
+     */
     PRG* prg() const;
-    //! prg() alias
+
+    /**
+     * @brief prg() alias
+     * @see prg()
+     */
     inline PRG* rand() const;
 
-    //! @returns the plugin's attributes
+    /**
+     * @brief Gets the plugin's attributes.
+     */
     inline const Attributes* attrs() const;
 
-    //! @returns the attribute's name for \p attrId
-    //! @throw  std::out_of_range if no such data is present.
+    /**
+     * @brief Gets the attribute's name for \p attrId.
+     * @throw std::out_of_range if no such data is present.
+     */
     inline const QString& attrName(int attrId) const;
-    //! @returns the attribute's value for \p attrId
-    //! @throw  std::out_of_range if no such data is present.
+
+    /**
+     * @brief Gets the attribute's value for \p attrId.
+     * @throw  std::out_of_range if no such data is present.
+     */
     inline const Value& attr(int attrId) const;
 
     /**
-     * @param name the attribute name
-     * @param defaultValue a Value to be returned if \p name is not present.
-     * @return the attribute's value
+     * @brief Gets the value of the attribute \p name.
+     * @param name The attribute name.
+     * @param defaultValue A Value to be returned if \p name is not present.
+     * @return The attribute's value.
      */
     inline Value attr(const QString& name, Value defaultValue=Value()) const;
 
@@ -77,10 +95,14 @@ public:
     //! @copydoc attrExists(const char*) const
     inline bool attrExists(const QString& name) const;
 
+/**@}*/
+
 protected:
     Trial* m_trial;
 
+    //! constructor
     AbstractPlugin() = default;
+    //! destructor
     ~AbstractPlugin() = default;
 
 private:

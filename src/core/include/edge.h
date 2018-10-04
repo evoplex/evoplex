@@ -29,8 +29,10 @@ class BaseEdge;
 using EdgePtr = std::shared_ptr<BaseEdge>;
 
 /**
- * @brief An Edge connects a node to itself or to another node.
- * @attention An edge can only be created by an AbstractGraph derived object.
+ * @brief An Edge connects a Node to itself or to another Node.
+ * This class wraps a std::shared_ptr<BaseEdge>.
+ * @note An edge should be created by an AbstractGraph derived object.
+ * @ingroup PublicAPI
  */
 class Edge
 {
@@ -38,19 +40,36 @@ class Edge
     friend class TestEdge;
 
 public:
-    Edge();
+    /**
+     * @brief Constructor.
+     * @param edge std::shared_ptr<BaseEdge>
+     */
     Edge(EdgePtr edge);
+    /**
+     * @brief Constructor to ease range-based for loops.
+     * @param p A pair <edgeId, Edge>.
+     */
     Edge(const std::pair<const int, Edge>& p);
+    //! Constructor.
+    Edge();
 
+    //! @copydoc BaseEdge::id
     int id() const;
+    //! @copydoc BaseEdge::origin
     const Node& origin() const;
+    //! @copydoc BaseEdge::neighbour
     const Node& neighbour() const;
 
+    //! @copydoc BaseEdge::attrs
     const Attributes* attrs() const;
+    //! @copydoc BaseEdge::attr(int id) const
     const Value& attr(int id) const;
+    //! @copydoc BaseEdge::attr(const QString& name, Value defaultValue=Value()) const
     Value attr(const QString& name, Value defaultValue=Value()) const;
 
+    //! @copydoc BaseEdge::setAttr
     void setAttr(const int id, const Value& value);
+    //! @copydoc BaseEdge::addAttr
     void addAttr(QString name, Value value);
 
 private:

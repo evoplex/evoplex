@@ -31,73 +31,134 @@ class AttributeRange;
 using AttributeRangePtr = std::shared_ptr<AttributeRange>;
 using AttributesScope = QHash<QString, AttributeRangePtr>;
 
+/**
+ * @brief A common interface for the Attribute Range classes.
+ * @see AttributeRange, SingleValue, IntervalOfValues, SetOfValues
+ */
 class AttributeRangeInterface
 {
 public:
+    //! Destructor.
     virtual ~AttributeRangeInterface() = default;
 
-    // returns a random value in the attrRange
+    /**
+     * @brief Gets a random value in the attribute range.
+     * @param prg A pointer to a valid PRG.
+     */
     virtual Value rand(PRG* prg) const = 0;
 
-    // returns the value after `v`
-    // if `v` is the last, it returns the first value in the attrRange
-    // if `v` is not in the attrRange, it returns `v`
+    /**
+     * @brief Gets the value after @p v.
+     * @param v A value in the attribute range.
+     * If @p v is the last, it returns the first value in the attrRange.
+     * if @p v is not in the attrRange, it returns @p v.
+     */
     virtual Value next(const Value& v) const = 0;
 
-    // returns the value before `v`
-    // if `v` is the first, it returns the last value in the attrRange
-    // if `v` is not in the attrRange, it returns `v`
+    /**
+     * @brief Gets the value before @p v.
+     * @param v A value in the attribute range.
+     * If @p v is the first, it returns the last value in the attrRange.
+     * if @p v is not in the attrRange, it returns @p v.
+     */
     virtual Value prev(const Value& v) const = 0;
 };
 
+/**
+ * @brief The AttributeRange base class.
+ * @see SingleValue, IntervalOfValues, SetOfValues
+ */
 class AttributeRange : public AttributeRangeInterface
 {
 public:
+    /**
+     * @brief An enum for the attribute range types.
+     */
     enum Type {
-        Invalid,
-
-        Double_Range,
-        Int_Range,
-
-        Double_Set,
-        Int_Set,
-        String_Set,
-
-        Bool,
-        String,
-        NonEmptyString,
-        DirPath,
-        FilePath
+        Invalid,        //!< Invalid type
+        // IntervalOfValues
+        Double_Range,   //!< A range of real numbers
+        Int_Range,      //!< A range of integers
+        Bool,           //!< A boolean
+        // SetOfValues
+        Double_Set,     //!< A set of real numbers
+        Int_Set,        //!< A set of intergers
+        String_Set,     //!< A set of strings
+        // SingleValue
+        String,         //!< A string
+        NonEmptyString, //!< A non-empty string
+        DirPath,        //!< A directory path
+        FilePath,       //!< A file path
     };
 
-    // an attrRangeStr can be:
-    //   - "bool"               // a boolean
-    //   - "dirpath"            // a string containing a valid dirpath (use forward slashes)
-    //   - "filepath"           // a string containing a valid filepath (use forward slashes)
-    //   - "string"             // a string (empty string is also valid)
-    //   - "non-empty-string"   // a non-empty string
-    //   - "string{aaa,bbb}"    // set of strings
-    //   - "int[min,max]"       // integers from min to max (including min and max)
-    //   - "int{1,2,3}"         // set of integers
-    //   - "double[min,max]     // doubles from min to max (including min and max)
-    //   - "double{1.1,1.2}     // set of doubles
-    //   * you can use 'max' to take the maximum value for the type
-    //   * do NOT add spaces before/after the commas
+    /**
+     * @brief Creates an AttributeRange object from a valid @p attrRangeStr string.
+     * @param attrId The attribute id.
+     * @param attrName The attribute name.
+     * @param attrRangeStr The attribute range string.
+     * @return Returns a null object if @p attrRangeStr is invalid.
+     *
+     * <b>The accepted @p 'attrRangeStr' strings are listed in the table below.</b>
+     *  Attribute Range    | Description
+     *  ------------------ | -------------
+     *  "bool"             | a boolean
+     *  "dirpath"          | a string containing a valid dirpath (use forward slashes)
+     *  "filepath"         | a string containing a valid filepath (use forward slashes)
+     *  "string"           | a string (empty string is also valid)
+     *  "non-empty-string" | a non-empty string
+     *  "string{aaa,bbb}"  | set of strings
+     *  "int[min,max]"     | integers from min to max (including min and max)
+     *  "int{1,2,3}"       | set of integers
+     *  "double[min,max]"  | doubles from min to max (including min and max)
+     *  "double{1.1,1.2}"  | set of doubles
+     *
+     * @note You can use 'max' to take the maximum value for the type.
+     *       For instance, 'int[0,max]' corresponds to an integer from
+     *       0 to 2147483647, which is the largest integer.
+     * @warning Do NOT add spaces before/after the commas.
+     */
     static AttributeRangePtr parse(int attrId, const QString& attrName,
                                    const QString& attrRangeStr);
 
+    //! Destructor.
     ~AttributeRange() override = default;
 
-    // Check if the valueStr belongs to this attribute range.
-    // If true, return a valid Value with the correct type
+    /**
+     * @brief Checks if the @p valueStr belongs to this attribute range.
+     * @param valueStr A value as a string.
+     * @return An empty/invalid Value if @p valueStr is not within this range.
+     */
     Value validate(const QString& valueStr) const;
 
+    /**
+     * @brief Checks if this AttributeRange is valid.
+     * @returns true if it is valid.
+     */
     inline bool isValid() const;
+    /**
+     * @brief Gets the attribute id.
+     */
     inline int id() const;
+    /**
+     * @brief Gets the attribute name.
+     */
     inline const QString& attrName() const;
+    /**
+     * @brief Gets the original attribute's range string.
+     * @see AttributeRange::parse
+     */
     inline const QString& attrRangeStr() const;
+    /**
+     * @brief Gets the current attribute's range type.
+     */
     inline Type type() const;
+    /**
+     * @brief Gets the minimum value in the range.
+     */
     inline const Value& min() const;
+    /**
+     * @brief Gets the maximum value in the range.
+     */
     inline const Value& max() const;
 
 protected:
@@ -108,6 +169,13 @@ protected:
     Value m_min;
     Value m_max;
 
+    /**
+     * @brief AttributeRange constructor
+     * @param id The attribute's id.
+     * @param attrName The attribute's name.
+     * @param type The attribute's type.
+     * @see AttributeRange::parse
+     */
     explicit AttributeRange(int id, const QString& attrName, Type type);
 
 private:
@@ -120,12 +188,26 @@ private:
                                               const QString& attrName);
 };
 
+/**
+ * @brief The SingleValue class.
+ * It handles the 'attribute ranges' defined by a single value,
+ * e.g., AttributeRange::String, AttributeRange::NonEmptyString,
+ * AttributeRange::DirPath and AttributeRange::FilePath.
+ * @see AttributeRange, IntervalOfValues, SetOfValues
+ */
 class SingleValue : public AttributeRange
 {
 public:
-    explicit SingleValue();
+    /**
+     * @brief Constructor.
+     * @param id The attribute id.
+     * @param attrName The attribute name.
+     * @param type The attribute type.
+     */
     explicit SingleValue(int id, const QString& attrName, Type type);
+    explicit SingleValue();
 
+    //! Destructor.
     ~SingleValue() override = default;
 
     inline Value rand(PRG*) const override;
@@ -133,12 +215,29 @@ public:
     inline Value prev(const Value& v) const override;
 };
 
+/**
+ * @brief The IntervalOfValues class.
+ * It handles the 'attribute ranges' defined by an interval of values,
+ * e.g., AttributeRange::Double_Range, AttributeRange::Int_Range and
+ *       AttributeRange::Bool.
+ * @see AttributeRange, SingleValue, SetOfValues
+ */
 class IntervalOfValues : public AttributeRange
 {
 public:
+    /**
+     * @brief Constructor.
+     * @param id The attribute id.
+     * @param attrName The attribute name.
+     * @param type The range type.
+     * @param min The smallest value in the range.
+     * @param max The largest value in the range.
+     * @see AttributeRange::parse
+     */
     IntervalOfValues(int id, const QString& attrName, Type type,
                      const Value &min, const Value &max);
 
+    //! Destructor.
     ~IntervalOfValues() override = default;
 
     inline Value rand(PRG* prg) const override;
@@ -151,18 +250,37 @@ private:
     std::function<Value(const Value&)> f_prev;
 };
 
+/**
+ * @brief The SetOfValues class.
+ * It handles the 'attribute ranges' defined by a set of values,
+ * e.g., AttributeRange::Double_Set, AttributeRange::Int_Set and
+ *       AttributeRange::String_Set.
+ * @see AttributeRange, SingleValue, IntervalOfValues
+ */
 class SetOfValues : public AttributeRange
 {
 public:
+    /**
+     * @brief Constructor.
+     * @param id The attribute id.
+     * @param attrName The attribute name.
+     * @param type The range type.
+     * @param values A vector of Value.
+     * @see AttributeRange::parse
+     */
     SetOfValues(int id, const QString& attrName, Type type, Values values);
 
+    //! Destructor.
     ~SetOfValues() override = default;
+
+    /**
+     * @brief Gets the vector of values.
+     */
+    inline const Values& values() const;
 
     inline Value rand(PRG* prg) const override;
     Value next(const Value& v) const override;
     Value prev(const Value& v) const override;
-
-    inline const Values& values() const;
 
 private:
     Values m_values;

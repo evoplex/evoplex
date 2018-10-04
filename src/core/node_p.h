@@ -28,6 +28,10 @@ namespace evoplex {
 class BaseNode;
 using NodePtr = std::shared_ptr<BaseNode>;
 
+/**
+ * @brief A common interface for the node's classes.
+ * @see BaseNode, UNode, DNode
+ */
 class NodeInterface
 {
     friend class AbstractGraph;
@@ -36,12 +40,40 @@ class NodeInterface
     friend class TestEdge;
 
 public:
+    //! Destructor.
     virtual ~NodeInterface() = default;
+
+    /**
+     * @brief Creates a new std::shared_ptr<BaseNode> with the
+     *        same data of the current Node.
+     */
     virtual NodePtr clone() const = 0;
+
+    /**
+     * @brief Gets the edges entering the node.
+     */
     virtual const Edges& inEdges() const = 0;
+
+    /**
+     * @brief Gets the edges leaving the node.
+     */
     virtual const Edges& outEdges() const = 0;
+
+    /**
+     * @brief Gets the node's degree.
+     */
     virtual int degree() const = 0;
+
+    /**
+     * @brief Gets the node's in-degree, i.e.,
+     *        the number of edges entering the node.
+     */
     virtual int inDegree() const = 0;
+
+    /**
+     * @brief Gets the node's out-degree, i.e.,
+     *        the number of edges leaving the node.
+     */
     virtual int outDegree() const = 0;
 
 private:
@@ -69,25 +101,56 @@ class BaseNode : public NodeInterface
     friend class TestEdge;
 
 public:
+    /**
+     * @brief Gets all the node's Attributes.
+     */
     inline const Attributes& attrs() const;
+    //! @copydoc Attributes::value
     inline const Value& attr(int id) const;
+    //! @copydoc Attributes::value(const QString& name, Value defaultValue=Value()) const
     inline Value attr(const QString& name, Value defaultValue=Value()) const;
+    //! @copydoc Attributes::setValue
     inline void setAttr(int id, const Value& value);
 
+    /**
+     * @brief Gets the node's id.
+     */
     inline int id() const;
+    /**
+     * @brief Gets the node's x coordinate.
+     */
     inline float x() const;
+    /**
+     * @brief Gets the node's y coordinate.
+     */
     inline float y() const;
 
+    /**
+     * @brief Sets the node's @p x coordinate.
+     */
     inline void setX(float x);
+    /**
+     * @brief Sets the node's @p y coordinate.
+     */
     inline void setY(float y);
+    /**
+     * @brief Sets the node's coordinates.
+     */
     inline void setCoords(float x, float y);
 
+    /**
+     * @brief Gets a random neighbour.
+     * Returns an invalid/empty Node if the node has no neighbours.
+     */
     Node randNeighbour(PRG* prg) const;
 
 protected:
     Edges m_outEdges;
 
-    struct constructor_key { /* this is a private key accessible only to friends */ };
+    /**
+     * @brief This is a private key accessible only to friend classes.
+     */
+    struct constructor_key { };
 
     explicit BaseNode(const constructor_key&, int id, const Attributes& attrs, float x, float y);
     explicit BaseNode(const constructor_key& k, int id, const Attributes& attr);
@@ -100,6 +163,10 @@ private:
     float m_y;
 };
 
+/**
+ * @brief BaseNode implementation for undirected nodes.
+ * @see BaseNode
+ */
 class UNode : public BaseNode
 {
 public:
@@ -123,6 +190,10 @@ private:
     inline void clearOutEdges() override;
 };
 
+/**
+ * @brief BaseNode implementation for directed nodes.
+ * @see BaseNode
+ */
 class DNode : public BaseNode
 {
 public:

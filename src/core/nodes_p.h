@@ -26,6 +26,9 @@
 
 namespace evoplex {
 
+/**
+ * @brief A collection of utility functions for creating and saving nodes.
+ */
 class NodesPrivate
 {
 public:

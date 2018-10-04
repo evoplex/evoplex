@@ -38,7 +38,6 @@ public:
     //! Provide a default destructor to keep compilers happy.
     virtual ~AbstractModelInterface() = default;
 
-    //! @see AbstractPlugin::init()
     using AbstractPlugin::init;
 
     /**
@@ -73,7 +72,7 @@ public:
 };
 
 /**
- * @brief Abstract base class for Model plugins.
+ * @brief Abstract base class for model plugins.
  * @ingroup AbstractModel
  */
 class AbstractModel : public AbstractModelInterface
@@ -81,26 +80,39 @@ class AbstractModel : public AbstractModelInterface
     friend class Trial;
 
 public:
-    //! @returns the graph id
+//! @addtogroup ModelAPI
+//! @{
+
+    /**
+     * @brief Gets the graph id.
+     */
     const QString& graphId() const;
-    //! @returns the current graph
+
+    /**
+     * @brief Gets the pointer to the current graph.
+     */
     AbstractGraph* graph() const;
 
-    //! @returns the current time step
+    /**
+     * @brief Gets the current time step.
+     */
     int step() const;
-    //! @returns the end time step (stopAt)
+
+    /**
+     * @brief Gets the end time step (stopAt).
+     */
     int lastStep() const;
 
-    //! @see AbstractGraph::nodes()
+    //! @copydoc AbstractGraph::nodes
     inline const Nodes& nodes() const;
-    //! @see AbstractGraph::node(int)
+    //! @copydoc AbstractGraph::node
     inline Node node(int nodeId) const;
 
-    //! @see AbstractGraph::edges()
+    //! @copydoc AbstractGraph::edges
     inline const Edges& edges() const;
-    //! @see AbstractGraph::edge(int)
+    //! @copydoc AbstractGraph::edge
     inline const Edge& edge(int edgeId) const;
-    //! @see AbstractGraph::edge(int,int)
+    //! @copydoc AbstractGraph::edge(int originId, int neighbourId) const
     inline const Edge& edge(int originId, int neighbourId) const;
 
     // AbstractModelInterface stuff
@@ -110,7 +122,10 @@ public:
     inline Values customOutputs(const Values& inputs) const override
     { Q_UNUSED(inputs); return Values(); }
 
+/**@}*/
+
 protected:
+    //! constructor
     AbstractModel() = default;
 };
 

@@ -29,14 +29,8 @@
 namespace evoplex {
 
 /**
- *  @defgroup AbstractGraph The Second Group
- *  This is the second group
- */
-
-/**
  * @brief Provides a common interface for Graph plugins.
  * @see AbstractGraph
- * @ingroup AbstractGraph
  */
 class AbstractGraphInterface : public AbstractPlugin
 {
@@ -44,7 +38,6 @@ public:
     //! Provide a default destructor to keep compilers happy.
     virtual ~AbstractGraphInterface() = default;
 
-    //! @see AbstractPlugin::init()
     using AbstractPlugin::init;
 
     /**
@@ -56,46 +49,82 @@ public:
 };
 
 /**
- * @brief Abstract base class for Graph plugins.
- * @ingroup AbstractGraph
+ * @brief Abstract base class for graph plugins.
  */
 class AbstractGraph : public AbstractGraphInterface
 {
     friend class Trial;
 
 public:
-    //! @returns the graph id
+//! @addtogroup GraphAPI
+//! @{
+
+    /**
+     * @brief Gets the graph id.
+     */
     const QString& id() const;
 
-    //! @returns the graph type (e.g., directed or undirected)
+    /**
+     * @brief Gets the graph type.
+     */
     GraphType type() const;
-    //! @returns true if the graph is directed
+
+    /**
+     * @brief Returns true if the graph is directed.
+     */
     inline bool isDirected() const;
-    //! @returns true if the graph is undirected
+
+    /**
+     * @brief Returns true if the graph is undirected.
+     */
     inline bool isUndirected() const;
 
-    //! @returns the reference of the container
-    //! containing all the edges of the graph
+    /**
+     * @brief Gets the edges.
+     */
     inline const Edges& edges() const;
-    //! @returns the Edge corresponding to \p edgeId
-    //! @throw  std::out_of_range if no such data is present.
+
+    /**
+     * @brief Returns the Edge corresponding to \p edgeId.
+     * @param edgeId A valid edge id.
+     * @throw std::out_of_range if no such data is present.
+     */
     inline const Edge& edge(int edgeId) const;
-    //! @returns the Edge that connects \p originId to \p neighbourId
-    //! @throw  std::out_of_range if no such data is present.
+
+    /**
+     * @brief Returns the Edge that connects \p originId to \p neighbourId.
+     * @param originId A valid node id.
+     * @param neighbourId A valid node id.
+     * @throw std::out_of_range if no such data is present.
+     */
     inline const Edge& edge(int originId, int neighbourId) const;
 
-    //! @returns the reference of the container
-    //! containing all the nodes of the graph
+    /**
+     * @brief Gets the nodes.
+     */
     inline const Nodes& nodes() const;
-    //! @returns the Node corresponding to \p nodeId
-    //! @throw  std::out_of_range if no such data is present.
+
+    /**
+     * @brief Gets the Node corresponding to \p nodeId.
+     * @param nodeId A valid node id.
+     * @throw std::out_of_range if no such data is present.
+     */
     inline Node node(int nodeId) const;
-    //! @returns a random Node in the graph
+
+    /**
+     * @brief Gets a random Node in the graph.
+     * @return If the graph has no nodes, it returns an invalid/empty Node.
+     */
     Node randNode() const;
 
-    //! @returns the number of nodes in the graph
+    /**
+     * @brief Gets the number of nodes in the graph.
+     */
     inline int numNodes() const;
-    //! @returns the number of edges in the graph
+
+    /**
+     * @brief Gets the number of edges in the graph.
+     */
     inline int numEdges() const;
 
     /**
@@ -104,6 +133,7 @@ public:
      * @param attr nodes' attributes
      */
     inline Node addNode(Attributes attr);
+
     /**
      * @copydoc addNode(Attributes)
      * @param x,y nodes's coordinates
@@ -119,6 +149,7 @@ public:
      * @warning the nodes' ids must belong to the graph.
      */
     inline Edge addEdge(int originId, int neighbourId, Attributes* attrs=new Attributes());
+
     /**
      * @brief Creates and adds an Edge into the graph.
      * @param origin the source Node
@@ -129,26 +160,55 @@ public:
      */
     Edge addEdge(const Node& origin, const Node& neighbour, Attributes* attrs=new Attributes());
 
-    //! @brief Removes all edges of the graph.
+    /**
+     * @brief Removes all edges of the graph.
+     */
     void removeAllEdges();
-    //! @brief Removes all edges of the \p node.
+
+    /**
+     * @brief Removes all edges of the \p node.
+     * @param node A Node that belongs to the graph.
+     */
     void removeAllEdges(const Node& node);
 
-    //! @brief Removes the \p node from the graph.
+    /**
+     * @brief Removes the \p node from the graph.
+     * @param node A Node that belongs to the graph.
+     */
     void removeNode(const Node& node);
-    //! @brief Removes a node from the graph.
+
+    /**
+     * @brief Removes a node from the graph.
+     * @param it An iterator pointing to a Node in the graph to be erased.
+     * @return An iterator pointing to the Node immediately following
+     *         \p it prior to the Node being erased. If no such
+     *         Node exists, end() is returned.
+     */
     Nodes::iterator removeNode(Nodes::iterator it);
 
-    //! @brief Removes the \p edge from the graph.
+    /**
+     * @brief Removes the \p edge from the graph.
+     * @param edge An Edge that belongs to the graph.
+     */
     void removeEdge(const Edge& edge);
-    //! @brief Removes an edge from the graph.
+
+    /**
+     * @brief Removes an edge from the graph.
+     * @param it An iterator pointing to an Edge in the graph to be erased.
+     * @return An iterator pointing to the Edge immediately following
+     *         \p it prior to the Edge being erased. If no such
+     *         Edge exists, end() is returned.
+     */
     Edges::iterator removeEdge(Edges::iterator it);
+
+/**@}*/
 
 protected:
     AttrsGeneratorPtr m_edgeAttrsGen;
     Edges m_edges;
     Nodes m_nodes;
 
+    //! constructor
     AbstractGraph();
 
 private:

@@ -46,14 +46,30 @@ public:
 
     ~BaseEdge();
 
+    /**
+     * @brief Gets the edge's attributes.
+     */
     inline const Attributes* attrs() const;
+    //! @copydoc Attributes::value
     inline const Value& attr(int id) const;
+    //! @copydoc Attributes::value(const QString& name, Value defaultValue=Value()) const
     inline Value attr(const QString& name, Value defaultValue=Value()) const;
+    //! @copydoc Attributes::setValue
     inline void setAttr(int id, const Value& value);
+    //! @copydoc Attributes::push_back
     inline void addAttr(QString name, Value value);
 
+    /**
+     * @brief Gets the edge's id.
+     */
     inline int id() const;
+    /**
+     * @brief Gets the source Node.
+     */
     inline const Node& origin() const;
+    /**
+     * @brief Gets the target Node.
+     */
     inline const Node& neighbour() const;
 
 private:

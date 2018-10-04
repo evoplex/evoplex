@@ -26,50 +26,234 @@ namespace evoplex {
 class Value;
 using Values = std::vector<Value>;
 
+/**
+ * @brief A class for variant data types (tagged union).
+ *
+ * This is a very important class in Evoplex, it defines a data type that can
+ * behave like an integer, double, char, bool or string in a very efficient way.
+ *
+ * A Value object holds a single value of a single type() at a time.
+ * You can find out what type (T) the Value holds and get its value using one
+ * of the toT() functions (e.g., toInt()).
+ *
+ * The functions named toT() (e.g., toInt(), toString()) are const. If you ask
+ * for the stored type, they return a copy of the stored object.
+ *
+ * Here is some example code to demonstrate the use of Value:
+ * @code{.cpp}
+ * Value v(123);                // The Value now contains an int
+ * int x = v.toInt();           // x = 123
+ * v = Value("hello");          // The Value now contains a string
+ * int y = v.toInt();           // throws an exception as v cannot be converted to an int
+ * QString s = v.toQString();   // s = "hello"
+ * ...
+ * v = 1.1;                     // v.type() is equal to DOUBLE
+ * v = v.toDouble() + 1.2;      // The Value now holds 2.3
+ * @endcode
+ *
+ * @ingroup PublicAPI
+ */
 class Value
 {
     friend struct std::hash<Value>;
 
 public:
+    /**
+     * @brief This enum defines the types of variable that a Value can contain.
+     */
     enum Type { BOOL, CHAR, DOUBLE, INT, STRING, INVALID };
 
+    /**
+     * @brief Constructs an invalid Value.
+     * @see isValid()
+     */
     Value();
+
+    /**
+     * @brief Constructs a copy of the @p value passed as
+     *        the argument to this constructor.
+     */
     Value(const Value& value);
+
+    /**
+     * @brief Constructs a new Value with a boolean value.
+     */
     Value(bool value);
+
+    /**
+     * @brief Constructs a new Value with a char value.
+     */
     Value(char value);
+
+    /**
+     * @brief Constructs a new Value with a double value.
+     */
     Value(double value);
+
+    /**
+     * @brief Constructs a new Value with an integer value.
+     */
     Value(int value);
+
+    /**
+     * @brief Constructs a new Value with a string value.
+     */
     Value(const char* value);
+
+    /**
+     * @brief Constructs a new Value with a string value.
+     */
     Value(const QString& value);
 
-    // let's accept the specialized vector<bool>
-    // http://www.cplusplus.com/reference/vector/vector-bool
+    /**
+     * @brief Constructs a new Value with a boolean value.
+     * This constructor is available just to accept the specialized vector<bool>.
+     * http://www.cplusplus.com/reference/vector/vector-bool
+     */
     Value(std::vector<bool>::reference value);
 
+    /**
+     * @brief Destroys this Value.
+     */
     ~Value();
 
+    /**
+     * @brief Returns the storage type of the data stored in the Value.
+     */
     inline Type type() const;
+
+    /**
+     * @brief Returns true if the storage type of this
+     *        Value is not Type::INVALID.
+     */
     inline bool isValid() const;
+
+    /**
+     * @brief Returns true if the storage type of this
+     *        Value is equal to Type::BOOL.
+     */
     inline bool isBool() const;
+
+    /**
+     * @brief Returns true if the storage type of this
+     *        Value is equal to Type::CHAR.
+     */
     inline bool isChar() const;
+
+    /**
+     * @brief Returns true if the storage type of this
+     *        Value is equal to Type::DOUBLE.
+     */
     inline bool isDouble() const;
+
+    /**
+     * @brief Returns true if the storage type of this
+     *        Value is equal to Type::INT.
+     */
     inline bool isInt() const;
+
+    /**
+     * @brief Returns true if the storage type of this
+     *        Value is equal to Type::STRING.
+     */
     inline bool isString() const;
 
+    /**
+     * @brief Returns the Value as a boolean.
+     * It returns a boolean if the data type() is equal to Type::BOOL.
+     * Otherwise, it throws an expection.
+     * @throw std::logic_error.
+     */
     inline bool toBool() const;
+
+    /**
+     * @brief Returns the Value as a char.
+     * It returns a char if the data type() is equal to Type::CHAR.
+     * Otherwise, it throws an expection.
+     * @throw std::logic_error.
+     */
     inline char toChar() const;
+
+    /**
+     * @brief Returns the Value as a double.
+     * It returns a double if the data type() is equal to Type::DOUBLE.
+     * Otherwise, it throws an expection.
+     * @throw std::logic_error.
+     */
     inline double toDouble() const;
+
+    /**
+     * @brief Returns the Value as an int.
+     * It returns an int if the data type() is equal to Type::INT.
+     * Otherwise, it throws an expection.
+     * @throw std::logic_error.
+     */
     inline int toInt() const;
+
+    /**
+     * @brief Returns the Value as an unsigned integer.
+     * It returns an unsigned integer if the data type() is equal to Type::INT
+     * and the value is >= 0. Otherwise, it throws an expection.
+     * @throw std::logic_error.
+     */
     inline quint32 toUInt() const;
+
+    /**
+     * @brief Returns the Value as a string.
+     * It returns a string if the data type() is equal to Type::STRING.
+     * Otherwise, it throws an expection.
+     * @throw std::logic_error.
+     */
     inline const char* toString() const;
+
+    /**
+     * @brief Returns the Value as a QString.
+     * It returns a QString for any data type().
+     * For example:
+     * @code{.cpp}
+     * Value v = 123;                // v is now an integer equal to 123
+     * QString s = v.toQString();    // s = "123"
+     * v = true;                     // v is now a boolean
+     * s = v.toQString();            // s = "1"
+     * v = "hello";                  // v is now a string
+     * s = v.toQString();            // s = "hello"
+     * @endcode
+     */
     QString toQString(char format = 'g', int precision = 8) const;
 
+    /**
+     * @brief Assigns the value @p v to this Value.
+     */
     Value& operator=(const Value& v);
+
+    /**
+     * @brief Checks if this Value is equal to @p v.
+     */
     bool operator==(const Value& v) const;
+
+    /**
+     * @brief Checks if this Value is different from @p v.
+     */
     bool operator!=(const Value& v) const;
+
+    /**
+     * @brief Checks if this Value is less than @p v.
+     */
     bool operator<(const Value& v) const;
+
+    /**
+     * @brief Checks if this Value is greater than @p v.
+     */
     bool operator>(const Value& v) const;
+
+    /**
+     * @brief Checks if this Value is less or equal to @p v.
+     */
     bool operator<=(const Value& v) const;
+
+    /**
+     * @brief Checks if this Value is greater or equal to @p v.
+     */
     bool operator>=(const Value& v) const;
 
 private:
@@ -129,7 +313,10 @@ inline quint32 Value::toUInt() const {
 
 namespace std
 {
-// http://www.cse.yorku.ca/~oz/hash.html
+/**
+ * @brief A hash function for char*.
+ * http://www.cse.yorku.ca/~oz/hash.html
+ */
 template <>
 struct hash<char*>
 {
@@ -143,6 +330,9 @@ struct hash<char*>
     }
 };
 
+/**
+ * @brief Implements a hash function for the Value class.
+ */
 template <>
 struct hash<evoplex::Value>
 {

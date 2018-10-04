@@ -23,6 +23,12 @@
 
 namespace evoplex {
 
+/**
+ * @brief A Node container.
+ * It is an unordered_map with the node's id as the key.
+ * @see Node
+ * @ingroup PublicAPI
+ */
 class Nodes : private std::unordered_map<int, Node>
 {
     friend class AbstractGraph;

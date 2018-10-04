@@ -29,7 +29,7 @@
 namespace evoplex {
 
 class Attributes;
-typedef std::vector<Attributes> SetOfAttributes;
+using SetOfAttributes = std::vector<Attributes>;
 
 /**
  * @brief A container of labeled values.
@@ -39,12 +39,15 @@ typedef std::vector<Attributes> SetOfAttributes;
 class Attributes
 {
 public:
-    //! constructor
-    Attributes() {}
-    //! constructor
-    //! @param size The containers size.
+    /**
+     * @brief Constructor.
+     * @param size The containers size.
+     */
     Attributes(int size) { resize(size); }
-    //! destructor
+    //! Constructor.
+    Attributes() {}
+
+    //! Destructor.
     ~Attributes() {}
 
     /**
@@ -54,7 +57,7 @@ public:
      * container's current size the container is truncated, otherwise
      * default constructed elements, i.e., empty name and Value() are
      * appended.
-     * @param  size Number of elements the container should contain.
+     * @param size Number of elements the container should contain.
      */
     inline void resize(int size);
 
@@ -66,72 +69,84 @@ public:
      * number requested is more than max_size(), length_error is
      * thrown.
      * @param size  Number of elements required.
-     * @throw std::length_error  If size n exceeds maximum size.
+     * @throw std::length_error If @p size n exceeds maximum size.
      */
     inline void reserve(int size);
 
-    //! @returns the number of attributes in the container
+    /**
+     * @brief Gets the number of attributes in the container.
+     */
     inline int size() const;
-    //! @returns true if the container is empty
+    /**
+     * @brief Checks if the container is empty.
+     */
     inline bool isEmpty() const;
     //! @copydoc isEmpty()
     inline bool empty() const;
 
     /**
-     * Returns the index position of \p name in the container.
+     * @brief Returns the index position of @p name in the container.
      * @param name The attribute's name.
      * @returns -1 if no item matched.
      * @see contains(const QString&)
      */
     inline int indexOf(const QString& name) const;
     /**
+     * @brief Checks if the container contains @p name.
      * @param name The attribute's name.
-     * @returns true if the container contains \p name.
      * @see indexOf(const QString&)
      */
     inline bool contains(const QString& name) const;
 
     /**
-     * @brief Replaces the item at index position \p id with \p newName
-     *        and \p newValue.
+     * @brief Replaces the item at index position @p id with @p newName
+     *        and @p newValue.
      * @param id The attribute's id.
      * @param newName The new attribute's name.
      * @param newValue The new attribute's value.
-     * @throw  std::out_of_range if the \p id is not present.
+     * @throw  std::out_of_range if the @p id is not present.
      */
     inline void replace(int id, QString newName, Value newValue);
 
     /**
-     * @brief Appends the attribute \p name with the value \p value.
+     * @brief Appends the attribute @p name with the value @p value.
      * @param name The attribute's name.
      * @param value The attribute's value.
      */
     inline void push_back(QString name, Value value);
 
-    //! @returns the name of all attributes.
+    /**
+     * @brief Gets the name of all attributes.
+     */
     inline const std::vector<QString>& names() const;
-    //! @returns the name of the attribute at \p id.
-    //! @throw  std::out_of_range if the \p id is not present.
+    /**
+     * @brief Gets the name of the attribute at @p id.
+     * @throw  std::out_of_range if the @p id is not present.
+     */
     inline const QString& name(int id) const;
 
-    //! @returns the values of all attributes.
+    /**
+     * @brief Gets the values of all attributes.
+     */
     inline const std::vector<Value>& values() const;
-    //! @returns the value of the attribute at \p id.
-    //! @throw  std::out_of_range if the \p id is not present.
+    /**
+     * @brief Gets the value of the attribute at @p id.
+     * @param id The attribute's id.
+     * @throw std::out_of_range if the @p id is not present.
+     */
     inline const Value& value(int id) const;
     /**
-     * @brief Returns the value corresponding to \p name.
+     * @brief Gets the value corresponding to @p name.
      * @param name The attribute's name.
-     * @param defaultValue a Value to be returned if \p name is not present.
-     * @returns the value.
+     * @param defaultValue A Value to be returned if @p name is not present.
      */
     inline Value value(const QString& name, Value defaultValue=Value()) const;
 
     /**
-     * @brief Sets the value at \p id
+     * @brief Sets the value at @p id.
      * @param id The attribute's id.
      * @param value The new attribute's value.
-     * @throw  std::out_of_range if the \p id is not present.
+     * @throw std::out_of_range if the @p id is not present.
      */
     inline void setValue(int id, const Value& value);
 

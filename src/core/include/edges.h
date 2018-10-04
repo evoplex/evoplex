@@ -23,6 +23,12 @@
 
 namespace evoplex {
 
+/**
+ * @brief An Edge container.
+ * It is an unordered_map with the edge's id as the key.
+ * @see Edge
+ * @ingroup PublicAPI
+ */
 class Edges : private std::unordered_map<int, Edge>
 {
     friend class AbstractGraph;
