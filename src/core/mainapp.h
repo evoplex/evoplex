@@ -92,22 +92,41 @@ public:
     void addPathToRecentProjects(const QString& projectFilePath);
 
 public slots:
-    // checks for updates
-    // returns an empty QJsonObject if there's no updates
+    /**
+     * @brief Checks if a newer version of Evoplex was released.
+     * @see checkedForUpdates
+     */
     void checkForUpdates();
 
 signals:
+    /**
+     * @brief This signal is emitted when a successful checkForUpdates() call ends.
+     * @param[out] data A map with the info about the newest version available.
+     */
+    void newVersionAvailable(const QVariantMap& data);
     void pluginAdded(const Plugin* plugin);
     void pluginRemoved(PluginKey key, PluginType t);
     void listOfRecentProjectsUpdated();
-    void checkedForUpdates(const QJsonObject& json);
 
 private:
-    // Load built-in plugins
+    /**
+     * @brief Triggered when a checkForUpdates() call ends.
+     * @param j The json object with the 'releases.txt' data
+     *          obtained from the internet.
+     * If there are updates available, this function will emit
+     * the newVersionAvailable() signal.
+     */
+    void finishedCheckingForUpdates(const QJsonObject& j);
+
+    /**
+     * @brief Loads built-in plugins.
+     */
     void initSystemPlugins();
 
-    // Load user imported plugins.
-    // It removes failed plugins from the list
+    /**
+     * @brief Loads user imported plugins.
+     * It removes failed plugins from the list.
+     */
     void initUserPlugins();
 
     ExperimentsMgr* m_expMgr;

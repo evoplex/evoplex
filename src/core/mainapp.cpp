@@ -33,6 +33,7 @@
 #include "project.h"
 #include "constants.h"
 #include "utils.h"
+#include "../config.h"
 
 namespace evoplex {
 
@@ -313,7 +314,7 @@ void MainApp::checkForUpdates()
 
     QNetworkReply* reply = m_networkMgr->get(QNetworkRequest((QUrl(url))));
     connect(reply, &QNetworkReply::finished, [this, reply]() {
-        emit (checkedForUpdates(QJsonDocument::fromJson(reply->readAll()).object()));
+        finishedCheckingForUpdates(QJsonDocument::fromJson(reply->readAll()).object());
     });
     QNetworkRequest req(QUrl("http://www.google-analytics.com/collect"));
     req.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
@@ -321,6 +322,42 @@ void MainApp::checkForUpdates()
     query.addQueryItem("ec", qApp->applicationVersion());
     query.addQueryItem("ea", QSysInfo::prettyProductName());
     m_networkMgr->post(req, query.toString().toLatin1());
+}
+
+void MainApp::finishedCheckingForUpdates(const QJsonObject& j)
+{
+    if (j.isEmpty()) {
+        qWarning() << "failed to check for updates (connection failed)";
+        return;
+    }
+
+    QDate d(2000, 1, 1);
+    for (const QString& s : j.keys()) {
+        auto _d = QDate::fromString(s, "yyyy-MM-dd");
+        if (_d.isValid() && _d > d) {
+            d = _d;
+        }
+    }
+
+    if (d == QDate(2000, 1, 1)) {
+        qWarning() << "failed to check for updates (invalid database: keys not found)";
+        return;
+    }
+
+    auto mostRecent = j.value(d.toString("yyyy-MM-dd")).toObject();
+    QStringList currVersion = QString(EVOPLEX_VERSION).split(".");
+    if (currVersion.size() != 3 || !mostRecent.contains("major") ||
+            !mostRecent.contains("minor") || !mostRecent.contains("patch")) {
+        qWarning() << "failed to check for updates (invalid database: missing fields)";
+        return;
+    }
+
+    if (mostRecent.value("major").toInt() > currVersion.at(0).toInt() ||
+        mostRecent.value("minor").toInt() > currVersion.at(1).toInt() ||
+        mostRecent.value("patch").toInt() > currVersion.at(2).toInt())
+    {
+        emit (newVersionAvailable(mostRecent.toVariantMap()));
+    }
 }
 
 } // evoplex

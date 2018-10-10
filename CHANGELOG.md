@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added
 - Improved the source code documentation.
+- Adds the `Check for updates` button to the menu bar.
 
 ### Changed
 - EvoplexCore is now licensed under the Apache 2.0 License terms.
