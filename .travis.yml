@@ -202,15 +202,17 @@ before_install:
     fi
 
   - if [[ "$SKIP_BUILD" != true ]]; then
-      mkdir qt5;
       if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
-        wget -q -O qt5.9.5.zip https://github.com/evoplex/evoplex-data/releases/download/qt5.9.5/linux_qt5.9.5.zip;
+        wget -q -O qt.zip https://github.com/evoplex/evoplex-data/releases/download/qt5.9.5/linux_qt5.9.5.zip;
+        unzip -qq qt.zip -d qt;
+        export PATH=`pwd`/qt/5.9.5/gcc_64/bin:$PATH;
+        export QT_PLUGIN_PATH=`pwd`/qt/5.9.5/gcc_64/plugins;
       elif [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
-        wget -q -O qt5.9.5.zip https://github.com/evoplex/evoplex-data/releases/download/qt5.9.5/macos_qt5.9.5.zip;
+        wget -q -O qt.zip https://github.com/evoplex/evoplex-data/releases/download/qt5.9.5/macos_qt5.9.5.zip;
+        unzip -qq qt.zip -d qt;
+        export PATH=`pwd`/qt/5.9.5/clang_64/bin:$PATH;
+        export QT_PLUGIN_PATH=`pwd`/qt/5.9.5/clang_64/plugins;
       fi
-      unzip -qq qt5.9.5.zip -d qt;
-      export PATH=`pwd`/qt/5.9.5/gcc_64/bin:$PATH;
-      export QT_PLUGIN_PATH=`pwd`/qt/5.9.5/gcc_64/plugins;
     fi
 
 #install:
