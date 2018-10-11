@@ -100,8 +100,12 @@ bool SaveDialog::saveAs(ProjectPtr project)
 
 void SaveDialog::browseDir()
 {
-    m_ui->dest->setText(QFileDialog::getExistingDirectory(this, tr("Project Directory"),
-            m_ui->dest->text(), QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks));
+    auto p = QFileDialog::getExistingDirectory(this,
+            tr("Project Directory"), m_ui->dest->text(),
+            QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+    if (!p.isEmpty()) {
+        m_ui->dest->setText(p);
+    }
 }
 
 }
