@@ -17,7 +17,7 @@
 
 --------------------------------------------------------------------------------
 
-Evoplex is a platform for implementing Agent-Based Models (ABM) and Multi-Agent Systems (MAS) imposing a [theoretical-graph approach](https://en.wikipedia.org/wiki/Graph_theory). Here, each agent is represented as a node in the network and is constrained to interact only with its neighbours, which are linked by edges in the network.
+[Evoplex](https://evoplex.org) is a fast, robust and extensible platform for developing agent-based models (ABM) and multi-agent systems (MAS) on networks. Each agent is represented as a node and interacts with its neighbors, as defined by the network structure.
 
 <p align="center">
   <img alt="Evoplex 0.2.0" src="https://evoplex.org/img/evoplex0.2.0_nowak92_2018-09-03.gif" width="90%">
@@ -43,9 +43,8 @@ Evoplex was originally developed to tackle problems in the field of **Evo**lutio
 
 Evoplex is cross-platform and is available for Linux, Windows and macOS.
 
- * [Download & Install](https://evoplex.org/#download)
-
- * [Quick guide](https://evoplex.org/docs/user-interface)
+ * [Download & Install](https://evoplex.org/index#download)
+ * [User docs](https://evoplex.org/docs)
 
 ## Getting Involved
 
@@ -70,7 +69,7 @@ Please see the [CONTRIBUTING](https://github.com/evoplex/evoplex/blob/master/CON
 
 If you use Evoplex in your publication, you can cite it as:
 
-> Marcos Cardinot, Colm O'Riordan, & Josephine Griffith. Evoplex: an agent-based modeling platform for networks. Zenodo. [https://doi.org/10.5281/zenodo.1340734](https://doi.org/10.5281/zenodo.1340734)
+> Marcos Cardinot, Colm O'Riordan, Josephine Griffith & Matjaz Perc. Evoplex: A platform for agent-based modeling on networks. Zenodo. [https://doi.org/10.5281/zenodo.1340734](https://doi.org/10.5281/zenodo.1340734)
 
 ## License
 

@@ -1,7 +1,7 @@
 ##########################################################################
 #  This file is part of Evoplex.
 #
-#  Evoplex is a multi-agent system for networks.
+#  Evoplex is a platform for agent-based modeling on networks.
 #  Copyright (C) 2017 - Marcos Cardinot <marcos@cardinot.net>
 #
 #  This program is free software: you can redistribute it and/or modify

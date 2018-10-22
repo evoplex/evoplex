@@ -1,7 +1,7 @@
 /**
  *  This file is part of Evoplex.
  *
- *  Evoplex is a multi-agent system for networks.
+ *  Evoplex is a platform for agent-based modeling on networks.
  *  Copyright (C) 2018 - Marcos Cardinot <marcos@cardinot.net>
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -394,9 +394,10 @@ void MainGUI::slotShowAbout()
 {
     QString version = "Evoplex " + qApp->applicationVersion();
     QString txt =
-        "Evoplex is a fast, robust and extensible platform to "
-        "implement either Agent‑Based Models (ABM) or Multi-Agent "
-        "Systems (MAS) imposing a theoretical-graph approach."
+        "Evoplex is a fast, robust and extensible platform for developing "
+        "agent-based models and multi-agent systems on networks. Each agent "
+        "is represented as a node and interacts with its neighbors, as "
+        "defined by the network structure."
         "<br><br>"
         "Based on Qt " QT_VERSION_STR " (" COMPILER_VERSION " " COMPILER_ARCHITECTURE ")"
         "<br><br>"

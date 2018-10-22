@@ -1,7 +1,7 @@
 ##########################################################################
 #  This file is part of Evoplex.
 #
-#  Evoplex is a multi-agent system for networks.
+#  Evoplex is a platform for agent-based modeling on networks.
 #  Copyright (C) 2018 - Marcos Cardinot <marcos@cardinot.net>
 #
 #  This program is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@
 # CPack: general configuration
 set(CPACK_PACKAGE_NAME ${PROJECT_NAME})
 set(CPACK_PACKAGE_VERSION ${PROJECT_VERSION})
-set(CPACK_PACKAGE_DESCRIPTION "Evoplex is a fast, robust and extensible platform to implement either Agent‑Based Models (ABM) or Multi-Agent Systems (MAS) imposing a theoretical-graph approach.")
+set(CPACK_PACKAGE_DESCRIPTION "Evoplex is a platform for agent-based modeling on networks.")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY ${CPACK_PACKAGE_DESCRIPTION})
 set(CPACK_PACKAGE_HOMEPAGE_URL "https://evoplex.org")
 set(CPACK_PACKAGE_VENDOR "Evoplex Team <${CPACK_PACKAGE_HOMEPAGE_URL}>")

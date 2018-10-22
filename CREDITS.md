@@ -2,6 +2,7 @@
 - [Marcos Cardinot](http://cardinot.net) (current maintainer)
 - Josephine Griffith
 - Colm O'Riordan
+- Matjaz Perc
 - Adriana Cardinot
 - Ethan Padden
 
