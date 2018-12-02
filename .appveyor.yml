@@ -4,36 +4,83 @@ configuration: Release
 clone_depth: 3
 environment:
   matrix:
+  - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2013
+    platform: x64
+    qtver: 5.8
+    qtbin: msvc2013_64
+    msvcname: Visual Studio 12 2013 Win64
+  - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2013
+    platform: Win32
+    qtver: 5.8
+    qtbin: msvc2013
+    msvcname: Visual Studio 12 2013
+
   - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
     platform: x64
-    qtver: 5.9.5
+    qtver: 5.9
     qtbin: msvc2015_64
     msvcname: Visual Studio 14 2015 Win64
   - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
     platform: Win32
-    qtver: 5.9.5
+    qtver: 5.9
     qtbin: msvc2015
     msvcname: Visual Studio 14 2015
+
   - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
     platform: x64
-    qtver: 5.11.1
+    qtver: 5.10
     qtbin: msvc2015_64
     msvcname: Visual Studio 14 2015 Win64
   - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
     platform: Win32
-    qtver: 5.11.1
+    qtver: 5.10
     qtbin: msvc2015
     msvcname: Visual Studio 14 2015
+
+  - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
+    platform: x64
+    qtver: 5.11
+    qtbin: msvc2015_64
+    msvcname: Visual Studio 14 2015 Win64
+  - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
+    platform: Win32
+    qtver: 5.11
+    qtbin: msvc2015
+    msvcname: Visual Studio 14 2015
+
   - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
     platform: x64
-    qtver: 5.9.5
+    qtver: 5.9
     qtbin: msvc2017_64
     msvcname: Visual Studio 15 2017 Win64
   - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
+    platform: Win32
+    qtver: 5.9
+    qtbin: msvc2017
+    msvcname: Visual Studio 15 2017
+
+  - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
     platform: x64
-    qtver: 5.11.1
+    qtver: 5.10
     qtbin: msvc2017_64
     msvcname: Visual Studio 15 2017 Win64
+  - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
+    platform: Win32
+    qtver: 5.10
+    qtbin: msvc2017
+    msvcname: Visual Studio 15 2017
+
+  - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
+    platform: x64
+    qtver: 5.11
+    qtbin: msvc2017_64
+    msvcname: Visual Studio 15 2017 Win64
+  - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
+    platform: Win32
+    qtver: 5.11
+    qtbin: msvc2017
+    msvcname: Visual Studio 15 2017
+
 before_build:
 - cmd: >-
     set PATH=C:\Qt\%qtver%\%qtbin%\bin;%PATH%
