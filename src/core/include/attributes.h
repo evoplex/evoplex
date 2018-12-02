@@ -22,6 +22,7 @@
 #include <algorithm>
 #include <stdexcept>
 #include <vector>
+#include <stdint.h>
 
 #include "value.h"
 #include "utils.h"
