@@ -202,7 +202,7 @@ private:
    Experiment: Inline member functions
  ************************************************************************/
 
-inline bool Experiment::Experiment::hasOutputs() const
+inline bool Experiment::hasOutputs() const
 { return !m_outputs.empty(); }
 
 inline void Experiment::addOutput(OutputPtr output)
