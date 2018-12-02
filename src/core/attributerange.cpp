@@ -345,15 +345,21 @@ SetOfValues::SetOfValues(int id, const QString& attrName, Type type, Values valu
     m_attrRangeStr.clear();
     switch (m_type) {
     case Double_Set:
-        for (auto const& v : values) Q_ASSERT(v.type() == Value::DOUBLE);
+        for (auto const& v : values) {
+            Q_ASSERT(v.type() == Value::DOUBLE);
+        }
         m_attrRangeStr = "double{";
         break;
     case Int_Set:
-        for (auto const& v : values) Q_ASSERT(v.type() == Value::INT);
+        for (auto const& v : values) {
+            Q_ASSERT(v.type() == Value::INT);
+        }
         m_attrRangeStr = "int{";
         break;
     case String_Set:
-        for (auto const& v : values) Q_ASSERT(v.type() == Value::STRING);
+        for (auto const& v : values) {
+            Q_ASSERT(v.type() == Value::STRING);
+        }
         m_attrRangeStr = "string{";
         break;
     default:
