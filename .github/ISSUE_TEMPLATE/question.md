@@ -1,6 +1,9 @@
 ---
 name: Question
 about: The issue tracker is not for questions. Please ask question at https://groups.google.com/group/evoplex
+title: ''
+labels: ''
+assignees: ''
 
 ---
 
@@ -11,5 +14,5 @@ If you have a question, please ask it on our google group:
 - or send an email to evoplex@googlegroups.com
 
 Other options:
-- Chat: https://gitter.im/EvoplexMAS/evoplex
-- Twitter: https://twitter.com/EvoplexMAS
+- Chat: https://gitter.im/EvoplexOrg/evoplex
+- Twitter: https://twitter.com/EvoplexOrg
