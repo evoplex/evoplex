@@ -8,9 +8,9 @@ There are many ways that you can contribute, beyond writing code. The goal of th
 
 Have a question? Rather than opening an issue, please use our Google group. You can ask on the [web interface](https://groups.google.com/group/evoplex) or send an email to evoplex@googlegroups.com (mailing list).
 
-If chat is more your speed, you can join us on [Gitter](https://gitter.im/EvoplexMAS/evoplex).
+If chat is more your speed, you can join us on [Gitter](https://gitter.im/EvoplexOrg/evoplex).
 
-We also use the [@evoplexmas](https://twitter.com/EvoplexMAS) account on Twitter to announce releases (follow us).
+We also use the [@evoplexOrg](https://twitter.com/EvoplexOrg) account on Twitter to announce releases (follow us).
 
 ## Reporting issues
 
