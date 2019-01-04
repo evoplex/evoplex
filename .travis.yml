@@ -21,11 +21,11 @@ matrix:
         coverity_scan:
           project:
             name: "evoplex/evoplex"
-            description: "Evoplex is a multi-agent system for networks."
+            description: "Evoplex is a platform for agent-based modeling on networks."
           build_command_prepend: cov-configure --comptype gcc --compiler gcc-4.8 --template && cmake ..
           build_command: make -j5
           branch_pattern: coverity_scan
-          notification_email: evoplexmas@gmail.com
+          notification_email: evoplexorg@gmail.com
       env:
          - MATRIX_EVAL="CC=gcc-4.8 && CXX=g++-4.8"
          - COVERAGE_ENABLED=true
@@ -250,6 +250,6 @@ after_success:
 notifications:
   email:
     recipients:
-      - evoplexmas@gmail.com
+      - evoplexorg@gmail.com
     on_success: change
     on_failure: always
