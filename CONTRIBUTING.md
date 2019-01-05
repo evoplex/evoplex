@@ -4,13 +4,17 @@
 
 There are many ways that you can contribute, beyond writing code. The goal of this document is to provide a high-level overview of how you can get involved. These are mostly guidelines, not rules. Use your best judgment, and feel free to propose changes to this document in a pull request.
 
+:star: [Give us a star on GitHub!!!](https://github.com/evoplex/evoplex/stargazers) :star:
+
+:heart: [Subscribe to our Youtube channel!](https://www.youtube.com/channel/UCUh-TLzsqG1of7rDh4R3nKw) :heart:
+
 ## Asking questions and providing feedback
 
 Have a question? Rather than opening an issue, please use our Google group. You can ask on the [web interface](https://groups.google.com/group/evoplex) or send an email to evoplex@googlegroups.com (mailing list).
 
-If chat is more your speed, you can join us on [Gitter](https://gitter.im/EvoplexOrg/evoplex).
+If chat is more your speed, you can join us on [ZulipChat](https://evoplex.zulipchat.com).
 
-We also use the [@evoplexOrg](https://twitter.com/EvoplexOrg) account on Twitter to announce releases (follow us).
+We also use the [@EvoplexOrg](https://twitter.com/EvoplexOrg) account on Twitter to announce releases (follow us).
 
 ## Reporting issues
 
