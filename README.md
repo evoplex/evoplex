@@ -5,7 +5,7 @@
 </p>
 
 <p align="center">
-<a href="https://gitter.im/EvoplexOrg/evoplex"><img src="https://badges.gitter.im/EvoplexOrg/evoplex.svg" alt="Chat"></a>
+<a href="https://evoplex.zulip.org"><img src="https://img.shields.io/badge/zulip-join_chat-brightgreen.svg" alt="Chat"></a>
 <a href="https://travis-ci.org/evoplex/evoplex"><img src="https://travis-ci.org/evoplex/evoplex.svg?branch=master" alt="CI: Linux & MacOS"></a>
 <a href="https://ci.appveyor.com/project/cardinot/evoplex/branch/master"><img src="https://ci.appveyor.com/api/projects/status/ulck2seq9rqgawbr/branch/master?svg=true" alt="CI: Windows"></a>
 <a href="https://coveralls.io/github/evoplex/evoplex"><img src="https://coveralls.io/repos/github/evoplex/evoplex/badge.svg" alt="Testing"></a>
@@ -39,6 +39,8 @@ Evoplex was originally developed to tackle problems in the field of **Evo**lutio
  * [Complex Adaptive Systems](https://en.wikipedia.org/wiki/Complex_adaptive_system)
  * ... the applications are endless!
 
+:star: [Give us a star on GitHub!](https://github.com/evoplex/evoplex/stargazers) :star:
+
 ## Getting Started
 
 Evoplex is cross-platform and is available for Linux, Windows and macOS.
@@ -63,7 +65,8 @@ Please see the [CONTRIBUTING](https://github.com/evoplex/evoplex/blob/master/CON
 - Ask a question in the [mailing list](https://groups.google.com/group/evoplex) (or send it directly to evoplex@googlegroups.com)
 - File a bug or request a new feature on [GitHub](https://github.com/evoplex/evoplex/issues)
 - Follow us on [Twitter](https://twitter.com/EvoplexOrg)
-- Join us on our [Gitter chat channel](https://gitter.im/EvoplexOrg/evoplex)
+- Join us on our [Zulip chat channel](https://evoplex.zulipchat.com)
+- Subscribe to our [Youtube channel](https://www.youtube.com/channel/UCUh-TLzsqG1of7rDh4R3nKw)
 
 ## How to cite
 
