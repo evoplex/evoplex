@@ -5,7 +5,7 @@
 </p>
 
 <p align="center">
-<a href="https://evoplex.zulip.org"><img src="https://img.shields.io/badge/zulip-join_chat-brightgreen.svg" alt="Chat"></a>
+<a href="https://evoplex.zulipchat.com"><img src="https://img.shields.io/badge/zulip-join_chat-brightgreen.svg" alt="Chat"></a>
 <a href="https://travis-ci.org/evoplex/evoplex"><img src="https://travis-ci.org/evoplex/evoplex.svg?branch=master" alt="CI: Linux & MacOS"></a>
 <a href="https://ci.appveyor.com/project/cardinot/evoplex/branch/master"><img src="https://ci.appveyor.com/api/projects/status/ulck2seq9rqgawbr/branch/master?svg=true" alt="CI: Windows"></a>
 <a href="https://coveralls.io/github/evoplex/evoplex"><img src="https://coveralls.io/repos/github/evoplex/evoplex/badge.svg" alt="Testing"></a>
