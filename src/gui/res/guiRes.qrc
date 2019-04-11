@@ -296,4 +296,7 @@
         <file>material-icons/image/png/ic_photo_camera_black_24dp.png</file>
         <file>material-icons/image/png/ic_photo_camera_black_18dp.png</file>
     </qresource>
+    <qresource prefix="/lan">
+        <file>lan/settings_de.qm</file>
+    </qresource>
 </RCC>

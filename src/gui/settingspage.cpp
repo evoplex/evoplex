@@ -18,6 +18,9 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <QApplication>
+#include <QDebug>
+#include <QTranslator>
 #include <QMessageBox>
 #include <QStringList>
 #include <QThread>
@@ -77,6 +80,8 @@ SettingsPage::SettingsPage(MainGUI* mainGUI)
     connect(m_ui->imageQuality, static_cast<void(QSpinBox::*)(int)>(&QSpinBox::valueChanged),
         [](int v) { QSettings s; s.setValue("settings/imgQuality", v); });
 
+    connect(m_ui->changeToGerman, SIGNAL(clicked()), SLOT(slotChangeToGerman()));
+
     refreshFields();
 }
 
@@ -123,6 +128,14 @@ void SettingsPage::setDfCMapName(const QString& name)
 void SettingsPage::setDfCMapSize(const QString& sz)
 {
     m_mainGUI->colorMapMgr()->setDefaultColorMap(m_ui->colormaps->currentText(), sz.toInt());
+}
+
+void SettingsPage::slotChangeToGerman()
+{
+    QTranslator translator;
+    qDebug() << "Translator:" << translator.load(":/lan/lan/settings_de.qm");
+    qDebug() << "Install translator:" <<  qApp->installTranslator(&translator);
+    m_ui->retranslateUi(this);
 }
 
 } // evoplex
