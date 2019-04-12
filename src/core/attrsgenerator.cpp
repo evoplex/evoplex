@@ -41,12 +41,17 @@ AttrsGeneratorPtr AttrsGenerator::parse(const AttributesScope& attrsScope,
     int size = cmd.toInt(&sizeIsValid);
     if (sizeIsValid) { // cmd is just an interger
         _cmd = QString("*%1;min").arg(size);
+        cmds.push_back(cmd);
         cmds.push_back("min");
-    } else {
+    } else if (cmd.indexOf(";") != -1){
         cmds = cmd.split(";");
         QString sizeStr = cmds.first();
         size = sizeStr.remove(0,1).toInt(&sizeIsValid);
         _cmd = cmd;
+    } else { // if cmd isn't an integer or semicolon seperated, throw an error
+        error = "the command '" + cmd + "' is invalid!";
+        qWarning() << error;
+        return nullptr;
     }
 
     if (sizeIsValid) {
