@@ -17,6 +17,7 @@
 #include <cfloat>
 #include <QtDebug>
 #include <QFileInfo>
+#include <QRegExp>
 
 #include "attributerange.h"
 
@@ -27,23 +28,27 @@ AttributeRangePtr AttributeRange::parse(int attrId, const QString& attrName,
                                         const QString& attrRangeStr)
 {
     AttributeRangePtr vs;
+    QRegExp rx("([\\[{,]) +");  // replace consecutive spaces
+    QString _attrName = attrName;
+    _attrName.replace(rx, "\\1");
+	
     if (attrRangeStr == "string") {
         vs = std::unique_ptr<SingleValue>(
-                new SingleValue(attrId, attrName, String));
+                new SingleValue(attrId, _attrName, String));
     } else if (attrRangeStr == "non-empty-string") {
         vs = std::unique_ptr<SingleValue>(
-                new SingleValue(attrId, attrName, NonEmptyString));
+                new SingleValue(attrId, _attrName, NonEmptyString));
     } else if (attrRangeStr == "dirpath") {
         vs = std::unique_ptr<SingleValue>(
-                new SingleValue(attrId, attrName, DirPath));
+                new SingleValue(attrId, _attrName, DirPath));
     } else if (attrRangeStr == "filepath") {
         vs = std::unique_ptr<SingleValue>(
-                new SingleValue(attrId, attrName, FilePath));
+                new SingleValue(attrId, _attrName, FilePath));
     } else if (attrRangeStr.contains('{') && attrRangeStr.endsWith('}')) {
-        vs = setOfValues(attrRangeStr, attrId, attrName);
+        vs = setOfValues(attrRangeStr, attrId, _attrName);
     } else if (attrRangeStr == "bool" ||
                (attrRangeStr.contains('[') && attrRangeStr.endsWith(']'))) {
-        vs = intervalOfValues(attrRangeStr, attrId, attrName);
+        vs = intervalOfValues(attrRangeStr, attrId, _attrName);
     }
 
     if (!vs || !vs->isValid()) {
