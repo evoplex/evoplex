@@ -115,7 +115,6 @@ public:
      * @note You can use 'max' to take the maximum value for the type.
      *       For instance, 'int[0,max]' corresponds to an integer from
      *       0 to 2147483647, which is the largest integer.
-     * @warning Do NOT add spaces before/after the commas.
      */
     static AttributeRangePtr parse(int attrId, const QString& attrName,
                                    const QString& attrRangeStr);
