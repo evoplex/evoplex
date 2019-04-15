@@ -28,7 +28,7 @@ AttributeRangePtr AttributeRange::parse(int attrId, const QString& attrName,
                                         const QString& attrRangeStr)
 {
     AttributeRangePtr vs;
-    QRegExp rx("([\\[{,]) +");  // replace consecutive spaces
+    QRegExp rx(" *([([{,\]})]) *");  // replace consecutive spaces
     QString _attrName = attrName;
     _attrName.replace(rx, "\\1");
 	
