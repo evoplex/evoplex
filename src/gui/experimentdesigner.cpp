@@ -74,7 +74,7 @@ ExperimentDesigner::ExperimentDesigner(MainApp* mainApp, QWidget *parent)
     m_ui->treeWidget->setFocusPolicy(Qt::NoFocus);
     connect(m_ui->cbWidgets, SIGNAL(currentIndexChanged(int)), SLOT(slotActiveWidget(int)));
 
-    auto newTreeItem = [this](const QString& title, bool expand=false) {
+    auto newTreeItem = [this](const QString& title, bool expand) {
         auto t = new QTreeWidgetItem(m_ui->treeWidget);
         t->setText(0, title);
         t->setToolTip(0, title);
@@ -91,7 +91,7 @@ ExperimentDesigner::ExperimentDesigner(MainApp* mainApp, QWidget *parent)
     addGeneralAttr(m_treeItemModels, GENERAL_ATTR_MODELID, cb);
 
     // setup the tree widget: graph
-    m_treeItemGraphs = newTreeItem("Graph");
+    m_treeItemGraphs = newTreeItem("Graph", false);
     // -- nodes generator
     LineButton* nodesCmd = new LineButton(this, LineButton::None);
     connect(nodesCmd->button(), SIGNAL(pressed()), SLOT(slotNodesWidget()));
@@ -116,7 +116,7 @@ ExperimentDesigner::ExperimentDesigner(MainApp* mainApp, QWidget *parent)
     addGeneralAttr(m_treeItemGraphs, GENERAL_ATTR_EDGEATTRS, edgesCmd);
 
     // setup the tree widget: general attributes
-    m_treeItemGeneral = newTreeItem("Simulation");
+    m_treeItemGeneral = newTreeItem("Simulation", false);
     // -- seed
     addGeneralAttr(m_treeItemGeneral, GENERAL_ATTR_SEED)->setValue(100);
     // --  stop at
@@ -127,7 +127,7 @@ ExperimentDesigner::ExperimentDesigner(MainApp* mainApp, QWidget *parent)
     addGeneralAttr(m_treeItemGeneral, GENERAL_ATTR_AUTODELETE);
 
     // setup the tree widget: outputs
-    m_treeItemOutputs = newTreeItem("File Outputs");
+    m_treeItemOutputs = newTreeItem("File Outputs", false);
     // -- enabled
     m_enableOutputs = new AttrWidget(AttributeRange::parse(-1, "enabled", "bool"), this);
     m_enableOutputs->setToolTip("save to file");
