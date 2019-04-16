@@ -24,31 +24,30 @@
 namespace evoplex
 {
 
-AttributeRangePtr AttributeRange::parse(int attrId, const QString& attrName,
-                                        const QString& attrRangeStr)
+AttributeRangePtr AttributeRange::parse(int attrId, const QString& attrName, QString attrRangeStr)
 {
+    QRegExp rx(" *([([{,\\]})]) *");  // replace consecutive spaces
+    rx.setPatternSyntax(QRegExp::RegExp2);
+    attrRangeStr.replace(rx, "\\1");
+
     AttributeRangePtr vs;
-    QRegExp rx(" *([([{,\]})]) *");  // replace consecutive spaces
-    QString _attrName = attrName;
-    _attrName.replace(rx, "\\1");
-	
     if (attrRangeStr == "string") {
         vs = std::unique_ptr<SingleValue>(
-                new SingleValue(attrId, _attrName, String));
+                new SingleValue(attrId, attrName, String));
     } else if (attrRangeStr == "non-empty-string") {
         vs = std::unique_ptr<SingleValue>(
-                new SingleValue(attrId, _attrName, NonEmptyString));
+                new SingleValue(attrId, attrName, NonEmptyString));
     } else if (attrRangeStr == "dirpath") {
         vs = std::unique_ptr<SingleValue>(
-                new SingleValue(attrId, _attrName, DirPath));
+                new SingleValue(attrId, attrName, DirPath));
     } else if (attrRangeStr == "filepath") {
         vs = std::unique_ptr<SingleValue>(
-                new SingleValue(attrId, _attrName, FilePath));
+                new SingleValue(attrId, attrName, FilePath));
     } else if (attrRangeStr.contains('{') && attrRangeStr.endsWith('}')) {
-        vs = setOfValues(attrRangeStr, attrId, _attrName);
+        vs = setOfValues(attrRangeStr, attrId, attrName);
     } else if (attrRangeStr == "bool" ||
                (attrRangeStr.contains('[') && attrRangeStr.endsWith(']'))) {
-        vs = intervalOfValues(attrRangeStr, attrId, _attrName);
+        vs = intervalOfValues(attrRangeStr, attrId, attrName);
     }
 
     if (!vs || !vs->isValid()) {

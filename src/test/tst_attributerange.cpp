@@ -134,7 +134,7 @@ void TestAttributeRange::tst_int_range()
     // Case 2: negative numbers
     // Case 3: large range
     // Case 4: empty spaces
-    QStringList attrRangeStrs = {"int[0,1]", "int[-10,-5]", "int[-100,100]", "int [3, 8]"};
+    QStringList attrRangeStrs = {"int[0,1]", "int[-10,-5]", "int[-100,100]", "int  [  3  ,  8  ] "};
 
     const auto attrRge = AttributeRange::parse(0, attrNames[0], attrRangeStrs[0]);
     const auto attrRge2 = AttributeRange::parse(1, attrNames[1], attrRangeStrs[1]);
@@ -153,7 +153,7 @@ void TestAttributeRange::tst_int_range()
     QCOMPARE(attrRge3->validate("-100"), Value(-100));  // min
     QCOMPARE(attrRge3->validate("100"), Value(100));  // max
     QCOMPARE(attrRge3->validate("0"), Value(0));  // other value
-    
+
     QCOMPARE(attrRge4->validate("3"), Value(3));  // min
     QCOMPARE(attrRge4->validate("8"), Value(8));  // max
     QCOMPARE(attrRge4->validate("5"), Value(5));  // other value
@@ -173,7 +173,7 @@ void TestAttributeRange::tst_int_range()
     QCOMPARE(attrRge3->id(), 2);
     QCOMPARE(attrRge3->attrName(), attrNames.at(2));
     QCOMPARE(attrRge3->attrRangeStr(), attrRangeStrs.at(2));
-    
+
     QVERIFY(attrRge4->isValid());
     QCOMPARE(attrRge4->id(), 3);
     QCOMPARE(attrRge4->attrName(), attrNames.at(3));
@@ -214,7 +214,7 @@ void TestAttributeRange::tst_int_range()
     QCOMPARE(v.type(), Value::INT);
     QVERIFY(v.toInt() >= min);
     QVERIFY(v.toInt() <= max);
-    
+
     min = 3;
     max = 8;
     QCOMPARE(attrRge4->min().toInt(), min);
@@ -270,7 +270,7 @@ void TestAttributeRange::tst_double_range()
     // Case 2: negative numbers
     // Case 3: large range
     // Case 4: empty spaces
-    QStringList attrRangeStrs = {"double[1.1,1.2]", "double[-5.5,-3.3]", "double[-95.7,87.5]", "double[ 0.8,  2.3 ]"};
+    QStringList attrRangeStrs = {"double[1.1,1.2]", "double[-5.5,-3.3]", "double[-95.7,87.5]", "double[ 0.8,  2.3 ] "};
 
     const auto attrRge = AttributeRange::parse(0, attrNames.at(0), attrRangeStrs.at(0));
     const auto attrRge2 = AttributeRange::parse(1, attrNames.at(1), attrRangeStrs.at(1));
@@ -289,7 +289,7 @@ void TestAttributeRange::tst_double_range()
     QCOMPARE(attrRge3->validate("-95.7"), Value(-95.7));  // min
     QCOMPARE(attrRge3->validate("87.5"), Value(87.5));  // max
     QCOMPARE(attrRge3->validate("5.6"), Value(5.6));  // other value
-    
+
     QCOMPARE(attrRge4->validate("0.8"), Value(0.8));  // min
     QCOMPARE(attrRge4->validate("2.3"), Value(2.3));  // max
     QCOMPARE(attrRge4->validate("1.1"), Value(1.1));  // other value
@@ -309,7 +309,7 @@ void TestAttributeRange::tst_double_range()
     QCOMPARE(attrRge3->id(), 2);
     QCOMPARE(attrRge3->attrName(), attrNames.at(2));
     QCOMPARE(attrRge3->attrRangeStr(), attrRangeStrs.at(2));
-    
+
     QVERIFY(attrRge4->isValid());
     QCOMPARE(attrRge4->id(), 3);
     QCOMPARE(attrRge4->attrName(), attrNames.at(3));
@@ -350,7 +350,7 @@ void TestAttributeRange::tst_double_range()
     QCOMPARE(v.type(), Value::DOUBLE);
     QVERIFY(v.toDouble() >= min);
     QVERIFY(v.toDouble() <= max);
-    
+
     min = 0.8;
     max = 2.3;
     QCOMPARE(attrRge4->min().toDouble(), min);
@@ -404,8 +404,8 @@ void TestAttributeRange::tst_int_set()
     QStringList attrNames = {"test0", "test1"};
     // Case 1: Set with positive, negative and large numbers
     // Case 2: Set with empty spaces
-    QStringList attrRangeStr = {"int{0,1,-5,100,-100}", "int { 0, 3, -4, 8, -5}"};
-    
+    QStringList attrRangeStr = {"int{0,1,-5,100,-100}", "int { 0, 3, -4   ,   8, -5 } "};
+
     Value v;
     int min;
     int max;
@@ -419,7 +419,7 @@ void TestAttributeRange::tst_int_set()
     QCOMPARE(attrRge1->validate("-5"), Value(-5));
     QCOMPARE(attrRge1->validate("100"), Value(100));
     QCOMPARE(attrRge1->validate("-100"), Value(-100));
-    
+
     QCOMPARE(attrRge2->validate("0"), Value(0));
     QCOMPARE(attrRge2->validate("3"), Value(3));
     QCOMPARE(attrRge2->validate("-4"), Value(-4));
@@ -431,7 +431,7 @@ void TestAttributeRange::tst_int_set()
     QCOMPARE(attrRge1->id(), 0);
     QCOMPARE(attrRge1->attrName(), attrNames.at(0));
     QCOMPARE(attrRge1->attrRangeStr(), attrRangeStr.at(0));
-    
+
     QVERIFY(attrRge2->isValid());
     QCOMPARE(attrRge2->id(), 1);
     QCOMPARE(attrRge2->attrName(), attrNames.at(1));
@@ -439,24 +439,24 @@ void TestAttributeRange::tst_int_set()
     AttributeRange::Type type = AttributeRange::Int_Set;
     QCOMPARE(attrRge1->type(), type);
     QCOMPARE(attrRge2->type(), type);
-    
+
     min = -100;
     max = 100;
-    
+
     QCOMPARE(attrRge1->min().toInt(), min);
     QCOMPARE(attrRge1->max().toInt(), max);
-    
+
     v = attrRge1->rand(m_prg.get());
     QCOMPARE(v.type(), Value::INT);
     QVERIFY(v.toInt() >= min);
     QVERIFY(v.toInt() <= max);
-    
+
     min = -5;
     max = 8;
-    
+
     QCOMPARE(attrRge2->min().toInt(), min);
     QCOMPARE(attrRge2->max().toInt(), max);
-    
+
     v = attrRge2->rand(m_prg.get());
     QCOMPARE(v.type(), Value::INT);
     QVERIFY(v.toInt() >= min);
@@ -469,7 +469,7 @@ void TestAttributeRange::tst_int_set()
     QCOMPARE(attrRge1->prev(0).toInt(), -100); // first
     QCOMPARE(attrRge1->prev(-5).toInt(), 1); // middle
     QCOMPARE(attrRge1->prev(-100).toInt(), 100); // last
-    
+
     // "int{0,3,-4,8,-5}"
     QCOMPARE(attrRge2->prev(0).toInt(), -5); // first
     QCOMPARE(attrRge2->prev(-4).toInt(), 3); // middle
@@ -482,7 +482,7 @@ void TestAttributeRange::tst_int_set()
     QCOMPARE(attrRge1->next(0).toInt(), 1); // first
     QCOMPARE(attrRge1->next(-5).toInt(), 100); // middle
     QCOMPARE(attrRge1->next(-100).toInt(), 0); // last
-    
+
     // "int{0,3,-4,8,-5}"
     QCOMPARE(attrRge2->next(0).toInt(), 3); // first
     QCOMPARE(attrRge2->next(-4).toInt(), 8); // middle
@@ -495,7 +495,7 @@ void TestAttributeRange::tst_double_set()
     // Case 1: Set with positive, negative and large numbers
     // Case 2: Set with empty spaces
     QStringList attrRangeStr = {"double{0,1.2,-5.5,-95.7,87.5,12}", "double{  0.0 , 3.9 , -4.3 , 2.2 }"};
-    
+
     Value v;
     double min;
     double max;
@@ -510,7 +510,7 @@ void TestAttributeRange::tst_double_set()
     QCOMPARE(attrRge1->validate("-95.7"), Value(-95.7));
     QCOMPARE(attrRge1->validate("87.5"), Value(87.5));
     QCOMPARE(attrRge1->validate("12"), Value(12.0));
-    
+
     QCOMPARE(attrRge2->validate("0"), Value(0.0));
     QCOMPARE(attrRge2->validate("3.9"), Value(3.9));
     QCOMPARE(attrRge2->validate("-4.3"), Value(-4.3));
@@ -527,7 +527,7 @@ void TestAttributeRange::tst_double_set()
 
     min = -95.7;
     max = 87.5;
-    
+
     // min() returns the first value in the set
     QCOMPARE(attrRge1->min().toDouble(), min);
     // max() returns the last value in the set
@@ -538,10 +538,10 @@ void TestAttributeRange::tst_double_set()
     QCOMPARE(v.type(), Value::DOUBLE);
     QVERIFY(v.toDouble() >= min);
     QVERIFY(v.toDouble() <= max);
-    
+
     min = -4.3;
     max = 3.9;
-    
+
     QCOMPARE(attrRge2->min().toDouble(), min);
     QCOMPARE(attrRge2->max().toDouble(), max);
 
@@ -549,7 +549,7 @@ void TestAttributeRange::tst_double_set()
     QCOMPARE(v.type(), Value::DOUBLE);
     QVERIFY(v.toDouble() >= min);
     QVERIFY(v.toDouble() <= max);
-    
+
     // Tests 'AttributeRange::prev()'
     // double{0,1.2,-5.5,-95.7,87.5,12}
     QCOMPARE(attrRge1->prev("abc"), Value("abc")); // invalid case: different type
@@ -557,8 +557,8 @@ void TestAttributeRange::tst_double_set()
     QCOMPARE(attrRge1->prev(0.0).toDouble(), 12.0); // first
     QCOMPARE(attrRge1->prev(-95.7).toDouble(), -5.5); // middle
     QCOMPARE(attrRge1->prev(12.0).toDouble(), 87.5); // last
-    
-    // double{0,3.9,-4.3,2.2} 
+
+    // double{0,3.9,-4.3,2.2}
     QCOMPARE(attrRge2->prev(0.0).toDouble(), 2.2); // first
     QCOMPARE(attrRge2->prev(-4.3).toDouble(), 3.9); // middle
     QCOMPARE(attrRge2->prev(2.2).toDouble(), -4.3); // last
@@ -570,8 +570,8 @@ void TestAttributeRange::tst_double_set()
     QCOMPARE(attrRge1->next(0.0).toDouble(), 1.2); // first
     QCOMPARE(attrRge1->next(-95.7).toDouble(), 87.5); // middle
     QCOMPARE(attrRge1->next(12.0).toDouble(), 0.0); // last
-    
-    // double{0,3.9,-4.3,2.2} 
+
+    // double{0,3.9,-4.3,2.2}
     QCOMPARE(attrRge2->prev(0.0).toDouble(), 2.2); // first
     QCOMPARE(attrRge2->prev(-4.3).toDouble(), 3.9); // middle
     QCOMPARE(attrRge2->prev(2.2).toDouble(), -4.3); // last
@@ -638,27 +638,40 @@ void TestAttributeRange::_tst_string(bool acceptEmpty)
 
 void TestAttributeRange::tst_string_set()
 {
-    // Case 1: normal string
-    // Case 2: long string
-    // Case 3: single character
-    // Case 4: unusual characters
-    // Case 5: number
-    const QString _values("sample,this sentence is a long string for testing purposes,a,abc£ãã&!£$%^*(áéí),123");
+    const QStringList strs = {
+        // Case 1: normal string
+        "sample",
+
+        // Case 2: long string
+        "this sentence is a long string for testing purposes",
+
+        // Case 3: single character
+        "a",
+
+        // Case 4: unusual characters
+        "abc£ãã&!£$%^*(áéí)",
+
+        // Case 5: number
+        "123"
+    };
+
+    // add cases with whitespaces between commas
+    QString arStr;
+    for (int i = 3; i < strs.size(); ++i) {
+        arStr += QString(",%1").arg(strs[i]);
+    }
+    arStr = QString("string {  %1,%2  ,  %3  %4 } ")
+            .arg(strs[0]).arg(strs[1]).arg(strs[2]).arg(arStr);
 
     const QString attrName("test");
-    const QString attrRangeStr = "string{" + _values + "}";
     const AttributeRange::Type type = AttributeRange::String_Set;
-    auto attrRge = AttributeRange::parse(0, attrName, attrRangeStr);
-
-    Validate vals;
-    QStringList values = _values.split(",");
-    vals.reserve(static_cast<size_t>(values.size()));
-    for (const QString& v : values) {
-        vals.push_back({v, Value(v)});
-    }
+    auto attrRge = AttributeRange::parse(0, attrName, arStr);
 
     // Tests if functions work as expected
-    _tst_parserInputs(attrRge, attrName, attrRangeStr, type, vals);
+    Validate vals(strs.size());
+    for (auto s : strs) { vals.push_back({s, Value(s)}); }
+    auto _arStr = QString("string{%1}").arg(strs.join(","));
+    _tst_parserInputs(attrRge, attrName, _arStr, type, vals);
 
     // The min and max values are taken to be the value of the first character
     // of the string according to the ASCII table
@@ -669,7 +682,7 @@ void TestAttributeRange::tst_string_set()
     QCOMPARE(attrRge->max().toString(), max);
     QCOMPARE(attrRge->min().toQString(), QString(min));
     QCOMPARE(attrRge->max().toQString(), QString(max));
-    QVERIFY(values.contains(attrRge->rand(m_prg.get()).toString()));
+    QVERIFY(strs.contains(attrRge->rand(m_prg.get()).toString()));
 
     // Tests 'AttributeRange::prev()'
     // sample,this sentence is a long string for testing purposes,a,abc£ãã&!£$%^*(áéí),123

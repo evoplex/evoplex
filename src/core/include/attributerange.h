@@ -116,8 +116,7 @@ public:
      *       For instance, 'int[0,max]' corresponds to an integer from
      *       0 to 2147483647, which is the largest integer.
      */
-    static AttributeRangePtr parse(int attrId, const QString& attrName,
-                                   const QString& attrRangeStr);
+    static AttributeRangePtr parse(int attrId, const QString& attrName, QString attrRangeStr);
 
     //! Destructor.
     ~AttributeRange() override = default;
