@@ -34,6 +34,7 @@ private slots:
     void cleanupTestCase() {}
     void tst_parseStarCmd();
     void tst_parseHashCmd();
+    void tst_parseIntegerCmd();
 
 private:
     void _tst_attrs(const SetOfAttributes& res,
@@ -169,6 +170,22 @@ void TestAttrsGenerator::_tst_parseStarCmd(const QString& func, const Attributes
             _tst_attrs(res, attrs, false);
         }
     }
+}
+
+void TestAttrsGenerator::tst_parseIntegerCmd()
+{
+    const QStringList attrRgeStrs = {"int[0,16]"};
+    const QStringList names = {"test0"};
+    
+    QString error;
+    QString _cmd = "8";
+    QString _exp_cmd = "*8;min";
+    const QString def_func = "min";
+
+    const AttributesScope attrsScope = _newAttrsScope(names, attrRgeStrs);
+    auto agen = AttrsGenerator::parse(attrsScope, _cmd, error);
+    
+    QCOMPARE(agen->command(), _exp_cmd);
 }
 
 void TestAttrsGenerator::tst_parseStarCmd()
