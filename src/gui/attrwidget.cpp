@@ -40,6 +40,10 @@ AttrWidget::AttrWidget(AttributeRangePtr attrRange, QWidget* parent, QWidget* cu
     m_widget->setSizePolicy(QSizePolicy::MinimumExpanding,
                             QSizePolicy::Preferred);
 
+    if (attrRange->type() != AttributeRange::Bool) {
+        m_widget->setMinimumWidth(100);
+    }
+
     auto l = new QHBoxLayout(this);
     l->addWidget(m_widget);
     l->setMargin(0);
