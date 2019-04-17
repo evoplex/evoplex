@@ -375,7 +375,7 @@ void BaseGraphGL::keyPressEvent(QKeyEvent* e)
     if (e->modifiers().testFlag(Qt::ControlModifier)) {
         if (e->key() == Qt::Key_0) {
             resetView();
-        } else if (e->key() == Qt::Key_Plus) {
+        } else if (e->key() == Qt::Key_Plus || e->key() == Qt::Key_Equal) {
             zoomIn();
         } else if (e->key() == Qt::Key_Minus) {
             zoomOut();
