@@ -17,15 +17,19 @@
 #include <cfloat>
 #include <QtDebug>
 #include <QFileInfo>
+#include <QRegExp>
 
 #include "attributerange.h"
 
 namespace evoplex
 {
 
-AttributeRangePtr AttributeRange::parse(int attrId, const QString& attrName,
-                                        const QString& attrRangeStr)
+AttributeRangePtr AttributeRange::parse(int attrId, const QString& attrName, QString attrRangeStr)
 {
+    QRegExp rx(" *([([{,\\]})]) *");  // replace consecutive spaces
+    rx.setPatternSyntax(QRegExp::RegExp2);
+    attrRangeStr.replace(rx, "\\1");
+
     AttributeRangePtr vs;
     if (attrRangeStr == "string") {
         vs = std::unique_ptr<SingleValue>(

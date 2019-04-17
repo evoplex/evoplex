@@ -5,7 +5,7 @@
 </p>
 
 <p align="center">
-<a href="https://evoplex.zulip.org"><img src="https://img.shields.io/badge/zulip-join_chat-brightgreen.svg" alt="Chat"></a>
+<a href="https://evoplex.zulipchat.com"><img src="https://img.shields.io/badge/zulip-join_chat-brightgreen.svg" alt="Chat"></a>
 <a href="https://travis-ci.org/evoplex/evoplex"><img src="https://travis-ci.org/evoplex/evoplex.svg?branch=master" alt="CI: Linux & MacOS"></a>
 <a href="https://ci.appveyor.com/project/cardinot/evoplex/branch/master"><img src="https://ci.appveyor.com/api/projects/status/ulck2seq9rqgawbr/branch/master?svg=true" alt="CI: Windows"></a>
 <a href="https://coveralls.io/github/evoplex/evoplex"><img src="https://coveralls.io/repos/github/evoplex/evoplex/badge.svg" alt="Testing"></a>
@@ -72,7 +72,21 @@ Please see the [CONTRIBUTING](https://github.com/evoplex/evoplex/blob/master/CON
 
 If you use Evoplex in your publication, you can cite it as:
 
-> Marcos Cardinot, Colm O'Riordan, Josephine Griffith & Matjaz Perc. Evoplex: A platform for agent-based modeling on networks. Zenodo. [https://doi.org/10.5281/zenodo.1340734](https://doi.org/10.5281/zenodo.1340734)
+> Cardinot, M., O’Riordan, C., Griffith, J., & Perc, M. (2019). Evoplex: A platform for agent-based modeling on networks. SoftwareX, 9, 199-204. https://doi.org/10.1016/j.softx.2019.02.009
+
+```
+@article{Evoplex,
+author = "Marcos Cardinot and Colm O’Riordan and Josephine Griffith and Matjaž Perc",
+title = "Evoplex: A platform for agent-based modeling on networks",
+journal = "SoftwareX",
+volume = "9",
+pages = "199 - 204",
+year = "2019",
+issn = "2352-7110",
+doi = "10.1016/j.softx.2019.02.009",
+url = "http://www.sciencedirect.com/science/article/pii/S2352711018302437"
+}
+```
 
 ## License
 

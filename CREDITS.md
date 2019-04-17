@@ -4,7 +4,8 @@
 - Colm O'Riordan
 - Matjaz Perc
 - Adriana Cardinot
-- Ethan Padden
+- [Ethan Padden](https://github.com/EthanPadden)
+- [Chatziargyriou Eleftheria](https://github.com/Sedictious)
 
 # Acknowledgements
 - This software was supported by the National Council for Scientific and Technological Development (CNPq-Brazil).
