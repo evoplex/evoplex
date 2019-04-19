@@ -377,7 +377,7 @@ void BaseGraphGL::keyPressEvent(QKeyEvent* e)
             resetView();
         } else if (e->key() == Qt::Key_Plus || e->key() == Qt::Key_Equal) {
             zoomIn();
-        } else if (e->key() == Qt::Key_Minus) {
+        } else if (e->key() == Qt::Key_Minus || e->key() == Qt::Key_Underscore) {
             zoomOut();
         }
         QOpenGLWidget::keyPressEvent(e);
