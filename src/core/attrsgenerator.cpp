@@ -43,22 +43,22 @@ AttrsGeneratorPtr AttrsGenerator::parse(const AttributesScope& attrsScope,
         _cmd = QString("*%1;min").arg(size);
         cmds.push_back(cmd);
         cmds.push_back("min");
-    } else if (cmd.indexOf(";") != -1){
-        cmds = cmd.split(";");
+    } else {
+        _cmd = cmd;
+        if (cmd.indexOf(";") != -1){            
+            cmds = _cmd.split(";");
+        } else {
+            cmds << _cmd;
+        }
         QString sizeStr = cmds.first();
         size = sizeStr.remove(0,1).toInt(&sizeIsValid);
         _cmd = cmd;
-    } else { // if cmd isn't an integer or semicolon seperated, throw an error
-        error = "the command '" + cmd + "' is invalid!";
-        qWarning() << error;
-        return nullptr;
     }
-
+    
     if (sizeIsValid) {
         if (size < 1) {
             error = "Unable to parse '" + cmd + "'.\n"
                     "The size of the attributes set cannot be negative!";
-            qWarning() << error;
             return nullptr;
         }
         // the size was parsed correctly, let's take it out of the cmds
