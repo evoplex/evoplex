@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added
 - AttributeRange now accepts empty spaces (#21)
+- Allows to zoom in/out with the alphanumeric keyboard (#28)
 
 ### Fixed
 - Fixes #27 - Experiment Designer: vertical scrollbar is hiding the buttons and fields
