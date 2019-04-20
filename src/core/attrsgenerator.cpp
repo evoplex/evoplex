@@ -54,11 +54,11 @@ AttrsGeneratorPtr AttrsGenerator::parse(const AttributesScope& attrsScope,
         size = sizeStr.remove(0,1).toInt(&sizeIsValid);
         _cmd = cmd;
     }
-    
     if (sizeIsValid) {
         if (size < 1) {
             error = "Unable to parse '" + cmd + "'.\n"
                     "The size of the attributes set cannot be negative!";
+            qWarning() << error;
             return nullptr;
         }
         // the size was parsed correctly, let's take it out of the cmds
