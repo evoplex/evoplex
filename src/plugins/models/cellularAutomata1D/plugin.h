@@ -23,6 +23,7 @@ private:
 
     int m_stateAttrId;  // the id of the `state` node attribute
     int m_rule;         // model attribute: cellular automaton rule
+    QString m_binrule; // binary representation of the automaton rule
 
     bool m_toroidal;    // true if the graph is a toroid
     int m_width;        // the number of columns in the `squareGrid` graph

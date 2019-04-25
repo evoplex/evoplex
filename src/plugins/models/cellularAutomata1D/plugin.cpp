@@ -38,6 +38,7 @@ bool CellularAutomata1D::init()
 
     // determines which rule to use
     m_rule = attr("rule").toInt();
+    m_binrule = QString::number( m_rule, 2 );
 
     return m_stateAttrId >= 0;
 }
@@ -81,17 +82,24 @@ Value CellularAutomata1D::nextState(const Node& leftNode, const Node& node, cons
     bool right = rightNode.attr(m_stateAttrId).toBool();
 
     bool r = false;
-    if (m_rule == 30) {
-        r = left ^ (center || right);
-    } else if (m_rule == 32) {
-        r = left && !center && right;
-    } else if (m_rule == 110) {
-        r = (!left && center) || (center ^ right);
-    } else if (m_rule == 250) {
-        r = left || right;
-    } else {
-        qFatal("invalid rule");
+    if (left && center && right) {
+        r = m_binrule.at(0) == "1";
+    } else if (left && center && !right) {
+        r = m_binrule.at(1) == "1";
+    } else if (left && !center && right) {
+        r = m_binrule.at(2) == "1";
+    } else if (left && !center && !right) {
+        r = m_binrule.at(3) == "1";
+    } else if (!left && center && right) {
+        r = m_binrule.at(4) == "1";
+    } else if (!left && center && !right) {
+        r = m_binrule.at(5) == "1";
+    } else if (!left && !center && right) {
+        r = m_binrule.at(6) == "1";
+    } else if (!left && !center && !right) {
+        r = m_binrule.at(7) == "1";
     }
+
     return Value(r);
 }
 
