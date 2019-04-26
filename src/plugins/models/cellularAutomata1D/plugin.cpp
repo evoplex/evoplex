@@ -38,7 +38,7 @@ bool CellularAutomata1D::init()
 
     // determines which rule to use
     m_rule = attr("rule").toInt();
-    m_binrule = QString::number( m_rule, 2 );
+    m_binrule = QString::number(m_rule, 2);
 
     return m_stateAttrId >= 0;
 }
@@ -99,7 +99,6 @@ Value CellularAutomata1D::nextState(const Node& leftNode, const Node& node, cons
     } else if (!left && !center && !right) {
         r = m_binrule.at(7) == "1";
     }
-
     return Value(r);
 }
 
