@@ -6,7 +6,7 @@
   "author": "Ethan Padden and Marcos Cardinot",
   "description": "This model implements a few elementary cellular automaton rules.",
 
-  "pluginAttributesScope": [ {"rule": "int[1,256]"} ],
+  "pluginAttributesScope": [ {"rule": "int[0,255]"} ],
   "nodeAttributesScope": [ {"state": "bool"} ],
 
   "supportedGraphs": [ "squareGrid" ]
