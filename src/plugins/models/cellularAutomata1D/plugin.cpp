@@ -39,6 +39,7 @@ bool CellularAutomata1D::init()
     // determines which rule to use
     m_rule = attr("rule").toInt();
     m_binrule = QString::number(m_rule, 2);
+    m_binrule.prepend(QString("0").repeated(8 - m_binrule.length()));
 
     return m_stateAttrId >= 0;
 }
