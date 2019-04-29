@@ -4,7 +4,7 @@
 
 This is a model plugin for [Evoplex](https://evoplex.org) and is included by default in the software.
 
-It implements the [elementary cellular automaton rules](http://mathworld.wolfram.com/ElementaryCellularAutomaton.html) 30, 32, 110 and 250.
+It implements the [256 elementary cellular automaton rules](http://mathworld.wolfram.com/ElementaryCellularAutomaton.html).
 
 ## How it works
 
@@ -16,6 +16,19 @@ Starting from the first row in the graph, at each time step:
 
 - based on the selected rule, compute the next state for each cell in the current row;
 - assign the new states to the row below.
+
+## Parameters
+
+``rule`` :
+  An integer between 0 and 255. Its 8-bit binary representation will indicate the transition rule.
+
+For example, for rule 110:
+
+(110)<sub>10</sub> = (01101110)<sub>2</sub> 
+
+| pattern |111|110|101|100|011|010|001|000|
+|:-------:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
+|**state**| 0 | 1 | 1 | 0 | 1 | 1 | 1 | 0 |
 
 ## Examples
 

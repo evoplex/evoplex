@@ -37,7 +37,7 @@ bool CellularAutomata1D::init()
     m_stateAttrId = node(0).attrs().indexOf("state");
 
     // determines which rule to use
-    m_rule = attr("rule").toInt();
+    m_binrule = std::bitset<8>(attr("rule").toInt());
 
     return m_stateAttrId >= 0;
 }
@@ -80,19 +80,7 @@ Value CellularAutomata1D::nextState(const Node& leftNode, const Node& node, cons
     bool center = node.attr(m_stateAttrId).toBool();
     bool right = rightNode.attr(m_stateAttrId).toBool();
 
-    bool r = false;
-    if (m_rule == 30) {
-        r = left ^ (center || right);
-    } else if (m_rule == 32) {
-        r = left && !center && right;
-    } else if (m_rule == 110) {
-        r = (!left && center) || (center ^ right);
-    } else if (m_rule == 250) {
-        r = left || right;
-    } else {
-        qFatal("invalid rule");
-    }
-    return Value(r);
+    return Value(m_binrule[left*4 + center*2 + right]);
 }
 
 int CellularAutomata1D::linearIdx(int row, int col) const

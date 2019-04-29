@@ -5,7 +5,7 @@
 - Matjaz Perc
 - Adriana Cardinot
 - [Ethan Padden](https://github.com/EthanPadden)
-- [Chatziargyriou Eleftheria](https://github.com/Sedictious)
+- [Eleftheria Chatziargyriou](https://github.com/Sedictious)
 
 # Acknowledgements
 - This software was supported by the National Council for Scientific and Technological Development (CNPq-Brazil).

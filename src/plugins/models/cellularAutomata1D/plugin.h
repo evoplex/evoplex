@@ -9,6 +9,7 @@
 #ifndef CELLULARAUTOMATA1D_H
 #define CELLULARAUTOMATA1D_H
 
+#include <bitset>
 #include <plugininterface.h>
 
 namespace evoplex {
@@ -22,7 +23,7 @@ private:
     int m_currRow;
 
     int m_stateAttrId;  // the id of the `state` node attribute
-    int m_rule;         // model attribute: cellular automaton rule
+    std::bitset<8> m_binrule;  // binary representation of the automaton rule
 
     bool m_toroidal;    // true if the graph is a toroid
     int m_width;        // the number of columns in the `squareGrid` graph

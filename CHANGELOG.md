@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - AttributeRange now accepts empty spaces (#21)
 - Allows to zoom in/out with the alphanumeric keyboard (#28)
 
+### Changed
+- The `CellularAutomata1D` model plugin has been updated to implement the 256 elementary cellular automaton rules
+
 ### Fixed
 - Fixes #27 - Experiment Designer: vertical scrollbar is hiding the buttons and fields
 - Fixes MSVC2013 compilation
