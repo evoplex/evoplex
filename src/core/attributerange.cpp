@@ -113,29 +113,19 @@ AttributeRangePtr AttributeRange::intervalOfValues(QString attrRangeStr, const i
     Type type;
     Value min;
     Value max;
-    bool ok1 = false;
-    bool ok2 = false;
+    bool ok1 = true;
+    bool ok2 = true;
 
     if (attrRangeStr.startsWith("int")) {
         type = AttributeRange::Int_Range;
         values[0] = values[0].remove("int");
-        min = Value(values.at(0).toInt(&ok1));
-        if (values.at(1) == "max") {
-            max = Value(INT32_MAX);
-            ok2 = true;
-        } else {
-            max = Value(values.at(1).toInt(&ok2));
-        }
+        min = values.at(0) == "min" ? Value(INT32_MIN) : Value(values.at(0).toInt(&ok1));
+        max = values.at(1) == "max" ? Value(INT32_MAX) : Value(values.at(1).toInt(&ok2));
     } else if (attrRangeStr.startsWith("double")) {
         type = AttributeRange::Double_Range;
         values[0] = values[0].remove("double");
-        min = Value(values.at(0).toDouble(&ok1));
-        if (values.at(1) == "max") {
-            max = Value(DBL_MAX);
-            ok2 = true;
-        } else {
-            max = Value(values.at(1).toDouble(&ok2));
-        }
+        min = values.at(0) == "min" ? Value(DBL_MIN) : Value(values.at(0).toDouble(&ok1));
+        max = values.at(1) == "max" ? Value(DBL_MAX) : Value(values.at(1).toDouble(&ok2));
     } else {
         return std::unique_ptr<SingleValue>(new SingleValue());
     }
