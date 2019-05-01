@@ -208,7 +208,12 @@ public:
     //! Destructor.
     ~SingleValue() override = default;
 
+    /**
+     * @brief Not defined for SingleValue
+     * @returns invalid Value
+     */
     inline Value rand(PRG*) const override;
+
     inline Value next(const Value& v) const override;
     inline Value prev(const Value& v) const override;
 };
@@ -309,8 +314,8 @@ inline const Value& AttributeRange::max() const
 
 /***********************/
 
-inline Value SingleValue::rand(PRG* prg) const
-{ return prg->bernoulli() ? m_max : m_min; }
+inline Value SingleValue::rand(PRG*) const
+{ return Value(); }
 
 inline Value SingleValue::next(const Value& val) const
 { return val; }

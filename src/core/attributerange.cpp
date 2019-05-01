@@ -236,6 +236,8 @@ AttributeRange::AttributeRange(int id, const QString& attrName, Type type)
     : m_id(id)
     , m_attrName(attrName)
     , m_type(type)
+    , m_min(Value())
+    , m_max(Value())
 {
 }
 
@@ -244,9 +246,6 @@ AttributeRange::AttributeRange(int id, const QString& attrName, Type type)
 SingleValue::SingleValue(int id, const QString& attrName, Type type)
     : AttributeRange(id, attrName, type)
 {
-    m_min = Value("");
-    m_max = Value("");
-
     switch (m_type) {
     case String:
         m_attrRangeStr = "string";
