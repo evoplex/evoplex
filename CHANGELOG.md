@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixes #27 - Experiment Designer: vertical scrollbar is hiding the buttons and fields
 - Fixes MSVC2013 compilation
 - Attribute range is now accepting the `min` keyword
+- Attribute range functions prev() and next() are now working as expected
 
 ## [0.2.1] - 2018-10-23
 ### Added

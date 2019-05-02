@@ -294,13 +294,13 @@ IntervalOfValues::IntervalOfValues(int id, const QString& attrName, Type type,
             if (v.type() != Value::DOUBLE || v > max || v < min) return v;
             if (v == max) return min;
             double n = v.toDouble() + 1.0;
-            return n > max.toDouble() ? max : n;
+            return n > max.toDouble() ? min : n;
         };
         f_prev = [max, min](const Value& v) {
             if (v.type() != Value::DOUBLE || v > max || v < min) return v;
             if (v == min) return max;
             double n = v.toDouble() - 1.0;
-            return n < min.toDouble() ? min : n;
+            return n < min.toDouble() ? max : n;
         };
         break;
     case Int_Range:
