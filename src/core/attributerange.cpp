@@ -283,7 +283,7 @@ IntervalOfValues::IntervalOfValues(int id, const QString& attrName, Type type,
         Q_ASSERT(min.isBool() && max.isBool());
         m_attrRangeStr = "bool";
         f_rand = [](PRG* prg) { return prg->bernoulli(); };
-        f_next = [](const Value& v) { return v.type() == Value::BOOL ? !v.toBool() : v; };
+        f_next = [](const Value& v) { return v.type() == Value::BOOL ? !v.toBool() : Value(); };
         f_prev = f_next;
         break;
     case Double_Range:
@@ -291,13 +291,13 @@ IntervalOfValues::IntervalOfValues(int id, const QString& attrName, Type type,
         m_attrRangeStr = QString("double[%1,%2]").arg(min.toDouble()).arg(max.toDouble());
         f_rand = [this](PRG* prg) { return prg->uniform(m_min.toDouble(), m_max.toDouble()); };
         f_next = [max, min](const Value& v) {
-            if (v.type() != Value::DOUBLE || v > max || v < min) return v;
+            if (v.type() != Value::DOUBLE || v > max || v < min) return Value();
             if (v == max) return min;
             double n = v.toDouble() + 1.0;
             return n > max.toDouble() ? min : n;
         };
         f_prev = [max, min](const Value& v) {
-            if (v.type() != Value::DOUBLE || v > max || v < min) return v;
+            if (v.type() != Value::DOUBLE || v > max || v < min) return Value();
             if (v == min) return max;
             double n = v.toDouble() - 1.0;
             return n < min.toDouble() ? max : n;
@@ -308,13 +308,13 @@ IntervalOfValues::IntervalOfValues(int id, const QString& attrName, Type type,
         m_attrRangeStr = QString("int[%1,%2]").arg(min.toInt()).arg(max.toInt());
         f_rand = [this](PRG* prg) { return prg->uniform(m_min.toInt(), m_max.toInt()); };
         f_next = [max, min](const Value& v) {
-            if (v.type() != Value::INT || v > max || v < min) return v;
+            if (v.type() != Value::INT || v > max || v < min) return Value();
             if (v == max) return min;
             int n = v.toInt() + 1;
             return n > max.toInt() ? min : n;
         };
         f_prev = [max, min](const Value& v) {
-            if (v.type() != Value::INT || v > max || v < min) return v;
+            if (v.type() != Value::INT || v > max || v < min) return Value();
             if (v == min) return max;
             int n = v.toInt() - 1;
             return n < min.toInt() ? max : n;
@@ -369,18 +369,18 @@ SetOfValues::SetOfValues(int id, const QString& attrName, Type type, Values valu
 
 Value SetOfValues::next(const Value& val) const
 {
-    if (val.type() != m_min.type()) return val;
+    if (val.type() != m_min.type()) return Value();
     auto it = std::find(m_values.cbegin(), m_values.cend(), val);
-    if (it == m_values.cend()) return val; // val is not in the set
+    if (it == m_values.cend()) return Value(); // val is not in the set
     if (++it == m_values.cend()) return m_values.front(); // val is the last
     return *it; // item after val
 }
 
 Value SetOfValues::prev(const Value& val) const
 {
-    if (val.type() != m_min.type()) return val;
+    if (val.type() != m_min.type()) return Value();
     auto it = std::find(m_values.cbegin(), m_values.cend(), val);
-    if (it == m_values.cend()) return val; // val is not in the set
+    if (it == m_values.cend()) return Value(); // val is not in the set
     if (it == m_values.cbegin()) return m_values.back(); // val is the first
     return *(--it); // item before val
 }

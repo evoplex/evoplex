@@ -51,7 +51,7 @@ public:
      * @brief Gets the value after @p v.
      * @param v A value in the attribute range.
      * If @p v is the last, it returns the first value in the attrRange.
-     * if @p v is not in the attrRange, it returns @p v.
+     * if @p v is not in the attrRange, it returns an invalid Value.
      */
     virtual Value next(const Value& v) const = 0;
 
@@ -59,7 +59,7 @@ public:
      * @brief Gets the value before @p v.
      * @param v A value in the attribute range.
      * If @p v is the first, it returns the last value in the attrRange.
-     * if @p v is not in the attrRange, it returns @p v.
+     * if @p v is not in the attrRange, it returns an invalid Value.
      */
     virtual Value prev(const Value& v) const = 0;
 };
