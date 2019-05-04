@@ -106,7 +106,7 @@ public:
      *  "filepath"         | a string containing a valid filepath (use forward slashes)
      *  "string"           | a string (empty string is also valid)
      *  "non-empty-string" | a non-empty string
-     *  "string{aaa,bbb}"  | set of strings
+     *  "string{aaa,bbb}"  | set of strings (empty strings are invalid)
      *  "int[min,max]"     | integers from min to max (including min and max)
      *  "int{1,2,3}"       | set of integers
      *  "double[min,max]"  | doubles from min to max (including min and max)

@@ -61,7 +61,7 @@ AttributeRangePtr AttributeRange::setOfValues(QString attrRangeStr, const int id
                                               const QString& attrName)
 {
     QStringList valuesStr = attrRangeStr.remove("{").remove("}").split(",");
-    Type type;
+    Type type = Type::Invalid;
     Values values;
     values.reserve(static_cast<size_t>(valuesStr.size()));
     bool ok = false;
@@ -84,13 +84,15 @@ AttributeRangePtr AttributeRange::setOfValues(QString attrRangeStr, const int id
         valuesStr[0] = valuesStr[0].remove("string");
         ok = true;
         for (const QString& vStr : valuesStr) {
+            if (vStr.isEmpty()) {
+                ok = false;
+                break;
+            }
             values.push_back(vStr);
         }
-    } else {
-        return std::unique_ptr<SingleValue>(new SingleValue());
     }
 
-    if (!ok) {
+    if (!ok || values.empty()) {
         return std::unique_ptr<SingleValue>(new SingleValue());
     }
     return std::unique_ptr<SetOfValues>(new SetOfValues(id, attrName, type, values));

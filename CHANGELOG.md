@@ -6,17 +6,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
-- AttributeRange now accepts empty spaces (#21)
+- AttrRange now accepts empty spaces (#21)
 - Allows to zoom in/out with the alphanumeric keyboard (#28)
 
 ### Changed
 - The `CellularAutomata1D` model plugin has been updated to implement the 256 elementary cellular automaton rules
-- SingleValue - `min()`, `max()` and `rand()` now return an invalid Value
+- AttrRange::SingleValue - `min()`, `max()` and `rand()` now return an invalid Value
 
 ### Fixed
 - Fixes #27 - Experiment Designer: vertical scrollbar is hiding the buttons and fields
 - Fixes MSVC2013 compilation
-- Attribute range is now accepting the `min` keyword
+- AttrRange is now accepting the `min` keyword
+- AttrRange: a set of strings should not accept empty strings
 - AttrRange prev() and next() are now working as expected
 
 ## [0.2.1] - 2018-10-23
