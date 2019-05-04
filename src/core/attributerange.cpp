@@ -288,7 +288,7 @@ IntervalOfValues::IntervalOfValues(int id, const QString& attrName, Type type,
         break;
     case Double_Range:
         Q_ASSERT(min.isDouble() && max.isDouble());
-        m_attrRangeStr = QString("double[%1,%2]").arg(min.toDouble()).arg(max.toDouble());
+        m_attrRangeStr = QString("double[%1,%2]").arg(min.toQString()).arg(max.toQString());
         f_rand = [this](PRG* prg) { return prg->uniform(m_min.toDouble(), m_max.toDouble()); };
         f_next = [max, min](const Value& v) {
             if (v.type() != Value::DOUBLE || v > max || v < min) return Value();
@@ -305,7 +305,7 @@ IntervalOfValues::IntervalOfValues(int id, const QString& attrName, Type type,
         break;
     case Int_Range:
         Q_ASSERT(min.isInt() && max.isInt());
-        m_attrRangeStr = QString("int[%1,%2]").arg(min.toInt()).arg(max.toInt());
+        m_attrRangeStr = QString("int[%1,%2]").arg(min.toQString()).arg(max.toQString());
         f_rand = [this](PRG* prg) { return prg->uniform(m_min.toInt(), m_max.toInt()); };
         f_next = [max, min](const Value& v) {
             if (v.type() != Value::INT || v > max || v < min) return Value();
