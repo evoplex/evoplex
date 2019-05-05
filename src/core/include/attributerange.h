@@ -106,11 +106,11 @@ public:
      *  "filepath"         | a string containing a valid filepath (use forward slashes)
      *  "string"           | a string (empty string is also valid)
      *  "non-empty-string" | a non-empty string
-     *  "string{aaa,bbb}"  | set of strings (empty strings are invalid)
+     *  "string{aaa,bbb}"  | set of unique strings (empty strings are invalid)
      *  "int[min,max]"     | integers from min to max (including min and max)
-     *  "int{1,2,3}"       | set of integers
+     *  "int{1,2,3}"       | set of unique integers
      *  "double[min,max]"  | doubles from min to max (including min and max)
-     *  "double{1.1,1.2}"  | set of doubles
+     *  "double{1.1,1.2}"  | set of unique doubles
      *
      * @note You can use 'max' to take the maximum value for the type.
      *       For instance, 'int[0,max]' corresponds to an integer from

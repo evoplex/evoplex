@@ -15,6 +15,7 @@
  */
 
 #include <cfloat>
+#include <unordered_set>
 #include <QtDebug>
 #include <QFileInfo>
 #include <QRegExp>
@@ -92,7 +93,13 @@ AttributeRangePtr AttributeRange::setOfValues(QString attrRangeStr, const int id
         }
     }
 
-    if (!ok || values.empty()) {
+    if (ok) {
+        std::unordered_set<Value> uniqueVals;
+        for (auto v : values) uniqueVals.insert(v);
+        ok = uniqueVals.size() == values.size();
+    }
+
+    if (!ok) {
         return std::unique_ptr<SingleValue>(new SingleValue());
     }
     return std::unique_ptr<SetOfValues>(new SetOfValues(id, attrName, type, values));

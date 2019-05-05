@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixes MSVC2013 compilation
 - AttrRange is now accepting the `min` keyword
 - AttrRange: a set of strings should not accept empty strings
+- AttrRange: the set of values is now accepting only unique values
 - AttrRange prev() and next() are now working as expected
 
 ## [0.2.1] - 2018-10-23
