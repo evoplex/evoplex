@@ -151,7 +151,7 @@ AttributeRangePtr AttributeRange::intervalOfValues(QString attrRangeStr, const i
         return std::unique_ptr<SingleValue>(new SingleValue());
     }
 
-    if (!ok1 || !ok2) {
+    if (!ok1 || !ok2 || min > max) {
         return std::unique_ptr<SingleValue>(new SingleValue());
     }
     return std::unique_ptr<IntervalOfValues>(
