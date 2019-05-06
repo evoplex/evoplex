@@ -313,15 +313,15 @@ IntervalOfValues::IntervalOfValues(int id, const QString& attrName, Type type,
         f_rand = [this](PRG* prg) { return prg->uniform(m_min.toDouble(), m_max.toDouble()); };
         f_next = [max, min](const Value& v) {
             if (v.type() != Value::DOUBLE || v > max || v < min) return Value();
-            if (v == max) return min;
+            if (v == max) return Value(min);
             double n = v.toDouble() + 1.0;
-            return n > max.toDouble() ? min : n;
+            return Value(n > max.toDouble() ? min : n);
         };
         f_prev = [max, min](const Value& v) {
             if (v.type() != Value::DOUBLE || v > max || v < min) return Value();
-            if (v == min) return max;
+            if (v == min) return Value(max);
             double n = v.toDouble() - 1.0;
-            return n < min.toDouble() ? max : n;
+            return Value(n < min.toDouble() ? max : n);
         };
         break;
     case Int_Range:
@@ -330,15 +330,15 @@ IntervalOfValues::IntervalOfValues(int id, const QString& attrName, Type type,
         f_rand = [this](PRG* prg) { return prg->uniform(m_min.toInt(), m_max.toInt()); };
         f_next = [max, min](const Value& v) {
             if (v.type() != Value::INT || v > max || v < min) return Value();
-            if (v == max) return min;
+            if (v == max) return Value(min);
             int n = v.toInt() + 1;
-            return n > max.toInt() ? min : n;
+            return Value(n > max.toInt() ? min : n);
         };
         f_prev = [max, min](const Value& v) {
             if (v.type() != Value::INT || v > max || v < min) return Value();
-            if (v == min) return max;
+            if (v == min) return Value(max);
             int n = v.toInt() - 1;
-            return n < min.toInt() ? max : n;
+            return Value(n < min.toInt() ? max : n);
         };
         break;
     default:
