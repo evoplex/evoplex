@@ -178,7 +178,7 @@ void TestValue::tst_valueDouble()
     QCOMPARE(v1 >  v2, true);
     QCOMPARE(v1 <  v2, false);
 
-    const Value v3(103.200000008);
+    const Value v3(103.2000000079);
     QCOMPARE(v1 == v3, true);
     QCOMPARE(v1 != v3, false);
     QCOMPARE(v1 >= v3, true);

@@ -119,7 +119,7 @@ bool Value::operator==(const Value& v) const
 
     switch (m_type) {
     case INT: return m_data.i == v.m_data.i;
-    case DOUBLE: return qFuzzyCompare(m_data.d, v.m_data.d);
+    case DOUBLE: return qFuzzyCompare(1.0+m_data.d, 1.0+v.m_data.d);
     case BOOL: return m_data.b == v.m_data.b;
     case CHAR: return m_data.c == v.m_data.c;
     case STRING: return qstrcmp(m_data.s, v.m_data.s) == 0;
@@ -136,7 +136,7 @@ bool Value::operator!=(const Value& v) const
 
     switch (m_type) {
     case INT: return m_data.i != v.m_data.i;
-    case DOUBLE: return !qFuzzyCompare(m_data.d, v.m_data.d);
+    case DOUBLE: return !qFuzzyCompare(1.0+m_data.d, 1.0+v.m_data.d);
     case BOOL: return m_data.b != v.m_data.b;
     case CHAR: return m_data.c != v.m_data.c;
     case STRING: return qstrcmp(m_data.s, v.m_data.s) != 0;
@@ -153,7 +153,7 @@ bool Value::operator<(const Value& v) const
 
     switch (m_type) {
     case INT: return m_data.i < v.m_data.i;
-    case DOUBLE: return m_data.d < v.m_data.d;
+    case DOUBLE: return !qFuzzyCompare(1.0+m_data.d, 1.0+v.m_data.d) && m_data.d < v.m_data.d;
     case BOOL: return m_data.b < v.m_data.b;
     case CHAR: return m_data.c < v.m_data.c;
     case STRING: return qstrcmp(m_data.s, v.m_data.s) < 0;
@@ -169,7 +169,7 @@ bool Value::operator>(const Value& v) const
 
     switch (m_type) {
     case INT: return m_data.i > v.m_data.i;
-    case DOUBLE: return m_data.d > v.m_data.d;
+    case DOUBLE: return !qFuzzyCompare(1.0+m_data.d, 1.0+v.m_data.d) && m_data.d > v.m_data.d;
     case BOOL: return m_data.b > v.m_data.b;
     case CHAR: return m_data.c > v.m_data.c;
     case STRING: return qstrcmp(m_data.s, v.m_data.s) > 0;
@@ -185,7 +185,7 @@ bool Value::operator<=(const Value& v) const
 
     switch (m_type) {
     case INT: return m_data.i <= v.m_data.i;
-    case DOUBLE: return m_data.d <= v.m_data.d;
+    case DOUBLE: return m_data.d <= v.m_data.d || qFuzzyCompare(1.0+m_data.d, 1.0+v.m_data.d);
     case BOOL: return m_data.b <= v.m_data.b;
     case CHAR: return m_data.c <= v.m_data.c;
     case STRING: return qstrcmp(m_data.s, v.m_data.s) <= 0;
@@ -201,7 +201,7 @@ bool Value::operator>=(const Value& v) const
 
     switch (m_type) {
     case INT: return m_data.i >= v.m_data.i;
-    case DOUBLE: return m_data.d >= v.m_data.d;
+    case DOUBLE: return m_data.d >= v.m_data.d || qFuzzyCompare(1.0+m_data.d, 1.0+v.m_data.d);
     case BOOL: return m_data.b >= v.m_data.b;
     case CHAR: return m_data.c >= v.m_data.c;
     case STRING: return qstrcmp(m_data.s, v.m_data.s) >= 0;
