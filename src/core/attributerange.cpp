@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-#include <cfloat>
 #include <unordered_set>
 #include <QtDebug>
 #include <QFileInfo>
@@ -65,25 +64,36 @@ AttributeRangePtr AttributeRange::setOfValues(QString attrRangeStr, const int id
     Type type = Type::Invalid;
     Values values;
     values.reserve(static_cast<size_t>(valuesStr.size()));
-    bool ok = false;
+    bool ok = true;
     if (attrRangeStr.startsWith("int")) {
         type = AttributeRange::Int_Set;
         valuesStr[0] = valuesStr[0].remove("int");
         for (const QString& vStr : valuesStr) {
-            values.push_back(vStr.toInt(&ok));
-            if (!ok) break;
+            if (vStr == "min") {
+                values.push_back(std::numeric_limits<int>::min());
+            } else if (vStr == "max") {
+                values.push_back(std::numeric_limits<int>::max());
+            } else {
+                values.push_back(vStr.toInt(&ok));
+                if (!ok) break;
+            }
         }
     } else if (attrRangeStr.startsWith("double")) {
         type = AttributeRange::Double_Set;
         valuesStr[0] = valuesStr[0].remove("double");
         for (const QString& vStr : valuesStr) {
-            values.push_back(vStr.toDouble(&ok));
-            if (!ok) break;
+            if (vStr == "min") {
+                values.push_back(std::numeric_limits<double>::min());
+            } else if (vStr == "max") {
+                values.push_back(std::numeric_limits<double>::max());
+            } else {
+                values.push_back(vStr.toDouble(&ok));
+                if (!ok) break;
+            }
         }
     } else if (attrRangeStr.startsWith("string")) {
         type = AttributeRange::String_Set;
         valuesStr[0] = valuesStr[0].remove("string");
-        ok = true;
         for (const QString& vStr : valuesStr) {
             if (vStr.isEmpty()) {
                 ok = false;
@@ -91,6 +101,8 @@ AttributeRangePtr AttributeRange::setOfValues(QString attrRangeStr, const int id
             }
             values.push_back(vStr);
         }
+    } else {
+        ok = false;
     }
 
     if (ok) {
@@ -128,13 +140,13 @@ AttributeRangePtr AttributeRange::intervalOfValues(QString attrRangeStr, const i
     if (attrRangeStr.startsWith("int")) {
         type = AttributeRange::Int_Range;
         values[0] = values[0].remove("int");
-        min = values.at(0) == "min" ? Value(INT32_MIN) : Value(values.at(0).toInt(&ok1));
-        max = values.at(1) == "max" ? Value(INT32_MAX) : Value(values.at(1).toInt(&ok2));
+        min = values.at(0) == "min" ? Value(std::numeric_limits<int>::min()) : Value(values.at(0).toInt(&ok1));
+        max = values.at(1) == "max" ? Value(std::numeric_limits<int>::max()) : Value(values.at(1).toInt(&ok2));
     } else if (attrRangeStr.startsWith("double")) {
         type = AttributeRange::Double_Range;
         values[0] = values[0].remove("double");
-        min = values.at(0) == "min" ? Value(DBL_MIN) : Value(values.at(0).toDouble(&ok1));
-        max = values.at(1) == "max" ? Value(DBL_MAX) : Value(values.at(1).toDouble(&ok2));
+        min = values.at(0) == "min" ? Value(std::numeric_limits<double>::min()) : Value(values.at(0).toDouble(&ok1));
+        max = values.at(1) == "max" ? Value(std::numeric_limits<double>::max()) : Value(values.at(1).toDouble(&ok2));
     } else {
         return std::unique_ptr<SingleValue>(new SingleValue());
     }

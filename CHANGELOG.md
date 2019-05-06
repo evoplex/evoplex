@@ -12,11 +12,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - The `CellularAutomata1D` model plugin has been updated to implement the 256 elementary cellular automaton rules
 - AttrRange::SingleValue - `min()`, `max()` and `rand()` now return an invalid Value
+- Value(double) safety: the comparison operators are now using qFuzzyCompare
 
 ### Fixed
 - Fixes #27 - Experiment Designer: vertical scrollbar is hiding the buttons and fields
 - Fixes MSVC2013 compilation
-- AttrRange is now accepting the `min` keyword
+- AttrRange::IntervalOfValues is now accepting the `min` keyword
+- AttrRange::SetOfvalues is now accepting the `min` and `max` keywords
 - AttrRange: a set of strings should not accept empty strings
 - AttrRange: the set of values is now accepting only unique values
 - AttrRange prev() and next() are now working as expected
