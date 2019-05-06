@@ -65,13 +65,13 @@ MainApp::MainApp()
         m_generalAttrsScope.insert(name, AttributeRange::parse(id++, name, attrRangeStr));
     };
 
-    addAttrScope(id, GENERAL_ATTR_EXPID, QString("int[0,%1]").arg(INT32_MAX));
+    addAttrScope(id, GENERAL_ATTR_EXPID, QString("int[0,%1]").arg(std::numeric_limits<int>::max()));
     addAttrScope(id, GENERAL_ATTR_NODES, "non-empty-string");
     addAttrScope(id, GENERAL_ATTR_GRAPHID, "non-empty-string");
     addAttrScope(id, GENERAL_ATTR_MODELID, "non-empty-string");
-    addAttrScope(id, GENERAL_ATTR_GRAPHVS, QString("int[0,%1]").arg(UINT16_MAX));
-    addAttrScope(id, GENERAL_ATTR_MODELVS, QString("int[0,%1]").arg(UINT16_MAX));
-    addAttrScope(id, GENERAL_ATTR_SEED, QString("int[0,%1]").arg(INT32_MAX));
+    addAttrScope(id, GENERAL_ATTR_GRAPHVS, QString("int[0,%1]").arg(std::numeric_limits<uint16_t>::max()));
+    addAttrScope(id, GENERAL_ATTR_MODELVS, QString("int[0,%1]").arg(std::numeric_limits<uint16_t>::max()));
+    addAttrScope(id, GENERAL_ATTR_SEED, QString("int[0,%1]").arg(std::numeric_limits<int>::max()));
     addAttrScope(id, GENERAL_ATTR_STOPAT, QString("int[1,%1]").arg(EVOPLEX_MAX_STEPS));
     addAttrScope(id, GENERAL_ATTR_TRIALS, QString("int[1,%1]").arg(EVOPLEX_MAX_TRIALS));
     addAttrScope(id, GENERAL_ATTR_AUTODELETE, "bool");

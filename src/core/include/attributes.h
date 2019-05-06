@@ -198,7 +198,7 @@ inline void Attributes::replace(int id, QString newName, Value newValue) {
 inline void Attributes::push_back(QString name, Value value) {
     m_names.emplace_back(name);
     m_values.emplace_back(value);
-    if (m_names.size() >= INT32_MAX)
+    if (m_names.size() >= std::numeric_limits<int>::max())
         throw std::length_error("too many attributes");
 }
 

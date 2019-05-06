@@ -25,7 +25,7 @@
 namespace evoplex {
 
 ExperimentsMgr::ExperimentsMgr()
-    : m_lastThreadPriority(INT32_MAX),
+    : m_lastThreadPriority(std::numeric_limits<int>::max()/2),
       m_timerProgress(new QTimer(this))
 {
     resetSettingsToDefault();
@@ -122,7 +122,7 @@ void ExperimentsMgr::trialFinished(Trial* trial)
         }
 
         if (m_running.empty() && m_queued.empty()) {
-            m_lastThreadPriority = INT32_MAX; // reset priority
+            m_lastThreadPriority = std::numeric_limits<int>::max()/2; // reset priority
         }
     }
 
