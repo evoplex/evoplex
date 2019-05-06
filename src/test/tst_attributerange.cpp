@@ -72,7 +72,7 @@ private:
         Value min, max, mid, valNotIn;
         Value pMid, nMid, pMax, nMin;
         const AttributeRange::Type type;
-        RgeInput(QString in, std::vector<T> vs, Value valNotIn, AttributeRange::Type t)
+        RgeInput(QString in, const std::vector<T>& vs, Value valNotIn, AttributeRange::Type t)
             : inRgeStr(in), vals(vs), valNotIn(valNotIn), type(t)
         {
             // build expected attrRange string
