@@ -162,13 +162,13 @@ void TestAttributeRange::_tst_range(RgeInput<T> in) const
         QCOMPARE(attrRge->validate(Value(v).toQString()).toQString(), Value(v).toQString());
     }
     // prev()
-    QCOMPARE(attrRge->prev(in.vals.front()), in.vals.back());
-    QCOMPARE(attrRge->prev(in.mid).toQString(), in.pMid.toQString());
+    QCOMPARE(attrRge->prev(in.vals.front()), Value(in.vals.back()));
+    QCOMPARE(attrRge->prev(in.mid), in.pMid);
     QCOMPARE(attrRge->prev(in.vals.back()), in.pMax);
     // next()
     QCOMPARE(attrRge->next(in.vals.front()), in.nMin);
     QCOMPARE(attrRge->next(in.mid), in.nMid);
-    QCOMPARE(attrRge->next(in.vals.back()), in.vals.front());
+    QCOMPARE(attrRge->next(in.vals.back()), Value(in.vals.front()));
     // invalid case: different type
     Value itype = std::is_same<T, QString>::value ? Value(123) : Value("invalid");
     QCOMPARE(attrRge->validate(itype.toQString()), Value());
@@ -471,8 +471,8 @@ void TestAttributeRange::tst_invalidCases()
         const auto attrRge = AttributeRange::parse(m_attrId, m_attrName, ars);
         QCOMPARE(attrRge->id(), -1);
         QVERIFY(!attrRge->isValid());
-        QCOMPARE(attrRge->attrName(), "");
-        QCOMPARE(attrRge->attrRangeStr(), "");
+        QCOMPARE(attrRge->attrName(), QString(""));
+        QCOMPARE(attrRge->attrRangeStr(), QString(""));
         QCOMPARE(attrRge->type(), AttributeRange::Invalid);
         QCOMPARE(attrRge->validate("abc"), Value());
         QCOMPARE(attrRge->min(), Value());
