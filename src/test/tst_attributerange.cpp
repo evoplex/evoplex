@@ -68,10 +68,10 @@ private:
     template<class T>
     struct RgeInput {
         QString expRgeStr, inRgeStr;
-        const std::vector<T> vals;
+        std::vector<T> vals;
         Value min, max, mid, valNotIn;
         Value pMid, nMid, pMax, nMin;
-        const AttributeRange::Type type;
+        AttributeRange::Type type;
         RgeInput(QString in, const std::vector<T>& vs, Value valNotIn, AttributeRange::Type t)
             : inRgeStr(in), vals(vs), valNotIn(valNotIn), type(t)
         {
