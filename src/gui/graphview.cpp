@@ -282,8 +282,7 @@ void GraphView::drawArrow(QPainter& painter, QPoint& p1, QPoint& p2) const
     arr_head.lineTo(x4, y4);
     arr_head.lineTo(x1, y1);
         
-    painter.fillPath (arr_head, QBrush (Qt::darkGray));
-    
+    painter.fillPath (arr_head, QBrush (Qt::darkGray));   
 }
 
 void GraphView::drawSelectedStar(QPainter& painter, double nodeRadius) const
