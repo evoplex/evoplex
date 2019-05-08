@@ -53,12 +53,14 @@ private slots:
     void setEdgeCMap(ColorMap* cmap);
 
 private:
+    bool directed = true;
     GraphSettings* m_settingsDlg;
 
     int m_edgeAttr;
     ColorMap* m_edgeCMap;
     qreal m_edgeScale;
 
+    bool m_directed;
     bool m_showNodes;
     bool m_showEdges;
 
@@ -80,6 +82,7 @@ private:
 
     void drawNode(QPainter& painter, const Star& s, double r) const;
     void drawEdges(QPainter& painter) const;
+    void drawArrow(QPainter& painter, QPoint& p1, QPoint& p2) const;
     void drawNodes(QPainter& painter, double nodeRadius) const;
     void drawSelectedStar(QPainter& painter, double nodeRadius) const;
 
