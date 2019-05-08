@@ -82,7 +82,7 @@ private:
 
     void drawNode(QPainter& painter, const Star& s, double r) const;
     void drawEdges(QPainter& painter) const;
-    void drawArrow(QPainter& painter, QPoint& p1, QPoint& p2) const;
+    void drawArrow(QPainter& painter, const QPoint p1, const QPoint p2) const;
     void drawNodes(QPainter& painter, double nodeRadius) const;
     void drawSelectedStar(QPainter& painter, double nodeRadius) const;
 

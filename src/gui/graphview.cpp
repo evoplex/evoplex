@@ -251,7 +251,7 @@ void GraphView::drawEdges(QPainter& painter) const
     painter.restore();
 }
 
-void GraphView::drawArrow(QPainter& painter, QPoint& p1, QPoint& p2) const
+void GraphView::drawArrow(QPainter& painter, const QPoint p1, const QPoint p2) const
 {
     float N = qSqrt(qPow(p2.x() - p1.x(), 2) + qPow(p2.y() - p1.y(), 2));
         
