@@ -234,6 +234,9 @@ void GraphView::drawEdges(QPainter& painter) const
                 const Value& value = ep.first.attr(m_edgeAttr);
                 pen.setColor(m_edgeCMap->colorFromValue(value));
                 painter.setPen(m_edgePen);
+                if (m_directed) {
+                    drawArrow(painter, m_edgeCMap->colorFromValue(value), QPoint(ep.second.x1(), ep.second.y1()), QPoint(ep.second.x2(), ep.second.y2()));
+                }
                 painter.drawLine(ep.second);
             }
         }
