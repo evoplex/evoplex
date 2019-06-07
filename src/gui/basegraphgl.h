@@ -36,6 +36,7 @@
 #include "experimentwidget.h"
 #include "graphwidget.h"
 #include "maingui.h"
+#include <QListWidget>
 
 class Ui_BaseGraphGL;
 
@@ -89,6 +90,8 @@ protected:
     qreal m_nodeScale;
     qreal m_nodeRadius;
     QPointF m_origin;
+    
+    bool pressed_ctrl;
 
     CacheStatus m_cacheStatus;
 
@@ -105,6 +108,7 @@ protected:
     void wheelEvent(QWheelEvent* e) override;
     void keyPressEvent(QKeyEvent* e) override;
     void keyReleaseEvent(QKeyEvent* e) override;
+    
 
 signals:
     void updateWidgets(bool) const;
@@ -122,6 +126,8 @@ private slots:
     void slotRestarted();
     void resetView();
     void setNodeCMap(ColorMap* cmap);
+    void edgesListItemClicked(QListWidgetItem* item);
+    void removeEdgeEvent();
 
 private:
     QtMaterialIconButton* m_bCenter;
@@ -139,6 +145,8 @@ private:
     void setupInspector();
 
     void updateInspector(const Node& node);
+    void updateEdgeInspector(const Edge& edge);
+    void updateEdgesInspector(const Node& pnode, const Node& cnode);
 };
 
 inline void BaseGraphGL::paintEvent(QPaintEvent*)
