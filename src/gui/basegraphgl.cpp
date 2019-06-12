@@ -378,6 +378,7 @@ void BaseGraphGL::mouseReleaseEvent(QMouseEvent *e)
                 m_bCenter->isChecked() ? updateCache() : update();
             }
         } else if(!m_nodeCur.isNull() && !node.isNull() && node != m_nodeCur){
+            clearSelection();
             m_trial->graph()->addEdge(m_nodeCur.id(), node.id());
             updateCache(true);
         } else {
