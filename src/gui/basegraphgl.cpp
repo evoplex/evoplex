@@ -269,9 +269,9 @@ void BaseGraphGL::removeEdgeEvent()
     int edgeId = (m_ui->edgeId->text()).toInt();
     const Edge e = m_trial->graph()->edge(edgeId);
     m_trial->graph()->removeEdge(e);
-    updateCache(true);
     m_ui->inspector->hide();
-
+    clearSelection();
+    updateCache(true);
 }
 
 void BaseGraphGL::setNodeCMap(ColorMap* cmap)
@@ -369,12 +369,14 @@ void BaseGraphGL::mouseReleaseEvent(QMouseEvent *e)
         if (!m_nodeCur.isNull() && !prevSelection.isNull() && m_nodeCur != prevSelection && pressed_ctrl) {
             clearSelection();
             updateEdgesInspector(m_nodeCur, prevSelection);
+            m_bCenter->isChecked() ? updateCache() : update();
         }
         else if (e->pos() == m_posEntered) {
             if (node.isNull() || prevSelection == node) {
                 clearSelection();
             } else {
                 updateInspector(node);
+                setSelectedNode(node, false);
                 m_bCenter->isChecked() ? updateCache() : update();
             }
         } else if(!m_nodeCur.isNull() && !node.isNull() && node != m_nodeCur){
@@ -482,6 +484,12 @@ void BaseGraphGL::updateEdgesInspector(const Node& pnode, const Node& cnode)
             edges.insert(e.first);
         }
     }
+    
+    if (edges.size() == 0){
+            return;
+    }
+    
+    setSelectedNode(pnode, true);
     
     // If there is only one edge to the target node, open the edgeInspector directly
     if (edges.size() == 1)

@@ -48,6 +48,7 @@ protected:
     inline QPointF selectedNodePos() const override;
     inline void clearSelection() override;
     CacheStatus refreshCache() override;
+    void setSelectedNode(const Node& node, bool ctrl) override;
 
 private slots:
     void setEdgeCMap(ColorMap* cmap);
@@ -76,11 +77,15 @@ private:
     };
     std::vector<Star> m_cache;
     Star m_selectedStar;
+    Node m_selectedNodeBase;
+    Node m_selectedNodeTar;
+    
     Star createStar(const Node& node, const qreal& edgeSizeRate, const QPointF& xy);
 
     void drawNode(QPainter& painter, const Star& s, double r) const;
     void drawEdges(QPainter& painter) const;
     void drawNodes(QPainter& painter, double nodeRadius) const;
+    void drawSelectedEdge(QPainter& painter, double nodeRadius) const;
     void drawSelectedStar(QPainter& painter, double nodeRadius) const;
 
     inline qreal currEdgeSize() const;
@@ -94,7 +99,11 @@ inline QPointF GraphView::selectedNodePos() const
 { return m_selectedStar.xy + m_origin; }
 
 inline void GraphView::clearSelection()
-{ m_selectedStar = Star(); BaseGraphGL::clearSelection(); }
+{ 
+    m_selectedStar = Star();
+    m_selectedNodeTar = Node();
+    BaseGraphGL::clearSelection(); 
+}
 
 inline void GraphView::zoomIn()
 { updateNodePen(); BaseGraphGL::zoomIn(); }
