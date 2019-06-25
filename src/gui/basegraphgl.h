@@ -92,8 +92,6 @@ protected:
     qreal m_nodeRadius;
     QPointF m_origin;
     
-    bool pressed_ctrl;
-
     CacheStatus m_cacheStatus;
 
     CacheStatus refreshCache() override { return CacheStatus::Ready; }
