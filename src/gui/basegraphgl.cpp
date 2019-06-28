@@ -369,11 +369,11 @@ void BaseGraphGL::mouseReleaseEvent(QMouseEvent *e)
             updateEdgesInspector(nodeCur, prevSelection);
             m_bCenter->isChecked() ? updateCache() : update();
         } else if (e->pos() == m_posEntered) {
-            if (node.isNull() || prevSelection == node) {
-                clearSelection();
-            } else {
+            clearSelection();
+            if (!node.isNull() && prevSelection != node) {
                 updateInspector(node);
                 setSelectedNode(node, false);
+                selectNode(e->localPos(), m_bCenter->isChecked());
                 m_bCenter->isChecked() ? updateCache() : update();
             }
         } else {

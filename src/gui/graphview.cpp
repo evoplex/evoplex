@@ -115,6 +115,7 @@ void GraphView::setSelectedNode(const Node& node, bool ctrl)
     }
     else {
         m_selectedNodeBase = node;
+        m_selectedNodeTar = Node();
     }
 }
 
