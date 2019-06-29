@@ -36,6 +36,7 @@
 #include "experimentwidget.h"
 #include "graphwidget.h"
 #include "maingui.h"
+#include <QListWidget>
 
 class Ui_BaseGraphGL;
 
@@ -59,6 +60,7 @@ protected:
     virtual bool selectNode(const Node& node, bool center) = 0;
     virtual Node selectedNode() const = 0;
     virtual QPointF selectedNodePos() const = 0;
+    virtual void setSelectedNode(const Node& node, bool ctrl){};
     virtual void clearSelection() = 0;
     virtual CacheStatus refreshCache() = 0;
 };
@@ -89,7 +91,7 @@ protected:
     qreal m_nodeScale;
     qreal m_nodeRadius;
     QPointF m_origin;
-
+    
     CacheStatus m_cacheStatus;
 
     CacheStatus refreshCache() override { return CacheStatus::Ready; }
@@ -105,6 +107,7 @@ protected:
     void wheelEvent(QWheelEvent* e) override;
     void keyPressEvent(QKeyEvent* e) override;
     void keyReleaseEvent(QKeyEvent* e) override;
+    
 
 signals:
     void updateWidgets(bool) const;
@@ -122,6 +125,8 @@ private slots:
     void slotRestarted();
     void resetView();
     void setNodeCMap(ColorMap* cmap);
+    void edgesListItemClicked(QListWidgetItem* item);
+    void removeEdgeEvent();
 
 private:
     QtMaterialIconButton* m_bCenter;
@@ -139,6 +144,8 @@ private:
     void setupInspector();
 
     void updateInspector(const Node& node);
+    void updateEdgeInspector(const Edge& edge);
+    void updateEdgesInspector(const Node& pnode, const Node& cnode);
 };
 
 inline void BaseGraphGL::paintEvent(QPaintEvent*)

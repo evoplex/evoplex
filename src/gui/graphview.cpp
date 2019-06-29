@@ -108,6 +108,17 @@ CacheStatus GraphView::refreshCache()
     return CacheStatus::Ready;
 }
 
+void GraphView::setSelectedNode(const Node& node, bool ctrl)
+{
+    if (ctrl){
+        m_selectedNodeTar = node;
+    }
+    else {
+        m_selectedNodeBase = node;
+        m_selectedNodeTar = Node();
+    }
+}
+
 Node GraphView::selectNode(const QPointF& pos, bool center)
 {
     m_selectedStar = Star();
@@ -185,7 +196,7 @@ void GraphView::updateNodePen()
 
 void GraphView::paintFrame(QPainter& painter) const
 {
-    if (m_selectedStar.node.isNull()) {
+    if (m_selectedStar.node.isNull() && m_selectedNodeTar.isNull()) {
         painter.setOpacity(1.0);
         drawEdges(painter);
     } else {
@@ -194,6 +205,7 @@ void GraphView::paintFrame(QPainter& painter) const
     const double nodeRadius = m_nodeRadius;
     drawNodes(painter, nodeRadius);
     drawSelectedStar(painter, nodeRadius);
+    drawSelectedEdge(painter, nodeRadius);
 }
 
 void GraphView::drawNode(QPainter& painter, const Star& s, double r) const
@@ -243,6 +255,36 @@ void GraphView::drawEdges(QPainter& painter) const
             }
         }
     }
+    painter.restore();
+}
+
+void GraphView::drawSelectedEdge(QPainter& painter, double nodeRadius) const
+{
+    if (m_selectedNodeTar.isNull() || m_selectedNodeBase.isNull()){
+        return;
+    }
+    
+    painter.setOpacity(1.0);
+    
+    const QPointF p1 = nodePoint(m_selectedNodeBase, currEdgeSize());
+    const QPointF p2 = nodePoint(m_selectedNodeTar, currEdgeSize());
+    
+    painter.save();
+    // highlight immediate edges
+    painter.setPen(QPen(Qt::darkGray, m_edgePen.width() + 3));
+    painter.drawLine(p1.x(), p1.y(), p2.x(), p2.y());
+    
+    // draw selected node
+    painter.setPen(m_nodePen);
+    
+    const Value& value1 = m_selectedNodeBase.attr(m_nodeAttr);
+    painter.setBrush(m_nodeCMap->colorFromValue(value1));
+    painter.drawEllipse(p1, nodeRadius, nodeRadius);
+    
+    const Value& value2 = m_selectedNodeTar.attr(m_nodeAttr);
+    painter.setBrush(m_nodeCMap->colorFromValue(value2));
+    painter.drawEllipse(p2, nodeRadius, nodeRadius);
+    
     painter.restore();
 }
 
