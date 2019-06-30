@@ -51,8 +51,6 @@ GraphView::GraphView(ColorMapMgr* cMgr, ExperimentPtr exp, GraphWidget* parent)
 
     updateNodePen();
     
-    m_selectedNodes.reserve(m_maxSelectedNodes);
-
     m_origin += m_origin; // double margin
 
     setTrial(0); // init at trial 0
@@ -112,7 +110,7 @@ CacheStatus GraphView::refreshCache()
     return CacheStatus::Ready;
 }
 
-Node GraphView::selectNode(const QPointF& pos, bool center, bool addNode)
+Node GraphView::selectNode(const QPointF& pos, bool center)
 {
     m_selectedStar = Star();
     if (m_cacheStatus != CacheStatus::Ready) {
@@ -128,8 +126,8 @@ Node GraphView::selectNode(const QPointF& pos, bool center, bool addNode)
         {
             m_selectedStar = star;
             if (center) { m_origin = rect().center() - star.xy; }
-            if (addNode && m_selectedNodes.size() < m_maxSelectedNodes) { 
-                m_selectedNodes.push_back(star.node);
+            if (m_selectedNodes.size() < m_maxSelectedNodes) {
+                m_selectedNodes.insert(std::make_pair(star.node.id(), star.node));
             }
             return star.node;
         }
@@ -260,8 +258,8 @@ void GraphView::drawSelectedEdge(QPainter& painter, double nodeRadius) const
         return;
     }
 
-    Node selectedNodeBase = m_selectedNodes.at(0);
-    Node selectedNodeTar = m_selectedNodes.at(1);
+    Node selectedNodeBase = m_selectedNodes.begin()->second;
+    Node selectedNodeTar = (++m_selectedNodes.begin())->second;
 
     // Check if the two nodes are neighbours
     bool isNeighbor = false;

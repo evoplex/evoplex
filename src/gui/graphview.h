@@ -24,6 +24,7 @@
 #include "basegraphgl.h"
 #include "graphsettings.h"
 
+
 namespace evoplex {
 
 class GraphView : public BaseGraphGL
@@ -42,7 +43,7 @@ public slots:
 
 protected:
     void paintFrame(QPainter& painter) const override;
-    Node selectNode(const QPointF &pos, bool center, bool addNode = false) override;
+    Node selectNode(const QPointF &pos, bool center) override;
     bool selectNode(const Node& node, bool center) override;
     inline Node selectedNode() const override;
     inline QPointF selectedNodePos() const override;
@@ -79,7 +80,7 @@ private:
     std::vector<Star> m_cache;
     Star m_selectedStar;
 
-    std::vector<Node> m_selectedNodes;
+    std::map<int, Node> m_selectedNodes;
     
     Star createStar(const Node& node, const qreal& edgeSizeRate, const QPointF& xy);
 
