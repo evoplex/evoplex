@@ -192,7 +192,7 @@ void GraphView::updateNodePen()
 
 void GraphView::paintFrame(QPainter& painter) const
 {
-    if (m_selectedStar.node.isNull() && m_selectedNodeTar.isNull()) {
+    if (m_selectedNodes.empty()) {
         painter.setOpacity(1.0);
         drawEdges(painter);
     } else {
@@ -302,7 +302,7 @@ void GraphView::drawSelectedEdge(QPainter& painter, double nodeRadius) const
 
 void GraphView::drawSelectedStar(QPainter& painter, double nodeRadius) const
 {
-    if (m_selectedStar.node.isNull()) {
+    if (m_selectedNodes.size() != 1) {
         return;
     }
 

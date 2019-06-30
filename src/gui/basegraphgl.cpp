@@ -365,12 +365,10 @@ void BaseGraphGL::mouseReleaseEvent(QMouseEvent *e)
         const Node& node = selectNode(e->localPos(), m_bCenter->isChecked(), true);
         const Node& nodeCur = selectNode(m_posEntered, m_bCenter->isChecked());
         if (!nodeCur.isNull() && !prevSelection.isNull() && nodeCur != prevSelection && e->modifiers().testFlag(Qt::ControlModifier)) {
-            clearSelection();
             updateEdgesInspector(nodeCur, prevSelection);
             m_bCenter->isChecked() ? updateCache() : update();
         } else if (e->pos() == m_posEntered) {
             clearSelection();
-            clearSelectedNodes();
             if (!node.isNull() && prevSelection != node) {
                 updateInspector(node);
                 selectNode(e->localPos(), m_bCenter->isChecked(), true);
@@ -379,7 +377,6 @@ void BaseGraphGL::mouseReleaseEvent(QMouseEvent *e)
         } else {
             m_origin += (e->pos() - m_posEntered);
             clearSelection();
-            clearSelectedNodes();
             updateCache();
         }
     } else if (e->button() == Qt::RightButton && m_nodeAttr >= 0 &&

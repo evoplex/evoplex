@@ -47,7 +47,6 @@ protected:
     inline Node selectedNode() const override;
     inline QPointF selectedNodePos() const override;
     inline void clearSelection() override;
-    inline void clearSelectedNodes() override;
     CacheStatus refreshCache() override;
 
 private slots:
@@ -81,8 +80,6 @@ private:
     Star m_selectedStar;
 
     std::vector<Node> m_selectedNodes;
-    Node m_selectedNodeBase;
-    Node m_selectedNodeTar;
     
     Star createStar(const Node& node, const qreal& edgeSizeRate, const QPointF& xy);
 
@@ -106,10 +103,8 @@ inline void GraphView::clearSelection()
 { 
     m_selectedStar = Star();
     BaseGraphGL::clearSelection(); 
+    m_selectedNodes.clear();
 }
-
-inline void GraphView::clearSelectedNodes()
-{ m_selectedNodes.clear(); }
 
 inline void GraphView::zoomIn()
 { updateNodePen(); BaseGraphGL::zoomIn(); }

@@ -61,7 +61,6 @@ protected:
     virtual Node selectedNode() const = 0;
     virtual QPointF selectedNodePos() const = 0;
     virtual void clearSelection() = 0;
-    virtual void clearSelectedNodes() {};
     virtual CacheStatus refreshCache() = 0;
 };
 
