@@ -56,7 +56,7 @@ private:
     GraphSettings* m_settingsDlg;
 
     int m_edgeAttr;
-    int m_maxSelectedNodes;
+    const int m_maxSelectedNodes;
 
     ColorMap* m_edgeCMap;
     qreal m_edgeScale;
