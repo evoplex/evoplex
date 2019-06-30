@@ -50,7 +50,6 @@ GraphView::GraphView(ColorMapMgr* cMgr, ExperimentPtr exp, GraphWidget* parent)
         [this](bool b) { m_showEdges = b; updateCache(); });
 
     updateNodePen();
-    
     m_origin += m_origin; // double margin
 
     setTrial(0); // init at trial 0

@@ -24,7 +24,6 @@
 #include "basegraphgl.h"
 #include "graphsettings.h"
 
-
 namespace evoplex {
 
 class GraphView : public BaseGraphGL
