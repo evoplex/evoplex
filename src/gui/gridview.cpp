@@ -105,7 +105,7 @@ void GridView::paintFrame(QPainter& painter) const
     }
 }
 
-Node GridView::selectNode(const QPointF& pos, bool center)
+Node GridView::selectNode(const QPointF& pos, bool center, bool addNode)
 {
     m_selectedCell = Cell();
     if (m_cacheStatus != CacheStatus::Ready) {

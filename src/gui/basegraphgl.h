@@ -56,12 +56,12 @@ public:
 protected:
     virtual ~GraphGLInterface() = default;
     virtual void paintFrame(QPainter& painter) const = 0;
-    virtual Node selectNode(const QPointF& pos, bool center) = 0;
+    virtual Node selectNode(const QPointF& pos, bool center, bool addNode = false) = 0;
     virtual bool selectNode(const Node& node, bool center) = 0;
     virtual Node selectedNode() const = 0;
     virtual QPointF selectedNodePos() const = 0;
-    virtual void setSelectedNode(const Node& node, bool ctrl){};
     virtual void clearSelection() = 0;
+    virtual void clearSelectedNodes() {};
     virtual CacheStatus refreshCache() = 0;
 };
 
@@ -107,7 +107,6 @@ protected:
     void wheelEvent(QWheelEvent* e) override;
     void keyPressEvent(QKeyEvent* e) override;
     void keyReleaseEvent(QKeyEvent* e) override;
-    
 
 signals:
     void updateWidgets(bool) const;
