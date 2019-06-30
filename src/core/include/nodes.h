@@ -32,7 +32,6 @@ namespace evoplex {
 class Nodes : private std::unordered_map<int, Node>
 {
     friend class AbstractGraph;
-    friend class GraphView;
     friend class Experiment;
     friend class NodesPrivate;
 

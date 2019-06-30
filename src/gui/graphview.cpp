@@ -129,7 +129,7 @@ Node GraphView::selectNode(const QPointF& pos, bool center, bool addNode)
             m_selectedStar = star;
             if (center) { m_origin = rect().center() - star.xy; }
             if (addNode && m_selectedNodes.size() < m_maxSelectedNodes) { 
-                m_selectedNodes.insert({ star.node.id(), star.node });
+                m_selectedNodes.push_back(star.node);
             }
             return star.node;
         }
@@ -260,8 +260,8 @@ void GraphView::drawSelectedEdge(QPainter& painter, double nodeRadius) const
         return;
     }
 
-    Node selectedNodeBase = m_selectedNodes.begin()->second;
-    Node selectedNodeTar = (++m_selectedNodes.begin())->second;
+    Node selectedNodeBase = m_selectedNodes.at(0);
+    Node selectedNodeTar = m_selectedNodes.at(1);
 
     // Check if the two nodes are neighbours
     bool isNeighbor = false;

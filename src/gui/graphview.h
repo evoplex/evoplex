@@ -80,7 +80,7 @@ private:
     std::vector<Star> m_cache;
     Star m_selectedStar;
 
-    Nodes m_selectedNodes;
+    std::vector<Node> m_selectedNodes;
     Node m_selectedNodeBase;
     Node m_selectedNodeTar;
     
