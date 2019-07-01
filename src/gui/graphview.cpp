@@ -35,7 +35,8 @@ GraphView::GraphView(ColorMapMgr* cMgr, ExperimentPtr exp, GraphWidget* parent)
       m_edgeAttr(-1),
       m_edgeCMap(nullptr),
       m_edgePen(Qt::gray),
-      m_nodePen(Qt::black)
+      m_nodePen(Qt::black),
+      m_maxSelectedNodes(2)
 {
     m_settingsDlg->init();
     setNodeScale(m_settingsDlg->nodeScale());
@@ -108,17 +109,6 @@ CacheStatus GraphView::refreshCache()
     return CacheStatus::Ready;
 }
 
-void GraphView::setSelectedNode(const Node& node, bool ctrl)
-{
-    if (ctrl){
-        m_selectedNodeTar = node;
-    }
-    else {
-        m_selectedNodeBase = node;
-        m_selectedNodeTar = Node();
-    }
-}
-
 Node GraphView::selectNode(const QPointF& pos, bool center)
 {
     m_selectedStar = Star();
@@ -135,6 +125,9 @@ Node GraphView::selectNode(const QPointF& pos, bool center)
         {
             m_selectedStar = star;
             if (center) { m_origin = rect().center() - star.xy; }
+            if (m_selectedNodes.size() < m_maxSelectedNodes) {
+                m_selectedNodes.insert(std::make_pair(star.node.id(), star.node));
+            }
             return star.node;
         }
     }
@@ -196,7 +189,7 @@ void GraphView::updateNodePen()
 
 void GraphView::paintFrame(QPainter& painter) const
 {
-    if (m_selectedStar.node.isNull() && m_selectedNodeTar.isNull()) {
+    if (m_selectedNodes.empty()) {
         painter.setOpacity(1.0);
         drawEdges(painter);
     } else {
@@ -260,37 +253,53 @@ void GraphView::drawEdges(QPainter& painter) const
 
 void GraphView::drawSelectedEdge(QPainter& painter, double nodeRadius) const
 {
-    if (m_selectedNodeTar.isNull() || m_selectedNodeBase.isNull()){
+    if (m_selectedNodes.size() != 2) {
         return;
     }
-    
+
+    Node selectedNodeBase = m_selectedNodes.begin()->second;
+    Node selectedNodeTar = (++m_selectedNodes.begin())->second;
+
+    // Check if the two nodes are neighbours
+    bool isNeighbor = false;
+    for (auto const& e : selectedNodeBase.outEdges()) {
+        if (selectedNodeTar == e.second.neighbour()) {
+            isNeighbor = true;
+            break;
+        }
+    }
+
+    if (!isNeighbor) {
+        return;
+    }
+
     painter.setOpacity(1.0);
-    
-    const QPointF p1 = nodePoint(m_selectedNodeBase, currEdgeSize());
-    const QPointF p2 = nodePoint(m_selectedNodeTar, currEdgeSize());
-    
+
+    const QPointF p1 = nodePoint(selectedNodeBase, currEdgeSize());
+    const QPointF p2 = nodePoint(selectedNodeTar, currEdgeSize());
+
     painter.save();
     // highlight immediate edges
     painter.setPen(QPen(Qt::darkGray, m_edgePen.width() + 3));
     painter.drawLine(p1.x(), p1.y(), p2.x(), p2.y());
-    
+
     // draw selected node
     painter.setPen(m_nodePen);
-    
-    const Value& value1 = m_selectedNodeBase.attr(m_nodeAttr);
+
+    const Value& value1 = selectedNodeBase.attr(m_nodeAttr);
     painter.setBrush(m_nodeCMap->colorFromValue(value1));
     painter.drawEllipse(p1, nodeRadius, nodeRadius);
-    
-    const Value& value2 = m_selectedNodeTar.attr(m_nodeAttr);
+
+    const Value& value2 = selectedNodeTar.attr(m_nodeAttr);
     painter.setBrush(m_nodeCMap->colorFromValue(value2));
     painter.drawEllipse(p2, nodeRadius, nodeRadius);
-    
+
     painter.restore();
 }
 
 void GraphView::drawSelectedStar(QPainter& painter, double nodeRadius) const
 {
-    if (m_selectedStar.node.isNull()) {
+    if (m_selectedNodes.size() != 1) {
         return;
     }
 

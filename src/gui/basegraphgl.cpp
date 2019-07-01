@@ -365,14 +365,12 @@ void BaseGraphGL::mouseReleaseEvent(QMouseEvent *e)
         const Node& node = selectNode(e->localPos(), m_bCenter->isChecked());
         const Node& nodeCur = selectNode(m_posEntered, m_bCenter->isChecked());
         if (!nodeCur.isNull() && !prevSelection.isNull() && nodeCur != prevSelection && e->modifiers().testFlag(Qt::ControlModifier)) {
-            clearSelection();
             updateEdgesInspector(nodeCur, prevSelection);
             m_bCenter->isChecked() ? updateCache() : update();
         } else if (e->pos() == m_posEntered) {
             clearSelection();
             if (!node.isNull() && prevSelection != node) {
                 updateInspector(node);
-                setSelectedNode(node, false);
                 selectNode(e->localPos(), m_bCenter->isChecked());
                 m_bCenter->isChecked() ? updateCache() : update();
             }
@@ -382,7 +380,7 @@ void BaseGraphGL::mouseReleaseEvent(QMouseEvent *e)
             updateCache();
         }
     } else if (e->button() == Qt::RightButton && m_nodeAttr >= 0 &&
-               m_trial->status() != Status::Running) {
+                m_trial->status() != Status::Running) {
         Node node = selectNode(e->localPos(), false);
         if (!node.isNull()) {
             const QString& attrName = node.attrs().name(m_nodeAttr);
@@ -476,9 +474,6 @@ void BaseGraphGL::updateEdgesInspector(const Node& srcNode, const Node& trgtNode
     if (edges.size() == 0){
             return;
     }
-    
-    setSelectedNode(srcNode, true);
-    
     // If there is only one edge to the target node, open the edgeInspector directly
     if (edges.size() == 1)
     {

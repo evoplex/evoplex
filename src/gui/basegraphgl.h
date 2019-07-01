@@ -60,7 +60,6 @@ protected:
     virtual bool selectNode(const Node& node, bool center) = 0;
     virtual Node selectedNode() const = 0;
     virtual QPointF selectedNodePos() const = 0;
-    virtual void setSelectedNode(const Node& node, bool ctrl){};
     virtual void clearSelection() = 0;
     virtual CacheStatus refreshCache() = 0;
 };
@@ -107,7 +106,6 @@ protected:
     void wheelEvent(QWheelEvent* e) override;
     void keyPressEvent(QKeyEvent* e) override;
     void keyReleaseEvent(QKeyEvent* e) override;
-    
 
 signals:
     void updateWidgets(bool) const;
