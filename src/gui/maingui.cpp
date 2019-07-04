@@ -68,6 +68,7 @@ MainGUI::MainGUI(MainApp* mainApp)
       m_plugins(new PluginsPage(this)),
       m_settings(new SettingsPage(this)),
       m_console(new ConsoleWidget(this)),
+      m_graphs(new PluginsPage(this)),
       m_curPage(PAGE_NULL)
 {
     // main window
@@ -90,12 +91,14 @@ MainGUI::MainGUI(MainApp* mainApp)
     centralLayout->addWidget(m_projectsPage);
     centralLayout->addWidget(m_plugins);
     centralLayout->addWidget(m_settings);
+    centralLayout->addWidget(m_graphs);
     setCentralWidget(centralLayout->parentWidget());
     m_welcome->hide();
     //m_queue->hide();
     m_projectsPage->hide();
     m_plugins->hide();
     m_settings->hide();
+    m_graphs->hide();
 
     //
     // left toolbar
@@ -119,6 +122,13 @@ MainGUI::MainGUI(MainApp* mainApp)
     wspacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     toolbar->addWidget(wspacer);
     toolbar->addSeparator();
+    QAction* acGraphs = new QAction(QIcon(":/icons/projects.svg"), "Graphs", actionGroup);
+    acGraphs->setCheckable(true);
+    acGraphs->setData(PAGE_GRAPHS);
+    toolbar->addActions(actionGroup->actions());
+    wspacer = new QWidget(this);
+    wspacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    toolbar->addWidget(wspacer);
     QAction* acPlugins = new QAction(QIcon(":/icons/plugins.svg"), "Plugins", actionGroup);
     acPlugins->setCheckable(true);
     acPlugins->setData(PAGE_PLUGINS);
@@ -165,7 +175,6 @@ MainGUI::MainGUI(MainApp* mainApp)
         if (m_projectsPage->slotNewProject()) slotPage(acProjects);
     });
     m_actOpenProject = new QAction("Open Project", this);
-
     connect(m_actOpenProject, &QAction::triggered, [this]() { emit(openProject("")); });
     connect(this, &MainGUI::openProject, [this, acProjects](const QString& path) {
         if (m_projectsPage->slotOpenProject(path)) slotPage(acProjects);
@@ -296,6 +305,9 @@ void MainGUI::setPageVisible(Page page, bool visible)
             m_plugins->setVisible(visible);
             break;
         case PAGE_SETTINGS:
+            m_settings->setVisible(visible);
+            break;
+        case PAGE_GRAPHS:
             m_settings->setVisible(visible);
             break;
         default:

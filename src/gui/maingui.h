@@ -78,7 +78,8 @@ private:
         PAGE_QUEUE,
         PAGE_PROJECTS,
         PAGE_PLUGINS,
-        PAGE_SETTINGS
+        PAGE_SETTINGS,
+        PAGE_GRAPHS
     };
 
     MainApp* m_mainApp;
@@ -91,6 +92,7 @@ private:
     PluginsPage* m_plugins;
     SettingsPage* m_settings;
     ConsoleWidget* m_console;
+    PluginsPage* m_graphs;
     Page m_curPage;
 
     QAction* m_actNewProject;
