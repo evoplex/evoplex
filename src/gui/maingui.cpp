@@ -45,6 +45,7 @@
 #include "consolewidget.h"
 #include "projectwidget.h"
 #include "savedialog.h"
+#include "graphpage.h"
 #include "pluginspage.h"
 #include "projectspage.h"
 #include "queuepage.h"
@@ -68,7 +69,7 @@ MainGUI::MainGUI(MainApp* mainApp)
       m_plugins(new PluginsPage(this)),
       m_settings(new SettingsPage(this)),
       m_console(new ConsoleWidget(this)),
-      m_graphs(new PluginsPage(this)),
+      m_graphs(new GraphPage(this)),
       m_curPage(PAGE_NULL)
 {
     // main window
@@ -308,7 +309,7 @@ void MainGUI::setPageVisible(Page page, bool visible)
             m_settings->setVisible(visible);
             break;
         case PAGE_GRAPHS:
-            m_settings->setVisible(visible);
+            m_graphs->setVisible(visible);
             break;
         default:
             m_welcome->setVisible(visible);

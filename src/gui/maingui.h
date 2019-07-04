@@ -35,6 +35,8 @@ class SaveDialog;
 
 class PluginsPage;
 class ProjectsPage;
+class GraphPage;
+
 //class QueuePage;
 class SettingsPage;
 class WelcomePage;
@@ -92,7 +94,7 @@ private:
     PluginsPage* m_plugins;
     SettingsPage* m_settings;
     ConsoleWidget* m_console;
-    PluginsPage* m_graphs;
+    GraphPage* m_graphs;
     Page m_curPage;
 
     QAction* m_actNewProject;
