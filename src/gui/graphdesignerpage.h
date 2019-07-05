@@ -18,26 +18,33 @@
 *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#ifndef GRAPHDESIGNERPAGE_H
+#define GRAPHDESIGNERPAGE_H
 
-#include "ui_graphpage.h"
-#include "graphpage.h"
+#include <QWidget>
+
+#include "maingui.h"
+#include "core/mainapp.h"
+
+class Ui_GraphDesignerPage;
+
+class MainGUI;
 
 namespace evoplex {
 
-GraphPage::GraphPage(MainGUI* mainGUI)
-    : QWidget(mainGUI),
-    m_ui(new Ui_GraphPage),
-    m_mainApp(mainGUI->mainApp()),
-    m_innerWindow(new QMainWindow())
+class GraphDesignerPage : public QWidget
 {
-    m_ui->setupUi(this);
+	Q_OBJECT
 
-    m_innerWindow->setStyleSheet("QMainWindow { background-color: rgb(24,24,24); }");
-}
+public:
+    explicit GraphDesignerPage(MainGUI* mainGUI);
+    ~GraphDesignerPage();
 
-GraphPage::~GraphPage()
-{
-    delete m_ui;
-}
+private:
+    Ui_GraphDesignerPage * m_ui;
+    MainApp* m_mainApp;
+    QMainWindow* m_innerWindow;
+};
 
 }
+#endif // GRAPHDESIGNERPAGE_H

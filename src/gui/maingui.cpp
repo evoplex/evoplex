@@ -45,7 +45,7 @@
 #include "consolewidget.h"
 #include "projectwidget.h"
 #include "savedialog.h"
-#include "graphpage.h"
+#include "graphdesignerpage.h"
 #include "pluginspage.h"
 #include "projectspage.h"
 #include "queuepage.h"
@@ -69,7 +69,7 @@ MainGUI::MainGUI(MainApp* mainApp)
       m_plugins(new PluginsPage(this)),
       m_settings(new SettingsPage(this)),
       m_console(new ConsoleWidget(this)),
-      m_graphs(new GraphPage(this)),
+      m_graphs(new GraphDesignerPage(this)),
       m_curPage(PAGE_NULL)
 {
     // main window

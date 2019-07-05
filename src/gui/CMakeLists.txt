@@ -101,7 +101,7 @@ set(EVOPLEX_GUI_H
   savedialog.h
   tablewidget.h
   graphtitlebar.h
-  graphpage.h
+  graphdesignerpage.h
   consolewidget.h
   pluginspage.h
   projectspage.h
@@ -134,7 +134,7 @@ set(EVOPLEX_GUI_CXX
   savedialog.cpp
   tablewidget.cpp
   graphtitlebar.cpp
-  graphpage.cpp
+  graphdesignerpage.cpp
   consolewidget.cpp
   pluginspage.cpp
   projectspage.cpp
@@ -153,7 +153,7 @@ set(EVOPLEX_GUI_UIFORM
   graphsettings
   gridsettings
   graphtitlebar
-  graphpage
+  graphdesignerpage
   #linechartsettings
   outputwidget
   pluginspage

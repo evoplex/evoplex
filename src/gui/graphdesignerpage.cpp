@@ -17,32 +17,28 @@
 *  You should have received a copy of the GNU General Public License
 *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+#include <QDebug>
 
-#ifndef GRAPHPAGE_H
-#define GRAPHPAGE_H
-
-#include <QWidget>
-
-#include "maingui.h"
-#include "core/mainapp.h"
-
-class Ui_GraphPage;
+#include "fontstyles.h"
+#include "ui_graphdesignerpage.h"
+#include "graphdesignerpage.h"
 
 namespace evoplex {
 
-class GraphPage : public QWidget
+GraphDesignerPage::GraphDesignerPage(MainGUI* mainGUI)
+    : QWidget(mainGUI),
+    m_ui(new Ui_GraphDesignerPage),
+    m_mainApp(mainGUI->mainApp()),
+    m_innerWindow(new QMainWindow())
 {
-	Q_OBJECT
+    m_ui->setupUi(this);
 
-public:
-    explicit GraphPage(MainGUI* mainGUI);
-    ~GraphPage();
+    m_ui->labelGraphDesigner->setFont(FontStyles::h4());
+}
 
-private:
-    Ui_GraphPage * m_ui;
-    MainApp* m_mainApp;
-    QMainWindow* m_innerWindow;
-};
+GraphDesignerPage::~GraphDesignerPage()
+{
+    delete m_ui;
+}
 
 }
-#endif // GRAPHPAGE_H
