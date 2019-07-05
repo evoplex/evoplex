@@ -119,17 +119,14 @@ MainGUI::MainGUI(MainApp* mainApp)
     acProjects->setCheckable(true);
     acProjects->setData(PAGE_PROJECTS);
     toolbar->addActions(actionGroup->actions());
-    auto wspacer = new QWidget(this);
-    wspacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    toolbar->addWidget(wspacer);
-    toolbar->addSeparator();
     QAction* acGraphs = new QAction(QIcon(":/icons/projects.svg"), "Graphs", actionGroup);
     acGraphs->setCheckable(true);
     acGraphs->setData(PAGE_GRAPHS);
     toolbar->addActions(actionGroup->actions());
-    wspacer = new QWidget(this);
+    auto wspacer = new QWidget(this);
     wspacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     toolbar->addWidget(wspacer);
+    toolbar->addSeparator();
     QAction* acPlugins = new QAction(QIcon(":/icons/plugins.svg"), "Plugins", actionGroup);
     acPlugins->setCheckable(true);
     acPlugins->setData(PAGE_PLUGINS);
@@ -143,6 +140,7 @@ MainGUI::MainGUI(MainApp* mainApp)
     toolbar->setToolButtonStyle(Qt::ToolButtonIconOnly);
     toolbar->setMovable(false);
     toolbar->setFloatable(false);
+
     addToolBar(Qt::LeftToolBarArea, toolbar);
     // remove the tooltips
     for (QToolButton* btn : toolbar->findChildren<QToolButton*>()) {
