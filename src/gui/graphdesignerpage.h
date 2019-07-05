@@ -21,7 +21,7 @@
 #ifndef GRAPHDESIGNERPAGE_H
 #define GRAPHDESIGNERPAGE_H
 
-#include <QWidget>
+#include <QMainWindow>
 
 #include "maingui.h"
 #include "core/mainapp.h"
@@ -43,7 +43,10 @@ public:
 private:
     Ui_GraphDesignerPage * m_ui;
     MainApp* m_mainApp;
+    MainGUI* m_mainGUI;
     QMainWindow* m_innerWindow;
+
+    void addGraphDesignerWidget();
 };
 
 }

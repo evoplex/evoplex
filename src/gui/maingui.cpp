@@ -69,7 +69,7 @@ MainGUI::MainGUI(MainApp* mainApp)
       m_plugins(new PluginsPage(this)),
       m_settings(new SettingsPage(this)),
       m_console(new ConsoleWidget(this)),
-      m_graphs(new GraphDesignerPage(this)),
+      m_graphPage(new GraphDesignerPage(this)),
       m_curPage(PAGE_NULL)
 {
     // main window
@@ -92,14 +92,14 @@ MainGUI::MainGUI(MainApp* mainApp)
     centralLayout->addWidget(m_projectsPage);
     centralLayout->addWidget(m_plugins);
     centralLayout->addWidget(m_settings);
-    centralLayout->addWidget(m_graphs);
+    centralLayout->addWidget(m_graphPage);
     setCentralWidget(centralLayout->parentWidget());
     m_welcome->hide();
     //m_queue->hide();
     m_projectsPage->hide();
     m_plugins->hide();
     m_settings->hide();
-    m_graphs->hide();
+    m_graphPage->hide();
 
     //
     // left toolbar
@@ -172,6 +172,11 @@ MainGUI::MainGUI(MainApp* mainApp)
     connect(this, SIGNAL(newProject()), m_actNewProject, SIGNAL(triggered()));
     connect(m_actNewProject, &QAction::triggered, [this, acProjects]() {
         if (m_projectsPage->slotNewProject()) slotPage(acProjects);
+    });
+    m_actNewGraph = new QAction("New Graph", this);
+    connect(this, SIGNAL(newGraph()), m_actNewGraph, SIGNAL(triggered()));
+    connect(m_actNewGraph, &QAction::triggered, [this, acProjects]() {
+        slotPage(acProjects);
     });
     m_actOpenProject = new QAction("Open Project", this);
     connect(m_actOpenProject, &QAction::triggered, [this]() { emit(openProject("")); });
@@ -307,7 +312,7 @@ void MainGUI::setPageVisible(Page page, bool visible)
             m_settings->setVisible(visible);
             break;
         case PAGE_GRAPHS:
-            m_graphs->setVisible(visible);
+            m_graphPage->setVisible(visible);
             break;
         default:
             m_welcome->setVisible(visible);

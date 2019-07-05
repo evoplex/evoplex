@@ -57,6 +57,7 @@ public:
 
 signals:
     void newProject();
+    void newGraph();
     void openProject(QString path);
 
 private slots:
@@ -94,11 +95,12 @@ private:
     PluginsPage* m_plugins;
     SettingsPage* m_settings;
     ConsoleWidget* m_console;
-    GraphDesignerPage* m_graphs;
+    GraphDesignerPage* m_graphPage;
     Page m_curPage;
 
     QAction* m_actNewProject;
     QAction* m_actOpenProject;
+    QAction* m_actNewGraph;
     QAction* m_actSave;
     QAction* m_actSaveAs;
 

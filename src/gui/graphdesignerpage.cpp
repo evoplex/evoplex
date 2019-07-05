@@ -29,16 +29,23 @@ GraphDesignerPage::GraphDesignerPage(MainGUI* mainGUI)
     : QWidget(mainGUI),
     m_ui(new Ui_GraphDesignerPage),
     m_mainApp(mainGUI->mainApp()),
+    m_mainGUI(mainGUI),
     m_innerWindow(new QMainWindow())
 {
     m_ui->setupUi(this);
 
     m_ui->labelGraphDesigner->setFont(FontStyles::h4());
+
+    connect(m_ui->bNewGraph, SIGNAL(pressed()), m_mainGUI, SIGNAL(newGraph()));
 }
 
 GraphDesignerPage::~GraphDesignerPage()
 {
     delete m_ui;
+}
+
+void GraphDesignerPage::addGraphDesignerWidget()
+{
 }
 
 }
