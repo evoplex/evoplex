@@ -87,6 +87,7 @@ set(EVOPLEX_GUI_H
   #contextmenutable.h
   experimentdesigner.h
   experimentwidget.h
+  graphdesigner.h
   fontstyles.h
   #linechart.h
   linebutton.h
@@ -117,6 +118,7 @@ set(EVOPLEX_GUI_CXX
   attrwidget.cpp
   attrsgendlg.cpp
   experimentdesigner.cpp
+  graphdesigner.cpp
   colormap.cpp
   #contextmenutable.cpp
   experimentwidget.cpp
@@ -149,6 +151,7 @@ set(EVOPLEX_GUI_UIFORM
   attrsgendlg
   consoletitlebar
   experimentdesigner
+  graphdesigner
   basegraphgl
   graphsettings
   gridsettings

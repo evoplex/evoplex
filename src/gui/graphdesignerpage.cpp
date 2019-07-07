@@ -22,6 +22,7 @@
 #include "fontstyles.h"
 #include "ui_graphdesignerpage.h"
 #include "graphdesignerpage.h"
+#include "graphdesigner.h"
 
 namespace evoplex {
 
@@ -36,7 +37,7 @@ GraphDesignerPage::GraphDesignerPage(MainGUI* mainGUI)
 
     m_ui->labelGraphDesigner->setFont(FontStyles::h4());
 
-    connect(m_ui->bNewGraph, SIGNAL(pressed()), m_mainGUI, SIGNAL(newGraph()));
+    connect(m_ui->bNewGraph, SIGNAL(pressed()), SLOT(slotNewGraph()));
 }
 
 GraphDesignerPage::~GraphDesignerPage()
@@ -44,8 +45,10 @@ GraphDesignerPage::~GraphDesignerPage()
     delete m_ui;
 }
 
-void GraphDesignerPage::addGraphDesignerWidget()
+void GraphDesignerPage::slotNewGraph()
 {
+    GraphDesigner* gd = new GraphDesigner(m_mainGUI->mainApp(), this);
+    gd->setVisible(true);
 }
 
 }

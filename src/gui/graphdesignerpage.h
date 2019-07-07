@@ -46,7 +46,8 @@ private:
     MainGUI* m_mainGUI;
     QMainWindow* m_innerWindow;
 
-    void addGraphDesignerWidget();
+private slots:
+    void slotNewGraph();
 };
 
 }

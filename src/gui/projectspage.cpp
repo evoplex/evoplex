@@ -50,7 +50,6 @@ ProjectsPage::ProjectsPage(MainGUI* mainGUI)
 
     restoreGeometry(m_userPrefs.value("gui/projectsPageGeometry").toByteArray());
     restoreState(m_userPrefs.value("gui/projectsPageState").toByteArray());
-
     addDockWidget(Qt::RightDockWidgetArea, m_expDesigner);
 }
 

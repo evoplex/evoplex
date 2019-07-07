@@ -173,11 +173,7 @@ MainGUI::MainGUI(MainApp* mainApp)
     connect(m_actNewProject, &QAction::triggered, [this, acProjects]() {
         if (m_projectsPage->slotNewProject()) slotPage(acProjects);
     });
-    m_actNewGraph = new QAction("New Graph", this);
-    connect(this, SIGNAL(newGraph()), m_actNewGraph, SIGNAL(triggered()));
-    connect(m_actNewGraph, &QAction::triggered, [this, acProjects]() {
-        slotPage(acProjects);
-    });
+
     m_actOpenProject = new QAction("Open Project", this);
     connect(m_actOpenProject, &QAction::triggered, [this]() { emit(openProject("")); });
     connect(this, &MainGUI::openProject, [this, acProjects](const QString& path) {
