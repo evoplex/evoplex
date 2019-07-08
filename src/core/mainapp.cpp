@@ -77,6 +77,9 @@ MainApp::MainApp()
     addAttrScope(id, GENERAL_ATTR_AUTODELETE, "bool");
     addAttrScope(id, GENERAL_ATTR_GRAPHTYPE, "string");
     addAttrScope(id, GENERAL_ATTR_EDGEATTRS, "string");
+    addAttrScope(id, GENERAL_ATTR_NODEATTRS, "string");
+    addAttrScope(id, GENERAL_ATTR_EDGE_NUM, "string");
+    addAttrScope(id, GENERAL_ATTR_NODE_NUM, "string");
 
     addAttrScope(id, OUTPUT_DIR, "string");
     addAttrScope(id, OUTPUT_HEADER, "string");

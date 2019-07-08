@@ -20,6 +20,10 @@
 
 #include <QDebug>
 #include <QComboBox> 
+#include <QSpinBox>
+#include <QStringList>
+#include <QTableWidget>
+
 #include "core/include/attrsgenerator.h"
 #include "core/include/enum.h"
 
@@ -48,6 +52,35 @@ GraphDesigner::GraphDesigner(MainApp* mainApp, QWidget *parent)
         return t;
     };
 
+    // - the tree widget: attributes
+    m_treeItemAttrs = newTreeItem("Attributes", true);
+    
+    // number of node attributes
+    QSpinBox* node_attr_num = new QSpinBox(m_ui->treeWidget);
+    node_attr_num->setRange(0, 1000000);
+    addGeneralAttr(m_treeItemAttrs, GENERAL_ATTR_NODEATTRS, node_attr_num);
+
+    // table holding the node attributes
+    m_nodeAttrTable = new QTableWidget(0, 2);
+    addGeneralAttr(m_treeItemAttrs, GENERAL_ATTR_NODE_NUM, m_nodeAttrTable);
+    m_nodeAttrTable->setHorizontalHeaderItem(0, new QTableWidgetItem("Attribute"));
+    m_nodeAttrTable->setHorizontalHeaderItem(1, new QTableWidgetItem("Range"));
+    m_nodeAttrTable->verticalHeader()->setVisible(false);
+    m_nodeAttrTable->horizontalHeader()->setStretchLastSection(true);
+    connect(node_attr_num, SIGNAL(valueChanged(int)), SLOT(slotNodeTableUpdate(int)));
+    
+    //number of edge attributes
+    QSpinBox* edge_attr_num = new QSpinBox(m_ui->treeWidget);
+    edge_attr_num->setRange(0, 1000000);
+    addGeneralAttr(m_treeItemAttrs, GENERAL_ATTR_EDGE_NUM, edge_attr_num);
+
+    // table holding the edge attributes
+    m_edgeAttrTable = new QTableWidget(0, 2);
+    addGeneralAttr(m_treeItemAttrs, GENERAL_ATTR_EDGEATTRS, m_edgeAttrTable);
+    m_edgeAttrTable->setHorizontalHeaderItem(0, new QTableWidgetItem("Attribute"));
+    m_edgeAttrTable->setHorizontalHeaderItem(1, new QTableWidgetItem("Range"));
+    m_edgeAttrTable->verticalHeader()->setVisible(false);
+    m_edgeAttrTable->horizontalHeader()->setStretchLastSection(true);
     // setup the tree widget: graph
     m_treeItemGraphs = newTreeItem("Graph", true);
     // -- nodes generator
@@ -85,6 +118,8 @@ GraphDesigner::GraphDesigner(MainApp* mainApp, QWidget *parent)
 GraphDesigner::~GraphDesigner()
 {
     delete m_ui;
+    delete m_nodeAttrTable;
+    delete m_edgeAttrTable;
 }
 
 AttrWidget* GraphDesigner::addGeneralAttr(QTreeWidgetItem* itemRoot,
@@ -168,7 +203,6 @@ void GraphDesigner::pluginSelected(QTreeWidgetItem* itemRoot, const PluginKey& k
 void GraphDesigner::slotPluginAdded(const Plugin* plugin)
 {
     int numVersions = 0;
-    qDebug() << numVersions;
         
     QComboBox* cb;
     if (plugin->type() == PluginType::Graph) {
@@ -252,6 +286,15 @@ void GraphDesigner::slotPluginRemoved(PluginKey key, PluginType type)
             --i;
         }
     }
+}
+
+
+void GraphDesigner::slotNodeTableUpdate(int val) {
+    m_nodeAttrTable->setRowCount(val);
+}
+
+void GraphDesigner::slotEdgeTableUpdate(int val) {
+    m_edgeAttrTable->setRowCount(val);
 }
 
 } // evoplex
