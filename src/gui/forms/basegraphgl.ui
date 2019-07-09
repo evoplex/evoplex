@@ -26,25 +26,6 @@
    <property name="rightMargin">
     <number>20</number>
    </property>
-   <item row="4" column="2">
-    <widget class="QPushButton" name="bZoomOut">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>35</width>
-       <height>16777215</height>
-      </size>
-     </property>
-     <property name="text">
-      <string>-</string>
-     </property>
-    </widget>
-   </item>
    <item row="4" column="0" colspan="2">
     <layout class="QHBoxLayout" name="horizontalLayout_2">
      <item>
@@ -190,35 +171,6 @@ color: rgb(255, 255, 255);</string>
      </item>
     </layout>
    </item>
-   <item row="0" column="0">
-    <spacer name="horizontalSpacer_2">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="sizeType">
-      <enum>QSizePolicy::MinimumExpanding</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>10</width>
-       <height>10</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item row="1" column="1" colspan="2">
-    <spacer name="verticalSpacer_2">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>14</width>
-       <height>34</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
    <item row="3" column="2">
     <widget class="QPushButton" name="bReset">
      <property name="sizePolicy">
@@ -238,25 +190,6 @@ color: rgb(255, 255, 255);</string>
      </property>
     </widget>
    </item>
-   <item row="2" column="2">
-    <widget class="QPushButton" name="bZoomIn">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>35</width>
-       <height>16777215</height>
-      </size>
-     </property>
-     <property name="text">
-      <string>+</string>
-     </property>
-    </widget>
-   </item>
    <item row="0" column="1" colspan="2">
     <widget class="QStackedWidget" name="inspector">
      <property name="sizePolicy">
@@ -269,7 +202,7 @@ color: rgb(255, 255, 255);</string>
       <bool>false</bool>
      </property>
      <property name="currentIndex">
-      <number>1</number>
+      <number>2</number>
      </property>
      <widget class="QWidget" name="nodeInspector">
       <layout class="QVBoxLayout" name="verticalLayout">
@@ -349,6 +282,25 @@ color: rgb(255, 255, 255);</string>
            </property>
           </widget>
          </item>
+         <item row="1" column="1">
+          <widget class="QSpinBox" name="nodeId">
+           <property name="enabled">
+            <bool>true</bool>
+           </property>
+           <property name="buttonSymbols">
+            <enum>QAbstractSpinBox::NoButtons</enum>
+           </property>
+           <property name="minimum">
+            <number>-1</number>
+           </property>
+           <property name="maximum">
+            <number>1000000000</number>
+           </property>
+           <property name="value">
+            <number>-1</number>
+           </property>
+          </widget>
+         </item>
          <item row="2" column="0">
           <widget class="QLabel" name="lNeighbours">
            <property name="sizePolicy">
@@ -365,6 +317,19 @@ color: rgb(255, 255, 255);</string>
            </property>
            <property name="text">
             <string>neighbors</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QLineEdit" name="neighbors">
+           <property name="enabled">
+            <bool>true</bool>
+           </property>
+           <property name="toolTip">
+            <string>neighbours ids</string>
+           </property>
+           <property name="readOnly">
+            <bool>true</bool>
            </property>
           </widget>
          </item>
@@ -397,38 +362,6 @@ color: rgb(255, 255, 255);</string>
            </property>
            <property name="readOnly">
             <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="1">
-          <widget class="QLineEdit" name="neighbors">
-           <property name="enabled">
-            <bool>true</bool>
-           </property>
-           <property name="toolTip">
-            <string>neighbours ids</string>
-           </property>
-           <property name="readOnly">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="1">
-          <widget class="QSpinBox" name="nodeId">
-           <property name="enabled">
-            <bool>true</bool>
-           </property>
-           <property name="buttonSymbols">
-            <enum>QAbstractSpinBox::NoButtons</enum>
-           </property>
-           <property name="minimum">
-            <number>-1</number>
-           </property>
-           <property name="maximum">
-            <number>1000000000</number>
-           </property>
-           <property name="value">
-            <number>-1</number>
            </property>
           </widget>
          </item>
@@ -548,7 +481,7 @@ color: rgb(255, 255, 255);</string>
           </widget>
          </item>
          <item row="3" column="1">
-          <widget class="QPushButton" name="deleteEdge">
+          <widget class="QPushButton" name="bDeleteEdge">
            <property name="text">
             <string>Delete Edge</string>
            </property>
@@ -637,6 +570,15 @@ color: rgb(255, 255, 255);</string>
        </item>
        <item>
         <layout class="QFormLayout" name="inspectorLayout">
+         <property name="horizontalSpacing">
+          <number>6</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
          <item row="1" column="0">
           <widget class="QLabel" name="loriginId">
            <property name="sizePolicy">
@@ -714,7 +656,14 @@ color: rgb(255, 255, 255);</string>
           </widget>
          </item>
          <item row="4" column="1">
-          <widget class="QListWidget" name="edgesList"/>
+          <widget class="QListWidget" name="edgesList">
+           <property name="enabled">
+            <bool>true</bool>
+           </property>
+           <property name="sizeAdjustPolicy">
+            <enum>QAbstractScrollArea::AdjustToContents</enum>
+           </property>
+          </widget>
          </item>
          <item row="2" column="1">
           <widget class="QSpinBox" name="targetId">
@@ -729,6 +678,13 @@ color: rgb(255, 255, 255);</string>
            </property>
            <property name="value">
             <number>-1</number>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="1">
+          <widget class="QPushButton" name="bAddEdge">
+           <property name="text">
+            <string>Add Edge</string>
            </property>
           </widget>
          </item>
@@ -757,6 +713,73 @@ color: rgb(255, 255, 255);</string>
       </layout>
      </widget>
     </widget>
+   </item>
+   <item row="1" column="1" colspan="2">
+    <spacer name="verticalSpacer_2">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>14</width>
+       <height>34</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="2" column="2">
+    <widget class="QPushButton" name="bZoomIn">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>35</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="text">
+      <string>+</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="2">
+    <widget class="QPushButton" name="bZoomOut">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>35</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="text">
+      <string>-</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="0">
+    <spacer name="horizontalSpacer_2">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::MinimumExpanding</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>10</width>
+       <height>10</height>
+      </size>
+     </property>
+    </spacer>
    </item>
   </layout>
  </widget>

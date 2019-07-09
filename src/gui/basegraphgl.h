@@ -124,6 +124,7 @@ private slots:
     void resetView();
     void setNodeCMap(ColorMap* cmap);
     void edgesListItemClicked(QListWidgetItem* item);
+    void addEdgeEvent();
     void removeEdgeEvent();
 
 private:
