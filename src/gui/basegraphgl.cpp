@@ -69,7 +69,9 @@ BaseGraphGL::BaseGraphGL(ExperimentPtr exp, GraphWidget* parent)
     connect(m_ui->bZoomOut, SIGNAL(pressed()), SLOT(zoomOut()));
     connect(m_ui->bReset, SIGNAL(pressed()), SLOT(resetView()));
     connect(m_ui->edgesList, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(edgesListItemClicked(QListWidgetItem*)));
-    connect(m_ui->deleteEdge, SIGNAL(clicked()), this, SLOT(removeEdgeEvent()));
+    connect(m_ui->bAddEdge, SIGNAL(clicked()), this, SLOT(addEdgeEvent()));
+    connect(m_ui->bDeleteEdge, SIGNAL(clicked()), this, SLOT(removeEdgeEvent()));
+
     m_bCenter = new QtMaterialIconButton(QIcon(":/icons/material/center_white_18"), this);
     m_bCenter->setToolTip("centralize selection");
     m_bCenter->setCheckable(true);
@@ -260,6 +262,17 @@ void BaseGraphGL::edgesListItemClicked(QListWidgetItem* item)
 {
     const Edge e = m_trial->graph()->edge(item->text().toInt());
     updateEdgeInspector(e);
+}
+
+void BaseGraphGL::addEdgeEvent()
+{
+    int origNodeId = m_ui->originId->text().toInt();
+    const Node origNode = m_trial->graph()->node(origNodeId);
+    int tarNodeId = m_ui->targetId->text().toInt();
+    const Node tarNode = m_trial->graph()->node(tarNodeId);
+    m_trial->graph()->addEdge(origNodeId, tarNodeId);
+    updateEdgesInspector(origNode, tarNode);
+    updateCache(true);
 }
 
 void BaseGraphGL::removeEdgeEvent()
@@ -469,17 +482,6 @@ void BaseGraphGL::updateEdgesInspector(const Node& srcNode, const Node& trgtNode
         if (e.second.neighbour().id() == trgtNode.id()){
             edges.insert(e.first);
         }
-    }
-    
-    if (edges.size() == 0){
-            return;
-    }
-    // If there is only one edge to the target node, open the edgeInspector directly
-    if (edges.size() == 1)
-    {
-        int eId = edges.values().takeFirst();
-        updateEdgeInspector(srcNode.outEdges().at(eId));
-        return;
     }
     
     m_ui->inspector->setCurrentIndex(2);
