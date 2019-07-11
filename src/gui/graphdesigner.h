@@ -71,12 +71,12 @@ private:
     int m_edgesAttrsIdx; // position of the edgesAttrs field in the graph tree
 
     QtMaterialIconButton* m_bRemove;
-
     
     AttrWidget* addGeneralAttr(QTreeWidgetItem* itemRoot,
         const QString& attrName, QWidget* customWidget = nullptr);
     void addTreeWidgetItem(QTreeWidgetItem* itemRoot, 
-        const QString& attrName, QWidget* customWidget, int i);
+        const QString& attrName,
+QWidget* customWidget, int i);
 
     QTableWidget* m_nodeAttrTable;
     QTableWidget* m_edgeAttrTable;

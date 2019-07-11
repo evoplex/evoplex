@@ -38,11 +38,17 @@ namespace evoplex {
 GraphDesigner::GraphDesigner(MainApp* mainApp, QWidget *parent)
     : QWidget(parent),
     m_mainApp(mainApp),
-    m_ui(new Ui_GraphDesigner)
+    m_ui(new Ui_GraphDesigner),
+    m_bRemove(new QtMaterialIconButton(QIcon(":/icons/material/delete_white_24"), this))
 {
     setWindowTitle("Graph Designer");
     setObjectName("GraphDesigner");
     m_ui->setupUi(this);
+
+    m_bRemove->setColor(Qt::white);
+    m_bRemove->setIconSize(QSize(24,24));
+    m_ui->gdWidget->layout()->addWidget(m_bRemove);
+    m_ui->gdWidget->layout()->setAlignment(m_bRemove, Qt::AlignRight);
 
     auto newTreeItem = [this](const QString& title, bool expand) {
         auto t = new QTreeWidgetItem(m_ui->treeWidget);

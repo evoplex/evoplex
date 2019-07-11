@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1054</width>
-    <height>395</height>
+    <width>491</width>
+    <height>411</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -26,9 +26,9 @@
    <property name="geometry">
     <rect>
      <x>0</x>
-     <y>0</y>
+     <y>40</y>
      <width>491</width>
-     <height>411</height>
+     <height>371</height>
     </rect>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout">
@@ -91,6 +91,21 @@
       </column>
      </widget>
     </item>
+   </layout>
+  </widget>
+  <widget class="QWidget" name="horizontalLayoutWidget">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>491</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <layout class="QHBoxLayout" name="gdWidget">
+    <property name="rightMargin">
+     <number>15</number>
+    </property>
    </layout>
   </widget>
  </widget>
