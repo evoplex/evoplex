@@ -25,12 +25,14 @@
 
 #include "maingui.h"
 #include "core/mainapp.h"
+#include "graphdesigner.h"
 
 class Ui_GraphDesignerPage;
-
 class MainGUI;
 
 namespace evoplex {
+
+class GraphDesigner;
 
 class GraphDesignerPage : public QWidget
 {
@@ -45,9 +47,11 @@ private:
     MainApp* m_mainApp;
     MainGUI* m_mainGUI;
     QMainWindow* m_innerWindow;
+    GraphDesigner* m_curGraphDesigner;
 
 private slots:
     void slotNewGraph();
+    void slotCloseGraphDesigner();
 };
 
 }

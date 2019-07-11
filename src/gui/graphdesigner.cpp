@@ -49,6 +49,7 @@ GraphDesigner::GraphDesigner(MainApp* mainApp, QWidget *parent)
     m_bRemove->setIconSize(QSize(24,24));
     m_ui->gdWidget->layout()->addWidget(m_bRemove);
     m_ui->gdWidget->layout()->setAlignment(m_bRemove, Qt::AlignRight);
+    connect(m_bRemove, SIGNAL(pressed()), parent, SLOT(slotCloseGraphDesigner()));
 
     auto newTreeItem = [this](const QString& title, bool expand) {
         auto t = new QTreeWidgetItem(m_ui->treeWidget);
@@ -66,6 +67,8 @@ GraphDesigner::GraphDesigner(MainApp* mainApp, QWidget *parent)
     node_attr_num->setRange(0, 1000000);
     addTreeWidgetItem(m_treeItemAttrs, "number of node attributes", node_attr_num, 1);
     m_nodeAttrTable = new QTableWidget(0, 2);
+
+    // table holding the node attributes
     addTreeWidgetItem(m_treeItemAttrs, "node attriutes", m_nodeAttrTable, 2);
     m_nodeAttrTable->setHorizontalHeaderItem(0, new QTableWidgetItem("Attribute"));
     m_nodeAttrTable->setHorizontalHeaderItem(1, new QTableWidgetItem("Range"));
@@ -85,6 +88,8 @@ GraphDesigner::GraphDesigner(MainApp* mainApp, QWidget *parent)
     m_edgeAttrTable->setHorizontalHeaderItem(1, new QTableWidgetItem("Range"));
     m_edgeAttrTable->verticalHeader()->setVisible(false);
     m_edgeAttrTable->horizontalHeader()->setStretchLastSection(true);
+    connect(edge_attr_num, SIGNAL(valueChanged(int)), SLOT(slotEdgeTableUpdate(int)));
+    
     // setup the tree widget: graph
     m_treeItemGraphs = newTreeItem("Graph", true);
     // -- nodes generator

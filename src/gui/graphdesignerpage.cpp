@@ -22,7 +22,6 @@
 #include "fontstyles.h"
 #include "ui_graphdesignerpage.h"
 #include "graphdesignerpage.h"
-#include "graphdesigner.h"
 
 namespace evoplex {
 
@@ -47,8 +46,14 @@ GraphDesignerPage::~GraphDesignerPage()
 
 void GraphDesignerPage::slotNewGraph()
 {
-    GraphDesigner* gd = new GraphDesigner(m_mainGUI->mainApp(), this);
-    gd->setVisible(true);
+    m_curGraphDesigner = new GraphDesigner(m_mainGUI->mainApp(), this);
+    m_curGraphDesigner->setVisible(true);
+}
+
+void GraphDesignerPage::slotCloseGraphDesigner()
+{
+    m_curGraphDesigner->setVisible(false);
+    delete m_curGraphDesigner;
 }
 
 }
