@@ -58,11 +58,9 @@ GraphDesigner::GraphDesigner(MainApp* mainApp, QWidget *parent)
     // number of node attributes
     QSpinBox* node_attr_num = new QSpinBox(m_ui->treeWidget);
     node_attr_num->setRange(0, 1000000);
-    addGeneralAttr(m_treeItemAttrs, GENERAL_ATTR_NODEATTRS, node_attr_num);
-
-    // table holding the node attributes
+    addTreeWidgetItem(m_treeItemAttrs, "number of node attributes", node_attr_num, 1);
     m_nodeAttrTable = new QTableWidget(0, 2);
-    addGeneralAttr(m_treeItemAttrs, GENERAL_ATTR_NODE_NUM, m_nodeAttrTable);
+    addTreeWidgetItem(m_treeItemAttrs, "node attriutes", m_nodeAttrTable, 2);
     m_nodeAttrTable->setHorizontalHeaderItem(0, new QTableWidgetItem("Attribute"));
     m_nodeAttrTable->setHorizontalHeaderItem(1, new QTableWidgetItem("Range"));
     m_nodeAttrTable->verticalHeader()->setVisible(false);
@@ -72,11 +70,11 @@ GraphDesigner::GraphDesigner(MainApp* mainApp, QWidget *parent)
     //number of edge attributes
     QSpinBox* edge_attr_num = new QSpinBox(m_ui->treeWidget);
     edge_attr_num->setRange(0, 1000000);
-    addGeneralAttr(m_treeItemAttrs, GENERAL_ATTR_EDGE_NUM, edge_attr_num);
+    addTreeWidgetItem(m_treeItemAttrs, "number of edge attributes", edge_attr_num, 3);
 
     // table holding the edge attributes
     m_edgeAttrTable = new QTableWidget(0, 2);
-    addGeneralAttr(m_treeItemAttrs, GENERAL_ATTR_EDGEATTRS, m_edgeAttrTable);
+    addTreeWidgetItem(m_treeItemAttrs, "edge attributes", m_edgeAttrTable, 4);
     m_edgeAttrTable->setHorizontalHeaderItem(0, new QTableWidgetItem("Attribute"));
     m_edgeAttrTable->setHorizontalHeaderItem(1, new QTableWidgetItem("Range"));
     m_edgeAttrTable->verticalHeader()->setVisible(false);
@@ -137,6 +135,14 @@ AttrWidget* GraphDesigner::addGeneralAttr(QTreeWidgetItem* itemRoot,
     return widget;
 }
 
+void GraphDesigner::addTreeWidgetItem(QTreeWidgetItem* itemRoot,
+    const QString& attrName, QWidget* customWidget, int i)
+{
+    QTreeWidgetItem* item = new QTreeWidgetItem(itemRoot);
+    item->setText(0, attrName);
+    item->setToolTip(0, attrName);
+    m_ui->treeWidget->setItemWidget(item, 1, customWidget);
+}
 
 void GraphDesigner::slotGraphSelected(int cbIdx)
 {

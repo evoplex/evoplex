@@ -56,7 +56,7 @@
        <enum>QFrame::NoFrame</enum>
       </property>
       <property name="horizontalScrollBarPolicy">
-       <enum>Qt::ScrollBarAlwaysOff</enum>
+       <enum>Qt::ScrollBarAsNeeded</enum>
       </property>
       <property name="editTriggers">
        <set>QAbstractItemView::NoEditTriggers</set>
@@ -71,6 +71,9 @@
        <bool>true</bool>
       </property>
       <attribute name="headerVisible">
+       <bool>false</bool>
+      </attribute>
+      <attribute name="headerCascadingSectionResizes">
        <bool>false</bool>
       </attribute>
       <attribute name="headerDefaultSectionSize">

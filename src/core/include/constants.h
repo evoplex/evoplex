@@ -57,12 +57,6 @@
 #define GENERAL_ATTR_GRAPHTYPE "graphType"
 //! a command to AttrsGenerator
 #define GENERAL_ATTR_EDGEATTRS "edgeAttrs"
-//! node attributes
-#define GENERAL_ATTR_NODEATTRS "nodeAttrs"
-//! number of edge attributes
-#define GENERAL_ATTR_EDGE_NUM "edgeAttrsNumber"
-//! number of node attributes
-#define GENERAL_ATTR_NODE_NUM "nodeAttrsNumber"
 
 //! path to the directory in which the file will be saved
 #define OUTPUT_DIR "outputDirectory"
