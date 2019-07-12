@@ -54,11 +54,11 @@ private slots:
     void slotGraphSelected(int cbIdx);
     void slotNodeTableUpdate(int val);
     void slotEdgeTableUpdate(int val);
+    void slotAddGraphDesigner();
 
 private:
     MainApp * m_mainApp;
     ProjectPtr m_project;
-    std::weak_ptr<Experiment> m_exp;
     PluginKey m_selectedGraphKey;
     PluginKey m_selectedModelKey;
 
@@ -69,7 +69,8 @@ private:
     AttrWidget* m_enableOutputs;
     int m_graphTypeIdx;  // position of the graphtype combobox in the graph tree
     int m_edgesAttrsIdx; // position of the edgesAttrs field in the graph tree
-
+    
+    QtMaterialIconButton* m_bAdd;
     QtMaterialIconButton* m_bRemove;
     
     AttrWidget* addGeneralAttr(QTreeWidgetItem* itemRoot,

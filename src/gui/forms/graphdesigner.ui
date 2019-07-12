@@ -32,6 +32,9 @@
     </rect>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout">
+    <property name="spacing">
+     <number>2</number>
+    </property>
     <property name="leftMargin">
      <number>0</number>
     </property>
@@ -103,6 +106,12 @@
     </rect>
    </property>
    <layout class="QHBoxLayout" name="gdWidget">
+    <property name="spacing">
+     <number>2</number>
+    </property>
+    <property name="leftMargin">
+     <number>15</number>
+    </property>
     <property name="rightMargin">
      <number>15</number>
     </property>

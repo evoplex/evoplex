@@ -26,6 +26,7 @@
 
 #include "core/include/attrsgenerator.h"
 #include "core/include/enum.h"
+#include "core/plugin.h"
 
 #include "graphdesigner.h"
 #include "attrsgendlg.h"
@@ -39,6 +40,7 @@ GraphDesigner::GraphDesigner(MainApp* mainApp, QWidget *parent)
     : QWidget(parent),
     m_mainApp(mainApp),
     m_ui(new Ui_GraphDesigner),
+    m_bAdd(new QtMaterialIconButton(QIcon(":/icons/material/add_white_24"), this)),
     m_bRemove(new QtMaterialIconButton(QIcon(":/icons/material/delete_white_24"), this))
 {
     setWindowTitle("Graph Designer");
@@ -50,6 +52,11 @@ GraphDesigner::GraphDesigner(MainApp* mainApp, QWidget *parent)
     m_ui->gdWidget->layout()->addWidget(m_bRemove);
     m_ui->gdWidget->layout()->setAlignment(m_bRemove, Qt::AlignRight);
     connect(m_bRemove, SIGNAL(pressed()), parent, SLOT(slotCloseGraphDesigner()));
+
+    m_bAdd->setColor(Qt::white);
+    m_bAdd->setIconSize(QSize(24, 24));
+    m_ui->gdWidget->layout()->addWidget(m_bAdd);
+    connect(m_bAdd, SIGNAL(pressed()), SLOT(slotAddGraphDesigner()));
 
     auto newTreeItem = [this](const QString& title, bool expand) {
         auto t = new QTreeWidgetItem(m_ui->treeWidget);
@@ -305,12 +312,21 @@ void GraphDesigner::slotPluginRemoved(PluginKey key, PluginType type)
     }
 }
 
+void GraphDesigner::slotAddGraphDesigner()
+{
+    if (m_selectedGraphKey == PluginKey()) {
+        qDebug() << "Please select a valid 'graphId'";
+        return;
+    }
+}
 
-void GraphDesigner::slotNodeTableUpdate(int val) {
+void GraphDesigner::slotNodeTableUpdate(int val) 
+{
     m_nodeAttrTable->setRowCount(val);
 }
 
-void GraphDesigner::slotEdgeTableUpdate(int val) {
+void GraphDesigner::slotEdgeTableUpdate(int val) 
+{
     m_edgeAttrTable->setRowCount(val);
 }
 
