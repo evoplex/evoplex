@@ -50,9 +50,6 @@ enum class CacheStatus {
 
 class GraphGLInterface
 {
-public:
-    virtual void openSettings() = 0;
-
 protected:
     virtual ~GraphGLInterface() = default;
     virtual void paintFrame(QPainter& painter) const = 0;
@@ -73,13 +70,15 @@ public:
 
     void paint(QPaintDevice* device, bool paintBackground) const;
 
+    inline int currStep() const { return m_currStep; }
+
 protected:
-    explicit BaseGraphGL(ExperimentPtr exp, GraphWidget* parent);
+    explicit BaseGraphGL(AbstractGraph* abstractGraph, AttributesScope nodeAttrsScope, QWidget* parent);
 
     Ui_BaseGraphGL* m_ui;
-    GraphWidget* m_graphWidget;
-    ExperimentPtr m_exp;
-    const Trial* m_trial;
+    AbstractGraph* m_abstractGraph;
+    AttributesScope m_nodeAttrsScope;
+    bool m_isReadOnly;
 
     int m_currStep;
     int m_nodeAttr;
@@ -113,14 +112,16 @@ signals:
 public slots:
     virtual void zoomIn();
     virtual void zoomOut();
-    void updateView(bool forceUpdate);
-    void setTrial(quint16 trialId);
+
+    void setup(AbstractGraph* abstractGraph, AttributesScope nodeAttrsScope);
+
+    void setCurrentStep(int step);
     void setNodeScale(int v);
+    void slotRestarted();
+    void slotStatusChanged(Status s);
 
 private slots:
     void slotSelectNode(int nodeid);
-    void slotStatusChanged(Status s);
-    void slotRestarted();
     void resetView();
     void setNodeCMap(ColorMap* cmap);
     void edgesListItemClicked(QListWidgetItem* item);
@@ -132,12 +133,11 @@ private:
 
     QTimer m_updateCacheTimer;
     QPoint m_posEntered;
-    quint16 m_currTrialId;
     QMutex m_mutex;
     QRect m_inspGeo; // inspector geometry with margin
     std::vector<std::shared_ptr<AttrWidget>> m_attrWidgets;
 
-    void attrChanged(int attrId) const;
+    void attrValueChanged(int attrId) const;
 
     void setupInspector();
 

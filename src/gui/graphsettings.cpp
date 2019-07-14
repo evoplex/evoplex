@@ -50,6 +50,8 @@ GraphSettings::GraphSettings(ColorMapMgr* cMgr, ExperimentPtr exp, GraphView* pa
     connect(m_ui->bOk, SIGNAL(pressed()), SLOT(close()));
     connect(m_ui->bRestore, SIGNAL(pressed()), SLOT(restoreSettings()));
     connect(m_ui->bSaveAsDefault, SIGNAL(pressed()), SLOT(saveAsDefault()));
+
+    init();
 }
 
 GraphSettings::~GraphSettings()

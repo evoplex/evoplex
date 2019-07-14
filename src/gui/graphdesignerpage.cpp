@@ -23,6 +23,7 @@
 #include "fontstyles.h"
 #include "ui_graphdesignerpage.h"
 #include "graphdesignerpage.h"
+#include "graphdesigner.h"
 
 namespace evoplex {
 

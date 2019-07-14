@@ -24,22 +24,15 @@
 
 #include "gridview.h"
 #include "ui_basegraphgl.h"
-#include "ui_graphsettings.h"
 #include "utils.h"
 
 namespace evoplex {
 
-GridView::GridView(ColorMapMgr* cMgr, ExperimentPtr exp, GraphWidget* parent)
-    : BaseGraphGL(exp, parent),
-      m_settingsDlg(new GridSettings(cMgr, exp, this))
+GridView::GridView(AbstractGraph* abstractGraph, AttributesScope nodeAttrsScope, QWidget* parent)
+    : BaseGraphGL(abstractGraph, nodeAttrsScope, parent)
 {
-    connect(m_settingsDlg->nodeColorSelector(),
-            SIGNAL(cmapUpdated(ColorMap*)), SLOT(setNodeCMap(ColorMap*)));
-    m_settingsDlg->init();
-
     m_ui->bShowNodes->hide();
     m_ui->bShowEdges->hide();
-    setTrial(0); // init at trial 0
 }
 
 CacheStatus GridView::refreshCache()
@@ -48,11 +41,11 @@ CacheStatus GridView::refreshCache()
         return CacheStatus::Scheduled;
     }
     Utils::clearAndShrink(m_cache);
-    if (!m_trial || !m_trial->graph()) {
+    if (!m_abstractGraph) {
         return CacheStatus::Ready;
     }
 
-    const Nodes& nodes = m_trial->graph()->nodes();
+    const Nodes& nodes = m_abstractGraph->nodes();
     m_cache.reserve(nodes.size());
 
     const double nodeRadius = m_nodeRadius;

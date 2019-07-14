@@ -129,7 +129,7 @@ public slots:
     inline void stop();
 
 signals:
-    void trialCreated(int trialId);
+    void trialCreated(quint16 trialId);
     void restarted();
     void progressUpdated(quint16);
     void statusChanged(Status);

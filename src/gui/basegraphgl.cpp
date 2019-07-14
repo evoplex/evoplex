@@ -22,19 +22,18 @@
 #include <QFutureWatcher>
 #include <QMessageBox>
 
-#include "core/trial.h"
-
 #include "basegraphgl.h"
 #include "ui_basegraphgl.h"
 
 namespace evoplex {
 
-BaseGraphGL::BaseGraphGL(ExperimentPtr exp, GraphWidget* parent)
+// (cardinot) TODO: nodeAttrsScope should not be here
+BaseGraphGL::BaseGraphGL(AbstractGraph* abstractGraph, AttributesScope nodeAttrsScope, QWidget* parent)
     : QOpenGLWidget(parent),
       m_ui(new Ui_BaseGraphGL),
-      m_graphWidget(parent),
-      m_exp(exp),
-      m_trial(nullptr),
+      m_abstractGraph(abstractGraph),
+      m_nodeAttrsScope(nodeAttrsScope),
+      m_isReadOnly(false),
       m_currStep(-1),
       m_nodeAttr(-1),
       m_nodeCMap(nullptr),
@@ -44,26 +43,12 @@ BaseGraphGL::BaseGraphGL(ExperimentPtr exp, GraphWidget* parent)
       m_nodeRadius(m_nodeScale),
       m_origin(m_nodeScale, m_nodeScale),
       m_cacheStatus(CacheStatus::Ready),
-      m_posEntered(0,0),
-      m_currTrialId(0)
+      m_posEntered(0,0)
 {
     m_ui->setupUi(this);
 
     // Qt uses this attribute to optimize paint events on resizes (see docs)
     setAttribute(Qt::WA_StaticContents, true);
-
-    Q_ASSERT_X(!m_exp->autoDeleteTrials(), "BaseGraphGL",
-               "tried to build a BaseGraphGL for a experiment that will be auto-deleted!");
-
-    connect(m_exp.get(), SIGNAL(restarted()), SLOT(slotRestarted()));
-
-    // setTrial() triggers a timer that needs to be exec in the main thread
-    // thus, we need to use queuedconnection here
-    connect(m_exp.get(), &Experiment::trialCreated, this,
-            [this](int trialId) { if (trialId == m_currTrialId) setTrial(m_currTrialId); },
-            Qt::QueuedConnection);
-
-    connect(m_exp.get(), SIGNAL(statusChanged(Status)), SLOT(slotStatusChanged(Status)));
 
     connect(m_ui->bZoomIn, SIGNAL(pressed()), SLOT(zoomIn()));
     connect(m_ui->bZoomOut, SIGNAL(pressed()), SLOT(zoomOut()));
@@ -101,11 +86,16 @@ BaseGraphGL::BaseGraphGL(ExperimentPtr exp, GraphWidget* parent)
 
 BaseGraphGL::~BaseGraphGL()
 {
-    m_exp->disconnect(this); // important to avoid triggering statusChanged()
     m_attrWidgets.clear();
-    m_trial = nullptr;
-    m_exp = nullptr;
     delete m_ui;
+}
+
+void BaseGraphGL::setup(AbstractGraph* abstractGraph, AttributesScope nodeAttrsScope)
+{
+    m_abstractGraph = abstractGraph;
+    m_nodeAttrsScope = nodeAttrsScope;
+    setupInspector();
+    updateCache();
 }
 
 void BaseGraphGL::paint(QPaintDevice* device, bool paintBackground) const
@@ -127,7 +117,7 @@ void BaseGraphGL::paint(QPaintDevice* device, bool paintBackground) const
 void BaseGraphGL::slotSelectNode(int nodeid)
 {
     try {
-        Node node = m_trial->graph()->node(nodeid);
+        Node node = m_abstractGraph->node(nodeid);
         selectNode(node, m_bCenter->isChecked());
     } catch (std::out_of_range) {
         if (selectedNode().isNull()) {
@@ -155,13 +145,13 @@ void BaseGraphGL::setupInspector()
     m_ui->inspector->hide();
 
     m_attrWidgets.clear();
-    m_attrWidgets.resize(static_cast<size_t>(m_exp->modelPlugin()->nodeAttrsScope().size()));
+    m_attrWidgets.resize(static_cast<size_t>(m_nodeAttrsScope.size()));
 
-    for (auto attrRange : m_exp->modelPlugin()->nodeAttrsScope()) {
+    for (auto attrRange : m_nodeAttrsScope) {
         auto aw = std::make_shared<AttrWidget>(attrRange, nullptr);
         aw->setToolTip(attrRange->attrRangeStr());
         int aId = aw->id();
-        connect(aw.get(), &AttrWidget::valueChanged, [this, aId]() { attrChanged(aId); });
+        connect(aw.get(), &AttrWidget::valueChanged, [this, aId]() { attrValueChanged(aId); });
         m_attrWidgets.at(attrRange->id()) = aw;
         m_ui->modelAttrs->insertRow(attrRange->id(), attrRange->attrName(), aw.get());
 
@@ -172,24 +162,24 @@ void BaseGraphGL::setupInspector()
     }
 }
 
-void BaseGraphGL::attrChanged(int attrId) const
+void BaseGraphGL::attrValueChanged(int attrId) const
 {
-    if (!m_trial || !m_trial->graph() || m_ui->nodeId->value() < 0) {
+    if (!m_abstractGraph || m_ui->nodeId->value() < 0) {
         return;
     }
 
     std::shared_ptr<AttrWidget> aw;
     try { aw = m_attrWidgets.at(attrId); }
     catch (std::out_of_range) { return; }
-
-    Node node = m_trial->graph()->node(m_ui->nodeId->value());
-    if (m_trial->status() == Status::Running) {
+    Node node = m_abstractGraph->node(m_ui->nodeId->value());
+    if (m_isReadOnly) {
         aw->blockSignals(true);
         aw->setValue(node.attr(aw->id()));
         aw->blockSignals(false);
         QMessageBox::warning(parentWidget(), "Graph",
             "You cannot change things in a running experiment.\n"
             "Please, pause it and try again.");
+        return;
     }
 
     Value v = aw->validate();
@@ -236,37 +226,32 @@ void BaseGraphGL::updateCache(bool force)
 
 void BaseGraphGL::slotStatusChanged(Status s)
 {
+    m_isReadOnly = s == Status::Running;
     for (auto aw : m_attrWidgets) {
         if (aw) {
-            aw->setReadOnly(s == Status::Running);
+            aw->setReadOnly(m_isReadOnly);
         }
     }
 }
 
 void BaseGraphGL::slotRestarted()
 {
-    if (m_exp->autoDeleteTrials()) {
-        m_graphWidget->close();
-        return;
-    }
     clearSelection();
-    setupInspector();
-    m_trial = nullptr;
-    m_ui->currStep->setText("--");
-    updateCache(true);
+    setCurrentStep(-1); // TODO
+    setup(nullptr, AttributesScope());
 }
 
 void BaseGraphGL::edgesListItemClicked(QListWidgetItem* item)
 {
-    const Edge e = m_trial->graph()->edge(item->text().toInt());
+    const Edge e = m_abstractGraph->edge(item->text().toInt());
     updateEdgeInspector(e);
 }
 
 void BaseGraphGL::removeEdgeEvent()
 {
     int edgeId = (m_ui->edgeId->text()).toInt();
-    const Edge e = m_trial->graph()->edge(edgeId);
-    m_trial->graph()->removeEdge(e);
+    const Edge e = m_abstractGraph->edge(edgeId);
+    m_abstractGraph->removeEdge(e);
     m_ui->inspector->hide();
     clearSelection();
     updateCache(true);
@@ -279,16 +264,17 @@ void BaseGraphGL::setNodeCMap(ColorMap* cmap)
     update();
 }
 
-void BaseGraphGL::setTrial(quint16 trialId)
+// (cardinot) TODO: showing the current time step only makes sense if the graph is loaded for an experiment.
+//                  let's use <0 to hide the counter, but it should be improved later
+void BaseGraphGL::setCurrentStep(int step)
 {
-    m_currTrialId = trialId;
-    m_trial = m_exp->trial(trialId);
-    if (m_trial && m_trial->model()) {
-        m_ui->currStep->setText(QString::number(m_trial->step()));
+    if (step >= 0) {
+        m_ui->currStep->show();
+        m_ui->currStep->setText(QString::number(step));
     } else {
-        m_ui->currStep->setText("--");
+        m_ui->currStep->hide();
     }
-    updateCache();
+    m_currStep = step;
 }
 
 void BaseGraphGL::setNodeScale(int v)
@@ -356,7 +342,7 @@ void BaseGraphGL::mouseReleaseEvent(QMouseEvent *e)
         return;
     }
 
-    if (!m_trial || !m_trial->model()) {
+    if (!m_abstractGraph) {
         return;
     }
 
@@ -379,12 +365,11 @@ void BaseGraphGL::mouseReleaseEvent(QMouseEvent *e)
             clearSelection();
             updateCache();
         }
-    } else if (e->button() == Qt::RightButton && m_nodeAttr >= 0 &&
-                m_trial->status() != Status::Running) {
+    } else if (e->button() == Qt::RightButton && m_nodeAttr >= 0 && !m_isReadOnly) {
         Node node = selectNode(e->localPos(), false);
         if (!node.isNull()) {
             const QString& attrName = node.attrs().name(m_nodeAttr);
-            auto attrRange = m_exp->modelPlugin()->nodeAttrRange(attrName);
+            auto attrRange = m_nodeAttrsScope.value(attrName);
             node.setAttr(m_nodeAttr, attrRange->next(node.attr(m_nodeAttr)));
             clearSelection();
             emit (updateWidgets(true));
@@ -431,7 +416,7 @@ void BaseGraphGL::keyReleaseEvent(QKeyEvent* e)
             Node node = selectedNode();
             if (!node.isNull()) {
                 const QString& attrName = node.attrs().name(m_nodeAttr);
-                auto attrRange = m_exp->modelPlugin()->nodeAttrRange(attrName);
+                auto attrRange = m_nodeAttrsScope.value(attrName);
                 node.setAttr(m_nodeAttr, attrRange->next(node.attr(m_nodeAttr)));
                 updateInspector(node);
                 emit (updateWidgets(true));
@@ -470,7 +455,7 @@ void BaseGraphGL::updateEdgesInspector(const Node& srcNode, const Node& trgtNode
             edges.insert(e.first);
         }
     }
-    
+
     if (edges.size() == 0){
             return;
     }
@@ -525,16 +510,6 @@ void BaseGraphGL::updateInspector(const Node& node)
     m_ui->inspector->adjustSize();
     m_inspGeo = m_ui->inspector->frameGeometry();
     m_inspGeo += QMargins(5,5,5,5);
-}
-
-void BaseGraphGL::updateView(bool forceUpdate)
-{
-    if (!m_trial || !m_trial->model() || (!forceUpdate && m_trial->step() == m_currStep)) {
-        return;
-    }
-    m_currStep = m_trial->step();
-    m_ui->currStep->setText(QString::number(m_currStep));
-    update();
 }
 
 void BaseGraphGL::clearSelection()

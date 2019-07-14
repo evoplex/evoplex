@@ -43,7 +43,7 @@ public:
     ~GraphTitleBar();
 
 signals:
-    void trialSelected(quint16);
+    void trialSelected(quint16 trialId);
     void openSettingsDlg();
 
 private slots:

@@ -23,7 +23,7 @@
 
 namespace evoplex {
 
-GridSettings::GridSettings(ColorMapMgr* cMgr, ExperimentPtr exp, QWidget *parent)
+GridSettings::GridSettings(ColorMapMgr* cMgr, ExperimentPtr exp, GridView* parent)
     : QDialog(parent, MainGUI::kDefaultDlgFlags),
       m_ui(new Ui_GridSettings),
       m_cMgr(cMgr),
@@ -32,10 +32,14 @@ GridSettings::GridSettings(ColorMapMgr* cMgr, ExperimentPtr exp, QWidget *parent
     m_ui->setupUi(this);
 
     connect(m_exp.get(), SIGNAL(restarted()), SLOT(init()));
+    connect(m_ui->nodesColor, SIGNAL(cmapUpdated(ColorMap*)),
+            parent, SLOT(setNodeCMap(ColorMap*)));
 
     connect(m_ui->bOk, SIGNAL(pressed()), SLOT(close()));
     connect(m_ui->bRestore, SIGNAL(pressed()), SLOT(restoreSettings()));
     connect(m_ui->bSaveAsDefault, SIGNAL(pressed()), SLOT(saveAsDefault()));
+
+    init();
 }
 
 GridSettings::~GridSettings()

@@ -22,7 +22,6 @@
 #define GRIDVIEW_H
 
 #include "basegraphgl.h"
-#include "gridsettings.h"
 
 namespace evoplex {
 
@@ -30,10 +29,7 @@ class GridView : public BaseGraphGL
 {
     Q_OBJECT
 public:
-    explicit GridView(ColorMapMgr* cMgr, ExperimentPtr exp, GraphWidget* parent);
-
-public slots:
-    void openSettings() override { m_settingsDlg->show(); }
+    explicit GridView(AbstractGraph *abstractGraph, AttributesScope nodeAttrsScope, QWidget* parent);
 
 protected:
     void paintFrame(QPainter& painter) const override;
@@ -50,7 +46,6 @@ private:
         QRectF rect;
     };
     std::vector<Cell> m_cache;
-    GridSettings* m_settingsDlg;
     Cell m_selectedCell;
 
     void drawCell(QPainter& painter, const Cell& cell) const;

@@ -24,24 +24,19 @@
 
 #include "graphview.h"
 #include "ui_basegraphgl.h"
-#include "ui_graphsettings.h"
 #include "utils.h"
 
 namespace evoplex {
 
-GraphView::GraphView(ColorMapMgr* cMgr, ExperimentPtr exp, GraphWidget* parent)
-    : BaseGraphGL(exp, parent),
-      m_settingsDlg(new GraphSettings(cMgr, exp, this)),
+GraphView::GraphView(AbstractGraph* abstractGraph, AttributesScope nodeAttrsScope, QWidget* parent)
+    : BaseGraphGL(abstractGraph, nodeAttrsScope, parent),
       m_edgeAttr(-1),
+      m_maxSelectedNodes(2),
       m_edgeCMap(nullptr),
+      m_edgeScale(25.),
       m_edgePen(Qt::gray),
-      m_nodePen(Qt::black),
-      m_maxSelectedNodes(2)
+      m_nodePen(Qt::black)
 {
-    m_settingsDlg->init();
-    setNodeScale(m_settingsDlg->nodeScale());
-    m_edgeScale = m_settingsDlg->edgeScale();
-
     m_showNodes = m_ui->bShowNodes->isChecked();
     m_showEdges = m_ui->bShowEdges->isChecked();
     connect(m_ui->bShowNodes, &QPushButton::clicked,
@@ -51,8 +46,6 @@ GraphView::GraphView(ColorMapMgr* cMgr, ExperimentPtr exp, GraphWidget* parent)
 
     updateNodePen();
     m_origin += m_origin; // double margin
-
-    setTrial(0); // init at trial 0
 }
 
 GraphView::Star GraphView::createStar(const Node& node,
@@ -87,7 +80,7 @@ CacheStatus GraphView::refreshCache()
         return CacheStatus::Scheduled;
     }
     Utils::clearAndShrink(m_cache);
-    if (!m_trial || !m_trial->graph() || (!m_showNodes && !m_showEdges)) {
+    if (!m_abstractGraph || (!m_showNodes && !m_showEdges)) {
         return CacheStatus::Ready;
     }
 
@@ -96,8 +89,8 @@ CacheStatus GraphView::refreshCache()
     QRectF frame = rect().translated(-m_origin.toPoint());
     frame = frame.marginsAdded(QMargins(m, m, m, m));
 
-    m_cache.reserve(m_trial->graph()->nodes().size());
-    for (auto const& np : m_trial->graph()->nodes()) {
+    m_cache.reserve(m_abstractGraph->nodes().size());
+    for (auto const& np : m_abstractGraph->nodes()) {
         QPointF xy = nodePoint(np.second, edgeSR);
         if (!frame.contains(xy)) {
             continue;

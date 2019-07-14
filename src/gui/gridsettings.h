@@ -25,6 +25,7 @@
 
 #include "core/experiment.h"
 #include "attrcolorselector.h"
+#include "gridview.h"
 #include "maingui.h"
 
 class Ui_GridSettings;
@@ -36,7 +37,7 @@ class GridSettings : public QDialog
     Q_OBJECT
 
 public:
-    explicit GridSettings(ColorMapMgr* cMgr, ExperimentPtr exp, QWidget* parent);
+    explicit GridSettings(ColorMapMgr* cMgr, ExperimentPtr exp, GridView* parent);
     ~GridSettings();
 
     AttrColorSelector* nodeColorSelector() const;

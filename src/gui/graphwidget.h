@@ -42,21 +42,27 @@ public:
         Grid
     };
 
-    explicit GraphWidget(Mode mode, ColorMapMgr* cMgr,
-                         ExperimentPtr exp, ExperimentWidget* parent);
-
+    explicit GraphWidget(Mode mode, ColorMapMgr* cMgr, ExperimentPtr exp, QWidget* parent);
+    explicit GraphWidget(Mode mode, AbstractGraph* graph, AttributesScope nodeAttrsScope, QWidget* parent);
     virtual ~GraphWidget();
 
     inline BaseGraphGL* view() const;
 
+signals:
+    void updateWidgets(bool forced);
+
 public slots:
     void updateView(bool forceUpdate);
 
-signals:
-    void updateWidgets(bool);
+private slots:
+    void slotRestarted();
+    void setTrial(quint16 trialId);
 
 private:
     BaseGraphGL* m_view;
+    QDialog* m_settingsDlg;
+    ExperimentPtr m_exp;
+    const Trial* m_currTrial;
 };
 
 inline BaseGraphGL* GraphWidget::view() const

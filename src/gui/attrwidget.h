@@ -52,6 +52,7 @@ public:
     inline const QString& attrName() const { return m_attrRange->attrName(); }
     inline const QString& attrRangeStr() const { return m_attrRange->attrRangeStr(); }
     inline QWidget* widget() const { return m_widget; }
+    inline bool isReadOnly() const { return m_isReadOnly; }
 
 public slots:
     void setReadOnly(bool r);

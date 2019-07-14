@@ -22,7 +22,6 @@
 #define GRAPHVIEW_H
 
 #include "basegraphgl.h"
-#include "graphsettings.h"
 
 namespace evoplex {
 
@@ -31,12 +30,11 @@ class GraphView : public BaseGraphGL
     Q_OBJECT
 
 public:
-    explicit GraphView(ColorMapMgr* cMgr, ExperimentPtr exp, GraphWidget* parent);
+    explicit GraphView(AbstractGraph *abstractGraph, AttributesScope nodeAttrsScope, QWidget* parent);
 
 public slots:
     inline void zoomIn() override;
     inline void zoomOut() override;
-    inline void openSettings() override;
     void setEdgeScale(int v);
     void setEdgeWidth(int v);
 
@@ -53,8 +51,6 @@ private slots:
     void setEdgeCMap(ColorMap* cmap);
 
 private:
-    GraphSettings* m_settingsDlg;
-
     int m_edgeAttr;
     const int m_maxSelectedNodes;
 
@@ -111,9 +107,6 @@ inline void GraphView::zoomIn()
 
 inline void GraphView::zoomOut()
 { updateNodePen(); BaseGraphGL::zoomOut(); }
-
-inline void GraphView::openSettings()
-{ m_settingsDlg->show(); }
 
 inline qreal GraphView::currEdgeSize() const
 { return m_edgeScale * std::pow(1.25f, m_zoomLevel); }
