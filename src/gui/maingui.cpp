@@ -45,6 +45,7 @@
 #include "consolewidget.h"
 #include "projectwidget.h"
 #include "savedialog.h"
+#include "graphdesignerpage.h"
 #include "pluginspage.h"
 #include "projectspage.h"
 #include "queuepage.h"
@@ -68,6 +69,7 @@ MainGUI::MainGUI(MainApp* mainApp)
       m_plugins(new PluginsPage(this)),
       m_settings(new SettingsPage(this)),
       m_console(new ConsoleWidget(this)),
+      m_graphPage(new GraphDesignerPage(this)),
       m_curPage(PAGE_NULL)
 {
     // main window
@@ -90,12 +92,14 @@ MainGUI::MainGUI(MainApp* mainApp)
     centralLayout->addWidget(m_projectsPage);
     centralLayout->addWidget(m_plugins);
     centralLayout->addWidget(m_settings);
+    centralLayout->addWidget(m_graphPage);
     setCentralWidget(centralLayout->parentWidget());
     m_welcome->hide();
     //m_queue->hide();
     m_projectsPage->hide();
     m_plugins->hide();
     m_settings->hide();
+    m_graphPage->hide();
 
     //
     // left toolbar
@@ -115,6 +119,10 @@ MainGUI::MainGUI(MainApp* mainApp)
     acProjects->setCheckable(true);
     acProjects->setData(PAGE_PROJECTS);
     toolbar->addActions(actionGroup->actions());
+    QAction* acGraphs = new QAction(QIcon(":/icons/projects.svg"), "Graphs", actionGroup);
+    acGraphs->setCheckable(true);
+    acGraphs->setData(PAGE_GRAPHS);
+    toolbar->addActions(actionGroup->actions());
     auto wspacer = new QWidget(this);
     wspacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     toolbar->addWidget(wspacer);
@@ -132,6 +140,7 @@ MainGUI::MainGUI(MainApp* mainApp)
     toolbar->setToolButtonStyle(Qt::ToolButtonIconOnly);
     toolbar->setMovable(false);
     toolbar->setFloatable(false);
+
     addToolBar(Qt::LeftToolBarArea, toolbar);
     // remove the tooltips
     for (QToolButton* btn : toolbar->findChildren<QToolButton*>()) {
@@ -164,8 +173,8 @@ MainGUI::MainGUI(MainApp* mainApp)
     connect(m_actNewProject, &QAction::triggered, [this, acProjects]() {
         if (m_projectsPage->slotNewProject()) slotPage(acProjects);
     });
-    m_actOpenProject = new QAction("Open Project", this);
 
+    m_actOpenProject = new QAction("Open Project", this);
     connect(m_actOpenProject, &QAction::triggered, [this]() { emit(openProject("")); });
     connect(this, &MainGUI::openProject, [this, acProjects](const QString& path) {
         if (m_projectsPage->slotOpenProject(path)) slotPage(acProjects);
@@ -297,6 +306,9 @@ void MainGUI::setPageVisible(Page page, bool visible)
             break;
         case PAGE_SETTINGS:
             m_settings->setVisible(visible);
+            break;
+        case PAGE_GRAPHS:
+            m_graphPage->setVisible(visible);
             break;
         default:
             m_welcome->setVisible(visible);

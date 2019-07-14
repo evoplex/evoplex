@@ -35,6 +35,8 @@ class SaveDialog;
 
 class PluginsPage;
 class ProjectsPage;
+class GraphDesignerPage;
+
 //class QueuePage;
 class SettingsPage;
 class WelcomePage;
@@ -55,6 +57,7 @@ public:
 
 signals:
     void newProject();
+    void newGraph();
     void openProject(QString path);
 
 private slots:
@@ -78,7 +81,8 @@ private:
         PAGE_QUEUE,
         PAGE_PROJECTS,
         PAGE_PLUGINS,
-        PAGE_SETTINGS
+        PAGE_SETTINGS,
+        PAGE_GRAPHS
     };
 
     MainApp* m_mainApp;
@@ -91,10 +95,12 @@ private:
     PluginsPage* m_plugins;
     SettingsPage* m_settings;
     ConsoleWidget* m_console;
+    GraphDesignerPage* m_graphPage;
     Page m_curPage;
 
     QAction* m_actNewProject;
     QAction* m_actOpenProject;
+    QAction* m_actNewGraph;
     QAction* m_actSave;
     QAction* m_actSaveAs;
 
