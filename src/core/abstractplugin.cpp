@@ -24,16 +24,10 @@ bool AbstractPlugin::init()
     return true;
 }
 
-bool AbstractPlugin::setup(Trial& trial, const Attributes& attrs)
+bool AbstractPlugin::setup(const Attributes& attrs)
 {
-    m_trial = &trial;
     m_attrs = &attrs;
     return init();
-}
-
-PRG* AbstractPlugin::prg() const
-{
-    return m_trial->prg();
 }
 
 } // evoplex

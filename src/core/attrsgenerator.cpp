@@ -41,14 +41,19 @@ AttrsGeneratorPtr AttrsGenerator::parse(const AttributesScope& attrsScope,
     int size = cmd.toInt(&sizeIsValid);
     if (sizeIsValid) { // cmd is just an interger
         _cmd = QString("*%1;min").arg(size);
+        cmds.push_back(cmd);
         cmds.push_back("min");
     } else {
-        cmds = cmd.split(";");
+        _cmd = cmd;
+        if (cmd.indexOf(";") != -1){            
+            cmds = _cmd.split(";");
+        } else {
+            cmds << _cmd;
+        }
         QString sizeStr = cmds.first();
         size = sizeStr.remove(0,1).toInt(&sizeIsValid);
         _cmd = cmd;
     }
-
     if (sizeIsValid) {
         if (size < 1) {
             error = "Unable to parse '" + cmd + "'.\n"

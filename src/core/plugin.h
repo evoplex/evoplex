@@ -66,7 +66,9 @@ protected:
     QJsonObject m_metaData;
 
     /**
-     * Relies that any plugin lugin is loaded from the temporary directory
+     * Assumes that any plugin is loaded from the temporary directory
+     * @param type plugin type
+     * @param loader
      * @param libPath refers to the original plugin's path
      */
     explicit Plugin(PluginType type, QPluginLoader* loader, const QString& libPath);

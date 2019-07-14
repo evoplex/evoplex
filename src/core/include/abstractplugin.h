@@ -35,6 +35,7 @@ class AbstractPlugin
 {
     friend class Trial;
     friend class AbstractGraph;
+    friend class AbstractModel;
 
 public:
 //! @addtogroup PluginsAPI
@@ -53,7 +54,7 @@ public:
      * @brief pseudo-random generator pointer.
      * This PRG is built with the Trial seed.
      */
-    PRG* prg() const;
+    virtual PRG* prg() const = 0;
 
     /**
      * @brief prg() alias
@@ -98,8 +99,6 @@ public:
 /**@}*/
 
 protected:
-    Trial* m_trial;
-
     //! constructor
     AbstractPlugin() = default;
     //! destructor
@@ -108,7 +107,7 @@ protected:
 private:
     const Attributes* m_attrs;
 
-    bool setup(Trial& trial, const Attributes& attrs);
+    bool setup(const Attributes& attrs);
 };
 
 /************************************************************************

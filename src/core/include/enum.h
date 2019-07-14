@@ -48,7 +48,7 @@ enum class Status {
     Finished,  //! all is done
 };
 
-enum class PluginType : int {
+enum class PluginType : quint8 {
     Invalid = 0,
     Graph = 1,
     Model = 2
@@ -69,7 +69,7 @@ inline QString _enumToString<PluginType>(PluginType type)
     }
 }
 
-enum class GraphType : int {
+enum class GraphType : quint8 {
     Invalid = 0,
     Undirected = 1,
     Directed = 2
@@ -90,7 +90,7 @@ inline QString _enumToString<GraphType>(GraphType type)
     }
 }
 
-enum class Function : unsigned char {
+enum class Function : quint8 {
     Invalid = 0,
     Min = 1,
     Max = 2,
