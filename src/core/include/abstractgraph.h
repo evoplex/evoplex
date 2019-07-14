@@ -25,8 +25,11 @@
 #include "edges.h"
 #include "enum.h"
 #include "nodes.h"
+#include "prg.h"
 
 namespace evoplex {
+
+class GraphPlugin;
 
 /**
  * @brief Provides a common interface for Graph plugins.
@@ -58,6 +61,9 @@ class AbstractGraph : public AbstractGraphInterface
 public:
 //! @addtogroup GraphAPI
 //! @{
+
+    //! @copydoc AbstractPlugin::nodes
+    virtual inline PRG* prg() const override;
 
     /**
      * @brief Gets the graph id.
@@ -212,14 +218,18 @@ protected:
     AbstractGraph();
 
 private:
+    QString m_graphId;
+    GraphType m_graphType;
+    PRG* m_prg;
+
     int m_lastNodeId;
     int m_lastEdgeId;
     QMutex m_mutex;
 
     std::uniform_int_distribution<int> m_numNodesDist;
 
-    bool setup(Trial& trial, AttrsGeneratorPtr edgeGen,
-               const Attributes& attrs, Nodes& nodes);
+    bool setup(const QString& id, GraphType type, PRG& prg,
+               AttrsGeneratorPtr edgeGen, Nodes& nodes, const Attributes& attrs);
 };
 
 
@@ -227,11 +237,20 @@ private:
    AbstractGraph: Inline member functions
  ************************************************************************/
 
+inline PRG *AbstractGraph::prg() const
+{ return m_prg; }
+
+inline const QString& AbstractGraph::id() const
+{ return m_graphId; }
+
+inline GraphType AbstractGraph::type() const
+{ return m_graphType; }
+
 inline bool AbstractGraph::isDirected() const
-{ return type() == GraphType::Directed; }
+{ return m_graphType == GraphType::Directed; }
 
 inline bool AbstractGraph::isUndirected() const
-{ return type() == GraphType::Undirected; }
+{ return m_graphType == GraphType::Undirected; }
 
 inline const Edges& AbstractGraph::edges() const
 { return m_edges; }

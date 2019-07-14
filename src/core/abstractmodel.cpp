@@ -19,6 +19,15 @@
 
 namespace evoplex {
 
+bool AbstractModel::setup(Trial& trial, const Attributes& attrs)
+{
+    m_trial = &trial;
+    return AbstractPlugin::setup(attrs);
+}
+
+PRG* AbstractModel::prg() const
+{ return m_trial->prg(); }
+
 const QString& AbstractModel::graphId() const
 { return m_trial->graphId(); }
 

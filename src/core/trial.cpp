@@ -87,8 +87,8 @@ bool Trial::init()
     m_prg = new PRG(seed + m_id);
 
     m_graph = dynamic_cast<AbstractGraph*>(m_exp->graphPlugin()->create());
-    if (!m_graph || !m_graph->setup(*this, std::move(edgeAttrsGen),
-                                    *m_exp->inputs()->graph(), nodes)) {
+    if (!m_graph || !m_graph->setup(m_exp->graphId(), m_exp->graphType(), *m_prg,
+                                    std::move(edgeAttrsGen), nodes, *m_exp->inputs()->graph())) {
         qWarning() << "unable to create the trials."
                    << "The graph could not be initialized."
                    << "Experiment:" << m_exp->id();

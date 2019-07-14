@@ -17,6 +17,7 @@
 #include "abstractgraph.h"
 #include "constants.h"
 #include "edge_p.h"
+#include "graphplugin.h"
 #include "node_p.h"
 #include "trial.h"
 #include "utils.h"
@@ -24,31 +25,27 @@
 namespace evoplex {
 
 AbstractGraph::AbstractGraph()
-    : m_lastNodeId(-1),
+    : m_graphType(GraphType::Invalid),
+      m_prg(nullptr),
+      m_lastNodeId(-1),
       m_lastEdgeId(-1)
 {
 }
 
-bool AbstractGraph::setup(Trial& trial, AttrsGeneratorPtr edgeGen,
-                          const Attributes& attrs, Nodes& nodes)
+bool AbstractGraph::setup(const QString& id, GraphType type, PRG& prg,
+                          AttrsGeneratorPtr edgeGen, Nodes& nodes, const Attributes& attrs)
 {
+    Q_ASSERT_X(type != GraphType::Invalid, "setup", "Graph type cannot be invalid!");
     Q_ASSERT_X(nodes.size() < EVOPLEX_MAX_NODES, "setup", "too many nodes!");
     Q_ASSERT_X(!nodes.empty(), "setup", "set of nodes cannot be empty!");
+    m_graphId = id;
+    m_graphType = type;
     m_nodes = nodes;
+    m_prg = &prg;
     m_numNodesDist = std::uniform_int_distribution<int>(0, numNodes()-1);
     m_lastNodeId = static_cast<int>(m_nodes.size());
     m_edgeAttrsGen = std::move(edgeGen);
-    return AbstractPlugin::setup(trial, attrs);
-}
-
-const QString& AbstractGraph::id() const
-{
-    return m_trial->graphId();
-}
-
-GraphType AbstractGraph::type() const
-{
-    return m_trial->graphType();
+    return AbstractPlugin::setup(attrs);
 }
 
 Node AbstractGraph::randNode() const
@@ -56,7 +53,7 @@ Node AbstractGraph::randNode() const
     if (m_nodes.empty()) {
         return Node();
     }
-    return std::next(m_nodes.cbegin(), prg()->uniform(m_numNodesDist))->second;
+    return std::next(m_nodes.cbegin(), m_prg->uniform(m_numNodesDist))->second;
 }
 
 Node AbstractGraph::addNode(Attributes attr, float x, float y)

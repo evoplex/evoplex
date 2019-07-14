@@ -83,6 +83,9 @@ public:
 //! @addtogroup ModelAPI
 //! @{
 
+    //! @copydoc AbstractPlugin::nodes
+    virtual PRG* prg() const override;
+
     /**
      * @brief Gets the graph id.
      */
@@ -127,6 +130,11 @@ public:
 protected:
     //! constructor
     AbstractModel() = default;
+
+private:
+    Trial* m_trial;
+
+    bool setup(Trial& trial, const Attributes& attrs);
 };
 
 /************************************************************************
