@@ -2,7 +2,7 @@
 *  This file is part of Evoplex.
 *
 *  Evoplex is a multi-agent system for networks.
-*  Copyright (C) 2018 - Marcos Cardinot <marcos@cardinot.net>
+*  Copyright (C) 2019 - Eleftheria Chatziargyriou
 *
 *  This program is free software: you can redistribute it and/or modify
 *  it under the terms of the GNU General Public License as published by
@@ -25,7 +25,6 @@
 
 #include "maingui.h"
 #include "core/mainapp.h"
-#include "graphdesigner.h"
 
 class Ui_GraphDesignerPage;
 class MainGUI;
@@ -36,7 +35,7 @@ class GraphDesigner;
 
 class GraphDesignerPage : public QWidget
 {
-	Q_OBJECT
+    Q_OBJECT
 
 public:
     explicit GraphDesignerPage(MainGUI* mainGUI);
@@ -55,4 +54,5 @@ private slots:
 };
 
 }
+
 #endif // GRAPHDESIGNERPAGE_H
