@@ -24,7 +24,6 @@
 #include <QHBoxLayout>
 
 #include "fontstyles.h"
-#include "ui_graphdesignerpage.h"
 #include "graphdesignerpage.h"
 
 namespace evoplex {
@@ -55,24 +54,27 @@ GraphDesignerPage::GraphDesignerPage(MainGUI* mainGUI)
     toolbar->setStyleSheet("QToolButton{ margin: 0px 10px; }");
 
     QActionGroup* actionGroup = new QActionGroup(toolbar);
-    QAction* acEdgeAttrs = new QAction(QIcon(":/icons/settings.svg"), "EdgeAttributesEditor", actionGroup);
-    acEdgeAttrs->setCheckable(true);
+    QAction *acImgExport = new QAction(QIcon(":/icons/material/screenshot_white_18"), "Image Exporter", actionGroup);
+    toolbar->addAction(acImgExport);
+
+    QAction *acNodeExport = new QAction(QIcon(":/icons/material/table_white_18"), "Nodes Exporter", actionGroup);
+    toolbar->addAction(acNodeExport);
+
+    QAction *acGraphSettings = new QAction(QIcon(":/icons/material/settings_white_18"), "Graph Settings", actionGroup);
+    toolbar->addAction(acGraphSettings);
+
+    QAction* acEdgeAttrs = new QAction(QIcon(":/icons/settings.svg"), "Edge Attributes Editor", actionGroup);
     toolbar->addAction(acEdgeAttrs);
 
-    QAction* acNodeAttrs = new QAction(QIcon(":/icons/settings.svg"), "NodeAttributesEditor", actionGroup);
-    acNodeAttrs->setCheckable(true);
+    QAction* acNodeAttrs = new QAction(QIcon(":/icons/settings.svg"), "Node Attributes Editor", actionGroup);
     toolbar->addAction(acNodeAttrs);
 
-    QAction* acGraphGen = new QAction(QIcon(":/icons/settings.svg"), "GraphGenerator", actionGroup);
-    acGraphGen->setCheckable(true);
+    QAction* acGraphGen = new QAction(QIcon(":/icons/settings.svg"), "Graph Generator", actionGroup);
     toolbar->addAction(acGraphGen);
 
     toolbar->setIconSize(QSize(32, 32));
     toolbar->setToolButtonStyle(Qt::ToolButtonIconOnly);
     addToolBar(toolbar);
-    for (QToolButton* btn : toolbar->findChildren<QToolButton*>()) {
-        btn->installEventFilter(this);
-    }
 
 }
 
