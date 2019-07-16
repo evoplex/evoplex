@@ -19,43 +19,65 @@
 */
 
 #include <QDebug>
+#include <QToolBar>
+#include <QToolButton>
+#include <QHBoxLayout>
 
 #include "fontstyles.h"
 #include "ui_graphdesignerpage.h"
 #include "graphdesignerpage.h"
-#include "graphdesigner.h"
 
 namespace evoplex {
 
 GraphDesignerPage::GraphDesignerPage(MainGUI* mainGUI)
-    : QWidget(mainGUI),
-    m_ui(new Ui_GraphDesignerPage),
+    : QMainWindow(mainGUI),
     m_mainApp(mainGUI->mainApp()),
     m_mainGUI(mainGUI),
-    m_innerWindow(new QMainWindow())
+    m_innerWindow(new QMainWindow()),
+    m_graphDesigner(new GraphDesigner(mainGUI->mainApp(), this))
 {
-    m_ui->setupUi(this);
+    setObjectName("GraphDesignerPage");
+    setWindowTitle("GraphDesigner");
+    setWindowIconText("GraphDesigner");
+    setTabPosition(Qt::AllDockWidgetAreas, QTabWidget::South);
 
-    m_ui->labelGraphDesigner->setFont(FontStyles::h4());
+    setDockNestingEnabled(false);
+    setAnimated(true);
 
-    connect(m_ui->bNewGraph, SIGNAL(pressed()), SLOT(slotNewGraph()));
+    QHBoxLayout* centralLayout = new QHBoxLayout(new QWidget(this));
+    centralLayout->setContentsMargins(0, 0, 0, 0);
+
+    setCentralWidget(m_graphDesigner);
+
+    // top toolbar
+    QToolBar* toolbar = new QToolBar(this);
+    toolbar->setObjectName("topToolbar");
+    toolbar->setStyleSheet("QToolButton{ margin: 0px 10px; }");
+
+    QActionGroup* actionGroup = new QActionGroup(toolbar);
+    QAction* acEdgeAttrs = new QAction(QIcon(":/icons/settings.svg"), "EdgeAttributesEditor", actionGroup);
+    acEdgeAttrs->setCheckable(true);
+    toolbar->addAction(acEdgeAttrs);
+
+    QAction* acNodeAttrs = new QAction(QIcon(":/icons/settings.svg"), "NodeAttributesEditor", actionGroup);
+    acNodeAttrs->setCheckable(true);
+    toolbar->addAction(acNodeAttrs);
+
+    QAction* acGraphGen = new QAction(QIcon(":/icons/settings.svg"), "GraphGenerator", actionGroup);
+    acGraphGen->setCheckable(true);
+    toolbar->addAction(acGraphGen);
+
+    toolbar->setIconSize(QSize(32, 32));
+    toolbar->setToolButtonStyle(Qt::ToolButtonIconOnly);
+    addToolBar(toolbar);
+    for (QToolButton* btn : toolbar->findChildren<QToolButton*>()) {
+        btn->installEventFilter(this);
+    }
+
 }
 
 GraphDesignerPage::~GraphDesignerPage()
 {
-    delete m_ui;
-}
-
-void GraphDesignerPage::slotNewGraph()
-{
-    m_curGraphDesigner = new GraphDesigner(m_mainGUI->mainApp(), this);
-    m_curGraphDesigner->setVisible(true);
-}
-
-void GraphDesignerPage::slotCloseGraphDesigner()
-{
-    m_curGraphDesigner->setVisible(false);
-    delete m_curGraphDesigner;
 }
 
 }

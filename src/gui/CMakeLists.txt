@@ -151,12 +151,10 @@ set(EVOPLEX_GUI_UIFORM
   attrsgendlg
   consoletitlebar
   experimentdesigner
-  graphdesigner
   basegraphgl
   graphsettings
   gridsettings
   graphtitlebar
-  graphdesignerpage
   #linechartsettings
   outputwidget
   pluginspage
