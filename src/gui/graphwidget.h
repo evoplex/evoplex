@@ -31,6 +31,7 @@
 namespace evoplex {
 
 class BaseGraphGL;
+class GraphWidget;
 
 class GraphWidget : public QDockWidget
 {

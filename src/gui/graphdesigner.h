@@ -26,6 +26,8 @@
 
 #include "core/project.h"
 
+#include "graphwidget.h"
+
 namespace evoplex {
 
 class GraphDesigner : public QDockWidget
@@ -38,6 +40,11 @@ public:
 
 private:
     MainApp* m_mainApp;
+    QMainWindow* m_innerWindow;
+
+    int m_curGraphId;
+
+    void initEmptyGraph();
 };
 }
 

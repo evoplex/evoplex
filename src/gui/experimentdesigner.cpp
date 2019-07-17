@@ -471,6 +471,7 @@ std::unique_ptr<ExpInputs> ExperimentDesigner::readInputs(const int expId, QStri
         error += "Unable to create the experiment.\nError: \"" + errorMsg + "\"";
         return nullptr; // this GUI should never create experiments with errors
     }
+
     return inputs;
 }
 
