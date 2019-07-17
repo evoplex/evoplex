@@ -155,6 +155,7 @@ set(EVOPLEX_GUI_UIFORM
   graphsettings
   gridsettings
   graphtitlebar
+  graphdesignerpage
   #linechartsettings
   outputwidget
   pluginspage

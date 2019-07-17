@@ -29,6 +29,7 @@
 #include "core/mainapp.h"
 
 class MainGUI;
+class Ui_GraphDesignerPage;
 
 namespace evoplex {
 
@@ -43,10 +44,12 @@ public:
     ~GraphDesignerPage();
 
 private:
+    Ui_GraphDesignerPage* m_ui;
     MainApp* m_mainApp;
     MainGUI* m_mainGUI;
     QMainWindow* m_innerWindow;
     GraphDesigner* m_graphDesigner;
+ 
 };
 
 }
