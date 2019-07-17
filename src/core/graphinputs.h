@@ -58,7 +58,7 @@ public:
     std::vector<Value> exportAttrValues() const;
 
 private:
-    explicit GraphInputs::GraphInputs(const GraphPlugin* g, Attributes* general, Attributes* graph, const std::vector<Cache*>& caches);
+    explicit GraphInputs(const GraphPlugin* g, Attributes* general, Attributes* graph, const std::vector<Cache*>& caches);
 
     const GraphPlugin* m_graphPlugin;
 
