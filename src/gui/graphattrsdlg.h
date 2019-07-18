@@ -25,11 +25,14 @@
 
 #include "attributerange.h"
 #include "attrsgenerator.h"
+#include "graphdesignerpage.h"
 
 class Ui_GraphAttrsDlg;
 
 namespace evoplex
 {
+
+class GraphDesignerPage;
 
 enum class  AttrsType
 {
@@ -42,17 +45,18 @@ class GraphAttrsDlg : public QDialog
     Q_OBJECT
 
 public:
-
-    explicit GraphAttrsDlg(QWidget* parent, AttrsType type);
+    explicit GraphAttrsDlg(GraphDesignerPage* parent, const AttrsType type);
     ~GraphAttrsDlg();
 
 private slots:
-    void slotTableUpdate(int n);
+    void slotTableUpdate(const int n);
+    void slotAttrSaved();
 
 private:
     Ui_GraphAttrsDlg* m_ui;
-    AttrsType m_type;
-
+    GraphDesignerPage* m_graphPage;
+    const AttrsType m_type;
+    AttributesScope* m_attrsScope;
 };
 
 } // evoplex

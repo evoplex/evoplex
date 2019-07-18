@@ -27,10 +27,11 @@
 
 namespace evoplex {
 
-GraphAttrsDlg::GraphAttrsDlg(QWidget* parent, AttrsType type)
+GraphAttrsDlg::GraphAttrsDlg(GraphDesignerPage* parent, const AttrsType type)
     : QDialog(parent, MainGUI::kDefaultDlgFlags),
     m_ui(new Ui_GraphAttrsDlg),
-    m_type(type)
+    m_type(type),
+    m_graphPage(parent)
 {
     setWindowModality(Qt::ApplicationModal);
     setWindowFlag(Qt::WindowStaysOnTopHint);
@@ -38,15 +39,20 @@ GraphAttrsDlg::GraphAttrsDlg(QWidget* parent, AttrsType type)
     setVisible(true);
 
     connect(m_ui->numAttrs, SIGNAL(valueChanged(int)), SLOT(slotTableUpdate(int)));
+    connect(m_ui->save, SIGNAL(clicked()), SLOT(slotAttrSaved()));
 };
 
 GraphAttrsDlg::~GraphAttrsDlg()
 {
 }
 
-void GraphAttrsDlg::slotTableUpdate(int n)
+void GraphAttrsDlg::slotTableUpdate(const int n)
 {
     m_ui->table->setRowCount(n);
+}
+
+void GraphAttrsDlg::slotAttrSaved() {
+    m_graphPage->changedAttrsScope(m_type, m_attrsScope);
 }
 
 }

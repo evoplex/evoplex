@@ -25,16 +25,18 @@
 
 #include "maingui.h"
 #include "abstractgraph.h"
+#include "attributerange.h"
 #include "graphdesigner.h"
+#include "graphattrsdlg.h"
 
 #include "core/mainapp.h"
 
-class MainGUI;
 class Ui_GraphDesignerPage;
 
 namespace evoplex {
 
 class GraphDesigner;
+enum class  AttrsType;
 
 class GraphDesignerPage : public QMainWindow
 {
@@ -44,17 +46,26 @@ public:
     explicit GraphDesignerPage(MainGUI* mainGUI);
     ~GraphDesignerPage();
 
+protected:
+    friend class GraphAttrsDlg;
+
+    void changedAttrsScope(const AttrsType type, AttributesScope* attrs);
+
 private:
     Ui_GraphDesignerPage* m_ui;
     MainApp* m_mainApp;
     MainGUI* m_mainGUI;
     QMainWindow* m_innerWindow;
     GraphDesigner* m_graphDesigner;
+    AttributesScope* m_edgeAttrScope;
+    AttributesScope* m_nodeAttrScope;
+
 
 private slots:
     void slotEdgeAttrs();
     void slotNodeAttrs();
     void slotGraphGen();
+
 };
 
 }

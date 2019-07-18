@@ -25,7 +25,6 @@
 
 #include "fontstyles.h"
 #include "graphdesignerpage.h"
-#include "graphattrsdlg.h"
 #include "ui_graphdesignerpage.h"
 
 namespace evoplex {
@@ -63,5 +62,14 @@ void GraphDesignerPage::slotNodeAttrs() {
 
 void GraphDesignerPage::slotGraphGen() {
 };
+
+void GraphDesignerPage::changedAttrsScope(const AttrsType type, AttributesScope* attrs)
+{
+    if (type == AttrsType::Edges) {
+        m_edgeAttrScope = attrs;
+    } else if (type == AttrsType::Nodes) {
+        m_nodeAttrScope = attrs;
+    }
+}
 
 }
