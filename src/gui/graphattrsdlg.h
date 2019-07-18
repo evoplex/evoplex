@@ -31,13 +31,19 @@ class Ui_GraphAttrsDlg;
 namespace evoplex
 {
 
+enum class  AttrsType
+{
+    Edges, 
+    Nodes
+};
+
 class GraphAttrsDlg : public QDialog
 {
     Q_OBJECT
 
 public:
 
-    explicit GraphAttrsDlg(QWidget* parent);
+    explicit GraphAttrsDlg(QWidget* parent, AttrsType type);
     ~GraphAttrsDlg();
 
 private slots:
@@ -45,6 +51,7 @@ private slots:
 
 private:
     Ui_GraphAttrsDlg* m_ui;
+    AttrsType m_type;
 
 };
 

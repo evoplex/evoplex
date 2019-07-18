@@ -27,9 +27,10 @@
 
 namespace evoplex {
 
-GraphAttrsDlg::GraphAttrsDlg(QWidget* parent)
+GraphAttrsDlg::GraphAttrsDlg(QWidget* parent, AttrsType type)
     : QDialog(parent, MainGUI::kDefaultDlgFlags),
-    m_ui(new Ui_GraphAttrsDlg)
+    m_ui(new Ui_GraphAttrsDlg),
+    m_type(type)
 {
     setWindowModality(Qt::ApplicationModal);
     setWindowFlag(Qt::WindowStaysOnTopHint);
