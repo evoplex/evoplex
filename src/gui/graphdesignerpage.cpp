@@ -25,6 +25,7 @@
 
 #include "fontstyles.h"
 #include "graphdesignerpage.h"
+#include "graphattrsdlg.h"
 #include "ui_graphdesignerpage.h"
 
 namespace evoplex {
@@ -41,12 +42,26 @@ GraphDesignerPage::GraphDesignerPage(MainGUI* mainGUI)
     setObjectName("GraphDesignerPage");
     m_ui->setupUi(this);
 
-    
+    connect(m_ui->acEdgeAttrs, SIGNAL(triggered()), SLOT(slotEdgeAttrs()));
+    connect(m_ui->acNodeAttrs, SIGNAL(triggered()), SLOT(slotNodeAttrs()));
+    connect(m_ui->acGraphGen, SIGNAL(triggered()), SLOT(slotGraphGen()));
+
     setCentralWidget(m_graphDesigner);
 }
 
 GraphDesignerPage::~GraphDesignerPage()
 {
 }
+
+void GraphDesignerPage::slotEdgeAttrs() {
+    GraphAttrsDlg* nodesdlg = new GraphAttrsDlg(this);
+};
+
+void GraphDesignerPage::slotNodeAttrs() {
+    GraphAttrsDlg* edgesdlg = new GraphAttrsDlg(this);
+};
+
+void GraphDesignerPage::slotGraphGen() {
+};
 
 }

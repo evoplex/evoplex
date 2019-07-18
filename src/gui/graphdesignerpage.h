@@ -50,6 +50,11 @@ private:
     MainGUI* m_mainGUI;
     QMainWindow* m_innerWindow;
     GraphDesigner* m_graphDesigner;
+
+private slots:
+    void slotEdgeAttrs();
+    void slotNodeAttrs();
+    void slotGraphGen();
 };
 
 }
