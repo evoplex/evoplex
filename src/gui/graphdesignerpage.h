@@ -24,6 +24,7 @@
 #include <QMainWindow>
 
 #include "maingui.h"
+#include "abstractgraph.h"
 #include "graphdesigner.h"
 
 #include "core/mainapp.h"
@@ -49,7 +50,6 @@ private:
     MainGUI* m_mainGUI;
     QMainWindow* m_innerWindow;
     GraphDesigner* m_graphDesigner;
- 
 };
 
 }

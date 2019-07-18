@@ -39,7 +39,6 @@ GraphDesignerPage::GraphDesignerPage(MainGUI* mainGUI)
 {
     setWindowTitle("Graph Designer Page");
     setObjectName("GraphDesignerPage");
-
     m_ui->setupUi(this);
 
     
