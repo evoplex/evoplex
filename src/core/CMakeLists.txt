@@ -46,6 +46,7 @@ set(EVOPLEX_CORE_H
   experiment.h
   expinputs.h
   experimentsmgr.h
+  graphinputs.h
   node_p.h
   nodes_p.h
   project.h
@@ -70,6 +71,7 @@ set(EVOPLEX_CORE_CXX
   experiment.cpp
   expinputs.cpp
   experimentsmgr.cpp
+  graphinputs.cpp
   node_p.cpp
   output.cpp
   project.cpp

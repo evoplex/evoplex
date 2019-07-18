@@ -22,68 +22,29 @@
 #define GRAPH_DESIGNER_H
 
 #include <QDockWidget>
-#include <QWidget>
-#include <QTreeWidgetItem>
-#include <QHash>
-#include <QTableWidget>
+#include <QMainWindow>
 
 #include "core/project.h"
 
-#include "external/qt-material-widgets/qtmaterialiconbutton.h"
-
-#include "attrwidget.h"
-#include "graphdesignerpage.h"
-
-class Ui_GraphDesigner;
+#include "graphwidget.h"
 
 namespace evoplex {
 
-class GraphDesigner : public QWidget
+class GraphDesigner : public QDockWidget
 {
-
     Q_OBJECT
 
 public:
-    explicit GraphDesigner(MainApp* mainApp, QWidget* parent);
+    explicit GraphDesigner(MainApp* mainApp, QMainWindow *parent);
     ~GraphDesigner();
 
-
-private slots:
-    void slotPluginAdded(const Plugin* plugin);
-    void slotPluginRemoved(PluginKey key, PluginType type);
-    void slotGraphSelected(int cbIdx);
-    void slotNodeTableUpdate(int val);
-    void slotEdgeTableUpdate(int val);
-    void slotAddGraphDesigner();
-
 private:
-    MainApp * m_mainApp;
-    ProjectPtr m_project;
-    PluginKey m_selectedGraphKey;
-    PluginKey m_selectedModelKey;
+    MainApp* m_mainApp;
+    QMainWindow* m_innerWindow;
 
-    Ui_GraphDesigner* m_ui;
-    QTreeWidgetItem* m_treeItemGraphs;
-    QTreeWidgetItem* m_treeItemAttrs;
-    QHash<QString, AttrWidget*> m_attrWidgets;
-    AttrWidget* m_enableOutputs;
-    int m_graphTypeIdx;  // position of the graphtype combobox in the graph tree
-    int m_edgesAttrsIdx; // position of the edgesAttrs field in the graph tree
-    
-    QtMaterialIconButton* m_bAdd;
-    QtMaterialIconButton* m_bRemove;
-    
-    AttrWidget* addGeneralAttr(QTreeWidgetItem* itemRoot,
-        const QString& attrName, QWidget* customWidget = nullptr);
-    void addTreeWidgetItem(QTreeWidgetItem* itemRoot, 
-        const QString& attrName,
-QWidget* customWidget, int i);
+    int m_curGraphId;
 
-    QTableWidget* m_nodeAttrTable;
-    QTableWidget* m_edgeAttrTable;
-
-    void pluginSelected(QTreeWidgetItem* itemRoot, const PluginKey& key);
-    void addPluginAttrs(QTreeWidgetItem* tree, const Plugin* plugin);
+    void initEmptyGraph();
 };
 }
 

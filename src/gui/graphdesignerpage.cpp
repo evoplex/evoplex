@@ -19,43 +19,35 @@
 */
 
 #include <QDebug>
+#include <QToolBar>
+#include <QToolButton>
+#include <QHBoxLayout>
 
 #include "fontstyles.h"
-#include "ui_graphdesignerpage.h"
 #include "graphdesignerpage.h"
-#include "graphdesigner.h"
+#include "ui_graphdesignerpage.h"
 
 namespace evoplex {
 
 GraphDesignerPage::GraphDesignerPage(MainGUI* mainGUI)
-    : QWidget(mainGUI),
-    m_ui(new Ui_GraphDesignerPage),
+    : QMainWindow(mainGUI),
     m_mainApp(mainGUI->mainApp()),
     m_mainGUI(mainGUI),
-    m_innerWindow(new QMainWindow())
+    m_innerWindow(new QMainWindow()),
+    m_ui(new Ui_GraphDesignerPage),
+    m_graphDesigner(new GraphDesigner(mainGUI->mainApp(), this))
 {
+    setWindowTitle("Graph Designer Page");
+    setObjectName("GraphDesignerPage");
+
     m_ui->setupUi(this);
 
-    m_ui->labelGraphDesigner->setFont(FontStyles::h4());
-
-    connect(m_ui->bNewGraph, SIGNAL(pressed()), SLOT(slotNewGraph()));
+    
+    setCentralWidget(m_graphDesigner);
 }
 
 GraphDesignerPage::~GraphDesignerPage()
 {
-    delete m_ui;
-}
-
-void GraphDesignerPage::slotNewGraph()
-{
-    m_curGraphDesigner = new GraphDesigner(m_mainGUI->mainApp(), this);
-    m_curGraphDesigner->setVisible(true);
-}
-
-void GraphDesignerPage::slotCloseGraphDesigner()
-{
-    m_curGraphDesigner->setVisible(false);
-    delete m_curGraphDesigner;
 }
 
 }
