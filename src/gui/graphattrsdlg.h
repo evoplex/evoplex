@@ -2,7 +2,7 @@
 *  This file is part of Evoplex.
 *
 *  Evoplex is a multi-agent system for networks.
-*  Copyright (C) 2018 - Marcos Cardinot <marcos@cardinot.net>
+*  Copyright (C) 2019 - Eleftheria Chatziargyriou <ele.hatzy@gmail.com>
 *
 *  This program is free software: you can redistribute it and/or modify
 *  it under the terms of the GNU General Public License as published by
@@ -55,8 +55,11 @@ private slots:
 private:
     Ui_GraphAttrsDlg* m_ui;
     GraphDesignerPage* m_graphPage;
+    AttributesScope m_attrsScope;
+
     const AttrsType m_type;
-    AttributesScope* m_attrsScope;
+
+    void parseAttributes(QString& error);
 };
 
 } // evoplex

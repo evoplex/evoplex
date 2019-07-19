@@ -193,13 +193,6 @@
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="save">
-       <property name="text">
-        <string>Save</string>
-       </property>
-      </widget>
-     </item>
-     <item>
       <widget class="QPushButton" name="ok">
        <property name="text">
         <string>Ok</string>

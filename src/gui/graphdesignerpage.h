@@ -49,7 +49,7 @@ public:
 protected:
     friend class GraphAttrsDlg;
 
-    void changedAttrsScope(const AttrsType type, AttributesScope* attrs);
+    void changedAttrsScope(const AttrsType type, AttributesScope attrs);
 
 private:
     Ui_GraphDesignerPage* m_ui;
@@ -57,8 +57,8 @@ private:
     MainGUI* m_mainGUI;
     QMainWindow* m_innerWindow;
     GraphDesigner* m_graphDesigner;
-    AttributesScope* m_edgeAttrScope;
-    AttributesScope* m_nodeAttrScope;
+    AttributesScope m_edgeAttrScope;
+    AttributesScope m_nodeAttrScope;
 
 
 private slots:

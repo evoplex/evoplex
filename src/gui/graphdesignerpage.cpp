@@ -50,6 +50,7 @@ GraphDesignerPage::GraphDesignerPage(MainGUI* mainGUI)
 
 GraphDesignerPage::~GraphDesignerPage()
 {
+    delete m_ui;
 }
 
 void GraphDesignerPage::slotEdgeAttrs() {
@@ -63,7 +64,7 @@ void GraphDesignerPage::slotNodeAttrs() {
 void GraphDesignerPage::slotGraphGen() {
 };
 
-void GraphDesignerPage::changedAttrsScope(const AttrsType type, AttributesScope* attrs)
+void GraphDesignerPage::changedAttrsScope(const AttrsType type, AttributesScope attrs)
 {
     if (type == AttrsType::Edges) {
         m_edgeAttrScope = attrs;
