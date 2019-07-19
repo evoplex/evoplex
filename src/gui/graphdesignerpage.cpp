@@ -54,11 +54,11 @@ GraphDesignerPage::~GraphDesignerPage()
 }
 
 void GraphDesignerPage::slotEdgeAttrs() {
-    GraphAttrsDlg* nodesdlg = new GraphAttrsDlg(this, AttrsType::Edges);
+    new GraphAttrsDlg(this, AttrsType::Edges);
 };
 
 void GraphDesignerPage::slotNodeAttrs() {
-    GraphAttrsDlg* edgesdlg = new GraphAttrsDlg(this, AttrsType::Nodes);
+    new GraphAttrsDlg(this, AttrsType::Nodes);
 };
 
 void GraphDesignerPage::slotGraphGen() {

@@ -61,7 +61,7 @@ void GraphDesigner::initEmptyGraph()
 
     auto graph = new BaseAbstractGraph;
     AttributesScope attrs;
-    m_curGraph = new GraphWidget(GraphWidget::Mode::Graph, nullptr, attrs, this);
+    m_curGraph = new GraphWidget(GraphWidget::Mode::Graph, graph, attrs, this);
 
     m_curGraph->setFeatures(QDockWidget::NoDockWidgetFeatures);
     m_innerWindow->setCentralWidget(m_curGraph);
