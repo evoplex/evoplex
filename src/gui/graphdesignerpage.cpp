@@ -39,15 +39,38 @@ GraphDesignerPage::GraphDesignerPage(MainGUI* mainGUI)
 {
     setWindowTitle("Graph Designer Page");
     setObjectName("GraphDesignerPage");
-
     m_ui->setupUi(this);
 
-    
+    connect(m_ui->acEdgeAttrs, SIGNAL(triggered()), SLOT(slotEdgeAttrs()));
+    connect(m_ui->acNodeAttrs, SIGNAL(triggered()), SLOT(slotNodeAttrs()));
+    connect(m_ui->acGraphGen, SIGNAL(triggered()), SLOT(slotGraphGen()));
+
     setCentralWidget(m_graphDesigner);
 }
 
 GraphDesignerPage::~GraphDesignerPage()
 {
+    delete m_ui;
+}
+
+void GraphDesignerPage::slotEdgeAttrs() {
+    new GraphAttrsDlg(this, AttrsType::Edges);
+};
+
+void GraphDesignerPage::slotNodeAttrs() {
+    new GraphAttrsDlg(this, AttrsType::Nodes);
+};
+
+void GraphDesignerPage::slotGraphGen() {
+};
+
+void GraphDesignerPage::changedAttrsScope(const AttrsType type, AttributesScope attrs)
+{
+    if (type == AttrsType::Edges) {
+        m_edgeAttrScope = attrs;
+    } else if (type == AttrsType::Nodes) {
+        m_nodeAttrScope = attrs;
+    }
 }
 
 }

@@ -25,7 +25,9 @@
 #include <QMainWindow>
 
 #include "core/project.h"
+#include "graphwidget.h"
 
+#include "abstractgraph.h"
 #include "graphwidget.h"
 
 namespace evoplex {
@@ -41,11 +43,20 @@ public:
 private:
     MainApp* m_mainApp;
     QMainWindow* m_innerWindow;
-
+    GraphWidget* m_curGraph;
     int m_curGraphId;
 
     void initEmptyGraph();
 };
+
+class BaseAbstractGraph : public AbstractGraph
+{
+
+public:
+    bool reset() override { return 0; };
+
+};
+
 }
 
 #endif // GRAPH_DESIGNER_H

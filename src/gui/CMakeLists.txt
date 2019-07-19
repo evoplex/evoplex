@@ -88,6 +88,7 @@ set(EVOPLEX_GUI_H
   experimentdesigner.h
   experimentwidget.h
   graphdesigner.h
+  graphattrsdlg.h
   fontstyles.h
   #linechart.h
   linebutton.h
@@ -118,6 +119,7 @@ set(EVOPLEX_GUI_CXX
   attrwidget.cpp
   attrsgendlg.cpp
   experimentdesigner.cpp
+  graphattrsdlg.cpp
   graphdesigner.cpp
   colormap.cpp
   #contextmenutable.cpp
@@ -156,6 +158,7 @@ set(EVOPLEX_GUI_UIFORM
   gridsettings
   graphtitlebar
   graphdesignerpage
+  graphattrsdlg
   #linechartsettings
   outputwidget
   pluginspage

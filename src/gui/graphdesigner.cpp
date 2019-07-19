@@ -23,12 +23,11 @@
 #include <QString>
 #include <QStringList>
 
-#include "core/include/attrsgenerator.h"
+#include "core/include/attributerange.h"
 #include "core/include/enum.h"
 #include "core/graphinputs.h"
 #include "core/plugin.h"
 
-#include "abstractgraph.h"
 #include "graphdesigner.h"
 
 namespace evoplex {
@@ -36,7 +35,8 @@ namespace evoplex {
 GraphDesigner::GraphDesigner(MainApp* mainApp, QMainWindow *parent)
     : QDockWidget(parent),
     m_mainApp(mainApp),
-    m_innerWindow(new QMainWindow(this))
+    m_innerWindow(new QMainWindow(this)),
+    m_curGraph(nullptr)
 {
     setObjectName("GraphDesigner");
 
@@ -59,22 +59,12 @@ void GraphDesigner::initEmptyGraph()
     QStringList values;
     QString errorMsg;
 
-    // Set inputs
-    header << GENERAL_ATTR_EXPID << GENERAL_ATTR_EDGEATTRS << GENERAL_ATTR_GRAPHTYPE <<
-        GENERAL_ATTR_NODES << GENERAL_ATTR_GRAPHID << GENERAL_ATTR_GRAPHVS;
-    values << QString::number(m_curGraphId) << "" << "undirected" << "1" << "zeroEdges" << "1";
-    
-    auto graphInpts = GraphInputs::parse(m_mainApp, header, values, errorMsg);
+    auto graph = new BaseAbstractGraph;
+    AttributesScope attrs;
+    m_curGraph = new GraphWidget(GraphWidget::Mode::Graph, graph, attrs, this);
 
-    if (!errorMsg.isEmpty()) { qDebug() << errorMsg; }
-
-    AttributesScope _attrs;
-
-    AbstractGraph* a_g = dynamic_cast<AbstractGraph*>(graphInpts->graphPlugin()->create());
-    GraphWidget* graphW = new GraphWidget(GraphWidget::Mode::Graph, a_g, _attrs, this);
-
-    graphW->setFeatures(QDockWidget::NoDockWidgetFeatures);
-    m_innerWindow->setCentralWidget(graphW);
+    m_curGraph->setFeatures(QDockWidget::NoDockWidgetFeatures);
+    m_innerWindow->setCentralWidget(m_curGraph);
 }
 
 GraphDesigner::~GraphDesigner()

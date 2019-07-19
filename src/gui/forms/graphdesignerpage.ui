@@ -49,7 +49,7 @@
     <bool>false</bool>
    </attribute>
    <addaction name="acImageExporter"/>
-   <addaction name="acNodes_Exporter"/>
+   <addaction name="acNodesExporter"/>
    <addaction name="acGraphSettings"/>
    <addaction name="separator"/>
    <addaction name="acEdgeAttrs"/>
@@ -68,7 +68,7 @@
     <string>Image Exporter</string>
    </property>
   </action>
-  <action name="acNodes_Exporter">
+  <action name="acNodesExporter">
    <property name="icon">
     <iconset resource="../res/guiRes.qrc">
      <normaloff>:/icons/material/material-icons/editor/png/baseline_table_chart_white_24dp.png</normaloff>:/icons/material/material-icons/editor/png/baseline_table_chart_white_24dp.png</iconset>
