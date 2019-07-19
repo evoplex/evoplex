@@ -34,7 +34,10 @@ GraphGenDlg::GraphGenDlg(GraphDesignerPage* parent)
     m_graphPage(parent)
 {
     setWindowModality(Qt::ApplicationModal);
+<<<<<<< HEAD
     setWindowFlag(Qt::WindowStaysOnTopHint);
+=======
+>>>>>>> Add graph generator dialog
     m_ui->setupUi(this);
     setVisible(true);
 

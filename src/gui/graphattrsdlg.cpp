@@ -35,7 +35,6 @@ GraphAttrsDlg::GraphAttrsDlg(GraphDesignerPage* parent, const AttrsType type)
     m_graphPage(parent)
 {
     setWindowModality(Qt::ApplicationModal);
-    setWindowFlag(Qt::WindowStaysOnTopHint);
     m_ui->setupUi(this);
     setVisible(true);
 
