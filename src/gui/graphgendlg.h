@@ -22,8 +22,10 @@
 #define GRAPHGENDLG_H
 
 #include <QDialog>
+#include <QHash>
 
 #include "graphdesignerpage.h"
+#include "maingui.h"
 
 class Ui_GraphGenDlg;
 
@@ -37,12 +39,15 @@ class GraphGenDlg : public QDialog
     Q_OBJECT
 
 public:
-    explicit GraphGenDlg(GraphDesignerPage* parent);
+    explicit GraphGenDlg(GraphDesignerPage* parent, MainGUI* mainGUI);
     ~GraphGenDlg();
 
 private:
     Ui_GraphGenDlg* m_ui;
     GraphDesignerPage* m_graphPage;
+    MainGUI* m_mainGUI;
+
+    QHash<int, PluginKey> m_plugins; // Easily retrieve the loaded plugins
 };
 
 } // evoplex

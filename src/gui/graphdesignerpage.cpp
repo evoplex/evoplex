@@ -63,7 +63,7 @@ void GraphDesignerPage::slotNodeAttrs() {
 };
 
 void GraphDesignerPage::slotGraphGen() {
-    new GraphGenDlg(this);
+    new GraphGenDlg(this, m_mainGUI);
 };
 
 void GraphDesignerPage::changedAttrsScope(const AttrsType type, AttributesScope attrs)

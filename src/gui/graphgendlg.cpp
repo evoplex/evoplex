@@ -22,24 +22,33 @@
 #include <QSet>
 #include <QMessageBox>
 
+#include "core/graphplugin.h"
+
 #include "graphgendlg.h"
 #include "ui_graphgendlg.h"
-#include "maingui.h"
 
 namespace evoplex {
 
-GraphGenDlg::GraphGenDlg(GraphDesignerPage* parent)
+GraphGenDlg::GraphGenDlg(GraphDesignerPage* parent, MainGUI* mainGUI)
     : QDialog(parent, MainGUI::kDefaultDlgFlags),
     m_ui(new Ui_GraphGenDlg),
-    m_graphPage(parent)
+    m_graphPage(parent),
+    m_mainGUI(mainGUI)
 {
     setWindowModality(Qt::ApplicationModal);
-<<<<<<< HEAD
-    setWindowFlag(Qt::WindowStaysOnTopHint);
-=======
->>>>>>> Add graph generator dialog
+
     m_ui->setupUi(this);
     setVisible(true);
+    
+    m_ui->graphType->insertItem(0, "--");
+    
+    int i = 0;
+    for (Plugin* p : m_mainGUI->mainApp()->plugins()) {
+        if (p->type() == PluginType::Graph) {
+            m_ui->graphType->insertItem(++i, p->title());
+            m_plugins.insert(i, p->key());
+        }
+    }
 
     //connect(m_ui->ok, SIGNAL(clicked()), SLOT(slotGraphSaved()));
     connect(m_ui->cancel, SIGNAL(clicked()), SLOT(close()));
