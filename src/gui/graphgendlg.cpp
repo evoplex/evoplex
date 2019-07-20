@@ -126,7 +126,7 @@ void GraphGenDlg::slotGraphSelected(int grId)
         _item->setText(0, it.key());
         _item->setToolTip(0, it.key());
         
-        it++;
+        ++it;
     }
 
     m_ui->treeWidget->setVisible(!graph->pluginAttrsScope().isEmpty());
