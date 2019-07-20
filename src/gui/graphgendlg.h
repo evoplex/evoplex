@@ -21,9 +21,9 @@
 #ifndef GRAPHGENDLG_H
 #define GRAPHGENDLG_H
 
-#include <QDialog>
 #include <QTreeWidgetItem>
 #include <QHash>
+#include <QStringList>
 
 #include "core/mainapp.h"
 
@@ -50,12 +50,20 @@ private:
     GraphDesignerPage* m_graphPage;
     MainGUI* m_mainGUI;
 
-    QHash<int, PluginKey> m_plugins; // Easily retrieve the loaded plugins
+    QHash<int, PluginKey> m_plugins; // Loaded plugins
+    QHash<QString, AttrWidget*> m_attrWidgets; // Attribute widgets
     PluginKey m_selectedGraphKey;
     QTreeWidgetItem* m_treeItemAttrs;
+    
+    QStringList m_attrHeader;
+    QStringList m_attrValues;
+    int m_numNodes;
+
+    void parseAttrs(QString& error);
 
 private slots:
     void slotGraphSelected(int grId);
+    void slotSaveGraphGen();
 };
 
 } // evoplex

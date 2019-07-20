@@ -19,6 +19,7 @@
 */
 
 #include <QDebug>
+#include <QDialog>
 #include <QSet>
 #include <QSizePolicy>
 #include <QMessageBox>
@@ -57,41 +58,79 @@ GraphGenDlg::GraphGenDlg(GraphDesignerPage* parent, MainGUI* mainGUI)
     m_treeItemAttrs = new QTreeWidgetItem(m_ui->treeWidget);
     m_treeItemAttrs->setText(0, "Attributes");
     m_treeItemAttrs->setToolTip(0, "Graph Attributes");
-    m_treeItemAttrs->setExpanded(false);
+    m_treeItemAttrs->setExpanded(true);
   
     QSizePolicy sp_retain = m_ui->treeWidget->sizePolicy();
     sp_retain.setRetainSizeWhenHidden(true);
     m_ui->treeWidget->setSizePolicy(sp_retain);
     m_ui->treeWidget->setVisible(false);
 
-    //connect(m_ui->ok, SIGNAL(clicked()), SLOT(slotGraphSaved()));
+    connect(m_ui->ok, SIGNAL(clicked()), SLOT(slotSaveGraphGen()));
     connect(m_ui->graphType, SIGNAL(currentIndexChanged(int)), SLOT(slotGraphSelected(int)));
     connect(m_ui->cancel, SIGNAL(clicked()), SLOT(close()));
 };
 
-void GraphGenDlg::slotGraphSelected(int grId) {
+void GraphGenDlg::parseAttrs(QString& error)
+{
+    if (m_selectedGraphKey == PluginKey()) {
+        error = "Please select a valid graph id";
+        return;
+    }
+
+    m_numNodes = m_ui->numNodes->value();
+
+    for (auto it = m_attrWidgets.cbegin(); it != m_attrWidgets.cend(); ++it) {
+        m_attrHeader << m_selectedGraphKey.first + "_" + it.value()->attrName();
+        m_attrValues << it.value()->value().toQString('g', 8);
+    }
+}
+
+void GraphGenDlg::slotSaveGraphGen()
+{
+    QString errstrng;
+    parseAttrs(errstrng);
+
+    if (!errstrng.isEmpty()) {
+        QMessageBox::warning(this, "Graph Generator", "Error: " + errstrng);
+        return;
+    }
+
+    m_graphPage->changedGraphAttrs(m_numNodes, m_attrHeader, m_attrValues);
+    close();
+}
+
+void GraphGenDlg::slotGraphSelected(int grId) 
+{
     // Clear attributes
     foreach(auto i, m_treeItemAttrs->takeChildren()) {
         delete i;
     }
     
+    if (grId == 0) {
+        m_selectedGraphKey = PluginKey();
+        m_ui->treeWidget->setVisible(false);
+        return;
+    }
+
     m_selectedGraphKey = m_plugins.value(grId);
     const GraphPlugin* graph = m_mainGUI->mainApp()->graph(m_selectedGraphKey);
     
-    QHash<QString, AttributeRangePtr>::const_iterator i = graph->pluginAttrsScope().begin();
+    QHash<QString, AttributeRangePtr>::const_iterator it = graph->pluginAttrsScope().begin();
 
-    while (i != graph->pluginAttrsScope().end()) {
+    while (it != graph->pluginAttrsScope().end()) {
         QTreeWidgetItem* _item = new QTreeWidgetItem(m_treeItemAttrs);
-        m_ui->treeWidget->setItemWidget(_item, 1, new AttrWidget(i.value(), this));
-        _item->setText(0, i.key());
-        _item->setToolTip(0, i.key());
-        i++;
+        AttrWidget* attrW = new AttrWidget(it.value(), this);
+        
+        m_ui->treeWidget->setItemWidget(_item, 1, attrW);
+        m_attrWidgets.insert(it.key(), attrW);
+        _item->setText(0, it.key());
+        _item->setToolTip(0, it.key());
+        
+        it++;
     }
 
     m_ui->treeWidget->setVisible(!graph->pluginAttrsScope().isEmpty());
 }
-
-
 
 GraphGenDlg::~GraphGenDlg()
 {

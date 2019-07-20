@@ -22,12 +22,14 @@
 #define GRAPHDESIGNERPAGE_H
 
 #include <QMainWindow>
+#include <QStringList>
 
 #include "maingui.h"
 #include "abstractgraph.h"
 #include "attributerange.h"
 #include "graphdesigner.h"
 #include "graphattrsdlg.h"
+#include "graphgendlg.h"
 
 #include "core/mainapp.h"
 
@@ -48,8 +50,10 @@ public:
 
 protected:
     friend class GraphAttrsDlg;
-
+    friend class GraphGenDlg;
+    
     void changedAttrsScope(const AttrsType type, AttributesScope attrs);
+    void changedGraphAttrs(const int numNodes, QStringList& graphAttrHeader, QStringList& graphAttrValues);
 
 private:
     Ui_GraphDesignerPage* m_ui;
@@ -57,9 +61,12 @@ private:
     MainGUI* m_mainGUI;
     QMainWindow* m_innerWindow;
     GraphDesigner* m_graphDesigner;
+    
     AttributesScope m_edgeAttrScope;
     AttributesScope m_nodeAttrScope;
-
+    int m_numNodes;
+    QStringList m_graphAttrHeader;
+    QStringList m_graphAttrValues;
 
 private slots:
     void slotEdgeAttrs();
