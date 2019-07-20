@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>451</width>
-    <height>210</height>
+    <width>312</width>
+    <height>408</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -25,6 +25,12 @@
      <layout class="QVBoxLayout" name="verticalLayout_2">
       <item>
        <widget class="QWidget" name="wNumAttrs" native="true">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <layout class="QHBoxLayout" name="horizontalLayout_3">
          <property name="spacing">
           <number>8</number>
@@ -64,7 +70,16 @@
       </item>
       <item>
        <widget class="QWidget" name="wData" native="true">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <layout class="QGridLayout" name="gridLayout">
+         <item row="0" column="1">
+          <widget class="QComboBox" name="graphType"/>
+         </item>
          <item row="0" column="2">
           <spacer name="horizontalSpacer_3">
            <property name="orientation">
@@ -78,7 +93,7 @@
            </property>
           </spacer>
          </item>
-         <item row="1" column="1">
+         <item row="2" column="1">
           <spacer name="verticalSpacer">
            <property name="orientation">
             <enum>Qt::Vertical</enum>
@@ -94,14 +109,37 @@
            </property>
           </spacer>
          </item>
-         <item row="0" column="1">
-          <widget class="QComboBox" name="graphType"/>
-         </item>
          <item row="0" column="0">
           <widget class="QLabel" name="lgraphType">
            <property name="text">
             <string>Graph Type</string>
            </property>
+          </widget>
+         </item>
+         <item row="1" column="0" colspan="3">
+          <widget class="QTreeWidget" name="treeWidget">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="headerHidden">
+            <bool>true</bool>
+           </property>
+           <property name="columnCount">
+            <number>2</number>
+           </property>
+           <column>
+            <property name="text">
+             <string notr="true">1</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string notr="true">2</string>
+            </property>
+           </column>
           </widget>
          </item>
         </layout>

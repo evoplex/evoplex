@@ -20,10 +20,14 @@
 
 #include <QDebug>
 #include <QSet>
+#include <QSizePolicy>
 #include <QMessageBox>
 
+#include "core/include/attributerange.h"
 #include "core/graphplugin.h"
+#include "core/plugin.h"
 
+#include "attrwidget.h"
 #include "graphgendlg.h"
 #include "ui_graphgendlg.h"
 
@@ -50,13 +54,49 @@ GraphGenDlg::GraphGenDlg(GraphDesignerPage* parent, MainGUI* mainGUI)
         }
     }
 
+    m_treeItemAttrs = new QTreeWidgetItem(m_ui->treeWidget);
+    m_treeItemAttrs->setText(0, "Attributes");
+    m_treeItemAttrs->setToolTip(0, "Graph Attributes");
+    m_treeItemAttrs->setExpanded(false);
+  
+    QSizePolicy sp_retain = m_ui->treeWidget->sizePolicy();
+    sp_retain.setRetainSizeWhenHidden(true);
+    m_ui->treeWidget->setSizePolicy(sp_retain);
+    m_ui->treeWidget->setVisible(false);
+
     //connect(m_ui->ok, SIGNAL(clicked()), SLOT(slotGraphSaved()));
+    connect(m_ui->graphType, SIGNAL(currentIndexChanged(int)), SLOT(slotGraphSelected(int)));
     connect(m_ui->cancel, SIGNAL(clicked()), SLOT(close()));
 };
+
+void GraphGenDlg::slotGraphSelected(int grId) {
+    // Clear attributes
+    foreach(auto i, m_treeItemAttrs->takeChildren()) {
+        delete i;
+    }
+    
+    m_selectedGraphKey = m_plugins.value(grId);
+    const GraphPlugin* graph = m_mainGUI->mainApp()->graph(m_selectedGraphKey);
+    
+    QHash<QString, AttributeRangePtr>::const_iterator i = graph->pluginAttrsScope().begin();
+
+    while (i != graph->pluginAttrsScope().end()) {
+        QTreeWidgetItem* _item = new QTreeWidgetItem(m_treeItemAttrs);
+        m_ui->treeWidget->setItemWidget(_item, 1, new AttrWidget(i.value(), this));
+        _item->setText(0, i.key());
+        _item->setToolTip(0, i.key());
+        i++;
+    }
+
+    m_ui->treeWidget->setVisible(!graph->pluginAttrsScope().isEmpty());
+}
+
+
 
 GraphGenDlg::~GraphGenDlg()
 {
     delete m_ui;
 }
+
 
 }

@@ -22,7 +22,10 @@
 #define GRAPHGENDLG_H
 
 #include <QDialog>
+#include <QTreeWidgetItem>
 #include <QHash>
+
+#include "core/mainapp.h"
 
 #include "graphdesignerpage.h"
 #include "maingui.h"
@@ -48,6 +51,11 @@ private:
     MainGUI* m_mainGUI;
 
     QHash<int, PluginKey> m_plugins; // Easily retrieve the loaded plugins
+    PluginKey m_selectedGraphKey;
+    QTreeWidgetItem* m_treeItemAttrs;
+
+private slots:
+    void slotGraphSelected(int grId);
 };
 
 } // evoplex
