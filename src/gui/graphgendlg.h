@@ -21,7 +21,6 @@
 #ifndef GRAPHGENDLG_H
 #define GRAPHGENDLG_H
 
-#include <QTreeWidgetItem>
 #include <QHash>
 #include <QStringList>
 
@@ -53,7 +52,6 @@ private:
     QHash<int, PluginKey> m_plugins; // Loaded plugins
     QHash<QString, AttrWidget*> m_attrWidgets; // Attribute widgets
     PluginKey m_selectedGraphKey;
-    QTreeWidgetItem* m_treeItemAttrs;
     
     QStringList m_attrHeader;
     QStringList m_attrValues;

@@ -55,16 +55,6 @@ GraphGenDlg::GraphGenDlg(GraphDesignerPage* parent, MainGUI* mainGUI)
         }
     }
 
-    m_treeItemAttrs = new QTreeWidgetItem(m_ui->treeWidget);
-    m_treeItemAttrs->setText(0, "Attributes");
-    m_treeItemAttrs->setToolTip(0, "Graph Attributes");
-    m_treeItemAttrs->setExpanded(true);
-  
-    QSizePolicy sp_retain = m_ui->treeWidget->sizePolicy();
-    sp_retain.setRetainSizeWhenHidden(true);
-    m_ui->treeWidget->setSizePolicy(sp_retain);
-    m_ui->treeWidget->setVisible(false);
-
     connect(m_ui->ok, SIGNAL(clicked()), SLOT(slotSaveGraphGen()));
     connect(m_ui->graphType, SIGNAL(currentIndexChanged(int)), SLOT(slotGraphSelected(int)));
     connect(m_ui->cancel, SIGNAL(clicked()), SLOT(close()));
@@ -101,14 +91,16 @@ void GraphGenDlg::slotSaveGraphGen()
 
 void GraphGenDlg::slotGraphSelected(int grId) 
 {
-    // Clear attributes
-    foreach(auto i, m_treeItemAttrs->takeChildren()) {
-        delete i;
+    // Clear list widget entries
+    while (m_ui->attrForm->count() > 0) {
+        auto item = m_ui->attrForm->takeAt(0);
+        auto widget = item->widget();
+        delete widget;
+        delete item;
     }
-    
+
     if (grId == 0) {
         m_selectedGraphKey = PluginKey();
-        m_ui->treeWidget->setVisible(false);
         return;
     }
 
@@ -118,18 +110,12 @@ void GraphGenDlg::slotGraphSelected(int grId)
     QHash<QString, AttributeRangePtr>::const_iterator it = graph->pluginAttrsScope().begin();
 
     while (it != graph->pluginAttrsScope().end()) {
-        QTreeWidgetItem* _item = new QTreeWidgetItem(m_treeItemAttrs);
-        AttrWidget* attrW = new AttrWidget(it.value(), this);
-        
-        m_ui->treeWidget->setItemWidget(_item, 1, attrW);
+        AttrWidget* attrW = new AttrWidget(it.value(), this);        
+        m_ui->attrForm->addRow(it.key(), attrW);
         m_attrWidgets.insert(it.key(), attrW);
-        _item->setText(0, it.key());
-        _item->setToolTip(0, it.key());
         
         ++it;
     }
-
-    m_ui->treeWidget->setVisible(!graph->pluginAttrsScope().isEmpty());
 }
 
 GraphGenDlg::~GraphGenDlg()
