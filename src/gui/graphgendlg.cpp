@@ -45,9 +45,10 @@ GraphGenDlg::GraphGenDlg(GraphDesignerPage* parent, MainGUI* mainGUI)
 
     m_ui->setupUi(this);
     setVisible(true);
-    
+
     m_ui->graphId->insertItem(0, "--");
-    
+    m_ui->attrForm->hide();
+
     int i = 0;
     for (Plugin* p : m_mainGUI->mainApp()->plugins()) {
         if (p->type() == PluginType::Graph) {
@@ -99,9 +100,11 @@ void GraphGenDlg::slotSaveGraphGen()
 
 void GraphGenDlg::slotGraphSelected(int grId) 
 {
+    auto layout = qobject_cast<QFormLayout*>(m_ui->attrForm->layout());
+
     // Clear list widget entries
-    while (m_ui->attrForm->count() > 0) {
-        m_ui->attrForm->removeRow(0);
+    while (!layout->isEmpty()) {
+        layout->removeRow(0);
         //auto item = m_ui->attrForm->takeAt(0);
         //auto widget = item->widget();
         //delete widget;
@@ -125,7 +128,7 @@ void GraphGenDlg::slotGraphSelected(int grId)
         m_cbgraphType->insertItem(1, _enumToString<GraphType>(GraphType::Directed),
             static_cast<int>(GraphType::Directed));
 
-        m_ui->attrForm->addRow("Graph Type", m_cbgraphType);
+        layout->addRow("Graph Type", m_cbgraphType);
     }
 
     // Add plugin attributes
@@ -133,11 +136,13 @@ void GraphGenDlg::slotGraphSelected(int grId)
 
     while (it != graph->pluginAttrsScope().end()) {
         AttrWidget* attrW = new AttrWidget(it.value(), this);        
-        m_ui->attrForm->addRow(it.key(), attrW);
+        layout->addRow(it.key(), attrW);
         m_attrWidgets.insert(it.key(), attrW);
         
         ++it;
     }
+
+    m_ui->attrForm->setVisible(!layout->isEmpty());
 }
 
 GraphGenDlg::~GraphGenDlg()
