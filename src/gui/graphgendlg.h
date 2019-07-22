@@ -21,9 +21,11 @@
 #ifndef GRAPHGENDLG_H
 #define GRAPHGENDLG_H
 
+#include <QComboBox>
 #include <QHash>
 #include <QStringList>
 
+#include "core/include/enum.h"
 #include "core/mainapp.h"
 
 #include "graphdesignerpage.h"
@@ -52,10 +54,13 @@ private:
     QHash<int, PluginKey> m_plugins; // Loaded plugins
     QHash<QString, AttrWidget*> m_attrWidgets; // Attribute widgets
     PluginKey m_selectedGraphKey;
-    
+
     QStringList m_attrHeader;
     QStringList m_attrValues;
     int m_numNodes;
+    GraphType m_graphType;
+
+    QComboBox* m_cbgraphType;
 
     void parseAttrs(QString& error);
 

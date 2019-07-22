@@ -77,11 +77,12 @@ void GraphDesignerPage::changedAttrsScope(const AttrsType type, AttributesScope 
     }
 }
 
-void GraphDesignerPage::changedGraphAttrs(const int numNodes, QStringList& graphAttrHeader, QStringList& graphAttrValues)
+void GraphDesignerPage::changedGraphAttrs(const int numNodes, GraphType graphType, QStringList& graphAttrHeader, QStringList& graphAttrValues)
 {
     m_numNodes = numNodes;
     m_graphAttrHeader = graphAttrHeader;
     m_graphAttrValues = graphAttrValues;
+    m_graphType = graphType;
 }
 
 }
