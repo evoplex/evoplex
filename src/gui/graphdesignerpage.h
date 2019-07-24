@@ -53,17 +53,28 @@ public:
 protected:
     friend class GraphAttrsDlg;
     friend class GraphGenDlg;
-    
+    friend class GraphDesigner;
+
     void changedAttrsScope(const AttrsType type, AttributesScope attrs);
-    void changedGraphAttrs(const int numNodes, GraphType graphType, QStringList& graphAttrHeader, QStringList& graphAttrValues);
+    void changedGraphAttrs(const int numNodes, PluginKey selectedGraphKey, GraphType graphType, QStringList& graphAttrHeader, QStringList& graphAttrValues);
+
+    inline int numNodes() const;
+    inline AttributesScope edgeAttributesScope() const;
+    inline AttributesScope nodeAttributesScope() const;
+    inline GraphType graphType() const;
+    inline QStringList graphAttrHeader() const;
+    inline QStringList graphAttrValues() const;
+    inline PluginKey selectedGraphKey() const;
 
 private:
-    Ui_GraphDesignerPage* m_ui;
+
+    Ui_GraphDesignerPage * m_ui;
     MainApp* m_mainApp;
     MainGUI* m_mainGUI;
     QMainWindow* m_innerWindow;
     GraphDesigner* m_graphDesigner;
 
+    PluginKey m_selectedGraphKey;
     AttributesScope m_edgeAttrScope;
     AttributesScope m_nodeAttrScope;
     int m_numNodes;
@@ -77,6 +88,41 @@ private slots:
     void slotGraphGen();
 
 };
+
+inline int GraphDesignerPage::numNodes() const
+{
+    return m_numNodes;
+}
+
+inline AttributesScope GraphDesignerPage::edgeAttributesScope() const
+{
+    return m_edgeAttrScope;
+}
+
+inline AttributesScope GraphDesignerPage::nodeAttributesScope() const
+{
+    return m_nodeAttrScope;
+}
+
+inline GraphType GraphDesignerPage::graphType() const
+{
+    return m_graphType;
+}
+
+inline QStringList GraphDesignerPage::graphAttrHeader() const
+{
+    return m_graphAttrHeader;
+}
+
+inline QStringList GraphDesignerPage::graphAttrValues() const
+{
+    return m_graphAttrValues;
+}
+
+inline PluginKey GraphDesignerPage::selectedGraphKey() const
+{
+    return m_selectedGraphKey;
+}
 
 }
 

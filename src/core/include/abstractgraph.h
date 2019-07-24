@@ -56,6 +56,7 @@ public:
  */
 class AbstractGraph : public AbstractGraphInterface
 {
+    friend class GraphDesigner;
     friend class Trial;
 
 public:

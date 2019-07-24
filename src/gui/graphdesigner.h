@@ -24,30 +24,17 @@
 #include <QDockWidget>
 #include <QMainWindow>
 
+#include "core/graphinputs.h"
 #include "core/project.h"
-#include "graphwidget.h"
 
 #include "abstractgraph.h"
 #include "graphwidget.h"
+#include "graphdesignerpage.h"
+#include "maingui.h"
 
 namespace evoplex {
 
-class GraphDesigner : public QDockWidget
-{
-    Q_OBJECT
-
-public:
-    explicit GraphDesigner(MainApp* mainApp, QMainWindow *parent);
-    ~GraphDesigner();
-
-private:
-    MainApp* m_mainApp;
-    QMainWindow* m_innerWindow;
-    GraphWidget* m_curGraph;
-    int m_curGraphId;
-
-    void initEmptyGraph();
-};
+class GraphDesignerPage;
 
 class BaseAbstractGraph : public AbstractGraph
 {
@@ -55,6 +42,30 @@ class BaseAbstractGraph : public AbstractGraph
 public:
     bool reset() override { return 0; };
 
+};
+
+class GraphDesigner : public QDockWidget
+{
+    Q_OBJECT
+
+public:
+    explicit GraphDesigner(MainGUI* mainGUI, GraphDesignerPage *parent);
+    ~GraphDesigner();
+
+public slots:
+    void slotUpdateGraph();
+
+private:
+    MainGUI * m_mainGUI;
+    MainApp* m_mainApp;
+    QMainWindow* m_innerWindow;
+    GraphDesignerPage* m_parent;
+    GraphWidget* m_curGraph;
+    int m_curGraphId;
+    AbstractGraph* m_abstrGraph;
+
+    void initEmptyGraph();
+    GraphInputsPtr parseInputs(QString& error);
 };
 
 }

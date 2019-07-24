@@ -22,6 +22,7 @@
 #include <QToolBar>
 #include <QToolButton>
 #include <QHBoxLayout>
+#include <QSettings>
 
 #include "fontstyles.h"
 #include "graphdesignerpage.h"
@@ -36,7 +37,7 @@ GraphDesignerPage::GraphDesignerPage(MainGUI* mainGUI)
     m_mainGUI(mainGUI),
     m_innerWindow(new QMainWindow()),
     m_ui(new Ui_GraphDesignerPage),
-    m_graphDesigner(new GraphDesigner(mainGUI->mainApp(), this))
+    m_graphDesigner(new GraphDesigner(mainGUI, this))
 {
     setWindowTitle("Graph Designer Page");
     setObjectName("GraphDesignerPage");
@@ -58,12 +59,12 @@ void GraphDesignerPage::slotEdgeAttrs() {
     new GraphAttrsDlg(this, AttrsType::Edges);
 };
 
-void GraphDesignerPage::slotNodeAttrs() 
+void GraphDesignerPage::slotNodeAttrs()
 {
     new GraphAttrsDlg(this, AttrsType::Nodes);
 }
 
-void GraphDesignerPage::slotGraphGen() 
+void GraphDesignerPage::slotGraphGen()
 {
     new GraphGenDlg(this, m_mainGUI);
 }
@@ -72,17 +73,21 @@ void GraphDesignerPage::changedAttrsScope(const AttrsType type, AttributesScope 
 {
     if (type == AttrsType::Edges) {
         m_edgeAttrScope = attrs;
-    } else if (type == AttrsType::Nodes) {
+    }
+    else if (type == AttrsType::Nodes) {
         m_nodeAttrScope = attrs;
     }
 }
 
-void GraphDesignerPage::changedGraphAttrs(const int numNodes, GraphType graphType, QStringList& graphAttrHeader, QStringList& graphAttrValues)
+void GraphDesignerPage::changedGraphAttrs(const int numNodes, PluginKey selectedGraphKey, GraphType graphType, QStringList& graphAttrHeader, QStringList& graphAttrValues)
 {
     m_numNodes = numNodes;
     m_graphAttrHeader = graphAttrHeader;
     m_graphAttrValues = graphAttrValues;
     m_graphType = graphType;
+    m_selectedGraphKey = selectedGraphKey;
+
+    m_graphDesigner->slotUpdateGraph();
 }
 
 }

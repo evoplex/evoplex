@@ -82,7 +82,7 @@
      <property name="title">
       <string>Graph Attributes</string>
      </property>
-     <layout class="QFormLayout" name="formLayout"/>
+     <layout class="QFormLayout" name="ltattrForm"/>
     </widget>
    </item>
    <item>

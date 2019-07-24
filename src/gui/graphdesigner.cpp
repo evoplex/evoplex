@@ -19,24 +19,33 @@
 */
 
 #include <QDebug>
+#include <QMessageBox>
 #include <QVBoxLayout>
 #include <QString>
 #include <QStringList>
 
+#include "core/include/abstractmodel.h"
 #include "core/include/attributerange.h"
 #include "core/include/enum.h"
-#include "core/graphinputs.h"
+#include <core/include/nodes.h>
+#include <core/nodes_p.h>
+
+#include "core/graphplugin.h"
 #include "core/plugin.h"
 
+#include "colormap.h"
 #include "graphdesigner.h"
+#include "prg.h"
 
 namespace evoplex {
 
-GraphDesigner::GraphDesigner(MainApp* mainApp, QMainWindow *parent)
+GraphDesigner::GraphDesigner(MainGUI* mainGUI, GraphDesignerPage *parent)
     : QDockWidget(parent),
-    m_mainApp(mainApp),
+    m_mainGUI(mainGUI),
+    m_mainApp(mainGUI->mainApp()),
     m_innerWindow(new QMainWindow(this)),
-    m_curGraph(nullptr)
+    m_curGraph(nullptr),
+    m_parent(parent)
 {
     setObjectName("GraphDesigner");
 
@@ -53,15 +62,88 @@ GraphDesigner::GraphDesigner(MainApp* mainApp, QMainWindow *parent)
     initEmptyGraph();
 }
 
+void GraphDesigner::slotUpdateGraph()
+{
+    QString errstrng;
+    GraphInputsPtr inputs = parseInputs(errstrng);
+
+    if (!errstrng.isEmpty()) {
+        QMessageBox::warning(this, "Graph Designer", "Error when parsing inputs:\n" + errstrng);
+        return;
+    }
+
+    PRG* prg = new PRG(0);
+    AttrsGeneratorPtr edgeGen = AttrsGenerator::parse(m_parent->edgeAttributesScope(), QString::number(m_parent->numNodes()), errstrng);
+
+    if (!errstrng.isEmpty()) {
+        QMessageBox::warning(this, "Graph Designer", "Error when parsing edge attributes:\n" + errstrng);
+        return;
+    }
+
+    Nodes nodes = NodesPrivate::fromCmd(QString::number(m_parent->numNodes()), m_parent->nodeAttributesScope(), GraphType::Undirected, errstrng);
+
+    if (!errstrng.isEmpty()) {
+        QMessageBox::warning(this, "Graph Designer", "Error when creating nodes:\n" + errstrng);
+        return;
+    }
+
+    m_abstrGraph = dynamic_cast<AbstractGraph*>(inputs->graphPlugin()->create());
+    m_abstrGraph->setup(QString::number(m_curGraphId), m_parent->graphType(), *prg,
+        std::move(edgeGen), nodes, *inputs->graph());
+}
+
+GraphInputsPtr GraphDesigner::parseInputs(QString& error)
+{
+    QStringList header;
+    QStringList values;
+    QString errorMsg;
+
+    header << GENERAL_ATTR_EXPID;
+    values << QString::number(m_curGraphId);
+
+    //TODO: Edge attributes widget
+    header << GENERAL_ATTR_EDGEATTRS;
+    values << "";
+
+    header << GENERAL_ATTR_NODES;
+    values << QString::number(m_parent->numNodes());
+
+    header << GENERAL_ATTR_GRAPHTYPE;
+
+    if (m_parent->graphType() == GraphType::Undirected) {
+        values << "undirected";
+    }
+    else if (m_parent->graphType() == GraphType::Directed) {
+        values << "directed";
+    }
+    else {
+        values << "invalid";
+    }
+
+    header += m_parent->graphAttrHeader();
+    values += m_parent->graphAttrValues();
+
+    header << GENERAL_ATTR_GRAPHID << GENERAL_ATTR_GRAPHVS;
+    values << m_parent->selectedGraphKey().first << QString::number(m_parent->selectedGraphKey().second);
+
+    QString errorstrng;
+    auto inputs = GraphInputs::parse(m_mainApp, header, values, errorstrng);
+    if (!inputs || !errorstrng.isEmpty()) {
+        return nullptr;
+    }
+
+    return inputs;
+}
+
 void GraphDesigner::initEmptyGraph()
 {
     QStringList header;
     QStringList values;
     QString errorMsg;
 
-    auto graph = new BaseAbstractGraph;
+    m_abstrGraph = new BaseAbstractGraph();
     AttributesScope attrs;
-    m_curGraph = new GraphWidget(GraphWidget::Mode::Graph, graph, attrs, this);
+    m_curGraph = new GraphWidget(GraphWidget::Mode::Graph, m_abstrGraph, attrs, this);
 
     m_curGraph->setFeatures(QDockWidget::NoDockWidgetFeatures);
     m_innerWindow->setCentralWidget(m_curGraph);
