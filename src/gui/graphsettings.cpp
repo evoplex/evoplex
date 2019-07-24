@@ -33,7 +33,9 @@ GraphSettings::GraphSettings(ColorMapMgr* cMgr, ExperimentPtr exp, GraphView* pa
       m_ui(new Ui_GraphSettings),
       m_parent(parent),
       m_cMgr(cMgr),
-      m_exp(exp)
+      m_exp(exp),
+      m_nodeAttrsScope(m_exp->modelPlugin()->nodeAttrsScope()),
+      m_edgeAttrsScope(m_exp->modelPlugin()->edgeAttrsScope())
 {
     m_ui->setupUi(this);
     connect(m_exp.get(), SIGNAL(restarted()), SLOT(init()));
@@ -54,6 +56,33 @@ GraphSettings::GraphSettings(ColorMapMgr* cMgr, ExperimentPtr exp, GraphView* pa
     init();
 }
 
+GraphSettings::GraphSettings(ColorMapMgr* cMgr, AttributesScope nodeAttrsScope, AttributesScope edgeAttrsScope, GraphView* parent)
+    : QDialog(parent, MainGUI::kDefaultDlgFlags),
+    m_ui(new Ui_GraphSettings),
+    m_parent(parent),
+    m_cMgr(cMgr),
+    m_exp(nullptr),
+    m_nodeAttrsScope(nodeAttrsScope),
+    m_edgeAttrsScope(edgeAttrsScope)
+{
+    m_ui->setupUi(this);
+
+    connect(m_ui->nodesColor, SIGNAL(cmapUpdated(ColorMap*)),
+        parent, SLOT(setNodeCMap(ColorMap*)));
+    connect(m_ui->edgesColor, SIGNAL(cmapUpdated(ColorMap*)),
+        parent, SLOT(setEdgeCMap(ColorMap*)));
+
+    connect(m_ui->nodeScale, SIGNAL(valueChanged(int)), SLOT(slotNodeScale(int)));
+    connect(m_ui->edgeScale, SIGNAL(valueChanged(int)), SLOT(slotEdgeScale(int)));
+    connect(m_ui->edgeWidth, SIGNAL(valueChanged(int)), SLOT(slotEdgeWidth(int)));
+
+    connect(m_ui->bOk, SIGNAL(pressed()), SLOT(close()));
+    connect(m_ui->bRestore, SIGNAL(pressed()), SLOT(restoreSettings()));
+    connect(m_ui->bSaveAsDefault, SIGNAL(pressed()), SLOT(saveAsDefault()));
+
+    init();
+}
+
 GraphSettings::~GraphSettings()
 {
     delete m_ui;
@@ -61,7 +90,7 @@ GraphSettings::~GraphSettings()
 
 void GraphSettings::init()
 {
-    Q_ASSERT_X(m_exp->modelPlugin(), "GraphSettings",
+    Q_ASSERT_X(m_exp && m_exp->modelPlugin(), "GraphSettings",
                "tried to init the graph settings for a null model!");
 
     QSettings userPrefs;
@@ -72,13 +101,13 @@ void GraphSettings::init()
     auto cmap = m_cMgr->defaultCMapKey();
     CMapKey n(userPrefs.value("graphSettings/nodeCMap", cmap.first).toString(),
               userPrefs.value("graphSettings/nodeCMapSize", cmap.second).toInt());
-    m_ui->nodesColor->init(m_cMgr, n, m_exp->modelPlugin()->nodeAttrsScope());
-    m_ui->nodesColor->setVisible(!m_exp->modelPlugin()->nodeAttrsScope().empty());
+    m_ui->nodesColor->init(m_cMgr, n,m_nodeAttrsScope);
+    m_ui->nodesColor->setVisible(!m_nodeAttrsScope.empty());
 
     CMapKey e(userPrefs.value("graphSettings/edgeCMap", cmap.first).toString(),
               userPrefs.value("graphSettings/edgeCMapSize", cmap.second).toInt());
-    m_ui->edgesColor->init(m_cMgr, e, m_exp->modelPlugin()->edgeAttrsScope());
-    m_ui->edgesColor->setVisible(!m_exp->modelPlugin()->edgeAttrsScope().empty());
+    m_ui->edgesColor->init(m_cMgr, e, m_edgeAttrsScope);
+    m_ui->edgesColor->setVisible(!m_edgeAttrsScope.empty());
 }
 
 void GraphSettings::restoreSettings()
