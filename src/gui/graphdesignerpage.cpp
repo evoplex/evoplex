@@ -73,13 +73,15 @@ void GraphDesignerPage::changedAttrsScope(const AttrsType type, AttributesScope 
 {
     if (type == AttrsType::Edges) {
         m_edgeAttrScope = attrs;
-    }
-    else if (type == AttrsType::Nodes) {
+    } else if (type == AttrsType::Nodes) {
         m_nodeAttrScope = attrs;
     }
+
+    m_graphDesigner->slotUpdateAttrs();
 }
 
-void GraphDesignerPage::changedGraphAttrs(const int numNodes, PluginKey selectedGraphKey, GraphType graphType, QStringList& graphAttrHeader, QStringList& graphAttrValues)
+void GraphDesignerPage::changedGraphAttrs(const int numNodes, PluginKey selectedGraphKey, GraphType graphType,
+    QStringList& graphAttrHeader, QStringList& graphAttrValues)
 {
     m_numNodes = numNodes;
     m_graphAttrHeader = graphAttrHeader;

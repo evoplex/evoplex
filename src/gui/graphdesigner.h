@@ -55,6 +55,7 @@ public:
 
 public slots:
     void slotUpdateGraph();
+    void slotUpdateAttrs();
     void slotOpenSettings();
 
 private:

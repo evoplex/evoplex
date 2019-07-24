@@ -67,6 +67,11 @@ void GraphDesigner::slotOpenSettings()
     m_curGraph->slotOpenSettings();
 }
 
+void GraphDesigner::slotUpdateAttrs()
+{
+    m_curGraph = new GraphWidget(GraphWidget::Mode::Graph, m_abstrGraph, m_parent->nodeAttributesScope(), m_parent->edgeAttributesScope(), this);
+}
+
 void GraphDesigner::slotUpdateGraph()
 {
     QString errstrng;
