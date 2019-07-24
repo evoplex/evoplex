@@ -26,13 +26,14 @@
 #include "gridview.h"
 #include "graphtitlebar.h"
 #include "graphsettings.h"
+#include "graphdesignerpage.h"
 #include "gridsettings.h"
 
 namespace evoplex {
 
 // (cardinot) TODO: this class should be refactored to remove the Experiment dependency
 GraphWidget::GraphWidget(Mode mode, ColorMapMgr* cMgr, ExperimentPtr exp, QWidget* parent)
-    : GraphWidget(mode, nullptr, AttributesScope(), parent)
+    : GraphWidget(mode, nullptr, AttributesScope(), AttributesScope(), parent)
 {
     m_exp = exp;
     Q_ASSERT(m_exp && m_view); // TODO
@@ -71,16 +72,20 @@ GraphWidget::GraphWidget(Mode mode, ColorMapMgr* cMgr, ExperimentPtr exp, QWidge
     }
 }
 
-GraphWidget::GraphWidget(Mode mode, AbstractGraph* graph, AttributesScope nodeAttrsScope, QWidget* parent)
+GraphWidget::GraphWidget(Mode mode, AbstractGraph* graph, AttributesScope nodeAttrsScope, AttributesScope edgeAttrsScope, QWidget* parent)
     : QDockWidget(parent),
       m_view(nullptr),
       m_currTrial(nullptr)
 {
     setAttribute(Qt::WA_DeleteOnClose, true);
+    ColorMapMgr* cMgr = new ColorMapMgr;
 
     if (mode == Mode::Graph) {
         m_view = new GraphView(graph, nodeAttrsScope, this);
         setWindowTitle("Graph");
+        auto view = qobject_cast<GraphView*>(m_view);
+        auto graphSettings = new GraphSettings(cMgr, nodeAttrsScope, edgeAttrsScope, view);
+        m_settingsDlg = graphSettings;
     } else {
         m_view = new GridView(graph, nodeAttrsScope, this);
         setWindowTitle("Grid");
@@ -98,6 +103,11 @@ GraphWidget::~GraphWidget()
     if (m_exp) m_exp->disconnect(this); // important to avoid triggering statusChanged()
     delete m_view;
     m_exp = nullptr;
+}
+
+void GraphWidget::slotOpenSettings()
+{
+    m_settingsDlg->show();
 }
 
 void GraphWidget::updateView(bool forceUpdate)

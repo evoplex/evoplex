@@ -87,6 +87,8 @@ private slots:
     void slotNodeAttrs();
     void slotGraphGen();
 
+signals:
+    void openSettingsDlg();
 };
 
 inline int GraphDesignerPage::numNodes() const

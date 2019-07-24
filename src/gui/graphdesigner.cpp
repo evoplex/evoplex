@@ -62,6 +62,11 @@ GraphDesigner::GraphDesigner(MainGUI* mainGUI, GraphDesignerPage *parent)
     initEmptyGraph();
 }
 
+void GraphDesigner::slotOpenSettings()
+{
+    m_curGraph->slotOpenSettings();
+}
+
 void GraphDesigner::slotUpdateGraph()
 {
     QString errstrng;
@@ -90,6 +95,8 @@ void GraphDesigner::slotUpdateGraph()
     m_abstrGraph = dynamic_cast<AbstractGraph*>(inputs->graphPlugin()->create());
     m_abstrGraph->setup(QString::number(m_curGraphId), m_parent->graphType(), *prg,
         std::move(edgeGen), nodes, *inputs->graph());
+    
+    m_curGraph = new GraphWidget(GraphWidget::Mode::Graph, m_abstrGraph, m_parent->nodeAttributesScope(), m_parent->edgeAttributesScope(), this);
 }
 
 GraphInputsPtr GraphDesigner::parseInputs(QString& error)
@@ -143,7 +150,7 @@ void GraphDesigner::initEmptyGraph()
 
     m_abstrGraph = new BaseAbstractGraph();
     AttributesScope attrs;
-    m_curGraph = new GraphWidget(GraphWidget::Mode::Graph, m_abstrGraph, attrs, this);
+    m_curGraph = new GraphWidget(GraphWidget::Mode::Graph, m_abstrGraph, attrs, attrs, this);
 
     m_curGraph->setFeatures(QDockWidget::NoDockWidgetFeatures);
     m_innerWindow->setCentralWidget(m_curGraph);

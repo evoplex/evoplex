@@ -46,7 +46,7 @@ GraphDesignerPage::GraphDesignerPage(MainGUI* mainGUI)
     connect(m_ui->acEdgeAttrs, SIGNAL(triggered()), SLOT(slotEdgeAttrs()));
     connect(m_ui->acNodeAttrs, SIGNAL(triggered()), SLOT(slotNodeAttrs()));
     connect(m_ui->acGraphGen, SIGNAL(triggered()), SLOT(slotGraphGen()));
-
+    connect(m_ui->acGraphSettings, SIGNAL(triggered()), m_graphDesigner, SLOT(slotOpenSettings()));
     setCentralWidget(m_graphDesigner);
 }
 

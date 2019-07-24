@@ -47,6 +47,7 @@ public:
 class GraphDesigner : public QDockWidget
 {
     Q_OBJECT
+   friend class GraphDesignerPage;
 
 public:
     explicit GraphDesigner(MainGUI* mainGUI, GraphDesignerPage *parent);
@@ -54,6 +55,7 @@ public:
 
 public slots:
     void slotUpdateGraph();
+    void slotOpenSettings();
 
 private:
     MainGUI * m_mainGUI;
@@ -67,6 +69,7 @@ private:
     void initEmptyGraph();
     GraphInputsPtr parseInputs(QString& error);
 };
+
 
 }
 
