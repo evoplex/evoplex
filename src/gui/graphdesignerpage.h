@@ -56,7 +56,8 @@ protected:
     friend class GraphDesigner;
 
     void changedAttrsScope(const AttrsType type, AttributesScope attrs);
-    void changedGraphAttrs(const int numNodes, PluginKey selectedGraphKey, GraphType graphType, QStringList& graphAttrHeader, QStringList& graphAttrValues);
+    void changedGraphAttrs(const int numNodes, PluginKey selectedGraphKey, GraphType graphType, QStringList& graphAttrHeader, 
+        QStringList& graphAttrValues, QString& error);
 
     inline int numNodes() const;
     inline AttributesScope edgeAttributesScope() const;

@@ -81,7 +81,7 @@ void GraphDesignerPage::changedAttrsScope(const AttrsType type, AttributesScope 
 }
 
 void GraphDesignerPage::changedGraphAttrs(const int numNodes, PluginKey selectedGraphKey, GraphType graphType,
-    QStringList& graphAttrHeader, QStringList& graphAttrValues)
+    QStringList& graphAttrHeader, QStringList& graphAttrValues, QString& error)
 {
     m_numNodes = numNodes;
     m_graphAttrHeader = graphAttrHeader;
@@ -89,7 +89,7 @@ void GraphDesignerPage::changedGraphAttrs(const int numNodes, PluginKey selected
     m_graphType = graphType;
     m_selectedGraphKey = selectedGraphKey;
 
-    m_graphDesigner->slotUpdateGraph();
+    m_graphDesigner->slotUpdateGraph(error);
 }
 
 }

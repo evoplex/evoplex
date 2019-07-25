@@ -54,7 +54,7 @@ public:
     ~GraphDesigner();
 
 public slots:
-    void slotUpdateGraph();
+    void slotUpdateGraph(QString& error);
     void slotUpdateAttrs();
     void slotOpenSettings();
 

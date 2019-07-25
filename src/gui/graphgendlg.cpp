@@ -94,12 +94,17 @@ void GraphGenDlg::slotSaveGraphGen()
     parseAttrs(errstrng);
 
     if (!errstrng.isEmpty()) {
-        QMessageBox::warning(this, "Graph Generator", "Error: " + errstrng);
+        QMessageBox::warning(this, "Graph Generator", "Error when parsing attributes:\n" + errstrng);
         return;
     }
 
-    m_graphPage->changedGraphAttrs(m_numNodes, m_selectedGraphKey, m_graphType, m_attrHeader, m_attrValues);
+    m_graphPage->changedGraphAttrs(m_numNodes, m_selectedGraphKey, m_graphType, m_attrHeader, m_attrValues, errstrng);
 
+    if (!errstrng.isEmpty()) {
+        QMessageBox::warning(this, "Graph Generator", errstrng);
+        return;
+    }
+    
     close();
 }
 

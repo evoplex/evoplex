@@ -19,7 +19,6 @@
 */
 
 #include <QDebug>
-#include <QMessageBox>
 #include <QVBoxLayout>
 #include <QString>
 #include <QStringList>
@@ -72,28 +71,27 @@ void GraphDesigner::slotUpdateAttrs()
     m_curGraph = new GraphWidget(GraphWidget::Mode::Graph, m_abstrGraph, m_parent->nodeAttributesScope(), m_parent->edgeAttributesScope(), this);
 }
 
-void GraphDesigner::slotUpdateGraph()
+void GraphDesigner::slotUpdateGraph(QString& error)
 {
-    QString errstrng;
-    GraphInputsPtr inputs = parseInputs(errstrng);
+    GraphInputsPtr inputs = parseInputs(error);
 
-    if (!errstrng.isEmpty()) {
-        QMessageBox::warning(this, "Graph Designer", "Error when parsing inputs:\n" + errstrng);
+    if (!error.isEmpty()) {
+        error.prepend("Error when parsing inputs:\n");
         return;
     }
 
     PRG* prg = new PRG(0);
-    AttrsGeneratorPtr edgeGen = AttrsGenerator::parse(m_parent->edgeAttributesScope(), QString::number(m_parent->numNodes()), errstrng);
+    AttrsGeneratorPtr edgeGen = AttrsGenerator::parse(m_parent->edgeAttributesScope(), QString::number(m_parent->numNodes()), error);
 
-    if (!errstrng.isEmpty()) {
-        QMessageBox::warning(this, "Graph Designer", "Error when parsing edge attributes:\n" + errstrng);
+    if (!error.isEmpty()) {
+        error.prepend("Error when parsing edge attributes:\n");
         return;
     }
 
-    Nodes nodes = NodesPrivate::fromCmd(QString::number(m_parent->numNodes()), m_parent->nodeAttributesScope(), GraphType::Undirected, errstrng);
+    Nodes nodes = NodesPrivate::fromCmd(QString::number(m_parent->numNodes()), m_parent->nodeAttributesScope(), GraphType::Undirected, error);
 
-    if (!errstrng.isEmpty()) {
-        QMessageBox::warning(this, "Graph Designer", "Error when creating nodes:\n" + errstrng);
+    if (!error.isEmpty()) {
+        error.prepend("Error when creating nodes:\n");
         return;
     }
 
