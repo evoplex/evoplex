@@ -29,31 +29,10 @@
 namespace evoplex {
 
 GraphSettings::GraphSettings(ColorMapMgr* cMgr, ExperimentPtr exp, GraphView* parent)
-    : QDialog(parent, MainGUI::kDefaultDlgFlags),
-      m_ui(new Ui_GraphSettings),
-      m_parent(parent),
-      m_cMgr(cMgr),
-      m_exp(exp),
-      m_nodeAttrsScope(m_exp->modelPlugin()->nodeAttrsScope()),
-      m_edgeAttrsScope(m_exp->modelPlugin()->edgeAttrsScope())
+    : GraphSettings(cMgr, exp->modelPlugin()->nodeAttrsScope(), exp->modelPlugin()->edgeAttrsScope(), parent)
 {
-    m_ui->setupUi(this);
+    m_exp = exp;
     connect(m_exp.get(), SIGNAL(restarted()), SLOT(init()));
-
-    connect(m_ui->nodesColor, SIGNAL(cmapUpdated(ColorMap*)),
-            parent, SLOT(setNodeCMap(ColorMap*)));
-    connect(m_ui->edgesColor, SIGNAL(cmapUpdated(ColorMap*)),
-            parent, SLOT(setEdgeCMap(ColorMap*)));
-
-    connect(m_ui->nodeScale, SIGNAL(valueChanged(int)), SLOT(slotNodeScale(int)));
-    connect(m_ui->edgeScale, SIGNAL(valueChanged(int)), SLOT(slotEdgeScale(int)));
-    connect(m_ui->edgeWidth, SIGNAL(valueChanged(int)), SLOT(slotEdgeWidth(int)));
-
-    connect(m_ui->bOk, SIGNAL(pressed()), SLOT(close()));
-    connect(m_ui->bRestore, SIGNAL(pressed()), SLOT(restoreSettings()));
-    connect(m_ui->bSaveAsDefault, SIGNAL(pressed()), SLOT(saveAsDefault()));
-
-    init();
 }
 
 GraphSettings::GraphSettings(ColorMapMgr* cMgr, AttributesScope nodeAttrsScope, AttributesScope edgeAttrsScope, GraphView* parent)
@@ -61,7 +40,6 @@ GraphSettings::GraphSettings(ColorMapMgr* cMgr, AttributesScope nodeAttrsScope, 
     m_ui(new Ui_GraphSettings),
     m_parent(parent),
     m_cMgr(cMgr),
-    m_exp(nullptr),
     m_nodeAttrsScope(nodeAttrsScope),
     m_edgeAttrsScope(edgeAttrsScope)
 {

@@ -66,7 +66,7 @@ private:
     Ui_GraphSettings* m_ui;
     GraphView* m_parent;
     ColorMapMgr* m_cMgr;
-    const ExperimentPtr m_exp;
+    ExperimentPtr m_exp;
     AttributesScope m_nodeAttrsScope;
     AttributesScope m_edgeAttrsScope;
 };
