@@ -203,7 +203,6 @@ void GraphView::drawNode(QPainter& painter, const Star& s, double r) const
 
 void GraphView::drawNodes(QPainter& painter, double nodeRadius) const
 {
-    
     if (!m_showNodes || m_nodeAttr < 0 || !m_nodeCMap) {
         return;
     }

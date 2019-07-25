@@ -124,11 +124,9 @@ GraphInputsPtr GraphDesigner::parseInputs(QString& error)
 
     if (m_parent->graphType() == GraphType::Undirected) {
         values << "undirected";
-    }
-    else if (m_parent->graphType() == GraphType::Directed) {
+    } else if (m_parent->graphType() == GraphType::Directed) {
         values << "directed";
-    }
-    else {
+    } else {
         values << "invalid";
     }
 

@@ -77,9 +77,9 @@ void GraphGenDlg::parseAttrs(QString& error)
 
     if (m_cbgraphType->count() > 0) {
         m_graphType = m_cbgraphType->currentIndex() == 0 ? GraphType::Undirected : GraphType::Directed;
-    }
-    else {
-        m_graphType = GraphType::Invalid;
+    } else {
+        // If graphtype is not defined for the graph plugin, set it to undirected
+        m_graphType = GraphType::Undirected;
     }
 
     for (auto it = m_attrWidgets.cbegin(); it != m_attrWidgets.cend(); ++it) {
