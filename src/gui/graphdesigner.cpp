@@ -100,9 +100,14 @@ void GraphDesigner::slotUpdateGraph(QString& error)
 
     m_abstrGraph = dynamic_cast<AbstractGraph*>(inputs->graphPlugin()->create());
     ++m_curGraphId;
-    m_abstrGraph->setup(QString::number(m_curGraphId), m_parent->graphType(), *prg,
-        std::move(edgeGen), nodes, *inputs->graph());
-    
+    if (!m_abstrGraph || !m_abstrGraph->setup(QString::number(m_curGraphId), m_parent->graphType(), *prg,
+        std::move(edgeGen), nodes, *inputs->graph())) {
+        error.prepend("Could not initialize graph:\n");
+        return;
+    }
+
+    m_abstrGraph->reset();
+
     m_curGraph = new GraphWidget(GraphWidget::Mode::Graph, m_abstrGraph, m_parent->nodeAttributesScope(), m_parent->edgeAttributesScope(), this);
 }
 
