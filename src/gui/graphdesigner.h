@@ -57,6 +57,7 @@ public slots:
     void slotUpdateGraph(QString& error);
     void slotUpdateAttrs();
     void slotOpenSettings();
+    void slotExportNodes();
 
 private:
     MainGUI * m_mainGUI;
@@ -68,6 +69,7 @@ private:
     AbstractGraph* m_abstrGraph;
 
     void initEmptyGraph();
+    bool readyToExport();
     GraphInputsPtr parseInputs(QString& error);
 };
 

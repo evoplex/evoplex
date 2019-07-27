@@ -19,9 +19,12 @@
 */
 
 #include <QDebug>
+#include <QFileDialog>
 #include <QVBoxLayout>
 #include <QString>
 #include <QStringList>
+#include <QMessageBox>
+#include <QProgressDialog>
 
 #include "core/include/abstractmodel.h"
 #include "core/include/attributerange.h"
@@ -80,7 +83,7 @@ void GraphDesigner::slotUpdateGraph(QString& error)
         return;
     }
 
-    PRG* prg = new PRG(0);
+    PRG* prg = new PRG(m_curGraphId);
     AttrsGeneratorPtr edgeGen = AttrsGenerator::parse(m_parent->edgeAttributesScope(), QString::number(m_parent->numNodes()), error);
 
     if (!error.isEmpty()) {
@@ -88,7 +91,7 @@ void GraphDesigner::slotUpdateGraph(QString& error)
         return;
     }
 
-    Nodes nodes = NodesPrivate::fromCmd(QString::number(m_parent->numNodes()), m_parent->nodeAttributesScope(), GraphType::Undirected, error);
+    Nodes nodes = NodesPrivate::fromCmd(QString::number(m_parent->numNodes()), m_parent->nodeAttributesScope(), m_parent->graphType(), error);
 
     if (!error.isEmpty()) {
         error.prepend("Error when creating nodes:\n");
@@ -96,10 +99,51 @@ void GraphDesigner::slotUpdateGraph(QString& error)
     }
 
     m_abstrGraph = dynamic_cast<AbstractGraph*>(inputs->graphPlugin()->create());
+    ++m_curGraphId;
     m_abstrGraph->setup(QString::number(m_curGraphId), m_parent->graphType(), *prg,
         std::move(edgeGen), nodes, *inputs->graph());
     
     m_curGraph = new GraphWidget(GraphWidget::Mode::Graph, m_abstrGraph, m_parent->nodeAttributesScope(), m_parent->edgeAttributesScope(), this);
+}
+
+bool GraphDesigner::readyToExport()
+{
+    if (m_abstrGraph->nodes().empty()) {
+        QMessageBox::warning(this, "Exporting nodes",
+            "Could not export the set of nodes.\n"
+            "Please, make sure there are nodes to be exported!");
+        return false;
+    }
+
+    return true;
+}
+
+void GraphDesigner::slotExportNodes()
+{
+    if (!readyToExport()) {
+        return;
+    }
+
+    QString path = "";
+    path = QFileDialog::getSaveFileName(this, "Export Nodes", path, "Text Files (*.csv)");
+    if (path.isEmpty()) {
+        return;
+    }
+
+    QProgressDialog progressDlg("Exporting nodes", QString(), 0, m_abstrGraph->numNodes(), this);
+    progressDlg.setWindowModality(Qt::WindowModal);
+    progressDlg.setValue(0);
+    std::function<void(int)> progress = [&progressDlg](int p) { progressDlg.setValue(p); };
+
+    if (NodesPrivate::saveToFile(m_abstrGraph->nodes(), path, progress)) {
+        QMessageBox::information(this, "Exporting nodes",
+            "The set of nodes was saved successfully!\n" + path);
+    }
+    else {
+        QMessageBox::warning(this, "Exporting nodes",
+            "ERROR! Unable to save the set of nodes at:\n"
+            + path + "\nPlease, make sure this directory is writable.");
+    }
 }
 
 GraphInputsPtr GraphDesigner::parseInputs(QString& error)

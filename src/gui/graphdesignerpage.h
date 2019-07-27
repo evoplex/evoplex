@@ -68,11 +68,10 @@ protected:
     inline PluginKey selectedGraphKey() const;
 
 private:
-
-    Ui_GraphDesignerPage * m_ui;
     MainApp* m_mainApp;
     MainGUI* m_mainGUI;
     QMainWindow* m_innerWindow;
+    Ui_GraphDesignerPage * m_ui;
     GraphDesigner* m_graphDesigner;
 
     PluginKey m_selectedGraphKey;

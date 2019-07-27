@@ -90,6 +90,8 @@ GraphWidget::GraphWidget(Mode mode, AbstractGraph* graph, AttributesScope nodeAt
         m_view = new GridView(graph, nodeAttrsScope, this);
         setWindowTitle("Grid");
     }
+
+    m_view->setup(graph, nodeAttrsScope);
     setWidget(m_view);
     connect(m_view, SIGNAL(updateWidgets(bool)), SIGNAL(updateWidgets(bool)));
 
