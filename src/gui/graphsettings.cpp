@@ -68,8 +68,12 @@ GraphSettings::~GraphSettings()
 
 void GraphSettings::init()
 {
-    Q_ASSERT_X(m_exp && m_exp->modelPlugin(), "GraphSettings",
-               "tried to init the graph settings for a null model!");
+    if (m_exp) {
+        Q_ASSERT_X(m_exp->modelPlugin(), "GraphSettings",
+            "tried to init the graph settings for a null model!");
+        m_nodeAttrsScope = m_exp->modelPlugin()->nodeAttrsScope();
+        m_edgeAttrsScope = m_exp->modelPlugin()->edgeAttrsScope();
+    }
 
     QSettings userPrefs;
     m_ui->nodeScale->setValue(userPrefs.value("graphSettings/nodeScale", 10).toInt());
@@ -79,7 +83,7 @@ void GraphSettings::init()
     auto cmap = m_cMgr->defaultCMapKey();
     CMapKey n(userPrefs.value("graphSettings/nodeCMap", cmap.first).toString(),
               userPrefs.value("graphSettings/nodeCMapSize", cmap.second).toInt());
-    m_ui->nodesColor->init(m_cMgr, n,m_nodeAttrsScope);
+    m_ui->nodesColor->init(m_cMgr, n, m_nodeAttrsScope);
     m_ui->nodesColor->setVisible(!m_nodeAttrsScope.empty());
 
     CMapKey e(userPrefs.value("graphSettings/edgeCMap", cmap.first).toString(),
