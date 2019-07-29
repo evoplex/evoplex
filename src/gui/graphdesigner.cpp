@@ -2,7 +2,7 @@
 *  This file is part of Evoplex.
 *
 *  Evoplex is a multi-agent system for networks.
-*  Copyright (C) 2018 - Marcos Cardinot <marcos@cardinot.net>
+*  Copyright (C) 2019
 *
 *  This program is free software: you can redistribute it and/or modify
 *  it under the terms of the GNU General Public License as published by
@@ -29,27 +29,32 @@
 #include "core/include/abstractmodel.h"
 #include "core/include/attributerange.h"
 #include "core/include/enum.h"
-#include <core/include/nodes.h>
-#include <core/nodes_p.h>
+#include "core/include/nodes.h"
+#include "core/nodes_p.h"
 
 #include "core/graphplugin.h"
 #include "core/plugin.h"
 
+#include "basegraphgl.h"
 #include "colormap.h"
 #include "graphdesigner.h"
 #include "prg.h"
 
 namespace evoplex {
 
-GraphDesigner::GraphDesigner(MainGUI* mainGUI, GraphDesignerPage *parent)
+GraphDesigner::GraphDesigner(MainGUI* mainGUI, QWidget* parent)
     : QDockWidget(parent),
-    m_mainGUI(mainGUI),
-    m_mainApp(mainGUI->mainApp()),
-    m_innerWindow(new QMainWindow(this)),
-    m_curGraph(nullptr),
-    m_parent(parent)
+      m_mainGUI(mainGUI),
+      m_mainApp(mainGUI->mainApp()),
+      m_innerWindow(new QMainWindow(this)),
+      m_curGraph(new GraphWidget(GraphWidget::Mode::Graph, mainGUI->colorMapMgr(), this)),
+      m_abstrGraph(nullptr),
+      m_prg(new PRG(0))
 {
     setObjectName("GraphDesigner");
+
+    m_curGraph->setFeatures(QDockWidget::NoDockWidgetFeatures);
+    m_innerWindow->setCentralWidget(m_curGraph);
 
     m_innerWindow->setObjectName("graphDesignerViewWindow");
     m_innerWindow->setDockNestingEnabled(false);
@@ -59,56 +64,45 @@ GraphDesigner::GraphDesigner(MainGUI* mainGUI, GraphDesignerPage *parent)
     layout->setSpacing(0);
     layout->addWidget(m_innerWindow);
     setWidget(layout->parentWidget());
-
-    m_curGraphId = 0;
-    initEmptyGraph();
 }
 
-void GraphDesigner::slotOpenSettings()
+GraphDesigner::~GraphDesigner()
 {
-    m_curGraph->slotOpenSettings();
+    delete m_prg;
 }
 
-void GraphDesigner::slotUpdateAttrs()
+void GraphDesigner::setup(GraphInputsPtr inputs, AttributesScope nodeAttrsScope, AttributesScope edgeAttrsScope)
 {
-    m_curGraph = new GraphWidget(GraphWidget::Mode::Graph, m_abstrGraph, m_parent->nodeAttributesScope(), m_parent->edgeAttributesScope(), this);
-}
+    QString error;
 
-void GraphDesigner::slotUpdateGraph(QString& error)
-{
-    GraphInputsPtr inputs = parseInputs(error);
-
-    if (!error.isEmpty()) {
-        error.prepend("Error when parsing inputs:\n");
-        return;
-    }
-
-    PRG* prg = new PRG(m_curGraphId);
-    AttrsGeneratorPtr edgeGen = AttrsGenerator::parse(m_parent->edgeAttributesScope(), QString::number(m_parent->numNodes()), error);
-
+    const auto numNodes = inputs->general(GENERAL_ATTR_NODES).toQString();
+    AttrsGeneratorPtr edgeGen = AttrsGenerator::parse(edgeAttrsScope, numNodes, error);
     if (!error.isEmpty()) {
         error.prepend("Error when parsing edge attributes:\n");
         return;
     }
 
-    Nodes nodes = NodesPrivate::fromCmd(QString::number(m_parent->numNodes()), m_parent->nodeAttributesScope(), m_parent->graphType(), error);
-
+    auto graphType = _enumFromString<GraphType>(inputs->general(GENERAL_ATTR_GRAPHTYPE).toQString());
+    Nodes nodes = NodesPrivate::fromCmd(numNodes, nodeAttrsScope, graphType, error);
     if (!error.isEmpty()) {
         error.prepend("Error when creating nodes:\n");
         return;
     }
 
     m_abstrGraph = dynamic_cast<AbstractGraph*>(inputs->graphPlugin()->create());
-    ++m_curGraphId;
-    if (!m_abstrGraph || !m_abstrGraph->setup(QString::number(m_curGraphId), m_parent->graphType(), *prg,
-        std::move(edgeGen), nodes, *inputs->graph())) {
+    if (!m_abstrGraph || !m_abstrGraph->setup("0", graphType, *m_prg, std::move(edgeGen), nodes, *inputs->graph())) {
         error.prepend("Could not initialize graph:\n");
         return;
     }
 
     m_abstrGraph->reset();
 
-    m_curGraph = new GraphWidget(GraphWidget::Mode::Graph, m_abstrGraph, m_parent->nodeAttributesScope(), m_parent->edgeAttributesScope(), this);
+    m_curGraph->setup(m_abstrGraph, nodeAttrsScope, edgeAttrsScope);
+}
+
+void GraphDesigner::slotOpenSettings()
+{
+    m_curGraph->slotOpenSettings();
 }
 
 bool GraphDesigner::readyToExport()
@@ -149,65 +143,6 @@ void GraphDesigner::slotExportNodes()
             "ERROR! Unable to save the set of nodes at:\n"
             + path + "\nPlease, make sure this directory is writable.");
     }
-}
-
-GraphInputsPtr GraphDesigner::parseInputs(QString& error)
-{
-    QStringList header;
-    QStringList values;
-    QString errorMsg;
-
-    header << GENERAL_ATTR_EXPID;
-    values << QString::number(m_curGraphId);
-
-    //TODO: Edge attributes widget
-    header << GENERAL_ATTR_EDGEATTRS;
-    values << "";
-
-    header << GENERAL_ATTR_NODES;
-    values << QString::number(m_parent->numNodes());
-
-    header << GENERAL_ATTR_GRAPHTYPE;
-
-    if (m_parent->graphType() == GraphType::Undirected) {
-        values << "undirected";
-    } else if (m_parent->graphType() == GraphType::Directed) {
-        values << "directed";
-    } else {
-        values << "invalid";
-    }
-
-    header += m_parent->graphAttrHeader();
-    values += m_parent->graphAttrValues();
-
-    header << GENERAL_ATTR_GRAPHID << GENERAL_ATTR_GRAPHVS;
-    values << m_parent->selectedGraphKey().first << QString::number(m_parent->selectedGraphKey().second);
-
-    QString errorstrng;
-    auto inputs = GraphInputs::parse(m_mainApp, header, values, errorstrng);
-    if (!inputs || !errorstrng.isEmpty()) {
-        return nullptr;
-    }
-
-    return inputs;
-}
-
-void GraphDesigner::initEmptyGraph()
-{
-    QStringList header;
-    QStringList values;
-    QString errorMsg;
-
-    m_abstrGraph = new BaseAbstractGraph();
-    AttributesScope attrs;
-    m_curGraph = new GraphWidget(GraphWidget::Mode::Graph, m_abstrGraph, attrs, attrs, this);
-
-    m_curGraph->setFeatures(QDockWidget::NoDockWidgetFeatures);
-    m_innerWindow->setCentralWidget(m_curGraph);
-}
-
-GraphDesigner::~GraphDesigner()
-{
 }
 
 } // evoplex

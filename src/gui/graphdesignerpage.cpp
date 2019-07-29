@@ -25,7 +25,9 @@
 #include <QSettings>
 
 #include "fontstyles.h"
+#include "graphattrsdlg.h"
 #include "graphdesignerpage.h"
+#include "graphdesigner.h"
 #include "graphgendlg.h"
 #include "ui_graphdesignerpage.h"
 
@@ -78,20 +80,61 @@ void GraphDesignerPage::changedAttrsScope(const AttrsType type, AttributesScope 
     } else if (type == AttrsType::Nodes) {
         m_nodeAttrScope = attrs;
     }
-
-    m_graphDesigner->slotUpdateAttrs();
 }
 
 void GraphDesignerPage::changedGraphAttrs(const int numNodes, PluginKey selectedGraphKey, GraphType graphType,
     QStringList& graphAttrHeader, QStringList& graphAttrValues, QString& error)
 {
+    Q_ASSERT(!m_nodeAttrScope.isEmpty()); // TODO: should we show a warning here instead?
+
     m_numNodes = numNodes;
     m_graphAttrHeader = graphAttrHeader;
     m_graphAttrValues = graphAttrValues;
     m_graphType = graphType;
     m_selectedGraphKey = selectedGraphKey;
 
-    m_graphDesigner->slotUpdateGraph(error);
+    m_graphDesigner->setup(parseInputs(), m_nodeAttrScope, m_edgeAttrScope);
 }
 
+GraphInputsPtr GraphDesignerPage::parseInputs()
+{
+    QStringList header;
+    QStringList values;
+    QString errorMsg;
+
+    header << GENERAL_ATTR_EXPID;
+    values << QString::number(0);
+
+    //TODO: Edge attributes widget
+    header << GENERAL_ATTR_EDGEATTRS;
+    values << "";
+
+    header << GENERAL_ATTR_NODES;
+    values << QString::number(m_numNodes);
+
+    header << GENERAL_ATTR_GRAPHTYPE;
+
+    if (m_graphType == GraphType::Undirected) {
+        values << "undirected";
+    } else if (m_graphType == GraphType::Directed) {
+        values << "directed";
+    } else {
+        values << "invalid";
+    }
+
+    header += graphAttrHeader();
+    values += graphAttrValues();
+
+    header << GENERAL_ATTR_GRAPHID << GENERAL_ATTR_GRAPHVS;
+    values << selectedGraphKey().first << QString::number(selectedGraphKey().second);
+
+    QString errorstrng;
+    auto inputs = GraphInputs::parse(m_mainApp, header, values, errorstrng);
+    if (!inputs || !errorstrng.isEmpty()) {
+        return nullptr;
+    }
+
+    return inputs;
 }
+
+} // evoplex

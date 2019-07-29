@@ -24,7 +24,6 @@
 #include <QDialog>
 
 #include "core/include/attributerange.h"
-#include "core/experiment.h"
 
 #include "attrcolorselector.h"
 #include "colormap.h"
@@ -40,10 +39,11 @@ class GraphSettings : public QDialog
     Q_OBJECT
 
 public:
-    explicit GraphSettings(ColorMapMgr* cMgr, ExperimentPtr exp, GraphView* parent);
-    explicit GraphSettings(ColorMapMgr* cMgr, AttributesScope nodeAttrsScope, AttributesScope edgeAttrsScope, GraphView* parent);
+    explicit GraphSettings(ColorMapMgr* cMgr, GraphView* parent);
 
     ~GraphSettings();
+
+    void setup(AttributesScope nodeAttrsScope, AttributesScope edgeAttrsScope);
 
     int nodeScale() const;
     int edgeScale() const;
@@ -53,7 +53,6 @@ public:
     AttrColorSelector* edgeColorSelector() const;
 
 public slots:
-    void init();
     void restoreSettings();
     void saveAsDefault();
 
@@ -66,7 +65,6 @@ private:
     Ui_GraphSettings* m_ui;
     GraphView* m_parent;
     ColorMapMgr* m_cMgr;
-    ExperimentPtr m_exp;
     AttributesScope m_nodeAttrsScope;
     AttributesScope m_edgeAttrsScope;
 };

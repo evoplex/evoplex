@@ -29,7 +29,7 @@ class GridView : public BaseGraphGL
 {
     Q_OBJECT
 public:
-    explicit GridView(AbstractGraph *abstractGraph, AttributesScope nodeAttrsScope, QWidget* parent);
+    explicit GridView(QWidget* parent);
 
 protected:
     void paintFrame(QPainter& painter) const override;

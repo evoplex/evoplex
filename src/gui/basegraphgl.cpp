@@ -28,11 +28,10 @@
 namespace evoplex {
 
 // (cardinot) TODO: nodeAttrsScope should not be here
-BaseGraphGL::BaseGraphGL(AbstractGraph* abstractGraph, AttributesScope nodeAttrsScope, QWidget* parent)
+BaseGraphGL::BaseGraphGL(QWidget* parent)
     : QOpenGLWidget(parent),
       m_ui(new Ui_BaseGraphGL),
-      m_abstractGraph(abstractGraph),
-      m_nodeAttrsScope(nodeAttrsScope),
+      m_abstractGraph(nullptr),
       m_isReadOnly(false),
       m_currStep(-1),
       m_nodeAttr(-1),

@@ -68,12 +68,14 @@ class BaseGraphGL : public QOpenGLWidget, public GraphGLInterface
 public:
     ~BaseGraphGL() override;
 
+    void setup(AbstractGraph* abstractGraph, AttributesScope nodeAttrsScope);
+
     void paint(QPaintDevice* device, bool paintBackground) const;
 
     inline int currStep() const { return m_currStep; }
 
 protected:
-    explicit BaseGraphGL(AbstractGraph* abstractGraph, AttributesScope nodeAttrsScope, QWidget* parent);
+    explicit BaseGraphGL(QWidget* parent);
 
     Ui_BaseGraphGL* m_ui;
     AbstractGraph* m_abstractGraph;
@@ -112,8 +114,6 @@ signals:
 public slots:
     virtual void zoomIn();
     virtual void zoomOut();
-
-    void setup(AbstractGraph* abstractGraph, AttributesScope nodeAttrsScope);
 
     void setCurrentStep(int step);
     void setNodeScale(int v);

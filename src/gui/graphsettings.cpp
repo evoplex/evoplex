@@ -28,20 +28,11 @@
 
 namespace evoplex {
 
-GraphSettings::GraphSettings(ColorMapMgr* cMgr, ExperimentPtr exp, GraphView* parent)
-    : GraphSettings(cMgr, exp->modelPlugin()->nodeAttrsScope(), exp->modelPlugin()->edgeAttrsScope(), parent)
-{
-    m_exp = exp;
-    connect(m_exp.get(), SIGNAL(restarted()), SLOT(init()));
-}
-
-GraphSettings::GraphSettings(ColorMapMgr* cMgr, AttributesScope nodeAttrsScope, AttributesScope edgeAttrsScope, GraphView* parent)
+GraphSettings::GraphSettings(ColorMapMgr* cMgr, GraphView* parent)
     : QDialog(parent, MainGUI::kDefaultDlgFlags),
-    m_ui(new Ui_GraphSettings),
-    m_parent(parent),
-    m_cMgr(cMgr),
-    m_nodeAttrsScope(nodeAttrsScope),
-    m_edgeAttrsScope(edgeAttrsScope)
+      m_ui(new Ui_GraphSettings),
+      m_parent(parent), // FIXME: this widget should not depends on the parent
+      m_cMgr(cMgr)
 {
     m_ui->setupUi(this);
 
@@ -57,8 +48,6 @@ GraphSettings::GraphSettings(ColorMapMgr* cMgr, AttributesScope nodeAttrsScope, 
     connect(m_ui->bOk, SIGNAL(pressed()), SLOT(close()));
     connect(m_ui->bRestore, SIGNAL(pressed()), SLOT(restoreSettings()));
     connect(m_ui->bSaveAsDefault, SIGNAL(pressed()), SLOT(saveAsDefault()));
-
-    init();
 }
 
 GraphSettings::~GraphSettings()
@@ -66,14 +55,10 @@ GraphSettings::~GraphSettings()
     delete m_ui;
 }
 
-void GraphSettings::init()
+void GraphSettings::setup(AttributesScope nodeAttrsScope, AttributesScope edgeAttrsScope)
 {
-    if (m_exp) {
-        Q_ASSERT_X(m_exp->modelPlugin(), "GraphSettings",
-            "tried to init the graph settings for a null model!");
-        m_nodeAttrsScope = m_exp->modelPlugin()->nodeAttrsScope();
-        m_edgeAttrsScope = m_exp->modelPlugin()->edgeAttrsScope();
-    }
+    m_nodeAttrsScope = nodeAttrsScope;
+    m_edgeAttrsScope = edgeAttrsScope;
 
     QSettings userPrefs;
     m_ui->nodeScale->setValue(userPrefs.value("graphSettings/nodeScale", 10).toInt());
@@ -103,7 +88,7 @@ void GraphSettings::restoreSettings()
     userPrefs.setValue("graphSettings/nodeCMapSize", cmap.second);
     userPrefs.setValue("graphSettings/edgeCMap", cmap.first);
     userPrefs.setValue("graphSettings/edgeCMapSize", cmap.second);
-    init();
+    setup(m_nodeAttrsScope, m_edgeAttrsScope);
 }
 
 void GraphSettings::saveAsDefault()

@@ -31,9 +31,38 @@
 
 namespace evoplex {
 
+GraphWidget::GraphWidget(Mode mode, ColorMapMgr* cMgr, QWidget* parent)
+    : QDockWidget(parent),
+      m_view(nullptr),
+      m_currTrial(nullptr)
+{
+    setAttribute(Qt::WA_DeleteOnClose, true);
+
+    if (mode == Mode::Graph) {
+        setWindowTitle("Graph");
+        auto view = new GraphView(this);
+        auto graphSettings = new GraphSettings(cMgr, view);
+        view->setNodeScale(graphSettings->nodeScale());
+        view->setEdgeScale(graphSettings->edgeScale());
+        m_view = view;
+        m_settingsDlg = graphSettings;
+    } else {
+        setWindowTitle("Grid");
+        m_view = new GridView(this);
+        m_settingsDlg = new GridSettings(cMgr, m_view);
+    }
+
+    setWidget(m_view);
+    connect(m_view, SIGNAL(updateWidgets(bool)), SIGNAL(updateWidgets(bool)));
+
+    // the widget might not be repaint after a drag and drop
+    connect(this, &QDockWidget::dockLocationChanged,
+            [this](){ m_view->update(); });
+}
+
 // (cardinot) TODO: this class should be refactored to remove the Experiment dependency
 GraphWidget::GraphWidget(Mode mode, ColorMapMgr* cMgr, ExperimentPtr exp, QWidget* parent)
-    : GraphWidget(mode, nullptr, AttributesScope(), AttributesScope(), parent)
+    : GraphWidget(mode, cMgr, parent)
 {
     m_exp = exp;
     Q_ASSERT(m_exp && m_view); // TODO
@@ -53,51 +82,11 @@ GraphWidget::GraphWidget(Mode mode, ColorMapMgr* cMgr, ExperimentPtr exp, QWidge
 
     connect(m_exp.get(), SIGNAL(statusChanged(Status)), m_view, SLOT(slotStatusChanged(Status)));
 
-    connect(exp.get(), SIGNAL(restarted()), SLOT(slotRestarted()));
-
-    if (mode == Mode::Graph) {
-        auto view = qobject_cast<GraphView*>(m_view);
-        auto graphSettings = new GraphSettings(cMgr, m_exp, view);
-        view->setNodeScale(graphSettings->nodeScale());
-        view->setEdgeScale(graphSettings->edgeScale());
-        m_settingsDlg = graphSettings;
-    } else {
-        auto view = qobject_cast<GridView*>(m_view);
-        auto gridSettings = new GridSettings(cMgr, m_exp, view);
-        m_settingsDlg = gridSettings;
-    }
+    connect(m_exp.get(), SIGNAL(restarted()), SLOT(slotRestarted()));
 
     if (!m_exp->trials().empty()) {
         setTrial(0); // init with the first trial
     }
-}
-
-GraphWidget::GraphWidget(Mode mode, AbstractGraph* graph, AttributesScope nodeAttrsScope, AttributesScope edgeAttrsScope, QWidget* parent)
-    : QDockWidget(parent),
-      m_view(nullptr),
-      m_currTrial(nullptr)
-{
-    setAttribute(Qt::WA_DeleteOnClose, true);
-    ColorMapMgr* cMgr = new ColorMapMgr;
-
-    if (mode == Mode::Graph) {
-        m_view = new GraphView(graph, nodeAttrsScope, this);
-        setWindowTitle("Graph");
-        auto view = qobject_cast<GraphView*>(m_view);
-        auto graphSettings = new GraphSettings(cMgr, nodeAttrsScope, edgeAttrsScope, view);
-        m_settingsDlg = graphSettings;
-    } else {
-        m_view = new GridView(graph, nodeAttrsScope, this);
-        setWindowTitle("Grid");
-    }
-
-    m_view->setup(graph, nodeAttrsScope);
-    setWidget(m_view);
-    connect(m_view, SIGNAL(updateWidgets(bool)), SIGNAL(updateWidgets(bool)));
-
-    // the widget might not be repaint after a drag and drop
-    connect(this, &QDockWidget::dockLocationChanged,
-            [this](){ m_view->update(); });
 }
 
 GraphWidget::~GraphWidget()
@@ -105,6 +94,16 @@ GraphWidget::~GraphWidget()
     if (m_exp) m_exp->disconnect(this); // important to avoid triggering statusChanged()
     delete m_view;
     m_exp = nullptr;
+}
+
+void GraphWidget::setup(AbstractGraph* abstractGraph, AttributesScope nodeAttrsScope, AttributesScope edgeAttrsScope)
+{
+    m_view->setup(abstractGraph, nodeAttrsScope);
+    if (auto settings = qobject_cast<GraphSettings*>(m_settingsDlg)) {
+        settings->setup(nodeAttrsScope, edgeAttrsScope);
+    } else if (auto settings = qobject_cast<GridSettings*>(m_settingsDlg)) {
+        settings->setup(nodeAttrsScope);
+    }
 }
 
 void GraphWidget::slotOpenSettings()
@@ -139,7 +138,7 @@ void GraphWidget::setTrial(quint16 trialId)
             m_view->setCurrentStep(trial->step());
         }
         m_currTrial = trial;
-        m_view->setup(trial->graph(), m_exp->modelPlugin()->nodeAttrsScope());
+        setup(trial->graph(), m_exp->modelPlugin()->nodeAttrsScope(), m_exp->modelPlugin()->edgeAttrsScope());
     } else {
         Q_ASSERT(false); // this should never happen
     }

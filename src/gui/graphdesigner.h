@@ -2,7 +2,7 @@
 *  This file is part of Evoplex.
 *
 *  Evoplex is a multi-agent system for networks.
-*  Copyright (C) 2018 - Marcos Cardinot <marcos@cardinot.net>
+*  Copyright (C) 2019
 *
 *  This program is free software: you can redistribute it and/or modify
 *  it under the terms of the GNU General Public License as published by
@@ -24,7 +24,6 @@
 #include <QDockWidget>
 #include <QMainWindow>
 
-#include "core/graphinputs.h"
 #include "core/project.h"
 
 #include "abstractgraph.h"
@@ -50,12 +49,12 @@ class GraphDesigner : public QDockWidget
    friend class GraphDesignerPage;
 
 public:
-    explicit GraphDesigner(MainGUI* mainGUI, GraphDesignerPage *parent);
+    explicit GraphDesigner(MainGUI* mainGUI, QWidget* parent);
     ~GraphDesigner();
 
+   void setup(GraphInputsPtr inputs, AttributesScope nodeAttrsScope, AttributesScope edgeAttrsScope);
+
 public slots:
-    void slotUpdateGraph(QString& error);
-    void slotUpdateAttrs();
     void slotOpenSettings();
     void slotExportNodes();
 
@@ -63,14 +62,11 @@ private:
     MainGUI * m_mainGUI;
     MainApp* m_mainApp;
     QMainWindow* m_innerWindow;
-    GraphDesignerPage* m_parent;
     GraphWidget* m_curGraph;
-    int m_curGraphId;
     AbstractGraph* m_abstrGraph;
+    PRG* m_prg;
 
-    void initEmptyGraph();
     bool readyToExport();
-    GraphInputsPtr parseInputs(QString& error);
 };
 
 

@@ -41,6 +41,7 @@ public:
     QString cmapName() const;
     int cmapSize() const;
     inline ColorMap* cmap() const;
+    inline const AttributesScope& attrScope() const;
 
 signals:
     void cmapUpdated(ColorMap* cmap);
@@ -60,6 +61,9 @@ private:
 
 inline ColorMap* AttrColorSelector::cmap() const
 { return m_cmap; }
+
+inline const AttributesScope& AttrColorSelector::attrScope() const
+{ return m_attrScope; }
 
 } // evoplex
 #endif // ATTRCOLORSELECTOR_H

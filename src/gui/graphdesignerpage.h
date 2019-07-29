@@ -29,11 +29,9 @@
 #include "maingui.h"
 #include "abstractgraph.h"
 #include "attributerange.h"
-#include "graphdesigner.h"
-#include "graphattrsdlg.h"
-#include "graphgendlg.h"
 
 #include "core/mainapp.h"
+#include "core/graphinputs.h"
 
 class Ui_GraphDesignerPage;
 
@@ -59,10 +57,8 @@ protected:
     void changedGraphAttrs(const int numNodes, PluginKey selectedGraphKey, GraphType graphType, QStringList& graphAttrHeader, 
         QStringList& graphAttrValues, QString& error);
 
-    inline int numNodes() const;
     inline AttributesScope edgeAttributesScope() const;
     inline AttributesScope nodeAttributesScope() const;
-    inline GraphType graphType() const;
     inline QStringList graphAttrHeader() const;
     inline QStringList graphAttrValues() const;
     inline PluginKey selectedGraphKey() const;
@@ -82,6 +78,8 @@ private:
     QStringList m_graphAttrHeader;
     QStringList m_graphAttrValues;
 
+    GraphInputsPtr parseInputs();
+
 private slots:
     void slotEdgeAttrs();
     void slotNodeAttrs();
@@ -91,11 +89,6 @@ signals:
     void openSettingsDlg();
 };
 
-inline int GraphDesignerPage::numNodes() const
-{
-    return m_numNodes;
-}
-
 inline AttributesScope GraphDesignerPage::edgeAttributesScope() const
 {
     return m_edgeAttrScope;
@@ -104,11 +97,6 @@ inline AttributesScope GraphDesignerPage::edgeAttributesScope() const
 inline AttributesScope GraphDesignerPage::nodeAttributesScope() const
 {
     return m_nodeAttrScope;
-}
-
-inline GraphType GraphDesignerPage::graphType() const
-{
-    return m_graphType;
 }
 
 inline QStringList GraphDesignerPage::graphAttrHeader() const
