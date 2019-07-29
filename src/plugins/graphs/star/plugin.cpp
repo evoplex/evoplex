@@ -44,10 +44,12 @@ bool StarGraph::reset()
     // which will always start from 0 and end at size-1
     node(0).setCoords(radius, radius);
     if (m_edgeAttrsGen) {
-        auto soa = m_edgeAttrsGen->create(nNodes);
-        for (int nodeId = 1; nodeId < nNodes; ++nodeId) {
+        auto setOfAttrs = m_edgeAttrsGen->create(nNodes - 1);
+        int nodeId = 1;
+        for (auto& attrs : setOfAttrs) {
             fixCoords(node(nodeId), radius, dTheta);
-            addEdge(0, nodeId, new Attributes(soa.at(nodeId)));
+            addEdge(0, nodeId, new Attributes(attrs));
+            ++nodeId;
         }
     } else {
         for (int nodeId = 1; nodeId < nNodes; ++nodeId) {
