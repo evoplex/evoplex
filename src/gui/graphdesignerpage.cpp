@@ -88,6 +88,10 @@ void GraphDesignerPage::changedAttrsScope(const AttrsType type, AttributesScope 
     } else if (type == AttrsType::Nodes) {
         m_nodeAttrScope = attrs;
     }
+    
+    QString errstrng;
+
+    changedGraphAttrs(m_numNodes, m_selectedGraphKey, m_graphType, m_graphAttrHeader, m_graphAttrValues, errstrng);
 }
 
 void GraphDesignerPage::changedGraphAttrs(const int numNodes, PluginKey selectedGraphKey, GraphType graphType,
@@ -99,7 +103,10 @@ void GraphDesignerPage::changedGraphAttrs(const int numNodes, PluginKey selected
     m_graphType = graphType;
     m_selectedGraphKey = selectedGraphKey;
 
-    m_graphDesigner->setup(parseInputs(), m_nodeAttrScope, m_edgeAttrScope);
+    if (m_numNodes > 0) {
+        //TODO: No need to update both the edge and node attributes each time either one is updated
+        m_graphDesigner->setup(parseInputs(), m_nodeAttrScope, m_edgeAttrScope);
+    }
 }
 
 GraphInputsPtr GraphDesignerPage::parseInputs()
