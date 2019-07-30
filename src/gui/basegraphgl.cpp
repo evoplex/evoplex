@@ -369,6 +369,7 @@ void BaseGraphGL::mouseReleaseEvent(QMouseEvent *e)
             node.setAttr(m_nodeAttr, attrRange->next(node.attr(m_nodeAttr)));
             clearSelection();
             emit (updateWidgets(true));
+            updateCache();
         }
     }
 }
