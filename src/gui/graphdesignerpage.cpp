@@ -21,6 +21,7 @@
 #include <QDebug>
 #include <QToolBar>
 #include <QToolButton>
+#include <QMessageBox>
 #include <QHBoxLayout>
 #include <QSettings>
 
@@ -47,7 +48,14 @@ GraphDesignerPage::GraphDesignerPage(MainGUI* mainGUI)
 
     connect(m_ui->acEdgeAttrs, SIGNAL(triggered()), SLOT(slotEdgeAttrs()));
     connect(m_ui->acNodeAttrs, SIGNAL(triggered()), SLOT(slotNodeAttrs()));
-    connect(m_ui->acGraphGen, SIGNAL(triggered()), SLOT(slotGraphGen()));
+    connect(m_ui->acGraphGen, &QAction::triggered, [this]() {
+        if (!this->m_nodeAttrScope.isEmpty()) {
+            this->slotGraphGen();
+        } else {
+            QMessageBox::warning(this, "Graph Generator",
+            "Make sure you have set valid node attributes before attempting to open the graph generator");
+        }
+    });
     connect(m_ui->acGraphSettings, SIGNAL(triggered()), m_graphDesigner, SLOT(slotOpenSettings()));
     connect(m_ui->acNodesExporter, SIGNAL(triggered()), m_graphDesigner, SLOT(slotExportNodes()));
 
@@ -85,8 +93,6 @@ void GraphDesignerPage::changedAttrsScope(const AttrsType type, AttributesScope 
 void GraphDesignerPage::changedGraphAttrs(const int numNodes, PluginKey selectedGraphKey, GraphType graphType,
     QStringList& graphAttrHeader, QStringList& graphAttrValues, QString& error)
 {
-    Q_ASSERT(!m_nodeAttrScope.isEmpty()); // TODO: should we show a warning here instead?
-
     m_numNodes = numNodes;
     m_graphAttrHeader = graphAttrHeader;
     m_graphAttrValues = graphAttrValues;
