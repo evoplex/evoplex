@@ -78,6 +78,7 @@ BaseGraphGL::BaseGraphGL(QWidget* parent)
 
     connect(m_ui->nodeId, SIGNAL(valueChanged(int)), SLOT(slotSelectNode(int)));
     setupInspector();
+    m_ui->currStep->hide();
 
     m_updateCacheTimer.setSingleShot(true);
     connect(&m_updateCacheTimer, &QTimer::timeout, [this]() { updateCache(true); });
@@ -267,12 +268,8 @@ void BaseGraphGL::setNodeCMap(ColorMap* cmap)
 //                  let's use <0 to hide the counter, but it should be improved later
 void BaseGraphGL::setCurrentStep(int step)
 {
-    if (step >= 0) {
-        m_ui->currStep->show();
-        m_ui->currStep->setText(QString::number(step));
-    } else {
-        m_ui->currStep->hide();
-    }
+    m_ui->currStep->show();
+    m_ui->currStep->setText(QString::number(step));
     m_currStep = step;
 }
 
