@@ -23,9 +23,7 @@
 
 #include <QDialog>
 
-#include "core/experiment.h"
 #include "attrcolorselector.h"
-#include "gridview.h"
 #include "maingui.h"
 
 class Ui_GridSettings;
@@ -37,20 +35,21 @@ class GridSettings : public QDialog
     Q_OBJECT
 
 public:
-    explicit GridSettings(ColorMapMgr* cMgr, ExperimentPtr exp, GridView* parent);
+    explicit GridSettings(ColorMapMgr* cMgr, QWidget *parent);
     ~GridSettings();
+
+    void setup(AttributesScope nodeAttrsScope);
 
     AttrColorSelector* nodeColorSelector() const;
 
 public slots:
-    void init();
     void restoreSettings();
     void saveAsDefault();
 
 private:
     Ui_GridSettings* m_ui;
     ColorMapMgr* m_cMgr;
-    const ExperimentPtr m_exp;
+    AttributesScope m_nodeAttrsScope;
 };
 
 } // evoplex

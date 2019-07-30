@@ -23,7 +23,8 @@
 
 #include <QDialog>
 
-#include "core/experiment.h"
+#include "core/include/attributerange.h"
+
 #include "attrcolorselector.h"
 #include "colormap.h"
 
@@ -38,8 +39,11 @@ class GraphSettings : public QDialog
     Q_OBJECT
 
 public:
-    explicit GraphSettings(ColorMapMgr* cMgr, ExperimentPtr exp, GraphView* parent);
+    explicit GraphSettings(ColorMapMgr* cMgr, GraphView* parent);
+
     ~GraphSettings();
+
+    void setup(AttributesScope nodeAttrsScope, AttributesScope edgeAttrsScope);
 
     int nodeScale() const;
     int edgeScale() const;
@@ -49,20 +53,14 @@ public:
     AttrColorSelector* edgeColorSelector() const;
 
 public slots:
-    void init();
     void restoreSettings();
     void saveAsDefault();
 
-private slots:
-    void slotNodeScale(int v);
-    void slotEdgeScale(int v);
-    void slotEdgeWidth(int v);
-
 private:
     Ui_GraphSettings* m_ui;
-    GraphView* m_parent;
     ColorMapMgr* m_cMgr;
-    const ExperimentPtr m_exp;
+    AttributesScope m_nodeAttrsScope;
+    AttributesScope m_edgeAttrsScope;
 };
 
 } // evoplex

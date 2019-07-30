@@ -22,6 +22,7 @@
 #define GRAPHGENDLG_H
 
 #include <QComboBox>
+#include <QFormLayout>
 #include <QHash>
 #include <QStringList>
 
@@ -47,7 +48,7 @@ public:
     ~GraphGenDlg();
 
 private:
-    Ui_GraphGenDlg* m_ui;
+    Ui_GraphGenDlg * m_ui;
     GraphDesignerPage* m_graphPage;
     MainGUI* m_mainGUI;
 
@@ -61,7 +62,6 @@ private:
     GraphType m_graphType;
 
     QComboBox* m_cbgraphType;
-
     void parseAttrs(QString& error);
 
 private slots:

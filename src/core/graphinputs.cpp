@@ -1,5 +1,5 @@
 /* Evoplex <https://evoplex.org>
-* Copyright (C) 2016-present - Marcos Cardinot <marcos@cardinot.net>
+* Copyright (C) 2016-present
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.

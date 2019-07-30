@@ -28,8 +28,8 @@
 
 namespace evoplex {
 
-GraphView::GraphView(AbstractGraph* abstractGraph, AttributesScope nodeAttrsScope, QWidget* parent)
-    : BaseGraphGL(abstractGraph, nodeAttrsScope, parent),
+GraphView::GraphView(QWidget* parent)
+    : BaseGraphGL(parent),
       m_edgeAttr(-1),
       m_maxSelectedNodes(2),
       m_edgeCMap(nullptr),

@@ -36,9 +36,8 @@ using CMapKey = QPair<QString, int>; // <name,size>
 
 class ColorMapMgr
 {
+    friend class MainGUI;
 public:
-    explicit ColorMapMgr();
-
     void resetSettingsToDefault();
 
     const Colors colors(const CMapKey& key) const;
@@ -51,6 +50,8 @@ public:
     void setDefaultColorMap(const QString& name, const int size);
 
 private:
+    explicit ColorMapMgr();
+
     QSettings m_userPrefs;
     CMapKey m_dfCMap;
     QHash<CMapKey, Colors> m_colormaps;

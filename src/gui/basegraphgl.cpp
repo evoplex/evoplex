@@ -28,11 +28,10 @@
 namespace evoplex {
 
 // (cardinot) TODO: nodeAttrsScope should not be here
-BaseGraphGL::BaseGraphGL(AbstractGraph* abstractGraph, AttributesScope nodeAttrsScope, QWidget* parent)
+BaseGraphGL::BaseGraphGL(QWidget* parent)
     : QOpenGLWidget(parent),
       m_ui(new Ui_BaseGraphGL),
-      m_abstractGraph(abstractGraph),
-      m_nodeAttrsScope(nodeAttrsScope),
+      m_abstractGraph(nullptr),
       m_isReadOnly(false),
       m_currStep(-1),
       m_nodeAttr(-1),
@@ -79,6 +78,7 @@ BaseGraphGL::BaseGraphGL(AbstractGraph* abstractGraph, AttributesScope nodeAttrs
 
     connect(m_ui->nodeId, SIGNAL(valueChanged(int)), SLOT(slotSelectNode(int)));
     setupInspector();
+    m_ui->currStep->hide();
 
     m_updateCacheTimer.setSingleShot(true);
     connect(&m_updateCacheTimer, &QTimer::timeout, [this]() { updateCache(true); });
@@ -268,12 +268,8 @@ void BaseGraphGL::setNodeCMap(ColorMap* cmap)
 //                  let's use <0 to hide the counter, but it should be improved later
 void BaseGraphGL::setCurrentStep(int step)
 {
-    if (step >= 0) {
-        m_ui->currStep->show();
-        m_ui->currStep->setText(QString::number(step));
-    } else {
-        m_ui->currStep->hide();
-    }
+    m_ui->currStep->show();
+    m_ui->currStep->setText(QString::number(step));
     m_currStep = step;
 }
 
@@ -373,6 +369,7 @@ void BaseGraphGL::mouseReleaseEvent(QMouseEvent *e)
             node.setAttr(m_nodeAttr, attrRange->next(node.attr(m_nodeAttr)));
             clearSelection();
             emit (updateWidgets(true));
+            updateCache();
         }
     }
 }

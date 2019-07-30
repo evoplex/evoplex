@@ -30,7 +30,7 @@ class GraphView : public BaseGraphGL
     Q_OBJECT
 
 public:
-    explicit GraphView(AbstractGraph *abstractGraph, AttributesScope nodeAttrsScope, QWidget* parent);
+    explicit GraphView(QWidget* parent);
 
 public slots:
     inline void zoomIn() override;

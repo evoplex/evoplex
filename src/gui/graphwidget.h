@@ -43,9 +43,11 @@ public:
         Grid
     };
 
+    explicit GraphWidget(Mode mode, ColorMapMgr* cMgr, QWidget* parent);
     explicit GraphWidget(Mode mode, ColorMapMgr* cMgr, ExperimentPtr exp, QWidget* parent);
-    explicit GraphWidget(Mode mode, AbstractGraph* graph, AttributesScope nodeAttrsScope, QWidget* parent);
     virtual ~GraphWidget();
+
+    void setup(AbstractGraph* abstractGraph, AttributesScope nodeAttrsScope, AttributesScope edgeAttrsScope);
 
     inline BaseGraphGL* view() const;
 
@@ -54,6 +56,7 @@ signals:
 
 public slots:
     void updateView(bool forceUpdate);
+    void slotOpenSettings();
 
 private slots:
     void slotRestarted();

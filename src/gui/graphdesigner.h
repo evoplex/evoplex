@@ -2,7 +2,7 @@
 *  This file is part of Evoplex.
 *
 *  Evoplex is a multi-agent system for networks.
-*  Copyright (C) 2018 - Marcos Cardinot <marcos@cardinot.net>
+*  Copyright (C) 2019
 *
 *  This program is free software: you can redistribute it and/or modify
 *  it under the terms of the GNU General Public License as published by
@@ -25,29 +25,15 @@
 #include <QMainWindow>
 
 #include "core/project.h"
-#include "graphwidget.h"
 
 #include "abstractgraph.h"
 #include "graphwidget.h"
+#include "graphdesignerpage.h"
+#include "maingui.h"
 
 namespace evoplex {
 
-class GraphDesigner : public QDockWidget
-{
-    Q_OBJECT
-
-public:
-    explicit GraphDesigner(MainApp* mainApp, QMainWindow *parent);
-    ~GraphDesigner();
-
-private:
-    MainApp* m_mainApp;
-    QMainWindow* m_innerWindow;
-    GraphWidget* m_curGraph;
-    int m_curGraphId;
-
-    void initEmptyGraph();
-};
+class GraphDesignerPage;
 
 class BaseAbstractGraph : public AbstractGraph
 {
@@ -56,6 +42,33 @@ public:
     bool reset() override { return 0; };
 
 };
+
+class GraphDesigner : public QDockWidget
+{
+    Q_OBJECT
+   friend class GraphDesignerPage;
+
+public:
+    explicit GraphDesigner(MainGUI* mainGUI, QWidget* parent);
+    ~GraphDesigner();
+
+   void setup(GraphInputsPtr inputs, AttributesScope nodeAttrsScope, AttributesScope edgeAttrsScope);
+
+public slots:
+    void slotOpenSettings();
+    void slotExportNodes();
+
+private:
+    MainGUI * m_mainGUI;
+    MainApp* m_mainApp;
+    QMainWindow* m_innerWindow;
+    GraphWidget* m_curGraph;
+    AbstractGraph* m_abstrGraph;
+    PRG* m_prg;
+
+    bool readyToExport();
+};
+
 
 }
 

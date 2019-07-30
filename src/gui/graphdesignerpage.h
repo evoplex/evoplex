@@ -29,11 +29,9 @@
 #include "maingui.h"
 #include "abstractgraph.h"
 #include "attributerange.h"
-#include "graphdesigner.h"
-#include "graphattrsdlg.h"
-#include "graphgendlg.h"
 
 #include "core/mainapp.h"
+#include "core/graphinputs.h"
 
 class Ui_GraphDesignerPage;
 
@@ -53,17 +51,26 @@ public:
 protected:
     friend class GraphAttrsDlg;
     friend class GraphGenDlg;
-    
+    friend class GraphDesigner;
+
     void changedAttrsScope(const AttrsType type, AttributesScope attrs);
-    void changedGraphAttrs(const int numNodes, GraphType graphType, QStringList& graphAttrHeader, QStringList& graphAttrValues);
+    void changedGraphAttrs(const int numNodes, PluginKey selectedGraphKey, GraphType graphType, QStringList& graphAttrHeader, 
+        QStringList& graphAttrValues, QString& error);
+
+    inline AttributesScope edgeAttributesScope() const;
+    inline AttributesScope nodeAttributesScope() const;
+    inline QStringList graphAttrHeader() const;
+    inline QStringList graphAttrValues() const;
+    inline PluginKey selectedGraphKey() const;
 
 private:
-    Ui_GraphDesignerPage* m_ui;
     MainApp* m_mainApp;
     MainGUI* m_mainGUI;
     QMainWindow* m_innerWindow;
+    Ui_GraphDesignerPage * m_ui;
     GraphDesigner* m_graphDesigner;
 
+    PluginKey m_selectedGraphKey;
     AttributesScope m_edgeAttrScope;
     AttributesScope m_nodeAttrScope;
     int m_numNodes;
@@ -71,12 +78,41 @@ private:
     QStringList m_graphAttrHeader;
     QStringList m_graphAttrValues;
 
+    GraphInputsPtr parseInputs();
+
 private slots:
     void slotEdgeAttrs();
     void slotNodeAttrs();
     void slotGraphGen();
 
+signals:
+    void openSettingsDlg();
 };
+
+inline AttributesScope GraphDesignerPage::edgeAttributesScope() const
+{
+    return m_edgeAttrScope;
+}
+
+inline AttributesScope GraphDesignerPage::nodeAttributesScope() const
+{
+    return m_nodeAttrScope;
+}
+
+inline QStringList GraphDesignerPage::graphAttrHeader() const
+{
+    return m_graphAttrHeader;
+}
+
+inline QStringList GraphDesignerPage::graphAttrValues() const
+{
+    return m_graphAttrValues;
+}
+
+inline PluginKey GraphDesignerPage::selectedGraphKey() const
+{
+    return m_selectedGraphKey;
+}
 
 }
 

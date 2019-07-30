@@ -47,7 +47,6 @@ GraphGenDlg::GraphGenDlg(GraphDesignerPage* parent, MainGUI* mainGUI)
     setVisible(true);
 
     m_ui->graphId->insertItem(0, "--");
-    m_ui->attrForm->hide();
 
     int i = 0;
     for (Plugin* p : m_mainGUI->mainApp()->plugins()) {
@@ -62,6 +61,11 @@ GraphGenDlg::GraphGenDlg(GraphDesignerPage* parent, MainGUI* mainGUI)
     connect(m_ui->cancel, SIGNAL(clicked()), SLOT(close()));
 };
 
+GraphGenDlg::~GraphGenDlg()
+{
+    delete m_ui;
+}
+
 void GraphGenDlg::parseAttrs(QString& error)
 {
     if (m_selectedGraphKey == PluginKey()) {
@@ -74,7 +78,8 @@ void GraphGenDlg::parseAttrs(QString& error)
     if (m_cbgraphType->count() > 0) {
         m_graphType = m_cbgraphType->currentIndex() == 0 ? GraphType::Undirected : GraphType::Directed;
     } else {
-        m_graphType = GraphType::Invalid;
+        // If graphtype is not defined for the graph plugin, set it to undirected
+        m_graphType = GraphType::Undirected;
     }
 
     for (auto it = m_attrWidgets.cbegin(); it != m_attrWidgets.cend(); ++it) {
@@ -89,26 +94,25 @@ void GraphGenDlg::slotSaveGraphGen()
     parseAttrs(errstrng);
 
     if (!errstrng.isEmpty()) {
-        QMessageBox::warning(this, "Graph Generator", "Error: " + errstrng);
+        QMessageBox::warning(this, "Graph Generator", "Error when parsing attributes:\n" + errstrng);
         return;
     }
 
-    m_graphPage->changedGraphAttrs(m_numNodes, m_graphType, m_attrHeader, m_attrValues);
-   
+    m_graphPage->changedGraphAttrs(m_numNodes, m_selectedGraphKey, m_graphType, m_attrHeader, m_attrValues, errstrng);
+
+    if (!errstrng.isEmpty()) {
+        QMessageBox::warning(this, "Graph Generator", errstrng);
+        return;
+    }
+    
     close();
 }
 
-void GraphGenDlg::slotGraphSelected(int grId) 
+void GraphGenDlg::slotGraphSelected(int grId)
 {
-    auto layout = qobject_cast<QFormLayout*>(m_ui->attrForm->layout());
-
     // Clear list widget entries
-    while (!layout->isEmpty()) {
-        layout->removeRow(0);
-        //auto item = m_ui->attrForm->takeAt(0);
-        //auto widget = item->widget();
-        //delete widget;
-        //delete item;
+    while (m_ui->ltattrForm->count() > 0) {
+        m_ui->ltattrForm->removeRow(0);
     }
 
     if (grId == 0) {
@@ -118,7 +122,7 @@ void GraphGenDlg::slotGraphSelected(int grId)
 
     m_selectedGraphKey = m_plugins.value(grId);
     const GraphPlugin* graph = m_mainGUI->mainApp()->graph(m_selectedGraphKey);
-    
+
     m_cbgraphType = new QComboBox();
 
     // Add valid graph types
@@ -128,27 +132,19 @@ void GraphGenDlg::slotGraphSelected(int grId)
         m_cbgraphType->insertItem(1, _enumToString<GraphType>(GraphType::Directed),
             static_cast<int>(GraphType::Directed));
 
-        layout->addRow("Graph Type", m_cbgraphType);
+        m_ui->ltattrForm->addRow("Graph Type", m_cbgraphType);
     }
 
     // Add plugin attributes
     QHash<QString, AttributeRangePtr>::const_iterator it = graph->pluginAttrsScope().begin();
 
     while (it != graph->pluginAttrsScope().end()) {
-        AttrWidget* attrW = new AttrWidget(it.value(), this);        
-        layout->addRow(it.key(), attrW);
+        AttrWidget* attrW = new AttrWidget(it.value(), this);
+        m_ui->ltattrForm->addRow(it.key(), attrW);
         m_attrWidgets.insert(it.key(), attrW);
-        
+
         ++it;
     }
-
-    m_ui->attrForm->setVisible(!layout->isEmpty());
 }
-
-GraphGenDlg::~GraphGenDlg()
-{
-    delete m_ui;
-}
-
 
 }

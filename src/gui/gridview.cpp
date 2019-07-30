@@ -28,8 +28,8 @@
 
 namespace evoplex {
 
-GridView::GridView(AbstractGraph* abstractGraph, AttributesScope nodeAttrsScope, QWidget* parent)
-    : BaseGraphGL(abstractGraph, nodeAttrsScope, parent)
+GridView::GridView(QWidget* parent)
+    : BaseGraphGL(parent)
 {
     m_ui->bShowNodes->hide();
     m_ui->bShowEdges->hide();

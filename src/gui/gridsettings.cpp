@@ -23,23 +23,19 @@
 
 namespace evoplex {
 
-GridSettings::GridSettings(ColorMapMgr* cMgr, ExperimentPtr exp, GridView* parent)
+GridSettings::GridSettings(ColorMapMgr* cMgr, QWidget* parent)
     : QDialog(parent, MainGUI::kDefaultDlgFlags),
       m_ui(new Ui_GridSettings),
-      m_cMgr(cMgr),
-      m_exp(exp)
+      m_cMgr(cMgr)
 {
     m_ui->setupUi(this);
 
-    connect(m_exp.get(), SIGNAL(restarted()), SLOT(init()));
     connect(m_ui->nodesColor, SIGNAL(cmapUpdated(ColorMap*)),
             parent, SLOT(setNodeCMap(ColorMap*)));
 
     connect(m_ui->bOk, SIGNAL(pressed()), SLOT(close()));
     connect(m_ui->bRestore, SIGNAL(pressed()), SLOT(restoreSettings()));
     connect(m_ui->bSaveAsDefault, SIGNAL(pressed()), SLOT(saveAsDefault()));
-
-    init();
 }
 
 GridSettings::~GridSettings()
@@ -47,16 +43,13 @@ GridSettings::~GridSettings()
     delete m_ui;
 }
 
-void GridSettings::init()
+void GridSettings::setup(AttributesScope nodeAttrsScope)
 {
-    Q_ASSERT_X(m_exp->modelPlugin(), "GridSettings",
-               "tried to init the graph settings for a null model!");
-
     QSettings userPrefs;
     auto cmap = m_cMgr->defaultCMapKey();
     CMapKey n(userPrefs.value("graphSettings/nodeCMap", cmap.first).toString(),
               userPrefs.value("graphSettings/nodeCMapSize", cmap.second).toInt());
-    m_ui->nodesColor->init(m_cMgr, n, m_exp->modelPlugin()->nodeAttrsScope());
+    m_ui->nodesColor->init(m_cMgr, n, nodeAttrsScope);
 }
 
 void GridSettings::restoreSettings()
@@ -65,7 +58,7 @@ void GridSettings::restoreSettings()
     QSettings userPrefs;
     userPrefs.setValue("graphSettings/nodeCMap", cmap.first);
     userPrefs.setValue("graphSettings/nodeCMapSize", cmap.second);
-    init();
+    setup(m_ui->nodesColor->attrScope());
 }
 
 void GridSettings::saveAsDefault()
