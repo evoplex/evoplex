@@ -31,7 +31,6 @@ namespace evoplex {
 GraphSettings::GraphSettings(ColorMapMgr* cMgr, GraphView* parent)
     : QDialog(parent, MainGUI::kDefaultDlgFlags),
       m_ui(new Ui_GraphSettings),
-      m_parent(parent), // FIXME: this widget should not depends on the parent
       m_cMgr(cMgr)
 {
     m_ui->setupUi(this);
@@ -41,9 +40,12 @@ GraphSettings::GraphSettings(ColorMapMgr* cMgr, GraphView* parent)
     connect(m_ui->edgesColor, SIGNAL(cmapUpdated(ColorMap*)),
         parent, SLOT(setEdgeCMap(ColorMap*)));
 
-    connect(m_ui->nodeScale, SIGNAL(valueChanged(int)), SLOT(slotNodeScale(int)));
-    connect(m_ui->edgeScale, SIGNAL(valueChanged(int)), SLOT(slotEdgeScale(int)));
-    connect(m_ui->edgeWidth, SIGNAL(valueChanged(int)), SLOT(slotEdgeWidth(int)));
+    connect(m_ui->nodeScale, SIGNAL(valueChanged(int)), parent, SLOT(setNodeScale(int)));
+    connect(m_ui->nodeScale, &QSlider::valueChanged, [this](int v) { m_ui->nodeScale->setToolTip(QString::number(v)); });
+    connect(m_ui->edgeScale, SIGNAL(valueChanged(int)), parent, SLOT(setEdgeScale(int)));
+    connect(m_ui->edgeScale, &QSlider::valueChanged, [this](int v) { m_ui->edgeScale->setToolTip(QString::number(v)); });
+    connect(m_ui->edgeWidth, SIGNAL(valueChanged(int)), parent, SLOT(setEdgeWidth(int)));
+    connect(m_ui->edgeWidth, &QSlider::valueChanged, [this](int v) { m_ui->edgeWidth->setToolTip(QString::number(v)); });
 
     connect(m_ui->bOk, SIGNAL(pressed()), SLOT(close()));
     connect(m_ui->bRestore, SIGNAL(pressed()), SLOT(restoreSettings()));
@@ -101,24 +103,6 @@ void GraphSettings::saveAsDefault()
     userPrefs.setValue("graphSettings/nodeCMapSize", nodeColorSelector()->cmapSize());
     userPrefs.setValue("graphSettings/edgeCMap", edgeColorSelector()->cmapName());
     userPrefs.setValue("graphSettings/edgeCMapSize", edgeColorSelector()->cmapSize());
-}
-
-void GraphSettings::slotNodeScale(int v)
-{
-    m_parent->setNodeScale(v);
-    m_ui->nodeScale->setToolTip(QString::number(v));
-}
-
-void GraphSettings::slotEdgeScale(int v)
-{
-    m_parent->setEdgeScale(v);
-    m_ui->edgeScale->setToolTip(QString::number(v));
-}
-
-void GraphSettings::slotEdgeWidth(int v)
-{
-    m_parent->setEdgeWidth(v);
-    m_ui->edgeWidth->setToolTip(QString::number(v));
 }
 
 int GraphSettings::nodeScale() const

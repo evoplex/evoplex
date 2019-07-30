@@ -56,14 +56,8 @@ public slots:
     void restoreSettings();
     void saveAsDefault();
 
-private slots:
-    void slotNodeScale(int v);
-    void slotEdgeScale(int v);
-    void slotEdgeWidth(int v);
-
 private:
     Ui_GraphSettings* m_ui;
-    GraphView* m_parent;
     ColorMapMgr* m_cMgr;
     AttributesScope m_nodeAttrsScope;
     AttributesScope m_edgeAttrsScope;
