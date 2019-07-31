@@ -60,6 +60,7 @@ private:
     const AttrsType m_type;
 
     void parseAttributes(QString& error);
+    void displayCurrentAttrs();
 };
 
 } // evoplex

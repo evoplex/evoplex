@@ -49,7 +49,21 @@ GraphDesignerPage::GraphDesignerPage(MainGUI* mainGUI)
     connect(m_ui->acEdgeAttrs, SIGNAL(triggered()), SLOT(slotEdgeAttrs()));
     connect(m_ui->acNodeAttrs, SIGNAL(triggered()), SLOT(slotNodeAttrs()));
     connect(m_ui->acGraphGen, &QAction::triggered, [this]() {
-        if (!this->m_nodeAttrScope.isEmpty()) {
+        if (m_numNodes > 0) {
+            QMessageBox msgBox;
+            msgBox.setText("You are attempting to create a new graph, this will reset your current progress.");
+            msgBox.setInformativeText("Do you want to continue?");
+            msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
+            msgBox.setDefaultButton(QMessageBox::Ok);
+            int but = msgBox.exec();
+            switch (but) {
+            case QMessageBox::Ok:
+                this->slotGraphGen();
+                break;
+            case QMessageBox::Cancel:
+                break;
+            }
+        } else if (!this->m_nodeAttrScope.isEmpty()) {
             this->slotGraphGen();
         } else {
             QMessageBox::warning(this, "Graph Generator",
