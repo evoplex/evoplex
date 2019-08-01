@@ -45,6 +45,7 @@ void FullInspector::slotClear() {
 
     m_ui->textMsg->show();
     m_ui->inspectorContents->hide();
+    m_selectedNodes.clear();
 }
 
 void FullInspector::slotChangeAttrScope(AttributesScope nodeAttrScope)

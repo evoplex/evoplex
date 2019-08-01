@@ -359,19 +359,26 @@ void BaseGraphGL::mouseReleaseEvent(QMouseEvent *e)
 
     if (m_curMode == SelectionMode::Select) {
         if (e->button() == Qt::LeftButton) {
+            bool fNodeSelected;
+            Node& node = findNode(e->localPos());
             Node prevSelection = selectedNode();
-            const Node& node = selectNode(e->localPos(), m_bCenter->isChecked());
-            const Node& nodeCur = selectNode(m_posEntered, m_bCenter->isChecked());
-            if (!nodeCur.isNull() && !prevSelection.isNull() && nodeCur != prevSelection && e->modifiers().testFlag(Qt::ControlModifier)) {
-                updateEdgesInspector(nodeCur, prevSelection);
-                m_bCenter->isChecked() ? updateCache() : update();
-            } else if (e->pos() == m_posEntered) {
-                clearSelection();
-                if (!node.isNull() && prevSelection != node) {
-                    updateInspector(node);
-                    selectNode(e->localPos(), m_bCenter->isChecked());
-                    m_bCenter->isChecked() ? updateCache() : update();
+
+            if (!node.isNull() && inSelectedNodes(node)) {
+                fNodeSelected = true;                
+            } else {
+                fNodeSelected = false;
+                Node& node = selectNode(e->localPos(), m_bCenter->isChecked());
+            }
+
+            if (e->pos() == m_posEntered) {
+                if (!e->modifiers().testFlag(Qt::ControlModifier)) {
+                    clearSelection();
                 }
+                selectNode(e->localPos(), m_bCenter->isChecked());
+                if (!node.isNull() && (!fNodeSelected || !e->modifiers().testFlag(Qt::ControlModifier))) {
+                        updateInspector(node);
+                }
+                m_bCenter->isChecked() ? updateCache() : update();
             } else {
                 m_origin += (e->pos() - m_posEntered);
                 clearSelection();

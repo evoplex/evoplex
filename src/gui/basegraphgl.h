@@ -35,7 +35,6 @@
 
 #include "colormap.h"
 #include "experimentwidget.h"
-#include "fullinspector.h"
 
 #include "maingui.h"
 
@@ -62,12 +61,14 @@ class GraphGLInterface
 protected:
     virtual ~GraphGLInterface() = default;
     virtual void paintFrame(QPainter& painter) const = 0;
+    virtual Node findNode(const QPointF& pos) const = 0;
     virtual Node selectNode(const QPointF& pos, bool center) = 0;
     virtual bool selectNode(const Node& node, bool center) = 0;
     virtual Node selectedNode() const = 0;
     virtual QPointF selectedNodePos() const = 0;
     virtual void clearSelection() = 0;
     virtual CacheStatus refreshCache() = 0;
+    virtual inline bool inSelectedNodes(Node node) const = 0;
 };
 
 class BaseGraphGL : public QOpenGLWidget, public GraphGLInterface
@@ -151,6 +152,8 @@ private:
     SelectionMode m_curMode;
     std::vector<std::shared_ptr<AttrWidget>> m_attrWidgets;
     std::map<int, Node> m_selectedNodes;
+    bool m_fullInspectorVisible;
+
     bool m_fullInspectorVisible;
 
     void attrValueChanged(int attrId) const;
