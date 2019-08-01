@@ -18,6 +18,7 @@
 *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <QActionGroup> 
 #include <QDebug>
 #include <QToolBar>
 #include <QToolButton>
@@ -45,6 +46,12 @@ GraphDesignerPage::GraphDesignerPage(MainGUI* mainGUI)
     setWindowTitle("Graph Designer Page");
     setObjectName("GraphDesignerPage");
     m_ui->setupUi(this);
+
+    QActionGroup* toolbarGroup = new QActionGroup(this);
+    toolbarGroup->addAction(m_ui->acSelectTool);
+    toolbarGroup->addAction(m_ui->acNodeTool);
+    toolbarGroup->addAction(m_ui->acEdgeTool);
+    toolbarGroup->setExclusive(true);
 
     connect(m_ui->acEdgeAttrs, SIGNAL(triggered()), SLOT(slotEdgeAttrs()));
     connect(m_ui->acNodeAttrs, SIGNAL(triggered()), SLOT(slotNodeAttrs()));

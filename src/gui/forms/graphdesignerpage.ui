@@ -56,7 +56,7 @@
    <addaction name="acNodeAttrs"/>
    <addaction name="acGraphGen"/>
   </widget>
-  <widget class="QToolBar" name="toolBar">
+  <widget class="QToolBar" name="bottomToolbar">
    <property name="windowTitle">
     <string>toolBar</string>
    </property>
@@ -149,6 +149,9 @@
    <property name="checked">
     <bool>true</bool>
    </property>
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="../res/guiRes.qrc">
      <normaloff>:/icons/material/material-icons/toggle/svg/ic_radio_button_checked_48px.svg</normaloff>:/icons/material/material-icons/toggle/svg/ic_radio_button_checked_48px.svg</iconset>
@@ -158,6 +161,9 @@
    </property>
    <property name="toolTip">
     <string>Select Tool</string>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>true</bool>
    </property>
   </action>
   <action name="acNodeTool">
