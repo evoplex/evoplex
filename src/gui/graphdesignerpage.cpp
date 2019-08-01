@@ -48,28 +48,7 @@ GraphDesignerPage::GraphDesignerPage(MainGUI* mainGUI)
 
     connect(m_ui->acEdgeAttrs, SIGNAL(triggered()), SLOT(slotEdgeAttrs()));
     connect(m_ui->acNodeAttrs, SIGNAL(triggered()), SLOT(slotNodeAttrs()));
-    connect(m_ui->acGraphGen, &QAction::triggered, [this]() {
-        if (m_numNodes > 0) {
-            QMessageBox msgBox;
-            msgBox.setText("You are attempting to create a new graph, this will reset your current progress.");
-            msgBox.setInformativeText("Do you want to continue?");
-            msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
-            msgBox.setDefaultButton(QMessageBox::Ok);
-            int but = msgBox.exec();
-            switch (but) {
-            case QMessageBox::Ok:
-                this->slotGraphGen();
-                break;
-            case QMessageBox::Cancel:
-                break;
-            }
-        } else if (!this->m_nodeAttrScope.isEmpty()) {
-            this->slotGraphGen();
-        } else {
-            QMessageBox::warning(this, "Graph Generator",
-            "Make sure you have set valid node attributes before attempting to open the graph generator");
-        }
-    });
+    connect(m_ui->acGraphGen, SIGNAL(triggered()), SLOT(slotGraphGen()));
     connect(m_ui->acGraphSettings, SIGNAL(triggered()), m_graphDesigner, SLOT(slotOpenSettings()));
     connect(m_ui->acNodesExporter, SIGNAL(triggered()), m_graphDesigner, SLOT(slotExportNodes()));
 
@@ -85,12 +64,32 @@ void GraphDesignerPage::slotEdgeAttrs() {
     new GraphAttrsDlg(this, AttrsType::Edges);
 }
 
+void GraphDesignerPage::slotGraphGen() {
+    if (m_numNodes > 0) {
+        QMessageBox msgBox;
+        msgBox.setText("You are attempting to create a new graph, this will reset your current progress.");
+        msgBox.setInformativeText("Do you want to continue?");
+        msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
+        msgBox.setDefaultButton(QMessageBox::Ok);
+        if (msgBox.exec() == QMessageBox::Ok) {
+            graphGen();
+        }
+    }
+    else if (!this->m_nodeAttrScope.isEmpty()) {
+        graphGen();
+    }
+    else {
+        QMessageBox::warning(this, "Graph Generator",
+            "Make sure you have set valid node attributes before attempting to open the graph generator");
+    }
+}
+    
 void GraphDesignerPage::slotNodeAttrs()
 {
     new GraphAttrsDlg(this, AttrsType::Nodes);
 }
 
-void GraphDesignerPage::slotGraphGen()
+void GraphDesignerPage::graphGen()
 {
     new GraphGenDlg(this, m_mainGUI);
 }
