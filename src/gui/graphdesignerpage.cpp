@@ -18,6 +18,7 @@
 *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <QAction>
 #include <QActionGroup> 
 #include <QDebug>
 #include <QToolBar>
@@ -26,6 +27,7 @@
 #include <QHBoxLayout>
 #include <QSettings>
 
+#include "enum.h"
 #include "fontstyles.h"
 #include "graphattrsdlg.h"
 #include "graphdesignerpage.h"
@@ -65,6 +67,10 @@ GraphDesignerPage::GraphDesignerPage(MainGUI* mainGUI)
     });
     connect(m_ui->acGraphSettings, SIGNAL(triggered()), m_graphDesigner, SLOT(slotOpenSettings()));
     connect(m_ui->acNodesExporter, SIGNAL(triggered()), m_graphDesigner, SLOT(slotExportNodes()));
+    
+    connect(m_ui->acSelectTool, &QAction::triggered, [this]() { this->m_graphDesigner->slotChangeTool(GraphTool::Select); });
+    connect(m_ui->acNodeTool, &QAction::triggered, [this]() { this->m_graphDesigner->slotChangeTool(GraphTool::Node); });
+    connect(m_ui->acEdgeTool, &QAction::triggered, [this]() { this->m_graphDesigner->slotChangeTool(GraphTool::Edge); });
 
     setCentralWidget(m_graphDesigner);
 }

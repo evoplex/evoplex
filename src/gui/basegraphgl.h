@@ -33,6 +33,7 @@
 #include "core/experiment.h"
 
 #include "colormap.h"
+#include "enum.h"
 #include "experimentwidget.h"
 #include "graphwidget.h"
 #include "maingui.h"
@@ -116,6 +117,7 @@ public slots:
     virtual void zoomOut();
 
     void setCurrentStep(int step);
+    void setCurrentTool(GraphTool tool);
     void setNodeScale(int v);
     void slotRestarted();
     void slotStatusChanged(Status s);
@@ -135,6 +137,7 @@ private:
     QPoint m_posEntered;
     QMutex m_mutex;
     QRect m_inspGeo; // inspector geometry with margin
+    GraphTool m_curTool;
     std::vector<std::shared_ptr<AttrWidget>> m_attrWidgets;
 
     void attrValueChanged(int attrId) const;

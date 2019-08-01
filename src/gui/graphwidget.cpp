@@ -111,6 +111,10 @@ void GraphWidget::slotOpenSettings()
     m_settingsDlg->show();
 }
 
+void GraphWidget::changeTool(GraphTool tool) {
+    m_view->setCurrentTool(tool);
+}
+
 void GraphWidget::updateView(bool forceUpdate)
 {  
     if (!m_currTrial || !m_view || !m_currTrial->model()
