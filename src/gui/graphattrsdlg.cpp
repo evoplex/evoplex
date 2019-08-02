@@ -20,6 +20,7 @@
 
 #include <QDebug>
 #include <QSet>
+#include <QTableWidgetItem>
 #include <QMessageBox>
 
 #include "graphattrsdlg.h"
@@ -41,11 +42,35 @@ GraphAttrsDlg::GraphAttrsDlg(GraphDesignerPage* parent, const AttrsType type)
     connect(m_ui->numAttrs, SIGNAL(valueChanged(int)), SLOT(slotTableUpdate(int)));
     connect(m_ui->ok, SIGNAL(clicked()), SLOT(slotAttrSaved()));
     connect(m_ui->cancel, SIGNAL(clicked()), SLOT(close()));
+
+    if ((m_type == AttrsType::Nodes && !m_graphPage->nodeAttributesScope().isEmpty()) ||
+        (m_type == AttrsType::Edges && !m_graphPage->edgeAttributesScope().isEmpty())) {
+        displayCurrentAttrs();
+    }
 };
 
 GraphAttrsDlg::~GraphAttrsDlg()
 {
     delete m_ui;
+}
+
+void GraphAttrsDlg::displayCurrentAttrs()
+{
+    AttributesScope attrsScope;
+    if (m_type == AttrsType::Nodes) {
+        attrsScope = m_graphPage->nodeAttributesScope();
+    } else {
+        attrsScope = m_graphPage->edgeAttributesScope();
+    }
+
+    m_ui->numAttrs->setValue(attrsScope.size());
+    int i = 0;
+    
+    for (auto attrRange : attrsScope) {    
+        m_ui->table->setItem(i, 0, new QTableWidgetItem(attrRange->attrName()));
+        m_ui->table->setItem(i, 1, new QTableWidgetItem(attrRange->attrRangeStr()));
+        ++i;
+    }
 }
 
 void GraphAttrsDlg::parseAttributes(QString& error)
