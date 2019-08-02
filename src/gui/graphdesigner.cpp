@@ -58,7 +58,7 @@ GraphDesigner::GraphDesigner(MainGUI* mainGUI, QWidget* parent)
 
     m_innerWindow->setObjectName("graphDesignerViewWindow");
     m_innerWindow->setDockNestingEnabled(false);
-    slotChangeTool(GraphTool::Select);
+    slotChangeSelectionMode(SelectionMode::Select);
 
     QVBoxLayout* layout = new QVBoxLayout(new QWidget(this));
     layout->setMargin(0);
@@ -118,9 +118,9 @@ bool GraphDesigner::readyToExport()
     return true;
 }
 
-void GraphDesigner::slotChangeTool(GraphTool tool)
+void GraphDesigner::slotChangeSelectionMode(SelectionMode m)
 {
-    m_curGraph->changeTool(tool);
+    m_curGraph->changeSelectionMode(m);
 }
 
 void GraphDesigner::slotExportNodes()

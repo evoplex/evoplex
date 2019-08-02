@@ -27,7 +27,7 @@
 #include "core/project.h"
 
 #include "abstractgraph.h"
-#include "enum.h"
+#include "basegraphgl.h"
 #include "graphwidget.h"
 #include "graphdesignerpage.h"
 #include "maingui.h"
@@ -58,7 +58,7 @@ public:
 public slots:
     void slotOpenSettings();
     void slotExportNodes();
-    void slotChangeTool(GraphTool tool);
+    void slotChangeSelectionMode(SelectionMode m);
 
 private:
     MainGUI * m_mainGUI;

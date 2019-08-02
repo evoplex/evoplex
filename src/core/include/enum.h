@@ -48,13 +48,6 @@ enum class Status {
     Finished,  //! all is done
 };
 
-enum class GraphTool {
-    Default = -1,     // used in experiment designer, opens the 'light' inspector
-    Select = 0,     // Select mode
-    Node = 1,       // Node tool
-    Edge = 2        // Edge tool
-};
-
 enum class PluginType : quint8 {
     Invalid = 0,
     Graph = 1,

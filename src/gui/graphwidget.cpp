@@ -111,8 +111,8 @@ void GraphWidget::slotOpenSettings()
     m_settingsDlg->show();
 }
 
-void GraphWidget::changeTool(GraphTool tool) {
-    m_view->setCurrentTool(tool);
+void GraphWidget::changeSelectionMode(SelectionMode m) {
+    m_view->setCurrentSelectionMode(m);
 }
 
 void GraphWidget::updateView(bool forceUpdate)

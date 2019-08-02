@@ -25,7 +25,7 @@
 
 #include "core/experiment.h"
 
-#include "enum.h"
+#include "basegraphgl.h"
 #include "experimentwidget.h"
 #include "maingui.h"
 
@@ -49,7 +49,7 @@ public:
     virtual ~GraphWidget();
 
     void setup(AbstractGraph* abstractGraph, AttributesScope nodeAttrsScope, AttributesScope edgeAttrsScope);
-    void changeTool(GraphTool tool);
+    void changeSelectionMode(SelectionMode m);
 
     inline BaseGraphGL* view() const;
 
