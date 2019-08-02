@@ -56,7 +56,6 @@ protected:
     void changedAttrsScope(const AttrsType type, AttributesScope attrs);
     void changedGraphAttrs(const int numNodes, PluginKey selectedGraphKey, GraphType graphType, QStringList& graphAttrHeader, 
         QStringList& graphAttrValues, QString& error);
-    void graphGen();
 
     inline AttributesScope edgeAttributesScope() const;
     inline AttributesScope nodeAttributesScope() const;

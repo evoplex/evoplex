@@ -72,13 +72,11 @@ void GraphDesignerPage::slotGraphGen() {
         msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
         msgBox.setDefaultButton(QMessageBox::Ok);
         if (msgBox.exec() == QMessageBox::Ok) {
-            graphGen();
+            new GraphGenDlg(this, m_mainGUI);
         }
-    }
-    else if (!this->m_nodeAttrScope.isEmpty()) {
-        graphGen();
-    }
-    else {
+    } else if (!this->m_nodeAttrScope.isEmpty()) {
+        new GraphGenDlg(this, m_mainGUI);
+    } else {
         QMessageBox::warning(this, "Graph Generator",
             "Make sure you have set valid node attributes before attempting to open the graph generator");
     }
@@ -87,11 +85,6 @@ void GraphDesignerPage::slotGraphGen() {
 void GraphDesignerPage::slotNodeAttrs()
 {
     new GraphAttrsDlg(this, AttrsType::Nodes);
-}
-
-void GraphDesignerPage::graphGen()
-{
-    new GraphGenDlg(this, m_mainGUI);
 }
 
 void GraphDesignerPage::changedAttrsScope(const AttrsType type, AttributesScope attrs)

@@ -21,7 +21,6 @@
 #include <QDebug>
 #include <QSet>
 #include <QTableWidgetItem>
-#include <QHash>
 #include <QMessageBox>
 
 #include "graphattrsdlg.h"
