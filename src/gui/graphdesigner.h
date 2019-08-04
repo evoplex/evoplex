@@ -35,6 +35,9 @@
 namespace evoplex {
 
 class GraphDesignerPage;
+class GraphWidget;
+
+enum class  SelectionMode;
 
 class BaseAbstractGraph : public AbstractGraph
 {
@@ -50,7 +53,7 @@ class GraphDesigner : public QDockWidget
    friend class GraphDesignerPage;
 
 public:
-    explicit GraphDesigner(MainGUI* mainGUI, QWidget* parent);
+    explicit GraphDesigner(MainGUI* mainGUI, GraphDesignerPage* parent);
     ~GraphDesigner();
 
    void setup(GraphInputsPtr inputs, AttributesScope nodeAttrsScope, AttributesScope edgeAttrsScope);

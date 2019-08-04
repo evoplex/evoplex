@@ -42,7 +42,7 @@
 
 namespace evoplex {
 
-GraphDesigner::GraphDesigner(MainGUI* mainGUI, QWidget* parent)
+GraphDesigner::GraphDesigner(MainGUI* mainGUI, GraphDesignerPage* parent)
     : QDockWidget(parent),
       m_mainGUI(mainGUI),
       m_mainApp(mainGUI->mainApp()),
@@ -64,6 +64,9 @@ GraphDesigner::GraphDesigner(MainGUI* mainGUI, QWidget* parent)
     layout->setMargin(0);
     layout->setSpacing(0);
     layout->addWidget(m_innerWindow);
+    
+    m_curGraph->setViewInspector(parent->fullInspector());
+
     setWidget(layout->parentWidget());
 }
 

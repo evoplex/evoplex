@@ -21,6 +21,7 @@
 #ifndef BASEGRAPHGL_H
 #define BASEGRAPHGL_H
 
+#include <map>
 #include <memory>
 #include <vector>
 
@@ -35,6 +36,7 @@
 
 #include "colormap.h"
 #include "experimentwidget.h"
+#include "fullinspector.h"
 #include "maingui.h"
 
 class Ui_BaseGraphGL;
@@ -42,6 +44,7 @@ class Ui_BaseGraphGL;
 namespace evoplex {
 
 class GraphWidget;
+class FullInspector;
 
 enum class CacheStatus {
     Ready,
@@ -81,6 +84,9 @@ public:
     void paint(QPaintDevice* device, bool paintBackground) const;
 
     inline int currStep() const { return m_currStep; }
+    std::map<int, Node> m_selectedNodes; //TODO: This shouldn't be public
+    inline void setInspector(FullInspector* inspector) { m_inspector = inspector; }
+    void updateFullInspector();
 
 protected:
     explicit BaseGraphGL(QWidget* parent);
@@ -146,6 +152,7 @@ private:
     QRect m_inspGeo; // inspector geometry with margin
     SelectionMode m_curMode;
     std::vector<std::shared_ptr<AttrWidget>> m_attrWidgets;
+    FullInspector* m_inspector;
 
     void attrValueChanged(int attrId) const;
 

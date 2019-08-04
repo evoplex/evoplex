@@ -115,6 +115,10 @@ void GraphWidget::changeSelectionMode(SelectionMode m) {
     m_view->setCurrentSelectionMode(m);
 }
 
+void GraphWidget::setViewInspector(FullInspector* inspector) {
+    m_view->setInspector(inspector);
+}
+
 void GraphWidget::updateView(bool forceUpdate)
 {  
     if (!m_currTrial || !m_view || !m_currTrial->model()

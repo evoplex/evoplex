@@ -22,6 +22,7 @@
 #define GRAPHVIEW_H
 
 #include "basegraphgl.h"
+#include "fullinspector.h"
 
 namespace evoplex {
 
@@ -52,8 +53,8 @@ private slots:
 
 private:
     int m_edgeAttr;
-    const int m_maxSelectedNodes;
 
+    FullInspector* m_inspector;
     ColorMap* m_edgeCMap;
     qreal m_edgeScale;
 
@@ -73,10 +74,9 @@ private:
             : node(n), xy(xy), edges(e) {}
     };
     std::vector<Star> m_cache;
-    Star m_selectedStar;
+    Star m_lastSelectedStar;
+    std::vector<Star> m_selectedStars;
 
-    std::map<int, Node> m_selectedNodes;
-    
     Star createStar(const Node& node, const qreal& edgeSizeRate, const QPointF& xy);
 
     void drawNode(QPainter& painter, const Star& s, double r) const;
@@ -90,16 +90,17 @@ private:
 };
 
 inline Node GraphView::selectedNode() const
-{ return m_selectedStar.node; }
+{ return m_lastSelectedStar.node; }
 
 inline QPointF GraphView::selectedNodePos() const
-{ return m_selectedStar.xy + m_origin; }
+{ return m_lastSelectedStar.xy + m_origin; }
 
 inline void GraphView::clearSelection()
 { 
-    m_selectedStar = Star();
+    m_lastSelectedStar = Star();
     BaseGraphGL::clearSelection(); 
     m_selectedNodes.clear();
+    m_selectedStars.clear();
 }
 
 inline void GraphView::zoomIn()
