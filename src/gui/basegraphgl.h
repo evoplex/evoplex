@@ -50,7 +50,6 @@ enum class CacheStatus {
 };
 
 enum class SelectionMode {
-    Default = -1,   // used in experiment designer, opens the 'light' inspector
     Select = 0,     // Select mode
     NodeEdit = 1,   // Node tool
     EdgeEdit = 2    // Edge tool

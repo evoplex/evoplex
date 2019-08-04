@@ -43,7 +43,7 @@ BaseGraphGL::BaseGraphGL(QWidget* parent)
       m_origin(m_nodeScale, m_nodeScale),
       m_cacheStatus(CacheStatus::Ready),
       m_posEntered(0,0),
-      m_curMode(SelectionMode::Default)
+      m_curMode(SelectionMode::Select)
 {
     m_ui->setupUi(this);
 
@@ -347,7 +347,7 @@ void BaseGraphGL::mouseReleaseEvent(QMouseEvent *e)
         return;
     }
 
-    if (m_curMode == SelectionMode::Default) {
+    if (m_curMode == SelectionMode::Select) {
         if (e->button() == Qt::LeftButton) {
             Node prevSelection = selectedNode();
             const Node& node = selectNode(e->localPos(), m_bCenter->isChecked());
