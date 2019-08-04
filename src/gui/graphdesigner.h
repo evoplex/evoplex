@@ -27,6 +27,7 @@
 #include "core/project.h"
 
 #include "abstractgraph.h"
+#include "basegraphgl.h"
 #include "graphwidget.h"
 #include "graphdesignerpage.h"
 #include "maingui.h"
@@ -57,6 +58,7 @@ public:
 public slots:
     void slotOpenSettings();
     void slotExportNodes();
+    void slotChangeSelectionMode(SelectionMode m);
 
 private:
     MainGUI * m_mainGUI;

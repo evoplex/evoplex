@@ -111,6 +111,10 @@ void GraphWidget::slotOpenSettings()
     m_settingsDlg->show();
 }
 
+void GraphWidget::changeSelectionMode(SelectionMode m) {
+    m_view->setCurrentSelectionMode(m);
+}
+
 void GraphWidget::updateView(bool forceUpdate)
 {  
     if (!m_currTrial || !m_view || !m_currTrial->model()

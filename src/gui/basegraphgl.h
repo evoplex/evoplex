@@ -28,24 +28,31 @@
 #include <QMouseEvent>
 #include <QMutex>
 #include <QPainter>
+#include <QListWidget>
 #include <QTimer>
 
 #include "core/experiment.h"
 
 #include "colormap.h"
 #include "experimentwidget.h"
-#include "graphwidget.h"
 #include "maingui.h"
-#include <QListWidget>
 
 class Ui_BaseGraphGL;
 
 namespace evoplex {
 
+class GraphWidget;
+
 enum class CacheStatus {
     Ready,
     Updating,
     Scheduled
+};
+
+enum class SelectionMode {
+    Select = 0,     // Select mode
+    NodeEdit = 1,   // Node tool
+    EdgeEdit = 2    // Edge tool
 };
 
 class GraphGLInterface
@@ -116,6 +123,7 @@ public slots:
     virtual void zoomOut();
 
     void setCurrentStep(int step);
+    void setCurrentSelectionMode(SelectionMode m);
     void setNodeScale(int v);
     void slotRestarted();
     void slotStatusChanged(Status s);
@@ -135,6 +143,7 @@ private:
     QPoint m_posEntered;
     QMutex m_mutex;
     QRect m_inspGeo; // inspector geometry with margin
+    SelectionMode m_curMode;
     std::vector<std::shared_ptr<AttrWidget>> m_attrWidgets;
 
     void attrValueChanged(int attrId) const;

@@ -117,6 +117,11 @@ bool GraphDesigner::readyToExport()
     return true;
 }
 
+void GraphDesigner::slotChangeSelectionMode(SelectionMode m)
+{
+    m_curGraph->changeSelectionMode(m);
+}
+
 void GraphDesigner::slotExportNodes()
 {
     if (!readyToExport()) {

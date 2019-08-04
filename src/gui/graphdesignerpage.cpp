@@ -18,6 +18,8 @@
 *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <QAction>
+#include <QActionGroup> 
 #include <QDebug>
 #include <QToolBar>
 #include <QToolButton>
@@ -25,6 +27,7 @@
 #include <QHBoxLayout>
 #include <QSettings>
 
+#include "enum.h"
 #include "fontstyles.h"
 #include "graphattrsdlg.h"
 #include "graphdesignerpage.h"
@@ -46,11 +49,21 @@ GraphDesignerPage::GraphDesignerPage(MainGUI* mainGUI)
     setObjectName("GraphDesignerPage");
     m_ui->setupUi(this);
 
+    QActionGroup* toolbarGroup = new QActionGroup(this);
+    toolbarGroup->addAction(m_ui->acSelectTool);
+    toolbarGroup->addAction(m_ui->acNodeTool);
+    toolbarGroup->addAction(m_ui->acEdgeTool);
+    toolbarGroup->setExclusive(true);
+
     connect(m_ui->acEdgeAttrs, SIGNAL(triggered()), SLOT(slotEdgeAttrs()));
     connect(m_ui->acNodeAttrs, SIGNAL(triggered()), SLOT(slotNodeAttrs()));
     connect(m_ui->acGraphGen, SIGNAL(triggered()), SLOT(slotGraphGen()));
     connect(m_ui->acGraphSettings, SIGNAL(triggered()), m_graphDesigner, SLOT(slotOpenSettings()));
     connect(m_ui->acNodesExporter, SIGNAL(triggered()), m_graphDesigner, SLOT(slotExportNodes()));
+    
+    connect(m_ui->acSelectTool, &QAction::triggered, [this]() { this->m_graphDesigner->slotChangeSelectionMode(SelectionMode::Select); });
+    connect(m_ui->acNodeTool, &QAction::triggered, [this]() { this->m_graphDesigner->slotChangeSelectionMode(SelectionMode::NodeEdit); });
+    connect(m_ui->acEdgeTool, &QAction::triggered, [this]() { this->m_graphDesigner->slotChangeSelectionMode(SelectionMode::EdgeEdit); });
 
     setCentralWidget(m_graphDesigner);
 }

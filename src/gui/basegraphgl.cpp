@@ -42,7 +42,8 @@ BaseGraphGL::BaseGraphGL(QWidget* parent)
       m_nodeRadius(m_nodeScale),
       m_origin(m_nodeScale, m_nodeScale),
       m_cacheStatus(CacheStatus::Ready),
-      m_posEntered(0,0)
+      m_posEntered(0,0),
+      m_curMode(SelectionMode::Select)
 {
     m_ui->setupUi(this);
 
@@ -273,6 +274,10 @@ void BaseGraphGL::setCurrentStep(int step)
     m_currStep = step;
 }
 
+void BaseGraphGL::setCurrentSelectionMode(SelectionMode m) {
+    m_curMode = m;
+}
+
 void BaseGraphGL::setNodeScale(int v)
 {
     m_nodeScale = v;
@@ -342,34 +347,36 @@ void BaseGraphGL::mouseReleaseEvent(QMouseEvent *e)
         return;
     }
 
-    if (e->button() == Qt::LeftButton) {
-        Node prevSelection = selectedNode();
-        const Node& node = selectNode(e->localPos(), m_bCenter->isChecked());
-        const Node& nodeCur = selectNode(m_posEntered, m_bCenter->isChecked());
-        if (!nodeCur.isNull() && !prevSelection.isNull() && nodeCur != prevSelection && e->modifiers().testFlag(Qt::ControlModifier)) {
-            updateEdgesInspector(nodeCur, prevSelection);
-            m_bCenter->isChecked() ? updateCache() : update();
-        } else if (e->pos() == m_posEntered) {
-            clearSelection();
-            if (!node.isNull() && prevSelection != node) {
-                updateInspector(node);
-                selectNode(e->localPos(), m_bCenter->isChecked());
+    if (m_curMode == SelectionMode::Select) {
+        if (e->button() == Qt::LeftButton) {
+            Node prevSelection = selectedNode();
+            const Node& node = selectNode(e->localPos(), m_bCenter->isChecked());
+            const Node& nodeCur = selectNode(m_posEntered, m_bCenter->isChecked());
+            if (!nodeCur.isNull() && !prevSelection.isNull() && nodeCur != prevSelection && e->modifiers().testFlag(Qt::ControlModifier)) {
+                updateEdgesInspector(nodeCur, prevSelection);
                 m_bCenter->isChecked() ? updateCache() : update();
+            } else if (e->pos() == m_posEntered) {
+                clearSelection();
+                if (!node.isNull() && prevSelection != node) {
+                    updateInspector(node);
+                    selectNode(e->localPos(), m_bCenter->isChecked());
+                    m_bCenter->isChecked() ? updateCache() : update();
+                }
+            } else {
+                m_origin += (e->pos() - m_posEntered);
+                clearSelection();
+                updateCache();
             }
-        } else {
-            m_origin += (e->pos() - m_posEntered);
-            clearSelection();
-            updateCache();
-        }
-    } else if (e->button() == Qt::RightButton && m_nodeAttr >= 0 && !m_isReadOnly) {
-        Node node = selectNode(e->localPos(), false);
-        if (!node.isNull()) {
-            const QString& attrName = node.attrs().name(m_nodeAttr);
-            auto attrRange = m_nodeAttrsScope.value(attrName);
-            node.setAttr(m_nodeAttr, attrRange->next(node.attr(m_nodeAttr)));
-            clearSelection();
-            emit (updateWidgets(true));
-            updateCache();
+        } else if (e->button() == Qt::RightButton && m_nodeAttr >= 0 && !m_isReadOnly) {
+            Node node = selectNode(e->localPos(), false);
+            if (!node.isNull()) {
+                const QString& attrName = node.attrs().name(m_nodeAttr);
+                auto attrRange = m_nodeAttrsScope.value(attrName);
+                node.setAttr(m_nodeAttr, attrRange->next(node.attr(m_nodeAttr)));
+                clearSelection();
+                emit(updateWidgets(true));
+                updateCache();
+            }
         }
     }
 }

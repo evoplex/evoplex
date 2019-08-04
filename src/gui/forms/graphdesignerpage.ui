@@ -56,6 +56,20 @@
    <addaction name="acNodeAttrs"/>
    <addaction name="acGraphGen"/>
   </widget>
+  <widget class="QToolBar" name="bottomToolbar">
+   <property name="windowTitle">
+    <string>toolBar</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>BottomToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="acSelectTool"/>
+   <addaction name="acNodeTool"/>
+   <addaction name="acEdgeTool"/>
+  </widget>
   <action name="acImageExporter">
    <property name="icon">
     <iconset resource="../res/guiRes.qrc">
@@ -126,6 +140,57 @@
    </property>
    <property name="toolTip">
     <string>Graph Generator</string>
+   </property>
+  </action>
+  <action name="acSelectTool">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../res/guiRes.qrc">
+     <normaloff>:/icons/material/material-icons/toggle/svg/ic_radio_button_checked_48px.svg</normaloff>:/icons/material/material-icons/toggle/svg/ic_radio_button_checked_48px.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Select Tool</string>
+   </property>
+   <property name="toolTip">
+    <string>Select Tool</string>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>true</bool>
+   </property>
+  </action>
+  <action name="acNodeTool">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../res/guiRes.qrc">
+     <normaloff>:/icons/material/material-icons/toggle/svg/ic_radio_button_checked_48px.svg</normaloff>:/icons/material/material-icons/toggle/svg/ic_radio_button_checked_48px.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Node Tool</string>
+   </property>
+  </action>
+  <action name="acEdgeTool">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../res/guiRes.qrc">
+     <normaloff>:/icons/material/material-icons/toggle/svg/ic_radio_button_checked_48px.svg</normaloff>:/icons/material/material-icons/toggle/svg/ic_radio_button_checked_48px.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Edge Tool</string>
+   </property>
+   <property name="toolTip">
+    <string>Edge Tool</string>
    </property>
   </action>
  </widget>
