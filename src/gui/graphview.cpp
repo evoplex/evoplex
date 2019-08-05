@@ -30,12 +30,12 @@ namespace evoplex {
 
 GraphView::GraphView(QWidget* parent)
     : BaseGraphGL(parent),
-     m_edgeAttr(-1),
-     m_maxSelectedNodes(2),
-     m_edgeCMap(nullptr),
-     m_edgeScale(25.),
-     m_edgePen(Qt::gray),
-     m_nodePen(Qt::black)
+      m_edgeAttr(-1),
+      m_maxSelectedNodes(2),
+      m_edgeCMap(nullptr),
+      m_edgeScale(25.),
+      m_edgePen(Qt::gray),
+      m_nodePen(Qt::black)
 {
     m_showNodes = m_ui->bShowNodes->isChecked();
     m_showEdges = m_ui->bShowEdges->isChecked();

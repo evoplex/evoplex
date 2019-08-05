@@ -84,8 +84,6 @@ public:
 
     inline int currStep() const { return m_currStep; }
     inline void setInspector(FullInspector* inspector);
-    std::map<int, Node> m_selectedNodes; //TODO: This shouldn't be public
-//    void updateFullInspector();
 
 protected:
     explicit BaseGraphGL(QWidget* parent);
@@ -153,7 +151,7 @@ private:
     QRect m_inspGeo; // inspector geometry with margin
     SelectionMode m_curMode;
     std::vector<std::shared_ptr<AttrWidget>> m_attrWidgets;
-    FullInspector* m_inspector;
+    std::map<int, Node> m_selectedNodes;
     bool m_fullInspectorVisible;
 
     void attrValueChanged(int attrId) const;
@@ -164,11 +162,6 @@ private:
     void updateEdgeInspector(const Edge& edge);
     void updateEdgesInspector(const Node& pnode, const Node& cnode);
 };
-
-inline void BaseGraphGL::setInspector(FullInspector* inspector) {
-    m_fullInspectorVisible = true;
-    m_inspector = inspector;
-}
 
 inline void BaseGraphGL::paintEvent(QPaintEvent*)
 { paint(this, true); }

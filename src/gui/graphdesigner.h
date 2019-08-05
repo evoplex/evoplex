@@ -29,6 +29,7 @@
 #include "abstractgraph.h"
 #include "basegraphgl.h"
 #include "graphwidget.h"
+#include "graphview.h"
 #include "graphdesignerpage.h"
 #include "maingui.h"
 
@@ -53,7 +54,7 @@ class GraphDesigner : public QDockWidget
    friend class GraphDesignerPage;
 
 public:
-    explicit GraphDesigner(MainGUI* mainGUI, GraphDesignerPage* parent);
+    explicit GraphDesigner(MainGUI* mainGUI, QWidget* parent);
     ~GraphDesigner();
 
    void setup(GraphInputsPtr inputs, AttributesScope nodeAttrsScope, AttributesScope edgeAttrsScope);
@@ -62,6 +63,9 @@ public slots:
     void slotOpenSettings();
     void slotExportNodes();
     void slotChangeSelectionMode(SelectionMode m);
+
+protected:
+    inline BaseGraphGL* graphView() const;
 
 private:
     MainGUI * m_mainGUI;
@@ -74,6 +78,8 @@ private:
     bool readyToExport();
 };
 
+inline BaseGraphGL* GraphDesigner::graphView() const
+{ return m_curGraph->view(); }
 
 }
 

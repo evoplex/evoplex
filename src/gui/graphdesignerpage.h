@@ -31,7 +31,6 @@
 #include "maingui.h"
 #include "abstractgraph.h"
 #include "attributerange.h"
-#include "graphdesigner.h"
 #include "fullinspector.h"
 
 class Ui_GraphDesignerPage;
@@ -64,7 +63,7 @@ protected:
     inline QStringList graphAttrHeader() const;
     inline QStringList graphAttrValues() const;
     inline PluginKey selectedGraphKey() const;
-    inline FullInspector* fullInspector();
+    inline FullInspector* fullInspector() const;
 
 
 private:
@@ -94,9 +93,11 @@ signals:
     void openSettingsDlg();
 };
 
-inline FullInspector* GraphDesignerPage::fullInspector(){
+inline FullInspector* GraphDesignerPage::fullInspector() const
+{
     return m_inspector;
 }
+
 inline AttributesScope GraphDesignerPage::edgeAttributesScope() const
 {
     return m_edgeAttrScope;

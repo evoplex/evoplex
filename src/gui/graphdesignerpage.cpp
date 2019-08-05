@@ -31,6 +31,7 @@
 #include "fontstyles.h"
 #include "graphattrsdlg.h"
 #include "graphdesignerpage.h"
+#include "graphdesigner.h"
 #include "graphgendlg.h"
 #include "ui_graphdesignerpage.h"
 
@@ -64,6 +65,9 @@ GraphDesignerPage::GraphDesignerPage(MainGUI* mainGUI)
     connect(m_ui->acSelectTool, &QAction::triggered, [this]() { this->m_graphDesigner->slotChangeSelectionMode(SelectionMode::Select); });
     connect(m_ui->acNodeTool, &QAction::triggered, [this]() { this->m_graphDesigner->slotChangeSelectionMode(SelectionMode::NodeEdit); });
     connect(m_ui->acEdgeTool, &QAction::triggered, [this]() { this->m_graphDesigner->slotChangeSelectionMode(SelectionMode::EdgeEdit); });
+    
+    connect(m_graphDesigner->graphView(), SIGNAL(nodeSelected(const Node&)), fullInspector(), SLOT(slotSelectedNode(const Node&)));
+    connect(m_graphDesigner->graphView(), SIGNAL(clearedSelected()), fullInspector(), SLOT(slotClear()));
 
     setCentralWidget(m_graphDesigner);
 

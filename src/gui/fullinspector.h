@@ -21,6 +21,8 @@
 #ifndef FULL_INSPECTOR_H
 #define FULL_INSPECTOR_H
 
+#include <QDockWidget>
+
 #include "core/include/node.h"
 
 class Ui_FullInspector;

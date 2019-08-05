@@ -33,7 +33,6 @@ namespace evoplex {
 
 class BaseGraphGL;
 class GraphWidget;
-class FullInspector;
 enum class SelectionMode;
 
 class GraphWidget : public QDockWidget
@@ -52,8 +51,6 @@ public:
 
     void setup(AbstractGraph* abstractGraph, AttributesScope nodeAttrsScope, AttributesScope edgeAttrsScope);
     void changeSelectionMode(SelectionMode m);
-
-    void setViewInspector(FullInspector* inspector);
 
     inline BaseGraphGL* view() const;
 
