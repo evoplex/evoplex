@@ -19,6 +19,7 @@
  */
 
 #include <QPainter>
+#include <QtMath>
 
 #include "core/trial.h"
 
@@ -35,7 +36,8 @@ GraphView::GraphView(ColorMapMgr* cMgr, ExperimentPtr exp, GraphWidget* parent)
       m_edgeAttr(-1),
       m_edgeCMap(nullptr),
       m_edgePen(Qt::gray),
-      m_nodePen(Qt::black)
+      m_nodePen(Qt::black),
+      m_directed(true)
 {
     m_settingsDlg->init();
     setNodeScale(m_settingsDlg->nodeScale());
@@ -232,6 +234,9 @@ void GraphView::drawEdges(QPainter& painter) const
                 const Value& value = ep.first.attr(m_edgeAttr);
                 pen.setColor(m_edgeCMap->colorFromValue(value));
                 painter.setPen(m_edgePen);
+                if (m_directed) {
+                    drawArrow(painter, m_edgeCMap->colorFromValue(value), QPoint(ep.second.x1(), ep.second.y1()), QPoint(ep.second.x2(), ep.second.y2()));
+                }
                 painter.drawLine(ep.second);
             }
         }
@@ -239,11 +244,48 @@ void GraphView::drawEdges(QPainter& painter) const
         painter.setPen(m_edgePen);
         for (const Star& star : m_cache) {
             for (auto const& ep : star.edges) {
+                if (m_directed) {
+                    drawArrow(painter, Qt::gray, QPoint(ep.second.x1(), ep.second.y1()), QPoint(ep.second.x2(), ep.second.y2()));
+                }
                 painter.drawLine(ep.second);
             }
         }
     }
     painter.restore();
+}
+
+void GraphView::drawArrow(QPainter& painter, const QColor& col,const QPoint p1, const QPoint p2) const
+{
+    float N = qSqrt(qPow(p2.x() - p1.x(), 2) + qPow(p2.y() - p1.y(), 2));
+        
+    float u0 = (p2.x() - p1.x()) / N;
+    float u1 = (p2.y() - p1.y()) / N;
+    
+    float x1 = p2.x() - m_nodeRadius * u0;
+    float y1 = p2.y() - m_nodeRadius * u1;
+        
+    // Temporary helper point
+    float x2 = (x1 - qPow(1.25f, m_zoomLevel) * m_edgeScale * u0 / 5.0f);
+    float y2 = (y1 - qPow(1.25f, m_zoomLevel) * m_edgeScale * u1 / 5.0f);
+
+    float l1 = qSqrt((x1 - x2)*(x1 - x2) + (y1 - y2)*(y1 - y2));
+    float l2 = l1 / 2;
+        
+    // rotate around the pivot point
+    float th = qDegreesToRadians(28.0f);
+    float x3 = x1 + (l2/l1) * (x2 - x1) * qCos(th) + (y2 - y1) * qSin(th);
+    float y3 = y1 + (l2/l1) * (y2 - y1) * qCos(th) - (x2 - x1) * qSin(th);
+        
+    float x4 = x1 + (l2/l1) * (x2 - x1) * qCos(th) - (y2 - y1) * qSin(th);
+    float y4 = y1 + (l2/l1) * (y2 - y1) * qCos(th) + (x2 - x1) * qSin(th);
+        
+    QPainterPath arr_head;
+    arr_head.moveTo(x1, y1);
+    arr_head.lineTo(x3, y3);
+    arr_head.lineTo(x4, y4);
+    arr_head.lineTo(x1, y1);
+        
+    painter.fillPath (arr_head, QBrush (col));   
 }
 
 void GraphView::drawSelectedStar(QPainter& painter, double nodeRadius) const
@@ -269,7 +311,10 @@ void GraphView::drawSelectedStar(QPainter& painter, double nodeRadius) const
     // highlight immediate edges
     painter.setPen(QPen(Qt::darkGray, m_edgePen.width() + 3));
     for (auto const& ep : m_selectedStar.edges) {
-        painter.drawLine(ep.second);
+        if (m_directed) {
+            drawArrow(painter, Qt::darkGray, QPoint(ep.second.x1(), ep.second.y1()), QPoint(ep.second.x2(), ep.second.y2()));
+        }
+        painter.drawLine(m_selectedStar.xy.x(), m_selectedStar.xy.y(), ep.second.x2(), ep.second.y2());
     }
 
     // draw selected node
