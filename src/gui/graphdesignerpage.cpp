@@ -115,6 +115,11 @@ void GraphDesignerPage::changedAttrsScope(const AttrsType type, AttributesScope 
     QString errstrng;
 
     changedGraphAttrs(m_numNodes, m_selectedGraphKey, m_graphType, m_graphAttrHeader, m_graphAttrValues, errstrng);
+
+    if (!errstrng.isEmpty()) {
+        QMessageBox::warning(this, "Graph Generator",
+            "Error when parsing the attributes: " + errstrng);
+    }
 }
 
 void GraphDesignerPage::changedGraphAttrs(const int numNodes, PluginKey selectedGraphKey, GraphType graphType,

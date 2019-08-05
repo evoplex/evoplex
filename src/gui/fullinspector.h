@@ -37,7 +37,7 @@ public:
    
 public slots:
     void slotClear();
-    void slotSelectedNode(Node& node);
+    void slotSelectedNode(const Node& node);
 
 private:
     QWidget* m_parent;

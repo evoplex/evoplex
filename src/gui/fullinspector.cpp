@@ -44,7 +44,7 @@ void FullInspector::slotClear() {
     hide();
 }
 
-void FullInspector::slotSelectedNode(Node& node)
+void FullInspector::slotSelectedNode(const Node& node)
 {
     show();
 
