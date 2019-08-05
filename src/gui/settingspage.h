@@ -44,6 +44,7 @@ private slots:
     void setDfCMapName(const QString& name);
     void setDfCMapSize(const QString& sz);
     void resetDefaults();
+    void slotChangeToGerman();
 
 private:
     Ui_SettingsPage* m_ui;
