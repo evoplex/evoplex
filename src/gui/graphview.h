@@ -1,28 +1,27 @@
 /**
- *  This file is part of Evoplex.
- *
- *  Evoplex is a multi-agent system for networks.
- *  Copyright (C) 2018 - Marcos Cardinot <marcos@cardinot.net>
- *
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+*  This file is part of Evoplex.
+*
+*  Evoplex is a multi-agent system for networks.
+*  Copyright (C) 2018 - Marcos Cardinot <marcos@cardinot.net>
+*
+*  This program is free software: you can redistribute it and/or modify
+*  it under the terms of the GNU General Public License as published by
+*  the Free Software Foundation, either version 3 of the License, or
+*  (at your option) any later version.
+*
+*  This program is distributed in the hope that it will be useful,
+*  but WITHOUT ANY WARRANTY; without even the implied warranty of
+*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*  GNU General Public License for more details.
+*
+*  You should have received a copy of the GNU General Public License
+*  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 #ifndef GRAPHVIEW_H
 #define GRAPHVIEW_H
 
 #include "basegraphgl.h"
-#include "fullinspector.h"
 
 namespace evoplex {
 
@@ -53,8 +52,8 @@ private slots:
 
 private:
     int m_edgeAttr;
+    const int m_maxSelectedNodes;
 
-    FullInspector* m_inspector;
     ColorMap* m_edgeCMap;
     qreal m_edgeScale;
 
@@ -68,14 +67,15 @@ private:
     struct Star {
         Node node;
         QPointF xy;
-        std::vector<std::pair<Edge,QLineF>> edges;
+        std::vector<std::pair<Edge, QLineF>> edges;
         Star() {}
-        Star(Node n, QPointF xy, std::vector<std::pair<Edge,QLineF>> e)
+        Star(Node n, QPointF xy, std::vector<std::pair<Edge, QLineF>> e)
             : node(n), xy(xy), edges(e) {}
     };
     std::vector<Star> m_cache;
-    Star m_lastSelectedStar;
-    std::vector<Star> m_selectedStars;
+    Star m_selectedStar;
+
+    std::map<int, Node> m_selectedNodes;
 
     Star createStar(const Node& node, const qreal& edgeSizeRate, const QPointF& xy);
 
@@ -90,27 +90,36 @@ private:
 };
 
 inline Node GraphView::selectedNode() const
-{ return m_lastSelectedStar.node; }
+{
+    return m_selectedStar.node;
+}
 
 inline QPointF GraphView::selectedNodePos() const
-{ return m_lastSelectedStar.xy + m_origin; }
+{
+    return m_selectedStar.xy + m_origin;
+}
 
 inline void GraphView::clearSelection()
-{ 
-    m_lastSelectedStar = Star();
-    BaseGraphGL::clearSelection(); 
+{
+    m_selectedStar = Star();
+    BaseGraphGL::clearSelection();
     m_selectedNodes.clear();
-    m_selectedStars.clear();
 }
 
 inline void GraphView::zoomIn()
-{ updateNodePen(); BaseGraphGL::zoomIn(); }
+{
+    updateNodePen(); BaseGraphGL::zoomIn();
+}
 
 inline void GraphView::zoomOut()
-{ updateNodePen(); BaseGraphGL::zoomOut(); }
+{
+    updateNodePen(); BaseGraphGL::zoomOut();
+}
 
 inline qreal GraphView::currEdgeSize() const
-{ return m_edgeScale * std::pow(1.25f, m_zoomLevel); }
+{
+    return m_edgeScale * std::pow(1.25f, m_zoomLevel);
+}
 
 inline QPointF GraphView::nodePoint(const Node& node, const qreal& edgeSizeRate) const
 {

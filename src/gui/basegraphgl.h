@@ -37,6 +37,7 @@
 #include "colormap.h"
 #include "experimentwidget.h"
 #include "fullinspector.h"
+
 #include "maingui.h"
 
 class Ui_BaseGraphGL;
@@ -53,7 +54,6 @@ enum class CacheStatus {
 };
 
 enum class SelectionMode {
-    Default = -1,   // used in experiment designer, opens the 'light' inspector
     Select = 0,     // Select mode
     NodeEdit = 1,   // Node tool
     EdgeEdit = 2    // Edge tool
@@ -84,9 +84,9 @@ public:
     void paint(QPaintDevice* device, bool paintBackground) const;
 
     inline int currStep() const { return m_currStep; }
+    inline void setInspector(FullInspector* inspector);
     std::map<int, Node> m_selectedNodes; //TODO: This shouldn't be public
-    inline void setInspector(FullInspector* inspector) { m_inspector = inspector; }
-    void updateFullInspector();
+//    void updateFullInspector();
 
 protected:
     explicit BaseGraphGL(QWidget* parent);
@@ -153,6 +153,7 @@ private:
     SelectionMode m_curMode;
     std::vector<std::shared_ptr<AttrWidget>> m_attrWidgets;
     FullInspector* m_inspector;
+    bool m_fullInspectorVisible;
 
     void attrValueChanged(int attrId) const;
 
@@ -162,6 +163,11 @@ private:
     void updateEdgeInspector(const Edge& edge);
     void updateEdgesInspector(const Node& pnode, const Node& cnode);
 };
+
+inline void BaseGraphGL::setInspector(FullInspector* inspector) {
+    m_fullInspectorVisible = true;
+    m_inspector = inspector;
+}
 
 inline void BaseGraphGL::paintEvent(QPaintEvent*)
 { paint(this, true); }

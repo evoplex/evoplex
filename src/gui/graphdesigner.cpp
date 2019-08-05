@@ -58,7 +58,6 @@ GraphDesigner::GraphDesigner(MainGUI* mainGUI, GraphDesignerPage* parent)
 
     m_innerWindow->setObjectName("graphDesignerViewWindow");
     m_innerWindow->setDockNestingEnabled(false);
-    slotChangeSelectionMode(SelectionMode::Select);
 
     QVBoxLayout* layout = new QVBoxLayout(new QWidget(this));
     layout->setMargin(0);

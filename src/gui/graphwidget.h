@@ -52,6 +52,7 @@ public:
 
     void setup(AbstractGraph* abstractGraph, AttributesScope nodeAttrsScope, AttributesScope edgeAttrsScope);
     void changeSelectionMode(SelectionMode m);
+
     void setViewInspector(FullInspector* inspector);
 
     inline BaseGraphGL* view() const;
