@@ -45,7 +45,6 @@ class Ui_BaseGraphGL;
 namespace evoplex {
 
 class GraphWidget;
-class FullInspector;
 
 enum class CacheStatus {
     Ready,

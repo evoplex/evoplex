@@ -30,20 +30,20 @@ namespace evoplex {
 // (cardinot) TODO: nodeAttrsScope should not be here
 BaseGraphGL::BaseGraphGL(QWidget* parent)
     : QOpenGLWidget(parent),
-    m_ui(new Ui_BaseGraphGL),
-    m_abstractGraph(nullptr),
-    m_isReadOnly(false),
-    m_currStep(-1),
-    m_nodeAttr(-1),
-    m_nodeCMap(nullptr),
-    m_background(QColor(239, 235, 231)),
-    m_zoomLevel(0.f),
-    m_nodeScale(10.),
-    m_nodeRadius(m_nodeScale),
-    m_origin(m_nodeScale, m_nodeScale),
-    m_cacheStatus(CacheStatus::Ready),
-    m_posEntered(0, 0),
-    m_curMode(SelectionMode::Select)
+      m_ui(new Ui_BaseGraphGL),
+      m_abstractGraph(nullptr),
+      m_isReadOnly(false),
+      m_currStep(-1),
+      m_nodeAttr(-1),
+      m_nodeCMap(nullptr),
+      m_background(QColor(239,235,231)),
+      m_zoomLevel(0.f),
+      m_nodeScale(10.),
+      m_nodeRadius(m_nodeScale),
+      m_origin(m_nodeScale, m_nodeScale),
+      m_cacheStatus(CacheStatus::Ready),
+      m_posEntered(0,0),
+      m_curMode(SelectionMode::Select)
 {
     m_ui->setupUi(this);
 
