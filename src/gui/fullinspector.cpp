@@ -18,12 +18,14 @@
 *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <QDockWidget>
+
 #include "fullinspector.h"
 #include "ui_fullinspector.h"
 
 namespace evoplex {
 
-FullInspector::FullInspector(GraphDesignerPage* parent)
+FullInspector::FullInspector(QWidget* parent)
     : QDockWidget(parent),
     m_ui(new Ui_FullInspector),
     m_parent(parent)
@@ -36,13 +38,17 @@ FullInspector::~FullInspector()
     delete m_ui;
 }
 
-void FullInspector::updateInspector(QStringList ids)
-{
+void FullInspector::slotClear() {
     m_ui->ids->clear();
+    
+    hide();
+}
 
-    for (auto id : ids) {
-        m_ui->ids->addItem(id);
-    }
+void FullInspector::slotSelectedNode(Node& node)
+{
+    show();
+
+    m_ui->ids->addItem(QString::number(node.id()));
 }
 
 }

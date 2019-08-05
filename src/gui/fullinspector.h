@@ -21,10 +21,7 @@
 #ifndef FULL_INSPECTOR_H
 #define FULL_INSPECTOR_H
 
-#include <QStringList>
-
-#include "graphdesigner.h"
-#include "graphdesignerpage.h"
+#include "core/include/node.h"
 
 class Ui_FullInspector;
 
@@ -35,13 +32,15 @@ class FullInspector : public QDockWidget
     Q_OBJECT
     
 public:
-    explicit FullInspector(GraphDesignerPage* parent);
+    explicit FullInspector(QWidget* parent);
     ~FullInspector();
-    
-    void updateInspector(QStringList ids);
+   
+public slots:
+    void slotClear();
+    void slotSelectedNode(Node& node);
 
 private:
-    GraphDesignerPage* m_parent;
+    QWidget* m_parent;
     Ui_FullInspector* m_ui;
 };
 

@@ -65,6 +65,8 @@ GraphDesigner::GraphDesigner(MainGUI* mainGUI, GraphDesignerPage* parent)
     layout->addWidget(m_innerWindow);
     
     m_curGraph->setViewInspector(parent->fullInspector());
+    connect(m_curGraph->view(), SIGNAL(nodeSelected(Node&)), parent->fullInspector(), SLOT(slotSelectedNode(Node&)));
+    connect(m_curGraph->view(), SIGNAL(clearedSelected()), parent->fullInspector(), SLOT(slotClear()));
 
     setWidget(layout->parentWidget());
 }

@@ -120,12 +120,11 @@ void BaseGraphGL::slotSelectNode(int nodeid)
     try {
         Node node = m_abstractGraph->node(nodeid);
         selectNode(node, m_bCenter->isChecked());
-    }
-    catch (std::out_of_range) {
+        emit(nodeSelected(node));
+    } catch (std::out_of_range) {
         if (selectedNode().isNull()) {
             clearSelection();
-        }
-        else {
+        } else {
             m_ui->nodeId->setValue(selectedNode().id());
         }
     }
@@ -190,8 +189,7 @@ void BaseGraphGL::attrValueChanged(int attrId) const
         node.setAttr(aw->id(), v);
         // let the other widgets aware that they all need to be updated
         emit(updateWidgets(true));
-    }
-    else {
+    } else {
         aw->blockSignals(true);
         aw->setValue(node.attr(aw->id()));
         aw->blockSignals(false);
@@ -358,22 +356,19 @@ void BaseGraphGL::mouseReleaseEvent(QMouseEvent *e)
             if (!nodeCur.isNull() && !prevSelection.isNull() && nodeCur != prevSelection && e->modifiers().testFlag(Qt::ControlModifier)) {
                 updateEdgesInspector(nodeCur, prevSelection);
                 m_bCenter->isChecked() ? updateCache() : update();
-            }
-            else if (e->pos() == m_posEntered) {
+            } else if (e->pos() == m_posEntered) {
                 clearSelection();
                 if (!node.isNull() && prevSelection != node) {
                     updateInspector(node);
                     selectNode(e->localPos(), m_bCenter->isChecked());
                     m_bCenter->isChecked() ? updateCache() : update();
                 }
-            }
-            else {
+            } else {
                 m_origin += (e->pos() - m_posEntered);
                 clearSelection();
                 updateCache();
             }
-        }
-        else if (e->button() == Qt::RightButton && m_nodeAttr >= 0 && !m_isReadOnly) {
+        } else if (e->button() == Qt::RightButton && m_nodeAttr >= 0 && !m_isReadOnly) {
             Node node = selectNode(e->localPos(), false);
             if (!node.isNull()) {
                 const QString& attrName = node.attrs().name(m_nodeAttr);
@@ -392,11 +387,9 @@ void BaseGraphGL::keyPressEvent(QKeyEvent* e)
     if (e->modifiers().testFlag(Qt::ControlModifier)) {
         if (e->key() == Qt::Key_0) {
             resetView();
-        }
-        else if (e->key() == Qt::Key_Plus || e->key() == Qt::Key_Equal) {
+        } else if (e->key() == Qt::Key_Plus || e->key() == Qt::Key_Equal) {
             zoomIn();
-        }
-        else if (e->key() == Qt::Key_Minus || e->key() == Qt::Key_Underscore) {
+        } else if (e->key() == Qt::Key_Minus || e->key() == Qt::Key_Underscore) {
             zoomOut();
         }
         QOpenGLWidget::keyPressEvent(e);
@@ -410,14 +403,11 @@ void BaseGraphGL::keyPressEvent(QKeyEvent* e)
 
     if (e->key() == Qt::Key_Right) {
         m_origin.rx() += increment;
-    }
-    else if (e->key() == Qt::Key_Left) {
+    } else if (e->key() == Qt::Key_Left) {
         m_origin.rx() -= increment;
-    }
-    else if (e->key() == Qt::Key_Up) {
+    } else if (e->key() == Qt::Key_Up) {
         m_origin.ry() -= increment;
-    }
-    else if (e->key() == Qt::Key_Down) {
+    } else if (e->key() == Qt::Key_Down) {
         m_origin.ry() += increment;
     }
     QOpenGLWidget::keyPressEvent(e);
@@ -529,6 +519,8 @@ void BaseGraphGL::updateInspector(const Node& node)
 
 void BaseGraphGL::clearSelection()
 {
+    emit(clearedSelected());
+
     if (m_ui->inspector->isVisible()) {
         m_ui->inspector->hide();
         update();

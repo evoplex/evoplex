@@ -123,6 +123,8 @@ protected:
     void keyReleaseEvent(QKeyEvent* e) override;
 
 signals:
+    void nodeSelected(Node&);
+    void clearedSelected();
     void updateWidgets(bool) const;
 
 public slots:
