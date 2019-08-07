@@ -24,14 +24,13 @@
 #include <QMainWindow>
 #include <QStringList>
 
+#include "core/include/abstractgraph.h"
+#include "core/include/attributerange.h"
 #include "core/include/enum.h"
 #include "core/mainapp.h"
 #include "core/graphinputs.h"
 
 #include "maingui.h"
-#include "abstractgraph.h"
-#include "attributerange.h"
-#include "fullinspector.h"
 
 class Ui_GraphDesignerPage;
 

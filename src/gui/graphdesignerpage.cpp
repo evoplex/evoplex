@@ -29,6 +29,7 @@
 
 #include "enum.h"
 #include "fontstyles.h"
+#include "fullinspector.h"
 #include "graphattrsdlg.h"
 #include "graphdesignerpage.h"
 #include "graphdesigner.h"
@@ -39,12 +40,12 @@ namespace evoplex {
 
 GraphDesignerPage::GraphDesignerPage(MainGUI* mainGUI)
     : QMainWindow(mainGUI),
-    m_mainApp(mainGUI->mainApp()),
-    m_mainGUI(mainGUI),
-    m_innerWindow(new QMainWindow()),
-    m_ui(new Ui_GraphDesignerPage),
-    m_inspector(new FullInspector(this)),
-    m_graphDesigner(new GraphDesigner(mainGUI, this))
+      m_mainApp(mainGUI->mainApp()),
+      m_mainGUI(mainGUI),
+      m_innerWindow(new QMainWindow()),
+      m_ui(new Ui_GraphDesignerPage),
+      m_inspector(new FullInspector(this)),
+      m_graphDesigner(new GraphDesigner(mainGUI, this))
 {
     setWindowTitle("Graph Designer Page");
     setObjectName("GraphDesignerPage");
@@ -66,8 +67,8 @@ GraphDesignerPage::GraphDesignerPage(MainGUI* mainGUI)
     connect(m_ui->acNodeTool, &QAction::triggered, [this]() { this->m_graphDesigner->slotChangeSelectionMode(SelectionMode::NodeEdit); });
     connect(m_ui->acEdgeTool, &QAction::triggered, [this]() { this->m_graphDesigner->slotChangeSelectionMode(SelectionMode::EdgeEdit); });
     
-    connect(m_graphDesigner->graphView(), SIGNAL(nodeSelected(const Node&)), fullInspector(), SLOT(slotSelectedNode(const Node&)));
-    connect(m_graphDesigner->graphView(), SIGNAL(clearedSelected()), fullInspector(), SLOT(slotClear()));
+    connect(m_graphDesigner->graphView(), SIGNAL(nodeSelected(const Node&)), m_inspector, SLOT(slotSelectedNode(const Node&)));
+    connect(m_graphDesigner->graphView(), SIGNAL(clearedSelected()), m_inspector, SLOT(slotClear()));
 
     setCentralWidget(m_graphDesigner);
 

@@ -21,7 +21,6 @@
 #ifndef BASEGRAPHGL_H
 #define BASEGRAPHGL_H
 
-#include <map>
 #include <memory>
 #include <vector>
 
@@ -83,7 +82,6 @@ public:
     void paint(QPaintDevice* device, bool paintBackground) const;
 
     inline int currStep() const { return m_currStep; }
-    inline void setInspector(FullInspector* inspector);
 
 protected:
     explicit BaseGraphGL(QWidget* parent);

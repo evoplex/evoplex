@@ -31,10 +31,6 @@
 
 namespace evoplex {
 
-class BaseGraphGL;
-class GraphWidget;
-enum class SelectionMode;
-
 class GraphWidget : public QDockWidget
 {
     Q_OBJECT
