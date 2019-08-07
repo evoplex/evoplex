@@ -31,6 +31,7 @@ FullInspector::FullInspector(QWidget* parent)
       m_parent(parent)
 {
     m_ui->setupUi(this);
+    m_ui->inspectorContents->hide();
 }
 
 FullInspector::~FullInspector() 
@@ -40,13 +41,15 @@ FullInspector::~FullInspector()
 
 void FullInspector::slotClear() {
     m_ui->ids->clear();
-    
-    hide();
+
+    m_ui->textMsg->show();
+    m_ui->inspectorContents->hide();
 }
 
 void FullInspector::slotSelectedNode(const Node& node)
 {
-    show();
+    m_ui->textMsg->hide();
+    m_ui->inspectorContents->show();
 
     m_ui->ids->addItem(QString::number(node.id()));
 }

@@ -13,7 +13,7 @@
   <property name="minimumSize">
    <size>
     <width>300</width>
-    <height>278</height>
+    <height>306</height>
    </size>
   </property>
   <property name="features">
@@ -34,7 +34,29 @@
      <number>0</number>
     </property>
     <item>
-     <widget class="QWidget" name="gridWidget" native="true">
+     <widget class="QPlainTextEdit" name="textMsg">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::NoFrame</enum>
+      </property>
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
+      <property name="plainText">
+       <string>Nothing  selected</string>
+      </property>
+      <property name="backgroundVisible">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QWidget" name="inspectorContents" native="true">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
       <layout class="QGridLayout" name="gridLayout">
        <property name="leftMargin">
         <number>20</number>
@@ -64,13 +86,6 @@
        <item row="2" column="1">
         <layout class="QFormLayout" name="attrs"/>
        </item>
-       <item row="2" column="0">
-        <widget class="QLabel" name="lattrs">
-         <property name="text">
-          <string>Attributes:</string>
-         </property>
-        </widget>
-       </item>
        <item row="0" column="1">
         <widget class="QListWidget" name="ids">
          <property name="baseSize">
@@ -93,6 +108,13 @@
           </size>
          </property>
         </spacer>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="lattrs">
+         <property name="text">
+          <string>Attributes:</string>
+         </property>
+        </widget>
        </item>
       </layout>
      </widget>
