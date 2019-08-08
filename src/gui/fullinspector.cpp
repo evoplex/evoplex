@@ -54,4 +54,14 @@ void FullInspector::slotSelectedNode(const Node& node)
     m_ui->ids->addItem(QString::number(node.id()));
 }
 
+void FullInspector::slotHide()
+{
+    hide();
+}
+
+void FullInspector::slotShow()
+{
+    show();
+}
+
 }

@@ -126,6 +126,7 @@ public slots:
     virtual void zoomIn();
     virtual void zoomOut();
 
+    void slotFullInspectorVisible(int visible);
     void setCurrentStep(int step);
     void setCurrentSelectionMode(SelectionMode m);
     void setNodeScale(int v);

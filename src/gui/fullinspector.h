@@ -39,6 +39,8 @@ public:
    
 public slots:
     void slotClear();
+    void slotHide();
+    void slotShow();
     void slotSelectedNode(const Node& node);
 
 private:

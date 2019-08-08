@@ -20,6 +20,7 @@
 
 #include <QAction>
 #include <QActionGroup> 
+#include <QCheckBox>
 #include <QDebug>
 #include <QToolBar>
 #include <QToolButton>
@@ -51,6 +52,15 @@ GraphDesignerPage::GraphDesignerPage(MainGUI* mainGUI)
     setObjectName("GraphDesignerPage");
     m_ui->setupUi(this);
 
+    QCheckBox* inspVisible = new QCheckBox("Full Inspector Visible", m_ui->toolbar);
+
+    QWidget *spacerWidget = new QWidget(this);
+    spacerWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+    spacerWidget->setVisible(true);
+
+    m_ui->toolbar->addWidget(spacerWidget);
+    m_ui->toolbar->addWidget(inspVisible);
+
     QActionGroup* toolbarGroup = new QActionGroup(this);
     toolbarGroup->addAction(m_ui->acSelectTool);
     toolbarGroup->addAction(m_ui->acNodeTool);
@@ -67,12 +77,21 @@ GraphDesignerPage::GraphDesignerPage(MainGUI* mainGUI)
     connect(m_ui->acNodeTool, &QAction::triggered, [this]() { this->m_graphDesigner->slotChangeSelectionMode(SelectionMode::NodeEdit); });
     connect(m_ui->acEdgeTool, &QAction::triggered, [this]() { this->m_graphDesigner->slotChangeSelectionMode(SelectionMode::EdgeEdit); });
     
+    connect(inspVisible, SIGNAL(stateChanged(int)), m_graphDesigner->graphView(), SLOT(slotFullInspectorVisible(int)));
+    connect(inspVisible, &QCheckBox::stateChanged, [this](int vis) {
+        if (vis) {
+            this->m_inspector->slotShow();
+        } else {
+            this->m_inspector->slotHide();
+        }});
+
     connect(m_graphDesigner->graphView(), SIGNAL(nodeSelected(const Node&)), m_inspector, SLOT(slotSelectedNode(const Node&)));
     connect(m_graphDesigner->graphView(), SIGNAL(clearedSelected()), m_inspector, SLOT(slotClear()));
 
     setCentralWidget(m_graphDesigner);
 
     addDockWidget(Qt::RightDockWidgetArea, m_inspector);
+    m_inspector->hide();
 }
 
 GraphDesignerPage::~GraphDesignerPage()

@@ -43,7 +43,8 @@ BaseGraphGL::BaseGraphGL(QWidget* parent)
       m_origin(m_nodeScale, m_nodeScale),
       m_cacheStatus(CacheStatus::Ready),
       m_posEntered(0,0),
-      m_curMode(SelectionMode::Select)
+      m_curMode(SelectionMode::Select),
+      m_fullInspectorVisible(false)
 {
     m_ui->setupUi(this);
 
@@ -113,6 +114,14 @@ void BaseGraphGL::paint(QPaintDevice* device, bool paintBackground) const
         paintFrame(painter);
     }
     painter.end();
+}
+
+void BaseGraphGL::slotFullInspectorVisible(int visible)
+{
+    m_fullInspectorVisible = visible;
+
+    clearSelection();
+    updateCache();
 }
 
 void BaseGraphGL::slotSelectNode(int nodeid)
@@ -440,18 +449,26 @@ void BaseGraphGL::resizeEvent(QResizeEvent* e)
 
 void BaseGraphGL::updateEdgeInspector(const Edge& edge)
 {
+    if (m_fullInspectorVisible) {
+        return;
+    }
+
     m_ui->inspector->setCurrentIndex(1);
 
     m_ui->edgeId->setText(QString::number(edge.id()));
-
+    
     m_ui->inspector->show();
     m_ui->inspector->adjustSize();
     m_inspGeo = m_ui->inspector->frameGeometry();
-    m_inspGeo += QMargins(5, 5, 5, 5);
+    m_inspGeo += QMargins(5, 5, 5, 5);   
 }
 
 void BaseGraphGL::updateEdgesInspector(const Node& srcNode, const Node& trgtNode)
 {
+    if (m_fullInspectorVisible) {
+        return;
+    }
+
     m_ui->edgesList->clear();
     QSet<int> edges;
 
@@ -487,6 +504,9 @@ void BaseGraphGL::updateEdgesInspector(const Node& srcNode, const Node& trgtNode
 
 void BaseGraphGL::updateInspector(const Node& node)
 {
+    if (!m_fullInspectorVisible) {
+        m_ui->inspector->show();
+    }
     m_ui->inspector->setCurrentIndex(0);
     QSet<int> neighbors;
     QSet<int> edges;
@@ -510,7 +530,6 @@ void BaseGraphGL::updateInspector(const Node& node)
         aw->setValue(node.attr(aw->id()));
         aw->blockSignals(false);
     }
-
     m_ui->inspector->show();
     m_ui->inspector->adjustSize();
     m_inspGeo = m_ui->inspector->frameGeometry();
