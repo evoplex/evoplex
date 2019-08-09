@@ -23,7 +23,10 @@
 
 #include <QDockWidget>
 
+#include "core/include/attributerange.h"
 #include "core/include/node.h"
+
+#include "attrwidget.h"
 
 class Ui_FullInspector;
 
@@ -42,10 +45,15 @@ public slots:
     void slotHide();
     void slotShow();
     void slotSelectedNode(const Node& node);
+    void slotChangeAttrScope(AttributesScope nodeAttrScope);
+
 
 private:
     QWidget* m_parent;
     Ui_FullInspector* m_ui;
+    std::vector<std::shared_ptr<AttrWidget>> m_attrWidgets;
+
+    void attrValueChanged(int attrId) const;
 };
 
 }

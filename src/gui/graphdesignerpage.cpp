@@ -85,7 +85,10 @@ GraphDesignerPage::GraphDesignerPage(MainGUI* mainGUI)
             this->m_inspector->slotHide();
         }});
 
-    connect(m_graphDesigner->graphView(), SIGNAL(nodeSelected(const Node&)), m_inspector, SLOT(slotSelectedNode(const Node&)));
+    connect(m_graphDesigner->graphView(), &GraphView::nodeSelected, [this](const Node& node) {
+        this->m_inspector->slotSelectedNode(node);
+    });
+
     connect(m_graphDesigner->graphView(), SIGNAL(clearedSelected()), m_inspector, SLOT(slotClear()));
 
     setCentralWidget(m_graphDesigner);
@@ -132,6 +135,7 @@ void GraphDesignerPage::changedAttrsScope(const AttrsType type, AttributesScope 
         m_edgeAttrScope = attrs;
     } else if (type == AttrsType::Nodes) {
         m_nodeAttrScope = attrs;
+        m_inspector->slotChangeAttrScope(m_nodeAttrScope);
     }
     
     QString errstrng;

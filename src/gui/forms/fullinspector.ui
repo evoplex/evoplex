@@ -13,7 +13,7 @@
   <property name="minimumSize">
    <size>
     <width>300</width>
-    <height>306</height>
+    <height>323</height>
    </size>
   </property>
   <property name="features">
@@ -36,7 +36,7 @@
     <item>
      <widget class="QPlainTextEdit" name="textMsg">
       <property name="enabled">
-       <bool>false</bool>
+       <bool>true</bool>
       </property>
       <property name="frameShape">
        <enum>QFrame::NoFrame</enum>
@@ -53,9 +53,16 @@
      </widget>
     </item>
     <item>
+     <widget class="QLabel" name="lids">
+      <property name="text">
+       <string>Ids:</string>
+      </property>
+     </widget>
+    </item>
+    <item>
      <widget class="QWidget" name="inspectorContents" native="true">
       <property name="enabled">
-       <bool>false</bool>
+       <bool>true</bool>
       </property>
       <layout class="QGridLayout" name="gridLayout">
        <property name="leftMargin">
@@ -76,26 +83,6 @@
        <property name="verticalSpacing">
         <number>30</number>
        </property>
-       <item row="0" column="0">
-        <widget class="QLabel" name="lids">
-         <property name="text">
-          <string>Ids:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="1">
-        <layout class="QFormLayout" name="attrs"/>
-       </item>
-       <item row="0" column="1">
-        <widget class="QListWidget" name="ids">
-         <property name="baseSize">
-          <size>
-           <width>0</width>
-           <height>0</height>
-          </size>
-         </property>
-        </widget>
-       </item>
        <item row="3" column="1">
         <spacer name="verticalSpacer">
          <property name="orientation">
@@ -111,10 +98,39 @@
        </item>
        <item row="1" column="0">
         <widget class="QLabel" name="lattrs">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>20</width>
+           <height>0</height>
+          </size>
+         </property>
          <property name="text">
           <string>Attributes:</string>
          </property>
         </widget>
+       </item>
+       <item row="0" column="0" colspan="2">
+        <widget class="QListWidget" name="ids">
+         <property name="baseSize">
+          <size>
+           <width>0</width>
+           <height>0</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0" colspan="2">
+        <layout class="QFormLayout" name="attrs">
+         <property name="formAlignment">
+          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+         </property>
+        </layout>
        </item>
       </layout>
      </widget>

@@ -504,9 +504,6 @@ void BaseGraphGL::updateEdgesInspector(const Node& srcNode, const Node& trgtNode
 
 void BaseGraphGL::updateInspector(const Node& node)
 {
-    if (!m_fullInspectorVisible) {
-        m_ui->inspector->show();
-    }
     m_ui->inspector->setCurrentIndex(0);
     QSet<int> neighbors;
     QSet<int> edges;
@@ -530,10 +527,12 @@ void BaseGraphGL::updateInspector(const Node& node)
         aw->setValue(node.attr(aw->id()));
         aw->blockSignals(false);
     }
-    m_ui->inspector->show();
-    m_ui->inspector->adjustSize();
-    m_inspGeo = m_ui->inspector->frameGeometry();
-    m_inspGeo += QMargins(5, 5, 5, 5);
+    if (!m_fullInspectorVisible) {
+        m_ui->inspector->show();
+        m_ui->inspector->adjustSize();
+        m_inspGeo = m_ui->inspector->frameGeometry();
+        m_inspGeo += QMargins(5, 5, 5, 5);
+    }
 }
 
 void BaseGraphGL::clearSelection()
