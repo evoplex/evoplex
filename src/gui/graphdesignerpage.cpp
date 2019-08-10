@@ -85,7 +85,7 @@ GraphDesignerPage::GraphDesignerPage(MainGUI* mainGUI)
             this->m_inspector->slotHide();
         }});
 
-    connect(m_graphDesigner->graphView(), &GraphView::nodeSelected, [this](const Node& node) {
+    connect(m_graphDesigner->graphView(), &GraphView::nodeSelected, [this](Node& node) {
         this->m_inspector->slotSelectedNode(node);
     });
 

@@ -77,13 +77,28 @@ void FullInspector::slotChangeAttrScope(AttributesScope nodeAttrScope)
 
 void FullInspector::attrValueChanged(int attrId) const
 {
-    //TODO
+    std::shared_ptr<AttrWidget> aw;
+    try { aw = m_attrWidgets.at(attrId); }
+    catch (std::out_of_range) { return; }
+    
+    for (Node node : m_selectedNodes) {
+        Value v = aw->validate();
+        if (v.isValid()) {
+            node.setAttr(aw->id(), v);
+        }
+        else {
+            aw->blockSignals(true);
+            aw->setValue(node.attr(aw->id()));
+            aw->blockSignals(false);
+        }
+    }
 }
 
-void FullInspector::slotSelectedNode(const Node& node)
+void FullInspector::slotSelectedNode(Node& node)
 {
     m_ui->textMsg->hide();
     m_ui->inspectorContents->show();
+    m_selectedNodes.push_back(node);
 
     m_ui->ids->addItem(QString::number(node.id()));
 

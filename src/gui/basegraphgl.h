@@ -118,7 +118,7 @@ protected:
     void keyReleaseEvent(QKeyEvent* e) override;
 
 signals:
-    void nodeSelected(const Node&);
+    void nodeSelected(Node&);
     void clearedSelected();
     void updateWidgets(bool) const;
 
