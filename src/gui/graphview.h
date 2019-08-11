@@ -76,7 +76,6 @@ private:
     Star m_selectedStar;
 
     std::map<int, Node> m_selectedNodes;
-    
     Star createStar(const Node& node, const qreal& edgeSizeRate, const QPointF& xy);
 
     void drawNode(QPainter& painter, const Star& s, double r) const;
@@ -96,9 +95,9 @@ inline QPointF GraphView::selectedNodePos() const
 { return m_selectedStar.xy + m_origin; }
 
 inline void GraphView::clearSelection()
-{ 
+{
     m_selectedStar = Star();
-    BaseGraphGL::clearSelection(); 
+    BaseGraphGL::clearSelection();
     m_selectedNodes.clear();
 }
 

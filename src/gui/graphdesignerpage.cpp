@@ -20,6 +20,7 @@
 
 #include <QAction>
 #include <QActionGroup> 
+#include <QCheckBox>
 #include <QDebug>
 #include <QToolBar>
 #include <QToolButton>
@@ -29,6 +30,7 @@
 
 #include "enum.h"
 #include "fontstyles.h"
+#include "fullinspector.h"
 #include "graphattrsdlg.h"
 #include "graphdesignerpage.h"
 #include "graphdesigner.h"
@@ -39,15 +41,26 @@ namespace evoplex {
 
 GraphDesignerPage::GraphDesignerPage(MainGUI* mainGUI)
     : QMainWindow(mainGUI),
-    m_mainApp(mainGUI->mainApp()),
-    m_mainGUI(mainGUI),
-    m_innerWindow(new QMainWindow()),
-    m_ui(new Ui_GraphDesignerPage),
-    m_graphDesigner(new GraphDesigner(mainGUI, this))
+      m_mainApp(mainGUI->mainApp()),
+      m_mainGUI(mainGUI),
+      m_innerWindow(new QMainWindow()),
+      m_ui(new Ui_GraphDesignerPage),
+      m_inspector(new FullInspector(this)),
+      m_graphDesigner(new GraphDesigner(mainGUI, this)),
+      m_numNodes(-1)
 {
     setWindowTitle("Graph Designer Page");
     setObjectName("GraphDesignerPage");
     m_ui->setupUi(this);
+
+    QCheckBox* inspVisible = new QCheckBox("Full Inspector Visible", m_ui->toolbar);
+
+    QWidget *spacerWidget = new QWidget(this);
+    spacerWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+    spacerWidget->setVisible(true);
+
+    m_ui->toolbar->addWidget(spacerWidget);
+    m_ui->toolbar->addWidget(inspVisible);
 
     QActionGroup* toolbarGroup = new QActionGroup(this);
     toolbarGroup->addAction(m_ui->acSelectTool);
@@ -64,8 +77,25 @@ GraphDesignerPage::GraphDesignerPage(MainGUI* mainGUI)
     connect(m_ui->acSelectTool, &QAction::triggered, [this]() { this->m_graphDesigner->slotChangeSelectionMode(SelectionMode::Select); });
     connect(m_ui->acNodeTool, &QAction::triggered, [this]() { this->m_graphDesigner->slotChangeSelectionMode(SelectionMode::NodeEdit); });
     connect(m_ui->acEdgeTool, &QAction::triggered, [this]() { this->m_graphDesigner->slotChangeSelectionMode(SelectionMode::EdgeEdit); });
+    
+    connect(inspVisible, SIGNAL(stateChanged(int)), m_graphDesigner->graphView(), SLOT(slotFullInspectorVisible(int)));
+    connect(inspVisible, &QCheckBox::stateChanged, [this](int vis) {
+        if (vis) {
+            this->m_inspector->slotShow();
+        } else {
+            this->m_inspector->slotHide();
+        }});
+
+    connect(m_graphDesigner->graphView(), &GraphView::nodeSelected, [this](Node& node) {
+        this->m_inspector->slotSelectedNode(node);
+    });
+
+    connect(m_graphDesigner->graphView(), SIGNAL(clearedSelected()), m_inspector, SLOT(slotClear()));
 
     setCentralWidget(m_graphDesigner);
+
+    addDockWidget(Qt::RightDockWidgetArea, m_inspector);
+    m_inspector->hide();
 }
 
 GraphDesignerPage::~GraphDesignerPage()
@@ -106,11 +136,17 @@ void GraphDesignerPage::changedAttrsScope(const AttrsType type, AttributesScope 
         m_edgeAttrScope = attrs;
     } else if (type == AttrsType::Nodes) {
         m_nodeAttrScope = attrs;
+        m_inspector->slotChangeAttrScope(m_nodeAttrScope);
     }
     
     QString errstrng;
 
     changedGraphAttrs(m_numNodes, m_selectedGraphKey, m_graphType, m_graphAttrHeader, m_graphAttrValues, errstrng);
+
+    if (!errstrng.isEmpty()) {
+        QMessageBox::warning(this, "Graph Generator",
+            "Error when parsing the attributes: " + errstrng);
+    }
 }
 
 void GraphDesignerPage::changedGraphAttrs(const int numNodes, PluginKey selectedGraphKey, GraphType graphType,

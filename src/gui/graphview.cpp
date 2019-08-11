@@ -3,7 +3,7 @@
  *
  *  Evoplex is a multi-agent system for networks.
  *  Copyright (C) 2018 - Marcos Cardinot <marcos@cardinot.net>
- *
+ * 
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -171,12 +171,12 @@ void GraphView::setEdgeWidth(int v)
 void GraphView::updateNodePen()
 {
     if (m_nodeRadius < 8) {
-        m_nodePen = QColor(100,100,100,0);
+        m_nodePen = QColor(100, 100, 100, 0);
     } else if (m_nodeRadius < 13) {
         // 255/(13-8)*(x-8)
-        m_nodePen = QColor(100,100,100,51*(m_nodeRadius-8.));
+        m_nodePen = QColor(100, 100, 100, 51 * (m_nodeRadius - 8.));
     } else {
-        m_nodePen = QColor(100,100,100,255);
+        m_nodePen = QColor(100, 100, 100, 255);
     }
 }
 

@@ -1,21 +1,21 @@
 /**
- *  This file is part of Evoplex.
+ * This file is part of Evoplex.
  *
- *  Evoplex is a multi-agent system for networks.
- *  Copyright (C) 2018 - Marcos Cardinot <marcos@cardinot.net>
+ * Evoplex is a multi-agent system for networks.
+ * Copyright (C) 2018 - Marcos Cardinot <marcos@cardinot.net>
  *
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef BASEGRAPHGL_H
@@ -35,6 +35,8 @@
 
 #include "colormap.h"
 #include "experimentwidget.h"
+#include "fullinspector.h"
+
 #include "maingui.h"
 
 class Ui_BaseGraphGL;
@@ -116,12 +118,15 @@ protected:
     void keyReleaseEvent(QKeyEvent* e) override;
 
 signals:
+    void nodeSelected(Node&);
+    void clearedSelected();
     void updateWidgets(bool) const;
 
 public slots:
     virtual void zoomIn();
     virtual void zoomOut();
 
+    void slotFullInspectorVisible(int visible);
     void setCurrentStep(int step);
     void setCurrentSelectionMode(SelectionMode m);
     void setNodeScale(int v);
@@ -145,6 +150,8 @@ private:
     QRect m_inspGeo; // inspector geometry with margin
     SelectionMode m_curMode;
     std::vector<std::shared_ptr<AttrWidget>> m_attrWidgets;
+    std::map<int, Node> m_selectedNodes;
+    bool m_fullInspectorVisible;
 
     void attrValueChanged(int attrId) const;
 

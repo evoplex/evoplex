@@ -29,12 +29,16 @@
 #include "abstractgraph.h"
 #include "basegraphgl.h"
 #include "graphwidget.h"
+#include "graphview.h"
 #include "graphdesignerpage.h"
 #include "maingui.h"
 
 namespace evoplex {
 
 class GraphDesignerPage;
+class GraphWidget;
+
+enum class  SelectionMode;
 
 class BaseAbstractGraph : public AbstractGraph
 {
@@ -60,6 +64,9 @@ public slots:
     void slotExportNodes();
     void slotChangeSelectionMode(SelectionMode m);
 
+protected:
+    inline BaseGraphGL* graphView() const;
+
 private:
     MainGUI * m_mainGUI;
     MainApp* m_mainApp;
@@ -71,6 +78,8 @@ private:
     bool readyToExport();
 };
 
+inline BaseGraphGL* GraphDesigner::graphView() const
+{ return m_curGraph->view(); }
 
 }
 

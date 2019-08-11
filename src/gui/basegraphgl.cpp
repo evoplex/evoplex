@@ -1,21 +1,21 @@
 /**
- *  This file is part of Evoplex.
+ * This file is part of Evoplex.
  *
- *  Evoplex is a multi-agent system for networks.
- *  Copyright (C) 2018 - Marcos Cardinot <marcos@cardinot.net>
+ * Evoplex is a multi-agent system for networks.
+ * Copyright (C) 2018 - Marcos Cardinot <marcos@cardinot.net>
  *
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include <QtConcurrent>
@@ -43,7 +43,8 @@ BaseGraphGL::BaseGraphGL(QWidget* parent)
       m_origin(m_nodeScale, m_nodeScale),
       m_cacheStatus(CacheStatus::Ready),
       m_posEntered(0,0),
-      m_curMode(SelectionMode::Select)
+      m_curMode(SelectionMode::Select),
+      m_fullInspectorVisible(false)
 {
     m_ui->setupUi(this);
 
@@ -115,11 +116,20 @@ void BaseGraphGL::paint(QPaintDevice* device, bool paintBackground) const
     painter.end();
 }
 
+void BaseGraphGL::slotFullInspectorVisible(int visible)
+{
+    m_fullInspectorVisible = visible;
+
+    clearSelection();
+    updateCache();
+}
+
 void BaseGraphGL::slotSelectNode(int nodeid)
 {
     try {
         Node node = m_abstractGraph->node(nodeid);
         selectNode(node, m_bCenter->isChecked());
+        emit(nodeSelected(node));
     } catch (std::out_of_range) {
         if (selectedNode().isNull()) {
             clearSelection();
@@ -187,13 +197,13 @@ void BaseGraphGL::attrValueChanged(int attrId) const
     if (v.isValid()) {
         node.setAttr(aw->id(), v);
         // let the other widgets aware that they all need to be updated
-        emit (updateWidgets(true));
+        emit(updateWidgets(true));
     } else {
         aw->blockSignals(true);
         aw->setValue(node.attr(aw->id()));
         aw->blockSignals(false);
         QString err = "The input for '" + aw->attrName() +
-                "' is invalid.\nExpected: " + aw->attrRangeStr();
+            "' is invalid.\nExpected: " + aw->attrRangeStr();
         QMessageBox::warning(parentWidget(), "Graph", err);
     }
 }
@@ -413,7 +423,7 @@ void BaseGraphGL::keyPressEvent(QKeyEvent* e)
 }
 
 void BaseGraphGL::keyReleaseEvent(QKeyEvent* e)
-{   
+{
     if (!e->isAutoRepeat()) {
         updateCache();
         if (e->key() == Qt::Key_Space) {
@@ -423,7 +433,7 @@ void BaseGraphGL::keyReleaseEvent(QKeyEvent* e)
                 auto attrRange = m_nodeAttrsScope.value(attrName);
                 node.setAttr(m_nodeAttr, attrRange->next(node.attr(m_nodeAttr)));
                 updateInspector(node);
-                emit (updateWidgets(true));
+                emit(updateWidgets(true));
             }
         }
     }
@@ -439,29 +449,37 @@ void BaseGraphGL::resizeEvent(QResizeEvent* e)
 
 void BaseGraphGL::updateEdgeInspector(const Edge& edge)
 {
+    if (m_fullInspectorVisible) {
+        return;
+    }
+
     m_ui->inspector->setCurrentIndex(1);
-    
+
     m_ui->edgeId->setText(QString::number(edge.id()));
     
     m_ui->inspector->show();
     m_ui->inspector->adjustSize();
     m_inspGeo = m_ui->inspector->frameGeometry();
-    m_inspGeo += QMargins(5,5,5,5);
+    m_inspGeo += QMargins(5, 5, 5, 5);   
 }
 
 void BaseGraphGL::updateEdgesInspector(const Node& srcNode, const Node& trgtNode)
 {
+    if (m_fullInspectorVisible) {
+        return;
+    }
+
     m_ui->edgesList->clear();
     QSet<int> edges;
-    
+
     for (auto const& e : srcNode.outEdges()) {
-        if (e.second.neighbour().id() == trgtNode.id()){
+        if (e.second.neighbour().id() == trgtNode.id()) {
             edges.insert(e.first);
         }
     }
 
-    if (edges.size() == 0){
-            return;
+    if (edges.size() == 0) {
+        return;
     }
     // If there is only one edge to the target node, open the edgeInspector directly
     if (edges.size() == 1)
@@ -470,9 +488,9 @@ void BaseGraphGL::updateEdgesInspector(const Node& srcNode, const Node& trgtNode
         updateEdgeInspector(srcNode.outEdges().at(eId));
         return;
     }
-    
+
     m_ui->inspector->setCurrentIndex(2);
-    
+
     for (auto const& id : edges) {
         new QListWidgetItem(QString::number(id), m_ui->edgesList);
     }
@@ -481,7 +499,7 @@ void BaseGraphGL::updateEdgesInspector(const Node& srcNode, const Node& trgtNode
     m_ui->inspector->show();
     m_ui->inspector->adjustSize();
     m_inspGeo = m_ui->inspector->frameGeometry();
-    m_inspGeo += QMargins(5,5,5,5);
+    m_inspGeo += QMargins(5, 5, 5, 5);
 }
 
 void BaseGraphGL::updateInspector(const Node& node)
@@ -509,15 +527,18 @@ void BaseGraphGL::updateInspector(const Node& node)
         aw->setValue(node.attr(aw->id()));
         aw->blockSignals(false);
     }
-
-    m_ui->inspector->show();
-    m_ui->inspector->adjustSize();
-    m_inspGeo = m_ui->inspector->frameGeometry();
-    m_inspGeo += QMargins(5,5,5,5);
+    if (!m_fullInspectorVisible) {
+        m_ui->inspector->show();
+        m_ui->inspector->adjustSize();
+        m_inspGeo = m_ui->inspector->frameGeometry();
+        m_inspGeo += QMargins(5, 5, 5, 5);
+    }
 }
 
 void BaseGraphGL::clearSelection()
 {
+    emit(clearedSelected());
+
     if (m_ui->inspector->isVisible()) {
         m_ui->inspector->hide();
         update();

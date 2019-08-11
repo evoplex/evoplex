@@ -111,7 +111,8 @@ void GraphWidget::slotOpenSettings()
     m_settingsDlg->show();
 }
 
-void GraphWidget::changeSelectionMode(SelectionMode m) {
+void GraphWidget::changeSelectionMode(SelectionMode m) 
+{
     m_view->setCurrentSelectionMode(m);
 }
 

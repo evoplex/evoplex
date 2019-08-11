@@ -73,6 +73,13 @@ void GraphGenDlg::parseAttrs(QString& error)
         return;
     }
 
+    for (auto it = m_attrWidgets.cbegin(); it != m_attrWidgets.cend(); ++it) {
+        if (it.value()->value().toQString().isEmpty()) {
+            error = "Empty value not allowed. Make sure to fill in all the attributes.";
+            return;
+        }
+    }
+
     m_numNodes = m_ui->numNodes->value();
 
     if (m_cbgraphType->count() > 0) {
@@ -137,6 +144,8 @@ void GraphGenDlg::slotGraphSelected(int grId)
 
     // Add plugin attributes
     QHash<QString, AttributeRangePtr>::const_iterator it = graph->pluginAttrsScope().begin();
+
+    m_attrWidgets.clear();
 
     while (it != graph->pluginAttrsScope().end()) {
         AttrWidget* attrW = new AttrWidget(it.value(), this);

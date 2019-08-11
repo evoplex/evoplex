@@ -87,6 +87,7 @@ set(EVOPLEX_GUI_H
   #contextmenutable.h
   experimentdesigner.h
   experimentwidget.h
+  fullinspector.h
   graphdesigner.h
   graphattrsdlg.h
   graphgendlg.h
@@ -120,6 +121,7 @@ set(EVOPLEX_GUI_CXX
   attrwidget.cpp
   attrsgendlg.cpp
   experimentdesigner.cpp
+  fullinspector.cpp
   graphattrsdlg.cpp
   graphgendlg.cpp
   graphdesigner.cpp
@@ -155,6 +157,7 @@ set(EVOPLEX_GUI_UIFORM
   attrsgendlg
   consoletitlebar
   experimentdesigner
+  fullinspector
   basegraphgl
   graphsettings
   gridsettings
