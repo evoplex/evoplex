@@ -46,7 +46,8 @@ GraphDesignerPage::GraphDesignerPage(MainGUI* mainGUI)
       m_innerWindow(new QMainWindow()),
       m_ui(new Ui_GraphDesignerPage),
       m_inspector(new FullInspector(this)),
-      m_graphDesigner(new GraphDesigner(mainGUI, this))
+      m_graphDesigner(new GraphDesigner(mainGUI, this)),
+      m_numNodes(-1)
 {
     setWindowTitle("Graph Designer Page");
     setObjectName("GraphDesignerPage");
