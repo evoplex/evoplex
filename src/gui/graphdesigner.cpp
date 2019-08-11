@@ -76,10 +76,17 @@ void GraphDesigner::setup(GraphInputsPtr inputs, AttributesScope nodeAttrsScope,
 {
     QString error;
 
+    if (!inputs) {
+        error = "The graph inputs can't be empty";
+        QMessageBox::warning(this, "Graph Designer", error);
+        return;
+    }
+
     const auto numNodes = inputs->general(GENERAL_ATTR_NODES).toQString();
     AttrsGeneratorPtr edgeGen = AttrsGenerator::parse(edgeAttrsScope, numNodes, error);
     if (!error.isEmpty()) {
         error.prepend("Error when parsing edge attributes:\n");
+        QMessageBox::warning(this, "Graph Designer", error);
         return;
     }
 
@@ -87,12 +94,14 @@ void GraphDesigner::setup(GraphInputsPtr inputs, AttributesScope nodeAttrsScope,
     Nodes nodes = NodesPrivate::fromCmd(numNodes, nodeAttrsScope, graphType, error);
     if (!error.isEmpty()) {
         error.prepend("Error when creating nodes:\n");
+        QMessageBox::warning(this, "Graph Designer", error);
         return;
     }
 
     m_abstrGraph = dynamic_cast<AbstractGraph*>(inputs->graphPlugin()->create());
     if (!m_abstrGraph || !m_abstrGraph->setup("0", graphType, *m_prg, std::move(edgeGen), nodes, *inputs->graph())) {
         error.prepend("Could not initialize graph:\n");
+        QMessageBox::warning(this, "Graph Designer", error);
         return;
     }
 
