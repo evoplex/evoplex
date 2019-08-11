@@ -13,7 +13,7 @@
   <property name="minimumSize">
    <size>
     <width>300</width>
-    <height>323</height>
+    <height>347</height>
    </size>
   </property>
   <property name="features">
@@ -53,13 +53,6 @@
      </widget>
     </item>
     <item>
-     <widget class="QLabel" name="lids">
-      <property name="text">
-       <string>Ids:</string>
-      </property>
-     </widget>
-    </item>
-    <item>
      <widget class="QWidget" name="inspectorContents" native="true">
       <property name="enabled">
        <bool>true</bool>
@@ -83,7 +76,7 @@
        <property name="verticalSpacing">
         <number>30</number>
        </property>
-       <item row="3" column="1">
+       <item row="4" column="1">
         <spacer name="verticalSpacer">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -96,7 +89,7 @@
          </property>
         </spacer>
        </item>
-       <item row="1" column="0">
+       <item row="2" column="0">
         <widget class="QLabel" name="lattrs">
          <property name="sizePolicy">
           <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
@@ -115,7 +108,14 @@
          </property>
         </widget>
        </item>
-       <item row="0" column="0" colspan="2">
+       <item row="3" column="0" colspan="2">
+        <layout class="QFormLayout" name="attrs">
+         <property name="formAlignment">
+          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+         </property>
+        </layout>
+       </item>
+       <item row="1" column="0" colspan="2">
         <widget class="QListWidget" name="ids">
          <property name="baseSize">
           <size>
@@ -125,12 +125,12 @@
          </property>
         </widget>
        </item>
-       <item row="2" column="0" colspan="2">
-        <layout class="QFormLayout" name="attrs">
-         <property name="formAlignment">
-          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+       <item row="0" column="0">
+        <widget class="QLabel" name="lids">
+         <property name="text">
+          <string>Ids:</string>
          </property>
-        </layout>
+        </widget>
        </item>
       </layout>
      </widget>
