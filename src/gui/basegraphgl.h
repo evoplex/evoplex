@@ -154,8 +154,6 @@ private:
     std::map<int, Node> m_selectedNodes;
     bool m_fullInspectorVisible;
 
-    bool m_fullInspectorVisible;
-
     void attrValueChanged(int attrId) const;
 
     void setupInspector();
