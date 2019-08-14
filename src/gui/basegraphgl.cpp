@@ -360,14 +360,14 @@ void BaseGraphGL::mouseReleaseEvent(QMouseEvent *e)
     if (m_curMode == SelectionMode::Select) {
         if (e->button() == Qt::LeftButton) {
             bool fNodeSelected;
-            Node& node = findNode(e->localPos());
+            const Node& node = findNode(e->localPos());
             Node prevSelection = selectedNode();
 
             if (!node.isNull() && inSelectedNodes(node)) {
                 fNodeSelected = true;                
             } else {
                 fNodeSelected = false;
-                Node& node = selectNode(e->localPos(), m_bCenter->isChecked());
+                selectNode(e->localPos(), m_bCenter->isChecked());
             }
 
             if (e->pos() == m_posEntered) {

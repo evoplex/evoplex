@@ -68,7 +68,7 @@ protected:
     virtual QPointF selectedNodePos() const = 0;
     virtual void clearSelection() = 0;
     virtual CacheStatus refreshCache() = 0;
-    virtual inline bool inSelectedNodes(Node node) const = 0;
+    virtual inline bool inSelectedNodes(const Node node) const = 0;
 };
 
 class BaseGraphGL : public QOpenGLWidget, public GraphGLInterface

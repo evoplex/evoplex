@@ -125,7 +125,6 @@ Node GraphView::selectNode(const QPointF& pos, bool center)
     Node node = findNode(pos);
     m_lastSelectedStar = Star();
 
-    const QPointF p = pos - m_origin;
     if (!node.isNull()) {
         const QPointF np = nodePoint(node, currEdgeSize());
         m_lastSelectedStar = createStar(node, currEdgeSize(), np);

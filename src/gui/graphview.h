@@ -47,7 +47,7 @@ protected:
     inline QPointF selectedNodePos() const override;
     inline void clearSelection() override;
     CacheStatus refreshCache() override;
-    inline bool inSelectedNodes(Node node) const override;
+    inline bool inSelectedNodes(const Node node) const override;
 
 private slots:
     void setEdgeCMap(ColorMap* cmap);
@@ -119,7 +119,7 @@ inline QPointF GraphView::nodePoint(const Node& node, const qreal& edgeSizeRate)
     return QPointF(edgeSizeRate * node.x(), edgeSizeRate * node.y());
 }
 
-inline bool GraphView::inSelectedNodes(Node node) const
+inline bool GraphView::inSelectedNodes(const Node node) const
 { return m_selectedNodes.count(node.id()) != 0; }
 
 } // evoplex
