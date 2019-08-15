@@ -82,24 +82,24 @@ void FullInspector::attrValueChanged(int attrId) const
     try { aw = m_attrWidgets.at(attrId); }
     catch (std::out_of_range) { return; }
     
-    for (Node node : m_selectedNodes) {
+    for (auto node : m_selectedNodes) {
         Value v = aw->validate();
         if (v.isValid()) {
-            node.setAttr(aw->id(), v);
+            node.second.setAttr(aw->id(), v);
         }
         else {
             aw->blockSignals(true);
-            aw->setValue(node.attr(aw->id()));
+            aw->setValue(node.second.attr(aw->id()));
             aw->blockSignals(false);
         }
     }
 }
 
-void FullInspector::slotSelectedNode(Node& node)
+void FullInspector::slotSelectedNode(const Node& node)
 {
     m_ui->textMsg->hide();
     m_ui->inspectorContents->show();
-    m_selectedNodes.push_back(node);
+    m_selectedNodes.insert(std::make_pair(node.id(), node));
 
     m_ui->ids->addItem(QString::number(node.id()));
 
@@ -108,7 +108,15 @@ void FullInspector::slotSelectedNode(Node& node)
         aw->setValue(node.attr(aw->id()));
         aw->blockSignals(false);
     }
+}
 
+void FullInspector::slotDeselectedNode(const Node& node)
+{
+    m_selectedNodes.erase(node.id());
+
+    QListWidgetItem* lItem = m_ui->ids->findItems(QString::number(node.id()), Qt::MatchExactly).at(0);
+    
+    delete m_ui->ids->takeItem(m_ui->ids->row(lItem));
 }
 
 void FullInspector::slotHide()

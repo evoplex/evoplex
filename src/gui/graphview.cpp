@@ -132,6 +132,7 @@ Node GraphView::selectNode(const QPointF& pos, bool center)
         m_selectedNodes.insert(std::make_pair(node.id(), node));
         m_selectedStars.insert(std::make_pair(node.id(), m_lastSelectedStar));
     }
+
     return node;
 }
 
@@ -156,6 +157,20 @@ bool GraphView::selectNode(const Node& node, bool center)
     updateCache();
     return true;
 }
+
+bool GraphView::deselectNode(const Node& node){
+    if (m_cacheStatus != CacheStatus::Ready) {
+        return false;
+    }
+
+    if (inSelectedNodes(node)) {
+        m_selectedNodes.erase(node.id());
+        return true;
+    } else {
+        return false;
+    }
+}
+
 
 void GraphView::setEdgeCMap(ColorMap* cmap)
 {

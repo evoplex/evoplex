@@ -64,6 +64,7 @@ protected:
     virtual Node findNode(const QPointF& pos) const = 0;
     virtual Node selectNode(const QPointF& pos, bool center) = 0;
     virtual bool selectNode(const Node& node, bool center) = 0;
+    virtual bool deselectNode(const Node& node) = 0;
     virtual Node selectedNode() const = 0;
     virtual QPointF selectedNodePos() const = 0;
     virtual void clearSelection() = 0;
@@ -119,7 +120,8 @@ protected:
     void keyReleaseEvent(QKeyEvent* e) override;
 
 signals:
-    void nodeSelected(Node&);
+    void nodeSelected(const Node&);
+    void nodeDeselected(const Node&);
     void clearedSelected();
     void updateWidgets(bool) const;
 

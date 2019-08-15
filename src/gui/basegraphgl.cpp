@@ -129,7 +129,6 @@ void BaseGraphGL::slotSelectNode(int nodeid)
     try {
         Node node = m_abstractGraph->node(nodeid);
         selectNode(node, m_bCenter->isChecked());
-        emit(nodeSelected(node));
     } catch (std::out_of_range) {
         if (selectedNode().isNull()) {
             clearSelection();
@@ -364,19 +363,23 @@ void BaseGraphGL::mouseReleaseEvent(QMouseEvent *e)
             Node prevSelection = selectedNode();
 
             if (!node.isNull() && inSelectedNodes(node)) {
-                fNodeSelected = true;                
+                fNodeSelected = true;
+                if (e->modifiers().testFlag(Qt::ControlModifier)) {
+                    deselectNode(node);
+                    emit(nodeDeselected(node));
+                }
             } else {
                 fNodeSelected = false;
-                selectNode(e->localPos(), m_bCenter->isChecked());
             }
 
             if (e->pos() == m_posEntered) {
                 if (!e->modifiers().testFlag(Qt::ControlModifier)) {
                     clearSelection();
                 }
-                selectNode(e->localPos(), m_bCenter->isChecked());
                 if (!node.isNull() && (!fNodeSelected || !e->modifiers().testFlag(Qt::ControlModifier))) {
+                        selectNode(e->localPos(), m_bCenter->isChecked());
                         updateInspector(node);
+                        emit(nodeSelected(node));
                 }
                 m_bCenter->isChecked() ? updateCache() : update();
             } else {

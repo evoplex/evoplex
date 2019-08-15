@@ -44,14 +44,15 @@ public slots:
     void slotClear();
     void slotHide();
     void slotShow();
-    void slotSelectedNode(Node& node);
+    void slotSelectedNode(const Node& node);
+    void slotDeselectedNode(const Node& node);
     void slotChangeAttrScope(AttributesScope nodeAttrScope);
 
 
 private:
     QWidget* m_parent;
     Ui_FullInspector* m_ui;
-    std::vector<Node> m_selectedNodes;
+    std::map<int, Node> m_selectedNodes;
     std::vector<std::shared_ptr<AttrWidget>> m_attrWidgets;
 
     void attrValueChanged(int attrId) const;

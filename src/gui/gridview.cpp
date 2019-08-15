@@ -129,9 +129,11 @@ Node GridView::selectNode(const QPointF& pos, bool center)
             if (center) { m_origin = rect().center() - cell.rect.center(); }
             m_selectedCells.insert(std::make_pair(cell.node.id(), cell));
             m_selectedNodes.insert(std::make_pair(cell.node.id(), cell.node));
+
             return cell.node;
         }
     }
+
     return Node();
 }
 
@@ -155,6 +157,19 @@ bool GridView::selectNode(const Node& node, bool center)
     m_origin = rect().center() - p.center();
     updateCache();
     return true;
+}
+
+bool GridView::deselectNode(const Node& node){
+    if (m_cacheStatus != CacheStatus::Ready) {
+        return false;
+    }
+
+    if (inSelectedNodes(node)) {
+        m_selectedNodes.erase(node.id());
+        return true;
+    } else {
+        return false;
+    }
 }
 
 void GridView::drawCell(QPainter& painter, const Cell& cell) const

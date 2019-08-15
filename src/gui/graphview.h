@@ -43,6 +43,7 @@ protected:
     Node findNode(const QPointF& pos) const override;
     Node selectNode(const QPointF &pos, bool center) override;
     bool selectNode(const Node& node, bool center) override;
+    bool deselectNode(const Node& node) override;
     inline Node selectedNode() const override;
     inline QPointF selectedNodePos() const override;
     inline void clearSelection() override;
