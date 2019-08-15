@@ -166,6 +166,7 @@ bool GridView::deselectNode(const Node& node){
 
     if (inSelectedNodes(node)) {
         m_selectedNodes.erase(node.id());
+        m_selectedCells.erase(node.id());
         return true;
     } else {
         return false;

@@ -367,6 +367,7 @@ void BaseGraphGL::mouseReleaseEvent(QMouseEvent *e)
                 if (e->modifiers().testFlag(Qt::ControlModifier)) {
                     deselectNode(node);
                     emit(nodeDeselected(node));
+                    refreshCache();
                 }
             } else {
                 fNodeSelected = false;
@@ -380,6 +381,7 @@ void BaseGraphGL::mouseReleaseEvent(QMouseEvent *e)
                         selectNode(e->localPos(), m_bCenter->isChecked());
                         updateInspector(node);
                         emit(nodeSelected(node));
+                        refreshCache();
                 }
                 m_bCenter->isChecked() ? updateCache() : update();
             } else {
