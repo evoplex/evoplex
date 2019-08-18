@@ -153,8 +153,11 @@ private:
     QRect m_inspGeo; // inspector geometry with margin
     SelectionMode m_curMode;
     std::vector<std::shared_ptr<AttrWidget>> m_attrWidgets;
+    std::vector<std::shared_ptr<AttrWidget>> m_nodeAttrWidgets;
     std::map<int, Node> m_selectedNodes;
     bool m_fullInspectorVisible;
+    int m_curId;
+    QSet<int> sneighbors;
 
     void attrValueChanged(int attrId) const;
 
@@ -162,11 +165,15 @@ private:
 
     void updateInspector(const Node& node);
     void updateEdgeInspector(const Edge& edge);
-    void updateEdgesInspector(const Node& pnode, const Node& cnode);
+    void updateNodesInspector(const Node& node);
+    void changeAttrId(int attrId);
 };
 
 inline void BaseGraphGL::paintEvent(QPaintEvent*)
 { paint(this, true); }
+
+inline void BaseGraphGL::changeAttrId(int attrId)
+{ int m_curId = attrId; }
 
 } // evoplex
 #endif // BASEGRAPHGL_H

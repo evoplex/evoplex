@@ -66,7 +66,8 @@ inline QPointF GridView::selectedNodePos() const
 { return m_selectedCell.rect.center() + m_origin; }
 
 inline void GridView::clearSelection() { 
-    m_selectedCell = Cell(); BaseGraphGL::clearSelection(); 
+    m_selectedCell = Cell(); 
+    BaseGraphGL::clearSelection(); 
     m_selectedCells.clear();
 }
 

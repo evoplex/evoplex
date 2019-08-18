@@ -49,7 +49,7 @@ protected:
     inline void clearSelection() override;
     CacheStatus refreshCache() override;
     inline bool inSelectedNodes(const Node node) const override;
-
+    
 private slots:
     void setEdgeCMap(ColorMap* cmap);
 

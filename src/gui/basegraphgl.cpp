@@ -54,7 +54,7 @@ BaseGraphGL::BaseGraphGL(QWidget* parent)
     connect(m_ui->bZoomIn, SIGNAL(pressed()), SLOT(zoomIn()));
     connect(m_ui->bZoomOut, SIGNAL(pressed()), SLOT(zoomOut()));
     connect(m_ui->bReset, SIGNAL(pressed()), SLOT(resetView()));
-    connect(m_ui->edgesList, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(edgesListItemClicked(QListWidgetItem*)));
+    //connect(m_ui->edgesList, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(edgesListItemClicked(QListWidgetItem*)));
     connect(m_ui->deleteEdge, SIGNAL(clicked()), this, SLOT(removeEdgeEvent()));
     m_bCenter = new QtMaterialIconButton(QIcon(":/icons/material/center_white_18"), this);
     m_bCenter->setToolTip("centralize selection");
@@ -152,24 +152,49 @@ void BaseGraphGL::setupInspector()
         delete item.labelItem;
         delete item.fieldItem;
     }
+
+    while (m_ui->nodeModelAttrs->count()) {
+        auto item = m_ui->nodeModelAttrs->takeRow(0);
+        delete item.labelItem->widget();
+        delete item.labelItem;
+        delete item.fieldItem;
+    }
+
     m_ui->inspector->hide();
 
     m_attrWidgets.clear();
     m_attrWidgets.resize(static_cast<size_t>(m_nodeAttrsScope.size()));
+
+    m_nodeAttrWidgets.clear();
+    m_nodeAttrWidgets.resize(static_cast<size_t>(m_nodeAttrsScope.size()));
 
     for (auto attrRange : m_nodeAttrsScope) {
         auto aw = std::make_shared<AttrWidget>(attrRange, nullptr);
         aw->setToolTip(attrRange->attrRangeStr());
         int aId = aw->id();
         connect(aw.get(), &AttrWidget::valueChanged, [this, aId]() { attrValueChanged(aId); });
+        connect(aw.get(), &AttrWidget::valueChanged, [this, aId]() { changeAttrId(aId); });
         m_attrWidgets.at(attrRange->id()) = aw;
         m_ui->modelAttrs->insertRow(attrRange->id(), attrRange->attrName(), aw.get());
-
         QWidget* l = m_ui->modelAttrs->labelForField(aw.get());
         l->setToolTip(attrRange->attrName());
         l->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::MinimumExpanding);
         l->setMinimumWidth(m_ui->lNodeId->minimumWidth());
     }
+    
+    for (auto attrRange : m_nodeAttrsScope) {
+        auto aw = std::make_shared<AttrWidget>(attrRange, nullptr);
+        aw->setToolTip(attrRange->attrRangeStr());
+        int aId = aw->id();
+        connect(aw.get(), &AttrWidget::valueChanged, [this, aId]() { attrValueChanged(aId); });
+        m_nodeAttrWidgets.at(attrRange->id()) = aw;
+        m_ui->nodeModelAttrs->insertRow(attrRange->id(), attrRange->attrName(), aw.get());
+        QWidget* l = m_ui->nodeModelAttrs->labelForField(aw.get());
+        l->setToolTip(attrRange->attrName());
+        l->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::MinimumExpanding);
+        l->setMinimumWidth(m_ui->lNodeId->minimumWidth());
+    }
+
 }
 
 void BaseGraphGL::attrValueChanged(int attrId) const
@@ -179,31 +204,51 @@ void BaseGraphGL::attrValueChanged(int attrId) const
     }
 
     std::shared_ptr<AttrWidget> aw;
-    try { aw = m_attrWidgets.at(attrId); }
-    catch (std::out_of_range) { return; }
-    Node node = m_abstractGraph->node(m_ui->nodeId->value());
-    if (m_isReadOnly) {
-        aw->blockSignals(true);
-        aw->setValue(node.attr(aw->id()));
-        aw->blockSignals(false);
-        QMessageBox::warning(parentWidget(), "Graph",
-            "You cannot change things in a running experiment.\n"
-            "Please, pause it and try again.");
-        return;
-    }
+    std::shared_ptr<AttrWidget> awNodes;
 
-    Value v = aw->validate();
-    if (v.isValid()) {
-        node.setAttr(aw->id(), v);
+    try { 
+        aw = m_attrWidgets.at(attrId);
+        awNodes = m_nodeAttrWidgets.at(attrId); 
+    } catch (std::out_of_range) { return; }
+
+    for (auto node : m_selectedNodes) {
+        if (m_isReadOnly) {
+            aw->blockSignals(true);
+            aw->setValue(node.second.attr(aw->id()));
+            aw->blockSignals(false);
+            awNodes->blockSignals(true);
+            awNodes->setValue(node.second.attr(aw->id()));
+            awNodes->blockSignals(false);
+            QMessageBox::warning(parentWidget(), "Graph",
+                "You cannot change things in a running experiment.\n"
+                "Please, pause it and try again.");
+            continue;
+        }
+
+        Value v;
+        if (m_selectedNodes.size() == 1) {
+            v = aw->validate();
+        } else {
+            v = awNodes->validate();
+        }
+
+        if (v.isValid()) {
+            node.second.setAttr(aw->id(), v);
+            node.second.setAttr(awNodes->id(), v);
+        }
+        else {
+            aw->blockSignals(true);
+            awNodes->blockSignals(true);
+            aw->setValue(node.second.attr(aw->id()));
+            awNodes->setValue(node.second.attr(awNodes->id()));
+            aw->blockSignals(false);
+            awNodes->blockSignals(false);
+            QString err = "The input for '" + aw->attrName() +
+                "' is invalid.\nExpected: " + aw->attrRangeStr();
+            QMessageBox::warning(parentWidget(), "Graph", err);
+        }
         // let the other widgets aware that they all need to be updated
         emit(updateWidgets(true));
-    } else {
-        aw->blockSignals(true);
-        aw->setValue(node.attr(aw->id()));
-        aw->blockSignals(false);
-        QString err = "The input for '" + aw->attrName() +
-            "' is invalid.\nExpected: " + aw->attrRangeStr();
-        QMessageBox::warning(parentWidget(), "Graph", err);
     }
 }
 
@@ -238,6 +283,11 @@ void BaseGraphGL::slotStatusChanged(Status s)
 {
     m_isReadOnly = s == Status::Running;
     for (auto aw : m_attrWidgets) {
+        if (aw) {
+            aw->setReadOnly(m_isReadOnly);
+        }
+    }
+    for (auto aw : m_nodeAttrWidgets) {
         if (aw) {
             aw->setReadOnly(m_isReadOnly);
         }
@@ -299,7 +349,6 @@ void BaseGraphGL::zoomIn()
     ++m_zoomLevel;
     m_nodeRadius = m_nodeScale * std::pow(1.25f, m_zoomLevel);
     updateCache();
-    clearSelection();
 }
 
 void BaseGraphGL::zoomOut()
@@ -307,7 +356,6 @@ void BaseGraphGL::zoomOut()
     --m_zoomLevel;
     m_nodeRadius = m_nodeScale * std::pow(1.25f, m_zoomLevel);
     updateCache();
-    clearSelection();
 }
 
 void BaseGraphGL::resetView()
@@ -329,7 +377,7 @@ void BaseGraphGL::wheelEvent(QWheelEvent* e)
     m_origin -= (newPos - fromOrigin);
     m_nodeRadius = newNodeRadius;
 
-    updateCache();
+    updateCache(true);
     clearSelection();
     e->accept();
 }
@@ -379,6 +427,7 @@ void BaseGraphGL::mouseReleaseEvent(QMouseEvent *e)
                 }
                 if (!node.isNull() && (!fNodeSelected || !e->modifiers().testFlag(Qt::ControlModifier))) {
                         selectNode(e->localPos(), m_bCenter->isChecked());
+                        m_selectedNodes.insert(std::make_pair(node.id(), node));
                         updateInspector(node);
                         emit(nodeSelected(node));
                         refreshCache();
@@ -386,7 +435,6 @@ void BaseGraphGL::mouseReleaseEvent(QMouseEvent *e)
                 m_bCenter->isChecked() ? updateCache() : update();
             } else {
                 m_origin += (e->pos() - m_posEntered);
-                clearSelection();
                 updateCache();
             }
         } else if (e->button() == Qt::RightButton && m_nodeAttr >= 0 && !m_isReadOnly) {
@@ -475,47 +523,53 @@ void BaseGraphGL::updateEdgeInspector(const Edge& edge)
     m_inspGeo += QMargins(5, 5, 5, 5);   
 }
 
-void BaseGraphGL::updateEdgesInspector(const Node& srcNode, const Node& trgtNode)
+void BaseGraphGL::updateNodesInspector(const Node& node)
 {
     if (m_fullInspectorVisible) {
         return;
     }
 
-    m_ui->edgesList->clear();
-    QSet<int> edges;
+    QString nodes;
+    QString neighbors;
 
-    for (auto const& e : srcNode.outEdges()) {
-        if (e.second.neighbour().id() == trgtNode.id()) {
-            edges.insert(e.first);
-        }
+    if (m_selectedNodes.size() == 1) {
+        nodes = QString::number(node.id());
+    } else {
+        nodes = m_ui->nodeIds->text() + " " + QString::number(node.id());
     }
 
-    if (edges.size() == 0) {
-        return;
+    for (auto const& e : node.outEdges()) {
+            sneighbors.insert(e.second.neighbour().id());
     }
-    // If there is only one edge to the target node, open the edgeInspector directly
-    if (edges.size() == 1)
-    {
-        int eId = edges.values().takeFirst();
-        updateEdgeInspector(srcNode.outEdges().at(eId));
-        return;
+    
+    for (int nbr : sneighbors) {
+        neighbors.append(QString::number(nbr) + " ");
     }
+    
+    m_ui->nodeIds->setText(nodes);
+    m_ui->nodesNeighbors->setText(neighbors);
 
     m_ui->inspector->setCurrentIndex(2);
+    
+    //std::shared_ptr<AttrWidget> awNodes = m_nodeAttrWidgets.at(m_curId);
+    //awNodes->blockSignals(true);
+    //awNodes->setValue(node.attr(awNodes->id()));
+    //awNodes->blockSignals(false);
 
-    for (auto const& id : edges) {
-        new QListWidgetItem(QString::number(id), m_ui->edgesList);
-    }
-    m_ui->originId->setValue(trgtNode.id());
-    m_ui->targetId->setValue(srcNode.id());
     m_ui->inspector->show();
     m_ui->inspector->adjustSize();
+    
     m_inspGeo = m_ui->inspector->frameGeometry();
     m_inspGeo += QMargins(5, 5, 5, 5);
 }
 
 void BaseGraphGL::updateInspector(const Node& node)
 {
+    updateNodesInspector(node);
+    if (m_selectedNodes.size() > 1) {
+        return;
+    }
+
     m_ui->inspector->setCurrentIndex(0);
     QSet<int> neighbors;
     QSet<int> edges;
@@ -550,7 +604,9 @@ void BaseGraphGL::updateInspector(const Node& node)
 void BaseGraphGL::clearSelection()
 {
     emit(clearedSelected());
+    m_selectedNodes.clear();
 
+    m_ui->nodeIds->clear();
     if (m_ui->inspector->isVisible()) {
         m_ui->inspector->hide();
         update();
