@@ -173,7 +173,6 @@ void BaseGraphGL::setupInspector()
         aw->setToolTip(attrRange->attrRangeStr());
         int aId = aw->id();
         connect(aw.get(), &AttrWidget::valueChanged, [this, aId]() { attrValueChanged(aId); });
-        connect(aw.get(), &AttrWidget::valueChanged, [this, aId]() { changeAttrId(aId); });
         m_attrWidgets.at(attrRange->id()) = aw;
         m_ui->modelAttrs->insertRow(attrRange->id(), attrRange->attrName(), aw.get());
         QWidget* l = m_ui->modelAttrs->labelForField(aw.get());
@@ -550,11 +549,6 @@ void BaseGraphGL::updateNodesInspector(const Node& node)
     m_ui->nodesNeighbors->setText(neighbors);
 
     m_ui->inspector->setCurrentIndex(2);
-    
-    //std::shared_ptr<AttrWidget> awNodes = m_nodeAttrWidgets.at(m_curId);
-    //awNodes->blockSignals(true);
-    //awNodes->setValue(node.attr(awNodes->id()));
-    //awNodes->blockSignals(false);
 
     m_ui->inspector->show();
     m_ui->inspector->adjustSize();
@@ -589,6 +583,11 @@ void BaseGraphGL::updateInspector(const Node& node)
     m_ui->neighbors->setText(neighbors_);
     m_ui->edges->setText(edges_);
     for (auto aw : m_attrWidgets) {
+        aw->blockSignals(true);
+        aw->setValue(node.attr(aw->id()));
+        aw->blockSignals(false);
+    }
+    for (auto aw : m_nodeAttrWidgets) {
         aw->blockSignals(true);
         aw->setValue(node.attr(aw->id()));
         aw->blockSignals(false);
