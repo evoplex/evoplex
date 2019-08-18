@@ -153,10 +153,10 @@ private:
     QRect m_inspGeo; // inspector geometry with margin
     SelectionMode m_curMode;
     std::vector<std::shared_ptr<AttrWidget>> m_attrWidgets;
-    std::vector<std::shared_ptr<AttrWidget>> m_nodeAttrWidgets;
     std::map<int, Node> m_selectedNodes;
     bool m_fullInspectorVisible;
     QSet<int> sneighbors;
+    QSet<int> sedges;
 
     void attrValueChanged(int attrId) const;
 
