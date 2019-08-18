@@ -548,12 +548,6 @@ void BaseGraphGL::updateInspector(const Node& node)
     m_ui->nodesNeighbors->setText(neighbors);
     m_ui->edges->setText(edges);
 
-    m_ui->inspector->show();
-    m_ui->inspector->adjustSize();
-
-    m_inspGeo = m_ui->inspector->frameGeometry();
-    m_inspGeo += QMargins(5, 5, 5, 5);
-
     for (auto aw : m_attrWidgets) {
         aw->blockSignals(true);
         aw->setValue(node.attr(aw->id()));
