@@ -172,7 +172,7 @@ void BaseGraphGL::setupInspector()
 
 void BaseGraphGL::attrValueChanged(int attrId) const
 {
-    if (!m_abstractGraph || m_selectedNodes.size() == 0) {
+    if (!m_abstractGraph || m_selectedNodes.empty()) {
         return;
     }
 
@@ -333,7 +333,7 @@ void BaseGraphGL::wheelEvent(QWheelEvent* e)
     m_origin -= (newPos - fromOrigin);
     m_nodeRadius = newNodeRadius;
 
-    updateCache(true);
+    updateCache();
     clearSelection();
     e->accept();
 }
