@@ -28,16 +28,39 @@ namespace evoplex {
 FullInspector::FullInspector(QWidget* parent)
     : QDockWidget(parent),
       m_ui(new Ui_FullInspector),
-      m_parent(parent)
-{
+      m_parent(parent),
+      m_inspMode(InspectorMode::Select)
+{   
     m_ui->setupUi(this);
     m_ui->inspectorContents->hide();
+    m_ui->bdelete->hide();
+
+    connect(m_ui->bdelete, SIGNAL(clicked()), SLOT(slotDelete()));
 }
 
 FullInspector::~FullInspector() 
 {
     delete m_ui;
     m_attrWidgets.clear();
+}
+
+void FullInspector::updateInspectorView() {
+    if (m_inspMode == InspectorMode::Select) {
+        m_ui->bdelete->hide();
+    } else if (m_inspMode == InspectorMode::Node){
+        m_ui->bdelete->show();
+        m_ui->bdelete->setText("Delete Nodes");
+    } else if (m_inspMode == InspectorMode::Edge) {
+        m_ui->bdelete->show();
+        m_ui->bdelete->setText("Delete Edges");
+    }
+}
+
+void FullInspector::slotChangeInspectorMode(InspectorMode inspMode) {
+    if (m_inspMode != inspMode){
+        m_inspMode = inspMode;
+        updateInspectorView();
+    }
 }
 
 void FullInspector::slotClear() {
@@ -74,6 +97,15 @@ void FullInspector::slotChangeAttrScope(AttributesScope nodeAttrScope)
         l->setMinimumWidth(m_ui->lattrs->minimumWidth());
     }
 
+}
+
+void FullInspector::slotDelete()
+{
+    if (m_inspMode == InspectorMode::Node) {
+        m_ui->ids->clear();
+        m_selectedNodes.clear();
+        emit(deleteNodes());
+    }
 }
 
 void FullInspector::attrValueChanged(int attrId) const

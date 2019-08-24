@@ -32,6 +32,12 @@ class Ui_FullInspector;
 
 namespace evoplex {
 
+enum class InspectorMode {
+    Select = 0, // Selection mode
+    Node = 1,   // Node tool
+    Edge = 2    // Edge tool
+};
+
 class FullInspector : public QDockWidget
 {
     Q_OBJECT
@@ -46,16 +52,22 @@ public slots:
     void slotShow();
     void slotSelectedNode(const Node& node);
     void slotDeselectedNode(const Node& node);
+    void slotDelete();
     void slotChangeAttrScope(AttributesScope nodeAttrScope);
+    void slotChangeInspectorMode(InspectorMode inspMode);
 
+signals:
+    void deleteNodes();
 
 private:
+    InspectorMode m_inspMode;
     QWidget* m_parent;
     Ui_FullInspector* m_ui;
     std::map<int, Node> m_selectedNodes;
     std::vector<std::shared_ptr<AttrWidget>> m_attrWidgets;
 
     void attrValueChanged(int attrId) const;
+    void updateInspectorView();
 };
 
 }

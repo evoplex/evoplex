@@ -74,9 +74,18 @@ GraphDesignerPage::GraphDesignerPage(MainGUI* mainGUI)
     connect(m_ui->acGraphSettings, SIGNAL(triggered()), m_graphDesigner, SLOT(slotOpenSettings()));
     connect(m_ui->acNodesExporter, SIGNAL(triggered()), m_graphDesigner, SLOT(slotExportNodes()));
     
-    connect(m_ui->acSelectTool, &QAction::triggered, [this]() { this->m_graphDesigner->slotChangeSelectionMode(SelectionMode::Select); });
-    connect(m_ui->acNodeTool, &QAction::triggered, [this]() { this->m_graphDesigner->slotChangeSelectionMode(SelectionMode::NodeEdit); });
-    connect(m_ui->acEdgeTool, &QAction::triggered, [this]() { this->m_graphDesigner->slotChangeSelectionMode(SelectionMode::EdgeEdit); });
+    connect(m_ui->acSelectTool, &QAction::triggered, [this]() { 
+        this->m_graphDesigner->slotChangeSelectionMode(SelectionMode::Select); 
+        this->m_inspector->slotChangeInspectorMode(InspectorMode::Select);
+    });
+    connect(m_ui->acNodeTool, &QAction::triggered, [this]() { 
+        this->m_graphDesigner->slotChangeSelectionMode(SelectionMode::NodeEdit); 
+        this->m_inspector->slotChangeInspectorMode(InspectorMode::Node);
+    });
+    connect(m_ui->acEdgeTool, &QAction::triggered, [this]() { 
+        this->m_graphDesigner->slotChangeSelectionMode(SelectionMode::EdgeEdit);
+        this->m_inspector->slotChangeInspectorMode(InspectorMode::Edge);
+    });
     
     connect(inspVisible, SIGNAL(stateChanged(int)), m_graphDesigner->graphView(), SLOT(slotFullInspectorVisible(int)));
     connect(inspVisible, &QCheckBox::stateChanged, [this](int vis) {
@@ -92,8 +101,9 @@ GraphDesignerPage::GraphDesignerPage(MainGUI* mainGUI)
     connect(m_graphDesigner->graphView(), &GraphView::nodeDeselected, [this](const Node& node) {
         this->m_inspector->slotDeselectedNode(node);
     });
-
     connect(m_graphDesigner->graphView(), SIGNAL(clearedSelected()), m_inspector, SLOT(slotClear()));
+
+    connect(m_inspector, SIGNAL(deleteNodes()), m_graphDesigner->graphView(), SLOT(slotDeleteSelectedNodes()));
 
     setCentralWidget(m_graphDesigner);
 

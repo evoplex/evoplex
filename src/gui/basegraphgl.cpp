@@ -135,6 +135,16 @@ void BaseGraphGL::slotSelectNode(int nodeid)
     }
 }
 
+void BaseGraphGL::slotDeleteSelectedNodes()
+{
+    for (auto node : m_selectedNodes) {
+        m_abstractGraph->removeNode(node.second);
+    }
+
+    clearSelection();
+    updateCache();
+}
+
 void BaseGraphGL::setupInspector()
 {
     // important! for some reason, changing the layout (add/delete itens)
@@ -360,49 +370,47 @@ void BaseGraphGL::mouseReleaseEvent(QMouseEvent *e)
         return;
     }
 
-    if (m_curMode == SelectionMode::Select) {
-        if (e->button() == Qt::LeftButton) {
-            bool fNodeSelected;
-            const Node& node = findNode(e->localPos());
-            Node prevSelection = selectedNode();
+    if (e->button() == Qt::LeftButton) {
+        bool fNodeSelected;
+        const Node& node = findNode(e->localPos());
+        Node prevSelection = selectedNode();
 
-            if (!node.isNull() && inSelectedNodes(node)) {
-                fNodeSelected = true;
-                if (e->modifiers().testFlag(Qt::ControlModifier)) {
-                    deselectNode(node);
-                    emit(nodeDeselected(node));
-                    refreshCache();
-                }
-            } else {
-                fNodeSelected = false;
+        if (!node.isNull() && inSelectedNodes(node)) {
+            fNodeSelected = true;
+            if (e->modifiers().testFlag(Qt::ControlModifier)) {
+                deselectNode(node);
+                emit(nodeDeselected(node));
+                refreshCache();
             }
+        } else {
+            fNodeSelected = false;
+        }
 
-            if (e->pos() == m_posEntered) {
-                if (!e->modifiers().testFlag(Qt::ControlModifier)) {
-                    clearSelection();
-                }
-                if (!node.isNull() && (!fNodeSelected || !e->modifiers().testFlag(Qt::ControlModifier))) {
-                        selectNode(e->localPos(), m_bCenter->isChecked());
-                        m_selectedNodes.insert(std::make_pair(node.id(), node));
-                        updateInspector(node);
-                        emit(nodeSelected(node));
-                        refreshCache();
-                }
-                m_bCenter->isChecked() ? updateCache() : update();
-            } else {
-                m_origin += (e->pos() - m_posEntered);
-                updateCache();
-            }
-        } else if (e->button() == Qt::RightButton && m_nodeAttr >= 0 && !m_isReadOnly) {
-            Node node = selectNode(e->localPos(), false);
-            if (!node.isNull()) {
-                const QString& attrName = node.attrs().name(m_nodeAttr);
-                auto attrRange = m_nodeAttrsScope.value(attrName);
-                node.setAttr(m_nodeAttr, attrRange->next(node.attr(m_nodeAttr)));
+        if (e->pos() == m_posEntered) {
+            if (!e->modifiers().testFlag(Qt::ControlModifier)) {
                 clearSelection();
-                emit(updateWidgets(true));
-                updateCache();
             }
+            if (!node.isNull() && (!fNodeSelected || !e->modifiers().testFlag(Qt::ControlModifier))) {
+                    selectNode(e->localPos(), m_bCenter->isChecked());
+                    m_selectedNodes.insert(std::make_pair(node.id(), node));
+                    updateInspector(node);
+                    emit(nodeSelected(node));
+                    refreshCache();
+            }
+            m_bCenter->isChecked() ? updateCache() : update();
+        } else {
+            m_origin += (e->pos() - m_posEntered);
+            updateCache();
+        }
+    } else if (e->button() == Qt::RightButton && m_nodeAttr >= 0 && !m_isReadOnly) {
+        Node node = selectNode(e->localPos(), false);
+        if (!node.isNull()) {
+            const QString& attrName = node.attrs().name(m_nodeAttr);
+            auto attrRange = m_nodeAttrsScope.value(attrName);
+            node.setAttr(m_nodeAttr, attrRange->next(node.attr(m_nodeAttr)));
+            clearSelection();
+            emit(updateWidgets(true));
+            updateCache();
         }
     }
 }
