@@ -35,7 +35,6 @@
 
 #include "colormap.h"
 #include "experimentwidget.h"
-#include "fullinspector.h"
 
 #include "maingui.h"
 
@@ -62,12 +61,15 @@ class GraphGLInterface
 protected:
     virtual ~GraphGLInterface() = default;
     virtual void paintFrame(QPainter& painter) const = 0;
+    virtual Node findNode(const QPointF& pos) const = 0;
     virtual Node selectNode(const QPointF& pos, bool center) = 0;
     virtual bool selectNode(const Node& node, bool center) = 0;
+    virtual bool deselectNode(const Node& node) = 0;
     virtual Node selectedNode() const = 0;
     virtual QPointF selectedNodePos() const = 0;
     virtual void clearSelection() = 0;
     virtual CacheStatus refreshCache() = 0;
+    virtual inline bool inSelectedNodes(const Node node) const = 0;
 };
 
 class BaseGraphGL : public QOpenGLWidget, public GraphGLInterface
@@ -118,7 +120,8 @@ protected:
     void keyReleaseEvent(QKeyEvent* e) override;
 
 signals:
-    void nodeSelected(Node&);
+    void nodeSelected(const Node&);
+    void nodeDeselected(const Node&);
     void clearedSelected();
     void updateWidgets(bool) const;
 
@@ -152,6 +155,8 @@ private:
     std::vector<std::shared_ptr<AttrWidget>> m_attrWidgets;
     std::map<int, Node> m_selectedNodes;
     bool m_fullInspectorVisible;
+    QSet<int> sneighbors;
+    QSet<int> sedges;
 
     void attrValueChanged(int attrId) const;
 
@@ -159,7 +164,7 @@ private:
 
     void updateInspector(const Node& node);
     void updateEdgeInspector(const Edge& edge);
-    void updateEdgesInspector(const Node& pnode, const Node& cnode);
+    void updateNodesInspector(const Node& node);
 };
 
 inline void BaseGraphGL::paintEvent(QPaintEvent*)

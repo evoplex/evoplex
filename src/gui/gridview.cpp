@@ -85,17 +85,34 @@ void GridView::paintFrame(QPainter& painter) const
         drawCell(painter, cell);
     }
 
-    if (!m_selectedCell.node.isNull()) {
+    for (auto cell : m_selectedCells) {
         painter.setOpacity(1.0);
         // draw neighbours
-        for (auto const& n : m_selectedCell.node.outEdges()) {
-            drawCell(painter, {n, cellRect(n, m_nodeRadius)});
+        for (auto const& n : cell.second.node.outEdges()) {
+            drawCell(painter, { n, cellRect(n, m_nodeRadius) });
         }
-        // draw selected node
-        drawCell(painter, m_selectedCell);
-        painter.setBrush(QBrush(m_background.color(), Qt::DiagCrossPattern));
-        painter.drawRect(m_selectedCell.rect);
     }
+    for (auto cell : m_selectedCells) {
+        // draw selected nodes
+        drawCell(painter, cell.second);
+        painter.setBrush(QBrush(m_background.color(), Qt::DiagCrossPattern));
+        painter.drawRect(cell.second.rect);
+    }
+}
+
+Node GridView::findNode(const QPointF& pos) const
+{
+    if (m_cacheStatus != CacheStatus::Ready) {
+        return Node();
+    }
+
+    const QPointF p = pos - m_origin;
+    for (const Cell& cell : m_cache) {
+        if (cell.rect.contains(p)) {
+            return cell.node;
+        }
+    }
+    return Node();
 }
 
 Node GridView::selectNode(const QPointF& pos, bool center)
@@ -110,9 +127,13 @@ Node GridView::selectNode(const QPointF& pos, bool center)
         if (cell.rect.contains(p)) {
             m_selectedCell = cell;
             if (center) { m_origin = rect().center() - cell.rect.center(); }
+            m_selectedCells.insert(std::make_pair(cell.node.id(), cell));
+            m_selectedNodes.insert(std::make_pair(cell.node.id(), cell.node));
+
             return cell.node;
         }
     }
+
     return Node();
 }
 
@@ -136,6 +157,20 @@ bool GridView::selectNode(const Node& node, bool center)
     m_origin = rect().center() - p.center();
     updateCache();
     return true;
+}
+
+bool GridView::deselectNode(const Node& node){
+    if (m_cacheStatus != CacheStatus::Ready) {
+        return false;
+    }
+
+    if (inSelectedNodes(node)) {
+        m_selectedNodes.erase(node.id());
+        m_selectedCells.erase(node.id());
+        return true;
+    } else {
+        return false;
+    }
 }
 
 void GridView::drawCell(QPainter& painter, const Cell& cell) const

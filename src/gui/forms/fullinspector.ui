@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>403</width>
+    <width>420</width>
     <height>558</height>
    </rect>
   </property>
@@ -76,19 +76,6 @@
        <property name="verticalSpacing">
         <number>30</number>
        </property>
-       <item row="4" column="1">
-        <spacer name="verticalSpacer">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>40</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
        <item row="2" column="0">
         <widget class="QLabel" name="lattrs">
          <property name="sizePolicy">
@@ -108,12 +95,18 @@
          </property>
         </widget>
        </item>
-       <item row="3" column="0" colspan="2">
-        <layout class="QFormLayout" name="attrs">
-         <property name="formAlignment">
-          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+       <item row="4" column="1">
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
          </property>
-        </layout>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
        </item>
        <item row="1" column="0" colspan="2">
         <widget class="QListWidget" name="ids">
@@ -131,6 +124,13 @@
           <string>Ids:</string>
          </property>
         </widget>
+       </item>
+       <item row="3" column="0" colspan="2">
+        <layout class="QFormLayout" name="attrs">
+         <property name="formAlignment">
+          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+         </property>
+        </layout>
        </item>
       </layout>
      </widget>
