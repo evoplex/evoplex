@@ -81,7 +81,7 @@ void FullInspector::slotChangeAttrScope(AttributesScope nodeAttrScope)
 void FullInspector::slotDelete()
 {
     m_ui->ids->clear();
-    if (m_selectedNodes.size() > 1) {
+    if (m_selectedNodes.size() > 0) {
         m_selectedNodes.clear();
         emit(deleteNodes());
     }

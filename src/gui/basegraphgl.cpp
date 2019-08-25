@@ -55,8 +55,8 @@ BaseGraphGL::BaseGraphGL(QWidget* parent)
     connect(m_ui->bZoomIn, SIGNAL(pressed()), SLOT(zoomIn()));
     connect(m_ui->bZoomOut, SIGNAL(pressed()), SLOT(zoomOut()));
     connect(m_ui->bReset, SIGNAL(pressed()), SLOT(resetView()));
-    //connect(m_ui->edgesList, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(edgesListItemClicked(QListWidgetItem*)));
     connect(m_ui->deleteEdge, SIGNAL(clicked()), this, SLOT(removeEdgeEvent()));
+    
     m_bCenter = new QtMaterialIconButton(QIcon(":/icons/material/center_white_18"), this);
     m_bCenter->setToolTip("centralize selection");
     m_bCenter->setCheckable(true);
