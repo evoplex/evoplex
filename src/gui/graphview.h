@@ -40,7 +40,7 @@ public slots:
 
 protected:
     void paintFrame(QPainter& painter) const override;
-    Node findNode(const QPointF& pos) const override;
+    Node findNode(const QPointF& pos) override;
     Node selectNode(const QPointF &pos, bool center) override;
     bool selectNode(const Node& node, bool center) override;
     bool deselectNode(const Node& node) override;

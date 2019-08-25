@@ -401,8 +401,8 @@ void BaseGraphGL::mouseReleaseEvent(QMouseEvent *e)
         return;
     }
 
-    Node& prevNode = findNode(m_posEntered);
-    Node& node = findNode(e->localPos());
+    Node prevNode = findNode(m_posEntered);
+    Node node = findNode(e->localPos());
     if (e->button() == Qt::LeftButton) {
         bool fNodeSelected;
         Node prevSelection = selectedNode();

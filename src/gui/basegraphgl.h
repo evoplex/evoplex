@@ -61,7 +61,7 @@ class GraphGLInterface
 protected:
     virtual ~GraphGLInterface() = default;
     virtual void paintFrame(QPainter& painter) const = 0;
-    virtual Node findNode(const QPointF& pos) const = 0;
+    virtual Node findNode(const QPointF& pos) = 0;
     virtual Node selectNode(const QPointF& pos, bool center) = 0;
     virtual bool selectNode(const Node& node, bool center) = 0;
     virtual bool deselectNode(const Node& node) = 0;

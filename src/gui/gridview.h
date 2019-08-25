@@ -34,7 +34,7 @@ public:
 protected:
     void paintFrame(QPainter& painter) const override;
     Node selectNode(const QPointF& pos, bool center) override;
-    Node findNode(const QPointF& pos) const override;
+    Node findNode(const QPointF& pos) override;
     bool selectNode(const Node& node, bool center) override;
     bool deselectNode(const Node& node) override;
     Node selectedNode() const override;
