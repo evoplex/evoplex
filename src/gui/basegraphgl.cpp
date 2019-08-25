@@ -154,6 +154,14 @@ void BaseGraphGL::createNode(QPointF pos)
     updateCache();
 }
 
+void BaseGraphGL::deleteNode(QPointF pos)
+{
+    const Node& node = findNode(pos);
+    clearSelection();
+    m_abstractGraph->removeNode(node);
+    updateCache();
+}
+
 void BaseGraphGL::setupInspector()
 {
     // important! for some reason, changing the layout (add/delete itens)
@@ -379,9 +387,9 @@ void BaseGraphGL::mouseReleaseEvent(QMouseEvent *e)
         return;
     }
 
+    const Node& node = findNode(e->localPos());
     if (e->button() == Qt::LeftButton) {
         bool fNodeSelected;
-        const Node& node = findNode(e->localPos());
         Node prevSelection = selectedNode();
 
         if (!node.isNull() && inSelectedNodes(node)) {
@@ -413,6 +421,8 @@ void BaseGraphGL::mouseReleaseEvent(QMouseEvent *e)
             m_origin += (e->pos() - m_posEntered);
             updateCache();
         }
+    } else if (e->button() == Qt::RightButton && m_curMode == SelectionMode::NodeEdit && !node.isNull()) {
+        deleteNode(e->localPos());
     } else if (e->button() == Qt::RightButton && m_nodeAttr >= 0 && !m_isReadOnly) {
         Node node = selectNode(e->localPos(), false);
         if (!node.isNull()) {

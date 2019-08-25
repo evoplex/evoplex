@@ -112,7 +112,9 @@ protected:
     void clearSelection() override;
 
     void updateCache(bool force=false);
+    
     void createNode(QPointF pos);
+    void deleteNode(QPointF pos);
 
     inline void paintEvent(QPaintEvent*) override;
     void mousePressEvent(QMouseEvent* e) override;
