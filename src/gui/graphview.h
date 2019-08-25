@@ -49,7 +49,7 @@ protected:
     inline void clearSelection() override;
     CacheStatus refreshCache() override;
     inline bool inSelectedNodes(const Node node) const override;
-    inline QPointF GraphView::nodePoint(const QPointF& pos) override;
+    inline QPointF nodePoint(const QPointF& pos) override;
 
 private slots:
     void setEdgeCMap(ColorMap* cmap);
@@ -123,9 +123,7 @@ inline QPointF GraphView::nodePoint(const Node& node, const qreal& edgeSizeRate)
 }
 
 inline QPointF GraphView::nodePoint(const QPointF& pos)
-{ 
-    return QPointF(pos.x() / currEdgeSize(), pos.y() / currEdgeSize());
-}
+{ return QPointF(pos.x() / currEdgeSize(), pos.y() / currEdgeSize()); }
 
 inline bool GraphView::inSelectedNodes(const Node node) const
 { return m_selectedNodes.count(node.id()) != 0; }
