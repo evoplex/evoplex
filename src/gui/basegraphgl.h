@@ -167,6 +167,9 @@ private:
 
     void attrValueChanged(int attrId) const;
 
+    void moveSelectedNodes(Node& node, QPointF pos);
+    void moveNode(Node& node, QPointF pos);
+
     void setupInspector();
 
     void updateInspector(const Node& node);

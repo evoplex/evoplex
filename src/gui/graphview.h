@@ -83,6 +83,7 @@ private:
     Star createStar(const Node& node, const qreal& edgeSizeRate, const QPointF& xy);
 
     void drawNode(QPainter& painter, const Star& s, double r) const;
+
     void drawEdges(QPainter& painter) const;
     void drawNodes(QPainter& painter, double nodeRadius) const;
     void drawSelectedEdge(QPainter& painter, double nodeRadius) const;
