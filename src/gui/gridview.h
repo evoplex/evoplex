@@ -42,6 +42,7 @@ protected:
     void clearSelection() override;
     CacheStatus refreshCache() override;
     inline bool inSelectedNodes(const Node node) const override;
+    inline QPointF nodePoint(const QPointF& pos) override;
 
 private:
     struct Cell {
@@ -76,6 +77,9 @@ inline QRectF GridView::cellRect(const Node& n, double length) const
 
 inline bool GridView::inSelectedNodes(const Node node) const
 { return m_selectedNodes.count(node.id()) != 0; }
+
+inline QPointF GridView::nodePoint(const QPointF& pos)
+{ return QPointF(pos.x() / m_nodeRadius, pos.y() / m_nodeRadius); }
 
 } // evoplex
 #endif // GRIDVIEW_H

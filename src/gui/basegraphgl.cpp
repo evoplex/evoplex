@@ -44,7 +44,8 @@ BaseGraphGL::BaseGraphGL(QWidget* parent)
       m_cacheStatus(CacheStatus::Ready),
       m_posEntered(0,0),
       m_curMode(SelectionMode::Select),
-      m_fullInspectorVisible(false)
+      m_fullInspectorVisible(false),
+      m_attrs(Attributes(0))
 {
     m_ui->setupUi(this);
 
@@ -97,6 +98,7 @@ void BaseGraphGL::setup(AbstractGraph* abstractGraph, AttributesScope nodeAttrsS
     m_nodeAttrsScope = nodeAttrsScope;
     setupInspector();
     updateCache();
+    m_attrs = m_abstractGraph->node(0).attrs();
 }
 
 void BaseGraphGL::paint(QPaintDevice* device, bool paintBackground) const
@@ -142,6 +144,13 @@ void BaseGraphGL::slotDeleteSelectedNodes()
     }
 
     clearSelection();
+    updateCache();
+}
+
+void BaseGraphGL::createNode(QPointF pos)
+{
+    QPointF p = nodePoint(pos - m_origin);
+    m_abstractGraph->addNode(m_attrs, p.x(), p.y());
     updateCache();
 }
 
@@ -391,11 +400,13 @@ void BaseGraphGL::mouseReleaseEvent(QMouseEvent *e)
                 clearSelection();
             }
             if (!node.isNull() && (!fNodeSelected || !e->modifiers().testFlag(Qt::ControlModifier))) {
-                    selectNode(e->localPos(), m_bCenter->isChecked());
-                    m_selectedNodes.insert(std::make_pair(node.id(), node));
-                    updateInspector(node);
-                    emit(nodeSelected(node));
-                    refreshCache();
+                selectNode(e->localPos(), m_bCenter->isChecked());
+                m_selectedNodes.insert(std::make_pair(node.id(), node));
+                updateInspector(node);
+                emit(nodeSelected(node));
+                refreshCache();
+            } else if (m_curMode == SelectionMode::NodeEdit && node.isNull()) {
+                createNode(e->localPos());
             }
             m_bCenter->isChecked() ? updateCache() : update();
         } else {

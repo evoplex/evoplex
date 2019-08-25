@@ -70,6 +70,8 @@ protected:
     virtual void clearSelection() = 0;
     virtual CacheStatus refreshCache() = 0;
     virtual inline bool inSelectedNodes(const Node node) const = 0;
+    virtual inline QPointF nodePoint(const QPointF& pos) = 0;
+
 };
 
 class BaseGraphGL : public QOpenGLWidget, public GraphGLInterface
@@ -110,6 +112,7 @@ protected:
     void clearSelection() override;
 
     void updateCache(bool force=false);
+    void createNode(QPointF pos);
 
     inline void paintEvent(QPaintEvent*) override;
     void mousePressEvent(QMouseEvent* e) override;
@@ -158,6 +161,7 @@ private:
     bool m_fullInspectorVisible;
     QSet<int> sneighbors;
     QSet<int> sedges;
+    Attributes m_attrs;
 
     void attrValueChanged(int attrId) const;
 
