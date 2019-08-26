@@ -73,6 +73,27 @@ GraphView::Star GraphView::createStar(const Node& node,
     return star;
 }
 
+void GraphView::slotUpdateSelection() {
+    for (auto selectedNode : m_selectedNodes) {
+        int i = selectedNode.first;
+        const Node node = selectedNode.second;
+        const QPointF xy = QPointF(node.x() * currEdgeSize(), node.y() * currEdgeSize());
+
+        Star selectedStar(node, xy, {});
+        selectedStar.edges.reserve(node.outEdges().size());
+        for (auto const& ep : node.outEdges()) {
+            QPointF xy2 = nodePoint(ep.second.neighbour(), currEdgeSize());
+            QLineF line(xy, xy2);
+            if (!m_showNodes || line.length() - m_nodeRadius * 2. > 4.0) {
+                selectedStar.edges.push_back({ ep.second, line });
+            }
+        }
+        selectedStar.edges.shrink_to_fit();
+
+        m_selectedStars.at(i) = selectedStar;
+    }
+}
+
 CacheStatus GraphView::refreshCache()
 {
     if (paintingActive()) {
@@ -322,46 +343,32 @@ void GraphView::drawSelectedStars(QPainter& painter, double nodeRadius) const
 
     painter.setOpacity(1.0);
 
-    for (auto selectedNode : m_selectedNodes) {
+    for (auto selectedStar : m_selectedStars) {
         // draw shadow of the selected node
-        const Node node = selectedNode.second;
-        const QPointF xy = QPointF(node.x() * currEdgeSize(), node.y() * currEdgeSize());
-
-        Star selectedStar(node, xy, {});
-        selectedStar.edges.reserve(node.outEdges().size());
-        for (auto const& ep : node.outEdges()) {
-            QPointF xy2 = nodePoint(ep.second.neighbour(), currEdgeSize());
-            QLineF line(xy, xy2);
-            if (!m_showNodes || line.length() - m_nodeRadius * 2. > 4.0) {
-                selectedStar.edges.push_back({ep.second, line});
-            }
-        }
-        selectedStar.edges.shrink_to_fit();
-
 
         painter.save();
         double shadowRadius = nodeRadius*1.5;
-        QRadialGradient r(selectedStar.xy, shadowRadius, selectedStar.xy);
+        QRadialGradient r(selectedStar.second.xy, shadowRadius, selectedStar.second.xy);
         r.setColorAt(0, Qt::black);
         r.setColorAt(1, m_background.color());
         painter.setBrush(r);
         painter.setPen(Qt::transparent);
-        painter.drawEllipse(selectedStar.xy, shadowRadius, shadowRadius);
+        painter.drawEllipse(selectedStar.second.xy, shadowRadius, shadowRadius);
         painter.restore();
 
         painter.save();
         // highlight immediate edges
         painter.setPen(QPen(Qt::darkGray, m_edgePen.width() + 3));
-        for (auto const& ep : selectedStar.edges) {
+        for (auto const& ep : selectedStar.second.edges) {
             painter.drawLine(ep.second);
         }
 
         // draw selected node
         painter.setPen(m_nodePen);
-        drawNode(painter, selectedStar, nodeRadius);
+        drawNode(painter, selectedStar.second, nodeRadius);
 
         // draw neighbours
-        const Edges& oe = selectedStar.node.outEdges();
+        const Edges& oe = selectedStar.second.node.outEdges();
         const double esize = currEdgeSize();
         for (auto const& e : oe) {
             const Node& n = e.second.neighbour();

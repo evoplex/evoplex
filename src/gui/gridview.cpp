@@ -69,6 +69,17 @@ CacheStatus GridView::refreshCache()
     return CacheStatus::Ready;
 }
 
+void GridView::slotUpdateSelection() {
+    for (auto selectedNode : m_selectedNodes) {
+        int i = selectedNode.first;
+        const Node node = selectedNode.second;
+
+        QRectF selectedCellRect = cellRect(node, m_nodeRadius);
+
+        m_selectedCells.at(i).rect = selectedCellRect;
+    }
+}
+
 void GridView::paintFrame(QPainter& painter) const
 {
     if (m_nodeAttr < 0 || !m_nodeCMap) {

@@ -57,6 +57,8 @@ BaseGraphGL::BaseGraphGL(QWidget* parent)
     connect(m_ui->bReset, SIGNAL(pressed()), SLOT(resetView()));
     connect(m_ui->deleteEdge, SIGNAL(clicked()), this, SLOT(removeEdgeEvent()));
     
+    connect(this, SIGNAL(nodesMoved()), SLOT(slotUpdateSelection()));
+
     m_bCenter = new QtMaterialIconButton(QIcon(":/icons/material/center_white_18"), this);
     m_bCenter->setToolTip("centralize selection");
     m_bCenter->setCheckable(true);
@@ -147,14 +149,14 @@ void BaseGraphGL::slotDeleteSelectedNodes()
     updateCache();
 }
 
-void BaseGraphGL::createNode(QPointF pos)
+void BaseGraphGL::createNode(const QPointF pos)
 {
     QPointF p = nodePoint(pos - m_origin);
     m_abstractGraph->addNode(m_attrs, p.x(), p.y());
     updateCache();
 }
 
-void BaseGraphGL::deleteNode(QPointF pos)
+void BaseGraphGL::deleteNode(const QPointF pos)
 {
     const Node& node = findNode(pos);
     clearSelection();
@@ -162,17 +164,19 @@ void BaseGraphGL::deleteNode(QPointF pos)
     updateCache();
 }
 
-void BaseGraphGL::moveSelectedNodes(Node& node, QPointF pos) {
+void BaseGraphGL::moveSelectedNodes(Node& node, const QPointF pos) {
     QPointF v = nodePoint(pos - m_origin) - QPointF(node.x(), node.y());
     for (Node _node : m_selectedNodes) {
         _node.setCoords(_node.x() + v.x(), _node.y() + v.y());
     }
+    emit(nodesMoved());
     updateCache();
 }
 
 void BaseGraphGL::moveNode(Node& node, QPointF pos) {
     QPointF p = nodePoint(pos - m_origin);
     node.setCoords(p.x(), p.y());
+    emit(nodesMoved());
     updateCache();
 }
 

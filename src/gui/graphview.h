@@ -35,6 +35,7 @@ public:
 public slots:
     inline void zoomIn() override;
     inline void zoomOut() override;
+    void slotUpdateSelection() override;
     void setEdgeScale(int v);
     void setEdgeWidth(int v);
 

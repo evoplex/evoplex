@@ -31,6 +31,9 @@ class GridView : public BaseGraphGL
 public:
     explicit GridView(QWidget* parent);
 
+public slots:
+    void slotUpdateSelection() override;
+
 protected:
     void paintFrame(QPainter& painter) const override;
     Node selectNode(const QPointF& pos, bool center) override;

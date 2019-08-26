@@ -113,8 +113,8 @@ protected:
 
     void updateCache(bool force=false);
     
-    void createNode(QPointF pos);
-    void deleteNode(QPointF pos);
+    void createNode(const QPointF pos);
+    void deleteNode(const QPointF pos);
 
     inline void paintEvent(QPaintEvent*) override;
     void mousePressEvent(QMouseEvent* e) override;
@@ -128,11 +128,13 @@ signals:
     void nodeSelected(const Node&);
     void nodeDeselected(const Node&);
     void clearedSelected();
+    void nodesMoved();
     void updateWidgets(bool) const;
 
 public slots:
     virtual void zoomIn();
     virtual void zoomOut();
+    virtual void slotUpdateSelection() = 0;
 
     void slotFullInspectorVisible(int visible);
     void setCurrentStep(int step);
@@ -167,8 +169,8 @@ private:
 
     void attrValueChanged(int attrId) const;
 
-    void moveSelectedNodes(Node& node, QPointF pos);
-    void moveNode(Node& node, QPointF pos);
+    void moveSelectedNodes(Node& node, const QPointF pos);
+    void moveNode(Node& node, const QPointF pos);
 
     void setupInspector();
 
