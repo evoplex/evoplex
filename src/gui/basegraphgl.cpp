@@ -173,7 +173,7 @@ void BaseGraphGL::moveSelectedNodes(Node& node, const QPointF pos) {
     updateCache();
 }
 
-void BaseGraphGL::moveNode(Node& node, QPointF pos) {
+void BaseGraphGL::moveNode(Node& node, const QPointF pos) {
     QPointF p = nodePoint(pos - m_origin);
     node.setCoords(p.x(), p.y());
     emit(nodesMoved());
