@@ -111,7 +111,7 @@ void GridView::paintFrame(QPainter& painter) const
     }
 }
 
-Node GridView::findNode(const QPointF& pos)
+Node GridView::findNode(const QPointF& pos) const
 {
     if (m_cacheStatus != CacheStatus::Ready) {
         return Node();

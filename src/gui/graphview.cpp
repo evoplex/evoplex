@@ -122,7 +122,7 @@ CacheStatus GraphView::refreshCache()
     return CacheStatus::Ready;
 }
 
-Node GraphView::findNode(const QPointF& pos)
+Node GraphView::findNode(const QPointF& pos) const
 {
     if (m_cacheStatus != CacheStatus::Ready) {
         return Node();

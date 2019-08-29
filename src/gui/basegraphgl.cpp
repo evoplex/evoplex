@@ -100,7 +100,9 @@ void BaseGraphGL::setup(AbstractGraph* abstractGraph, AttributesScope nodeAttrsS
     m_nodeAttrsScope = nodeAttrsScope;
     setupInspector();
     updateCache();
-    m_attrs = m_abstractGraph->node(0).attrs();
+    if (m_abstractGraph && !m_abstractGraph->nodes().empty()) {
+        m_attrs = m_abstractGraph->node(0).attrs();
+    }
 }
 
 void BaseGraphGL::paint(QPaintDevice* device, bool paintBackground) const
@@ -149,7 +151,7 @@ void BaseGraphGL::slotDeleteSelectedNodes()
     updateCache();
 }
 
-void BaseGraphGL::createNode(const QPointF pos)
+void BaseGraphGL::createNode(const QPointF& pos)
 {
     QPointF p = nodePoint(pos - m_origin);
     m_abstractGraph->addNode(m_attrs, p.x(), p.y());
@@ -164,7 +166,7 @@ void BaseGraphGL::deleteNode(const QPointF pos)
     updateCache();
 }
 
-void BaseGraphGL::moveSelectedNodes(Node& node, const QPointF pos) {
+void BaseGraphGL::moveSelectedNodes(const Node& node, const QPointF pos) {
     QPointF v = nodePoint(pos - m_origin) - QPointF(node.x(), node.y());
     for (Node _node : m_selectedNodes) {
         _node.setCoords(_node.x() + v.x(), _node.y() + v.y());
@@ -405,7 +407,7 @@ void BaseGraphGL::mouseReleaseEvent(QMouseEvent *e)
         return;
     }
 
-    Node prevNode = findNode(m_posEntered);
+    const Node _prevNode = findNode(m_posEntered);
     Node node = findNode(e->localPos());
     if (e->button() == Qt::LeftButton) {
         bool fNodeSelected;
@@ -437,11 +439,17 @@ void BaseGraphGL::mouseReleaseEvent(QMouseEvent *e)
             }
             m_bCenter->isChecked() ? updateCache() : update();
         } else {
-            if (m_curMode == SelectionMode::NodeEdit && !prevNode.isNull()) {
-                if (inSelectedNodes(prevNode)) {
-                    moveSelectedNodes(prevNode, e->localPos());
+            if (m_curMode == SelectionMode::NodeEdit && !_prevNode.isNull()) {
+                Node movedNode;
+                if (inSelectedNodes(_prevNode)) {
+                    moveSelectedNodes(_prevNode, e->localPos());
                 } else {
-                    moveNode(prevNode, e->localPos());
+                    clearSelection();
+                    movedNode = selectNode(m_posEntered, false);
+                    moveNode(movedNode, e->localPos());
+                    m_selectedNodes.insert(std::make_pair(movedNode.id(), movedNode));
+                    updateInspector(movedNode);
+                    emit(nodeSelected(movedNode));
                 }
             } else {
                 m_origin += (e->pos() - m_posEntered);
@@ -573,6 +581,7 @@ void BaseGraphGL::updateNodesInspector(const Node& node)
 void BaseGraphGL::updateInspector(const Node& node)
 {
     m_ui->inspector->setCurrentIndex(0);
+
     QString nodes;
     QString neighbors;
     QString edges;
