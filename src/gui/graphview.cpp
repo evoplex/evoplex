@@ -79,17 +79,8 @@ void GraphView::slotUpdateSelection() {
         const Node node = selectedNode.second;
         const QPointF xy = QPointF(node.x() * currEdgeSize(), node.y() * currEdgeSize());
 
-        Star selectedStar(node, xy, {});
-        selectedStar.edges.reserve(node.outEdges().size());
-        for (auto const& ep : node.outEdges()) {
-            QPointF xy2 = nodePoint(ep.second.neighbour(), currEdgeSize());
-            QLineF line(xy, xy2);
-            if (!m_showNodes || line.length() - m_nodeRadius * 2. > 4.0) {
-                selectedStar.edges.push_back({ ep.second, line });
-            }
-        }
-        selectedStar.edges.shrink_to_fit();
-
+        Star selectedStar = createStar(node, currEdgeSize(), xy);
+        
         m_selectedStars.at(i) = selectedStar;
     }
 }
