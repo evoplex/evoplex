@@ -46,8 +46,11 @@ public slots:
     void slotShow();
     void slotSelectedNode(const Node& node);
     void slotDeselectedNode(const Node& node);
+    void slotDelete();
     void slotChangeAttrScope(AttributesScope nodeAttrScope);
 
+signals:
+    void deleteNodes();
 
 private:
     QWidget* m_parent;

@@ -29,9 +29,11 @@ FullInspector::FullInspector(QWidget* parent)
     : QDockWidget(parent),
       m_ui(new Ui_FullInspector),
       m_parent(parent)
-{
+{   
     m_ui->setupUi(this);
     m_ui->inspectorContents->hide();
+
+    connect(m_ui->bdelete, SIGNAL(clicked()), SLOT(slotDelete()));
 }
 
 FullInspector::~FullInspector() 
@@ -74,6 +76,15 @@ void FullInspector::slotChangeAttrScope(AttributesScope nodeAttrScope)
         l->setMinimumWidth(m_ui->lattrs->minimumWidth());
     }
 
+}
+
+void FullInspector::slotDelete()
+{
+    m_ui->ids->clear();
+    if (m_selectedNodes.size() > 0) {
+        m_selectedNodes.clear();
+        emit(deleteNodes());
+    }
 }
 
 void FullInspector::attrValueChanged(int attrId) const

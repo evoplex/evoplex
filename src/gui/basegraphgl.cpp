@@ -44,7 +44,8 @@ BaseGraphGL::BaseGraphGL(QWidget* parent)
       m_cacheStatus(CacheStatus::Ready),
       m_posEntered(0,0),
       m_curMode(SelectionMode::Select),
-      m_fullInspectorVisible(false)
+      m_fullInspectorVisible(false),
+      m_attrs(Attributes(0))
 {
     m_ui->setupUi(this);
 
@@ -54,8 +55,10 @@ BaseGraphGL::BaseGraphGL(QWidget* parent)
     connect(m_ui->bZoomIn, SIGNAL(pressed()), SLOT(zoomIn()));
     connect(m_ui->bZoomOut, SIGNAL(pressed()), SLOT(zoomOut()));
     connect(m_ui->bReset, SIGNAL(pressed()), SLOT(resetView()));
-    //connect(m_ui->edgesList, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(edgesListItemClicked(QListWidgetItem*)));
     connect(m_ui->deleteEdge, SIGNAL(clicked()), this, SLOT(removeEdgeEvent()));
+    
+    connect(this, SIGNAL(nodesMoved()), SLOT(slotUpdateSelection()));
+
     m_bCenter = new QtMaterialIconButton(QIcon(":/icons/material/center_white_18"), this);
     m_bCenter->setToolTip("centralize selection");
     m_bCenter->setCheckable(true);
@@ -97,6 +100,9 @@ void BaseGraphGL::setup(AbstractGraph* abstractGraph, AttributesScope nodeAttrsS
     m_nodeAttrsScope = nodeAttrsScope;
     setupInspector();
     updateCache();
+    if (m_abstractGraph && !m_abstractGraph->nodes().empty()) {
+        m_attrs = m_abstractGraph->node(0).attrs();
+    }
 }
 
 void BaseGraphGL::paint(QPaintDevice* device, bool paintBackground) const
@@ -133,6 +139,47 @@ void BaseGraphGL::slotSelectNode(int nodeid)
             clearSelection();
         }
     }
+}
+
+void BaseGraphGL::slotDeleteSelectedNodes()
+{
+    for (auto node : m_selectedNodes) {
+        m_abstractGraph->removeNode(node.second);
+    }
+
+    clearSelection();
+    updateCache();
+}
+
+void BaseGraphGL::createNode(const QPointF& pos)
+{
+    QPointF p = nodePoint(pos - m_origin);
+    m_abstractGraph->addNode(m_attrs, p.x(), p.y());
+    updateCache();
+}
+
+void BaseGraphGL::deleteNode(const QPointF pos)
+{
+    const Node& node = findNode(pos);
+    clearSelection();
+    m_abstractGraph->removeNode(node);
+    updateCache();
+}
+
+void BaseGraphGL::moveSelectedNodes(const Node& node, const QPointF pos) {
+    QPointF v = nodePoint(pos - m_origin) - QPointF(node.x(), node.y());
+    for (Node _node : m_selectedNodes) {
+        _node.setCoords(_node.x() + v.x(), _node.y() + v.y());
+    }
+    emit(nodesMoved());
+    updateCache();
+}
+
+void BaseGraphGL::moveNode(Node& node, const QPointF pos) {
+    QPointF p = nodePoint(pos - m_origin);
+    node.setCoords(p.x(), p.y());
+    emit(nodesMoved());
+    updateCache();
 }
 
 void BaseGraphGL::setupInspector()
@@ -360,49 +407,72 @@ void BaseGraphGL::mouseReleaseEvent(QMouseEvent *e)
         return;
     }
 
-    if (m_curMode == SelectionMode::Select) {
-        if (e->button() == Qt::LeftButton) {
-            bool fNodeSelected;
-            const Node& node = findNode(e->localPos());
-            Node prevSelection = selectedNode();
+    const Node _prevNode = findNode(m_posEntered);
+    Node node = findNode(e->localPos());
+    if (e->button() == Qt::LeftButton) {
+        bool fNodeSelected;
+        Node prevSelection = selectedNode();
 
-            if (!node.isNull() && inSelectedNodes(node)) {
-                fNodeSelected = true;
-                if (e->modifiers().testFlag(Qt::ControlModifier)) {
-                    deselectNode(node);
-                    emit(nodeDeselected(node));
-                    refreshCache();
-                }
-            } else {
-                fNodeSelected = false;
+        if (!node.isNull() && inSelectedNodes(node)) {
+            fNodeSelected = true;
+            if (e->modifiers().testFlag(Qt::ControlModifier)) {
+                deselectNode(node);
+                emit(nodeDeselected(node));
+                refreshCache();
             }
+        } else {
+            fNodeSelected = false;
+        }
 
-            if (e->pos() == m_posEntered) {
-                if (!e->modifiers().testFlag(Qt::ControlModifier)) {
+        if (e->pos() == m_posEntered) {
+            if (!e->modifiers().testFlag(Qt::ControlModifier)) {
+                if (m_curMode == SelectionMode::NodeEdit && node.isNull()) {
+                    if (m_selectedNodes.empty()) {
+                        createNode(e->localPos());
+                    } else {
+                        clearSelection();
+                    }
+                } else {
                     clearSelection();
                 }
-                if (!node.isNull() && (!fNodeSelected || !e->modifiers().testFlag(Qt::ControlModifier))) {
-                        selectNode(e->localPos(), m_bCenter->isChecked());
-                        m_selectedNodes.insert(std::make_pair(node.id(), node));
-                        updateInspector(node);
-                        emit(nodeSelected(node));
-                        refreshCache();
+            }
+            if (!node.isNull() && (!fNodeSelected || !e->modifiers().testFlag(Qt::ControlModifier))) {
+                selectNode(e->localPos(), m_bCenter->isChecked());
+                m_selectedNodes.insert(std::make_pair(node.id(), node));
+                updateInspector(node);
+                emit(nodeSelected(node));
+                refreshCache();
+            }
+            m_bCenter->isChecked() ? updateCache() : update();
+        } else {
+            if (m_curMode == SelectionMode::NodeEdit && !_prevNode.isNull()) {
+                Node movedNode;
+                if (inSelectedNodes(_prevNode)) {
+                    moveSelectedNodes(_prevNode, e->localPos());
+                } else {
+                    clearSelection();
+                    movedNode = selectNode(m_posEntered, false);
+                    moveNode(movedNode, e->localPos());
+                    m_selectedNodes.insert(std::make_pair(movedNode.id(), movedNode));
+                    updateInspector(movedNode);
+                    emit(nodeSelected(movedNode));
                 }
-                m_bCenter->isChecked() ? updateCache() : update();
             } else {
                 m_origin += (e->pos() - m_posEntered);
                 updateCache();
             }
-        } else if (e->button() == Qt::RightButton && m_nodeAttr >= 0 && !m_isReadOnly) {
-            Node node = selectNode(e->localPos(), false);
-            if (!node.isNull()) {
-                const QString& attrName = node.attrs().name(m_nodeAttr);
-                auto attrRange = m_nodeAttrsScope.value(attrName);
-                node.setAttr(m_nodeAttr, attrRange->next(node.attr(m_nodeAttr)));
-                clearSelection();
-                emit(updateWidgets(true));
-                updateCache();
-            }
+        }
+    } else if (e->button() == Qt::RightButton && m_curMode == SelectionMode::NodeEdit && !node.isNull()) {
+        deleteNode(e->localPos());
+    } else if (e->button() == Qt::RightButton && m_nodeAttr >= 0 && !m_isReadOnly) {
+        Node node = selectNode(e->localPos(), false);
+        if (!node.isNull()) {
+            const QString& attrName = node.attrs().name(m_nodeAttr);
+            auto attrRange = m_nodeAttrsScope.value(attrName);
+            node.setAttr(m_nodeAttr, attrRange->next(node.attr(m_nodeAttr)));
+            clearSelection();
+            emit(updateWidgets(true));
+            updateCache();
         }
     }
 }
@@ -517,6 +587,7 @@ void BaseGraphGL::updateNodesInspector(const Node& node)
 void BaseGraphGL::updateInspector(const Node& node)
 {
     m_ui->inspector->setCurrentIndex(0);
+
     QString nodes;
     QString neighbors;
     QString edges;

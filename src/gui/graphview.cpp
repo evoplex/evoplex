@@ -73,6 +73,18 @@ GraphView::Star GraphView::createStar(const Node& node,
     return star;
 }
 
+void GraphView::slotUpdateSelection() {
+    for (auto selectedNode : m_selectedNodes) {
+        int i = selectedNode.first;
+        const Node node = selectedNode.second;
+        const QPointF xy = QPointF(node.x() * currEdgeSize(), node.y() * currEdgeSize());
+
+        Star selectedStar = createStar(node, currEdgeSize(), xy);
+        
+        m_selectedStars.at(i) = selectedStar;
+    }
+}
+
 CacheStatus GraphView::refreshCache()
 {
     if (paintingActive()) {
@@ -324,6 +336,7 @@ void GraphView::drawSelectedStars(QPainter& painter, double nodeRadius) const
 
     for (auto selectedStar : m_selectedStars) {
         // draw shadow of the selected node
+
         painter.save();
         double shadowRadius = nodeRadius*1.5;
         QRadialGradient r(selectedStar.second.xy, shadowRadius, selectedStar.second.xy);

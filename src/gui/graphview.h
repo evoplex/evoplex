@@ -35,21 +35,23 @@ public:
 public slots:
     inline void zoomIn() override;
     inline void zoomOut() override;
+    void slotUpdateSelection() override;
     void setEdgeScale(int v);
     void setEdgeWidth(int v);
 
 protected:
     void paintFrame(QPainter& painter) const override;
     Node findNode(const QPointF& pos) const override;
-    Node selectNode(const QPointF &pos, bool center) override;
+    Node selectNode(const QPointF& pos, bool center) override;
     bool selectNode(const Node& node, bool center) override;
     bool deselectNode(const Node& node) override;
     inline Node selectedNode() const override;
     inline QPointF selectedNodePos() const override;
     inline void clearSelection() override;
     CacheStatus refreshCache() override;
-    inline bool inSelectedNodes(const Node node) const override;
-    
+    inline bool inSelectedNodes(const Node& node) const override;
+    inline QPointF nodePoint(const QPointF& pos) override;
+
 private slots:
     void setEdgeCMap(ColorMap* cmap);
 
@@ -82,6 +84,7 @@ private:
     Star createStar(const Node& node, const qreal& edgeSizeRate, const QPointF& xy);
 
     void drawNode(QPainter& painter, const Star& s, double r) const;
+
     void drawEdges(QPainter& painter) const;
     void drawNodes(QPainter& painter, double nodeRadius) const;
     void drawSelectedEdge(QPainter& painter, double nodeRadius) const;
@@ -120,7 +123,10 @@ inline QPointF GraphView::nodePoint(const Node& node, const qreal& edgeSizeRate)
     return QPointF(edgeSizeRate * node.x(), edgeSizeRate * node.y());
 }
 
-inline bool GraphView::inSelectedNodes(const Node node) const
+inline QPointF GraphView::nodePoint(const QPointF& pos)
+{ return QPointF(pos.x() / currEdgeSize(), pos.y() / currEdgeSize()); }
+
+inline bool GraphView::inSelectedNodes(const Node& node) const
 { return m_selectedNodes.count(node.id()) != 0; }
 
 } // evoplex

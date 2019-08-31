@@ -31,6 +31,9 @@ class GridView : public BaseGraphGL
 public:
     explicit GridView(QWidget* parent);
 
+public slots:
+    void slotUpdateSelection() override;
+
 protected:
     void paintFrame(QPainter& painter) const override;
     Node selectNode(const QPointF& pos, bool center) override;
@@ -41,7 +44,8 @@ protected:
     inline QPointF selectedNodePos() const override;
     void clearSelection() override;
     CacheStatus refreshCache() override;
-    inline bool inSelectedNodes(const Node node) const override;
+    inline bool inSelectedNodes(const Node& node) const override;
+    inline QPointF nodePoint(const QPointF& pos) override;
 
 private:
     struct Cell {
@@ -74,8 +78,11 @@ inline void GridView::clearSelection() {
 inline QRectF GridView::cellRect(const Node& n, double length) const 
 { return QRectF(n.x() * length, n.y() * length, length, length); }
 
-inline bool GridView::inSelectedNodes(const Node node) const
+inline bool GridView::inSelectedNodes(const Node& node) const
 { return m_selectedNodes.count(node.id()) != 0; }
+
+inline QPointF GridView::nodePoint(const QPointF& pos)
+{ return QPointF(pos.x() / m_nodeRadius, pos.y() / m_nodeRadius); }
 
 } // evoplex
 #endif // GRIDVIEW_H
