@@ -338,6 +338,9 @@ void BaseGraphGL::setCurrentStep(int step)
 
 void BaseGraphGL::setCurrentSelectionMode(SelectionMode m) {
     m_curMode = m;
+    //TODO: Don't clear selection each time the mode is changed
+    clearSelection();
+    updateCache();
 }
 
 void BaseGraphGL::setNodeScale(int v)
@@ -432,16 +435,37 @@ void BaseGraphGL::mouseReleaseEvent(QMouseEvent *e)
                     } else {
                         clearSelection();
                     }
+                } else if (!node.isNull() && m_curMode == SelectionMode::EdgeEdit) {
+                    if (!inSelectedNodes(node)) {
+                        selectNode(e->localPos(), m_bCenter->isChecked());
+                        m_selectedNodes.insert(std::make_pair(node.id(), node));
+
+                        for (Edge edge : node.outEdges()) {
+                            if (!inSelectedEdges(edge) && inSelectedNodes(edge.neighbour())) {
+                                m_selectedEdges.insert(std::make_pair(edge.id(), edge));
+                                selectEdge(edge);
+                                emit(edgeSelected(edge));
+                            }
+                        }
+                    } else {
+                        for (Edge edge : node.outEdges()) {
+                            deselectEdge(edge);
+                            emit(edgeDeselected(edge));
+                        }
+                        deselectNode(node);
+                    }
+                    
                 } else {
                     clearSelection();
                 }
             }
-            if (!node.isNull() && (!fNodeSelected || !e->modifiers().testFlag(Qt::ControlModifier))) {
+            if (!node.isNull() && (!fNodeSelected || !e->modifiers().testFlag(Qt::ControlModifier)) && m_curMode != SelectionMode::EdgeEdit) {
                 selectNode(e->localPos(), m_bCenter->isChecked());
-                m_selectedNodes.insert(std::make_pair(node.id(), node));
+                m_selectedNodes.insert(std::make_pair(node.id(), node));               
                 updateInspector(node);
                 emit(nodeSelected(node));
                 refreshCache();
+                
             }
             m_bCenter->isChecked() ? updateCache() : update();
         } else {
@@ -524,6 +548,22 @@ void BaseGraphGL::keyReleaseEvent(QKeyEvent* e)
         }
     }
     QOpenGLWidget::keyReleaseEvent(e);
+}
+
+bool BaseGraphGL::deselectNode(const Node& node) {
+    if (inSelectedNodes(node)) {
+        m_selectedNodes.erase(node.id());
+        return true;
+    }
+    return false;
+}
+
+bool BaseGraphGL::deselectEdge(const Edge& edge) {
+    if (inSelectedEdges(edge)) {
+        m_selectedEdges.erase(edge.id());
+        return true;
+    }
+    return false;
 }
 
 void BaseGraphGL::resizeEvent(QResizeEvent* e)
@@ -637,6 +677,7 @@ void BaseGraphGL::clearSelection()
 {
     emit(clearedSelected());
     m_selectedNodes.clear();
+    m_selectedEdges.clear();
 
     m_ui->nodeIds->clear();
     sedges.clear();

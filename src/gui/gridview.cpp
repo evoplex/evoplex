@@ -170,6 +170,11 @@ bool GridView::selectNode(const Node& node, bool center)
     return true;
 }
 
+void GridView::selectEdge(const Edge& edge) 
+{
+    m_selectedEdges.insert(std::make_pair(edge.id(), edge));
+}
+
 bool GridView::deselectNode(const Node& node){
     if (m_cacheStatus != CacheStatus::Ready) {
         return false;
@@ -178,6 +183,21 @@ bool GridView::deselectNode(const Node& node){
     if (inSelectedNodes(node)) {
         m_selectedNodes.erase(node.id());
         m_selectedCells.erase(node.id());
+        BaseGraphGL::deselectNode(node);
+        return true;
+    } else {
+        return false;
+    }
+}
+
+bool GridView::deselectEdge(const Edge& edge){
+    if (m_cacheStatus != CacheStatus::Ready) {
+        return false;
+    }
+
+    if (inSelectedEdges(edge)) {
+        m_selectedEdges.erase(edge.id());
+        BaseGraphGL::deselectEdge(edge);
         return true;
     } else {
         return false;

@@ -29,7 +29,7 @@ FullInspector::FullInspector(QWidget* parent)
     : QDockWidget(parent),
       m_ui(new Ui_FullInspector),
       m_parent(parent)
-{   
+{
     m_ui->setupUi(this);
     m_ui->inspectorContents->hide();
 
@@ -48,6 +48,7 @@ void FullInspector::slotClear() {
     m_ui->textMsg->show();
     m_ui->inspectorContents->hide();
     m_selectedNodes.clear();
+    m_selectedEdges.clear();
 }
 
 void FullInspector::slotChangeAttrScope(AttributesScope nodeAttrScope)
@@ -108,6 +109,10 @@ void FullInspector::attrValueChanged(int attrId) const
 
 void FullInspector::slotSelectedNode(const Node& node)
 {
+    if (m_selectedEdges.size() > 0) {
+        slotClear();
+    }
+
     m_ui->textMsg->hide();
     m_ui->inspectorContents->show();
     m_selectedNodes.insert(std::make_pair(node.id(), node));
@@ -121,11 +126,32 @@ void FullInspector::slotSelectedNode(const Node& node)
     }
 }
 
+void FullInspector::slotSelectedEdge(const Edge& edge)
+{
+    if (m_selectedNodes.size() > 0) {
+        slotClear();
+    }
+    m_ui->textMsg->hide();
+    m_ui->inspectorContents->show();
+    m_selectedEdges.insert(std::make_pair(edge.id(), edge));
+
+    m_ui->ids->addItem(QString::number(edge.id()));
+}
+
 void FullInspector::slotDeselectedNode(const Node& node)
 {
     m_selectedNodes.erase(node.id());
 
     QListWidgetItem* lItem = m_ui->ids->findItems(QString::number(node.id()), Qt::MatchExactly).at(0);
+    
+    delete m_ui->ids->takeItem(m_ui->ids->row(lItem));
+}
+
+void FullInspector::slotDeselectedEdge(const Edge& edge)
+{
+    m_selectedEdges.erase(edge.id());
+
+    QListWidgetItem* lItem = m_ui->ids->findItems(QString::number(edge.id()), Qt::MatchExactly).at(0);
     
     delete m_ui->ids->takeItem(m_ui->ids->row(lItem));
 }

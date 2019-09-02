@@ -39,12 +39,15 @@ protected:
     Node selectNode(const QPointF& pos, bool center) override;
     Node findNode(const QPointF& pos) const override;
     bool selectNode(const Node& node, bool center) override;
+    void selectEdge(const Edge& edge) override;
     bool deselectNode(const Node& node) override;
+    bool deselectEdge(const Edge& edge) override;
     Node selectedNode() const override;
     inline QPointF selectedNodePos() const override;
     void clearSelection() override;
     CacheStatus refreshCache() override;
     inline bool inSelectedNodes(const Node& node) const override;
+    inline bool inSelectedEdges(const Edge& edge) const override;
     inline QPointF nodePoint(const QPointF& pos) override;
 
 private:
@@ -56,6 +59,7 @@ private:
 
     std::map<int, Cell> m_selectedCells;
     std::map<int, Node> m_selectedNodes;
+    std::map<int, Edge> m_selectedEdges;
     Cell m_selectedCell;
 
     void drawCell(QPainter& painter, const Cell& cell) const;
@@ -73,6 +77,8 @@ inline void GridView::clearSelection() {
     m_selectedCell = Cell(); 
     BaseGraphGL::clearSelection(); 
     m_selectedCells.clear();
+    m_selectedNodes.clear();
+    m_selectedEdges.clear();
 }
 
 inline QRectF GridView::cellRect(const Node& n, double length) const 
@@ -80,6 +86,9 @@ inline QRectF GridView::cellRect(const Node& n, double length) const
 
 inline bool GridView::inSelectedNodes(const Node& node) const
 { return m_selectedNodes.count(node.id()) != 0; }
+
+inline bool GridView::inSelectedEdges(const Edge& edge) const
+{ return m_selectedEdges.count(edge.id()) != 0; }
 
 inline QPointF GridView::nodePoint(const QPointF& pos)
 { return QPointF(pos.x() / m_nodeRadius, pos.y() / m_nodeRadius); }

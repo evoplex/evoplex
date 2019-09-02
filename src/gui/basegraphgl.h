@@ -64,12 +64,15 @@ protected:
     virtual Node findNode(const QPointF& pos) const = 0;
     virtual Node selectNode(const QPointF& pos, bool center) = 0;
     virtual bool selectNode(const Node& node, bool center) = 0;
+    virtual void selectEdge(const Edge& edge) = 0;
     virtual bool deselectNode(const Node& node) = 0;
+    virtual bool deselectEdge(const Edge& edge) = 0;
     virtual Node selectedNode() const = 0;
     virtual QPointF selectedNodePos() const = 0;
     virtual void clearSelection() = 0;
     virtual CacheStatus refreshCache() = 0;
     virtual inline bool inSelectedNodes(const Node& node) const = 0;
+    virtual inline bool inSelectedEdges(const Edge& edge) const = 0;
     virtual inline QPointF nodePoint(const QPointF& pos) = 0;
 
 };
@@ -115,7 +118,10 @@ protected:
     
     void createNode(const QPointF& pos);
     void deleteNode(const QPointF pos);
-
+    
+    bool deselectNode(const Node& node) override;
+    bool deselectEdge(const Edge& edge) override;
+    inline SelectionMode curSelectionMode() const;
     inline void paintEvent(QPaintEvent*) override;
     void mousePressEvent(QMouseEvent* e) override;
     void mouseReleaseEvent(QMouseEvent* e) override;
@@ -126,7 +132,9 @@ protected:
 
 signals:
     void nodeSelected(const Node&);
+    void edgeSelected(const Edge&);
     void nodeDeselected(const Node&);
+    void edgeDeselected(const Edge&);
     void clearedSelected();
     void nodesMoved();
     void updateWidgets(bool) const;
@@ -162,6 +170,7 @@ private:
     SelectionMode m_curMode;
     std::vector<std::shared_ptr<AttrWidget>> m_attrWidgets;
     std::map<int, Node> m_selectedNodes;
+    std::map<int, Edge> m_selectedEdges;
     bool m_fullInspectorVisible;
     QSet<int> sneighbors;
     QSet<int> sedges;
@@ -178,6 +187,9 @@ private:
     void updateEdgeInspector(const Edge& edge);
     void updateNodesInspector(const Node& node);
 };
+
+inline SelectionMode BaseGraphGL::curSelectionMode() const
+{ return m_curMode; }
 
 inline void BaseGraphGL::paintEvent(QPaintEvent*)
 { paint(this, true); }

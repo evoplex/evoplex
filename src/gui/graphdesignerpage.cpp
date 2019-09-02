@@ -95,8 +95,14 @@ GraphDesignerPage::GraphDesignerPage(MainGUI* mainGUI)
     connect(m_graphDesigner->graphView(), &GraphView::nodeSelected, [this](const Node& node) {
         this->m_inspector->slotSelectedNode(node);
     });
+    connect(m_graphDesigner->graphView(), &GraphView::edgeSelected, [this](const Edge& edge) {
+        this->m_inspector->slotSelectedEdge(edge);
+    });
     connect(m_graphDesigner->graphView(), &GraphView::nodeDeselected, [this](const Node& node) {
         this->m_inspector->slotDeselectedNode(node);
+    });
+    connect(m_graphDesigner->graphView(), &GraphView::edgeDeselected, [this](const Edge& edge) {
+        this->m_inspector->slotDeselectedEdge(edge);
     });
     connect(m_graphDesigner->graphView(), SIGNAL(clearedSelected()), m_inspector, SLOT(slotClear()));
 
