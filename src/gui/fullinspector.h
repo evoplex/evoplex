@@ -22,6 +22,7 @@
 #define FULL_INSPECTOR_H
 
 #include <QDockWidget>
+#include <QFormLayout>
 
 #include "core/include/attributerange.h"
 #include "core/include/node.h"
@@ -59,9 +60,11 @@ private:
     Ui_FullInspector* m_ui;
     std::map<int, Node> m_selectedNodes;
     std::map<int, Edge> m_selectedEdges;
-    std::vector<std::shared_ptr<AttrWidget>> m_attrWidgets;
+    std::vector<std::shared_ptr<AttrWidget>> m_nodeAttrWidgets;
 
     void attrValueChanged(int attrId) const;
+    void hideLayout(QFormLayout* layout);
+    void showLayout(QFormLayout* layout);
 };
 
 }

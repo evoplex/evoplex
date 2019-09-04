@@ -39,7 +39,19 @@ FullInspector::FullInspector(QWidget* parent)
 FullInspector::~FullInspector() 
 {
     delete m_ui;
-    m_attrWidgets.clear();
+    m_nodeAttrWidgets.clear();
+}
+
+void FullInspector::hideLayout(QFormLayout* layout) {
+    for (int i = 0; i < layout->count(); ++i) {
+        layout->itemAt(i)->widget()->hide();
+    }
+}
+
+void FullInspector::showLayout(QFormLayout* layout) {
+    for (int i = 0; i < layout->count(); ++i) {
+        layout->itemAt(i)->widget()->show();
+    }
 }
 
 void FullInspector::slotClear() {
@@ -53,25 +65,25 @@ void FullInspector::slotClear() {
 
 void FullInspector::slotChangeAttrScope(AttributesScope nodeAttrScope)
 {
-    while (m_ui->attrs->count()) {
-        auto item = m_ui->attrs->takeRow(0);
+    while (m_ui->nodeAttrs->count()) {
+        auto item = m_ui->nodeAttrs->takeRow(0);
         delete item.labelItem->widget();
         delete item.labelItem;
         delete item.fieldItem;
     }
 
-    m_attrWidgets.clear();
-    m_attrWidgets.resize(static_cast<size_t>(nodeAttrScope.size()));
+    m_nodeAttrWidgets.clear();
+    m_nodeAttrWidgets.resize(static_cast<size_t>(nodeAttrScope.size()));
 
     for (auto attrRange : nodeAttrScope) {
         auto aw = std::make_shared<AttrWidget>(attrRange, nullptr);
         aw->setToolTip(attrRange->attrRangeStr());
         int aId = aw->id();
         connect(aw.get(), &AttrWidget::valueChanged, [this, aId]() { attrValueChanged(aId); });
-        m_attrWidgets.at(attrRange->id()) = aw;
-        m_ui->attrs->insertRow(attrRange->id(), attrRange->attrName(), aw.get());
+        m_nodeAttrWidgets.at(attrRange->id()) = aw;
+        m_ui->nodeAttrs->insertRow(attrRange->id(), attrRange->attrName(), aw.get());
 
-        QWidget* l = m_ui->attrs->labelForField(aw.get());
+        QWidget* l = m_ui->nodeAttrs->labelForField(aw.get());
         l->setToolTip(attrRange->attrName());
         l->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::MinimumExpanding);
         l->setMinimumWidth(m_ui->lattrs->minimumWidth());
@@ -91,7 +103,7 @@ void FullInspector::slotDelete()
 void FullInspector::attrValueChanged(int attrId) const
 {
     std::shared_ptr<AttrWidget> aw;
-    try { aw = m_attrWidgets.at(attrId); }
+    try { aw = m_nodeAttrWidgets.at(attrId); }
     catch (std::out_of_range) { return; }
     
     for (auto node : m_selectedNodes) {
@@ -109,8 +121,13 @@ void FullInspector::attrValueChanged(int attrId) const
 
 void FullInspector::slotSelectedNode(const Node& node)
 {
-    if (m_selectedEdges.size() > 0) {
+    if (m_selectedNodes.size() == 0 &&  m_selectedEdges.size() == 0) {
+        hideLayout(m_ui->edgeAttrs);
+        showLayout(m_ui->nodeAttrs);
+    } else if (m_selectedEdges.size() > 0) {
         slotClear();
+        hideLayout(m_ui->edgeAttrs);
+        showLayout(m_ui->nodeAttrs);
     }
 
     m_ui->textMsg->hide();
@@ -119,7 +136,7 @@ void FullInspector::slotSelectedNode(const Node& node)
 
     m_ui->ids->addItem(QString::number(node.id()));
 
-    for (auto aw : m_attrWidgets) {
+    for (auto aw : m_nodeAttrWidgets) {
         aw->blockSignals(true);
         aw->setValue(node.attr(aw->id()));
         aw->blockSignals(false);
@@ -128,8 +145,13 @@ void FullInspector::slotSelectedNode(const Node& node)
 
 void FullInspector::slotSelectedEdge(const Edge& edge)
 {
-    if (m_selectedNodes.size() > 0) {
+    if (m_selectedNodes.size() == 0 && m_selectedEdges.size() == 0) {
+        hideLayout(m_ui->nodeAttrs);
+        showLayout(m_ui->edgeAttrs);
+    } else if (m_selectedNodes.size() > 0) {
         slotClear();
+        showLayout(m_ui->nodeAttrs);
+        hideLayout(m_ui->edgeAttrs);
     }
     m_ui->textMsg->hide();
     m_ui->inspectorContents->show();

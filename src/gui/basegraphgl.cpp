@@ -90,7 +90,7 @@ BaseGraphGL::BaseGraphGL(QWidget* parent)
 
 BaseGraphGL::~BaseGraphGL()
 {
-    m_attrWidgets.clear();
+    m_nodeAttrWidgets.clear();
     delete m_ui;
 }
 
@@ -199,15 +199,15 @@ void BaseGraphGL::setupInspector()
 
     m_ui->inspector->hide();
 
-    m_attrWidgets.clear();
-    m_attrWidgets.resize(static_cast<size_t>(m_nodeAttrsScope.size()));
+    m_nodeAttrWidgets.clear();
+    m_nodeAttrWidgets.resize(static_cast<size_t>(m_nodeAttrsScope.size()));
 
     for (auto attrRange : m_nodeAttrsScope) {
         auto aw = std::make_shared<AttrWidget>(attrRange, nullptr);
         aw->setToolTip(attrRange->attrRangeStr());
         int aId = aw->id();
         connect(aw.get(), &AttrWidget::valueChanged, [this, aId]() { attrValueChanged(aId); });
-        m_attrWidgets.at(attrRange->id()) = aw;
+        m_nodeAttrWidgets.at(attrRange->id()) = aw;
         m_ui->modelAttrs->insertRow(attrRange->id(), attrRange->attrName(), aw.get());
         QWidget* l = m_ui->modelAttrs->labelForField(aw.get());
         l->setToolTip(attrRange->attrName());
@@ -226,7 +226,7 @@ void BaseGraphGL::attrValueChanged(int attrId) const
     std::shared_ptr<AttrWidget> aw;
 
     try { 
-        aw = m_attrWidgets.at(attrId);
+        aw = m_nodeAttrWidgets.at(attrId);
     } catch (std::out_of_range) { return; }
 
     for (auto node : m_selectedNodes) {
@@ -290,7 +290,7 @@ void BaseGraphGL::updateCache(bool force)
 void BaseGraphGL::slotStatusChanged(Status s)
 {
     m_isReadOnly = s == Status::Running;
-    for (auto aw : m_attrWidgets) {
+    for (auto aw : m_nodeAttrWidgets) {
         if (aw) {
             aw->setReadOnly(m_isReadOnly);
         }
@@ -659,7 +659,7 @@ void BaseGraphGL::updateInspector(const Node& node)
     m_ui->nodesNeighbors->setText(neighbors);
     m_ui->edges->setText(edges);
 
-    for (auto aw : m_attrWidgets) {
+    for (auto aw : m_nodeAttrWidgets) {
         aw->blockSignals(true);
         aw->setValue(node.attr(aw->id()));
         aw->blockSignals(false);

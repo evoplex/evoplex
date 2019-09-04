@@ -168,7 +168,7 @@ private:
     QMutex m_mutex;
     QRect m_inspGeo; // inspector geometry with margin
     SelectionMode m_curMode;
-    std::vector<std::shared_ptr<AttrWidget>> m_attrWidgets;
+    std::vector<std::shared_ptr<AttrWidget>> m_nodeAttrWidgets;
     std::map<int, Node> m_selectedNodes;
     std::map<int, Edge> m_selectedEdges;
     bool m_fullInspectorVisible;
