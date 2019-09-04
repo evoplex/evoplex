@@ -85,10 +85,10 @@ inline QRectF GridView::cellRect(const Node& n, double length) const
 { return QRectF(n.x() * length, n.y() * length, length, length); }
 
 inline bool GridView::inSelectedNodes(const Node& node) const
-{ return m_selectedNodes.count(node.id()) != 0; }
+{ return m_selectedNodes.find(node.id()) != m_selectedNodes.end(); }
 
 inline bool GridView::inSelectedEdges(const Edge& edge) const
-{ return m_selectedEdges.count(edge.id()) != 0; }
+{ return m_selectedEdges.find(edge.id()) != m_selectedEdges.end(); }
 
 inline QPointF GridView::nodePoint(const QPointF& pos)
 { return QPointF(pos.x() / m_nodeRadius, pos.y() / m_nodeRadius); }

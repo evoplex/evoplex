@@ -132,10 +132,10 @@ inline QPointF GraphView::nodePoint(const QPointF& pos)
 { return QPointF(pos.x() / currEdgeSize(), pos.y() / currEdgeSize()); }
 
 inline bool GraphView::inSelectedNodes(const Node& node) const
-{ return m_selectedNodes.count(node.id()) != 0; }
+{ return m_selectedNodes.find(node.id()) != m_selectedNodes.end(); }
 
 inline bool GraphView::inSelectedEdges(const Edge& edge) const
-{ return m_selectedEdges.count(edge.id()) != 0; }
+{ return m_selectedEdges.find(edge.id()) != m_selectedEdges.end(); }
 
 } // evoplex
 #endif // GRAPHVIEW_H
