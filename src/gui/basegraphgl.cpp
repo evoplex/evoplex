@@ -450,11 +450,9 @@ void BaseGraphGL::mouseReleaseEvent(QMouseEvent *e)
                     } else {
                         for (Edge edge : node.outEdges()) {
                             deselectEdge(edge);
-                            emit(edgeDeselected(edge));
                         }
                         deselectNode(node);
                     }
-                    
                 } else {
                     clearSelection();
                 }
@@ -465,7 +463,6 @@ void BaseGraphGL::mouseReleaseEvent(QMouseEvent *e)
                 updateInspector(node);
                 emit(nodeSelected(node));
                 refreshCache();
-                
             }
             m_bCenter->isChecked() ? updateCache() : update();
         } else {
@@ -559,7 +556,8 @@ bool BaseGraphGL::deselectNode(const Node& node) {
 }
 
 bool BaseGraphGL::deselectEdge(const Edge& edge) {
-    if (inSelectedEdges(edge)) {
+    if (m_selectedEdges.find(edge.id()) != m_selectedEdges.end()) {
+        emit(edgeDeselected(edge));
         m_selectedEdges.erase(edge.id());
         return true;
     }

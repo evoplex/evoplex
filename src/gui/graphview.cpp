@@ -177,10 +177,6 @@ void GraphView::selectEdge(const Edge& edge)
 
 bool GraphView::deselectNode(const Node& node)
 {
-    if (m_cacheStatus != CacheStatus::Ready) {
-        return false;
-    }
-
     if (inSelectedNodes(node)) {
         m_selectedNodes.erase(node.id());
         m_selectedStars.erase(node.id());
@@ -193,10 +189,6 @@ bool GraphView::deselectNode(const Node& node)
 
 bool GraphView::deselectEdge(const Edge& edge)
 {
-    if (m_cacheStatus != CacheStatus::Ready) {
-        return false;
-    }
-
     if (inSelectedEdges(edge)) {
         m_selectedEdges.erase(edge.id());
         BaseGraphGL::deselectEdge(edge);
