@@ -22,6 +22,7 @@
 #define FULL_INSPECTOR_H
 
 #include <QDockWidget>
+#include <QFormLayout>
 
 #include "core/include/attributerange.h"
 #include "core/include/node.h"
@@ -45,7 +46,9 @@ public slots:
     void slotHide();
     void slotShow();
     void slotSelectedNode(const Node& node);
+    void slotSelectedEdge(const Edge& edge);
     void slotDeselectedNode(const Node& node);
+    void slotDeselectedEdge(const Edge& edge);
     void slotDelete();
     void slotChangeAttrScope(AttributesScope nodeAttrScope);
 
@@ -56,9 +59,12 @@ private:
     QWidget* m_parent;
     Ui_FullInspector* m_ui;
     std::map<int, Node> m_selectedNodes;
-    std::vector<std::shared_ptr<AttrWidget>> m_attrWidgets;
+    std::map<int, Edge> m_selectedEdges;
+    std::vector<std::shared_ptr<AttrWidget>> m_nodeAttrWidgets;
 
     void attrValueChanged(int attrId) const;
+    void hideLayout(QFormLayout* layout);
+    void showLayout(QFormLayout* layout);
 };
 
 }

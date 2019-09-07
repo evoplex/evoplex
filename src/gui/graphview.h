@@ -44,12 +44,15 @@ protected:
     Node findNode(const QPointF& pos) const override;
     Node selectNode(const QPointF& pos, bool center) override;
     bool selectNode(const Node& node, bool center) override;
+    void selectEdge(const Edge& edge) override;
     bool deselectNode(const Node& node) override;
+    bool deselectEdge(const Edge& edge) override;
     inline Node selectedNode() const override;
     inline QPointF selectedNodePos() const override;
     inline void clearSelection() override;
     CacheStatus refreshCache() override;
     inline bool inSelectedNodes(const Node& node) const override;
+    inline bool inSelectedEdges(const Edge& edge) const override;
     inline QPointF nodePoint(const QPointF& pos) override;
 
 private slots:
@@ -81,13 +84,14 @@ private:
 
     std::map<int, Star> m_selectedStars;
     std::map<int, Node> m_selectedNodes;
+    std::map<int, Edge> m_selectedEdges;
     Star createStar(const Node& node, const qreal& edgeSizeRate, const QPointF& xy);
 
     void drawNode(QPainter& painter, const Star& s, double r) const;
 
     void drawEdges(QPainter& painter) const;
     void drawNodes(QPainter& painter, double nodeRadius) const;
-    void drawSelectedEdge(QPainter& painter, double nodeRadius) const;
+    void drawSelectedEdges(QPainter& painter, double nodeRadius) const;
     void drawSelectedStars(QPainter& painter, double nodeRadius) const;
 
     inline qreal currEdgeSize() const;
@@ -106,6 +110,7 @@ inline void GraphView::clearSelection()
 
     BaseGraphGL::clearSelection();
     m_selectedNodes.clear();
+    m_selectedEdges.clear();
     m_selectedStars.clear();
 }
 
@@ -127,7 +132,10 @@ inline QPointF GraphView::nodePoint(const QPointF& pos)
 { return QPointF(pos.x() / currEdgeSize(), pos.y() / currEdgeSize()); }
 
 inline bool GraphView::inSelectedNodes(const Node& node) const
-{ return m_selectedNodes.count(node.id()) != 0; }
+{ return m_selectedNodes.find(node.id()) != m_selectedNodes.end(); }
+
+inline bool GraphView::inSelectedEdges(const Edge& edge) const
+{ return m_selectedEdges.find(edge.id()) != m_selectedEdges.end(); }
 
 } // evoplex
 #endif // GRAPHVIEW_H
