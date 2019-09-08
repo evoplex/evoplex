@@ -284,7 +284,7 @@ void ExperimentDesigner::setExperiment(ExperimentPtr exp)
             continue;
         }
 
-        AttrWidget* aw = m_attrWidgets.value(header.at(i));
+        AttrWidget* aw = m_nodeAttrWidgets.value(header.at(i));
         Q_ASSERT_X(aw, "ExperimentDesigner",
                    "unable to find the field. It should never happen!");
 
@@ -334,12 +334,12 @@ void ExperimentDesigner::slotEdgesWidget()
         return;
     }
 
-    const QString& cmd = m_attrWidgets.value(GENERAL_ATTR_EDGEATTRS)->value().toQString();
+    const QString& cmd = m_nodeAttrWidgets.value(GENERAL_ATTR_EDGEATTRS)->value().toQString();
     AttrsGenDlg* adlg = new AttrsGenDlg(this, AttrsGenDlg::Mode::Edges,
                                         model->edgeAttrsScope(), cmd);
 
     if (adlg->exec() == QDialog::Accepted) {
-        m_attrWidgets.value(GENERAL_ATTR_EDGEATTRS)->setValue(adlg->readCommand());
+        m_nodeAttrWidgets.value(GENERAL_ATTR_EDGEATTRS)->setValue(adlg->readCommand());
     }
     adlg->deleteLater();
 }
@@ -353,13 +353,13 @@ void ExperimentDesigner::slotNodesWidget()
     }
 
     const ModelPlugin* model = m_mainApp->model(m_selectedModelKey);
-    const QString& cmd = m_attrWidgets.value(GENERAL_ATTR_NODES)->value().toQString();
+    const QString& cmd = m_nodeAttrWidgets.value(GENERAL_ATTR_NODES)->value().toQString();
 
     AttrsGenDlg* adlg = new AttrsGenDlg(this, AttrsGenDlg::Mode::Nodes,
                                         model->nodeAttrsScope(), cmd);
 
     if (adlg->exec() == QDialog::Accepted) {
-        m_attrWidgets.value(GENERAL_ATTR_NODES)->setValue(adlg->readCommand());
+        m_nodeAttrWidgets.value(GENERAL_ATTR_NODES)->setValue(adlg->readCommand());
     }
     adlg->deleteLater();
 }
@@ -371,7 +371,7 @@ void ExperimentDesigner::slotOutputWidget()
         return;
     }
 
-    int numTrials = m_attrWidgets.value(GENERAL_ATTR_TRIALS)->value().toInt();
+    int numTrials = m_nodeAttrWidgets.value(GENERAL_ATTR_TRIALS)->value().toInt();
     std::vector<int> trialIds;
     trialIds.reserve(static_cast<size_t>(numTrials));
     for (int id = 0; id < numTrials; ++id) {
@@ -380,7 +380,7 @@ void ExperimentDesigner::slotOutputWidget()
 
     std::vector<Cache*> currFileCaches;
     const ModelPlugin* model = m_mainApp->model(m_selectedModelKey);
-    QString currentHeader = m_attrWidgets.value(OUTPUT_HEADER)->value().toQString();
+    QString currentHeader = m_nodeAttrWidgets.value(OUTPUT_HEADER)->value().toQString();
     if (!currentHeader.isEmpty()) {
         QString errorMsg;
         currFileCaches = Output::parseHeader(currentHeader.split(";", QString::SkipEmptyParts), trialIds, model, errorMsg);
@@ -401,7 +401,7 @@ void ExperimentDesigner::slotOutputWidget()
         }
         outputStr.chop(1);
 
-        m_attrWidgets.value(OUTPUT_HEADER)->setValue(outputStr);
+        m_nodeAttrWidgets.value(OUTPUT_HEADER)->setValue(outputStr);
     }
     ow->deleteLater();
     for (Cache* c : currFileCaches) c->deleteCache();
@@ -416,8 +416,8 @@ std::unique_ptr<ExpInputs> ExperimentDesigner::readInputs(const int expId, QStri
         error = "Please, select a valid 'graphId'.";
         return nullptr;
     } else if (m_enableOutputs->value().toBool()
-               && (m_attrWidgets.value(OUTPUT_DIR)->value().toQString().isEmpty()
-                   || m_attrWidgets.value(OUTPUT_HEADER)->value().toQString().isEmpty())) {
+               && (m_nodeAttrWidgets.value(OUTPUT_DIR)->value().toQString().isEmpty()
+                   || m_nodeAttrWidgets.value(OUTPUT_HEADER)->value().toQString().isEmpty())) {
         error = "Please, insert a valid output directory and a output header.";
         return nullptr;
     }
@@ -430,7 +430,7 @@ std::unique_ptr<ExpInputs> ExperimentDesigner::readInputs(const int expId, QStri
 
     const QString modelKey_ = Plugin::keyStr(m_selectedModelKey) + "_";
     const QString graphKey_ = Plugin::keyStr(m_selectedGraphKey) + "_";
-    for (auto it = m_attrWidgets.cbegin(); it != m_attrWidgets.cend(); ++it) {
+    for (auto it = m_nodeAttrWidgets.cbegin(); it != m_nodeAttrWidgets.cend(); ++it) {
         if (!it.value()->isEnabled()) {
             continue;
         }
@@ -513,7 +513,7 @@ void ExperimentDesigner::slotEditExperiment()
 
 void ExperimentDesigner::slotGraphSelected(int cbIdx)
 {
-    auto cb = qobject_cast<QComboBox*>(m_attrWidgets.value(GENERAL_ATTR_GRAPHID)->widget());
+    auto cb = qobject_cast<QComboBox*>(m_nodeAttrWidgets.value(GENERAL_ATTR_GRAPHID)->widget());
     m_selectedGraphKey = cb->itemData(cbIdx).value<PluginKey>();
     pluginSelected(m_treeItemGraphs, m_selectedGraphKey);
 
@@ -535,7 +535,7 @@ void ExperimentDesigner::slotGraphSelected(int cbIdx)
 
 void ExperimentDesigner::slotModelSelected(int cbIdx)
 {
-    auto cb = qobject_cast<QComboBox*>(m_attrWidgets.value(GENERAL_ATTR_MODELID)->widget());
+    auto cb = qobject_cast<QComboBox*>(m_nodeAttrWidgets.value(GENERAL_ATTR_MODELID)->widget());
     m_selectedModelKey = cb->itemData(cbIdx).value<PluginKey>();
     pluginSelected(m_treeItemModels, m_selectedModelKey);
 
@@ -573,12 +573,12 @@ void ExperimentDesigner::slotPluginAdded(const Plugin* plugin)
     if (plugin->type() == PluginType::Graph) {
         addPluginAttrs(m_treeItemGraphs, plugin);
         slotGraphSelected(0); // to hide all fields
-        cb = qobject_cast<QComboBox*>(m_attrWidgets.value(GENERAL_ATTR_GRAPHID)->widget());
+        cb = qobject_cast<QComboBox*>(m_nodeAttrWidgets.value(GENERAL_ATTR_GRAPHID)->widget());
         numVersions = m_mainApp->graphs().values(plugin->id()).size();
     } else if (plugin->type() == PluginType::Model) {
         addPluginAttrs(m_treeItemModels, plugin);
         slotModelSelected(0); // to hide all fields
-        cb = qobject_cast<QComboBox*>(m_attrWidgets.value(GENERAL_ATTR_MODELID)->widget());
+        cb = qobject_cast<QComboBox*>(m_nodeAttrWidgets.value(GENERAL_ATTR_MODELID)->widget());
         numVersions = m_mainApp->models().values(plugin->id()).size();
     } else {
         qFatal("invalid plugin type!");
@@ -616,10 +616,10 @@ void ExperimentDesigner::slotPluginRemoved(PluginKey key, PluginType type)
     QComboBox* cb;
     if (type == PluginType::Graph) {
         tree = m_treeItemGraphs;
-        cb = qobject_cast<QComboBox*>(m_attrWidgets.value(GENERAL_ATTR_GRAPHID)->widget());
+        cb = qobject_cast<QComboBox*>(m_nodeAttrWidgets.value(GENERAL_ATTR_GRAPHID)->widget());
     } else if (type == PluginType::Model) {
         tree = m_treeItemModels;
-        cb = qobject_cast<QComboBox*>(m_attrWidgets.value(GENERAL_ATTR_MODELID)->widget());
+        cb = qobject_cast<QComboBox*>(m_nodeAttrWidgets.value(GENERAL_ATTR_MODELID)->widget());
     } else {
         qFatal("invalid plugin type!");
     }
@@ -630,10 +630,10 @@ void ExperimentDesigner::slotPluginRemoved(PluginKey key, PluginType type)
 
     // remove all fields which belog to this plugin
     const QString keyStr_ = Plugin::keyStr(key) + "_";
-    auto it = m_attrWidgets.begin();
-    while (it != m_attrWidgets.end()) {
+    auto it = m_nodeAttrWidgets.begin();
+    while (it != m_nodeAttrWidgets.end()) {
         if (it.key().startsWith(keyStr_)) {
-            it = m_attrWidgets.erase(it);
+            it = m_nodeAttrWidgets.erase(it);
         } else {
             ++it;
         }
@@ -671,7 +671,7 @@ void ExperimentDesigner::addPluginAttrs(QTreeWidgetItem* tree, const Plugin* plu
         auto attrWidget = new AttrWidget(plugin->pluginAttrRange(attrName), this);
         m_ui->treeWidget->setItemWidget(item, 1, attrWidget);
         // add the uid as prefix to avoid clashes.
-        m_attrWidgets.insert(key_ + attrWidget->attrName(), attrWidget);
+        m_nodeAttrWidgets.insert(key_ + attrWidget->attrName(), attrWidget);
     }
 }
 
@@ -680,7 +680,7 @@ AttrWidget* ExperimentDesigner::addGeneralAttr(QTreeWidgetItem* itemRoot,
 {
     AttrWidget* widget = new AttrWidget(
             m_mainApp->generalAttrsScope().value(attrName), this, customWidget);
-    m_attrWidgets.insert(attrName, widget);
+    m_nodeAttrWidgets.insert(attrName, widget);
 
     QTreeWidgetItem* item = new QTreeWidgetItem(itemRoot);
     item->setText(0, attrName);

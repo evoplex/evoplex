@@ -97,6 +97,9 @@ void FullInspector::slotDelete()
     if (m_selectedNodes.size() > 0) {
         m_selectedNodes.clear();
         emit(deleteNodes());
+    } else if (m_selectedEdges.size() > 0) {
+        m_selectedEdges.clear();
+        emit(deleteEdges());
     }
 }
 

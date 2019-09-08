@@ -53,7 +53,7 @@ private:
     MainGUI* m_mainGUI;
 
     QHash<int, PluginKey> m_plugins; // Loaded plugins
-    QHash<QString, AttrWidget*> m_attrWidgets; // Attribute widgets
+    QHash<QString, AttrWidget*> m_nodeAttrWidgets; // Attribute widgets
     PluginKey m_selectedGraphKey;
 
     QStringList m_attrHeader;

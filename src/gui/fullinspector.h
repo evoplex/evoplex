@@ -54,6 +54,7 @@ public slots:
 
 signals:
     void deleteNodes();
+    void deleteEdges();
 
 private:
     QWidget* m_parent;

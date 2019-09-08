@@ -151,6 +151,16 @@ void BaseGraphGL::slotDeleteSelectedNodes()
     updateCache();
 }
 
+void BaseGraphGL::slotDeleteSelectedEdges()
+{
+    for (auto edge : m_selectedEdges) {
+        m_abstractGraph->removeEdge(edge.second);
+    }
+
+    clearSelection();
+    updateCache();
+}
+
 void BaseGraphGL::createNode(const QPointF& pos)
 {
     QPointF p = nodePoint(pos - m_origin);

@@ -73,7 +73,7 @@ void GraphGenDlg::parseAttrs(QString& error)
         return;
     }
 
-    for (auto it = m_attrWidgets.cbegin(); it != m_attrWidgets.cend(); ++it) {
+    for (auto it = m_nodeAttrWidgets.cbegin(); it != m_nodeAttrWidgets.cend(); ++it) {
         if (it.value()->value().toQString().isEmpty()) {
             error = "Empty value not allowed. Make sure to fill in all the attributes.";
             return;
@@ -89,7 +89,7 @@ void GraphGenDlg::parseAttrs(QString& error)
         m_graphType = GraphType::Undirected;
     }
 
-    for (auto it = m_attrWidgets.cbegin(); it != m_attrWidgets.cend(); ++it) {
+    for (auto it = m_nodeAttrWidgets.cbegin(); it != m_nodeAttrWidgets.cend(); ++it) {
         m_attrHeader << m_selectedGraphKey.first + "_" + it.value()->attrName();
         m_attrValues << it.value()->value().toQString('g', 8);
     }
@@ -145,12 +145,12 @@ void GraphGenDlg::slotGraphSelected(int grId)
     // Add plugin attributes
     QHash<QString, AttributeRangePtr>::const_iterator it = graph->pluginAttrsScope().begin();
 
-    m_attrWidgets.clear();
+    m_nodeAttrWidgets.clear();
 
     while (it != graph->pluginAttrsScope().end()) {
         AttrWidget* attrW = new AttrWidget(it.value(), this);
         m_ui->ltattrForm->addRow(it.key(), attrW);
-        m_attrWidgets.insert(it.key(), attrW);
+        m_nodeAttrWidgets.insert(it.key(), attrW);
 
         ++it;
     }

@@ -107,6 +107,7 @@ GraphDesignerPage::GraphDesignerPage(MainGUI* mainGUI)
     connect(m_graphDesigner->graphView(), SIGNAL(clearedSelected()), m_inspector, SLOT(slotClear()));
 
     connect(m_inspector, SIGNAL(deleteNodes()), m_graphDesigner->graphView(), SLOT(slotDeleteSelectedNodes()));
+    connect(m_inspector, SIGNAL(deleteEdges()), m_graphDesigner->graphView(), SLOT(slotDeleteSelectedEdges()));
 
     setCentralWidget(m_graphDesigner);
 

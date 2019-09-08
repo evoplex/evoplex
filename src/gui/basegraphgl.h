@@ -151,6 +151,7 @@ public slots:
     void slotRestarted();
     void slotStatusChanged(Status s);
     void slotDeleteSelectedNodes();
+    void slotDeleteSelectedEdges();
 
 private slots:
     void slotSelectNode(int nodeid);
