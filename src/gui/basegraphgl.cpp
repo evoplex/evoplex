@@ -168,6 +168,11 @@ void BaseGraphGL::createNode(const QPointF& pos)
     updateCache();
 }
 
+void BaseGraphGL::createEdge(const Node& orig, const Node& neigh) {
+    m_abstractGraph->addEdge(orig.id(), neigh.id());
+    updateCache();
+}
+
 void BaseGraphGL::deleteNode(const QPointF pos)
 {
     const Node& node = findNode(pos);
@@ -488,6 +493,8 @@ void BaseGraphGL::mouseReleaseEvent(QMouseEvent *e)
                     updateInspector(movedNode);
                     emit(nodeSelected(movedNode));
                 }
+            } else if (m_curMode == SelectionMode::EdgeEdit && !node.isNull() && !_prevNode.isNull()) {
+                createEdge(_prevNode, node);
             } else {
                 m_origin += (e->pos() - m_posEntered);
                 updateCache();

@@ -118,6 +118,7 @@ protected:
     
     void createNode(const QPointF& pos);
     void deleteNode(const QPointF pos);
+    void createEdge(const Node& orig, const Node& neigh);
     
     bool deselectNode(const Node& node) override;
     bool deselectEdge(const Edge& edge) override;
