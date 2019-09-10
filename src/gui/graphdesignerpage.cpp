@@ -153,7 +153,7 @@ void GraphDesignerPage::changedAttrsScope(const AttrsType type, AttributesScope 
         m_edgeAttrScope = attrs;
     } else if (type == AttrsType::Nodes) {
         m_nodeAttrScope = attrs;
-        m_inspector->slotChangeAttrScope(m_nodeAttrScope);
+        m_inspector->slotChangeNodeAttrsScope(m_nodeAttrScope);
     }
     
     QString errstrng;

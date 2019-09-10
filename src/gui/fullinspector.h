@@ -50,7 +50,8 @@ public slots:
     void slotDeselectedNode(const Node& node);
     void slotDeselectedEdge(const Edge& edge);
     void slotDelete();
-    void slotChangeAttrScope(AttributesScope nodeAttrScope);
+    void slotChangeNodeAttrsScope(AttributesScope attrScope);
+    void slotChangeEdgeAttrsScope(AttributesScope attrScope);
 
 signals:
     void deleteNodes();
@@ -62,10 +63,14 @@ private:
     std::map<int, Node> m_selectedNodes;
     std::map<int, Edge> m_selectedEdges;
     std::vector<std::shared_ptr<AttrWidget>> m_nodeAttrWidgets;
+    std::vector<std::shared_ptr<AttrWidget>> m_edgeAttrWidgets;
 
     void attrValueChanged(int attrId) const;
     void hideLayout(QFormLayout* layout);
     void showLayout(QFormLayout* layout);
+
+private slots:
+    void slotChangeAttrScope(AttributesScope nodeAttrScope, std::vector<std::shared_ptr<AttrWidget>>& attrWidget, QFormLayout* lattrs);
 };
 
 }
