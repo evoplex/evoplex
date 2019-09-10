@@ -65,7 +65,8 @@ private:
     std::vector<std::shared_ptr<AttrWidget>> m_nodeAttrWidgets;
     std::vector<std::shared_ptr<AttrWidget>> m_edgeAttrWidgets;
 
-    void attrValueChanged(int attrId) const;
+    void attrNodeValueChanged(int attrId) const;
+    void attrEdgeValueChanged(int attrId) const;
     void hideLayout(QFormLayout* layout);
     void showLayout(QFormLayout* layout);
 

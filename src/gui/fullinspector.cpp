@@ -69,7 +69,7 @@ void FullInspector::slotChangeNodeAttrsScope(AttributesScope attrScope) {
 }
 
 void FullInspector::slotChangeEdgeAttrsScope(AttributesScope attrScope) {
-
+    slotChangeAttrScope(attrScope, m_edgeAttrWidgets, m_ui->edgeAttrs);
 }
 
 void FullInspector::slotChangeAttrScope(AttributesScope attrScope, std::vector<std::shared_ptr<AttrWidget>>& attrWidget, QFormLayout* lattrs)
@@ -88,7 +88,13 @@ void FullInspector::slotChangeAttrScope(AttributesScope attrScope, std::vector<s
         auto aw = std::make_shared<AttrWidget>(attrRange, nullptr);
         aw->setToolTip(attrRange->attrRangeStr());
         int aId = aw->id();
-        connect(aw.get(), &AttrWidget::valueChanged, [this, aId]() { attrValueChanged(aId); });
+        connect(aw.get(), &AttrWidget::valueChanged, [this, aId, attrWidget]() { 
+            if (this->m_selectedEdges.size() > 0) { 
+                attrEdgeValueChanged(aId);
+            } else {
+                attrNodeValueChanged(aId);
+            }
+        });
         attrWidget.at(attrRange->id()) = aw;
         lattrs->insertRow(attrRange->id(), attrRange->attrName(), aw.get());
 
@@ -111,19 +117,37 @@ void FullInspector::slotDelete()
     }
 }
 
-void FullInspector::attrValueChanged(int attrId) const
+void FullInspector::attrNodeValueChanged(int attrId) const
 {
     std::shared_ptr<AttrWidget> aw;
     try { aw = m_nodeAttrWidgets.at(attrId); }
     catch (std::out_of_range) { return; }
-    
-    for (auto node : m_selectedNodes) {
+
+    for (auto it : m_selectedNodes) {
         Value v = aw->validate();
         if (v.isValid()) {
-            node.second.setAttr(aw->id(), v);
+            it.second.setAttr(aw->id(), v);
         } else {
             aw->blockSignals(true);
-            aw->setValue(node.second.attr(aw->id()));
+            aw->setValue(it.second.attr(aw->id()));
+            aw->blockSignals(false);
+        }
+    }
+}
+
+void FullInspector::attrEdgeValueChanged(int attrId) const
+{
+    std::shared_ptr<AttrWidget> aw;
+    try { aw = m_edgeAttrWidgets.at(attrId); }
+    catch (std::out_of_range) { return; }
+
+    for (auto it : m_selectedEdges) {
+        Value v = aw->validate();
+        if (v.isValid()) {
+            it.second.setAttr(aw->id(), v);
+        } else {
+            aw->blockSignals(true);
+            aw->setValue(it.second.attr(aw->id()));
             aw->blockSignals(false);
         }
     }
@@ -160,14 +184,20 @@ void FullInspector::slotSelectedEdge(const Edge& edge)
         showLayout(m_ui->edgeAttrs);
     } else if (m_selectedNodes.size() > 0) {
         slotClear();
-        showLayout(m_ui->nodeAttrs);
-        hideLayout(m_ui->edgeAttrs);
+        showLayout(m_ui->edgeAttrs);
+        hideLayout(m_ui->nodeAttrs);
     }
     m_ui->textMsg->hide();
     m_ui->inspectorContents->show();
     m_selectedEdges.insert(std::make_pair(edge.id(), edge));
 
     m_ui->ids->addItem(QString::number(edge.id()));
+
+    for (auto aw : m_edgeAttrWidgets) {
+        aw->blockSignals(true);
+        aw->setValue(edge.attr(aw->id()));
+        aw->blockSignals(false);
+    }
 }
 
 void FullInspector::slotDeselectedNode(const Node& node)
