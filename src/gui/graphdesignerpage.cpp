@@ -151,7 +151,7 @@ void GraphDesignerPage::changedAttrsScope(const AttrsType type, AttributesScope 
 {
     if (type == AttrsType::Edges) {
         m_edgeAttrScope = attrs;
-        m_inspector->slotChangeEdgeAttrsScope(m_nodeAttrScope);
+        m_inspector->slotChangeEdgeAttrsScope(m_edgeAttrScope);
     } else if (type == AttrsType::Nodes) {
         m_nodeAttrScope = attrs;
         m_inspector->slotChangeNodeAttrsScope(m_nodeAttrScope);

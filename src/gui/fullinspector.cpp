@@ -17,7 +17,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-
 #include <QDockWidget>
 
 #include "fullinspector.h"
@@ -88,13 +87,12 @@ void FullInspector::slotChangeAttrScope(AttributesScope attrScope, std::vector<s
         auto aw = std::make_shared<AttrWidget>(attrRange, nullptr);
         aw->setToolTip(attrRange->attrRangeStr());
         int aId = aw->id();
-        connect(aw.get(), &AttrWidget::valueChanged, [this, aId, attrWidget]() { 
-            if (this->m_selectedEdges.size() > 0) { 
-                attrEdgeValueChanged(aId);
-            } else {
-                attrNodeValueChanged(aId);
-            }
-        });
+        if (m_edgeAttrWidgets == attrWidget) {
+            connect(aw.get(), &AttrWidget::valueChanged, [this, aId]() { attrEdgeValueChanged(aId); });
+        } else {
+            connect(aw.get(), &AttrWidget::valueChanged, [this, aId]() { attrNodeValueChanged(aId); });
+        }
+        
         attrWidget.at(attrRange->id()) = aw;
         lattrs->insertRow(attrRange->id(), attrRange->attrName(), aw.get());
 
@@ -155,13 +153,13 @@ void FullInspector::attrEdgeValueChanged(int attrId) const
 
 void FullInspector::slotSelectedNode(const Node& node)
 {
-    if (m_selectedNodes.size() == 0 &&  m_selectedEdges.size() == 0) {
-        hideLayout(m_ui->edgeAttrs);
-        showLayout(m_ui->nodeAttrs);
-    } else if (m_selectedEdges.size() > 0) {
+    if (m_selectedEdges.size() > 0) {
         slotClear();
-        hideLayout(m_ui->edgeAttrs);
+    } 
+    
+    if (m_selectedNodes.size() == 0) {
         showLayout(m_ui->nodeAttrs);
+        hideLayout(m_ui->edgeAttrs);
     }
 
     m_ui->textMsg->hide();
@@ -179,11 +177,11 @@ void FullInspector::slotSelectedNode(const Node& node)
 
 void FullInspector::slotSelectedEdge(const Edge& edge)
 {
-    if (m_selectedNodes.size() == 0 && m_selectedEdges.size() == 0) {
-        hideLayout(m_ui->nodeAttrs);
-        showLayout(m_ui->edgeAttrs);
-    } else if (m_selectedNodes.size() > 0) {
+    if (m_selectedNodes.size() > 0) {
         slotClear();
+    } 
+    
+    if (m_selectedEdges.size() == 0) {
         showLayout(m_ui->edgeAttrs);
         hideLayout(m_ui->nodeAttrs);
     }
