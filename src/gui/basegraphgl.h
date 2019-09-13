@@ -84,7 +84,7 @@ class BaseGraphGL : public QOpenGLWidget, public GraphGLInterface
 public:
     ~BaseGraphGL() override;
 
-    void setup(AbstractGraph* abstractGraph, AttributesScope nodeAttrsScope);
+    void setup(AbstractGraph* abstractGraph, AttributesScope nodeAttrsScope, AttributesScope edgeAttrsScope);
 
     void paint(QPaintDevice* device, bool paintBackground) const;
 
@@ -96,6 +96,7 @@ protected:
     Ui_BaseGraphGL* m_ui;
     AbstractGraph* m_abstractGraph;
     AttributesScope m_nodeAttrsScope;
+    AttributesScope m_edgeAttrsScope;
     bool m_isReadOnly;
 
     int m_currStep;
@@ -170,13 +171,15 @@ private:
     QMutex m_mutex;
     QRect m_inspGeo; // inspector geometry with margin
     SelectionMode m_curMode;
+    std::vector<std::shared_ptr<AttrWidget>> m_edgeAttrWidgets;
     std::vector<std::shared_ptr<AttrWidget>> m_nodeAttrWidgets;
     std::map<int, Node> m_selectedNodes;
     std::map<int, Edge> m_selectedEdges;
     bool m_fullInspectorVisible;
     QSet<int> sneighbors;
     QSet<int> sedges;
-    Attributes m_attrs;
+    Attributes m_nodeAttrs;
+    Attributes m_edgeAttrs;
 
     void attrValueChanged(int attrId) const;
 
