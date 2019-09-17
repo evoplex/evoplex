@@ -79,7 +79,7 @@ private:
     QTreeWidgetItem* m_treeItemOutputs;
     QTreeWidgetItem* m_treeItemModels;
     QTreeWidgetItem* m_treeItemGraphs;
-    QHash<QString, AttrWidget*> m_attrWidgets;
+    QHash<QString, AttrWidget*> m_nodeAttrWidgets;
     AttrWidget* m_enableOutputs;
     int m_graphTypeIdx;  // position of the graphtype combobox in the graph tree
     int m_edgesAttrsIdx; // position of the edgesAttrs field in the graph tree

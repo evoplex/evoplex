@@ -45,7 +45,8 @@ BaseGraphGL::BaseGraphGL(QWidget* parent)
       m_posEntered(0,0),
       m_curMode(SelectionMode::Select),
       m_fullInspectorVisible(false),
-      m_attrs(Attributes(0))
+      m_nodeAttrs(Attributes(0)),
+      m_edgeAttrs(Attributes(0))
 {
     m_ui->setupUi(this);
 
@@ -94,14 +95,26 @@ BaseGraphGL::~BaseGraphGL()
     delete m_ui;
 }
 
-void BaseGraphGL::setup(AbstractGraph* abstractGraph, AttributesScope nodeAttrsScope)
+void BaseGraphGL::setup(AbstractGraph* abstractGraph, AttributesScope nodeAttrsScope, AttributesScope edgeAttrsScope)
 {
     m_abstractGraph = abstractGraph;
     m_nodeAttrsScope = nodeAttrsScope;
+    m_edgeAttrsScope = edgeAttrsScope;
     setupInspector();
     updateCache();
-    if (m_abstractGraph && !m_abstractGraph->nodes().empty()) {
-        m_attrs = m_abstractGraph->node(0).attrs();
+    m_nodeAttrs.resize(m_nodeAttrsScope.size());
+    m_edgeAttrs.resize(m_edgeAttrsScope.size());
+
+    int n = 0;
+    for(auto i = m_nodeAttrsScope.begin(); i != m_nodeAttrsScope.end(); ++i) {
+        m_nodeAttrs.replace(n, i.value().get()->attrName(), i.value().get()->min());
+        ++n;
+    }
+
+    n = 0;
+    for(auto i = m_edgeAttrsScope.begin(); i != m_edgeAttrsScope.end(); ++i) {
+        m_edgeAttrs.replace(n, i.value().get()->attrName(), i.value().get()->min());
+        ++n;
     }
 }
 
@@ -151,10 +164,27 @@ void BaseGraphGL::slotDeleteSelectedNodes()
     updateCache();
 }
 
+void BaseGraphGL::slotDeleteSelectedEdges()
+{
+    for (auto edge : m_selectedEdges) {
+        const Edge e = m_abstractGraph->edge(edge.second.id());
+        m_abstractGraph->removeEdge(e);
+    }
+
+    clearSelection();
+    updateCache();
+}
+
 void BaseGraphGL::createNode(const QPointF& pos)
 {
     QPointF p = nodePoint(pos - m_origin);
-    m_abstractGraph->addNode(m_attrs, p.x(), p.y());
+    m_abstractGraph->addNode(m_nodeAttrs, p.x(), p.y());
+    updateCache();
+}
+
+void BaseGraphGL::createEdge(const Node& orig, const Node& neigh) {
+    Attributes* edgeAttrs = &m_edgeAttrs;
+    m_abstractGraph->addEdge(orig.id(), neigh.id(), edgeAttrs);
     updateCache();
 }
 
@@ -301,7 +331,7 @@ void BaseGraphGL::slotRestarted()
 {
     clearSelection();
     setCurrentStep(-1); // TODO
-    setup(nullptr, AttributesScope());
+    setup(nullptr, AttributesScope(), AttributesScope());
 }
 
 void BaseGraphGL::edgesListItemClicked(QListWidgetItem* item)
@@ -478,6 +508,8 @@ void BaseGraphGL::mouseReleaseEvent(QMouseEvent *e)
                     updateInspector(movedNode);
                     emit(nodeSelected(movedNode));
                 }
+            } else if (m_curMode == SelectionMode::EdgeEdit && !node.isNull() && !_prevNode.isNull()) {
+                createEdge(_prevNode, node);
             } else {
                 m_origin += (e->pos() - m_posEntered);
                 updateCache();

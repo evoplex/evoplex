@@ -98,7 +98,7 @@ GraphWidget::~GraphWidget()
 
 void GraphWidget::setup(AbstractGraph* abstractGraph, AttributesScope nodeAttrsScope, AttributesScope edgeAttrsScope)
 {
-    m_view->setup(abstractGraph, nodeAttrsScope);
+    m_view->setup(abstractGraph, nodeAttrsScope, edgeAttrsScope);
     if (auto settings = qobject_cast<GraphSettings*>(m_settingsDlg)) {
         settings->setup(nodeAttrsScope, edgeAttrsScope);
     } else if (auto settings = qobject_cast<GridSettings*>(m_settingsDlg)) {
