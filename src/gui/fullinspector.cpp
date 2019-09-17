@@ -63,15 +63,15 @@ void FullInspector::slotClear() {
     m_selectedEdges.clear();
 }
 
-void FullInspector::slotChangeNodeAttrsScope(AttributesScope attrScope) {
+void FullInspector::slotChangeNodeAttrsScope(AttributesScope& attrScope) {
     slotChangeAttrScope(attrScope, m_nodeAttrWidgets, m_ui->nodeAttrs);
 }
 
-void FullInspector::slotChangeEdgeAttrsScope(AttributesScope attrScope) {
+void FullInspector::slotChangeEdgeAttrsScope(AttributesScope& attrScope) {
     slotChangeAttrScope(attrScope, m_edgeAttrWidgets, m_ui->edgeAttrs);
 }
 
-void FullInspector::slotChangeAttrScope(AttributesScope attrScope, std::vector<std::shared_ptr<AttrWidget>>& attrWidget, QFormLayout* lattrs)
+void FullInspector::slotChangeAttrScope(AttributesScope& attrScope, std::vector<std::shared_ptr<AttrWidget>>& attrWidget, QFormLayout* lattrs)
 {
     while (lattrs->count()) {
         auto item = lattrs->takeRow(0);

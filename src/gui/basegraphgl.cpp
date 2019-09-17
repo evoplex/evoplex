@@ -167,7 +167,8 @@ void BaseGraphGL::slotDeleteSelectedNodes()
 void BaseGraphGL::slotDeleteSelectedEdges()
 {
     for (auto edge : m_selectedEdges) {
-        m_abstractGraph->removeEdge(edge.second);
+        const Edge e = m_abstractGraph->edge(edge.second.id());
+        m_abstractGraph->removeEdge(e);
     }
 
     clearSelection();
